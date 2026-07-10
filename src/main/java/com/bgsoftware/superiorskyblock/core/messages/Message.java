@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -796,7 +795,9 @@ public enum Message {
                 message = Formatters.COLOR_FORMATTER.format(message);
             }
 
-            plugin.getProviders().getMessagesProvider().createRawMessageComponent(message).sendMessage(sender);
+            MessagesService.Builder builder = messagesService.get().newBuilder();
+            builder.addRawMessage(message);
+            builder.build().sendMessage(sender);
         }
 
     };
@@ -805,10 +806,10 @@ public enum Message {
     private static final Object[] EMPTY_ARGS = new Object[0];
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final LazyReference<MessagesServiceImpl> messagesService = new LazyReference<MessagesServiceImpl>() {
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
         @Override
-        protected MessagesServiceImpl create() {
-            return (MessagesServiceImpl) plugin.getServices().getService(MessagesService.class);
+        protected MessagesService create() {
+            return plugin.getServices().getService(MessagesService.class);
         }
     };
 

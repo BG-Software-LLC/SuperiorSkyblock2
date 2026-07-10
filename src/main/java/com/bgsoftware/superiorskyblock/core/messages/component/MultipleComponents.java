@@ -1,16 +1,17 @@
 package com.bgsoftware.superiorskyblock.core.messages.component;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class MultipleComponents implements IMessageComponent {
 
@@ -19,27 +20,27 @@ public class MultipleComponents implements IMessageComponent {
     private final List<IMessageComponent> messageComponents;
 
     public static IMessageComponent parseSection(ConfigurationSection section) {
-        List<IMessageComponent> messageComponents = new LinkedList<>();
+        MessagesService.Builder builder = plugin.getServices().getService(MessagesService.class).newBuilder();
 
         for (String key : section.getKeys(false)) {
             switch (key) {
                 case "action-bar": {
                     String text = section.getString(key + ".text");
 
-                    messageComponents.add(plugin.getProviders().getMessagesProvider().createActionBarComponent(text));
+                    builder.addActionBar(text);
                     break;
                 }
                 case "bossbar": {
                     String message = section.getString(key + ".message");
-                    String color = section.getString(key + ".color", "PINK").toUpperCase();
-                    String overlay = section.getString(key + ".overlay", "PROGRESS").toUpperCase();
+                    String color = section.getString(key + ".color", "PINK").toUpperCase(Locale.ENGLISH);
+                    String overlay = section.getString(key + ".overlay", "PROGRESS").toUpperCase(Locale.ENGLISH);
                     int ticks = section.getInt(key + ".ticks");
 
-                    messageComponents.add(plugin.getProviders().getMessagesProvider().createBossBarComponent(message, color, overlay, ticks));
+                    builder.addBossBar(message, BossBar.Color.getSafe(color), BossBar.Style.getSafe(overlay), ticks);
                     break;
                 }
                 case "sound":
-                    messageComponents.add(SoundComponent.of(MenuParserImpl.getInstance().getSound(section.getConfigurationSection("sound"))));
+                    builder.addSound(MenuParserImpl.getInstance().getSound(section.getConfigurationSection("sound")));
                     break;
                 case "title": {
                     String title = section.getString(key + ".title");
@@ -48,7 +49,7 @@ public class MultipleComponents implements IMessageComponent {
                     int duration = section.getInt(key + ".duration");
                     int fadeOut = section.getInt(key + ".fade-out");
 
-                    messageComponents.add(plugin.getProviders().getMessagesProvider().createTitleComponent(title, subtitle, fadeIn, duration, fadeOut));
+                    builder.addTitle(title, subtitle, fadeIn, duration, fadeOut);
                     break;
                 }
                 default: {
@@ -58,9 +59,10 @@ public class MultipleComponents implements IMessageComponent {
                     String tooltip = section.getString(key + ".tooltip");
 
                     if (command != null || suggest != null || tooltip != null) {
-                        messageComponents.add(ComplexMessageComponent.of(Formatters.COLOR_FORMATTER.format(text), command, suggest, tooltip));
+                        builder.addComplexMessage(ComplexMessageComponent.parseBaseComponents(
+                                Formatters.COLOR_FORMATTER.format(text), command, suggest, tooltip));
                     } else {
-                        messageComponents.add(plugin.getProviders().getMessagesProvider().createRawMessageComponent(text));
+                        builder.addRawMessage(text);
                     }
 
                     break;
@@ -68,9 +70,7 @@ public class MultipleComponents implements IMessageComponent {
             }
         }
 
-        messageComponents.removeIf(component -> component.getType() == Type.EMPTY);
-
-        return of(messageComponents);
+        return builder.build();
     }
 
     public static IMessageComponent of(List<IMessageComponent> messageComponents) {

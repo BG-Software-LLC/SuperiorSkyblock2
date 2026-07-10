@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
+import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -64,13 +65,20 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addActionBar(@Nullable String message) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider().createActionBarComponent(message));
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createActionBarComponent(message));
         }
 
         @Override
-        public boolean addBossBar(@Nullable String message, BossBar.Color color, int ticks) {
+        public boolean addBossBar(@Nullable String message, BossBar.Color color, int duration) {
             return addMessageComponent(plugin.getProviders().getMessagesProvider()
-                    .createBossBarComponent(message, color.name(), "solid", ticks));
+                    .createBossBarComponent(message, color, BossBar.Style.SOLID, duration));
+        }
+
+        @Override
+        public boolean addBossBar(@Nullable String message, BossBar.Color color, BossBar.Style style, int duration) {
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createBossBarComponent(message, color, style, duration));
         }
 
         @Override
@@ -85,12 +93,18 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addRawMessage(@Nullable String message) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider().createRawMessageComponent(message));
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createRawMessageComponent(message));
         }
 
         @Override
         public boolean addSound(Sound sound, float volume, float pitch) {
             return addMessageComponent(SoundComponent.of(new GameSoundImpl(sound, volume, pitch)));
+        }
+
+        @Override
+        public boolean addSound(@Nullable GameSound gameSound) {
+            return addMessageComponent(SoundComponent.of(gameSound));
         }
 
         @Override

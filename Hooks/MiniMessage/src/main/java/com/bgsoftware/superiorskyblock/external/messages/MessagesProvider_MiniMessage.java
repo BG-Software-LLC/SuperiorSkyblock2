@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.external.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.hooks.MessagesProvider;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -28,7 +27,13 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public class MessagesProvider_MiniMessage implements MessagesProvider {
 
+    // Adventure 5.x renamed the Title.Times factory method from 'of' to 'times',
+    // breaking binary compatibility with Adventure 4.x. Resolve the method
+    // reflectively so a single build works on both versions.
+    private static final ReflectMethod<Title.Times> TITLE_TIMES_FACTORY = getTitleTimesFactory();
+
     private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().tags(StandardTags.defaults()).build();
+    private static final LegacyComponentSerializer LEGACY_COMPONENT_SERIALIZER = LegacyComponentSerializer.legacySection();
 
     public MessagesProvider_MiniMessage(SuperiorSkyblockPlugin plugin) {
         Log.info("Using MiniMessage as a messages provider.");
@@ -40,22 +45,9 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
     }
 
     @Override
-    public IMessageComponent createBossBarComponent(String name, String color, String overlay, int duration) {
-        BossBar.Color bossBarColor;
-        try {
-            bossBarColor = BossBar.Color.valueOf(color);
-        } catch (IllegalArgumentException error) {
-            bossBarColor = BossBar.Color.PINK;
-        }
-
-        BossBar.Overlay bossBarOverlay;
-        try {
-            bossBarOverlay = BossBar.Overlay.valueOf(overlay);
-        } catch (IllegalArgumentException error) {
-            bossBarOverlay = BossBar.Overlay.PROGRESS;
-        }
-
-        return BossBarComponent.of(name, bossBarColor, bossBarOverlay, duration);
+    public IMessageComponent createBossBarComponent(String message, com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar.Color color,
+                                                    com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar.Style style, int duration) {
+        return BossBarComponent.of(message, BossBar.Color.valueOf(color.name()), BossBar.Overlay.valueOf(style.getOverlayName()), duration);
     }
 
     @Override
@@ -64,8 +56,31 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
     }
 
     @Override
-    public IMessageComponent createTitleComponent(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
-        return TitleComponent.of(title, subtitle, fadeIn, stay, fadeOut);
+    public IMessageComponent createTitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int stay, int fadeOut) {
+        return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
+    }
+
+    private static ReflectMethod<Title.Times> getTitleTimesFactory() {
+        ReflectMethod<Title.Times> method = new ReflectMethod<>(Title.Times.class, "times",
+                Duration.class, Duration.class, Duration.class);
+
+        if (method.isValid()) {
+            return method;
+        }
+
+        method = new ReflectMethod<>(Title.Times.class, "of",
+                Duration.class, Duration.class, Duration.class);
+
+        if (method.isValid()) {
+            return method;
+        }
+
+        throw new ExceptionInInitializerError("Couldn't find a method to create a Title for MiniMessage.");
+    }
+
+    private static Title.Times createTimes(int fadeIn, int stay, int fadeOut) {
+        return TITLE_TIMES_FACTORY.invoke(null, Duration.ofMillis(fadeIn * 50L),
+                Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L));
     }
 
     private static Component deserialize(String message) {
@@ -74,7 +89,7 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
         try {
             return MINI_MESSAGE.deserialize(formattedMessage);
         } catch (ParsingException exception) {
-            return LegacyComponentSerializer.legacySection().deserialize(formattedMessage);
+            return LEGACY_COMPONENT_SERIALIZER.deserialize(formattedMessage);
         }
     }
 
@@ -200,34 +215,6 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
                 sender.sendMessage(deserialize(message)));
         }
 
-    }
-
-    // Adventure 5.x renamed the Title.Times factory method from 'of' to 'times',
-    // breaking binary compatibility with Adventure 4.x. Resolve the method
-    // reflectively so a single build works on both versions.
-    private static final ReflectMethod<Title.Times> TITLE_TIMES_FACTORY = getTitleTimesFactory();
-
-    private static ReflectMethod<Title.Times> getTitleTimesFactory() {
-        ReflectMethod<Title.Times> method = new ReflectMethod<>(Title.Times.class, "times",
-                Duration.class, Duration.class, Duration.class);
-
-        if (method.isValid()) {
-            return method;
-        }
-
-        method = new ReflectMethod<>(Title.Times.class, "of",
-                Duration.class, Duration.class, Duration.class);
-
-        if (method.isValid()) {
-            return method;
-        }
-
-        throw new ExceptionInInitializerError("Couldn't find a method to create a Title for MiniMessage.");
-    }
-
-    private static Title.Times createTimes(int fadeIn, int stay, int fadeOut) {
-        return TITLE_TIMES_FACTORY.invoke(null, Duration.ofMillis(fadeIn * 50L),
-                Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L));
     }
 
     private static class TitleComponent implements IMessageComponent {

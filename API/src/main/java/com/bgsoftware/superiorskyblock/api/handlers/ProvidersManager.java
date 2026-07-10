@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.MessagesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
@@ -127,18 +126,6 @@ public interface ProvidersManager {
      * @param menuProvider The new menus-provider to use.
      */
     void setMenusProvider(MenusProvider menuProvider);
-
-    /**
-     * Get the currently used messages-provider.
-     */
-    MessagesProvider getMessagesProvider();
-
-    /**
-     * Set a new messages-provider to the plugin.
-     *
-     * @param messagesProvider The new messages-provider to use.
-     */
-    void setMessagesProvider(MessagesProvider messagesProvider);
 
     /**
      * Get the currently used permissions-provider.

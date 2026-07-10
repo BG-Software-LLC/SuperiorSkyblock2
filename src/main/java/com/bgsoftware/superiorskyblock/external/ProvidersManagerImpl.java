@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.MessagesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
@@ -42,6 +41,7 @@ import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
 import com.bgsoftware.superiorskyblock.external.chunks.ChunksProvider_Default;
 import com.bgsoftware.superiorskyblock.external.economy.EconomyProvider_Default;
 import com.bgsoftware.superiorskyblock.external.menus.MenusProvider_Default;
+import com.bgsoftware.superiorskyblock.external.messages.MessagesProvider;
 import com.bgsoftware.superiorskyblock.external.messages.MessagesProvider_Default;
 import com.bgsoftware.superiorskyblock.external.permissions.PermissionsProvider_Default;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
@@ -251,16 +251,6 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     @Override
-    public MessagesProvider getMessagesProvider() {
-        return messagesProvider;
-    }
-
-    @Override
-    public void setMessagesProvider(MessagesProvider messagesProvider) {
-        this.messagesProvider = messagesProvider;
-    }
-
-    @Override
     public PermissionsProvider getPermissionsProvider() {
         return permissionsProvider;
     }
@@ -323,6 +313,14 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     @Override
     public void unregisterStackedBlocksListener(IStackedBlocksListener stackedBlocksListener) {
         this.stackedBlocksListeners.remove(stackedBlocksListener);
+    }
+
+    public MessagesProvider getMessagesProvider() {
+        return messagesProvider;
+    }
+
+    public void setMessagesProvider(MessagesProvider messagesProvider) {
+        this.messagesProvider = messagesProvider;
     }
 
     public void registerCustomBlocksProvider(ICustomBlocksProvider customBlocksProvider) {

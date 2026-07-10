@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -13,6 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 public class CmdAdminTitle implements IAdminPlayerCommand {
+
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
+        @Override
+        protected MessagesService create() {
+            return SuperiorSkyblockPlugin.getPlugin().getServices().getService(MessagesService.class);
+        }
+    };
 
     @Override
     public List<String> getAliases() {
@@ -92,8 +101,9 @@ public class CmdAdminTitle implements IAdminPlayerCommand {
             return;
         }
 
-        plugin.getProviders().getMessagesProvider().createTitleComponent(title, subtitle,
-                fadeIn.getNumber(), duration.getNumber(), fadeOut.getNumber()).sendMessage(targetPlayer.asPlayer());
+        MessagesService.Builder builder = messagesService.get().newBuilder();
+        builder.addTitle(title, subtitle, fadeIn.getNumber(), duration.getNumber(), fadeOut.getNumber());
+        builder.build().sendMessage(targetPlayer.asPlayer());
 
         Message.TITLE_SENT.send(sender, targetPlayer.getName());
     }

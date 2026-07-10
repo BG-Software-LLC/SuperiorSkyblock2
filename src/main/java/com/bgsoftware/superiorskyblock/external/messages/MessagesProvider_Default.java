@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.external.messages;
 
-import com.bgsoftware.superiorskyblock.api.hooks.MessagesProvider;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -17,22 +16,8 @@ public class MessagesProvider_Default implements MessagesProvider {
     }
 
     @Override
-    public IMessageComponent createBossBarComponent(String name, String color, String style, int duration) {
-        BossBar.Color bossBarColor;
-        try {
-            bossBarColor = BossBar.Color.valueOf(color);
-        } catch (Exception error) {
-            bossBarColor = BossBar.Color.PINK;
-        }
-
-        BossBar.Style bossBarStyle;
-        try {
-            bossBarStyle = BossBar.Style.valueOf(style);
-        } catch (Exception error) {
-            bossBarStyle = BossBar.Style.SOLID;
-        }
-
-        return BossBarComponent.of(Formatters.COLOR_FORMATTER.format(name), bossBarColor, bossBarStyle, duration);
+    public IMessageComponent createBossBarComponent(String message, BossBar.Color color, BossBar.Style style, int duration) {
+        return BossBarComponent.of(Formatters.COLOR_FORMATTER.format(message), color, style, duration);
     }
 
     @Override
@@ -41,9 +26,9 @@ public class MessagesProvider_Default implements MessagesProvider {
     }
 
     @Override
-    public IMessageComponent createTitleComponent(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
-        return TitleComponent.of(Formatters.COLOR_FORMATTER.format(title),
-                Formatters.COLOR_FORMATTER.format(subtitle), fadeIn, stay, fadeOut);
+    public IMessageComponent createTitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int stay, int fadeOut) {
+        return TitleComponent.of(Formatters.COLOR_FORMATTER.format(titleMessage),
+                Formatters.COLOR_FORMATTER.format(subtitleMessage), fadeIn, stay, fadeOut);
     }
 
 }

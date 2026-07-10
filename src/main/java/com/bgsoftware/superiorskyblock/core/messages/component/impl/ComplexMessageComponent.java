@@ -14,15 +14,16 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 public class ComplexMessageComponent implements IMessageComponent {
+
+    private static final BaseComponent[] EMPTY_BASE_COMPONENT_ARRAY = new BaseComponent[0];
 
     private final IWrappedComponent[] components;
     private final MessageContent content;
 
-    public static IMessageComponent of(@Nullable String text, @Nullable String command, @Nullable String suggest, @Nullable String tooltip) {
+    public static BaseComponent[] parseBaseComponents(@Nullable String text, @Nullable String command, @Nullable String suggest, @Nullable String tooltip) {
         if (Text.isBlank(text)) {
-            return EmptyMessageComponent.getInstance();
+            return EMPTY_BASE_COMPONENT_ARRAY;
         }
 
         BaseComponent[] baseComponents = TextComponent.fromLegacyText(text);
@@ -46,7 +47,7 @@ public class ComplexMessageComponent implements IMessageComponent {
             }
         }
 
-        return new ComplexMessageComponent(baseComponents);
+        return baseComponents;
     }
 
     public static IMessageComponent of(@Nullable BaseComponent[] baseComponents) {
