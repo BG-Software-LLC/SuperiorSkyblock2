@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.external.messages;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.MessagesProvider;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
@@ -20,7 +21,6 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
@@ -205,27 +205,29 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
     // Adventure 5.x renamed the Title.Times factory method from 'of' to 'times',
     // breaking binary compatibility with Adventure 4.x. Resolve the method
     // reflectively so a single build works on both versions.
-    private static final Method TITLE_TIMES_FACTORY = getTitleTimesFactory();
+    private static final ReflectMethod<Title.Times> TITLE_TIMES_FACTORY = getTitleTimesFactory();
 
-    private static Method getTitleTimesFactory() {
-        try {
-            return Title.Times.class.getMethod("times", Duration.class, Duration.class, Duration.class);
-        } catch (NoSuchMethodException exception) {
-            try {
-                return Title.Times.class.getMethod("of", Duration.class, Duration.class, Duration.class);
-            } catch (NoSuchMethodException exception1) {
-                throw new ExceptionInInitializerError(exception1);
-            }
+    private static ReflectMethod<Title.Times> getTitleTimesFactory() {
+        ReflectMethod<Title.Times> method = new ReflectMethod<>(Title.Times.class, "times",
+                Duration.class, Duration.class, Duration.class);
+
+        if (method.isValid()) {
+            return method;
         }
+
+        method = new ReflectMethod<>(Title.Times.class, "of",
+                Duration.class, Duration.class, Duration.class);
+
+        if (method.isValid()) {
+            return method;
+        }
+
+        throw new ExceptionInInitializerError("Couldn't find a method to create a Title for MiniMessage.");
     }
 
     private static Title.Times createTimes(int fadeIn, int stay, int fadeOut) {
-        try {
-            return (Title.Times) TITLE_TIMES_FACTORY.invoke(null, Duration.ofMillis(fadeIn * 50L),
-                    Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L));
-        } catch (ReflectiveOperationException ex) {
-            throw new RuntimeException(ex);
-        }
+        return TITLE_TIMES_FACTORY.invoke(null, Duration.ofMillis(fadeIn * 50L),
+                Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L));
     }
 
     private static class TitleComponent implements IMessageComponent {
