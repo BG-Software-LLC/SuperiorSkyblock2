@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.missions.blocks.BlocksTracker;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
+import com.bgsoftware.superiorskyblock.missions.common.FoliaUtil;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.KeyRequirements;
 import com.bgsoftware.superiorskyblock.missions.common.tracker.KeyDataTracker;
@@ -72,16 +73,20 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
     protected void registerListeners() {
         registerListener(this);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Runnable foliaHookTask = () -> {
             if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
                 registerListener(new WildStackerListener());
                 this.isBarrelCheck = block -> WildStackerAPI.getWildStacker().getSystemManager().isStackedBarrel(block);
             }
-
             if (Bukkit.getPluginManager().isPluginEnabled("WildTools")) {
                 registerListener(new WildToolsListener());
             }
-        }, 1L);
+        };
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runGlobalDelayed(plugin, foliaHookTask, 1L);
+        } else {
+            Bukkit.getScheduler().runTaskLater(plugin, foliaHookTask, 1L);
+        }
     }
 
     @Override
@@ -238,10 +243,15 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
         if (this.onlyNatural) {
             // We want to track block broken & placed only if this mission only progresses for natural blocks
             // We do that in a delayed tick so all other missions will check for their progress as well.
-            Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            Runnable trackTask = () -> {
                 BlocksTracker.INSTANCE.untrackBlock(BlocksTracker.TrackingType.BROKEN_BLOCKS, e.getBlock());
                 BlocksTracker.INSTANCE.trackBlock(BlocksTracker.TrackingType.PLACED_BLOCKS, e.getBlock());
-            }, 1L);
+            };
+            if (FoliaUtil.isFolia()) {
+                FoliaUtil.runGlobalDelayed(this.plugin, trackTask, 1L);
+            } else {
+                Bukkit.getScheduler().runTaskLater(this.plugin, trackTask, 1L);
+            }
         }
     }
 
@@ -264,10 +274,15 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
         if (this.onlyNatural) {
             // We want to track block broken & placed only if this mission only progresses for natural blocks
             // We do that in a delayed tick so all other missions will check for their progress as well.
-            Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            Runnable trackTask = () -> {
                 BlocksTracker.INSTANCE.untrackBlock(BlocksTracker.TrackingType.PLACED_BLOCKS, e.getBlock());
                 BlocksTracker.INSTANCE.trackBlock(BlocksTracker.TrackingType.BROKEN_BLOCKS, e.getBlock());
-            }, 1L);
+            };
+            if (FoliaUtil.isFolia()) {
+                FoliaUtil.runGlobalDelayed(this.plugin, trackTask, 1L);
+            } else {
+                Bukkit.getScheduler().runTaskLater(this.plugin, trackTask, 1L);
+            }
         }
     }
 
@@ -330,10 +345,15 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
                 if (onlyNatural) {
                     // We want to track block broken & placed only if this mission only progresses for natural blocks
                     // We do that in a delayed tick so all other missions will check for their progress as well.
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    Runnable trackTask = () -> {
                         BlocksTracker.INSTANCE.untrackBlock(BlocksTracker.TrackingType.PLACED_BLOCKS, block);
                         BlocksTracker.INSTANCE.trackBlock(BlocksTracker.TrackingType.BROKEN_BLOCKS, block);
-                    }, 1L);
+                    };
+                    if (FoliaUtil.isFolia()) {
+                        FoliaUtil.runGlobalDelayed(plugin, trackTask, 1L);
+                    } else {
+                        Bukkit.getScheduler().runTaskLater(plugin, trackTask, 1L);
+                    }
                 }
             }
         }
@@ -394,10 +414,17 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
 
         blocksCounter.track(blockKey, amount);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(_player -> {
-            if (canComplete(superiorPlayer))
-                this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
-        }), 2L);
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runAsyncDelayed(plugin, () -> superiorPlayer.runIfOnline(_player -> {
+                if (canComplete(superiorPlayer))
+                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+            }), 100L);
+        } else {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(_player -> {
+                if (canComplete(superiorPlayer))
+                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+            }), 2L);
+        }
     }
 
     private int getBlockAmount(Player player, Location blockLocation) {

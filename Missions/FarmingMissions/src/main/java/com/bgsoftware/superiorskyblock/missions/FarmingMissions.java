@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
+import com.bgsoftware.superiorskyblock.missions.common.FoliaUtil;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.KeyRequirements;
 import com.bgsoftware.superiorskyblock.missions.common.tracker.KeyDataTracker;
@@ -322,10 +323,17 @@ public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implem
 
         farmingTracker.track(plantKey, 1);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> playerTracked.runIfOnline(player -> {
-            if (canComplete(playerTracked))
-                this.plugin.getMissions().rewardMission(this, playerTracked, true);
-        }), 2L);
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runAsyncDelayed(plugin, () -> playerTracked.runIfOnline(player -> {
+                if (canComplete(playerTracked))
+                    this.plugin.getMissions().rewardMission(this, playerTracked, true);
+            }), 100L);
+        } else {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> playerTracked.runIfOnline(player -> {
+                if (canComplete(playerTracked))
+                    this.plugin.getMissions().rewardMission(this, playerTracked, true);
+            }), 2L);
+        }
     }
 
     private int getBlockAge(BlockState newState) {
