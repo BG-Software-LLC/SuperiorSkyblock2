@@ -9,12 +9,8 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.RawMessageComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -63,16 +59,18 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
     private static class BuilderImpl implements Builder {
 
+        private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         private final List<IMessageComponent> messageComponents = new LinkedList<>();
 
         @Override
         public boolean addActionBar(@Nullable String message) {
-            return addMessageComponent(ActionBarComponent.of(message));
+            return addMessageComponent(plugin.getProviders().getMessagesProvider().createActionBarComponent(message));
         }
 
         @Override
         public boolean addBossBar(@Nullable String message, BossBar.Color color, int ticks) {
-            return addMessageComponent(BossBarComponent.of(message, color, BossBar.Style.SOLID, ticks));
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createBossBarComponent(message, color.name(), "solid", ticks));
         }
 
         @Override
@@ -87,7 +85,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addRawMessage(@Nullable String message) {
-            return addMessageComponent(RawMessageComponent.of(message));
+            return addMessageComponent(plugin.getProviders().getMessagesProvider().createRawMessageComponent(message));
         }
 
         @Override
@@ -97,7 +95,8 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addTitle(@Nullable String titleMessage, @Nullable String subtitleMessage, int fadeIn, int duration, int fadeOut) {
-            return addMessageComponent(TitleComponent.of(titleMessage, subtitleMessage, fadeIn, duration, fadeOut));
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createTitleComponent(titleMessage, subtitleMessage, fadeIn, duration, fadeOut));
         }
 
         @Override
