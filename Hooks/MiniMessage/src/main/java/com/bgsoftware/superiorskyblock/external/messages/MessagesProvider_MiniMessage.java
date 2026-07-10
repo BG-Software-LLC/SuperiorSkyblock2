@@ -69,10 +69,12 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
     }
 
     private static Component deserialize(String message) {
+        String formattedMessage = Formatters.COLOR_FORMATTER.format(message);
+
         try {
-            return MINI_MESSAGE.deserialize(message);
+            return MINI_MESSAGE.deserialize(formattedMessage);
         } catch (ParsingException exception) {
-            return LegacyComponentSerializer.legacySection().deserialize(Formatters.COLOR_FORMATTER.format(message));
+            return LegacyComponentSerializer.legacySection().deserialize(formattedMessage);
         }
     }
 
