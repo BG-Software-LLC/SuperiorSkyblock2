@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.DynamicArray;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;

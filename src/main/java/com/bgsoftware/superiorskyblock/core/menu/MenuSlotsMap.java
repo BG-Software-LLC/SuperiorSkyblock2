@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MenuPatternSlots {
+public class MenuSlotsMap {
 
     private final Char2ObjectMapView<List<Integer>> charSlots = CollectionsFactory.createChar2ObjectArrayMap();
 
-    public MenuPatternSlots() {
+    public MenuSlotsMap() {
     }
 
     public CharIterator getChars() {

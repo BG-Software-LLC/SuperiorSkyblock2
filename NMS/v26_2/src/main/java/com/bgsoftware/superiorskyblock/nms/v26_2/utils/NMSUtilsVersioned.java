@@ -36,6 +36,8 @@ import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -439,6 +441,10 @@ public class NMSUtilsVersioned {
 
     public static Identifier getBlockEntityTypeKey(BlockEntityType<?> type) {
         return BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type);
+    }
+
+    public static ItemStackTemplate getItemBodyItemParameter(ItemStack nmsCopy) {
+        return ItemStackTemplate.fromNonEmptyStack(nmsCopy);
     }
 
     private NMSUtilsVersioned() {
