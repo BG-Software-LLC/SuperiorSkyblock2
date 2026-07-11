@@ -22,6 +22,7 @@ public interface PagedMenuLayout<V extends MenuView<V, ?>> extends MenuLayout<V>
      *
      * @deprecated See {@link PagedInventoryMenuLayout} and {@link PagedDialogMenuLayout}
      */
+    @Deprecated
     static <V extends PagedMenuView<V, ?, E>, E> Builder<V, E> newBuilder() {
         return PagedInventoryMenuLayout.newBuilder();
     }

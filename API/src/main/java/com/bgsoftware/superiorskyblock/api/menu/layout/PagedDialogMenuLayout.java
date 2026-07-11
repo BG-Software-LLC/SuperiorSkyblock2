@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 
 /**
- * Similar to {@link MenuLayout}, but used for layout of page-based menus.
- * See {@link MenuLayout}
+ * Similar to {@link DialogMenuLayout}, but used for layout of page-based menus.
+ * See {@link DialogMenuLayout}
  */
 public interface PagedDialogMenuLayout<V extends MenuView<V, ?>> extends DialogMenuLayout<V>, PagedMenuLayout<V> {
 

@@ -81,7 +81,7 @@ public class MenusListener extends AbstractGameEventListener {
             if (clickedInventory.equals(topInventory)) {
                 MenuView menuView = (MenuView) inventoryHolder;
                 try (ButtonClickContextImpl ctx = ButtonClickContextImpl.obtain(menuView, e.getArgs().bukkitEvent)) {
-                    menuView.getMenu().onClick(ctx, menuView);
+                    menuView.getMenu().onClick(ctx);
                 }
             }
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
@@ -103,8 +103,8 @@ public class MenusListener extends AbstractGameEventListener {
 
     private void onDialogMenuClick(GameEvent<GameEventArgs.DialogClickEvent> e) {
         MenuView menuView = e.getArgs().dialog.getMenuView();
-        try (ButtonClickContextImpl<?, GameEventArgs.DialogClickEvent> ctx = ButtonClickContextImpl.obtain(menuView, e.getArgs())) {
-            menuView.getMenu().onClick(ctx, menuView);
+        try (ButtonClickContextImpl ctx = ButtonClickContextImpl.obtain(menuView, e.getArgs())) {
+            menuView.getMenu().onClick(ctx);
         }
     }
 

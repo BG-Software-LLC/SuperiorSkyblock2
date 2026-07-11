@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.api.menu;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import java.util.LinkedList;
@@ -129,8 +130,21 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
     }
 
     @Override
-    public void onClick(ButtonClickContext<V> context, V menuView) {
+    @Deprecated
+    public void onClick(InventoryClickEvent clickEvent, V menuView) {
+        onClick(ButtonClickContext.create(
+                (Player) clickEvent.getWhoClicked(),
+                menuView,
+                clickEvent.getRawSlot(),
+                clickEvent.getClick()
+        ));
+    }
+
+    @Override
+    public void onClick(ButtonClickContext<V> context) {
         Preconditions.checkNotNull(this.menuLayout, "menu wasn't initialized properly.");
+
+        V menuView = context.getMenuView();
 
         MenuViewButton<V> menuButton = context.getClickedButton().createViewButton(menuView);
 
@@ -154,6 +168,7 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
     }
 
     @Override
+    @Deprecated
     public final void onClose(InventoryCloseEvent closeEvent, V menuView) {
         onClose(menuView);
     }

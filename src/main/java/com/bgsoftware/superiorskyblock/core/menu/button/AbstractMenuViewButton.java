@@ -47,7 +47,7 @@ public abstract class AbstractMenuViewButton<V extends MenuView<V, ?>> implement
     @Override
     @Deprecated
     public final void onButtonClick(InventoryClickEvent clickEvent) {
-        try (ButtonClickContextImpl<V, InventoryClickEvent> ctx = ButtonClickContextImpl.obtain(getView(), clickEvent)) {
+        try (ButtonClickContextImpl<V> ctx = ButtonClickContextImpl.obtain(getView(), clickEvent)) {
             onButtonClick(ctx);
         }
     }

@@ -15,12 +15,9 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputBoolean;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputNumberRange;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputSingleOption;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputText;
 import com.bgsoftware.superiorskyblock.api.menu.layout.DialogMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -35,19 +32,22 @@ import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
+import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContextImpl;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyItem;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyText;
+import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedDialogMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedInventoryMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularInventoryMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
-import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
-import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.google.common.base.Preconditions;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -605,28 +605,18 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
-    public <V extends MenuView<V, ?>> MenuTemplateInputBoolean.Builder<V> createInputBooleanBuilder() {
-        return null;
-    }
-
-    @Override
-    public <V extends MenuView<V, ?>> MenuTemplateInputNumberRange.Builder<V> createInputNumberRangeBuilder() {
-        return null;
-    }
-
-    @Override
-    public <V extends MenuView<V, ?>> MenuTemplateInputSingleOption.Builder<V> createInputSingleOptionBuilder() {
-        return null;
-    }
-
-    @Override
-    public <V extends MenuView<V, ?>> MenuTemplateInputText.Builder<V> createInputTextBuilder() {
-        return null;
+    public DialogBodyText.Config createTextConfig() {
+        return new DialogBodyText.Config();
     }
 
     @Override
     public DialogBodyElement createDialogBodyTextElement(String text, @Nullable DialogBodyElement.TextConfig textConfig) {
         return new DialogBodyText(text, textConfig);
+    }
+
+    @Override
+    public DialogBodyItem.Config createItemConfig() {
+        return new DialogBodyItem.Config();
     }
 
     @Override
@@ -637,6 +627,12 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     @Override
     public DialogButton.Builder createDialogButtonBuilder() {
         return new DialogButtonImpl.Builder();
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> ButtonClickContext<V> createButtonClickContext(Player player, V menuView,
+                                                                                     int clickedSlot, ClickType clickType) {
+        return new ButtonClickContextImpl<>(player, menuView, clickedSlot, clickType);
     }
 
     @Override

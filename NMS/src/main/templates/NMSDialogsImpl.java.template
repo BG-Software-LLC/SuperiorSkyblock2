@@ -76,11 +76,6 @@ public class NMSDialogsImpl implements NMSDialogs {
             ${IDENTIFIER_CLASS}.fromNamespaceAndPath("superiorskyblock", "dialog_click_callback");
 
     @Override
-    public boolean isSupported() {
-        return true;
-    }
-
-    @Override
     public PlayerCustomClickEventFunctions<?> createCustomClickEventFunctions() {
         return PlayerCustomClickEventFunctionsImpl.INSTANCE;
     }

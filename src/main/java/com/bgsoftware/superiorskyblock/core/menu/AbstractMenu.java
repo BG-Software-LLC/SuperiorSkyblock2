@@ -52,15 +52,15 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
     @Override
     @Deprecated
     public void onClick(InventoryClickEvent clickEvent, V menuView) {
-        try (ButtonClickContextImpl<V, InventoryClickEvent> ctx = ButtonClickContextImpl.obtain(menuView, clickEvent)) {
-            onClick(ctx, menuView);
+        try (ButtonClickContextImpl ctx = ButtonClickContextImpl.obtain(menuView, clickEvent)) {
+            this.onClick(ctx);
         }
     }
 
     @Override
-    public void onClick(ButtonClickContext<V> context, V menuView) {
-        if (!menuView.isRefreshing())
-            super.onClick(context, menuView);
+    public void onClick(ButtonClickContext<V> context) {
+        if (!context.getMenuView().isRefreshing())
+            super.onClick(context);
     }
 
     @Override

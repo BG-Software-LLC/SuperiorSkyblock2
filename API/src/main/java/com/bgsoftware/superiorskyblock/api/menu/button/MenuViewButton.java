@@ -42,7 +42,7 @@ public interface MenuViewButton<V extends MenuView<V, ?>> {
     /**
      * Method callback when clicking this button, from either an inventory menu or a Dialog UI.
      *
-     * @param context The click context, either a {@link InventoryButtonClickContext} or a {@link DialogButtonClickContext}.
+     * @param context The click context. See {@link ButtonClickContext} for more info.
      */
     void onButtonClick(ButtonClickContext<V> context);
 

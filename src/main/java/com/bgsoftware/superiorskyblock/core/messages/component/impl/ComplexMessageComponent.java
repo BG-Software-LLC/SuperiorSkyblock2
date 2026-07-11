@@ -43,20 +43,16 @@ public class ComplexMessageComponent implements IMessageComponent {
     private static IWrappedComponent[] parseComponents(BaseComponent[] baseComponents) {
         IWrappedComponent[] components = new IWrappedComponent[baseComponents.length];
         for (int i = 0; i < components.length; ++i) {
-            try {
-                BaseComponent curr = baseComponents[i];
-                IWrappedComponent wrappedComponent;
-                if (curr instanceof TextComponent) {
-                    wrappedComponent = new ContentComponent((TextComponent) curr);
-                } else if (curr.getHoverEvent() != null) {
-                    wrappedComponent = new HoverEventComponent(curr);
-                } else {
-                    wrappedComponent = new ComponentHolder(curr);
-                }
-                components[i] = wrappedComponent;
-            } catch (Throwable error) {
-                error.printStackTrace();
+            BaseComponent curr = baseComponents[i];
+            IWrappedComponent wrappedComponent;
+            if (curr instanceof TextComponent) {
+                wrappedComponent = new ContentComponent((TextComponent) curr);
+            } else if (curr.getHoverEvent() != null) {
+                wrappedComponent = new HoverEventComponent(curr);
+            } else {
+                wrappedComponent = new ComponentHolder(curr);
             }
+            components[i] = wrappedComponent;
         }
         return components;
     }

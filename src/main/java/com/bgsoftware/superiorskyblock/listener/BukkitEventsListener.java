@@ -886,7 +886,7 @@ public class BukkitEventsListener implements Listener {
 
     }
 
-    public interface ApplyBukkitEventFunction<E, Args extends IEventArgs> {
+    private interface ApplyBukkitEventFunction<E, Args extends IEventArgs> {
 
         void apply(E bukkitEvent, GameEvent<Args> event);
 

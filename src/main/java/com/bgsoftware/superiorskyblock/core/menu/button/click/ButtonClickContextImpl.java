@@ -10,7 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.DialogClickEvent;
 
-public class ButtonClickContextImpl<V extends MenuView<V, ?>, C> implements ButtonClickContext<V>, ObjectsPool.Releasable, AutoCloseable {
+public class ButtonClickContextImpl<V extends MenuView<V, ?>> implements ButtonClickContext<V>, ObjectsPool.Releasable, AutoCloseable {
 
     public static final ObjectsPool<ButtonClickContextImpl> POOL = new ObjectsPool<>(ButtonClickContextImpl::new);
 
@@ -23,9 +23,17 @@ public class ButtonClickContextImpl<V extends MenuView<V, ?>, C> implements Butt
     private ButtonClickContextImpl() {
     }
 
-    public static <V extends MenuView<V, ?>> ButtonClickContextImpl<V, InventoryClickEvent> obtain(
+    public ButtonClickContextImpl(Player player, V menuView, int clickedSlot, ClickType clickType) {
+        this.menuView = menuView;
+        this.player = player;
+        this.clickedSlot = clickedSlot;
+        this.clickedButton = menuView.getMenu().getLayout().getButton(clickedSlot);
+        this.clickType = clickType;
+    }
+
+    public static <V extends MenuView<V, ?>> ButtonClickContextImpl<V> obtain(
             V menuView, InventoryClickEvent clickEvent) {
-        ButtonClickContextImpl<V, InventoryClickEvent> buttonClickContext = POOL.obtain();
+        ButtonClickContextImpl<V> buttonClickContext = POOL.obtain();
         buttonClickContext.menuView = menuView;
         buttonClickContext.clickedSlot = clickEvent.getRawSlot();
         buttonClickContext.player = (Player) clickEvent.getWhoClicked();
@@ -34,9 +42,9 @@ public class ButtonClickContextImpl<V extends MenuView<V, ?>, C> implements Butt
         return buttonClickContext;
     }
 
-    public static <V extends MenuView<V, ?>> ButtonClickContextImpl<V, DialogClickEvent> obtain(
+    public static <V extends MenuView<V, ?>> ButtonClickContextImpl<V> obtain(
             V menuView, DialogClickEvent clickEvent) {
-        ButtonClickContextImpl<V, DialogClickEvent> buttonClickContext = POOL.obtain();
+        ButtonClickContextImpl<V> buttonClickContext = POOL.obtain();
         buttonClickContext.menuView = menuView;
         buttonClickContext.clickedSlot = clickEvent.clickedSlot;
         buttonClickContext.player = clickEvent.superiorPlayer.asPlayer();

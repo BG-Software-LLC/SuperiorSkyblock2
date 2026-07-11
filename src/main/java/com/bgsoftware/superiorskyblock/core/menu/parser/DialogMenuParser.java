@@ -18,6 +18,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -69,11 +70,11 @@ public class DialogMenuParser {
 
     public static <V extends PagedMenuView<V, ?, E>, E> MenuSlotsMap parsePagedMenuPatternInternal(
             String callerName, YamlConfiguration cfg, DialogMenuLayout.Builder<V> menuLayoutBuilder) {
-        return parseRegularMenuPatternInternal(callerName, cfg, menuLayoutBuilder);
+        throw new UnsupportedOperationException("Dialog menus do not support paged-menus currently");
     }
 
     private static DialogMenuType readDialogMenuType(YamlConfiguration cfg, String callerName) {
-        String dialogMenuTypeName = cfg.getString("dialog-type", "MULTI_ACTION");
+        String dialogMenuTypeName = cfg.getString("dialog-type", "MULTI_ACTION").toUpperCase(Locale.ENGLISH);
         DialogMenuType dialogMenuType = EnumHelper.getEnum(DialogMenuType.class, dialogMenuTypeName);
         if (dialogMenuType == null) {
             Log.warnFromFile(callerName, "Unknown dialog-type '", dialogMenuTypeName, "', defaulting to MULTI_ACTION");
@@ -93,16 +94,18 @@ public class DialogMenuParser {
                     Log.warnFromFile(callerName, "Invalid dialog body item in file, skipping...");
                     return Optional.empty();
                 }
-                return Optional.of(new DialogBodyItem(templateItem, new DialogBodyElement.ItemConfig()
+                return Optional.of(new DialogBodyItem(templateItem, DialogBodyElement.ItemConfig.create()
                         .setDescription(readDialogBodyElement(callerName, section.get("description")).orElse(null))
                         .setShowDecorations(section.getBoolean("show-decorations", true))
                         .setShowTooltip(section.getBoolean("show-tooltip", true))
-                        .setWidth(section.getInt("width", 16))
-                        .setHeight(section.getInt("height", 16))
+                        .setWidth(section.getInt("width", DialogBodyElement.ItemConfig.DEFAULT_WIDTH))
+                        .setHeight(section.getInt("height", DialogBodyElement.ItemConfig.DEFAULT_HEIGHT))
                 ));
             } else {
-                return Optional.of(DialogBodyElement.fromText(Formatters.COLOR_FORMATTER.format(section.getString("text")),
-                        new DialogBodyElement.TextConfig().setWidth(section.getInt("width", 200))));
+                String text = Formatters.COLOR_FORMATTER.format(section.getString("text"));
+                return Optional.of(DialogBodyElement.fromText(text, DialogBodyElement.TextConfig.create()
+                        .setWidth(section.getInt("width", DialogBodyElement.TextConfig.DEFAULT_WIDTH))
+                ));
             }
         } else {
             Log.warnFromFile(callerName, "Invalid dialog body entry: ", entry, " - skipping...");

@@ -47,7 +47,7 @@ public class MenuCommandsImpl implements MenuCommands {
 
     @Override
     public void runCommand(MenuView<?, ?> menuView, String command, InventoryClickEvent clickEvent) {
-        try (ButtonClickContextImpl<?, InventoryClickEvent> ctx = ButtonClickContextImpl.obtain((MenuView) menuView, clickEvent)) {
+        try (ButtonClickContextImpl<?> ctx = ButtonClickContextImpl.obtain((MenuView) menuView, clickEvent)) {
             runCommand(menuView, command, ctx);
         }
     }

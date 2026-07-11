@@ -1,103 +1,101 @@
 package com.bgsoftware.superiorskyblock.api.menu.dialog;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.google.common.base.Preconditions;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Represents a body element in a dialog.
+ */
 public interface DialogBodyElement {
 
+    /**
+     * Creates a new text-based body element for dialog UI.
+     *
+     * @param text       The text to show in the dialog.
+     * @param textConfig Configuration for the body element.
+     */
     static DialogBodyElement fromText(String text, @Nullable TextConfig textConfig) {
         return SuperiorSkyblockAPI.getMenus().createDialogBodyTextElement(text, textConfig);
     }
 
-    static DialogBodyElement fromItem(ItemStack itemStack) {
-        return fromItem(itemStack, null);
-    }
-
+    /**
+     * Creates a new item-based body element for dialog UI.
+     *
+     * @param itemStack  The item to show in the dialog.
+     * @param itemConfig Configuration for the body element.
+     */
     static DialogBodyElement fromItem(ItemStack itemStack, @Nullable ItemConfig itemConfig) {
         return SuperiorSkyblockAPI.getMenus().createDialogBodyItemElement(itemStack, itemConfig);
     }
 
-    class TextConfig {
+    /**
+     * Configuration for text-based body elements.
+     */
+    interface TextConfig {
 
-        private int width = 200;
+        int DEFAULT_WIDTH = 200;
 
-        public TextConfig() {
-
+        static TextConfig create() {
+            return SuperiorSkyblockAPI.getMenus().createTextConfig();
         }
 
-        public TextConfig setWidth(int width) {
-            Preconditions.checkArgument(width > 0, "width must be a positive number");
-            this.width = width;
-            return this;
-        }
-
-        public int getWidth() {
-            return width;
-        }
+        /**
+         * Set the width of the text element.
+         *
+         * @param width The width of the element.
+         */
+        TextConfig setWidth(@Size int width);
 
     }
 
-    class ItemConfig {
+    /**
+     * Configuration for item-based body elements.
+     */
+    interface ItemConfig {
 
-        @Nullable
-        private DialogBodyElement description = null;
-        private boolean showDecorations = true;
-        private boolean showTooltip = true;
-        private int width = 16;
-        private int height = 16;
+        int DEFAULT_WIDTH = 16;
+        int DEFAULT_HEIGHT = 16;
 
-        public ItemConfig() {
-
+        static ItemConfig create() {
+            return SuperiorSkyblockAPI.getMenus().createItemConfig();
         }
 
-        public ItemConfig setDescription(@Nullable DialogBodyElement description) {
-            this.description = description;
-            return this;
-        }
+        /**
+         * Set the description of the item element.
+         *
+         * @param description The description to set.
+         */
+        ItemConfig setDescription(@Nullable DialogBodyElement description);
 
-        public DialogBodyElement getDescription() {
-            return this.description;
-        }
+        /**
+         * Set whether the item should have its decorations shown
+         *
+         * @param showDecorations Whether to show the item decorations
+         */
+        ItemConfig setShowDecorations(boolean showDecorations);
 
-        public ItemConfig setShowDecorations(boolean showDecorations) {
-            this.showDecorations = showDecorations;
-            return this;
-        }
+        /**
+         * Set whether the item should have its tooltip shown
+         *
+         * @param showTooltip Whether to show the item tooltip
+         */
+        ItemConfig setShowTooltip(boolean showTooltip);
 
-        public boolean isShowDecorations() {
-            return this.showDecorations;
-        }
+        /**
+         * Set the width of the item element.
+         *
+         * @param width The width of the element.
+         */
+        ItemConfig setWidth(@Size int width);
 
-        public ItemConfig setShowTooltip(boolean showTooltip) {
-            this.showTooltip = showTooltip;
-            return this;
-        }
-
-        public boolean isShowTooltip() {
-            return this.showTooltip;
-        }
-
-        public ItemConfig setWidth(int width) {
-            Preconditions.checkArgument(width >= 1 && width <= 256, "width must be between 1 and 256");
-            this.width = width;
-            return this;
-        }
-
-        public int getWidth() {
-            return width;
-        }
-
-        public ItemConfig setHeight(int height) {
-            Preconditions.checkArgument(height >= 1 && height <= 256, "height must be between 1 and 256");
-            this.height = height;
-            return this;
-        }
-
-        public int getHeight() {
-            return height;
-        }
+        /**
+         * Set the height of the item element.
+         *
+         * @param height The height of the element.
+         */
+        ItemConfig setHeight(@Size int height);
     }
 
 }

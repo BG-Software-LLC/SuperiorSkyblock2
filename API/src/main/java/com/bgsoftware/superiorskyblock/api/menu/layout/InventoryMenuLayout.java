@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 /**
- * The layout class is used to describe the layout of buttons for a menu.
+ * The layout class is used to describe the layout of buttons for an inventory menu.
  * It is later used by the plugin to create a new inventory for the menu.
  */
 public interface InventoryMenuLayout<V extends MenuView<V, ?>> extends MenuLayout<V> {
@@ -18,7 +18,6 @@ public interface InventoryMenuLayout<V extends MenuView<V, ?>> extends MenuLayou
 
     /**
      * Create a new inventory from this layout.
-     * Can only be called if {@link #getType()} is {@link LayoutType#INVENTORY}
      *
      * @param menuView The view to create the inventory for.
      */

@@ -13,12 +13,9 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputBoolean;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputNumberRange;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputSingleOption;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.input.MenuTemplateInputText;
 import com.bgsoftware.superiorskyblock.api.menu.layout.DialogMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -31,6 +28,8 @@ import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -923,24 +922,9 @@ public interface MenusManager {
             Class<?> viewButtonType, PagedMenuTemplateButton.PagedMenuViewButtonCreator<V, E> viewButtonCreator);
 
     /**
-     * Create a new {@link MenuTemplateInputBoolean.Builder}.
+     * Create a config for a text-based {@link DialogBodyElement}
      */
-    <V extends MenuView<V, ?>> MenuTemplateInputBoolean.Builder<V> createInputBooleanBuilder();
-
-    /**
-     * Create a new {@link MenuTemplateInputNumberRange.Builder}.
-     */
-    <V extends MenuView<V, ?>> MenuTemplateInputNumberRange.Builder<V> createInputNumberRangeBuilder();
-
-    /**
-     * Create a new {@link MenuTemplateInputSingleOption.Builder}.
-     */
-    <V extends MenuView<V, ?>> MenuTemplateInputSingleOption.Builder<V> createInputSingleOptionBuilder();
-
-    /**
-     * Create a new {@link MenuTemplateInputText.Builder}.
-     */
-    <V extends MenuView<V, ?>> MenuTemplateInputText.Builder<V> createInputTextBuilder();
+    DialogBodyElement.TextConfig createTextConfig();
 
     /**
      * Creates a new text-based {@link DialogBodyElement}.
@@ -949,6 +933,11 @@ public interface MenusManager {
      * @param textConfig Extra configuration for the body text element.
      */
     DialogBodyElement createDialogBodyTextElement(String text, @Nullable DialogBodyElement.TextConfig textConfig);
+
+    /**
+     * Create a config for a item-based {@link DialogBodyElement}
+     */
+    DialogBodyElement.ItemConfig createItemConfig();
 
     /**
      * Creates a new item-based {@link DialogBodyElement}.
@@ -962,6 +951,17 @@ public interface MenusManager {
      * Create a new builder for a {@link DialogButton} object.
      */
     DialogButton.Builder createDialogButtonBuilder();
+
+    /**
+     * Creates a new click context in a menu.
+     *
+     * @param player      The player who clicked the button.
+     * @param menuView    The view that the player clicked in.
+     * @param clickedSlot The slot the player clicked.
+     * @param clickType   The type of click the player performed.
+     */
+    <V extends MenuView<V, ?>> ButtonClickContext<V> createButtonClickContext(Player player, V menuView,
+                                                                              int clickedSlot, ClickType clickType);
 
     /**
      * Get the parser instance.
@@ -979,4 +979,5 @@ public interface MenusManager {
      */
     @Deprecated
     ISuperiorMenu getOldMenuFromView(MenuView<?, ?> menuView);
+
 }

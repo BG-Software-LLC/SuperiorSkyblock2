@@ -9,11 +9,7 @@ import org.bukkit.event.Event;
 
 public interface NMSDialogs {
 
-    boolean isSupported();
-
-    default PlayerCustomClickEventFunctions<?> createCustomClickEventFunctions() {
-        return null;
-    }
+    PlayerCustomClickEventFunctions<?> createCustomClickEventFunctions();
 
     <V extends MenuView<V, ?>> DialogWrapper<V> createDialog(V menuView);
 

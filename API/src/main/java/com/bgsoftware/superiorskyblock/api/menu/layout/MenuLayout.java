@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * The layout class is used to describe the layout of buttons for a menu.
- * It is later used by the plugin to create a new inventory for the menu.
+ * See {@link InventoryMenuLayout} and {@link DialogMenuLayout} for layouts of specific menu types.
  */
 public interface MenuLayout<V extends MenuView<V, ?>> {
 

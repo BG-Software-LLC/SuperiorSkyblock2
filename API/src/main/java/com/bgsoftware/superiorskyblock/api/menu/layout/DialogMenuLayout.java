@@ -8,15 +8,25 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import java.util.List;
 
 /**
- * The layout class is used to describe the layout of buttons for a menu.
- * It is later used by the plugin to create a new inventory for the menu.
+ * The layout class is used to describe the layout of buttons for a dialog menu.
+ * It is later used by the plugin to create a new dialog for the menu.
  */
 public interface DialogMenuLayout<V extends MenuView<V, ?>> extends MenuLayout<V> {
 
+    /**
+     * Get the type of the dialog menu.
+     */
     DialogMenuType getDialogType();
 
+    /**
+     * Get whether players can close the dialog menu with the escape button in the keyboard.
+     * Closing a dialog menu with escape acts the same as clicking the "Cancel" or "No" buttons.
+     */
     boolean isCloseWithEscapeAllowed();
 
+    /**
+     * Get the elements in the body of the dialog.
+     */
     List<DialogBodyElement> getBodyElements();
 
     /**
