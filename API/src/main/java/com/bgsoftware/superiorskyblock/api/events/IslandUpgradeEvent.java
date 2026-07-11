@@ -26,7 +26,6 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
     private final UpgradeLevel upgradeLevel;
     private final List<String> commands;
     private final Cause cause;
-    @Nullable
     private List<UpgradeCost> upgradeCosts;
     private boolean cancelled = false;
 

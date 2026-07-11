@@ -16,7 +16,7 @@ public class ItemsUpgradeCost extends UpgradeCostAbstract {
     private final KeySet keySet;
 
     public ItemsUpgradeCost(BigDecimal cost, KeySet keySet) {
-        super(cost, "item");
+        super(cost, "items");
         this.keySet = keySet;
     }
 
