@@ -50,7 +50,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     };
 
     private final int level;
-    private final UpgradeCost cost;
+    private final List<UpgradeCost> costs;
     private final List<String> commands;
     private final String permission;
     private final Set<UpgradeRequirement> requirements;
@@ -71,7 +71,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Nullable
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
+    public SUpgradeLevel(int level, List<UpgradeCost> costs, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
                          Value<OptionalDouble> cropGrowth, Value<OptionalDouble> spawnerRates, Value<OptionalDouble> mobDrops,
                          Value<OptionalInt> teamLimit, Value<OptionalInt> warpsLimit, Value<OptionalInt> coopLimit,
                          Value<OptionalInt> borderSize, Value<KeyMap<Integer>> blockLimits,
@@ -79,7 +79,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          Value<Map<PotionEffectType, Integer>> islandEffects, Value<Optional<BigDecimal>> bankLimit,
                          Value<Int2IntMapView> roleLimits) {
         this.level = level;
-        this.cost = cost;
+        this.costs = Collections.unmodifiableList(costs);
         this.commands = commands;
         this.permission = permission;
         this.requirements = requirements;
@@ -104,12 +104,14 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
-    public double getPrice() {
-        return cost.getCost().doubleValue();
+    @Deprecated
+    public UpgradeCost getCost() {
+        return costs == null || costs.isEmpty() ? null : costs.get(0);
     }
 
-    public UpgradeCost getCost() {
-        return cost;
+    @Override
+    public List<UpgradeCost> getCosts() {
+        return costs;
     }
 
     @Override
@@ -380,7 +382,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public Value<BigDecimal> getBankLimitUpgradeValue() {
-        return Value.syncedSupplied(() -> bankLimit.get().orElseGet(() -> IslandUpgradeConstants.NO_BANK_LIMIT_VALUE));
+        return Value.syncedSupplied(() -> bankLimit.get().orElse(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE));
     }
 
     public Map<PlayerRole, IntValue> getRoleLimitsUpgradeValue() {

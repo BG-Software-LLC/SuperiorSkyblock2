@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -144,6 +145,16 @@ public class IslandUtils {
         }
 
         return chunkCoords;
+    }
+
+    public static boolean hasEnoughBalance(List<UpgradeCost> upgradeCosts, SuperiorPlayer superiorPlayer) {
+        for (UpgradeCost upgradeCost : upgradeCosts) {
+            if (!upgradeCost.hasEnoughBalance(superiorPlayer)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static void updateIslandFly(Island island, SuperiorPlayer superiorPlayer) {
