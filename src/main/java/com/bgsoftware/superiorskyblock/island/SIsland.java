@@ -2057,7 +2057,7 @@ public class SIsland implements Island {
     @Deprecated
     public void setBiome(Biome biome, boolean updateBlocks) {
         setBiome(plugin.getSettings().getWorlds().getDefaultWorldDimension(), biome,
-                updateBlocks ? IslandBiomeFlags.UPDATE_BLOCKS : 0);
+                IslandBiomeFlags.UPDATE_ALL_DIMENSIONS | (updateBlocks ? IslandBiomeFlags.UPDATE_BLOCKS : 0));
     }
 
     @Override
