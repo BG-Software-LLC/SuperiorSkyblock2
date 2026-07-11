@@ -16,12 +16,11 @@ public abstract class UnparsedEnumerateSet<K extends Enumerable> extends Enumera
     }
 
     public boolean addName(String name) {
+        if (name == null)
+            return false;
         try {
             return add(parseName(name));
         } catch (Throwable ignored) {
-            if (name == null)
-                return false;
-
             return unparsedNames.add(normalizeName(name));
         }
     }
