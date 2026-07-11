@@ -62,12 +62,10 @@ CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Das Banklimit aller Inseln wurde erfol
   aktualisiert.'
 CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Das Banklimit von {0} wurde erfolgreich
   aktualisiert.'
-CHANGED_BIOME: '&e&lIsland | &7Biom erfolgreich in {0} geändert. Möglicherweise musst
-  du dich erneut mit dem Server verbinden, um die Änderungen anzuzeigen.'
-CHANGED_BIOME_ALL: '&e&lInsel | &7Biom für alle Inseln erfolgreich auf {0} geändert.'
-CHANGED_BIOME_NAME: '&e&lInsel | &7Biom erfolgreich auf {0} für Insel {1} ​​geändert.'
-CHANGED_BIOME_OTHER: '&e&lInsel | &7Das Biom wurde erfolgreich in {0} für die Insel
-  von {1} geändert.'
+CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Der Blockbetrag bei {0} wurde erfolgreich in
   {1} geändert.'
 CHANGED_BLOCK_LIMIT: '&e&lUpgrades | &7Das {0} Blocklimit der Insel von {1} wurde
@@ -1037,4 +1035,5 @@ WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBank | &7You withdrawn ${0} from {1}''s island bank!'
 WITHDRAWN_MONEY_NAME: '&e&lBank | &7Du hast ${0} von der Inselbank von {1} abgehoben!'
 WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
+WORLD_NOT_GENERATED: '&e&lWorlds | &7The {0} world is not generated yet!'
 WORLD_NOT_UNLOCKED: '&e&lWorlds | &7Die Welt {0} ist noch nicht freigeschaltet!'
