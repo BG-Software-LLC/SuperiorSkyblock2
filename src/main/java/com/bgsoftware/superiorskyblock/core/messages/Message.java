@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -945,6 +946,18 @@ public enum Message {
     @Nullable
     public String getMessage(Locale locale, Object... args) {
         return isEmpty(locale) ? defaultMessage : messages.get(locale).getMessage(args);
+    }
+
+    public final void sendPlayerOrConsole(@Nullable SuperiorPlayer superiorPlayer) {
+        sendPlayerOrConsole(superiorPlayer, EMPTY_ARGS);
+    }
+
+    public final void sendPlayerOrConsole(@Nullable SuperiorPlayer superiorPlayer, Object... args) {
+        if (superiorPlayer == null) {
+            send(Bukkit.getConsoleSender(), args);
+        } else {
+            send(superiorPlayer, args);
+        }
     }
 
     public final void send(SuperiorPlayer superiorPlayer) {
