@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Biome;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
@@ -53,6 +54,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)");
     private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
 
+    private static final Pattern BIOME_PLACEHOLDER_PATTERN = Pattern.compile("island_biome_(.+)");
     private static final Pattern BLOCK_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_count_(.+)");
     private static final Pattern BLOCK_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("island_block_level_(.+)");
     private static final Pattern BLOCK_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_limit_(.+)");
@@ -67,9 +69,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
     private static final Pattern GENERATOR_AMOUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_amount_(.+)");
     private static final Pattern GENERATOR_PERCENTAGE_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_percentage_(.+)");
-    private static final Pattern WORLD_UNLOCKED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_unlocked_(.+)");
-    private static final Pattern WORLD_ENABLED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_enabled_(.+)");
-    private static final Pattern WORLD_GENERATED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_generated_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
     private static final Pattern MISSION_STATUS_PATTERN = Pattern.compile("mission_status_(.+)");
@@ -86,6 +85,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
     private static final Pattern TOP_CUSTOM_PLACEHOLDER_PATTERN = Pattern.compile("(\\d+)_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
+    private static final Pattern WORLD_UNLOCKED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_unlocked_(.+)");
+    private static final Pattern WORLD_ENABLED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_enabled_(.+)");
+    private static final Pattern WORLD_GENERATED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_generated_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
             new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
@@ -149,7 +151,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("bans_list", (island, superiorPlayer) ->
                             Formatters.COMMA_FORMATTER.format(island.getBannedPlayers().stream().map(SuperiorPlayer::getName)))
                     .put("biome", (island, superiorPlayer) ->
-                            Formatters.CAPITALIZED_FORMATTER.format(island.getBiome().name()))
+                            Formatters.CAPITALIZED_FORMATTER.format(island.getBiome(getDefaultWorldDimension()).name()))
                     .put("bonus_level", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getBonusLevel()))
                     .put("bonus_level_format", (island, superiorPlayer) ->
@@ -513,6 +515,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         Matcher matcher;
 
         if (island != null) {
+            if ((matcher = BIOME_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                Biome biome = island.getBiome(Dimension.getByName(matcher.group(1)));
+                return Optional.of(Formatters.CAPITALIZED_FORMATTER.format(biome.name()));
+            }
+
             if ((matcher = GENERATOR_AMOUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 return handleGeneratorAmountsPlaceholder(island, matcher.group(1));
             }
@@ -554,6 +561,21 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
             if ((matcher = PERMISSION_ROLE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 return handlePermissionRolesPlaceholder(island, matcher.group(1));
+            }
+
+            if ((matcher = WORLD_UNLOCKED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                boolean unlockedWorld = island.getUnlockedWorlds().contains(Dimension.getByName(matcher.group(1)));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(unlockedWorld, superiorPlayer.getUserLocale()));
+            }
+
+            if ((matcher = WORLD_ENABLED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                boolean enabledWorld = island.isDimensionEnabled(Dimension.getByName(matcher.group(1)));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(enabledWorld, superiorPlayer.getUserLocale()));
+            }
+
+            if ((matcher = WORLD_GENERATED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                boolean generatedWorld = island.wasSchematicGenerated(Dimension.getByName(matcher.group(1)));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(generatedWorld, superiorPlayer.getUserLocale()));
             }
 
             if (superiorPlayer != null) {
@@ -799,7 +821,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     }
 
     private static WorldInfo getDefaultWorldInfo(Island island) {
-        return plugin.getGrid().getIslandsWorldInfo(island, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+        return plugin.getGrid().getIslandsWorldInfo(island, getDefaultWorldDimension());
     }
 
     private static Dimension getDefaultWorldDimension() {
