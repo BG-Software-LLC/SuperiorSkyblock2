@@ -4,10 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -39,14 +39,24 @@ public class MultipleComponents implements IMessageComponent {
                 case "bossbar": {
                     String message = section.getString(key + ".message");
                     String color = section.getString(key + ".color", "PINK").toUpperCase(Locale.ENGLISH);
-                    String overlay = section.getString(key + ".overlay", "PROGRESS").toUpperCase(Locale.ENGLISH);
+                    String style = section.getString(key + ".style", "PROGRESS").toUpperCase(Locale.ENGLISH);
                     int ticks = section.getInt(key + ".ticks");
 
-                    builder.addBossBar(message, BossBar.Color.getSafe(color), BossBar.Style.getSafe(overlay), ticks);
+                    BossBar.Color bossBarColor = EnumHelper.getEnum(BossBar.Color.class, color);
+                    if (bossBarColor == null) {
+                        bossBarColor = BossBar.Color.PINK;
+                    }
+
+                    BossBar.Style bossBarStyle = EnumHelper.getEnum(BossBar.Style.class, style);
+                    if (bossBarStyle == null) {
+                        bossBarStyle = BossBar.Style.SOLID;
+                    }
+
+                    builder.addBossBar(message, bossBarColor, bossBarStyle, ticks);
                     break;
                 }
                 case "sound":
-                    builder.addSound(MenuParserImpl.getInstance().getSound(section.getConfigurationSection("sound")));
+                    builder.addSound(MenuParserUtils.getSound(section.getConfigurationSection("sound")));
                     break;
                 case "title": {
                     String title = section.getString(key + ".title");

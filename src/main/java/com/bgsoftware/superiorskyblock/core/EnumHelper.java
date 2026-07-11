@@ -15,8 +15,9 @@ public class EnumHelper {
         return enumClass.isInterface() ? getInterfaceEnumValue(enumClass, name) : getEnumValue(enumClass, name);
     }
 
+    @Nullable
     public static <T> T getEnum(Class<T> enumClass, String... names) {
-        if(enumClass.isInterface()) {
+        if (enumClass.isInterface()) {
             for (String name : names) {
                 T enumValue = getInterfaceEnumValue(enumClass, name);
                 if (enumValue != null)
@@ -51,7 +52,5 @@ public class EnumHelper {
             return null;
         }
     }
-
-
 
 }

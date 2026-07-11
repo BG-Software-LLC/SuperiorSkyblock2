@@ -1,11 +1,10 @@
-package com.bgsoftware.superiorskyblock.core.messages.component.impl;
+package com.bgsoftware.superiorskyblock.core.messages.component;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
-import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;

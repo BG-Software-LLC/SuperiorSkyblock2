@@ -24,7 +24,6 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
-@SuppressWarnings("unused")
 public class MessagesProvider_MiniMessage implements MessagesProvider {
 
     // Adventure 5.x renamed the Title.Times factory method from 'of' to 'times',
@@ -47,7 +46,7 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
     @Override
     public IMessageComponent createBossBarComponent(String message, com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar.Color color,
                                                     com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar.Style style, int duration) {
-        return BossBarComponent.of(message, BossBar.Color.valueOf(color.name()), BossBar.Overlay.valueOf(style.getOverlayName()), duration);
+        return BossBarComponent.of(message, BossBar.Color.valueOf(color.name()), mapBossBarStyle(style), duration);
     }
 
     @Override
@@ -58,6 +57,16 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
     @Override
     public IMessageComponent createTitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int stay, int fadeOut) {
         return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
+    }
+
+    private static BossBar.Overlay mapBossBarStyle(com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar.Style style) {
+        return switch (style) {
+            case SEGMENTED_6, NOTCHED_6 -> BossBar.Overlay.NOTCHED_6;
+            case SEGMENTED_10, NOTCHED_10 -> BossBar.Overlay.NOTCHED_10;
+            case SEGMENTED_12, NOTCHED_12 -> BossBar.Overlay.NOTCHED_12;
+            case SEGMENTED_20, NOTCHED_20 -> BossBar.Overlay.NOTCHED_20;
+            default -> BossBar.Overlay.PROGRESS;
+        };
     }
 
     private static ReflectMethod<Title.Times> getTitleTimesFactory() {
@@ -230,8 +239,8 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
         }
 
         private TitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int stay, int fadeOut) {
-            this.titleContent = MessageContent.parse(titleMessage);
-            this.subtitleContent = MessageContent.parse(subtitleMessage);
+            this.titleContent = Text.isBlank(titleMessage) ? MessageContent.EMPTY : MessageContent.parse(titleMessage);
+            this.subtitleContent = Text.isBlank(subtitleMessage) ? MessageContent.EMPTY : MessageContent.parse(subtitleMessage);
             this.titleTimes = createTimes(fadeIn, stay, fadeOut);
         }
 
@@ -256,16 +265,16 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
                 return;
             }
 
-            this.titleContent.getContent(player, args).ifPresent(titleMessage -> {
+            String titleMessage = this.titleContent.getContent(player, args).orElse(null);
+            String subtitleMessage = this.subtitleContent.getContent(player, args).orElse(null);
+
+            if (titleMessage != null && subtitleMessage != null) {
                 Component titleComponent = deserialize(titleMessage);
+                Component subtitleComponent = deserialize(subtitleMessage);
 
-                this.subtitleContent.getContent(player, args).ifPresent(subtitleMessage -> {
-                    Component subtitleComponent  = deserialize(subtitleMessage);
-
-                    Title title = Title.title(titleComponent, subtitleComponent, titleTimes);
-                    sender.showTitle(title);
-                });
-            });
+                Title title = Title.title(titleComponent, subtitleComponent, this.titleTimes);
+                sender.showTitle(title);
+            }
         }
 
     }
