@@ -5314,7 +5314,17 @@ public class SIsland implements Island {
     }
 
     private static void onSettingsUpdate() {
-        DEFAULT_FLAGS_CACHE = new UnparsedEnumerateSet<>(IslandFlag.values(), IslandFlag::getByName, IslandFlag::getName);
+        DEFAULT_FLAGS_CACHE = new UnparsedEnumerateSet<IslandFlag>(IslandFlag.values()) {
+            @Override
+            protected IslandFlag parseName(String name) {
+                return IslandFlag.getByName(name);
+            }
+
+            @Override
+            protected String getName(IslandFlag islandFlag) {
+                return islandFlag.getName();
+            }
+        };
         plugin.getSettings().getDefaultSettings().forEach(DEFAULT_FLAGS_CACHE::addName);
     }
 

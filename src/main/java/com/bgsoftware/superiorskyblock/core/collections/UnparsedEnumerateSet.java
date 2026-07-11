@@ -6,23 +6,18 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import java.util.function.Function;
 
-public class UnparsedEnumerateSet<K extends Enumerable> extends EnumerateSet<K> {
+public abstract class UnparsedEnumerateSet<K extends Enumerable> extends EnumerateSet<K> {
 
     private final Set<String> unparsedNames = new HashSet<>();
-    private final Function<String, K> parser;
-    private final Function<K, String> nameProvider;
 
-    public UnparsedEnumerateSet(Collection<K> enumerables, Function<String, K> parser, Function<K, String> nameProvider) {
+    public UnparsedEnumerateSet(Collection<K> enumerables) {
         super(enumerables);
-        this.parser = parser;
-        this.nameProvider = nameProvider;
     }
 
     public boolean addName(String name) {
         try {
-            return add(parser.apply(name));
+            return add(parseName(name));
         } catch (Throwable ignored) {
             if (name == null)
                 return false;
@@ -36,7 +31,10 @@ public class UnparsedEnumerateSet<K extends Enumerable> extends EnumerateSet<K> 
         if (super.contains(key))
             return true;
 
-        if (unparsedNames.remove(normalizeName(nameProvider.apply(key)))) {
+        if (unparsedNames.isEmpty())
+            return false;
+
+        if (unparsedNames.remove(normalizeName(getName(key)))) {
             add(key);
             return true;
         }
@@ -47,5 +45,9 @@ public class UnparsedEnumerateSet<K extends Enumerable> extends EnumerateSet<K> 
     private static String normalizeName(String name) {
         return name.toUpperCase(Locale.ENGLISH);
     }
+
+    protected abstract K parseName(String name);
+
+    protected abstract String getName(K key);
 
 }

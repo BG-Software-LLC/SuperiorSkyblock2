@@ -99,7 +99,17 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private static void onSettingsUpdate() {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-        WORLD_PERMISSIONS_CACHE = new UnparsedEnumerateSet<>(IslandPrivilege.values(), IslandPrivilege::getByName, IslandPrivilege::getName);
+        WORLD_PERMISSIONS_CACHE = new UnparsedEnumerateSet<IslandPrivilege>(IslandPrivilege.values()) {
+            @Override
+            protected IslandPrivilege parseName(String name) {
+                return IslandPrivilege.getByName(name);
+            }
+
+            @Override
+            protected String getName(IslandPrivilege islandPrivilege) {
+                return islandPrivilege.getName();
+            }
+        };
         plugin.getSettings().getWorldPermissions().forEach(WORLD_PERMISSIONS_CACHE::addName);
     }
 

@@ -92,8 +92,7 @@ public class IslandPrivilege implements Enumerable {
 
         Preconditions.checkState(!islandPrivileges.containsKey(name), "IslandPrivilege with the name " + name + " already exists.");
 
-        IslandPrivilege islandPrivilege = new IslandPrivilege(name, type);
-        islandPrivileges.put(name, islandPrivilege);
+        islandPrivileges.put(name, new IslandPrivilege(name, type));
     }
 
     /**

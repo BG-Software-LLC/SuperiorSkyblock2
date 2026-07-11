@@ -60,8 +60,7 @@ public class IslandFlag implements Enumerable {
 
         Preconditions.checkState(!islandFlags.containsKey(name), "IslandFlag with the name " + name + " already exists.");
 
-        IslandFlag islandFlag = new IslandFlag(name);
-        islandFlags.put(name, islandFlag);
+        islandFlags.put(name, new IslandFlag(name));
     }
 
     /**
