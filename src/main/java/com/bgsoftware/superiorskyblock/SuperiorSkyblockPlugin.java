@@ -76,6 +76,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
 import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
@@ -181,6 +182,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         IslandPrivileges.registerPrivileges();
         SortingTypes.registerSortingTypes(this);
         IslandFlags.registerFlags();
+        ChatStates.registerStates();
         ClearActions.registerActions();
         RespawnActions.registerActions();
         IslandCacheKeys.registerCacheKeys();

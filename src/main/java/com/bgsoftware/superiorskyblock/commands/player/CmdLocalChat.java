@@ -17,26 +17,26 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdTeamChat implements ISuperiorCommand {
+public class CmdLocalChat implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("teamchat", "tc");
+        return Arrays.asList("localchat", "lc");
     }
 
     @Override
     public String getPermission() {
-        return "superior.island.teamchat";
+        return "superior.island.localchat";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "teamchat [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
+        return "localchat [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Message.COMMAND_DESCRIPTION_TEAM_CHAT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_LOCAL_CHAT.getMessage(locale);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class CmdTeamChat implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
+        IslandArgument arguments = CommandArguments.getIslandWhereStanding(plugin, sender);
 
         Island island = arguments.getIsland();
 
@@ -67,21 +67,20 @@ public class CmdTeamChat implements ISuperiorCommand {
 
         if (args.length == 1) {
             ChatState oldChatState = superiorPlayer.getChatState();
-            ChatState newChatState = oldChatState == ChatStates.TEAM_CHAT ?
-                    ChatStates.GLOBAL : ChatStates.TEAM_CHAT;
+            ChatState newChatState = oldChatState == ChatStates.LOCAL_CHAT ?
+                    ChatStates.GLOBAL : ChatStates.LOCAL_CHAT;
 
-            if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, newChatState) ||
-                    !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+            if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, newChatState))
                 return;
 
-            if (newChatState == ChatStates.TEAM_CHAT) {
-                if (oldChatState == ChatStates.LOCAL_CHAT) {
-                    Message.TOGGLED_LOCAL_CHAT_OFF.send(superiorPlayer);
+            if (newChatState == ChatStates.LOCAL_CHAT) {
+                if (oldChatState == ChatStates.TEAM_CHAT) {
+                    Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
                 }
 
-                Message.TOGGLED_TEAM_CHAT_ON.send(superiorPlayer);
+                Message.TOGGLED_LOCAL_CHAT_ON.send(superiorPlayer);
             } else {
-                Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
+                Message.TOGGLED_LOCAL_CHAT_OFF.send(superiorPlayer);
             }
 
             superiorPlayer.setChatState(newChatState);
