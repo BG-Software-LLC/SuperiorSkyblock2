@@ -77,7 +77,7 @@ public class IslandNames {
     }
 
     public static boolean isWarpNameLengthValid(String warpName) {
-        return warpName.length() <= getMaxWarpNameLength();
+        return !warpName.isEmpty() && warpName.length() <= getMaxWarpNameLength();
     }
 
     public static int getMaxWarpNameLength() {
