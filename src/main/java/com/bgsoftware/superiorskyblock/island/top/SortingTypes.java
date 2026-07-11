@@ -12,6 +12,7 @@ public class SortingTypes {
 
     public static final SortingType BY_WORTH = register("WORTH", SortingComparators.WORTH_COMPARATOR, false);
     public static final SortingType BY_LEVEL = register("LEVEL", SortingComparators.LEVEL_COMPARATOR, false);
+    public static final SortingType BY_BANK = register("BANK", SortingComparators.BANK_COMPARATOR, false);
     public static final SortingType BY_RATING = register("RATING", SortingComparators.RATING_COMPARATOR, false);
     public static final SortingType BY_PLAYERS = register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, false);
 

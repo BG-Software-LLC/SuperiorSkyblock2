@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -874,11 +875,6 @@ public class PluginEventsFactory {
         fireEvent(ISLAND_SCHEMATIC_PASTE_EVENT, islandSchematicPaste);
     }
 
-    public static PluginEvent<IslandSetHome> callIslandSetHomeEvent(Island island, CommandSender commandSender,
-                                                                    Location islandHome, IslandSetHomeEvent.Reason reason) {
-        return callIslandSetHomeEvent(island, commandSenderToSuperiorPlayer(commandSender), islandHome, reason);
-    }
-
     public static PluginEvent<IslandSetHome> callIslandSetHomeEvent(Island island, @Nullable SuperiorPlayer superiorPlayer,
                                                                     Location islandHome, IslandSetHomeEvent.Reason reason) {
         IslandSetHome islandRenameWarp = new IslandSetHome();
@@ -940,20 +936,20 @@ public class PluginEventsFactory {
                                                                     Upgrade upgrade, UpgradeLevel currentLevel,
                                                                     UpgradeLevel nextLevel, IslandUpgradeEvent.Cause upgradeCause) {
         return callIslandUpgradeEvent(island, superiorPlayer, upgrade, nextLevel, currentLevel.getCommands(),
-                upgradeCause, currentLevel.getCost());
+                upgradeCause, currentLevel.getCosts());
     }
 
     public static PluginEvent<IslandUpgrade> callIslandUpgradeEvent(Island island, CommandSender commandSender,
                                                                     Upgrade upgrade, UpgradeLevel nextLevel,
                                                                     IslandUpgradeEvent.Cause upgradeCause) {
         return callIslandUpgradeEvent(island, commandSenderToSuperiorPlayer(commandSender), upgrade, nextLevel,
-                Collections.emptyList(), upgradeCause, null);
+                Collections.emptyList(), upgradeCause, Collections.emptyList());
     }
 
     public static PluginEvent<IslandUpgrade> callIslandUpgradeEvent(Island island, @Nullable SuperiorPlayer superiorPlayer,
                                                                     Upgrade upgrade, UpgradeLevel nextLevel,
                                                                     List<String> commands, IslandUpgradeEvent.Cause upgradeCause,
-                                                                    @Nullable UpgradeCost upgradeCost) {
+                                                                    List<UpgradeCost> upgradeCosts) {
         IslandUpgrade islandUpgrade = new IslandUpgrade();
         islandUpgrade.island = island;
         islandUpgrade.superiorPlayer = superiorPlayer;
@@ -961,7 +957,7 @@ public class PluginEventsFactory {
         islandUpgrade.nextLevel = nextLevel;
         islandUpgrade.commands = commands;
         islandUpgrade.upgradeCause = upgradeCause;
-        islandUpgrade.upgradeCost = upgradeCost;
+        islandUpgrade.upgradeCosts = upgradeCosts;
         return fireEvent(ISLAND_UPGRADE_EVENT, islandUpgrade);
     }
 
@@ -1041,6 +1037,13 @@ public class PluginEventsFactory {
         playerChangeBorderColor.superiorPlayer = superiorPlayer;
         playerChangeBorderColor.borderColor = borderColor;
         return !fireEvent(PLAYER_CHANGE_BORDER_COLOR_EVENT, playerChangeBorderColor).isCancelled();
+    }
+
+    public static boolean callPlayerChangeChatStateEvent(SuperiorPlayer superiorPlayer, ChatState chatState) {
+        PlayerChangeChatState playerChangeChatState = new PlayerChangeChatState();
+        playerChangeChatState.superiorPlayer = superiorPlayer;
+        playerChangeChatState.newChatState = chatState;
+        return !fireEvent(PLAYER_CHANGE_CHAT_STATE_EVENT, playerChangeChatState).isCancelled();
     }
 
     public static boolean callPlayerChangeLanguageEvent(SuperiorPlayer superiorPlayer, Locale language) {

@@ -5,8 +5,7 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuViewButton;
-import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
-import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedInventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -16,23 +15,22 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.PreviousPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.layout.order.CustomPagedLayoutOrder;
 import com.bgsoftware.superiorskyblock.core.menu.layout.order.PagedLayoutOrder;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMenuLayout<V> implements PagedMenuLayout<V> {
+public class PagedInventoryMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> extends RegularInventoryMenuLayoutImpl<V> implements PagedInventoryMenuLayout<V> {
 
     @Nullable
     private final PagedLayoutOrder<V> customLayoutOrder;
     private final int objectsPerPageCount;
 
-    private PagedMenuLayoutImpl(String title, InventoryType inventoryType, MenuTemplateButton<V>[] buttons, @Nullable PagedLayoutOrder<V> layoutOrder) {
-        super(title, inventoryType, buttons);
-        this.customLayoutOrder = layoutOrder;
-        this.objectsPerPageCount = layoutOrder == null ? countPagedButtons(buttons) : layoutOrder.getObjectsPerPageCount();
+    private PagedInventoryMenuLayoutImpl(Builder<V, E> builder) {
+        super(builder);
+        this.customLayoutOrder = builder.layoutOrder;
+        this.objectsPerPageCount = builder.layoutOrder == null ? countPagedButtons(buttons) : builder.layoutOrder.getObjectsPerPageCount();
         if (this.customLayoutOrder != null) {
             // Update button indexes with the custom layout order
             PagedLayoutOrder.MenuButtonsIterator<V> buttonsIterator = this.customLayoutOrder.createIterator(this.buttons);
@@ -53,12 +51,6 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
 
     @Override
     protected void populateInventory(Inventory inventory, V menuView) {
-        if (!(menuView instanceof PagedMenuView))
-            return;
-
-        // noinspection unchecked
-        PagedMenuView<V, ?, E> pagedMenuView = (PagedMenuView<V, ?, E>) menuView;
-
         MutableInt pagedObjectSlot = new MutableInt(0);
 
         // Set all regular buttons in the menu
@@ -68,7 +60,7 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
             if (this.customLayoutOrder != null && button instanceof PagedMenuViewButton)
                 continue;
 
-            populateInventoryWithButton(inventory, button, slot, pagedMenuView, pagedObjectSlot);
+            populateInventoryWithButton(inventory, button, slot, menuView, pagedObjectSlot);
         }
 
         if (this.customLayoutOrder == null)
@@ -84,7 +76,7 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
             MenuViewButton<V> button = templateButton.createViewButton(menuView);
             int slot = buttonsIterator.getSlot();
 
-            populateInventoryWithButton(inventory, button, slot, pagedMenuView, pagedObjectSlot);
+            populateInventoryWithButton(inventory, button, slot, menuView, pagedObjectSlot);
         }
 
     }
@@ -142,13 +134,9 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
         return (int) Arrays.stream(buttons).filter(button -> button instanceof PagedMenuTemplateButton).count();
     }
 
-    public static <V extends PagedMenuView<V, ?, E>, E> Builder<V, E> newBuilder() {
-        return new Builder<>();
-    }
-
     public static class Builder<V extends PagedMenuView<V, ?, E>, E>
-            extends AbstractBuilder<V>
-            implements PagedMenuLayout.Builder<V, E> {
+            extends RegularInventoryMenuLayoutImpl.AbstractBuilder<V, Builder<V, E>>
+            implements PagedInventoryMenuLayout.Builder<V, E> {
 
         @Nullable
         private PagedLayoutOrder<V> layoutOrder;
@@ -178,7 +166,7 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
         }
 
         @Override
-        public PagedMenuLayout.Builder<V, E> setCustomLayoutOrder(List<Integer> slotsOrder) {
+        public Builder<V, E> setCustomLayoutOrder(List<Integer> slotsOrder) {
             slotsOrder.removeIf(slot -> !(super.buttons[slot] instanceof PagedMenuTemplateButton));
             if (!slotsOrder.isEmpty())
                 this.layoutOrder = new CustomPagedLayoutOrder<>(slotsOrder);
@@ -186,8 +174,8 @@ public class PagedMenuLayoutImpl<V extends MenuView<V, ?>, E> extends AbstractMe
         }
 
         @Override
-        public PagedMenuLayoutImpl<V, E> build() {
-            return new PagedMenuLayoutImpl<>(super.title, super.inventoryType, super.buttons, this.layoutOrder);
+        public PagedInventoryMenuLayout<V> build() {
+            return new PagedInventoryMenuLayoutImpl<>(this);
         }
 
     }

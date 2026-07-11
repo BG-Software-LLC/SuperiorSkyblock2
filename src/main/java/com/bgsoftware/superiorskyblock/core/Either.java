@@ -14,6 +14,10 @@ public abstract class Either<L, R> {
         return new Left<>(value);
     }
 
+    public abstract boolean isRight();
+
+    public abstract boolean isLeft();
+
     public abstract Either<L, R> ifRight(Consumer<R> consumer);
 
     public abstract Either<L, R> ifLeft(Consumer<L> consumer);
@@ -30,6 +34,16 @@ public abstract class Either<L, R> {
 
         Right(R value) {
             this.value = value;
+        }
+
+        @Override
+        public boolean isRight() {
+            return true;
+        }
+
+        @Override
+        public boolean isLeft() {
+            return false;
         }
 
         @Override
@@ -62,6 +76,16 @@ public abstract class Either<L, R> {
 
         Left(L value) {
             this.value = value;
+        }
+
+        @Override
+        public boolean isRight() {
+            return false;
+        }
+
+        @Override
+        public boolean isLeft() {
+            return true;
         }
 
         @Override

@@ -57,6 +57,7 @@ import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradesManagerImpl;
 import com.bgsoftware.superiorskyblock.island.upgrade.container.DefaultUpgradesContainer;
+import com.bgsoftware.superiorskyblock.island.upgrade.loaders.ItemsUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.island.upgrade.loaders.PlaceholdersUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.island.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.listener.BukkitListeners;
@@ -66,6 +67,7 @@ import com.bgsoftware.superiorskyblock.module.ModulesManagerImpl;
 import com.bgsoftware.superiorskyblock.module.container.DefaultModulesContainer;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
+import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFightChooser;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
@@ -75,6 +77,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
 import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
@@ -129,6 +132,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Nullable
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
+    private Optional<NMSDialogs> nmsDialogs;
     private NMSDragonFight nmsDragonFight;
     private NMSEntities nmsEntities;
     private NMSHolograms nmsHolograms;
@@ -179,6 +183,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         IslandPrivileges.registerPrivileges();
         SortingTypes.registerSortingTypes(this);
         IslandFlags.registerFlags();
+        ChatStates.registerStates();
         ClearActions.registerActions();
         RespawnActions.registerActions();
         IslandCacheKeys.registerCacheKeys();
@@ -414,6 +419,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             this.nmsWorld = nmsLoader.loadNMSHandler(NMSWorld.class);
             this.nmsDragonFight = new NMSDragonFightChooser(plugin, () -> nmsLoader.loadNMSHandler(NMSDragonFight.class));
 
+            try {
+                this.nmsDialogs = Optional.of(nmsLoader.loadNMSHandler(NMSDialogs.class));
+            } catch (NMSLoadException e) {
+                // Failed to load NMSDialogs
+                this.nmsDialogs = Optional.empty();
+            }
+
             return true;
         } catch (NMSLoadException error) {
             new ManagerLoadException(error, "The plugin doesn't support your minecraft version.\n" + "Please try a different version.",
@@ -632,6 +644,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         return nmsChunks;
     }
 
+    public Optional<NMSDialogs> getNMSDialogs() {
+        return nmsDialogs;
+    }
+
     public NMSDragonFight getNMSDragonFight() {
         return nmsDragonFight;
     }
@@ -663,6 +679,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private void loadUpgradeCostLoaders() {
         upgradesHandler.registerUpgradeCostLoader("money", new VaultUpgradeCostLoader());
         upgradesHandler.registerUpgradeCostLoader("placeholders", new PlaceholdersUpgradeCostLoader());
+        upgradesHandler.registerUpgradeCostLoader("items", new ItemsUpgradeCostLoader());
     }
 
     private long calculateMaxPossibleIslands() {
