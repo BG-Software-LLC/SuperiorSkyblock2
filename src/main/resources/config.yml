@@ -169,12 +169,14 @@ island-level-rounding-mode: 'HALF_UP'
 # placement and breaking of blocks.
 auto-blocks-tracking: true
 
-# How should the island top be ordered by default?
-# Use WORTH, LEVEL, RATING or PLAYERS.
+# Which sorting type should be used by default for the island top?
+# The default available sorting types: WORTH, LEVEL, RATING, PLAYERS, BANK
+# Custom sorting types can be registered using the API.
 island-top-order: 'WORTH'
 
-# How should the global warps be ordered by default?
-# Use WORTH, LEVEL, RATING or PLAYERS.
+# Which sorting type should be used by default for the global warps?
+# The default available sorting types: WORTH, LEVEL, RATING, PLAYERS, BANK
+# Custom sorting types can be registered using the API.
 global-warps-order: 'WORTH'
 
 # Whether coop members should be enabled or not.
