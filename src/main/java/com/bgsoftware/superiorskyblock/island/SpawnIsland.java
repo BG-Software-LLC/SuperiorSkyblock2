@@ -41,7 +41,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -100,29 +100,39 @@ public class SpawnIsland implements Island {
     private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static EnumerateSet<IslandFlag> DEFAULT_SPAWN_FLAGS_CACHE;
-    private static EnumerateSet<IslandPrivilege> DEFAULT_SPAWN_PRIVILEGES_CACHE;
+    private static UnparsedEnumerateSet<IslandFlag> DEFAULT_SPAWN_FLAGS_CACHE;
+    private static UnparsedEnumerateSet<IslandPrivilege> DEFAULT_SPAWN_PRIVILEGES_CACHE;
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SpawnIsland::onSettingsUpdate);
     }
 
     private static void onSettingsUpdate() {
-        DEFAULT_SPAWN_FLAGS_CACHE = new EnumerateSet<>(IslandFlag.values());
-        plugin.getSettings().getSpawn().getSettings().forEach(flagName -> {
-            try {
-                DEFAULT_SPAWN_FLAGS_CACHE.add(IslandFlag.getByName(flagName));
-            } catch (Throwable ignored) {
+        DEFAULT_SPAWN_FLAGS_CACHE = new UnparsedEnumerateSet<IslandFlag>(IslandFlag.values()) {
+            @Override
+            protected IslandFlag parseName(String name) {
+                return IslandFlag.getByName(name);
             }
-        });
 
-        DEFAULT_SPAWN_PRIVILEGES_CACHE = new EnumerateSet<>(IslandPrivilege.values());
-        plugin.getSettings().getSpawn().getPermissions().forEach(privilegeName -> {
-            try {
-                DEFAULT_SPAWN_PRIVILEGES_CACHE.add(IslandPrivilege.getByName(privilegeName));
-            } catch (Throwable ignored) {
+            @Override
+            protected String getName(IslandFlag islandFlag) {
+                return islandFlag.getName();
             }
-        });
+        };
+        plugin.getSettings().getSpawn().getSettings().forEach(DEFAULT_SPAWN_FLAGS_CACHE::addName);
+
+        DEFAULT_SPAWN_PRIVILEGES_CACHE = new UnparsedEnumerateSet<IslandPrivilege>(IslandPrivilege.values()) {
+            @Override
+            protected IslandPrivilege parseName(String name) {
+                return IslandPrivilege.getByName(name);
+            }
+
+            @Override
+            protected String getName(IslandPrivilege islandPrivilege) {
+                return islandPrivilege.getName();
+            }
+        };
+        plugin.getSettings().getSpawn().getPermissions().forEach(DEFAULT_SPAWN_PRIVILEGES_CACHE::addName);
     }
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);

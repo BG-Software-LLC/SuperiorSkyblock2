@@ -56,6 +56,7 @@ import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.Location2ObjectMap;
+import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
@@ -180,7 +181,7 @@ public class SIsland implements Island {
         }
     };
 
-    private static EnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
+    private static UnparsedEnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
 
     private final DatabaseBridge databaseBridge;
     private final IslandBank islandBank;
@@ -5312,13 +5313,18 @@ public class SIsland implements Island {
     }
 
     private static void onSettingsUpdate() {
-        DEFAULT_FLAGS_CACHE = new EnumerateSet<>(IslandFlag.values());
-        plugin.getSettings().getDefaultSettings().forEach(islandFlagName -> {
-            try {
-                DEFAULT_FLAGS_CACHE.add(IslandFlag.getByName(islandFlagName));
-            } catch (Throwable ignored) {
+        DEFAULT_FLAGS_CACHE = new UnparsedEnumerateSet<IslandFlag>(IslandFlag.values()) {
+            @Override
+            protected IslandFlag parseName(String name) {
+                return IslandFlag.getByName(name);
             }
-        });
+
+            @Override
+            protected String getName(IslandFlag islandFlag) {
+                return islandFlag.getName();
+            }
+        };
+        plugin.getSettings().getDefaultSettings().forEach(DEFAULT_FLAGS_CACHE::addName);
     }
 
     private static WorldPosition adjustPositionToCenterOfBlock(@Nullable WorldPosition worldPosition) {
