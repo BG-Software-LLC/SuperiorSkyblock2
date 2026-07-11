@@ -1,16 +1,17 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BiomeButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
@@ -52,7 +53,7 @@ public class MenuBiomes extends AbstractMenu<IslandMenuView, IslandViewArgs> {
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
@@ -79,19 +80,19 @@ public class MenuBiomes extends AbstractMenu<IslandMenuView, IslandViewArgs> {
                 BiomeButton.Builder buttonBuilder = new BiomeButton.Builder(biome);
 
                 if (itemSection.isConfigurationSection("access")) {
-                    buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("menus/biomes.yml",
+                    buttonBuilder.setAccessItem(MenuParserUtils.getItemStack("menus/biomes.yml",
                             itemSection.getConfigurationSection("access")));
                 }
                 if (itemSection.isConfigurationSection("no-access")) {
-                    buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("menus/biomes.yml",
+                    buttonBuilder.setNoAccessItem(MenuParserUtils.getItemStack("menus/biomes.yml",
                             itemSection.getConfigurationSection("no-access")));
                 }
                 if (soundSection != null) {
                     if (soundSection.isConfigurationSection("access")) {
-                        buttonBuilder.setAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("access")));
+                        buttonBuilder.setAccessSound(MenuParserUtils.getSound(soundSection.getConfigurationSection("access")));
                     }
                     if (soundSection.isConfigurationSection("no-access")) {
-                        buttonBuilder.setNoAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("no-access")));
+                        buttonBuilder.setNoAccessSound(MenuParserUtils.getSound(soundSection.getConfigurationSection("no-access")));
                     }
                 }
                 if (commandSection != null) {
@@ -103,7 +104,7 @@ public class MenuBiomes extends AbstractMenu<IslandMenuView, IslandViewArgs> {
                     }
                 }
 
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), buttonBuilder);
+                patternBuilder.mapButtons(menuSlotsMap.getSlots(itemSectionName), buttonBuilder);
             }
         }
 

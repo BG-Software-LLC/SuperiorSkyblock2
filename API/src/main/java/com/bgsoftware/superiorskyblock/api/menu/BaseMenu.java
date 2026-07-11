@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.menu;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
@@ -129,43 +130,59 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
     }
 
     @Override
+    @Deprecated
     public void onClick(InventoryClickEvent clickEvent, V menuView) {
-        if (clickEvent.getCurrentItem() == null)
-            return;
+        onClick(ButtonClickContext.create(
+                (Player) clickEvent.getWhoClicked(),
+                menuView,
+                clickEvent.getRawSlot(),
+                clickEvent.getClick()
+        ));
+    }
 
+    @Override
+    public void onClick(ButtonClickContext<V> context) {
         Preconditions.checkNotNull(this.menuLayout, "menu wasn't initialized properly.");
 
-        MenuViewButton<V> menuButton = this.menuLayout.getButton(clickEvent.getRawSlot()).createViewButton(menuView);
+        V menuView = context.getMenuView();
+
+        MenuViewButton<V> menuButton = context.getClickedButton().createViewButton(menuView);
 
         String requiredPermission = menuButton.getTemplate().getRequiredPermission();
         if (requiredPermission != null && !menuView.getInventoryViewer().hasPermission(requiredPermission)) {
-            onButtonClickLackPermission(menuButton, clickEvent);
+            onButtonClickLackPermission(menuButton, context);
             return;
         }
 
-        Player player = (Player) clickEvent.getWhoClicked();
+        Player player = context.getPlayer();
 
         GameSound clickSound = menuButton.getTemplate().getClickSound();
         if (clickSound != null)
             player.playSound(player.getLocation(), clickSound.getSound(), clickSound.getVolume(), clickSound.getPitch());
 
         menuButton.getTemplate().getClickCommands().forEach(command ->
-                MenuCommands.getInstance().runCommand(menuView, command, clickEvent));
+                MenuCommands.getInstance().runCommand(menuView, command, context));
 
-        if (onPreButtonClick(menuButton, clickEvent))
-            menuButton.onButtonClick(clickEvent);
+        if (onPreButtonClick(menuButton, context))
+            menuButton.onButtonClick(context);
     }
 
     @Override
+    @Deprecated
     public final void onClose(InventoryCloseEvent closeEvent, V menuView) {
-        removeView(menuView);
-        this.onCloseInternal(closeEvent, menuView);
+        onClose(menuView);
     }
 
-    protected abstract boolean onPreButtonClick(MenuViewButton<V> menuButton, InventoryClickEvent clickEvent);
+    @Override
+    public final void onClose(V menuView) {
+        removeView(menuView);
+        this.onCloseInternal(menuView);
+    }
 
-    protected abstract void onButtonClickLackPermission(MenuViewButton<V> menuButton, InventoryClickEvent clickEvent);
+    protected abstract boolean onPreButtonClick(MenuViewButton<V> menuButton, ButtonClickContext<V> context);
 
-    protected abstract void onCloseInternal(InventoryCloseEvent closeEvent, V menuView);
+    protected abstract void onButtonClickLackPermission(MenuViewButton<V> menuButton, ButtonClickContext<V> context);
+
+    protected abstract void onCloseInternal(V menuView);
 
 }
