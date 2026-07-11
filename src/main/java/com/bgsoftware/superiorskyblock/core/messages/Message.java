@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -803,15 +802,9 @@ public enum Message {
                 message = Formatters.COLOR_FORMATTER.format(message);
             }
 
-            for (MessagesServiceImpl.CustomComponentParser parser : messagesService.get().getCustomComponentParsers()) {
-                Optional<IMessageComponent> component = parser.parseRawMessage(message);
-                if (component.isPresent()) {
-                    component.get().sendMessage(sender);
-                    return;
-                }
-            }
-
-            sender.sendMessage(message);
+            MessagesService.Builder builder = messagesService.get().newBuilder();
+            builder.addRawMessage(message);
+            builder.build().sendMessage(sender);
         }
 
     };
@@ -820,10 +813,10 @@ public enum Message {
     private static final Object[] EMPTY_ARGS = new Object[0];
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final LazyReference<MessagesServiceImpl> messagesService = new LazyReference<MessagesServiceImpl>() {
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
         @Override
-        protected MessagesServiceImpl create() {
-            return (MessagesServiceImpl) plugin.getServices().getService(MessagesService.class);
+        protected MessagesService create() {
+            return plugin.getServices().getService(MessagesService.class);
         }
     };
 

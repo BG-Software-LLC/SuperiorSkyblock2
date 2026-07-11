@@ -1,10 +1,9 @@
-package com.bgsoftware.superiorskyblock.core.messages.component.impl;
+package com.bgsoftware.superiorskyblock.core.messages.component;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
-import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -166,6 +167,12 @@ public class SIsland implements Island {
 
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
+        @Override
+        protected MessagesService create() {
+            return plugin.getServices().getService(MessagesService.class);
+        }
+    };
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
         @Override
         protected PlaceholdersService create() {
@@ -2171,17 +2178,9 @@ public class SIsland implements Island {
         Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, Arrays.toString(ignoredMembers));
 
         forEachIslandMember(ignoredMembers, true, islandMember -> {
-            String playerTitle = title;
-            String playerSubtitle = subtitle;
-
-            Player player = islandMember.asPlayer();
-
-            if (!Text.isBlank(playerTitle))
-                playerTitle = placeholdersService.get().parsePlaceholders(player, playerTitle);
-            if (!Text.isBlank(playerSubtitle))
-                playerSubtitle = placeholdersService.get().parsePlaceholders(player, playerSubtitle);
-
-            plugin.getNMSPlayers().sendTitle(player, playerTitle, playerSubtitle, fadeIn, duration, fadeOut);
+            MessagesService.Builder builder = messagesService.get().newBuilder();
+            builder.addTitle(title, subtitle, fadeIn, duration, fadeOut);
+            builder.build().sendMessage(islandMember.asPlayer());
         });
     }
 
