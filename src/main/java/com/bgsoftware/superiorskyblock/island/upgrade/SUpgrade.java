@@ -22,7 +22,7 @@ import java.util.Set;
 public class SUpgrade implements Upgrade {
 
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0,
-            EmptyUpgradeCost.getInstance(),
+            Collections.singletonList(EmptyUpgradeCost.getInstance()),
             Collections.emptyList(),
             "",
             Collections.emptySet(),

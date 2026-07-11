@@ -997,14 +997,14 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
         @Override
         public Event createBukkitEvent(IslandUpgrade args) {
             return new IslandUpgradeEvent(args.superiorPlayer, args.island, args.upgrade, args.nextLevel, args.commands,
-                    args.upgradeCause, args.upgradeCost);
+                    args.upgradeCause, args.upgradeCosts);
         }
 
         @Override
         public void applyBukkitToPluginEvent(Event bukkitEvent, PluginEvent<IslandUpgrade> pluginEvent) {
             super.applyBukkitToPluginEvent(bukkitEvent, pluginEvent);
             pluginEvent.getArgs().commands = ((IslandUpgradeEvent) bukkitEvent).getCommands();
-            pluginEvent.getArgs().upgradeCost = ((IslandUpgradeEvent) bukkitEvent).getUpgradeCost();
+            pluginEvent.getArgs().upgradeCosts = ((IslandUpgradeEvent) bukkitEvent).getUpgradeCosts();
         }
     };
     public static final PluginEventType<IslandVisitorHomeTeleport> ISLAND_VISITOR_HOME_TELEPORT_EVENT = new PluginEventType<IslandVisitorHomeTeleport>(IslandVisitorHomeTeleportEvent.class) {
