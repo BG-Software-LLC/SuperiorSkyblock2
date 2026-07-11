@@ -15,6 +15,7 @@ public class SortingTypes {
     public static final SortingType BY_LEVEL = register("LEVEL", Island::getIslandLevel, SortingComparators.LEVEL_COMPARATOR);
     public static final SortingType BY_RATING = register("RATING", Island::getTotalRating, SortingComparators.RATING_COMPARATOR);
     public static final SortingType BY_PLAYERS = register("PLAYERS", island -> island.getAllPlayersInside().size(), SortingComparators.PLAYERS_COMPARATOR);
+    public static final SortingType BY_BANK = register("BANK", island -> island.getIslandBank().getBalance(), SortingComparators.BANK_COMPARATOR);
 
     private static volatile SortingType ISLAND_TOP_SORTING;
     private static volatile SortingType GLOBAL_WARPS_SORTING;
