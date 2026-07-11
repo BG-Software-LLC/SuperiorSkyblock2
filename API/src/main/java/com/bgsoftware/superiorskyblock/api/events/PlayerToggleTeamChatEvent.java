@@ -8,7 +8,9 @@ import org.bukkit.event.HandlerList;
 
 /**
  * PlayerToggleTeamChatEvent is called when a player toggles his team chat.
+ * @deprecated See {@link PlayerChangeChatStateEvent}
  */
+@Deprecated
 public class PlayerToggleTeamChatEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();

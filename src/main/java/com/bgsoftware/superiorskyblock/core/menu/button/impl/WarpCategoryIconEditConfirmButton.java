@@ -9,9 +9,9 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractIconProviderMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class WarpCategoryIconEditConfirmButton extends AbstractMenuViewButton<AbstractIconProviderMenu.View<WarpCategory>> {
 
@@ -21,8 +21,8 @@ public class WarpCategoryIconEditConfirmButton extends AbstractMenuViewButton<Ab
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
+    public void onButtonClick(ButtonClickContext<AbstractIconProviderMenu.View<WarpCategory>> context) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getPlayer());
 
         WarpCategory warpCategory = menuView.getIconProvider();
 
@@ -32,7 +32,7 @@ public class WarpCategoryIconEditConfirmButton extends AbstractMenuViewButton<Ab
         if (event.isCancelled())
             return;
 
-        clickEvent.getWhoClicked().closeInventory();
+        context.getPlayer().closeInventory();
 
         Message.WARP_CATEGORY_ICON_UPDATED.send(superiorPlayer);
 
@@ -43,8 +43,7 @@ public class WarpCategoryIconEditConfirmButton extends AbstractMenuViewButton<Ab
 
         @Override
         public MenuTemplateButton<AbstractIconProviderMenu.View<WarpCategory>> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, WarpCategoryIconEditConfirmButton.class,
+            return new MenuTemplateButtonImpl<>(this, WarpCategoryIconEditConfirmButton.class,
                     WarpCategoryIconEditConfirmButton::new);
         }
 

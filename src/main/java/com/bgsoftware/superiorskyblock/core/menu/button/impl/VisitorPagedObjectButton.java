@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandVisitors;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Locale;
@@ -21,16 +21,16 @@ public class VisitorPagedObjectButton extends AbstractPagedMenuButton<MenuIsland
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuIslandVisitors.View> context) {
         String subCommandToExecute;
 
-        if (clickEvent.getClick().isRightClick())
+        if (context.getClickType().isRightClick())
             subCommandToExecute = "invite";
-        else if (clickEvent.getClick().isLeftClick())
+        else if (context.getClickType().isLeftClick())
             subCommandToExecute = "expel";
         else return;
 
-        plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), subCommandToExecute, pagedObject.getName());
+        plugin.getCommands().dispatchSubCommand(context.getPlayer(), subCommandToExecute, pagedObject.getName());
     }
 
     @Override
@@ -53,8 +53,7 @@ public class VisitorPagedObjectButton extends AbstractPagedMenuButton<MenuIsland
 
         @Override
         public PagedMenuTemplateButton<MenuIslandVisitors.View, SuperiorPlayer> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), VisitorPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, VisitorPagedObjectButton.class,
                     VisitorPagedObjectButton::new);
         }
 

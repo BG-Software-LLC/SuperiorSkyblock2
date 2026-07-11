@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -289,6 +290,7 @@ public enum Message {
     COMMAND_DESCRIPTION_KICK,
     COMMAND_DESCRIPTION_LANG,
     COMMAND_DESCRIPTION_LEAVE,
+    COMMAND_DESCRIPTION_LOCAL_CHAT,
     COMMAND_DESCRIPTION_MEMBERS,
     COMMAND_DESCRIPTION_MISSION,
     COMMAND_DESCRIPTION_MISSIONS,
@@ -549,6 +551,7 @@ public enum Message {
     LEFT_ISLAND,
     LEFT_ISLAND_COOP,
     LEFT_ISLAND_COOP_NAME,
+    LOCAL_CHAT_FORMAT,
     LOCK_WORLD_ANNOUNCEMENT_ALL,
     LOCK_WORLD_ANNOUNCEMENT_NAME,
     LOCK_WORLD_ANNOUNCEMENT,
@@ -699,6 +702,7 @@ public enum Message {
     SPAWN_PROTECTED_OPPED,
     SPAWN_SET_SUCCESS,
     SPAWN_TELEPORT_SUCCESS,
+    SPY_LOCAL_CHAT_FORMAT,
     SPY_TEAM_CHAT_FORMAT,
     SYNC_UPGRADES,
     SYNC_UPGRADES_ALL,
@@ -719,6 +723,8 @@ public enum Message {
     TOGGLED_FLY_ON,
     TOGGLED_FLY_OFF_OTHER,
     TOGGLED_FLY_ON_OTHER,
+    TOGGLED_LOCAL_CHAT_OFF,
+    TOGGLED_LOCAL_CHAT_ON,
     TOGGLED_SCHEMATIC_OFF,
     TOGGLED_SCHEMATIC_ON,
     TOGGLED_SPY_OFF,
@@ -940,6 +946,18 @@ public enum Message {
     @Nullable
     public String getMessage(Locale locale, Object... args) {
         return isEmpty(locale) ? defaultMessage : messages.get(locale).getMessage(args);
+    }
+
+    public final void sendPlayerOrConsole(@Nullable SuperiorPlayer superiorPlayer) {
+        sendPlayerOrConsole(superiorPlayer, EMPTY_ARGS);
+    }
+
+    public final void sendPlayerOrConsole(@Nullable SuperiorPlayer superiorPlayer, Object... args) {
+        if (superiorPlayer == null) {
+            send(Bukkit.getConsoleSender(), args);
+        } else {
+            send(superiorPlayer, args);
+        }
     }
 
     public final void send(SuperiorPlayer superiorPlayer) {

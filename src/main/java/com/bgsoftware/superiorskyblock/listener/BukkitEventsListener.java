@@ -4,12 +4,12 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
-import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -22,7 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -241,6 +240,15 @@ public class BukkitEventsListener implements Listener {
             createEventListener(GameEventType.GENERIC_GAME_EVENT, genericGameEventClass, plugin.getNMSAlgorithms().getGenericGameCreator());
         } catch (Exception ignored) {
         }
+
+        plugin.getNMSDialogs().ifPresent(nmsDialogs -> {
+            try {
+                NMSDialogs.PlayerCustomClickEventFunctions clickEventFunctions = nmsDialogs.createCustomClickEventFunctions();
+                createEventListener(GameEventType.DIALOG_CLICK_EVENT, clickEventFunctions.getEventClass(), clickEventFunctions);
+            } catch (Exception ignored) {
+            }
+        });
+
     }
 
     /*

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
@@ -8,17 +9,14 @@ import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Optional;
 
 public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissionsCategory.View, MissionReference> {
@@ -33,7 +31,7 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuMissionsCategory.View> context) {
         Mission<?> mission = pagedObject.getMission();
 
         if (mission == null)
@@ -66,7 +64,7 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
         else
             gameSound = getTemplate().notCompletedSound;
 
-        GameSoundImpl.playSound(clickEvent.getWhoClicked(), gameSound);
+        GameSoundImpl.playSound(context.getPlayer(), gameSound);
 
         if (!canComplete)
             return;
@@ -155,8 +153,9 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
 
         @Override
         public PagedMenuTemplateButton<MenuMissionsCategory.View, MissionReference> build() {
-            return new Template(buttonItem, commands, requiredPermission, lackPermissionSound, nullItem,
-                    getButtonIndex(), clickSound, notCompletedSound, canCompleteSound, lockedSound);
+            GameSound completedSound = canCompleteSound;
+            this.clickSound = null;
+            return new Template(this, completedSound, notCompletedSound, canCompleteSound, lockedSound);
         }
 
     }
@@ -168,11 +167,9 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
         private final GameSound canCompleteSound;
         private final GameSound lockedSound;
 
-        Template(TemplateItem buttonItem, List<String> commands, String requiredPermission,
-                 GameSound lackPermissionSound, TemplateItem nullItem, int buttonIndex,
+        Template(AbstractBuilder<MenuMissionsCategory.View, MissionReference> builder,
                  GameSound completedSound, GameSound notCompletedSound, GameSound canCompleteSound, GameSound lockedSound) {
-            super(buttonItem, null, commands, requiredPermission, lackPermissionSound, nullItem, buttonIndex,
-                    MissionsPagedObjectButton.class, MissionsPagedObjectButton::new);
+            super(builder, MissionsPagedObjectButton.class, MissionsPagedObjectButton::new);
             this.completedSound = completedSound;
             this.notCompletedSound = notCompletedSound;
             this.canCompleteSound = canCompleteSound;

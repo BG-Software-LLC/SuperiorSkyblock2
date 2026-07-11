@@ -17,8 +17,10 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.notifications.IslandNotifications;
@@ -29,6 +31,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
@@ -216,6 +219,11 @@ public class PlayersListener extends AbstractGameEventListener {
 
         // Remove all player chat-listeners
         PlayerChat.remove(player);
+
+        // Destroy current opened dialog
+        DialogWrapper<?> dialog = DialogWrapper.getByPlayer(player.getUniqueId());
+        if (dialog != null)
+            dialog.onCloseDialog();
     }
 
     private void onPlayerGameModeChange(GameEvent<GameEventArgs.PlayerGamemodeChangeEvent> e) {
@@ -395,24 +403,42 @@ public class PlayersListener extends AbstractGameEventListener {
 
     private void onPlayerChat(GameEvent<GameEventArgs.PlayerChatEvent> e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
-        Island island = superiorPlayer.getIsland();
 
-        if (superiorPlayer.hasTeamChatEnabled()) {
-            if (island == null) {
-                if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+        if (superiorPlayer.getChatState() == ChatStates.LOCAL_CHAT) {
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt((e.getArgs().player).getLocation(wrapper.getHandle()));
+            }
+
+            if (island == null || island.isSpawn()) {
+                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.GLOBAL))
                     return;
 
-                superiorPlayer.toggleTeamChat();
+                superiorPlayer.setChatState(ChatStates.GLOBAL);
                 return;
             }
 
             e.setCancelled();
 
-            String message = e.getArgs().message;
+            IslandChat.handleIslandChat(island, superiorPlayer, e.getArgs().message);
+        } else if (superiorPlayer.getChatState() == ChatStates.TEAM_CHAT) {
+            Island island = superiorPlayer.getIsland();
 
-            IslandUtils.handleIslandChat(island, superiorPlayer, message);
+            if (island == null) {
+                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.GLOBAL) ||
+                        !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+                    return;
+
+                superiorPlayer.setChatState(ChatStates.GLOBAL);
+                return;
+            }
+
+            e.setCancelled();
+
+            IslandChat.handleIslandChat(island, superiorPlayer, e.getArgs().message);
         } else if (e.getArgs().format != null) {
-            e.getArgs().format = Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, island));
+            e.getArgs().format = Formatters.CHAT_FORMATTER.format(
+                    new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, superiorPlayer.getIsland()));
         }
     }
 

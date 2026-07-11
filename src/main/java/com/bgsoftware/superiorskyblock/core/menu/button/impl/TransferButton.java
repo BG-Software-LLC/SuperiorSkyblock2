@@ -1,19 +1,14 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmTransfer;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import org.bukkit.event.inventory.InventoryClickEvent;
-
-import java.util.List;
 
 public class TransferButton extends AbstractMenuViewButton<MenuConfirmTransfer.View> {
 
@@ -27,8 +22,8 @@ public class TransferButton extends AbstractMenuViewButton<MenuConfirmTransfer.V
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
+    public void onButtonClick(ButtonClickContext<MenuConfirmTransfer.View> context) {
+        SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(context.getPlayer());
 
         if (getTemplate().newOwner)
             IslandUtils.handleTransferIsland(clickedPlayer, menuView.getIsland(), menuView.getSuperiorPlayer());
@@ -47,7 +42,7 @@ public class TransferButton extends AbstractMenuViewButton<MenuConfirmTransfer.V
 
         @Override
         public MenuTemplateButton<MenuConfirmTransfer.View> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, newOwner);
+            return new Template(this, newOwner);
         }
 
     }
@@ -56,10 +51,8 @@ public class TransferButton extends AbstractMenuViewButton<MenuConfirmTransfer.V
 
         private final boolean newOwner;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, boolean newOwner) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    TransferButton.class, TransferButton::new);
+        Template(AbstractBuilder<MenuConfirmTransfer.View> builder, boolean newOwner) {
+            super(builder, TransferButton.class, TransferButton::new);
             this.newOwner = newOwner;
         }
 

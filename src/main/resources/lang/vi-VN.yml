@@ -306,6 +306,7 @@ COMMAND_DESCRIPTION_INVITE: Mời một người chơi đến đảo của bạn
 COMMAND_DESCRIPTION_KICK: Kick một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_LANG: Thay đổi ngôn ngữ cá nhân của bạn.
 COMMAND_DESCRIPTION_LEAVE: Rời khỏi hòn đảo của bạn.
+COMMAND_DESCRIPTION_LOCAL_CHAT: 'Toggle local chat mode.'
 COMMAND_DESCRIPTION_MEMBERS: Mở menu thành viên.
 COMMAND_DESCRIPTION_MISSION: Hoàn thành nhiệm vụ.
 COMMAND_DESCRIPTION_MISSIONS: Mở menu nhiệm vụ.
@@ -623,6 +624,7 @@ LEFT_ISLAND_COOP: '&e&lĐảo | &7Bạn không còn là thành viên co-op đả
   nữa.'
 LEFT_ISLAND_COOP_NAME: '&e&lĐảo | &7Bạn không còn là thành viên co-op đảo {0}
   nữa.'
+LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lThế giới | &7Thế giới {0} hiện đã bị khóa đối với tất cả các hòn đảo!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lThế giới | &7Thế giới {0} hiện đã bị khóa đối với hòn đảo {1}!'
 LOCK_WORLD_ANNOUNCEMENT: '&e&lThế giới | &7Thế giới {0} hiện đã bị khóa đối với hòa đảo của {1}!'
@@ -810,6 +812,7 @@ SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
 SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lTrung Tâm | &7Dịch chuyển thành công {0} đến trung tâm.'
 SPAWN_SET_SUCCESS: '&e&lTrung Tâm | &7Cập nhật thành công vị trí trung tâm thành {0}.'
+SPY_LOCAL_CHAT_FORMAT: '&7[Spy] &6[{0}] {1}&f: &7{2}'
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'
 SYNC_UPGRADES: '&e&lNâng Cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp đảo của {0}.'
 SYNC_UPGRADES_ALL: '&e&lNâng Cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp cho tất cả các đảo.'
@@ -833,6 +836,8 @@ TOGGLED_FLY_OFF: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &cT�
 TOGGLED_FLY_ON: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &aBẬT&7.'
 TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
 TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
+TOGGLED_LOCAL_CHAT_OFF: '&e&lChat | &7Toggling local chat &cOFF&7.'
+TOGGLED_LOCAL_CHAT_ON: '&e&lChat | &7Toggling local chat &aON&7.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Chuyển đổi chế độ schematic: &cTẮT&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchematics | &7Chuyển đổi chế độ schematic: &aBẬT&7.

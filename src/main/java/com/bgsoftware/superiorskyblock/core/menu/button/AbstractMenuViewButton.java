@@ -1,11 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.menu.button;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
+import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContextImpl;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,10 +40,26 @@ public abstract class AbstractMenuViewButton<V extends MenuView<V, ?>> implement
     }
 
     @Override
-    public abstract void onButtonClick(InventoryClickEvent clickEvent);
+    public void onButtonClick(ButtonClickContext<V> context) {
+        // Do nothing.
+    }
 
-    public void onButtonClickLackPermission(InventoryClickEvent clickEvent) {
-        GameSoundImpl.playSound(clickEvent.getWhoClicked(), this.templateButton.getLackPermissionSound());
+    @Override
+    @Deprecated
+    public final void onButtonClick(InventoryClickEvent clickEvent) {
+        try (ButtonClickContextImpl<V> ctx = ButtonClickContextImpl.obtain(getView(), clickEvent)) {
+            onButtonClick(ctx);
+        }
+    }
+
+    /**
+     * Called when the player lacks the required permission to click this button.
+     * Plays the button's lack-permission sound. Subclasses may override to add further behaviour.
+     *
+     * @param context The button click context.
+     */
+    public void onButtonClickLackPermission(ButtonClickContext<V> context) {
+        GameSoundImpl.playSound(context.getPlayer(), this.templateButton.getLackPermissionSound());
     }
 
 }
