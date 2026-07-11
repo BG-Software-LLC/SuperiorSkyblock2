@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
@@ -18,7 +19,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.View, MenuBiomes.BiomeInfo> {
@@ -28,7 +28,7 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuBiomes.View> context) {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Player player = inventoryViewer.asPlayer();
 
@@ -61,8 +61,8 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
     }
 
     @Override
-    public void onButtonClickLackPermission(InventoryClickEvent clickEvent) {
-        GameSoundImpl.playSound(clickEvent.getWhoClicked(), pagedObject.getNoAccessSound());
+    public void onButtonClickLackPermission(ButtonClickContext<MenuBiomes.View> context) {
+        super.onButtonClickLackPermission(context);
         pagedObject.getNoAccessCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", menuView.getInventoryViewer().getName())));
     }
@@ -95,8 +95,7 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
 
         @Override
         public PagedMenuTemplateButton<MenuBiomes.View, MenuBiomes.BiomeInfo> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), BiomePagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, BiomePagedObjectButton.class,
                     BiomePagedObjectButton::new);
         }
 

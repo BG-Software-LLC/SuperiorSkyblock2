@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
@@ -21,6 +20,8 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BiomePagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
@@ -117,13 +118,13 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
         List<Dimension> dimensions = new ArrayList<>();
 
         if (biomeSection != null) {
-            accessItem = MenuParserImpl.getInstance().getItemStack("menus/biomes.yml",
+            accessItem = MenuParserUtils.getItemStack("menus/biomes.yml",
                     biomeSection.getConfigurationSection("access"));
-            noAccessItem = MenuParserImpl.getInstance().getItemStack("menus/biomes.yml",
+            noAccessItem = MenuParserUtils.getItemStack("menus/biomes.yml",
                     biomeSection.getConfigurationSection("no-access"));
-            accessSound = MenuParserImpl.getInstance().getSound(
+            accessSound = MenuParserUtils.getSound(
                     biomeSection.getConfigurationSection("access.sound"));
-            noAccessSound = MenuParserImpl.getInstance().getSound(
+            noAccessSound = MenuParserUtils.getSound(
                     biomeSection.getConfigurationSection("no-access.sound"));
             accessCommands = biomeSection.getStringList("access.commands");
             noAccessCommands = biomeSection.getStringList("no-access.commands");
