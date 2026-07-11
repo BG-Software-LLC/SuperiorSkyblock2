@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
+import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.ChangeSortingTypeButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.SwitchTopIslandsSortingTypeButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsPagedObjectButton;
@@ -161,9 +162,19 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
                 if (itemsSection == null)
                     continue;
 
+                TemplateItem islandItem = MenuParserUtils.getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("island"));
+                if (islandItem == null)
+                    Log.warnFromFile("top-islands.yml", "The island item is missing for the char '", slotsChar, "'");
+
+                TemplateItem noIslandItem = MenuParserUtils.getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("no-island"));
+                if (noIslandItem == null)
+                    Log.warnFromFile("top-islands.yml", "The no-island item is missing for the char '", slotsChar, "'");
+
                 TopIslandsPagedObjectButton.Builder slotsBuilder = new TopIslandsPagedObjectButton.Builder();
-                slotsBuilder.setIslandItem(MenuParserUtils.getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("island")));
-                slotsBuilder.setNoIslandItem(MenuParserUtils.getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("no-island")));
+                if (islandItem != null)
+                    slotsBuilder.setIslandItem(islandItem);
+                if (noIslandItem != null)
+                    slotsBuilder.setNoIslandItem(noIslandItem);
                 slotsBuilder.setIslandSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
                 slotsBuilder.setNoIslandSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
                 slotsBuilder.setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"));
@@ -175,8 +186,10 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
                     configuredSelfPlayerButton = true;
 
                     TopIslandsSelfIslandButton.Builder selfIslandBuilder = new TopIslandsSelfIslandButton.Builder();
-                    selfIslandBuilder.setIslandItem(MenuParserUtils.getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("island")));
-                    selfIslandBuilder.setNoIslandItem(MenuParserUtils.getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("no-island")));
+                    if (islandItem != null)
+                        selfIslandBuilder.setIslandItem(islandItem.copy());
+                    if (noIslandItem != null)
+                        selfIslandBuilder.setNoIslandItem(noIslandItem.copy());
                     selfIslandBuilder.setIslandSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
                     selfIslandBuilder.setNoIslandSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
                     selfIslandBuilder.setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"));

@@ -153,9 +153,13 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
 
         @Override
         public PagedMenuTemplateButton<MenuMissionsCategory.View, MissionReference> build() {
-            GameSound completedSound = canCompleteSound;
+            GameSound completedSound = clickSound;
             this.clickSound = null;
-            return new Template(this, completedSound, notCompletedSound, canCompleteSound, lockedSound);
+            try {
+                return new Template(this, completedSound, notCompletedSound, canCompleteSound, lockedSound);
+            } finally {
+                this.clickSound = completedSound;
+            }
         }
 
     }

@@ -66,7 +66,11 @@ public class BorderColorToggleButton extends AbstractMenuViewButton<BaseMenuView
         public MenuTemplateButton<BaseMenuView> build() {
             Either<TemplateItem, DialogButton> enabledButton = buttonData;
             this.buttonData = null;
-            return new Template(this, enabledButton, disabledButton);
+            try {
+                return new Template(this, enabledButton, disabledButton);
+            } finally {
+                this.buttonData = enabledButton;
+            }
         }
 
     }

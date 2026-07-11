@@ -150,7 +150,12 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
             List<String> accessCommands = commands;
             this.clickSound = null;
             this.commands = null;
-            return new Template(this, accessSound, accessCommands, noAccessItem, noAccessCommands, biome);
+            try {
+                return new Template(this, accessSound, accessCommands, noAccessItem, noAccessCommands, biome);
+            } finally {
+                this.clickSound = accessSound;
+                this.commands = accessCommands;
+            }
         }
 
     }
