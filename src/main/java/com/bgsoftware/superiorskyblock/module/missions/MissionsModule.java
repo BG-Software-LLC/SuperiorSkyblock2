@@ -6,13 +6,13 @@ import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.io.Files;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookup;
 import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandMembers;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.mission.SMissionCategory;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.IModuleConfiguration;
@@ -246,16 +246,16 @@ public class MissionsModule extends BuiltinModule<MissionsModule.Configuration> 
         if (menuLoadResult == null)
             return false;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuLoadResult.getPatternSlots();
         YamlConfiguration missionsMenuConfig = menuLoadResult.getConfig();
 
-        List<Integer> islandsCategorySlot = menuPatternSlots.getSlots(missionsMenuConfig.getString("island-missions", ""));
+        List<Integer> islandsCategorySlot = menuSlotsMap.getSlots(missionsMenuConfig.getString("island-missions", ""));
         if (islandsCategorySlot.isEmpty()) {
             categoriesSection.set("islands.name", "Islands");
             categoriesSection.set("islands.slot", islandsCategorySlot.get(0));
         }
 
-        List<Integer> playersCategorySlot = menuPatternSlots.getSlots(missionsMenuConfig.getString("player-missions", ""));
+        List<Integer> playersCategorySlot = menuSlotsMap.getSlots(missionsMenuConfig.getString("player-missions", ""));
         if (playersCategorySlot.isEmpty()) {
             categoriesSection.set("players.name", "Players");
             categoriesSection.set("players.slot", playersCategorySlot.get(0));

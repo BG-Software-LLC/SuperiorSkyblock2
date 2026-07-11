@@ -1,19 +1,15 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.impl.PlayerMenuView;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.List;
 import java.util.Objects;
 
 public class MemberRoleButton extends AbstractMenuViewButton<PlayerMenuView> {
@@ -28,7 +24,7 @@ public class MemberRoleButton extends AbstractMenuViewButton<PlayerMenuView> {
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<PlayerMenuView> context) {
         Player inventoryViewer = menuView.getInventoryViewer().asPlayer();
         SuperiorPlayer targetPlayer = menuView.getSuperiorPlayer();
         PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(getTemplate().playerRoleId);
@@ -53,7 +49,7 @@ public class MemberRoleButton extends AbstractMenuViewButton<PlayerMenuView> {
 
         @Override
         public MenuTemplateButton<PlayerMenuView> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, playerRoleId);
+            return new Template(this, playerRoleId);
         }
 
     }
@@ -62,10 +58,8 @@ public class MemberRoleButton extends AbstractMenuViewButton<PlayerMenuView> {
 
         private final int playerRoleId;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, int playerRoleId) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    MemberRoleButton.class, MemberRoleButton::new);
+        Template(AbstractBuilder<PlayerMenuView> builder, int playerRoleId) {
+            super(builder, MemberRoleButton.class, MemberRoleButton::new);
             this.playerRoleId = playerRoleId;
         }
 

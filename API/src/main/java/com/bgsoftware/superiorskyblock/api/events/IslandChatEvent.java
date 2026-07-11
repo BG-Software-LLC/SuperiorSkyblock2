@@ -17,7 +17,7 @@ public class IslandChatEvent extends IslandEvent implements Cancellable {
     /**
      * The constructor of the event.
      *
-     * @param island         The island that the player talks in.
+     * @param island         The island from which the message was sent.
      * @param superiorPlayer The player who sent the message.
      * @param message        The message that was sent.
      */
@@ -28,7 +28,7 @@ public class IslandChatEvent extends IslandEvent implements Cancellable {
     }
 
     /**
-     * Get the player who banned the other player.
+     * Get the player who sent the message.
      */
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
@@ -42,7 +42,7 @@ public class IslandChatEvent extends IslandEvent implements Cancellable {
     }
 
     /**
-     * Set a new message that will be sent.
+     * Set a new message that will be sent instead.
      *
      * @param message The new message to send.
      */

@@ -1,20 +1,16 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Objects;
 
 public class ChangeSortingTypeButton extends AbstractMenuViewButton<MenuTopIslands.View> {
@@ -42,7 +38,7 @@ public class ChangeSortingTypeButton extends AbstractMenuViewButton<MenuTopIslan
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuTopIslands.View> context) {
         SortingType sortingType = getTemplate().sortingType;
 
         if (menuView.getSortingType() == sortingType)
@@ -68,7 +64,7 @@ public class ChangeSortingTypeButton extends AbstractMenuViewButton<MenuTopIslan
 
         @Override
         public MenuTemplateButton<MenuTopIslands.View> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, sortingType);
+            return new Template(this, sortingType);
         }
 
     }
@@ -77,10 +73,8 @@ public class ChangeSortingTypeButton extends AbstractMenuViewButton<MenuTopIslan
 
         private final SortingType sortingType;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, SortingType sortingType) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    ChangeSortingTypeButton.class, ChangeSortingTypeButton::new);
+        Template(AbstractBuilder<MenuTopIslands.View> builder, SortingType sortingType) {
+            super(builder, ChangeSortingTypeButton.class, ChangeSortingTypeButton::new);
             this.sortingType = Objects.requireNonNull(sortingType, "sortingType cannot be null");
         }
 

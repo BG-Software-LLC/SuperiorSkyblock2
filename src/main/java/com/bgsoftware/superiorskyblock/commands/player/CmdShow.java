@@ -64,7 +64,7 @@ public class CmdShow implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Island island = args.length == 1 ? CommandArguments.getIslandWhereStanding(plugin, sender).getIsland() :
+        Island island = args.length == 1 ? CommandArguments.getIslandWhereStandingOrSenderIsland(plugin, sender).getIsland() :
                 CommandArguments.getIsland(plugin, sender, args[1]).getIsland();
 
         if (island == null)
