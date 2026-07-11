@@ -1,4 +1,5 @@
-package com.bgsoftware.superiorskyblock.nms.v1_21_3.trial;
+//<generate-if:TRIALS_SUPPORT>
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.trial;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
