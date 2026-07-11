@@ -3,18 +3,18 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
 import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
 import com.bgsoftware.superiorskyblock.core.menu.MenuConfig;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
-import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
 import org.bukkit.Bukkit;
@@ -135,8 +135,13 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.buttonData = this.buttonData == null ? Either.left(TemplateItem.AIR) : this.buttonData;
             this.clickSound = null;
             this.commands = null;
-            return new Template(this, accessSound, accessCommands, noAccessItem, noAccessCommands, biome,
-                    bonusWorth, bonusLevel, isOffset, spawnOffset, schematic);
+            try {
+                return new Template(this, accessSound, accessCommands, noAccessItem, noAccessCommands, biome,
+                        bonusWorth, bonusLevel, isOffset, spawnOffset, schematic);
+            } finally {
+                this.clickSound = accessSound;
+                this.commands = accessCommands;
+            }
         }
 
     }

@@ -32,6 +32,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -56,6 +57,7 @@ import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.Location2ObjectMap;
+import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
@@ -167,6 +169,12 @@ public class SIsland implements Island {
 
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
+        @Override
+        protected MessagesService create() {
+            return plugin.getServices().getService(MessagesService.class);
+        }
+    };
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
         @Override
         protected PlaceholdersService create() {
@@ -174,7 +182,7 @@ public class SIsland implements Island {
         }
     };
 
-    private static EnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
+    private static UnparsedEnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
 
     private final DatabaseBridge databaseBridge;
     private final IslandBank islandBank;
@@ -2231,17 +2239,9 @@ public class SIsland implements Island {
         Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, Arrays.toString(ignoredMembers));
 
         forEachIslandMember(ignoredMembers, true, islandMember -> {
-            String playerTitle = title;
-            String playerSubtitle = subtitle;
-
-            Player player = islandMember.asPlayer();
-
-            if (!Text.isBlank(playerTitle))
-                playerTitle = placeholdersService.get().parsePlaceholders(player, playerTitle);
-            if (!Text.isBlank(playerSubtitle))
-                playerSubtitle = placeholdersService.get().parsePlaceholders(player, playerSubtitle);
-
-            plugin.getNMSPlayers().sendTitle(player, playerTitle, playerSubtitle, fadeIn, duration, fadeOut);
+            MessagesService.Builder builder = messagesService.get().newBuilder();
+            builder.addTitle(title, subtitle, fadeIn, duration, fadeOut);
+            builder.build().sendMessage(islandMember.asPlayer());
         });
     }
 
@@ -5373,13 +5373,18 @@ public class SIsland implements Island {
     }
 
     private static void onSettingsUpdate() {
-        DEFAULT_FLAGS_CACHE = new EnumerateSet<>(IslandFlag.values());
-        plugin.getSettings().getDefaultSettings().forEach(islandFlagName -> {
-            try {
-                DEFAULT_FLAGS_CACHE.add(IslandFlag.getByName(islandFlagName));
-            } catch (Throwable ignored) {
+        DEFAULT_FLAGS_CACHE = new UnparsedEnumerateSet<IslandFlag>(IslandFlag.values()) {
+            @Override
+            protected IslandFlag parseName(String name) {
+                return IslandFlag.getByName(name);
             }
-        });
+
+            @Override
+            protected String getName(IslandFlag islandFlag) {
+                return islandFlag.getName();
+            }
+        };
+        plugin.getSettings().getDefaultSettings().forEach(DEFAULT_FLAGS_CACHE::addName);
     }
 
     private static WorldPosition adjustPositionToCenterOfBlock(@Nullable WorldPosition worldPosition) {

@@ -1,10 +1,10 @@
-package com.bgsoftware.superiorskyblock.core.messages.component.impl;
+package com.bgsoftware.superiorskyblock.core.messages.component;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
-import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -13,11 +13,41 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 public class ComplexMessageComponent implements IMessageComponent {
+
+    private static final BaseComponent[] EMPTY_BASE_COMPONENT_ARRAY = new BaseComponent[0];
 
     private final IWrappedComponent[] components;
     private final MessageContent content;
+
+    public static BaseComponent[] parseBaseComponents(@Nullable String text, @Nullable String command, @Nullable String suggest, @Nullable String tooltip) {
+        if (Text.isBlank(text)) {
+            return EMPTY_BASE_COMPONENT_ARRAY;
+        }
+
+        BaseComponent[] baseComponents = TextComponent.fromLegacyText(text);
+
+        if (tooltip != null) {
+            for (BaseComponent baseComponent : baseComponents) {
+                baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                        new BaseComponent[]{new TextComponent(Formatters.COLOR_FORMATTER.format(tooltip))}));
+            }
+        }
+
+        if (command != null) {
+            for (BaseComponent baseComponent : baseComponents) {
+                baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+            }
+        }
+
+        if (suggest != null) {
+            for (BaseComponent baseComponent : baseComponents) {
+                baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggest));
+            }
+        }
+
+        return baseComponents;
+    }
 
     public static IMessageComponent of(@Nullable BaseComponent[] baseComponents) {
         if (baseComponents == null || baseComponents.length == 0)

@@ -228,7 +228,13 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
             this.buttonData = null;
             this.clickSound = null;
             this.commands = null;
-            return new Template(this, islandItem, islandSound, islandCommands, noIslandItem, noIslandSound, noIslandCommands);
+            try {
+                return new Template(this, islandItem, islandSound, islandCommands, noIslandItem, noIslandSound, noIslandCommands);
+            } finally {
+                this.buttonData = islandItem;
+                this.clickSound = islandSound;
+                this.commands = islandCommands;
+            }
         }
 
     }

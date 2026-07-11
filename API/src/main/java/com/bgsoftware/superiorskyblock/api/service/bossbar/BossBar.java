@@ -46,7 +46,13 @@ public interface BossBar {
         SEGMENTED_6,
         SEGMENTED_10,
         SEGMENTED_12,
-        SEGMENTED_20
+        SEGMENTED_20,
+
+        PROGRESS,
+        NOTCHED_6,
+        NOTCHED_10,
+        NOTCHED_12,
+        NOTCHED_20
 
     }
 

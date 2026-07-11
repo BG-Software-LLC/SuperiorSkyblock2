@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
@@ -89,8 +89,14 @@ public class TopIslandsPagedObjectButton extends AbstractPagedMenuButton<MenuTop
             this.buttonData = null;
             this.clickSound = null;
             this.commands = null;
-            this.nullItem = noIslandItem;
-            return new Template(this, islandItem, islandSound, islandCommands, noIslandSound, noIslandCommands);
+            this.nullItem = this.noIslandItem == null ? Either.left(TemplateItem.AIR) : this.noIslandItem;
+            try {
+                return new Template(this, islandItem, islandSound, islandCommands, noIslandSound, noIslandCommands);
+            } finally {
+                this.buttonData = islandItem;
+                this.clickSound = islandSound;
+                this.commands = islandCommands;
+            }
         }
 
     }
@@ -106,7 +112,7 @@ public class TopIslandsPagedObjectButton extends AbstractPagedMenuButton<MenuTop
         Template(AbstractBuilder<MenuTopIslands.View, Island> builder, Either<TemplateItem, DialogButton> islandItem, GameSound islandSound,
                  List<String> islandCommands, GameSound noIslandSound, List<String> noIslandCommands) {
             super(builder, TopIslandsPagedObjectButton.class, TopIslandsPagedObjectButton::new);
-            this.islandItem = islandItem;
+            this.islandItem = islandItem == null ? Either.left(TemplateItem.AIR) : islandItem;
             this.islandSound = islandSound;
             this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
             this.noIslandSound = noIslandSound;

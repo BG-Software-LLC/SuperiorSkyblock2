@@ -1,11 +1,11 @@
-package com.bgsoftware.superiorskyblock.nms.v1_20_4.vibration;
+//<generate-if:SCULK_SENSOR_SUPPORT>
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.vibration;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
@@ -40,8 +40,8 @@ public class IslandVibrationUser implements VibrationSystem.User {
     }
 
     @Override
-    public boolean canReceiveVibration(ServerLevel serverLevel, BlockPos blockPos, Holder<GameEvent> holder, GameEvent.Context context) {
-        if (!this.original.canReceiveVibration(serverLevel, blockPos, holder, context))
+    public boolean canReceiveVibration(ServerLevel serverLevel, BlockPos blockPos, ${VIBRATION_USER_GAME_EVENT_PARAMETER_CLASS} gameEvent, GameEvent.Context context) {
+        if (!this.original.canReceiveVibration(serverLevel, blockPos, gameEvent, context))
             return false;
 
         if (context.sourceEntity() instanceof Player player) {
@@ -53,8 +53,8 @@ public class IslandVibrationUser implements VibrationSystem.User {
     }
 
     @Override
-    public void onReceiveVibration(ServerLevel serverLevel, BlockPos blockPos, Holder<GameEvent> holder, @Nullable Entity entity, @Nullable Entity entity1, float v) {
-        this.original.onReceiveVibration(serverLevel, blockPos, holder, entity, entity1, v);
+    public void onReceiveVibration(ServerLevel serverLevel, BlockPos blockPos, ${VIBRATION_USER_GAME_EVENT_PARAMETER_CLASS} gameEvent, @Nullable Entity entity, @Nullable Entity entity1, float v) {
+        this.original.onReceiveVibration(serverLevel, blockPos, gameEvent, entity, entity1, v);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class IslandVibrationUser implements VibrationSystem.User {
     }
 
     @Override
-    public boolean isValidVibration(Holder<GameEvent> gameEvent, GameEvent.Context context) {
+    public boolean isValidVibration(${VIBRATION_USER_GAME_EVENT_PARAMETER_CLASS} gameEvent, GameEvent.Context context) {
         return this.original.isValidVibration(gameEvent, context);
     }
 
