@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -679,14 +680,14 @@ public class IslandsDeserializer {
                 return;
             }
 
-            String name = warpCategory.getString("name").orElse(null);
-            if (Text.isBlank(name)) {
+            Optional<String> name = warpCategory.getString("name").map(Formatters.STRIP_COLOR_FORMATTER::format);
+            if (!name.isPresent() || name.get().isEmpty()) {
                 Log.warn("Cannot load warp categories with invalid name for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_warp_categories");
-            builder.addWarpCategory(name, warpCategory.getInt("slot").orElse(-1),
+            builder.addWarpCategory(name.get(), warpCategory.getInt("slot").orElse(-1),
                     warpCategory.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null));
         });
     }
