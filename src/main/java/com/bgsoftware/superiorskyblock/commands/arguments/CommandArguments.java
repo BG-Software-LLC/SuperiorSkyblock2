@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -113,6 +114,32 @@ public class CommandArguments {
         return Collections.unmodifiableList(players);
     }
 
+    public static IslandArgument getIslandWhereStandingOrSenderIsland(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            Message.CUSTOM.send(sender, "&cYou must specify a player's name.", true);
+            return IslandArgument.EMPTY;
+        }
+
+
+        SuperiorPlayer superiorPlayer;
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Island locationIsland = plugin.getGrid().getIslandAt(((Player) sender).getLocation(wrapper.getHandle()));
+            if (locationIsland == null || locationIsland.isSpawn()) {
+                superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+                island = superiorPlayer.getIsland();
+            } else {
+                island = locationIsland;
+                superiorPlayer = island.getOwner();
+            }
+        }
+
+        if (island == null)
+            Message.INVALID_ISLAND.send(sender);
+
+        return new IslandArgument(island, superiorPlayer);
+    }
+
     public static IslandArgument getIslandWhereStanding(SuperiorSkyblockPlugin plugin, CommandSender sender) {
         if (!(sender instanceof Player)) {
             Message.CUSTOM.send(sender, "&cYou must specify a player's name.", true);
@@ -124,11 +151,11 @@ public class CommandArguments {
         Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Island locationIsland = plugin.getGrid().getIslandAt(((Player) sender).getLocation(wrapper.getHandle()));
-            island = locationIsland == null || locationIsland.isSpawn() ? superiorPlayer.getIsland() : locationIsland;
+            island = locationIsland.isSpawn() ? null : locationIsland;
         }
 
         if (island == null)
-            Message.INVALID_ISLAND.send(sender);
+            Message.INVALID_ISLAND_LOCATION.send(sender);
 
         return new IslandArgument(island, superiorPlayer);
     }
@@ -158,6 +185,15 @@ public class CommandArguments {
         }
 
         return Collections.unmodifiableList(missions);
+    }
+
+    public static MissionCategory getMissionCategory(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        MissionCategory missionCategory = plugin.getMissions().getMissionCategory(argument);
+
+        if (missionCategory == null)
+            Message.INVALID_MISSION_CATEGORY.send(sender, argument);
+
+        return missionCategory;
     }
 
     public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {
@@ -305,12 +341,10 @@ public class CommandArguments {
         return islandWarp;
     }
 
-    public static Biome getBiome(CommandSender sender, String argument) {
-        Biome biome = null;
+    public static Biome getBiome(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        Biome biome = plugin.getNMSAlgorithms().getBiome(argument);
 
-        try {
-            biome = Biome.valueOf(argument.toUpperCase(Locale.ENGLISH));
-        } catch (Exception ex) {
+        if (biome == null) {
             Message.INVALID_BIOME.send(sender, argument);
         }
 

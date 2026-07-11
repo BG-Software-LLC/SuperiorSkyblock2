@@ -8,7 +8,9 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
@@ -58,6 +60,8 @@ public class NMSWorldImpl implements NMSWorld {
     private static final ReflectField<MobSpawnerAbstract> MOB_SPAWNER_ABSTRACT = new ReflectField<MobSpawnerAbstract>(
             TileEntityMobSpawner.class, MobSpawnerAbstract.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
+    private static boolean alreadyWarned = false;
+
     private final SuperiorSkyblockPlugin plugin;
 
     public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
@@ -65,8 +69,16 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return getBlockKeyInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return ConstantKeys.AIR;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private Key getBlockKeyInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         int blockId = chunkSnapshot.getBlockTypeId(x, y, z);
         int blockData = chunkSnapshot.getBlockData(x, y, z);
         int combinedId = blockId + (blockData << 12);
@@ -79,6 +91,23 @@ public class NMSWorldImpl implements NMSWorld {
         );
 
         return Keys.of(KeyBlocksCache.getBlockKey(Block.getByCombinedId(combinedId)), location);
+    }
+
+    @Override
+    public boolean canPlayerSuffocate(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return canPlayerSuffocateInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return true;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private boolean canPlayerSuffocateInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        int blockId = chunkSnapshot.getBlockTypeId(x, y, z);
+        int blockData = chunkSnapshot.getBlockData(x, y, z);
+        int combinedId = blockId + (blockData << 12);
+        return Block.getByCombinedId(combinedId).r();
     }
 
     @Override
@@ -319,6 +348,11 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
+    public void setOceanLevel(World world) {
+        ((CraftWorld) world).getHandle().b(plugin.getSettings().getWorlds().getSeaLevelHeight());
+    }
+
+    @Override
     public IslandsGenerator createGenerator(Dimension dimension) {
         return new IslandsGeneratorImpl(dimension);
     }
@@ -336,6 +370,14 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public ChunkReader createChunkReader(Chunk chunk) {
         return new ChunkReaderImpl(chunk);
+    }
+
+    @Override
+    public void listenBlockStateChanges(org.bukkit.World world) {
+        if (!alreadyWarned) {
+            Log.warn("This version is old and you may experience issues with block changes detection");
+            alreadyWarned = true;
+        }
     }
 
 }

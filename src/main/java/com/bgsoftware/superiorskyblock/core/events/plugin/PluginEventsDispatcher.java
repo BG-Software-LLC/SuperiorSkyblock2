@@ -11,10 +11,13 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
+import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -36,11 +39,14 @@ public class PluginEventsDispatcher extends EventsDispatcher<
         SIsland.registerListeners(this);
         CommandsMap.registerListeners(this);
         SpawnIsland.registerListeners(this);
-        RegionManagerServiceImpl.registerCallbacks(this);
+        RegionManagerServiceImpl.registerListeners(this);
         CmdHelp.registerListeners(this);
-        CmdAdmin.registerCallbacks(this);
+        CmdAdmin.registerListeners(this);
         Message.registerListeners(this);
         SSuperiorPlayer.registerListeners(this);
+        WorldsProvider_Default.registerListeners(this);
+        IslandPrivileges.registerListeners(this);
+        Dimensions.registerListeners(this);
     }
 
     public void registerCallback(PluginEventType<?> type, Runnable callback) {

@@ -1,8 +1,11 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
@@ -33,12 +36,16 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().islandsHeight;
     }
 
+    public int getSeaLevelHeight() {
+        return getContainer().seaLevelHeight;
+    }
+
     public boolean isWorldBorders() {
         return getContainer().worldBordersEnabled;
     }
 
-    public String getIslandLevelFormula() {
-        return getContainer().islandLevelFormula;
+    public String getBlockLevelFormula() {
+        return getContainer().blockLevelFormula;
     }
 
     public boolean isRoundedIslandLevels() {
@@ -53,8 +60,12 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().autoBlocksTracking;
     }
 
-    public String getIslandTopOrder() {
+    public SortingType getIslandTopOrder() {
         return getContainer().islandTopOrder;
+    }
+
+    public SortingType getGlobalWarpsOrder() {
+        return getContainer().globalWarpsOrder;
     }
 
     public boolean isCoopMembers() {
@@ -73,7 +84,7 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().signWarp;
     }
 
-    public List<String> getInteractables() {
+    public SettingsManager.Interactables getInteractablesMap() {
         return getContainer().interactables;
     }
 
@@ -341,8 +352,8 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().dropsUpgradePlayersMultiply;
     }
 
-    public long getProtectedMessageDelay() {
-        return getContainer().protectedMessageDelay;
+    public Map<String, Long> getMessageDelays() {
+        return getContainer().messageDelays;
     }
 
     public boolean isWarpCategories() {
@@ -409,8 +420,20 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().commandsPerPage;
     }
 
+    public boolean isHelpOnInvalidCommand() {
+        return getContainer().helpOnInvalidCommand;
+    }
+
+    public boolean isHelpOnNoPermission() {
+        return getContainer().helpOnNoPermission;
+    }
+
     public boolean isCacheSchematics() {
         return getContainer().cacheSchematics;
+    }
+
+    public SettingsManager.EntityCategories getEntityCategoriesMap() {
+        return getContainer().entityCategories;
     }
 
 }

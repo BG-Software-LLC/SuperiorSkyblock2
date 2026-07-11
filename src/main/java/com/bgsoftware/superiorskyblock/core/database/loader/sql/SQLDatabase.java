@@ -5,6 +5,7 @@ import com.bgsoftware.common.databasebridge.sql.query.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v0.DatabaseUpgrade_V0;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v1.DatabaseUpgrade_V1;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v2.DatabaseUpgrade_V2;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v3.DatabaseUpgrade_V3;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v4.DatabaseUpgrade_V4;
 import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
@@ -17,7 +18,8 @@ public class SQLDatabase {
             DatabaseUpgrade_V0.INSTANCE,
             DatabaseUpgrade_V1.INSTANCE,
             DatabaseUpgrade_V2.INSTANCE,
-            DatabaseUpgrade_V4.INSTANCE,
+            DatabaseUpgrade_V3.INSTANCE,
+            DatabaseUpgrade_V4.INSTANCE
     };
 
     private SQLDatabase() {
@@ -81,8 +83,8 @@ public class SQLDatabase {
                 new Column("ignored", "BOOLEAN"),
                 new Column("name", "TEXT"),
                 new Column("description", "TEXT"),
-                new Column("generated_schematics", "INTEGER"),
-                new Column("unlocked_worlds", "INTEGER"),
+                new Column("generated_schematics", "TEXT"),
+                new Column("unlocked_worlds", "TEXT"),
                 new Column("last_time_updated", "BIGINT"),
                 new Column("dirty_chunks", "LONGTEXT"),
                 new Column("block_counts", "LONGTEXT"),

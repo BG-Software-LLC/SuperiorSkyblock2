@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLogger;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -19,10 +20,11 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.Bukkit;
 
 import java.time.Duration;
@@ -120,17 +122,17 @@ public class CmdRankup implements IPermissibleCommand {
                 PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
                         island, superiorPlayer, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
-                UpgradeCost upgradeCost = event.getArgs().upgradeCost;
+                List<UpgradeCost> upgradeCosts = event.getArgs().upgradeCosts;
 
                 if (event.isCancelled()) {
                     hasNextLevel = false;
 
-                } else if (!upgradeCost.hasEnoughBalance(superiorPlayer)) {
+                } else if (!IslandUtils.hasEnoughBalance(upgradeCosts, superiorPlayer)) {
                     Message.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                     hasNextLevel = false;
 
                 } else {
-                    upgradeCost.withdrawCost(superiorPlayer);
+                    upgradeCosts.forEach(upgradeCost -> upgradeCost.withdrawCost(superiorPlayer));
 
                     for (String command : event.getArgs().commands) {
                         String parsedCommand = placeholdersService.get().parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
@@ -140,7 +142,8 @@ public class CmdRankup implements IPermissibleCommand {
                         try {
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
                         } catch (Throwable error) {
-                            Log.error(error, "An unexpected error occurred while executing command:\n", parsedCommand);
+                            ModuleLogger logger = (ModuleLogger) BuiltinModules.UPGRADES.getLogger();
+                            logger.e("An unexpected error occurred while executing command:\n" + parsedCommand, error);
                         }
                     }
 

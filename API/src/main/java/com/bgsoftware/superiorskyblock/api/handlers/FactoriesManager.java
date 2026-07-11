@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.World;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -193,15 +192,6 @@ public interface FactoriesManager {
      * @param dimension The dimension of the world.
      */
     WorldInfo createWorldInfo(String worldName, Dimension dimension);
-
-    /**
-     * Create a new world info.
-     *
-     * @param worldName   The name of the world.
-     * @param environment The environment of the world.
-     */
-    @Deprecated
-    WorldInfo createWorldInfo(String worldName, World.Environment environment);
 
     /**
      * Create a new game sound instance.

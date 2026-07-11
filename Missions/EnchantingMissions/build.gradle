@@ -1,0 +1,9 @@
+group 'Missions:EnchantingMissions'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_9_R1:latest"
+}
+
+shadowJar {
+    relocate 'com.bgsoftware.superiorskyblock.missions.common', 'com.bgsoftware.superiorskyblock.missions.enchanting'
+}

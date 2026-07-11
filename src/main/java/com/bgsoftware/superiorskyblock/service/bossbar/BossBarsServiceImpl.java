@@ -21,7 +21,12 @@ public class BossBarsServiceImpl implements BossBarsService, IService {
 
     @Override
     public BossBar createBossBar(Player player, String message, BossBar.Color color, double ticksToRun) {
-        return plugin.getNMSPlayers().createBossBar(player, message, color, ticksToRun);
+        return createBossBar(player, message, color, BossBar.Style.SOLID, ticksToRun);
+    }
+
+    @Override
+    public BossBar createBossBar(Player player, String message, BossBar.Color color, BossBar.Style style, double ticksToRun) {
+        return plugin.getNMSPlayers().createBossBar(player, message, color, style, ticksToRun);
     }
 
 }

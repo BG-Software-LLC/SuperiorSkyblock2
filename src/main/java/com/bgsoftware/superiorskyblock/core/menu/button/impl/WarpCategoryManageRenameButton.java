@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
@@ -14,10 +15,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuWarpCategoryManage.View> {
 
@@ -26,8 +27,8 @@ public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuW
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        Player player = (Player) clickEvent.getWhoClicked();
+    public void onButtonClick(ButtonClickContext<MenuWarpCategoryManage.View> context) {
+        Player player = context.getPlayer();
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         Message.WARP_CATEGORY_RENAME.send(player);
@@ -72,8 +73,8 @@ public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuW
 
         @Override
         public MenuTemplateButton<MenuWarpCategoryManage.View> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, WarpCategoryManageRenameButton.class, WarpCategoryManageRenameButton::new);
+            return new MenuTemplateButtonImpl<>(this, WarpCategoryManageRenameButton.class,
+                    WarpCategoryManageRenameButton::new);
         }
 
     }

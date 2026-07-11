@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.google.common.base.Preconditions;
 
 import java.math.BigInteger;
@@ -48,7 +49,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         BlockValue blockValue = plugin.getBlockValues().getBlockValue(key);
         boolean increaseAmount = blockValue != BlockValue.ZERO;
 
-        boolean hasBlockLimit = island.getBlockLimit(key) != -1;
+        boolean hasBlockLimit = island.getBlockLimit(key) != IslandUpgradeConstants.NO_LIMIT_VALUE;
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
         if (increaseAmount || hasBlockLimit || valuesMenu) {
@@ -78,7 +79,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
 
         boolean decreaseAmount = blockValue != BlockValue.ZERO;
 
-        boolean hasBlockLimit = island.getBlockLimit(key) != -1;
+        boolean hasBlockLimit = island.getBlockLimit(key) != IslandUpgradeConstants.NO_LIMIT_VALUE;
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
         if (decreaseAmount || hasBlockLimit || valuesMenu) {
@@ -86,6 +87,9 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
 
             Key valueKey = plugin.getBlockValues().getBlockKey(key);
             removeCounts(valueKey, amount);
+
+            if (loadingDataMode)
+                return true;
 
             Key limitKey = island.getBlockLimitKey(valueKey);
             Key globalKey = ((BaseKey<?>) valueKey).toGlobalKey();

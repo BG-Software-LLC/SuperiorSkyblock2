@@ -22,6 +22,8 @@ import com.bgsoftware.superiorskyblock.island.bank.logs.CacheBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.DatabaseBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.IBankLogs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -40,7 +42,6 @@ public class SIslandBank implements IslandBank {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final BigDecimal MONEY_FAILURE = BigDecimal.valueOf(-1);
-    private static final BigDecimal NO_BANK_LIMIT = BigDecimal.valueOf(-1);
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
@@ -115,6 +116,8 @@ public class SIslandBank implements IslandBank {
             IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(amount));
 
+            plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_BANK, island);
+
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshIslandBank(island);
         } else {
@@ -156,6 +159,8 @@ public class SIslandBank implements IslandBank {
         if (!event.isCancelled())
             increaseBalance(amount);
 
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_BANK, island);
+
         plugin.getMenus().refreshBankLogs(island);
         plugin.getMenus().refreshIslandBank(island);
 
@@ -165,8 +170,10 @@ public class SIslandBank implements IslandBank {
     @Override
     public boolean canDepositMoney(BigDecimal amount) {
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
-        return this.island.getBankLimit().compareTo(NO_BANK_LIMIT) <= 0 ||
-                this.balance.get().add(amount).compareTo(this.island.getBankLimit()) <= 0;
+
+        BigDecimal bankLimit = this.island.getBankLimit();
+        return bankLimit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) <= 0 ||
+                this.balance.get().add(amount).compareTo(bankLimit) <= 0;
     }
 
     @Override
@@ -218,6 +225,8 @@ public class SIslandBank implements IslandBank {
             IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(withdrawAmount));
 
+            plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_BANK, island);
+
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshIslandBank(island);
 
@@ -258,6 +267,8 @@ public class SIslandBank implements IslandBank {
             decreaseBalance(amount);
 
         addTransaction(bankTransaction, true);
+
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_BANK, island);
 
         plugin.getMenus().refreshBankLogs(island);
         plugin.getMenus().refreshIslandBank(island);

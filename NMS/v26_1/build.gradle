@@ -1,0 +1,25 @@
+plugins {
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.getMOJANG_PRODUCTION()
+
+group 'NMS:v26_1'
+
+dependencies {
+    paperweight.paperDevBundle("26.1.2.build.+")
+    compileOnly project(":NMS:Spigot-1_20_3")
+    compileOnly project(":NMS:Paper-1_20_3")
+    compileOnly project(":API")
+    compileOnly project(":")
+}
+
+if (project.hasProperty('nms.compile_v26_1') && !Boolean.valueOf(project.findProperty("nms.compile_v26_1").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

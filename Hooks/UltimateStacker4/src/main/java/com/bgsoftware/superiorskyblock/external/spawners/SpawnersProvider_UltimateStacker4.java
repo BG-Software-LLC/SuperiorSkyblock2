@@ -20,17 +20,12 @@ import org.bukkit.event.Listener;
 
 public class SpawnersProvider_UltimateStacker4 implements SpawnersProviderItemMetaSpawnerType {
 
-    private static boolean registered = false;
-
     private final SuperiorSkyblockPlugin plugin;
 
     public SpawnersProvider_UltimateStacker4(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
-            Log.info("Using UltimateStacker as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Log.info("Using UltimateStacker as a spawners provider.");
     }
 
     @Override

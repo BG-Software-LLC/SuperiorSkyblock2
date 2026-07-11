@@ -9,7 +9,6 @@ import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.event.SkinApplyEvent;
 import net.skinsrestorer.api.exception.DataRequestException;
 import net.skinsrestorer.api.property.SkinProperty;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.function.Consumer;
@@ -37,11 +36,10 @@ public class SkinsRestorer15Hook {
     }
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> setSkinTexture(superiorPlayer));
-            return;
-        }
+        BukkitExecutor.ensureAsync(() -> setSkinTextureInternal(superiorPlayer));
+    }
 
+    private static void setSkinTextureInternal(SuperiorPlayer superiorPlayer) {
         Property property = getSkin(superiorPlayer);
         if (property != null)
             BukkitExecutor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));

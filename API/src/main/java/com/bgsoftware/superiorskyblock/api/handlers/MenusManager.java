@@ -13,7 +13,14 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
+import com.bgsoftware.superiorskyblock.api.menu.layout.DialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedDialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedInventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -21,6 +28,9 @@ import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
@@ -137,7 +147,7 @@ public interface MenusManager {
      * @param targetPlayer The player to open the menu for.
      * @param previousMenu The previous menu that was opened, if exists.
      * @param targetIsland The island to ban the player from.
-     * @param newOwner The player that will be banned.
+     * @param newOwner     The player that will be banned.
      */
     void openConfirmTransfer(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland, SuperiorPlayer newOwner);
 
@@ -865,25 +875,93 @@ public interface MenusManager {
 
     /**
      * Create a new pattern builder for building a menu.
+     *
+     * @deprecated See {@link InventoryMenuLayout} and {@link DialogMenuLayout}
      */
+    @Deprecated
     <V extends MenuView<V, ?>> MenuLayout.Builder<V> createPatternBuilder();
 
     /**
-     * Create a new pattern builder for building a paged-based menu.
+     * Create a new pattern builder for building an inventory based menu.
      */
+    <V extends MenuView<V, ?>> InventoryMenuLayout.Builder<V> createInventoryLayoutBuilder();
+
+    /**
+     * Create a new pattern builder for building a dialog based menu.
+     */
+    <V extends MenuView<V, ?>> DialogMenuLayout.Builder<V> createDialogLayoutBuilder();
+
+    /**
+     * Create a new pattern builder for building a paged-based menu.
+     *
+     * @deprecated See {@link InventoryMenuLayout} and {@link DialogMenuLayout}
+     */
+    @Deprecated
     <V extends PagedMenuView<V, ?, E>, E> PagedMenuLayout.Builder<V, E> createPagedPatternBuilder();
 
     /**
-     * Create a new button builder.
+     * Create a new pattern builder for building an inventory paged-based menu.
+     */
+    <V extends PagedMenuView<V, ?, E>, E> PagedInventoryMenuLayout.Builder<V, E> createInventoryPagedLayoutBuilder();
+
+    /**
+     * Create a new pattern builder for building a dialog paged-based menu.
+     */
+    <V extends PagedMenuView<V, ?, E>, E> PagedDialogMenuLayout.Builder<V, E> createDialogPagedLayoutBuilder();
+
+    /**
+     * Create a new {@link MenuTemplateButton.Builder}.
      */
     <V extends MenuView<V, ?>> MenuTemplateButton.Builder<V> createButtonBuilder(
             Class<?> viewButtonType, MenuTemplateButton.MenuViewButtonCreator<V> viewButtonCreator);
 
     /**
-     * Create a new button builder.
+     * Create a new {@link PagedMenuTemplateButton.Builder}.
      */
     <V extends MenuView<V, ?>, E> PagedMenuTemplateButton.Builder<V, E> createPagedButtonBuilder(
             Class<?> viewButtonType, PagedMenuTemplateButton.PagedMenuViewButtonCreator<V, E> viewButtonCreator);
+
+    /**
+     * Create a config for a text-based {@link DialogBodyElement}
+     */
+    DialogBodyElement.TextConfig createTextConfig();
+
+    /**
+     * Creates a new text-based {@link DialogBodyElement}.
+     *
+     * @param text       The content of the body element.
+     * @param textConfig Extra configuration for the body text element.
+     */
+    DialogBodyElement createDialogBodyTextElement(String text, @Nullable DialogBodyElement.TextConfig textConfig);
+
+    /**
+     * Create a config for a item-based {@link DialogBodyElement}
+     */
+    DialogBodyElement.ItemConfig createItemConfig();
+
+    /**
+     * Creates a new item-based {@link DialogBodyElement}.
+     *
+     * @param itemStack  The item of the body element.
+     * @param itemConfig Extra configuration for the body item element.
+     */
+    DialogBodyElement createDialogBodyItemElement(ItemStack itemStack, @Nullable DialogBodyElement.ItemConfig itemConfig);
+
+    /**
+     * Create a new builder for a {@link DialogButton} object.
+     */
+    DialogButton.Builder createDialogButtonBuilder();
+
+    /**
+     * Creates a new click context in a menu.
+     *
+     * @param player      The player who clicked the button.
+     * @param menuView    The view that the player clicked in.
+     * @param clickedSlot The slot the player clicked.
+     * @param clickType   The type of click the player performed.
+     */
+    <V extends MenuView<V, ?>> ButtonClickContext<V> createButtonClickContext(Player player, V menuView,
+                                                                              int clickedSlot, ClickType clickType);
 
     /**
      * Get the parser instance.

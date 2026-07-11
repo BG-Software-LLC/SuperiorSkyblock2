@@ -21,10 +21,8 @@ import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -35,6 +33,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,36 +50,36 @@ public class SUpgradeLevel implements UpgradeLevel {
     };
 
     private final int level;
-    private final UpgradeCost cost;
+    private final List<UpgradeCost> costs;
     private final List<String> commands;
     private final String permission;
     private final Set<UpgradeRequirement> requirements;
-    private final DoubleValue cropGrowth;
-    private final DoubleValue spawnerRates;
-    private final DoubleValue mobDrops;
-    private final IntValue teamLimit;
-    private final IntValue warpsLimit;
-    private final IntValue coopLimit;
-    private final IntValue borderSize;
+    private final Value<OptionalDouble> cropGrowth;
+    private final Value<OptionalDouble> spawnerRates;
+    private final Value<OptionalDouble> mobDrops;
+    private final Value<OptionalInt> teamLimit;
+    private final Value<OptionalInt> warpsLimit;
+    private final Value<OptionalInt> coopLimit;
+    private final Value<OptionalInt> borderSize;
     private final Value<KeyMap<Integer>> blockLimits;
     private final Value<KeyMap<Integer>> entityLimits;
     private final Value<EnumerateMap<Dimension, Map<Key, Integer>>> generatorRates;
     private final Value<Map<PotionEffectType, Integer>> islandEffects;
-    private final Value<BigDecimal> bankLimit;
+    private final Value<Optional<BigDecimal>> bankLimit;
     private final Value<Int2IntMapView> roleLimits;
 
     @Nullable
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
-                         DoubleValue cropGrowth, DoubleValue spawnerRates, DoubleValue mobDrops,
-                         IntValue teamLimit, IntValue warpsLimit, IntValue coopLimit,
-                         IntValue borderSize, Value<KeyMap<Integer>> blockLimits,
+    public SUpgradeLevel(int level, List<UpgradeCost> costs, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
+                         Value<OptionalDouble> cropGrowth, Value<OptionalDouble> spawnerRates, Value<OptionalDouble> mobDrops,
+                         Value<OptionalInt> teamLimit, Value<OptionalInt> warpsLimit, Value<OptionalInt> coopLimit,
+                         Value<OptionalInt> borderSize, Value<KeyMap<Integer>> blockLimits,
                          Value<KeyMap<Integer>> entityLimits, Value<EnumerateMap<Dimension, Map<Key, Integer>>> generatorRates,
-                         Value<Map<PotionEffectType, Integer>> islandEffects, Value<BigDecimal> bankLimit,
+                         Value<Map<PotionEffectType, Integer>> islandEffects, Value<Optional<BigDecimal>> bankLimit,
                          Value<Int2IntMapView> roleLimits) {
         this.level = level;
-        this.cost = cost;
+        this.costs = Collections.unmodifiableList(costs);
         this.commands = commands;
         this.permission = permission;
         this.requirements = requirements;
@@ -103,12 +104,14 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
-    public double getPrice() {
-        return cost.getCost().doubleValue();
+    @Deprecated
+    public UpgradeCost getCost() {
+        return costs == null || costs.isEmpty() ? null : costs.get(0);
     }
 
-    public UpgradeCost getCost() {
-        return cost;
+    @Override
+    public List<UpgradeCost> getCosts() {
+        return costs;
     }
 
     @Override
@@ -144,30 +147,45 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
+    public boolean hasCropGrowth() {
+        return cropGrowth.get().isPresent();
+    }
+
+    @Override
     public double getCropGrowth() {
-        return cropGrowth.get();
+        return cropGrowth.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE);
+    }
+
+    @Override
+    public boolean hasSpawnerRates() {
+        return spawnerRates.get().isPresent();
     }
 
     @Override
     public double getSpawnerRates() {
-        return spawnerRates.get();
+        return spawnerRates.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE);
+    }
+
+    @Override
+    public boolean hasMobDrops() {
+        return mobDrops.get().isPresent();
     }
 
     @Override
     public double getMobDrops() {
-        return mobDrops.get();
+        return mobDrops.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE);
     }
 
     @Override
     public int getBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.get().getOrDefault(key, -1);
+        return blockLimits.get().getOrDefault(key, IslandUpgradeConstants.NO_LIMIT_VALUE);
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.get().getRaw(key, -1);
+        return blockLimits.get().getRaw(key, IslandUpgradeConstants.NO_LIMIT_VALUE);
     }
 
     @Override
@@ -184,7 +202,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getEntityLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return entityLimits.get().getOrDefault(key, -1);
+        return entityLimits.get().getOrDefault(key, IslandUpgradeConstants.NO_LIMIT_VALUE);
     }
 
     @Override
@@ -193,23 +211,43 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
+    public boolean hasTeamLimit() {
+        return teamLimit.get().isPresent();
+    }
+
+    @Override
     public int getTeamLimit() {
-        return teamLimit.get();
+        return teamLimit.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE);
+    }
+
+    @Override
+    public boolean hasWarpsLimit() {
+        return warpsLimit.get().isPresent();
     }
 
     @Override
     public int getWarpsLimit() {
-        return warpsLimit.get();
+        return warpsLimit.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE);
+    }
+
+    @Override
+    public boolean hasCoopLimit() {
+        return coopLimit.get().isPresent();
     }
 
     @Override
     public int getCoopLimit() {
-        return coopLimit.get();
+        return coopLimit.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE);
+    }
+
+    @Override
+    public boolean hasBorderSize() {
+        return borderSize.get().isPresent();
     }
 
     @Override
     public int getBorderSize() {
-        return borderSize.get();
+        return borderSize.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE);
     }
 
     @Override
@@ -221,24 +259,12 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratorAmount(Key key, World.Environment environment) {
-        return getGeneratorAmount(key, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
         Map<Key, Integer> generatorRates = this.generatorRates.get().get(dimension);
         return generatorRates == null ? Collections.emptyMap() : generatorRates.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
-        return getGeneratorAmounts(Dimensions.fromEnvironment(environment));
     }
 
     @Override
@@ -253,14 +279,19 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
+    public boolean hasBankLimit() {
+        return bankLimit.get().isPresent();
+    }
+
+    @Override
     public BigDecimal getBankLimit() {
-        return bankLimit.get();
+        return bankLimit.get().orElse(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE);
     }
 
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        return roleLimits.get().getOrDefault(playerRole.getId(), 0);
+        return roleLimits.get().getOrDefault(playerRole.getId(), IslandUpgradeConstants.NO_LIMIT_VALUE);
     }
 
     @Override
@@ -284,15 +315,15 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public DoubleValue getCropGrowthUpgradeValue() {
-        return cropGrowth;
+        return DoubleValue.syncedSupplied(() -> cropGrowth.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE));
     }
 
     public DoubleValue getSpawnerRatesUpgradeValue() {
-        return spawnerRates;
+        return DoubleValue.syncedSupplied(() -> spawnerRates.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE));
     }
 
     public DoubleValue getMobDropsUpgradeValue() {
-        return mobDrops;
+        return DoubleValue.syncedSupplied(() -> mobDrops.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE));
     }
 
     public Map<Key, IntValue> getBlockLimitsUpgradeValue() {
@@ -310,19 +341,19 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public IntValue getTeamLimitUpgradeValue() {
-        return teamLimit;
+        return IntValue.syncedSupplied(() -> teamLimit.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE));
     }
 
     public IntValue getWarpsLimitUpgradeValue() {
-        return warpsLimit;
+        return IntValue.syncedSupplied(() -> warpsLimit.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE));
     }
 
     public IntValue getCoopLimitUpgradeValue() {
-        return coopLimit;
+        return IntValue.syncedSupplied(() -> coopLimit.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE));
     }
 
     public IntValue getBorderSizeUpgradeValue() {
-        return borderSize;
+        return IntValue.syncedSupplied(() -> borderSize.get().orElse(IslandUpgradeConstants.NO_LIMIT_VALUE));
     }
 
     public EnumerateMap<Dimension, Map<Key, IntValue>> getGeneratorUpgradeValue() {
@@ -351,7 +382,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     public Value<BigDecimal> getBankLimitUpgradeValue() {
-        return bankLimit;
+        return Value.syncedSupplied(() -> bankLimit.get().orElse(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE));
     }
 
     public Map<PlayerRole, IntValue> getRoleLimitsUpgradeValue() {

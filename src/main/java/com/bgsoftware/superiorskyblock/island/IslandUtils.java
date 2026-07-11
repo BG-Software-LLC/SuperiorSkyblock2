@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -22,6 +23,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.SynchronizedTasks;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.Chunk;
@@ -65,7 +67,7 @@ public class IslandUtils {
     static {
         for (Dimension dimension : Dimension.values()) {
             Biome biome = Optional.ofNullable(plugin.getSettings().getWorlds().getDimensionConfig(dimension))
-                    .map(config -> EnumHelper.getEnum(Biome.class, config.getBiome()))
+                    .map(config -> plugin.getNMSAlgorithms().getBiome(config.getBiome()))
                     .orElseGet(() -> getDefaultBiomeForEnvironment(dimension.getEnvironment()));
             DEFAULT_WORLD_BIOMES.put(dimension, biome);
         }
@@ -145,6 +147,16 @@ public class IslandUtils {
         return chunkCoords;
     }
 
+    public static boolean hasEnoughBalance(List<UpgradeCost> upgradeCosts, SuperiorPlayer superiorPlayer) {
+        for (UpgradeCost upgradeCost : upgradeCosts) {
+            if (!upgradeCost.hasEnoughBalance(superiorPlayer)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static void updateIslandFly(Island island, SuperiorPlayer superiorPlayer) {
         superiorPlayer.runIfOnline(player -> {
             if (!player.getAllowFlight() && superiorPlayer.hasIslandFlyEnabled() && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
@@ -186,6 +198,16 @@ public class IslandUtils {
     public static double getGeneratorPercentageDecimal(Island island, Key key, Dimension dimension) {
         int totalAmount = island.getGeneratorTotalAmount(dimension);
         return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, dimension) * 100D) / totalAmount;
+    }
+
+    public static PlayerRole getPlayerRole(Island island, SuperiorPlayer superiorPlayer) {
+        if (island.isMember(superiorPlayer)) {
+            return superiorPlayer.getPlayerRole();
+        } else if (island.isCoop(superiorPlayer)) {
+            return SPlayerRole.coopRole();
+        } else {
+            return SPlayerRole.guestRole();
+        }
     }
 
     public static boolean checkTransferRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {

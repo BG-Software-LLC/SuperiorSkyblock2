@@ -25,4 +25,14 @@ public class DelegatePermissionNode implements PermissionNode {
         return this.handle.getCustomPermissions();
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
 }

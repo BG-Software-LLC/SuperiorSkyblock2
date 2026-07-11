@@ -1,24 +1,18 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
-import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.nms.v1_20_3.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_20_3.utils.NMSUtilsVersioned;
-import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -27,10 +21,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
+import net.minecraft.network.protocol.game.ClientboundChunkBatchFinishedPacket;
+import net.minecraft.network.protocol.game.ClientboundChunkBatchStartPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
@@ -46,11 +43,8 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.lighting.LevelLightEngine;
-import org.bukkit.craftbukkit.v1_20_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBiome;
-import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -60,6 +54,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.AbstractNMSChunks {
+
+    private static final ClientboundChunkBatchStartPacket CHUNK_BATCH_START_PACKET = new ClientboundChunkBatchStartPacket();
+    private static final ClientboundChunkBatchFinishedPacket CHUNK_BATCH_FINISHED_PACKET = new ClientboundChunkBatchFinishedPacket(1);
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -87,14 +84,18 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.A
 
                 levelChunk.setUnsaved(true);
 
-                ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos);
                 ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk, levelChunk.level.getLightEngine(), null, null, true);
+                        levelChunk, levelChunk.getLevel().getLightEngine(), null, null);
 
                 playersToUpdate.forEach(player -> {
                     ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                    serverPlayer.connection.send(forgetLevelChunkPacket);
-                    serverPlayer.connection.send(mapChunkPacket);
+
+                    try {
+                        serverPlayer.connection.send(CHUNK_BATCH_START_PACKET);
+                        serverPlayer.connection.send(mapChunkPacket);
+                    } finally {
+                        serverPlayer.connection.send(CHUNK_BATCH_FINISHED_PACKET);
+                    }
                 });
             }
 
@@ -366,6 +367,13 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.A
 
     @Override
     protected Optional<Entity> createEntityFromTag(CompoundTag compoundTag, ServerLevel serverLevel) {
+        int dataVersion = compoundTag.getInt("DataVersion");
+        if (dataVersion < com.bgsoftware.superiorskyblock.nms.v1_20_3.AbstractNMSAlgorithms.DATA_VERSION) {
+            compoundTag = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ENTITY_CHUNK,
+                    new Dynamic<>(NbtOps.INSTANCE, compoundTag), dataVersion,
+                    com.bgsoftware.superiorskyblock.nms.v1_20_3.AbstractNMSAlgorithms.DATA_VERSION).getValue();
+        }
+
         return EntityType.create(compoundTag, serverLevel);
     }
 

@@ -5,12 +5,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -94,8 +94,6 @@ public class ChunksListener extends AbstractGameEventListener {
 
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
-
-        Arrays.stream(chunk.getEntities()).forEach(this.worldRecordService.get()::recordEntityDespawn);
     }
 
     private void handleChunkLoad(Chunk chunk, boolean isNewChunk) {
@@ -121,9 +119,10 @@ public class ChunksListener extends AbstractGameEventListener {
             Biome defaultWorldBiome = IslandUtils.getDefaultWorldBiome(dimension);
             // We want to update the biome for new island chunks.
             if (island.getBiome() != defaultWorldBiome) {
-                List<Player> playersToUpdate = new SequentialListBuilder<Player>()
-                        .filter(player -> player.getWorld().equals(world))
-                        .build(island.getAllPlayersInside(), SuperiorPlayer::asPlayer);
+                List<Player> playersToUpdate;
+                try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
+                    playersToUpdate = strategy.getPlayers(WorldInfo.of(world));
+                }
                 plugin.getNMSChunks().setBiome(Collections.singletonList(chunkPosition), island.getBiome(), playersToUpdate);
             }
         }

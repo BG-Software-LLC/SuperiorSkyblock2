@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
@@ -671,14 +672,14 @@ public class DatabaseConverter {
                 .setValue(IslandAttributes.Field.BANK_BALANCE, resultSet.get("islandBank", ""))
                 .setValue(IslandAttributes.Field.BANK_LAST_INTEREST, resultSet.get("lastInterest", currentTime / 1000))
                 .setValue(IslandAttributes.Field.VISITOR_HOMES, resultSet.get("visitorsLocation", ""))
-                .setValue(IslandAttributes.Field.ISLAND_SIZE, resultSet.get("islandSize", -1))
-                .setValue(IslandAttributes.Field.TEAM_LIMIT, resultSet.get("teamLimit", -1))
-                .setValue(IslandAttributes.Field.WARPS_LIMIT, resultSet.get("warpsLimit", -1))
-                .setValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER, resultSet.get("cropGrowth", -1D))
-                .setValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER, resultSet.get("spawnerRates", -1D))
-                .setValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER, resultSet.get("mobDrops", -1D))
-                .setValue(IslandAttributes.Field.COOP_LIMIT, resultSet.get("coopLimit", -1))
-                .setValue(IslandAttributes.Field.BANK_LIMIT, resultSet.get("bankLimit", "-2"));
+                .setValue(IslandAttributes.Field.ISLAND_SIZE, resultSet.get("islandSize", IslandUpgradeConstants.SYNCED_VALUE))
+                .setValue(IslandAttributes.Field.TEAM_LIMIT, resultSet.get("teamLimit", IslandUpgradeConstants.SYNCED_VALUE))
+                .setValue(IslandAttributes.Field.WARPS_LIMIT, resultSet.get("warpsLimit", IslandUpgradeConstants.SYNCED_VALUE))
+                .setValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER, resultSet.get("cropGrowth", IslandUpgradeConstants.SYNCED_VALUE))
+                .setValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER, resultSet.get("spawnerRates", IslandUpgradeConstants.SYNCED_VALUE))
+                .setValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER, resultSet.get("mobDrops", IslandUpgradeConstants.SYNCED_VALUE))
+                .setValue(IslandAttributes.Field.COOP_LIMIT, resultSet.get("coopLimit", IslandUpgradeConstants.SYNCED_VALUE))
+                .setValue(IslandAttributes.Field.BANK_LIMIT, resultSet.get("bankLimit", IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE.toString()));
     }
 
     private static StackedBlockAttributes loadStackedBlock(ResultSetMapBridge resultSet) {

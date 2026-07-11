@@ -6,20 +6,19 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
-import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.GlobalWarpsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
-import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -56,7 +55,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
         if (menuParseResult == null)
             return null;
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         PagedMenuLayout.Builder<View, Island> patternBuilder = (PagedMenuLayout.Builder<View, Island>) menuParseResult.getLayoutBuilder();
 
@@ -65,9 +64,9 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
         List<Integer> slots = new LinkedList<>();
 
         if (cfg.isString("warps"))
-            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warps", menuPatternSlots));
+            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warps", menuSlotsMap));
         if (cfg.isString("slots"))
-            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "slots", menuPatternSlots));
+            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "slots", menuSlotsMap));
         if (slots.isEmpty())
             slots.add(-1);
 
@@ -86,7 +85,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
         @Override
         protected List<Island> requestObjects() {
             return new SequentialListBuilder<Island>()
-                    .sorted(SortingComparators.WORTH_COMPARATOR)
+                    .sorted(SortingTypes.getGlobalWarpsSorting().getComparator())
                     .filter(ISLANDS_FILTER)
                     .build(plugin.getGrid().getIslands());
         }

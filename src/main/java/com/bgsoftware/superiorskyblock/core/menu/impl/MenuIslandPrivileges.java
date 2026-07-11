@@ -11,8 +11,9 @@ import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -20,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandPrivilegePagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
@@ -29,9 +31,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 public class MenuIslandPrivileges extends AbstractPagedMenu<
         MenuIslandPrivileges.View, MenuIslandPrivileges.Args, MenuIslandPrivileges.IslandPrivilegeInfo> {
@@ -91,6 +96,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         String higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
         List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges = new LinkedList<>();
+        Set<String> detectedPrivileges = new HashSet<>();
 
         Optional.ofNullable(cfg.getConfigurationSection("permissions")).ifPresent(permissionsSection -> {
             for (String islandPrivilegeName : permissionsSection.getKeys(false)) {
@@ -98,9 +104,17 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
                     if (islandPrivilegeSection.getBoolean("display-menu", true)) {
                         islandPrivileges.add(loadIslandPrivilegeInfo(islandPrivilegeSection, islandPrivilegeName, islandPrivileges.size()));
                     }
+                    detectedPrivileges.add(islandPrivilegeName.toUpperCase(Locale.ENGLISH));
                 });
             }
         });
+
+        for (IslandPrivilege islandPrivilege : IslandPrivilege.values()) {
+            String islandPrivilegeName = islandPrivilege.getName();
+            if (!detectedPrivileges.contains(islandPrivilegeName)) {
+                Log.warnFromFile("permissions.yml", "Potentially missing permission ", islandPrivilegeName);
+            }
+        }
 
         return new MenuIslandPrivileges(menuParseResult, islandPrivileges, noRolePermission,
                 exactRolePermission, higherRolePermission);
@@ -116,14 +130,14 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         List<String> noAccessCommands = null;
 
         if (islandPrivilegeSection != null) {
-            enabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
+            enabledIslandPrivilegeItem = MenuParserUtils.getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("permission-enabled"));
-            disabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
+            disabledIslandPrivilegeItem = MenuParserUtils.getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("permission-disabled"));
-            rolePrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
+            rolePrivilegeItem = MenuParserUtils.getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("role-permission"));
-            accessSound = MenuParserImpl.getInstance().getSound(islandPrivilegeSection.getConfigurationSection("has-access.sound"));
-            noAccessSound = MenuParserImpl.getInstance().getSound(islandPrivilegeSection.getConfigurationSection("no-access.sound"));
+            accessSound = MenuParserUtils.getSound(islandPrivilegeSection.getConfigurationSection("has-access.sound"));
+            noAccessSound = MenuParserUtils.getSound(islandPrivilegeSection.getConfigurationSection("no-access.sound"));
             accessCommands = islandPrivilegeSection.getStringList("has-access.commands");
             noAccessCommands = islandPrivilegeSection.getStringList("no-access.commands");
         }

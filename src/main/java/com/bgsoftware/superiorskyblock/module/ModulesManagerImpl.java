@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
@@ -155,21 +154,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             return;
         }
 
-        Listener[] listeners = pluginModule.getModuleListeners(plugin);
-        SuperiorCommand[] commands = pluginModule.getSuperiorCommands(plugin);
-        SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands(plugin);
-
-        if (listeners != null || commands != null || adminCommands != null)
-            this.modulesContainer.addModuleData(pluginModule, new ModuleData(listeners, commands, adminCommands));
-
-        if (listeners != null)
-            Arrays.stream(listeners).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, plugin));
-
-        if (commands != null)
-            Arrays.stream(commands).forEach(plugin.getCommands()::registerCommand);
-
-        if (adminCommands != null)
-            Arrays.stream(adminCommands).forEach(plugin.getCommands()::registerAdminCommand);
+        startupModuleInternal(pluginModule);
 
         Log.info("Finished enabling the module ", pluginModule.getName(), " (Took ",
                 System.currentTimeMillis() - startTime, "ms)");
@@ -204,16 +189,35 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
         }
 
-        // We register listeners again
-        ModuleData moduleData = this.modulesContainer.getModuleData(pluginModule);
-        if (moduleData != null) {
-            Listener[] listeners = moduleData.getListeners();
-            if (listeners != null) {
-                for (Listener listener : listeners)
-                    Bukkit.getPluginManager().registerEvents(listener, plugin);
-            }
+        // We remove the old module data, as all listeners and commands were cleared due to the reload
+        this.modulesContainer.removeModuleData(pluginModule);
+
+        // Register module data again
+        startupModuleInternal(pluginModule);
+    }
+
+    private void startupModuleInternal(PluginModule pluginModule) {
+        Listener[] listeners = pluginModule.getModuleListeners(plugin);
+        SuperiorCommand[] commands = pluginModule.getSuperiorCommands(plugin);
+        SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands(plugin);
+
+        if (listeners != null || commands != null || adminCommands != null)
+            this.modulesContainer.addModuleData(pluginModule, new ModuleData(listeners, commands, adminCommands));
+
+        if (listeners != null) {
+            for (Listener listener : listeners)
+                Bukkit.getPluginManager().registerEvents(listener, plugin);
         }
 
+        if (commands != null) {
+            for (SuperiorCommand superiorCommand : commands)
+                plugin.getCommands().registerCommand(superiorCommand);
+        }
+
+        if (adminCommands != null) {
+            for (SuperiorCommand superiorCommand : adminCommands)
+                plugin.getCommands().registerAdminCommand(superiorCommand);
+        }
     }
 
     public void loadModulesData(SuperiorSkyblockPlugin plugin) {

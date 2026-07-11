@@ -21,17 +21,12 @@ import java.util.Locale;
 
 public class SpawnersProvider_AdvancedSpawners implements SpawnersProvider_AutoDetect {
 
-    private static boolean registered = false;
-
     private final SuperiorSkyblockPlugin plugin;
 
     public SpawnersProvider_AdvancedSpawners(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new SpawnersProvider_AdvancedSpawners.StackerListener(), plugin);
-            registered = true;
-            Log.info("Using AdvancedSpawners as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_AdvancedSpawners.StackerListener(), plugin);
+        Log.info("Using AdvancedSpawners as a spawners provider.");
     }
 
     @Override

@@ -51,7 +51,7 @@ public class CmdTop implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        plugin.getMenus().openTopIslands(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), SortingTypes.getDefaultSorting());
+        plugin.getMenus().openTopIslands(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), SortingTypes.getIslandTopSorting());
     }
 
     @Override

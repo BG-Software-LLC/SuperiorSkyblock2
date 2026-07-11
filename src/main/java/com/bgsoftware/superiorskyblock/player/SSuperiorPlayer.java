@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -30,13 +31,15 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.cache.PlayerCacheImpl;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
+import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -73,12 +76,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm;
     @Nullable
     private PersistentDataContainer persistentDataContainer; // Lazy loading
-    private LazyReference<PlayerCache> playerCache = new LazyReference<PlayerCache>() {
+    private final LazyReference<PlayerCache> playerCache = new LazyReference<PlayerCache>() {
         @Override
         protected PlayerCache create() {
             return new PlayerCacheImpl(SSuperiorPlayer.this);
         }
     };
+    private final PlayerPermissionsStore permissionsStore;
 
     private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final List<UUID> pendingInvites = new LinkedList<>();
@@ -97,10 +101,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private boolean blocksStackerEnabled = plugin.getSettings().isDefaultStackedBlocks();
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
-    private boolean teamChatEnabled = false;
     private boolean toggledPanel;
     private boolean islandFly;
     private boolean adminSpyEnabled = false;
+    private ChatState chatState = ChatStates.GLOBAL;
 
     private SBlockPosition schematicPos1 = null;
     private SBlockPosition schematicPos2 = null;
@@ -109,7 +113,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private long lastTimeStatus;
 
     private BukkitTask teleportTask = null;
-    private EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
+    private final EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
 
     public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -129,6 +133,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         this.databaseBridge = plugin.getFactory().createDatabaseBridge(this);
         this.playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
+        this.permissionsStore = new PlayerPermissionsStore(this);
 
         databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
@@ -325,6 +330,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasPermission(String permission) {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
 
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Checking for permission", permission);
+
         if (permission.isEmpty())
             return true;
 
@@ -347,22 +354,21 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasPermissionWithoutOP(String permission) {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
 
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Checking for permission", permission);
+
         if (permission.isEmpty())
             return true;
 
         Log.debug(Debug.PERMISSION_LOOKUP, getName(), permission, "No-Op Check");
 
         Player player = asPlayer();
-        if (player == null) {
-            Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", "Player is not online");
-            return false;
-        }
 
-        boolean res = plugin.getProviders().getPermissionsProvider().hasPermission(player, permission);
+        PlayerPermissionsStore.PermissionResult permissionResult =
+                this.permissionsStore.hasCustomPermission(player, permission);
 
-        Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", res);
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", permissionResult);
 
-        return res;
+        return permissionResult == PlayerPermissionsStore.PermissionResult.PRIVILEGED;
     }
 
     @Override
@@ -370,6 +376,22 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
         Island island = getIsland();
         return island != null && island.hasPermission(this, permission);
+    }
+
+    @Override
+    public boolean hasBypassPermission(IslandPrivilege permission) {
+        Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
+
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Checking for IslandPrivilege bypass permission", permission);
+
+        Player player = asPlayer();
+
+        PlayerPermissionsStore.PermissionResult permissionResult =
+                this.permissionsStore.hasBypassPermission(player, permission);
+
+        Log.debugResult(Debug.PERMISSION_LOOKUP, "Result", permissionResult);
+
+        return permissionResult == PlayerPermissionsStore.PermissionResult.PRIVILEGED;
     }
 
     /*
@@ -387,7 +409,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         World world = getWorld();
 
         // Checks for island teammates pvp
-        if (getIsland() == otherPlayer.getIsland() && (world == null || !isPvPWorldInternal(world.getName())))
+        Island island = getIsland();
+        if (island != null && island == otherPlayer.getIsland() && (world == null || !isPvPWorldInternal(world.getName())))
             return HitActionResult.ISLAND_TEAM_PVP;
 
         // Checks if this player can bypass all pvp restrictions
@@ -480,18 +503,6 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         } else if (teleportResult != null) {
             teleportResult.accept(false);
         }
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment) {
-        teleport(island, Dimensions.fromEnvironment(environment));
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
-        teleport(island, Dimensions.fromEnvironment(environment), teleportResult);
     }
 
     @Override
@@ -696,6 +707,17 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public ChatState getChatState() {
+        return this.chatState;
+    }
+
+    @Override
+    public void setChatState(ChatState chatState) {
+        Log.debug(Debug.SET_CHAT_STATE, getName(), chatState);
+        this.chatState = chatState;
+    }
+
+    @Override
     public boolean hasSchematicModeEnabled() {
         return schematicModeEnabled;
     }
@@ -712,19 +734,29 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public boolean hasTeamChatEnabled() {
-        return teamChatEnabled;
+        return getChatState() == ChatStates.TEAM_CHAT;
     }
 
     @Override
+    @Deprecated
     public void toggleTeamChat() {
-        setTeamChat(!teamChatEnabled);
+        if (getChatState() == ChatStates.TEAM_CHAT) {
+            setChatState(ChatStates.GLOBAL);
+        } else {
+            setChatState(ChatStates.TEAM_CHAT);
+        }
     }
 
     @Override
+    @Deprecated
     public void setTeamChat(boolean enabled) {
-        Log.debug(Debug.SET_TEAM_CHAT, getName(), enabled);
-        teamChatEnabled = enabled;
+        if (enabled) {
+            setChatState(ChatStates.TEAM_CHAT);
+        } else {
+            setChatState(ChatStates.GLOBAL);
+        }
     }
 
     @Override
@@ -809,6 +841,12 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setAdminSpy(boolean enabled) {
         Log.debug(Debug.SET_ADMIN_SPY, getName(), enabled);
         adminSpyEnabled = enabled;
+
+        if (enabled) {
+            IslandChat.addSpy(this);
+        } else {
+            IslandChat.removeSpy(this);
+        }
     }
 
     @Override
@@ -975,10 +1013,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.blocksStackerEnabled |= otherPlayer.hasBlocksStackerEnabled();
         this.schematicModeEnabled |= otherPlayer.hasSchematicModeEnabled();
         this.bypassModeEnabled |= otherPlayer.hasBypassModeEnabled();
-        this.teamChatEnabled |= otherPlayer.hasTeamChatEnabled();
         this.toggledPanel |= otherPlayer.hasToggledPanel();
         this.islandFly |= otherPlayer.hasToggledPanel();
         this.adminSpyEnabled |= otherPlayer.hasAdminSpyEnabled();
+        this.chatState = otherPlayer.getChatState();
         this.disbands = otherPlayer.getDisbands();
         this.borderColor = otherPlayer.getBorderColor();
         this.lastTimeStatus = otherPlayer.getLastTimeStatus();
@@ -1025,14 +1063,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
+        this.changeAmountMissionsCompletedInternal(mission, false, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.inc(-1));
     }
 
     @Override
@@ -1047,8 +1085,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
             return false;
 
         Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
-        return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) <
-                missionDataOptional.get().getResetAmount();
+
+        if (missionDataOptional.isPresent()) {
+            int resetAmount = missionDataOptional.get().getResetAmount();
+            return resetAmount <= 0 || getAmountMissionCompleted(mission) < resetAmount;
+        }
+
+        return false;
     }
 
     @Override
@@ -1062,10 +1105,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(!mission.getIslandMission(), "mission parameter must be player-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.set(finishCount));
     }
 
-    private void changeAmountMissionsCompletedInternal(Mission<?> mission, Function<Counter, Integer> action) {
+    private void changeAmountMissionsCompletedInternal(Mission<?> mission, boolean clearData, Function<Counter, Integer> action) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
 
         MissionReference missionReference = new MissionReference(mission);
@@ -1076,8 +1119,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         Log.debug(Debug.SET_PLAYER_MISSION_COMPLETED, getName(), mission.getName(), newFinishCount);
 
-        // We always want to reset data
-        mission.clearData(this);
+        if (clearData)
+            mission.clearData(this);
 
         if (newFinishCount > 0) {
             if (newFinishCount == oldFinishCount)

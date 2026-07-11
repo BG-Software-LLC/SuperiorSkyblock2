@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -22,7 +23,7 @@ public abstract class AbstractNMSTags implements NMSTags {
     @Override
     public CompoundTag serializeItem(org.bukkit.inventory.ItemStack bukkitItem) {
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
-        return setTagAndGetCompoundTag(itemStack, "DataVersion", CraftMagicNumbers.INSTANCE.getDataVersion());
+        return setTagAndGetCompoundTag(itemStack, "DataVersion", AbstractNMSAlgorithms.DATA_VERSION);
     }
 
     protected abstract CompoundTag setTagAndGetCompoundTag(ItemStack itemStack, String key, int value);
@@ -36,11 +37,10 @@ public abstract class AbstractNMSTags implements NMSTags {
 
         net.minecraft.nbt.CompoundTag tagCompound = (net.minecraft.nbt.CompoundTag) compoundTag.toNBT();
 
-        int currentVersion = CraftMagicNumbers.INSTANCE.getDataVersion();
         int itemVersion = getCompoundTagInt(tagCompound, "DataVersion", 0);
-        if (itemVersion < currentVersion) {
+        if (itemVersion < AbstractNMSAlgorithms.DATA_VERSION) {
             tagCompound = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK,
-                    new Dynamic<>(NbtOps.INSTANCE, tagCompound), itemVersion, currentVersion).getValue();
+                    new Dynamic<>(NbtOps.INSTANCE, tagCompound), itemVersion, AbstractNMSAlgorithms.DATA_VERSION).getValue();
         }
 
         ItemStack itemStack = parseItemStack(tagCompound);

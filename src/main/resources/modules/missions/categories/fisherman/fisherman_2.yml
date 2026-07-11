@@ -47,6 +47,22 @@ required-caughts:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aFisherman II'
+    lore:
+      - '&7Cleaning the ocean from junk can be messy, but fun!'
+      - '&7Catch 5 items.'
+      - ''
+      - '&6Required Caughts:'
+      - '&8 - &7x5 Items'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$15,000'
+      - ''
+      - '&6Items: &7{1}/5'
+      - '&c&l ✘ &7Locked'
+    amount: 2
   not-completed:
     type: PAPER
     name: '&aFisherman II'

@@ -29,6 +29,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec2;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -51,7 +52,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final boolean isStarLightInterface = ((Supplier<Boolean>) () -> {
         try {
-            Class.forName("ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface");
+            Class.forName("${STAR_LIGHT_INTERFACE_CLASS}");
             return true;
         } catch (ClassNotFoundException error) {
             return false;
@@ -61,7 +62,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
-    private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
+    private final Set<Vec2> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
+    private final Set<ChunkPos> lightenChunksPositions = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
 
     private Dimension dimension;
     private LevelHeightAccessor levelHeightAccessor;
@@ -79,8 +81,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
 
         @Override
-        public void prepareChunkAccess(ChunkPos chunkPos) {
-            chunkData = chunks.computeIfAbsent(chunkPos.toLong(), ChunkData::new);
+        public void prepareChunkAccess(int chunkX, int chunkZ) {
+            long packedPos = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
+            chunkData = chunks.computeIfAbsent(packedPos, pos -> new ChunkData(new ChunkPos(chunkX, chunkZ)));
         }
 
         @Override
@@ -172,11 +175,13 @@ public class WorldEditSessionImpl implements WorldEditSession {
     public void applyBlocks(Chunk bukkitChunk) {
         Preconditions.checkState(this.serverLevel != null, "Cannot call WorldEditSession#applyBlocks on partial initialized session");
 
-        ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
-        ChunkPos chunkPos = levelChunk.getPos();
+        int chunkX = bukkitChunk.getX();
+        int chunkZ = bukkitChunk.getZ();
 
-        long chunkKey = chunkPos.toLong();
+        ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(chunkX, chunkZ);
+
+        long chunkKey = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
         ChunkData chunkData = this.chunks.remove(chunkKey);
 
         if (chunkData == null)
@@ -193,7 +198,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         if (plugin.getSettings().isLightsUpdate()) {
             if (isStarLightInterface) {
-                this.lightenChunks.add(chunkPos);
+                this.lightenChunks.add(new Vec2(chunkX, chunkZ));
+                this.lightenChunksPositions.add(levelChunk.getPos());
             } else {
                 ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
                 chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
@@ -232,8 +238,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         if (plugin.getSettings().isLightsUpdate() && isStarLightInterface && !lightenChunks.isEmpty()) {
             ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
-            NMSUtilsVersioned.relightChunks(threadedLevelLightEngine, lightenChunks);
+            NMSUtilsVersioned.relightChunks(threadedLevelLightEngine, lightenChunksPositions);
             this.lightenChunks.clear();
+            this.lightenChunksPositions.clear();
         }
 
         release();
@@ -260,7 +267,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 baseBlockPosZAxis, this, this.chunks);
         dataImpl.readBlocksToUpdate(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blocksToUpdate);
         dataImpl.readBlockEntities(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blockEntities);
-        dataImpl.readLights(baseChunkPosXAxis, baseChunkPosZAxis, this.lightenChunks);
+        dataImpl.readLights(baseChunkPosXAxis, baseChunkPosZAxis, this.lightenChunksPositions);
     }
 
     @Override
@@ -269,6 +276,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         this.blocksToUpdate.clear();
         this.blockEntities.clear();
         this.lightenChunks.clear();
+        this.lightenChunksPositions.clear();
         this.serverLevel = null;
         this.dimension = null;
         this.levelHeightAccessor = null;
@@ -308,11 +316,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
         private final Map<Heightmap.Types, Heightmap> heightmaps;
         private final List<BlockPos> lights;
 
-        private ChunkData(long chunkKey) {
+        private ChunkData(ChunkPos chunkPos) {
             this(new LevelChunkSection[levelHeightAccessor.getSectionsCount()], new EnumMap<>(Heightmap.Types.class),
                     isStarLightInterface ? Collections.emptyList() : new LinkedList<>());
-
-            ChunkPos chunkPos = new ChunkPos(chunkKey);
 
             NMSUtilsVersioned.createChunkSections(serverLevel, levelHeightAccessor, this.chunkSections, dimension);
 

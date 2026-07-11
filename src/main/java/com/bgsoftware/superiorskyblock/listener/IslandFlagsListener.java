@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
@@ -43,9 +44,6 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
 
-    @Nullable
-    private static final CreatureSpawnEvent.SpawnReason VILLAGE_INVASION = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "VILLAGE_INVASION");
-
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
 
     private World spawnIslandWorld;
@@ -81,39 +79,30 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Location entityLocation) {
-        EntityType entityType = e.getArgs().entity.getType();
         CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
-
-        IslandFlag actionFlag;
 
         if (spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER ||
                 spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {
-            switch (BukkitEntities.getCategory(entityType)) {
-                case ANIMAL:
-                    actionFlag = IslandFlags.SPAWNER_ANIMALS_SPAWN;
-                    break;
-                case MONSTER:
-                    actionFlag = IslandFlags.SPAWNER_MONSTER_SPAWN;
-                    break;
-                default:
-                    return false;
+            List<EntityCategory> entityCategories = BukkitEntities.getCategories(e.getArgs().entity);
+            IslandFlag islandFlag;
+            for (EntityCategory entityCategory : entityCategories) {
+                islandFlag = entityCategory.getSpawnerSpawningIslandFlag();
+                if (islandFlag != null && preventAction(entityLocation, islandFlag)) {
+                    return true;
+                }
             }
         } else if (NATURAL_SPAWN_REASONS.contains(spawnReason)) {
-            switch (BukkitEntities.getCategory(entityType)) {
-                case ANIMAL:
-                    actionFlag = IslandFlags.NATURAL_ANIMALS_SPAWN;
-                    break;
-                case MONSTER:
-                    actionFlag = IslandFlags.NATURAL_MONSTER_SPAWN;
-                    break;
-                default:
-                    return false;
+            List<EntityCategory> entityCategories = BukkitEntities.getCategories(e.getArgs().entity);
+            IslandFlag islandFlag;
+            for (EntityCategory entityCategory : entityCategories) {
+                islandFlag = entityCategory.getNaturalSpawningIslandFlag();
+                if (islandFlag != null && preventAction(entityLocation, islandFlag)) {
+                    return true;
+                }
             }
-        } else {
-            return false;
         }
 
-        return preventAction(entityLocation, actionFlag);
+        return false;
     }
 
     private boolean checkPreventEggLay(GameEvent<GameEventArgs.EntitySpawnEvent> e, Location entityLocation) {

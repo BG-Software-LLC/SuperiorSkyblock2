@@ -38,10 +38,10 @@ import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -60,6 +60,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
@@ -99,29 +100,39 @@ public class SpawnIsland implements Island {
     private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static EnumerateSet<IslandFlag> DEFAULT_SPAWN_FLAGS_CACHE;
-    private static EnumerateSet<IslandPrivilege> DEFAULT_SPAWN_PRIVILEGES_CACHE;
+    private static UnparsedEnumerateSet<IslandFlag> DEFAULT_SPAWN_FLAGS_CACHE;
+    private static UnparsedEnumerateSet<IslandPrivilege> DEFAULT_SPAWN_PRIVILEGES_CACHE;
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SpawnIsland::onSettingsUpdate);
     }
 
     private static void onSettingsUpdate() {
-        DEFAULT_SPAWN_FLAGS_CACHE = new EnumerateSet<>(IslandFlag.values());
-        plugin.getSettings().getSpawn().getSettings().forEach(flagName -> {
-            try {
-                DEFAULT_SPAWN_FLAGS_CACHE.add(IslandFlag.getByName(flagName));
-            } catch (Throwable ignored) {
+        DEFAULT_SPAWN_FLAGS_CACHE = new UnparsedEnumerateSet<IslandFlag>(IslandFlag.values()) {
+            @Override
+            protected IslandFlag parseName(String name) {
+                return IslandFlag.getByName(name);
             }
-        });
 
-        DEFAULT_SPAWN_PRIVILEGES_CACHE = new EnumerateSet<>(IslandPrivilege.values());
-        plugin.getSettings().getSpawn().getPermissions().forEach(privilegeName -> {
-            try {
-                DEFAULT_SPAWN_PRIVILEGES_CACHE.add(IslandPrivilege.getByName(privilegeName));
-            } catch (Throwable ignored) {
+            @Override
+            protected String getName(IslandFlag islandFlag) {
+                return islandFlag.getName();
             }
-        });
+        };
+        plugin.getSettings().getSpawn().getSettings().forEach(DEFAULT_SPAWN_FLAGS_CACHE::addName);
+
+        DEFAULT_SPAWN_PRIVILEGES_CACHE = new UnparsedEnumerateSet<IslandPrivilege>(IslandPrivilege.values()) {
+            @Override
+            protected IslandPrivilege parseName(String name) {
+                return IslandPrivilege.getByName(name);
+            }
+
+            @Override
+            protected String getName(IslandPrivilege islandPrivilege) {
+                return islandPrivilege.getName();
+            }
+        };
+        plugin.getSettings().getSpawn().getPermissions().forEach(DEFAULT_SPAWN_PRIVILEGES_CACHE::addName);
     }
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
@@ -133,7 +144,7 @@ public class SpawnIsland implements Island {
         }
     };
 
-    private final BlockPosition center;
+    private final WorldPosition center;
     private final World spawnWorld;
     private final WorldInfo spawnWorldInfo;
     private final int islandSize;
@@ -144,7 +155,7 @@ public class SpawnIsland implements Island {
 
     public SpawnIsland() throws ManagerLoadException {
         String spawnLocation = plugin.getSettings().getSpawn().getLocation();
-        Location centerLocation = Serializers.LOCATION_SPACED_SERIALIZER.deserialize(spawnLocation);
+        Location centerLocation = Serializers.LOCATION_SPACED_CENTERED_SERIALIZER.deserialize(spawnLocation);
         if (centerLocation == null) {
             throw new ManagerLoadException("The spawn location could not be parsed", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
@@ -161,8 +172,8 @@ public class SpawnIsland implements Island {
 
         this.islandSize = plugin.getSettings().getSpawn().getSize();
 
-        this.center = SBlockPosition.of(centerLocation);
-        this.islandArea.update(this.center, this.islandSize);
+        this.center = SWorldPosition.of(centerLocation);
+        this.islandArea.update(this.center.toBlockPosition(), this.islandSize);
         this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), Dimensions.fromEnvironment(this.spawnWorld.getEnvironment()));
 
         this.dirtyChunksContainer = new DirtyChunksContainer(this);
@@ -346,12 +357,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Location getCenter(Dimension unused) {
-        return this.center.toWorldPosition().toLocation(this.spawnWorld);
+        return this.center.toLocation(this.spawnWorld);
     }
 
     @Override
     public BlockPosition getCenterPosition() {
-        return this.center;
+        return this.center.toBlockPosition();
     }
 
     @Override
@@ -853,12 +864,6 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getUnlockedWorldsFlag() {
-        return 0;
-    }
-
-    @Override
     public boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege) {
         return sender instanceof ConsoleCommandSender || hasPermission(plugin.getPlayers().getSuperiorPlayer(sender), islandPrivilege);
     }
@@ -866,8 +871,10 @@ public class SpawnIsland implements Island {
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
         boolean checkForProtection = islandPrivilege != IslandPrivileges.FLY;
-        return (checkForProtection && !plugin.getSettings().getSpawn().isProtected()) || superiorPlayer.hasBypassModeEnabled() ||
-                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
+        return (checkForProtection && !plugin.getSettings().getSpawn().isProtected()) ||
+                superiorPlayer.hasBypassModeEnabled() ||
+                superiorPlayer.hasBypassPermission(islandPrivilege) ||
+                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*") ||
                 hasPermission(SPlayerRole.guestRole(), islandPrivilege);
     }
 
@@ -1164,7 +1171,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public BigDecimal getBankLimit() {
-        return BigDecimal.valueOf(-1);
+        return IslandUpgradeConstants.NO_BANK_LIMIT_VALUE;
     }
 
     @Override
@@ -1174,7 +1181,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public BigDecimal getBankLimitRaw() {
-        return BigDecimal.valueOf(-1);
+        return IslandUpgradeConstants.NO_BANK_LIMIT_VALUE;
     }
 
     @Override
@@ -1610,12 +1617,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getBlockLimit(Key key) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1660,12 +1667,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
     public int getEntityLimit(Key key) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1725,7 +1732,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getTeamLimit() {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1735,12 +1742,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getTeamLimitRaw() {
-        return 0;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
     public int getWarpsLimit() {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1750,7 +1757,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getWarpsLimitRaw() {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -1815,12 +1822,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
     public int getRoleLimitRaw(PlayerRole playerRole) {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
@@ -2061,12 +2068,6 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratedSchematicsFlag() {
-        return 0;
-    }
-
-    @Override
     public String getSchematicName() {
         return "";
     }
@@ -2093,7 +2094,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getCoopLimitRaw() {
-        return -1;
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override

@@ -51,7 +51,7 @@ public class NMSTagsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_7.Abs
 
         net.minecraft.nbt.CompoundTag tagCompound = (net.minecraft.nbt.CompoundTag)
                 ItemStack.CODEC.encodeStart(context, itemStack).getOrThrow();
-        tagCompound.putInt("DataVersion", CraftMagicNumbers.INSTANCE.getDataVersion());
+        tagCompound.putInt("DataVersion", com.bgsoftware.superiorskyblock.nms.v1_21_7.AbstractNMSAlgorithms.DATA_VERSION);
 
         return CompoundTag.fromNBT(tagCompound);
     }

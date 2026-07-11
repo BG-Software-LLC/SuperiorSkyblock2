@@ -87,7 +87,8 @@ public class CmdInvite implements IPermissibleCommand {
             announcementMessage = Message.REVOKE_INVITE_ANNOUNCEMENT;
             Message.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
         } else {
-            if (island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()) {
+            int teamLimit = island.getTeamLimit();
+            if (teamLimit >= 0 && island.getIslandMembers(true).size() >= teamLimit) {
                 Message.INVITE_TO_FULL_ISLAND.send(superiorPlayer);
                 return;
             }

@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.IModuleConfiguration;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminAddBankLimit;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminDeposit;
+import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminSetBankLimit;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminWithdraw;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBalance;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBank;
@@ -77,7 +79,8 @@ public class BankModule extends BuiltinModule<BankModule.Configuration> {
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        return new SuperiorCommand[]{new CmdAdminDeposit(), new CmdAdminWithdraw()};
+        return new SuperiorCommand[]{new CmdAdminAddBankLimit(), new CmdAdminDeposit(),
+                new CmdAdminSetBankLimit(), new CmdAdminWithdraw()};
     }
 
     @Override

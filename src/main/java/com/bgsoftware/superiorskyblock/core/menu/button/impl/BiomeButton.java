@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
+import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
@@ -19,10 +21,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -52,7 +54,7 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
         if (requiredPermission == null || inventoryViewer.hasPermission(requiredPermission)) {
             buttonItem = super.createViewItem();
         } else if (getTemplate().lackPermissionItem != null) {
-            buttonItem = getTemplate().lackPermissionItem.build(inventoryViewer);
+            buttonItem = getTemplate().lackPermissionItem.getLeft().build(inventoryViewer);
         }
 
         if (buttonItem == null || !Menus.MENU_BIOMES.isCurrentBiomeGlow())
@@ -69,7 +71,7 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<IslandMenuView> context) {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Player player = inventoryViewer.asPlayer();
 
@@ -94,8 +96,8 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
     }
 
     @Override
-    public void onButtonClickLackPermission(InventoryClickEvent clickEvent) {
-        super.onButtonClickLackPermission(clickEvent);
+    public void onButtonClickLackPermission(ButtonClickContext<IslandMenuView> context) {
+        super.onButtonClickLackPermission(context);
         getTemplate().lackPermissionCommands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", menuView.getInventoryViewer().getName())));
     }
@@ -103,7 +105,7 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<IslandMenuView> {
 
         private final Biome biome;
-        private TemplateItem noAccessItem = null;
+        private Either<TemplateItem, DialogButton> noAccessItem = null;
         private List<String> noAccessCommands = null;
 
         public Builder(Biome biome) {
@@ -111,11 +113,19 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
         }
 
         public void setAccessItem(TemplateItem accessItem) {
-            this.buttonItem = accessItem;
+            this.buttonData = Either.left(accessItem);
+        }
+
+        public void setAccessDialog(DialogButton accessDialog) {
+            this.buttonData = Either.right(accessDialog);
         }
 
         public void setNoAccessItem(TemplateItem noAccessItem) {
-            this.noAccessItem = noAccessItem;
+            this.noAccessItem = Either.left(noAccessItem);
+        }
+
+        public void setNoAccessDialog(DialogButton noAccessDialog) {
+            this.noAccessItem = Either.right(noAccessDialog);
         }
 
         public void setAccessSound(GameSound accessSound) {
@@ -136,8 +146,16 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
 
         @Override
         public MenuTemplateButton<IslandMenuView> build() {
-            return new Template(buttonItem, requiredPermission, lackPermissionSound,
-                    clickSound, commands, noAccessItem, noAccessCommands, biome);
+            GameSound accessSound = clickSound;
+            List<String> accessCommands = commands;
+            this.clickSound = null;
+            this.commands = null;
+            try {
+                return new Template(this, accessSound, accessCommands, noAccessItem, noAccessCommands, biome);
+            } finally {
+                this.clickSound = accessSound;
+                this.commands = accessCommands;
+            }
         }
 
     }
@@ -148,16 +166,14 @@ public class BiomeButton extends AbstractMenuViewButton<IslandMenuView> {
         private final GameSound accessSound;
         private final List<String> accessCommands;
         @Nullable
-        private final TemplateItem lackPermissionItem;
+        private final Either<TemplateItem, DialogButton> lackPermissionItem;
         private final List<String> lackPermissionCommands;
         private final Biome biome;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable String requiredPermission,
-                 @Nullable GameSound lackPermissionSound, @Nullable GameSound accessSound,
-                 @Nullable List<String> accessCommands, @Nullable TemplateItem lackPermissionItem,
+        Template(AbstractBuilder<IslandMenuView> builder, @Nullable GameSound accessSound,
+                 @Nullable List<String> accessCommands, @Nullable Either<TemplateItem, DialogButton> lackPermissionItem,
                  @Nullable List<String> lackPermissionCommands, Biome biome) {
-            super(buttonItem, null, null, requiredPermission, lackPermissionSound,
-                    BiomeButton.class, BiomeButton::new);
+            super(builder, BiomeButton.class, BiomeButton::new);
             this.accessSound = accessSound;
             this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
             this.lackPermissionItem = lackPermissionItem;

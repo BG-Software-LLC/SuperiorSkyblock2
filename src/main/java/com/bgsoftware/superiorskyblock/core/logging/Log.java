@@ -2,28 +2,40 @@ package com.bgsoftware.superiorskyblock.core.logging;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.module.logging.ModuleLoggerFileHandler;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.EnumSet;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Log {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final Logger LOGGER = initializeLogger();
 
     private static final EnumSet<Debug> DEBUG_FILTERS = EnumSet.noneOf(Debug.class);
     private static boolean debugMode = false;
-    private static final ThreadLocal<StackTrace> originalStackTrace = new ThreadLocal<>();
+
+    private static Logger initializeLogger() {
+        Logger logger = Logger.getLogger("SuperiorSkyblock2");
+
+        logger.setParent(plugin.getLogger());
+        logger.setUseParentHandlers(true);
+
+        File logsFolder = new File(plugin.getDataFolder(), "logs");
+        File archiveLogsFile = new File(logsFolder, "archive");
+
+        ModuleLoggerFileHandler.addToLogger(logsFolder, archiveLogsFile, logger);
+
+        return logger;
+    }
 
     private Log() {
 
-    }
-
-    public static void attachStackTrace(StackTrace stackTrace) {
-        originalStackTrace.set(stackTrace);
-    }
-
-    public static void detachStackTrace() {
-        originalStackTrace.set(null);
     }
 
     public static void info(Object first, Object... parts) {
@@ -44,7 +56,7 @@ public class Log {
 
     public static void error(Throwable error, Object first, Object... parts) {
         error(first, parts);
-        error.printStackTrace();
+        printStackTrace(error);
     }
 
     public static void errorFromFile(String fileName, Object first, Object... parts) {
@@ -53,7 +65,7 @@ public class Log {
 
     public static void errorFromFile(Throwable error, String fileName, Object first, Object... parts) {
         errorFromFile(fileName, first, parts);
-        error.printStackTrace();
+        printStackTrace(error);
     }
 
     public static void profile(String[] profiledDataLines) {
@@ -117,11 +129,11 @@ public class Log {
     }
 
     private static void logInternalWithFile(Level level, String fileName, Object first, Object... parts) {
-        plugin.getLogger().log(level, buildFromPartsWithFile(fileName, first, parts));
+        LOGGER.log(level, buildFromPartsWithFile(fileName, first, parts));
     }
 
     private static void logInternal(Level level, Object first, Object... parts) {
-        plugin.getLogger().log(level, buildFromParts(first, parts));
+        LOGGER.log(level, buildFromParts(first, parts));
     }
 
     private static String buildFromParts(Object first, Object... parts) {
@@ -152,10 +164,14 @@ public class Log {
     }
 
     private static void printStackTrace() {
-        Thread.dumpStack();
-        StackTrace originalStackTrace = Log.originalStackTrace.get();
-        if (originalStackTrace != null)
-            originalStackTrace.dump();
+        printStackTrace(new Exception("Stack trace"));
+    }
+
+    private static void printStackTrace(Throwable error) {
+        StringWriter buffer = new StringWriter();
+        PrintWriter pw = new PrintWriter(buffer);
+        error.printStackTrace(pw);
+        LOGGER.log(Level.SEVERE, buffer.toString());
     }
 
 }

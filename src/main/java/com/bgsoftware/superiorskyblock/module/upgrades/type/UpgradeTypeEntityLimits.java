@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
@@ -15,6 +16,9 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEntityLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveEntityLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEntityLimit;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
@@ -37,7 +41,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +49,9 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
+
+    @Nullable
+    private static final Material GOLDEN_DANDELION_TYPE = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
 
     private final Map<EntityType, SpawningPlayerData> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
     private final Map<Location, SpawningPlayerData> vehiclesOwners = AutoRemovalMap.newMap(2, TimeUnit.SECONDS, Location2ObjectMap::new);
@@ -69,7 +76,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return Collections.emptyList();
+        return Arrays.asList(new CmdAdminAddEntityLimit(), new CmdAdminRemoveEntityLimit(), new CmdAdminSetEntityLimit());
     }
 
     private Optional<Listener> checkEntityBreedListener() {
@@ -289,7 +296,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             PlayerHand usedHand = BukkitItems.getHand(e);
             ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
 
-            if (usedItem == null || !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked()))
+            if (usedItem == null || (usedItem.getType() != GOLDEN_DANDELION_TYPE &&
+                    !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked())))
                 return;
 
             // We want to calculate the amount of items consumed by breeding this animal.

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
@@ -11,12 +12,12 @@ import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MissionsPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import org.bukkit.configuration.ConfigurationSection;
@@ -56,7 +57,7 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         PagedMenuLayout.Builder<View, MissionReference> patternBuilder = (PagedMenuLayout.Builder<View, MissionReference>) menuParseResult.getLayoutBuilder();
 
@@ -71,14 +72,16 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
                 if (soundSection == null)
                     continue;
 
-                GameSound completedSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("completed"));
-                GameSound notCompletedSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("not-completed"));
-                GameSound canCompleteSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("can-complete"));
+                GameSound completedSound = MenuParserUtils.getSound(soundSection.getConfigurationSection("completed"));
+                GameSound notCompletedSound = MenuParserUtils.getSound(soundSection.getConfigurationSection("not-completed"));
+                GameSound canCompleteSound = MenuParserUtils.getSound(soundSection.getConfigurationSection("can-complete"));
+                GameSound lockedSound = MenuParserUtils.getSound(soundSection.getConfigurationSection("locked"));
 
-                patternBuilder.setPagedObjectSlots(menuPatternSlots.getSlots(slotChar), new MissionsPagedObjectButton.Builder()
+                patternBuilder.setPagedObjectSlots(menuSlotsMap.getSlots(slotChar), new MissionsPagedObjectButton.Builder()
                         .setCompletedSound(completedSound)
                         .setNotCompletedSound(notCompletedSound)
-                        .setCanCompleteSound(canCompleteSound));
+                        .setCanCompleteSound(canCompleteSound)
+                        .setLockedSound(lockedSound));
             }
         }
 

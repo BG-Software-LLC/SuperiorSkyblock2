@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -25,6 +26,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -146,22 +148,37 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     boolean isShownAsOnline();
 
     /**
-     * Check whether or not the player has a permission.
-     * When the player is offline, false will be returned.
+     * Check whether the player has a permission.
+     *
+     * @param permission The permission to check.
+     * @return When the player is offline, false will be returned.
      */
     boolean hasPermission(String permission);
 
     /**
-     * Check whether or not the player has a permission without having op.
-     * When the player is offline, false will be returned.
+     * Check whether the player has a permission without having op.
+     *
+     * @param permission The permission to check.
+     * @return When the player is offline, false may be returned.
      */
     boolean hasPermissionWithoutOP(String permission);
 
     /**
-     * Check whether or not the player has a permission on his island.
+     * Check whether the player has a permission on his island.
+     *
+     * @param permission The {@link IslandPrivilege} to check.
+     * @return Whether the player has the permission on his island.
      * When the player doesn't have an island, false will be returned.
      */
     boolean hasPermission(IslandPrivilege permission);
+
+    /**
+     * Check whether the player has the bypass permission for the provided {@link IslandPrivilege}.
+     *
+     * @param permission The {@link IslandPrivilege} to check.
+     * @return Whether the player has the bypass permission. If the player is offline, false may be returned.
+     */
+    boolean hasBypassPermission(IslandPrivilege permission);
 
     /**
      * Check whether or not this player can hit another player.
@@ -251,27 +268,6 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * @param teleportResult Consumer that will be ran when task is finished.
      */
     void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult);
-
-    /**
-     * Teleport the player to an island.
-     *
-     * @param island      The island to teleport the player to.
-     * @param environment The environment to teleport the player to.
-     * @deprecated See {@link #teleport(Island, Dimension)}
-     */
-    @Deprecated
-    void teleport(Island island, World.Environment environment);
-
-    /**
-     * Teleport the player to an island.
-     *
-     * @param island         The island to teleport the player to.
-     * @param environment    The environment to teleport the player to.
-     * @param teleportResult Consumer that will be ran when task is finished.
-     * @deprecated See {@link #teleport(Island, Dimension, Consumer)}
-     */
-    @Deprecated
-    void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult);
 
     /**
      * Check whether or not the player is inside their island.
@@ -364,6 +360,17 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Get all islands that the player is coop of.
      */
     List<Island> getCoopIslands();
+
+    /**
+     * Get the ChatState of the player;
+     */
+    ChatState getChatState();
+
+
+    /**
+     * Set the ChatState of the player.
+     */
+    void setChatState(ChatState chatState);
 
     /**
      * Get the role of the player.
@@ -468,19 +475,25 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
 
     /**
      * Check whether the team chat is enabled for the player.
+     * @deprecated See {@link #getChatState()}
      */
+    @Deprecated
     boolean hasTeamChatEnabled();
 
     /**
      * Toggle the team chat for the player.
+     * @deprecated See {@link #setChatState(ChatState)}
      */
+    @Deprecated
     void toggleTeamChat();
 
     /**
-     * Set whether the schematic mode is enabled for the player.
+     * Set whether the team chat is enabled for the player.
      *
-     * @param enabled true to enable schematic mode.
+     * @param enabled true to enable team chat;
+     * @deprecated See {@link #setChatState(ChatState)}
      */
+    @Deprecated
     void setTeamChat(boolean enabled);
 
     /**

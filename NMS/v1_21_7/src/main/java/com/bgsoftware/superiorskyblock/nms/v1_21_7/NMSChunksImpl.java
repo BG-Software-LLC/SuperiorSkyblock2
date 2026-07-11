@@ -1,23 +1,19 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_7;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.nms.v1_21_7.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_21_7.utils.NMSUtilsVersioned;
-import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -26,12 +22,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
+import net.minecraft.network.protocol.game.ClientboundChunkBatchFinishedPacket;
+import net.minecraft.network.protocol.game.ClientboundChunkBatchStartPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -50,11 +49,8 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
-import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.block.CraftBiome;
-import org.bukkit.craftbukkit.entity.CraftEntityType;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.slf4j.Logger;
@@ -65,6 +61,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_7.AbstractNMSChunks {
+
+    private static final ClientboundChunkBatchFinishedPacket CHUNK_BATCH_FINISHED_PACKET = new ClientboundChunkBatchFinishedPacket(1);
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -80,8 +78,6 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_7.A
                 Registry<Biome> biomesRegistry = levelChunk.level.registryAccess().lookupOrThrow(Registries.BIOME);
                 Holder<Biome> biome = CraftBiome.bukkitToMinecraftHolder(bukkitBiome);
 
-                ChunkPos chunkPos = levelChunk.getPos();
-
                 LevelChunkSection[] chunkSections = levelChunk.getSections();
                 for (int i = 0; i < chunkSections.length; ++i) {
                     LevelChunkSection currentSection = chunkSections[i];
@@ -94,14 +90,18 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_7.A
 
                 levelChunk.markUnsaved();
 
-                ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos);
                 ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk, levelChunk.level.getLightEngine(), null, null, true);
+                        levelChunk, levelChunk.getLevel().getLightEngine(), null, null);
 
                 playersToUpdate.forEach(player -> {
                     ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                    serverPlayer.connection.send(forgetLevelChunkPacket);
-                    serverPlayer.connection.send(mapChunkPacket);
+
+                    try {
+                        serverPlayer.connection.send(ClientboundChunkBatchStartPacket.INSTANCE);
+                        serverPlayer.connection.send(mapChunkPacket);
+                    } finally {
+                        serverPlayer.connection.send(CHUNK_BATCH_FINISHED_PACKET);
+                    }
                 });
             }
 
@@ -370,6 +370,13 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_7.A
 
     @Override
     protected Optional<Entity> createEntityFromTag(CompoundTag compoundTag, ServerLevel serverLevel) {
+        int dataVersion = compoundTag.getIntOr("DataVersion", 0);
+        if (dataVersion < com.bgsoftware.superiorskyblock.nms.v1_21_7.AbstractNMSAlgorithms.DATA_VERSION) {
+            compoundTag = (net.minecraft.nbt.CompoundTag) DataFixers.getDataFixer().update(References.ENTITY_CHUNK,
+                    new Dynamic<>(NbtOps.INSTANCE, compoundTag), dataVersion,
+                    com.bgsoftware.superiorskyblock.nms.v1_21_7.AbstractNMSAlgorithms.DATA_VERSION).getValue();
+        }
+
         try (ProblemReporter.ScopedCollector scopedCollector =
                      new ProblemReporter.ScopedCollector(compoundTag::toString, LOGGER)) {
             ValueInput valueInput = TagValueInput.create(scopedCollector, serverLevel.registryAccess(), compoundTag);

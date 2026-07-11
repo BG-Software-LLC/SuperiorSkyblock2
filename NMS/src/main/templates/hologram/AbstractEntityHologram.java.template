@@ -78,12 +78,6 @@ public class AbstractEntityHologram extends ArmorStand implements Hologram {
     }
 
     @Override
-    public InteractionResult interactAt(Player player, Vec3 hitPos, InteractionHand hand) {
-        // Prevent stand being equipped
-        return InteractionResult.PASS;
-    }
-
-    @Override
     public void tick() {
         // Disable normal ticking for this entity.
 

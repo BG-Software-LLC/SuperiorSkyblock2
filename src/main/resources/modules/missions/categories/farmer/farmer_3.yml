@@ -38,6 +38,23 @@ required-plants:
 
 # Icons used in the menus.
 icons:
+  locked:
+    type: PAPER
+    name: '&aFarmer III'
+    lore:
+      - '&7Expand your farm with sugar canes and cactus.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7x10 Sugar Canes'
+      - '&8 - &7x10 Cactus'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7Crops Upgrade'
+      - ''
+      - '&6Grown Sugar Canes: &7{value_sugar_cane}/10'
+      - '&6Grown Cactus: &7{value_cactus}/10'
+      - '&c&l ✘ &7Locked'
+    amount: 3
   not-completed:
     type: PAPER
     name: '&aFarmer III'

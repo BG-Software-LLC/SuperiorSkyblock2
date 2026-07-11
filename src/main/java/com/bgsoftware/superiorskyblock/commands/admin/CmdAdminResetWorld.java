@@ -7,11 +7,13 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -53,7 +55,8 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
         return "admin resetworld <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <normal/nether/the_end>";
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + ">";
     }
 
     @Override
@@ -115,16 +118,12 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
     private static void resetChunksInternal(Island island, World world, Dimension dimension) {
         boolean isDefaultDimension = dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
-        // Sending the players that are in that world to the main island.
-        // If the world that will be reset is the normal world, they will be teleported to spawn.
-        for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
-            assert superiorPlayer.getWorld() != null;
-            if (superiorPlayer.getWorld().equals(world)) {
-                if (isDefaultDimension) {
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                } else {
-                    superiorPlayer.teleport(island);
-                }
+        try(IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
+            // Sending the players that are in that world to the main island.
+            // If the world that will be reset is the normal world, they will be teleported to spawn.
+            Island teleportIsland = isDefaultDimension ? plugin.getGrid().getSpawnIsland() : island;
+            for (SuperiorPlayer superiorPlayer : strategy.getSuperiorPlayers(WorldInfo.of(world))) {
+                superiorPlayer.teleport(teleportIsland);
             }
         }
 
@@ -164,18 +163,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if (args.length != 4)
-            return Collections.emptyList();
-
-        List<String> environments = new ArrayList<>();
-
-        for (Dimension dimension : Dimension.values()) {
-            if (plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-                environments.add(dimension.getName().toLowerCase(Locale.ENGLISH));
-            }
-        }
-
-        return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));
+        return args.length == 4 ? CommandTabCompletes.getDimensions(plugin, args[3]) : Collections.emptyList();
     }
 
 }

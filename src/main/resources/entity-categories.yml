@@ -1,0 +1,132 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# Configure the categories of entities of the plugin.
+# The format of the file is as so:
+# <CATEGORY_NAME>:
+#   entities:
+#     - <ENTITIES...>
+#   actions:
+#     # The privilege required to spawn the entities using spawn eggs
+#     SPAWN: <ISLAND_PRIVILEGE>
+#     # The privilege required to damage the entities
+#     DAMAGE: <ISLAND_PRIVILEGE>
+#     # The privilege required to interact with the entities
+#     INTERACT: <ISLAND_PRIVILEGE>
+#     # The island flag required so the entities can spawn from spawners
+#     SPAWNER_SPAWN: <ISLAND_FLAG>
+#     # The island flag required so the entities can spawn vanilla
+#     NATURAL_SPAWN: <ISLAND_FLAG>
+# You can create as many custom categories as you want.
+# There are custom groups used for detecting animals, monsters and tameable entities.
+# These groups do not have `entities` and the entities are added automatically depending on your Minecraft version.
+
+# Custom interact groups
+ALLAY:
+  entities:
+    - ALLAY
+  actions:
+    INTERACT: ALLAY_INTERACT
+
+AXOLOTL:
+  entities:
+    - AXOLOTL
+  actions:
+    INTERACT: PICKUP_AXOLOTL
+
+COPPER_GOLEM:
+  entities:
+    - COPPER_GOLEM
+  actions:
+    INTERACT: COPPER_GOLEM_INTERACT
+
+FISH:
+  entities:
+    - COD
+    - PUFFERFISH
+    - SALMON
+    - TADPOLE
+    - TROPICAL_FISH
+  actions:
+    INTERACT: PICKUP_FISH
+
+HORSES:
+  entities:
+    - CAMEL
+    - CAMEL_HUSK
+    - DONKEY
+    - HORSE
+    - LLAMA
+    - MULE
+    - SKELETON_HORSE
+    - TRADER_LLAMA
+    - ZOMBIE_HORSE
+  actions:
+    INTERACT: HORSE_INTERACT
+
+NAUTILUS:
+  entities:
+    - NAUTILUS
+    - ZOMBIE_NAUTILUS
+  actions:
+    INTERACT: NAUTILUS_INTERACT
+
+VILLAGERS:
+  entities:
+    - VILLAGER
+  actions:
+    INTERACT: VILLAGER_TRADING
+
+# Custom entities with custom functionalities
+ARMOR_STAND:
+  entities:
+    - ARMOR_STAND
+  actions:
+    SPAWN: BUILD
+    DAMAGE: BREAK
+    INTERACT: BUILD
+
+ITEM_FRAME:
+  entities:
+    - GLOW_ITEM_FRAME
+    - ITEM_FRAME
+  actions:
+    SPAWN: ITEM_FRAME
+    DAMAGE: ITEM_FRAME
+    INTERACT: ITEM_FRAME
+
+PAINTING:
+  entities:
+    - PAINTING
+  actions:
+    SPAWN: PAINTING
+    DAMAGE: PAINTING
+    INTERACT: PAINTING
+
+# Custom built-in groups
+TAMEABLE:
+  actions:
+    DAMAGE: TAMED_ANIMAL_DAMAGE
+
+VEHICLE:
+  actions:
+    SPAWN: MINECART_PLACE
+    DAMAGE: MINECART_DAMAGE
+
+ANIMAL:
+  actions:
+    SPAWN: ANIMAL_SPAWN
+    DAMAGE: ANIMAL_DAMAGE
+    SPAWNER_SPAWN: SPAWNER_ANIMALS_SPAWN
+    NATURAL_SPAWN: NATURAL_ANIMALS_SPAWN
+
+MONSTER:
+  actions:
+    SPAWN: MONSTER_SPAWN
+    DAMAGE: MONSTER_DAMAGE
+    SPAWNER_SPAWN: SPAWNER_MONSTER_SPAWN
+    NATURAL_SPAWN: NATURAL_MONSTER_SPAWN

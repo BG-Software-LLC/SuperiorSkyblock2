@@ -38,12 +38,17 @@ public class ItemsAdderHook {
         }
     };
 
+    private static boolean registered = false;
+
     private static SuperiorSkyblockPlugin plugin;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         ItemsAdderHook.plugin = plugin;
-        plugin.getBlockValues().registerKeyParser(new ItemsAdderKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
         plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), plugin);
+        if (!registered) {
+            registered = true;
+            plugin.getBlockValues().registerKeyParser(new ItemsAdderKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
+        }
     }
 
     private static class ListenerImpl implements Listener {

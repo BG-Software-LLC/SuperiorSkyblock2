@@ -4,9 +4,9 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLogger;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.event.Listener;
 
 import java.io.File;
@@ -96,7 +96,7 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
             try {
                 config.save(configFile);
             } catch (Exception error) {
-                Log.error(error, "An error occurred while saving config file for module " + getName() + ":");
+                this.logger().e("An error occurred while saving config file for module " + getName() + ":", error);
             }
         }
 
@@ -105,12 +105,15 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
                     Resources.getResource("modules/" + getName() + "/config.yml"),
                     getIgnoredSections());
         } catch (Exception error) {
-            Log.entering(getClass().getName(), "onPluginInit", "ENTER", "");
-            Log.error(error, "An error occurred while loading config file:");
+            this.logger().e("An error occurred while loading config file:", error);
         }
 
 
         this.configuration = createConfigFile(config);
+    }
+
+    protected ModuleLogger logger() {
+        return (ModuleLogger) super.getLogger();
     }
 
     protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {

@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
-import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
@@ -62,6 +61,8 @@ import java.util.stream.Collectors;
 public class IslandBuilderImpl implements Island.Builder {
 
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
+    private static final int SYNCED_VALUE = -2;
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Nullable
@@ -102,13 +103,13 @@ public class IslandBuilderImpl implements Island.Builder {
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
     public final Int2ObjectMapView<IntValue> roleLimits = CollectionsFactory.createInt2ObjectArrayMap();
     public final EnumerateMap<Dimension, WorldPosition> visitorHomes = new EnumerateMap<>(Dimension.values());
-    public IntValue islandSize = IntValue.syncedFixed(-1);
-    public IntValue warpsLimit = IntValue.syncedFixed(-1);
-    public IntValue teamLimit = IntValue.syncedFixed(-1);
-    public IntValue coopLimit = IntValue.syncedFixed(-1);
-    public DoubleValue cropGrowth = DoubleValue.syncedFixed(-1D);
-    public DoubleValue spawnerRates = DoubleValue.syncedFixed(-1D);
-    public DoubleValue mobDrops = DoubleValue.syncedFixed(-1D);
+    public IntValue islandSize = IntValue.syncedFixed(SYNCED_VALUE);
+    public IntValue warpsLimit = IntValue.syncedFixed(SYNCED_VALUE);
+    public IntValue teamLimit = IntValue.syncedFixed(SYNCED_VALUE);
+    public IntValue coopLimit = IntValue.syncedFixed(SYNCED_VALUE);
+    public DoubleValue cropGrowth = DoubleValue.syncedFixed(SYNCED_VALUE);
+    public DoubleValue spawnerRates = DoubleValue.syncedFixed(SYNCED_VALUE);
+    public DoubleValue mobDrops = DoubleValue.syncedFixed(SYNCED_VALUE);
     public Value<BigDecimal> bankLimit = Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE);
     public BigDecimal balance = BigDecimal.ZERO;
     public long lastInterestTime = System.currentTimeMillis() / 1000;
@@ -284,21 +285,8 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    @Deprecated
-    public Island.Builder setGeneratedSchematics(int generatedSchematicsMask) {
-        this.generatedSchematics.addAll(LegacyMasks.convertGeneratedSchematicsMask(generatedSchematicsMask));
-        return this;
-    }
-
-    @Override
     public Set<Dimension> getGeneratedSchematics() {
         return Collections.unmodifiableSet(this.generatedSchematics.collect(Dimension.values()));
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratedSchematicsMask() {
-        return LegacyMasks.convertGeneratedSchematicsMask(this.generatedSchematics);
     }
 
     @Override
@@ -308,21 +296,8 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    @Deprecated
-    public Island.Builder setUnlockedWorlds(int unlockedWorldsMask) {
-        this.unlockedWorlds.addAll(LegacyMasks.convertUnlockedWorldsMask(unlockedWorldsMask));
-        return this;
-    }
-
-    @Override
     public Set<Dimension> getUnlockedWorlds() {
         return Collections.unmodifiableSet(this.unlockedWorlds.collect(Dimension.values()));
-    }
-
-    @Override
-    @Deprecated
-    public int getUnlockedWorldsMask() {
-        return LegacyMasks.convertUnlockedWorldsMask(this.unlockedWorlds);
     }
 
     @Override

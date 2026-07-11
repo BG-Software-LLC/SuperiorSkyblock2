@@ -169,13 +169,14 @@ public abstract class AbstractNMSChunks implements NMSChunks {
             return;
 
         if (stop) {
-            CropsBlockEntity cropsBlockEntity = CropsBlockEntity.remove(ChunkPos.asLong(chunk.getX(), chunk.getZ()));
+            long packedPos = NMSUtils.getChunkPackedPos(chunk.getX(), chunk.getZ());
+            CropsBlockEntity cropsBlockEntity = CropsBlockEntity.remove(chunk.getWorld().getName(), packedPos);
             if (cropsBlockEntity != null)
                 cropsBlockEntity.remove();
         } else {
             ServerLevel serverLevel = ((CraftWorld) chunk.getWorld()).getHandle();
             LevelChunk levelChunk = serverLevel.getChunk(chunk.getX(), chunk.getZ());
-            CropsBlockEntity.create(island, levelChunk);
+            CropsBlockEntity.create(island, chunk.getWorld().getName(), levelChunk);
         }
     }
 
@@ -291,12 +292,10 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     }
 
     protected void removeEntities(LevelChunk levelChunk) {
-        ChunkPos chunkPos = levelChunk.getPos();
-        ServerLevel serverLevel = levelChunk.level;
+        ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
 
-        int chunkWorldCoordX = chunkPos.x << 4;
-        int chunkWorldCoordZ = chunkPos.z << 4;
-
+        int chunkWorldCoordX = levelChunk.locX << 4;
+        int chunkWorldCoordZ = levelChunk.locZ << 4;
 
         AABB chunkBounds = new AABB(chunkWorldCoordX, NMSUtilsVersioned.getMinBuildHeight(serverLevel), chunkWorldCoordZ,
                 chunkWorldCoordX + 15, NMSUtilsVersioned.getMaxBuildHeight(serverLevel), chunkWorldCoordZ + 15);

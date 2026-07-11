@@ -261,8 +261,9 @@ public class NMSChunksImpl implements NMSChunks {
                     byte yPosition = sectionCompound.getByte("Y");
                     if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
                         //noinspection deprecation
-                        chunkSections[i] = new ChunkSection(yPosition << 4);
-                        chunkSections[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
+                        ChunkSection chunkSection = chunkSections[i] = new ChunkSection(yPosition << 4);
+                        chunkSection.getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
+                        chunkSection.recalcBlockCounts();
                     }
                 }
 
@@ -379,12 +380,12 @@ public class NMSChunksImpl implements NMSChunks {
 
         if (stop) {
             CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(
-                    ChunkCoordIntPair.pair(chunk.getX(), chunk.getZ()));
+                    chunk.getWorld().getName(), ChunkCoordIntPair.pair(chunk.getX(), chunk.getZ()));
             World world = cropsTickingTileEntity == null ? null : cropsTickingTileEntity.getWorld();
             if (cropsTickingTileEntity != null && world != null)
                 world.tileEntityListTick.remove(cropsTickingTileEntity);
         } else {
-            CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
+            CropsTickingTileEntity.create(island, chunk.getWorld().getName(), ((CraftChunk) chunk).getHandle());
         }
     }
 

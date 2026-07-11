@@ -19,19 +19,14 @@ import skyblock.hassan.plugin.spawners.StackedSpawner;
 
 public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMetaSpawnerType {
 
-    private static boolean registered = false;
-
     private final SuperiorSkyblockPlugin plugin;
     private final Main main;
 
     public SpawnersProvider_PvpingSpawners(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
-            Log.info("Using PvpingSpawners as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Log.info("Using PvpingSpawners as a spawners provider.");
     }
 
     @Override

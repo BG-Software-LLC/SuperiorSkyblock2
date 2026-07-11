@@ -19,4 +19,9 @@ public @interface IslandBlockFlags {
      */
     int UPDATE_LAST_TIME_STATUS = (1 << 1);
 
+    /**
+     * Indicates to update block counts only for the provided blocks, and do not count global keys, limit keys, etc.
+     */
+    int RAW_BLOCKS = (1 << 2);
+
 }

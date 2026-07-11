@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -29,6 +30,7 @@ import com.bgsoftware.superiorskyblock.island.top.metadata.IslandSortValueMetada
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -154,17 +156,25 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Nullable
     @Override
     public Island getIslandAt(Location location) {
+        Island island = plugin.getProviders().hasCustomWorldsSupport() ?
+                customWorldsSupportIslandLookup(location) : nativeIslandLookup(location);
+        return island == null || !island.isInside(SWorldPosition.of(location)) ? null : island;
+    }
+
+    private Island customWorldsSupportIslandLookup(Location location) {
         long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());
+        String worldName = LazyWorldLocation.getWorldName(location);
+        return this.islandsGrid.getIslandAt(worldName, packedPos);
+    }
 
-        Island island;
-        if (plugin.getProviders().hasCustomWorldsSupport()) {
-            String worldName = LazyWorldLocation.getWorldName(location);
-            island = this.islandsGrid.getIslandAt(worldName, packedPos);
-        } else {
-            island = this.islandsGrid.getIslandAt(null, packedPos);
-        }
+    private Island nativeIslandLookup(Location location) {
+        // We first check that the world is an islands world.
+        World world = location.getWorld();
+        if (world == null || !plugin.getGrid().isIslandsWorld(world))
+            return null;
 
-        return island == null || !island.isInside(location) ? null : island;
+        long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());
+        return this.islandsGrid.getIslandAt(null, packedPos);
     }
 
     @Override
@@ -184,11 +194,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
             return;
         }
 
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> sortIslandsInternal(sortingType, onFinish));
-        } else {
-            sortIslandsInternal(sortingType, onFinish);
-        }
+        BukkitExecutor.ensureAsync(() -> sortIslandsInternal(sortingType, onFinish));
     }
 
     @Override
@@ -227,7 +233,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         if (existingIslands.size() <= 1) {
             sortedIslands = existingIslands;
         } else try {
-            if (sortingType == SortingTypes.BY_LEVEL || sortingType == SortingTypes.BY_WORTH ||
+            if (sortingType == SortingTypes.BY_LEVEL || sortingType == SortingTypes.BY_WORTH || sortingType == SortingTypes.BY_BANK ||
                     sortingType == SortingTypes.BY_PLAYERS || sortingType == SortingTypes.BY_RATING) {
                 sortedIslands = sortIslandsBuiltinSortingType(existingIslands, sortingType);
             } else {
@@ -252,6 +258,8 @@ public class DefaultIslandsContainer implements IslandsContainer {
             existingIslands.forEach(island -> islandMetadatas.add(new IslandSortValueMetadata(island, island.getWorth())));
         else if (sortingType == SortingTypes.BY_LEVEL)
             existingIslands.forEach(island -> islandMetadatas.add(new IslandSortValueMetadata(island, island.getIslandLevel())));
+        else if (sortingType == SortingTypes.BY_BANK)
+            existingIslands.forEach(island -> islandMetadatas.add(new IslandSortValueMetadata(island, island.getIslandBank().getBalance())));
         else if (sortingType == SortingTypes.BY_RATING)
             existingIslands.forEach(island -> islandMetadatas.add(new IslandSortRatingMetadata(island)));
         else /* BY_PLAYERS */

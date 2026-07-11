@@ -17,7 +17,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonI
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -63,9 +62,12 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("CARROT", "CARROT_ITEM")
             .put("CARROTS", "CARROT")
             .put("CAULDRON", "CAULDRON_ITEM")
+            .put("CAVE_VINES", "GLOW_BERRIES")
+            .put("CAVE_VINES_PLANT", "GLOW_BERRIES")
             .put("CHERRY_WALL_HANGING_SIGN", "CHERRY_HANGING_SIGN")
             .put("CHERRY_WALL_SIGN", "CHERRY_SIGN")
             .put("COCOA", ServerVersion.isLegacy() ? "INK_SACK:3" : "COCOA_BEANS")
+            .put("COPPER_WALL_TORCH", "COPPER_TORCH")
             .put("CREEPER_WALL_HEAD", "CREEPER_HEAD")
             .put("CRIMSON_WALL_HANGING_SIGN", "CRIMSON_HANGING_SIGN")
             .put("CRIMSON_WALL_SIGN", "CRIMSON_SIGN")
@@ -154,6 +156,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("POTTED_DEAD_BUSH", "FLOWER_POT")
             .put("POTTED_FERN", "FLOWER_POT")
             .put("POTTED_FLOWERING_AZALEA_BUSH", "FLOWER_POT")
+            .put("POTTED_GOLDEN_DANDELION", "GOLDEN_DANDELION")
             .put("POTTED_JUNGLE_SAPLING", "FLOWER_POT")
             .put("POTTED_LILY_OF_THE_VALLEY", "FLOWER_POT")
             .put("POTTED_MANGROVE_PROPAGULE", "FLOWER_POT")
@@ -227,11 +230,6 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        // Dummy button
-    }
-
-    @Override
     public ItemStack modifyViewItem(ItemStack buttonItem) {
         Key rawKey = pagedObject.getBlockKey();
         Pair<Key, ItemStack> customKeyItem = plugin.getBlockValues().convertCustomKeyItem(rawKey);
@@ -291,8 +289,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
 
         @Override
         public PagedMenuTemplateButton<MenuCounts.View, MenuCounts.BlockCount> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), CountsPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, CountsPagedObjectButton.class,
                     CountsPagedObjectButton::new);
         }
 

@@ -7,11 +7,9 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
@@ -50,12 +48,6 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                     teleportInternal(player, island, dimension, result));
         });
         return result;
-    }
-
-    @Override
-    @Deprecated
-    public CompletableFuture<Boolean> teleport(Player player, Island island, World.Environment environment) {
-        return teleport(player, island, Dimensions.fromEnvironment(environment));
     }
 
     public void teleportInternal(Player player, Island island, Dimension dimension, CompletableFuture<Boolean> result) {
