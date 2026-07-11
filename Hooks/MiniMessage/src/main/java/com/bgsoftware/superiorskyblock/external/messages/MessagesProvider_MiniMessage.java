@@ -38,23 +38,24 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
     }
 
     @Override
-    public IMessageComponent createActionBarComponent(String message) {
+    public IMessageComponent createActionBarComponent(@Nullable String message) {
         return ActionBarComponent.of(message);
     }
 
     @Override
-    public IMessageComponent createBossBarComponent(String message, com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar.Color color,
+    public IMessageComponent createBossBarComponent(@Nullable String message, com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar.Color color,
                                                     com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar.Style style, int duration) {
         return BossBarComponent.of(message, BossBar.Color.valueOf(color.name()), mapBossBarStyle(style), duration);
     }
 
     @Override
-    public IMessageComponent createRawMessageComponent(String message) {
+    public IMessageComponent createRawMessageComponent(@Nullable String message) {
         return RawMessageComponent.of(message);
     }
 
     @Override
-    public IMessageComponent createTitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int stay, int fadeOut) {
+    public IMessageComponent createTitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage,
+                                                  int fadeIn, int stay, int fadeOut) {
         return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
     }
 

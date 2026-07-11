@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.messages;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 
@@ -11,7 +12,7 @@ public interface MessagesProvider {
      * @param message The action bar text.
      * @return The created message component.
      */
-    IMessageComponent createActionBarComponent(String message);
+    IMessageComponent createActionBarComponent(@Nullable String message);
 
     /**
      * Create a boss bar message component.
@@ -22,7 +23,8 @@ public interface MessagesProvider {
      * @param duration The boss bar duration, in ticks.
      * @return The created message component.
      */
-    IMessageComponent createBossBarComponent(String message, BossBar.Color color, BossBar.Style style, int duration);
+    IMessageComponent createBossBarComponent(@Nullable String message, BossBar.Color color,
+                                             BossBar.Style style, int duration);
 
     /**
      * Create a raw message component.
@@ -30,7 +32,7 @@ public interface MessagesProvider {
      * @param message The raw text.
      * @return The created message component.
      */
-    IMessageComponent createRawMessageComponent(String message);
+    IMessageComponent createRawMessageComponent(@Nullable String message);
 
     /**
      * Create a title message component.
@@ -42,6 +44,7 @@ public interface MessagesProvider {
      * @param fadeOut         The duration of the fade-out phase, in ticks.
      * @return The created message component.
      */
-    IMessageComponent createTitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int stay, int fadeOut);
+    IMessageComponent createTitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage,
+                                           int fadeIn, int stay, int fadeOut);
 
 }

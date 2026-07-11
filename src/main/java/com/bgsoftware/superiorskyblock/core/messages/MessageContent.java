@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersServ
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 
 import java.math.BigDecimal;
@@ -66,7 +67,7 @@ public class MessageContent {
             if (previousPart.length() > 0) {
                 String previous = previousPart.toString();
 
-                if (previous.indexOf('§') >= 0) {
+                if (previous.indexOf(ChatColor.COLOR_CHAR) >= 0) {
                     legacyColorCodes = true;
                 }
 
@@ -83,7 +84,7 @@ public class MessageContent {
         if (lastPartIdx < content.length()) {
             String remaining = content.substring(lastPartIdx);
 
-            if (remaining.indexOf('§') >= 0) {
+            if (remaining.indexOf(ChatColor.COLOR_CHAR) >= 0) {
                 legacyColorCodes = true;
             }
 

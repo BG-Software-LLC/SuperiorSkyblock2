@@ -125,7 +125,8 @@ public interface MessagesService {
          * @param fadeOut         The duration of the fade-out phase, in ticks.
          * @return {@code true} if the title was successfully added.
          */
-        boolean addTitle(@Nullable String titleMessage, @Nullable String subtitleMessage, int fadeIn, int stay, int fadeOut);
+        boolean addTitle(@Nullable String titleMessage, @Nullable String subtitleMessage,
+                         int fadeIn, int stay, int fadeOut);
 
         /**
          * Add another message component to the message component.

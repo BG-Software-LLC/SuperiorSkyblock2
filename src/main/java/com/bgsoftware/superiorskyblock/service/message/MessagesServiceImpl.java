@@ -110,7 +110,8 @@ public class MessagesServiceImpl implements MessagesService, IService {
         }
 
         @Override
-        public boolean addTitle(@Nullable String titleMessage, @Nullable String subtitleMessage, int fadeIn, int stay, int fadeOut) {
+        public boolean addTitle(@Nullable String titleMessage, @Nullable String subtitleMessage,
+                                int fadeIn, int stay, int fadeOut) {
             return addMessageComponent(plugin.getProviders().getMessagesProvider()
                     .createTitleComponent(titleMessage, subtitleMessage, fadeIn, stay, fadeOut));
         }

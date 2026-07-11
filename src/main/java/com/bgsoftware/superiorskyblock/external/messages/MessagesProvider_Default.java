@@ -15,22 +15,24 @@ import org.bukkit.entity.Player;
 public class MessagesProvider_Default implements MessagesProvider {
 
     @Override
-    public IMessageComponent createActionBarComponent(String message) {
+    public IMessageComponent createActionBarComponent(@Nullable String message) {
         return ActionBarComponent.of(message);
     }
 
     @Override
-    public IMessageComponent createBossBarComponent(String message, BossBar.Color color, BossBar.Style style, int duration) {
+    public IMessageComponent createBossBarComponent(@Nullable String message, BossBar.Color color,
+                                                    BossBar.Style style, int duration) {
         return BossBarComponent.of(message, color, mapBossBarStyle(style), duration);
     }
 
     @Override
-    public IMessageComponent createRawMessageComponent(String message) {
+    public IMessageComponent createRawMessageComponent(@Nullable String message) {
         return RawMessageComponent.of(message);
     }
 
     @Override
-    public IMessageComponent createTitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int stay, int fadeOut) {
+    public IMessageComponent createTitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage,
+                                                  int fadeIn, int stay, int fadeOut) {
         return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
     }
 
