@@ -35,6 +35,7 @@ public class MessageContent {
     private static final Pattern DEFAULT_PLACEHOLDER_PATTERN = Pattern.compile("\\{(\\d+)}");
 
     private final List<IPart> contentParts = new LinkedList<>();
+    private final boolean legacyColorCodes;
 
     public static List<MessageContent> parse(List<String> contents) {
         List<MessageContent> messageContentsList = new LinkedList<>();
@@ -48,6 +49,7 @@ public class MessageContent {
 
         List<IPart> parts = new LinkedList<>();
         int lastPartIdx = 0;
+        boolean legacyColorCodes = false;
 
         while (matcher.find()) {
             StringBuilder previousPart = new StringBuilder(content.substring(lastPartIdx, matcher.start()));
@@ -61,22 +63,43 @@ public class MessageContent {
                 previousPart.append(matcher.group());
             }
 
-            if (previousPart.length() > 0)
-                parts.add(new StaticPart(previousPart.toString()));
-            if (argumentPart != null)
+            if (previousPart.length() > 0) {
+                String previous = previousPart.toString();
+
+                if (previous.indexOf('§') >= 0) {
+                    legacyColorCodes = true;
+                }
+
+                parts.add(new StaticPart(previous));
+            }
+
+            if (argumentPart != null) {
                 parts.add(argumentPart);
+            }
 
             lastPartIdx = matcher.end();
         }
 
-        if (lastPartIdx < content.length())
-            parts.add(new StaticPart(content.substring(lastPartIdx)));
+        if (lastPartIdx < content.length()) {
+            String remaining = content.substring(lastPartIdx);
 
-        return new MessageContent(parts);
+            if (remaining.indexOf('§') >= 0) {
+                legacyColorCodes = true;
+            }
+
+            parts.add(new StaticPart(remaining));
+        }
+
+        return new MessageContent(parts, legacyColorCodes);
     }
 
     private MessageContent(List<IPart> contentParts) {
+        this(contentParts, false);
+    }
+
+    private MessageContent(List<IPart> contentParts, boolean legacyColorCodes) {
         this.contentParts.addAll(contentParts);
+        this.legacyColorCodes = legacyColorCodes;
     }
 
     public Optional<String> getContent(@Nullable OfflinePlayer offlinePlayer, Object... arguments) {
@@ -102,6 +125,10 @@ public class MessageContent {
             return Optional.empty();
 
         return Optional.of(content.toString());
+    }
+
+    public boolean hasLegacyColorCodes() {
+        return legacyColorCodes;
     }
 
     public static String getArgumentString(Object argument) {

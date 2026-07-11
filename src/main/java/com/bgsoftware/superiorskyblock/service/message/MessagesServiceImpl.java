@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.messages.component.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
@@ -42,7 +43,8 @@ public class MessagesServiceImpl implements MessagesService, IService {
         if (config.isConfigurationSection(path)) {
             return MultipleComponents.parseSection(config.getConfigurationSection(path));
         } else {
-            return plugin.getProviders().getMessagesProvider().createRawMessageComponent(config.getString(path));
+            return plugin.getProviders().getMessagesProvider()
+                    .createRawMessageComponent(Formatters.COLOR_FORMATTER.format(config.getString(path)));
         }
     }
 

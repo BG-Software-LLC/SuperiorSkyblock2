@@ -5,7 +5,6 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
@@ -92,13 +91,15 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
                 Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L));
     }
 
-    private static Component deserialize(String message) {
-        String formattedMessage = Formatters.COLOR_FORMATTER.format(message);
+    private static Component deserialize(String message, boolean legacyColorCodes) {
+        if (legacyColorCodes) {
+            return LEGACY_COMPONENT_SERIALIZER.deserialize(message);
+        }
 
         try {
-            return MINI_MESSAGE.deserialize(formattedMessage);
+            return MINI_MESSAGE.deserialize(message);
         } catch (ParsingException exception) {
-            return LEGACY_COMPONENT_SERIALIZER.deserialize(formattedMessage);
+            return LEGACY_COMPONENT_SERIALIZER.deserialize(message);
         }
     }
 
@@ -131,12 +132,12 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
 
         @Override
         public void sendMessage(CommandSender sender, Object... args) {
-            if (!(sender instanceof Player)) {
+            if (!(sender instanceof Player player)) {
                 return;
             }
 
-            this.messageContent.getContent((Player) sender, args).ifPresent(message ->
-                    sender.sendActionBar(deserialize(message)));
+            this.messageContent.getContent(player, args).ifPresent(message ->
+                    sender.sendActionBar(deserialize(message, this.messageContent.hasLegacyColorCodes())));
         }
 
     }
@@ -181,7 +182,8 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
             }
 
             this.messageContent.getContent(player, args).ifPresent(message -> {
-                BossBar bossBar = BossBar.bossBar(deserialize(message), 1.0f, color, overlay);
+                BossBar bossBar = BossBar.bossBar(deserialize(message,
+                        this.messageContent.hasLegacyColorCodes()), 1.0f, color, overlay);
                 sender.showBossBar(bossBar);
                 new BossBarImpl(bossBar, duration).addPlayer(player);
             });
@@ -221,7 +223,7 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
             Player player = sender instanceof Player ? (Player) sender : null;
 
             this.messageContent.getContent(player, args).ifPresent(message ->
-                sender.sendMessage(deserialize(message)));
+                sender.sendMessage(deserialize(message, this.messageContent.hasLegacyColorCodes())));
         }
 
     }
@@ -269,8 +271,8 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
             String subtitleMessage = this.subtitleContent.getContent(player, args).orElse(null);
 
             if (titleMessage != null && subtitleMessage != null) {
-                Component titleComponent = deserialize(titleMessage);
-                Component subtitleComponent = deserialize(subtitleMessage);
+                Component titleComponent = deserialize(titleMessage, this.titleContent.hasLegacyColorCodes());
+                Component subtitleComponent = deserialize(subtitleMessage, this.subtitleContent.hasLegacyColorCodes());
 
                 Title title = Title.title(titleComponent, subtitleComponent, this.titleTimes);
                 sender.showTitle(title);

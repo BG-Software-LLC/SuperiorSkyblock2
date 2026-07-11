@@ -33,7 +33,7 @@ public class MultipleComponents implements IMessageComponent {
                 case "action-bar": {
                     String text = section.getString(key + ".text");
 
-                    builder.addActionBar(text);
+                    builder.addActionBar(Formatters.COLOR_FORMATTER.format(text));
                     break;
                 }
                 case "bossbar": {
@@ -52,7 +52,7 @@ public class MultipleComponents implements IMessageComponent {
                         bossBarStyle = BossBar.Style.SOLID;
                     }
 
-                    builder.addBossBar(message, bossBarColor, bossBarStyle, ticks);
+                    builder.addBossBar(Formatters.COLOR_FORMATTER.format(message), bossBarColor, bossBarStyle, ticks);
                     break;
                 }
                 case "sound":
@@ -65,7 +65,8 @@ public class MultipleComponents implements IMessageComponent {
                     int duration = section.getInt(key + ".duration");
                     int fadeOut = section.getInt(key + ".fade-out");
 
-                    builder.addTitle(title, subtitle, fadeIn, duration, fadeOut);
+                    builder.addTitle(Formatters.COLOR_FORMATTER.format(title),
+                            Formatters.COLOR_FORMATTER.format(subtitle), fadeIn, duration, fadeOut);
                     break;
                 }
                 default: {
@@ -78,7 +79,7 @@ public class MultipleComponents implements IMessageComponent {
                         builder.addComplexMessage(ComplexMessageComponent.parseBaseComponents(
                                 Formatters.COLOR_FORMATTER.format(text), command, suggest, tooltip));
                     } else {
-                        builder.addRawMessage(text);
+                        builder.addRawMessage(Formatters.COLOR_FORMATTER.format(text));
                     }
 
                     break;

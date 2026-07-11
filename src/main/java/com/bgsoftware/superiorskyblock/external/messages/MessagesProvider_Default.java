@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBarsService;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
 import org.bukkit.command.CommandSender;
@@ -17,23 +16,22 @@ public class MessagesProvider_Default implements MessagesProvider {
 
     @Override
     public IMessageComponent createActionBarComponent(String message) {
-        return ActionBarComponent.of(Formatters.COLOR_FORMATTER.format(message));
+        return ActionBarComponent.of(message);
     }
 
     @Override
     public IMessageComponent createBossBarComponent(String message, BossBar.Color color, BossBar.Style style, int duration) {
-        return BossBarComponent.of(Formatters.COLOR_FORMATTER.format(message), color, mapBossBarStyle(style), duration);
+        return BossBarComponent.of(message, color, mapBossBarStyle(style), duration);
     }
 
     @Override
     public IMessageComponent createRawMessageComponent(String message) {
-        return RawMessageComponent.of(Formatters.COLOR_FORMATTER.format(message));
+        return RawMessageComponent.of(message);
     }
 
     @Override
     public IMessageComponent createTitleComponent(String titleMessage, String subtitleMessage, int fadeIn, int stay, int fadeOut) {
-        return TitleComponent.of(Formatters.COLOR_FORMATTER.format(titleMessage),
-                Formatters.COLOR_FORMATTER.format(subtitleMessage), fadeIn, stay, fadeOut);
+        return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
     }
 
     private static BossBar.Style mapBossBarStyle(BossBar.Style style) {
