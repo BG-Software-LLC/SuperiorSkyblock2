@@ -30,8 +30,10 @@ public class IslandChat {
         spies.remove(spy);
     }
 
-    public static void handleIslandChat(Island island, SuperiorPlayer superiorPlayer, String message) {
-        ChatState chatState = superiorPlayer.getChatState();
+    public static void handleIslandChat(Island island, SuperiorPlayer superiorPlayer, String message, ChatState chatState) {
+        if (chatState != ChatStates.LOCAL_CHAT && chatState != ChatStates.TEAM_CHAT) {
+            return;
+        }
 
         PluginEvent<PluginEventArgs.IslandChat> event = PluginEventsFactory.callIslandChatEvent(island, superiorPlayer,
                 superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message);
@@ -42,7 +44,7 @@ public class IslandChat {
 
         if (chatState == ChatStates.LOCAL_CHAT) {
             handleLocalChat(island, superiorPlayer, event.getArgs().message);
-        } else if (chatState == ChatStates.TEAM_CHAT) {
+        } else {
             handleTeamChat(island, superiorPlayer, event.getArgs().message);
         }
     }

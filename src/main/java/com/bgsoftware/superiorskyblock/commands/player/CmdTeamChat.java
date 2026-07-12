@@ -87,17 +87,8 @@ public class CmdTeamChat implements ISuperiorCommand {
 
             superiorPlayer.setChatState(newChatState);
         } else {
-            if (superiorPlayer.getChatState() != ChatStates.TEAM_CHAT) {
-                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.TEAM_CHAT) ||
-                        !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer)) {
-                    return;
-                }
-
-                superiorPlayer.setChatState(ChatStates.TEAM_CHAT);
-            }
-
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandChat.handleIslandChat(island, superiorPlayer, message);
+            IslandChat.handleIslandChat(island, superiorPlayer, message, ChatStates.TEAM_CHAT);
         }
     }
 

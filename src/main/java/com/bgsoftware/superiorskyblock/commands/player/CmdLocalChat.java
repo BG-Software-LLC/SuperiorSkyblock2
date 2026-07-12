@@ -86,16 +86,8 @@ public class CmdLocalChat implements ISuperiorCommand {
 
             superiorPlayer.setChatState(newChatState);
         } else {
-            if (superiorPlayer.getChatState() != ChatStates.LOCAL_CHAT) {
-                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.LOCAL_CHAT)) {
-                    return;
-                }
-
-                superiorPlayer.setChatState(ChatStates.LOCAL_CHAT);
-            }
-
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandChat.handleIslandChat(island, superiorPlayer, message);
+            IslandChat.handleIslandChat(island, superiorPlayer, message, ChatStates.LOCAL_CHAT);
         }
     }
 
