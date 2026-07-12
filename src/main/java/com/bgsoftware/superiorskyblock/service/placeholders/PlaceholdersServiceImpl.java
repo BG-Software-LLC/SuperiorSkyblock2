@@ -27,6 +27,7 @@ import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvide
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
@@ -54,6 +55,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)");
     private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
 
+    private static final Pattern BAN_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("ban_(.+)");
     private static final Pattern BIOME_PLACEHOLDER_PATTERN = Pattern.compile("island_biome_(.+)");
     private static final Pattern BLOCK_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_count_(.+)");
     private static final Pattern BLOCK_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("island_block_level_(.+)");
@@ -61,6 +63,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_level_(.+)");
     private static final Pattern BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_worth_(.+)");
     private static final Pattern BLOCK_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_worth_(.+)");
+    private static final Pattern COOP_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("coop_(.+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_count_(.+)");
     private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("island_data_(.+)");
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("island_effect_(.+)");
@@ -69,14 +72,14 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
     private static final Pattern GENERATOR_AMOUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_amount_(.+)");
     private static final Pattern GENERATOR_PERCENTAGE_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_percentage_(.+)");
-    private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
+    private static final Pattern MEMBER_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
     private static final Pattern MISSION_STATUS_PATTERN = Pattern.compile("mission_status_(.+)");
     private static final Pattern PERMISSION_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_(.+)");
     private static final Pattern PERMISSION_ROLE_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_role_(.+)");
+    private static final Pattern PLAYER_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
     private static final Pattern ROLE_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_role_count_(.+)");
     private static final Pattern ROLE_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_role_limit_(.+)");
-    private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
     private static final Pattern TOP_TYPE_PLACEHOLDER_PATTERN = Pattern.compile("(.+?)_(.+)");
     private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
@@ -84,6 +87,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
     private static final Pattern TOP_CUSTOM_PLACEHOLDER_PATTERN = Pattern.compile("(\\d+)_(.+)");
+    private static final Pattern UNIQUE_VISITOR_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("unique_visitor_(.+)");
+    private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
+    private static final Pattern VISITOR_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("visitor_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
     private static final Pattern WORLD_UNLOCKED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_unlocked_(.+)");
     private static final Pattern WORLD_ENABLED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_enabled_(.+)");
@@ -99,10 +105,14 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasBypassModeEnabled(), superiorPlayer.getUserLocale()))
                     .put("chat_spy", superiorPlayer ->
                             Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasAdminSpyEnabled(), superiorPlayer.getUserLocale()))
+                    .put("chat_state", superiorPlayer ->
+                            Formatters.CAPITALIZED_FORMATTER.format(superiorPlayer.getChatState().getName()))
                     .put("disbands", superiorPlayer ->
                             superiorPlayer.getDisbands() + "")
                     .put("fly", superiorPlayer ->
                             Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasIslandFlyEnabled(), superiorPlayer.getUserLocale()))
+                    .put("local_chat", superiorPlayer ->
+                            Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.getChatState() == ChatStates.LOCAL_CHAT, superiorPlayer.getUserLocale()))
                     .put("locale", superiorPlayer ->
                             Formatters.LOCALE_FORMATTER.format(superiorPlayer.getUserLocale()))
                     .put("missions_completed", superiorPlayer ->
@@ -116,7 +126,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("schematics", superiorPlayer ->
                             Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasSchematicModeEnabled(), superiorPlayer.getUserLocale()))
                     .put("team_chat", superiorPlayer ->
-                            Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasTeamChatEnabled(), superiorPlayer.getUserLocale()))
+                            Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.getChatState() == ChatStates.TEAM_CHAT, superiorPlayer.getUserLocale()))
                     .put("texture", SuperiorPlayer::getTextureValue)
                     .put("world_border", superiorPlayer ->
                             Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasWorldBorderEnabled(), superiorPlayer.getUserLocale()))
@@ -232,11 +242,14 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), superiorPlayer.getUserLocale()))
                     .put("missions_completed", (island, superiorPlayer) ->
                             island.getCompletedMissions().size() + "")
-                    .put("name", (island, superiorPlayer) -> island.getName())
-                    .put("name_formatted", (island, superiorPlayer) -> island.getFormattedName())
+                    .put("name", (island, superiorPlayer) ->
+                            island.getName())
+                    .put("name_formatted", (island, superiorPlayer) ->
+                            island.getFormattedName())
                     .put("name_leader", (island, superiorPlayer) ->
                             island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
-                    .put("name_stripped", (island, superiorPlayer) -> island.getStrippedName())
+                    .put("name_stripped", (island, superiorPlayer) ->
+                            island.getStrippedName())
                     .put("paypal", (island, superiorPlayer) ->
                             island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : "None")
                     .put("paypal_all", (island, superiorPlayer) ->
@@ -528,21 +541,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return handleGeneratorPercentagesPlaceholder(island, matcher.group(1));
             }
 
-            if ((matcher = WORLD_UNLOCKED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                boolean unlockedWorld = island.getUnlockedWorlds().contains(Dimension.getByName(matcher.group(1)));
-                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(unlockedWorld, superiorPlayer.getUserLocale()));
-            }
-
-            if ((matcher = WORLD_ENABLED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                boolean enabledWorld = island.isDimensionEnabled(Dimension.getByName(matcher.group(1)));
-                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(enabledWorld, superiorPlayer.getUserLocale()));
-            }
-
-            if ((matcher = WORLD_GENERATED_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                boolean generatedWorld = island.getGeneratedSchematics().contains(Dimension.getByName(matcher.group(1)));
-                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(generatedWorld, superiorPlayer.getUserLocale()));
-            }
-
             if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(subPlaceholder)).matches()) {
                 String categoryName = matcher.group(1);
                 return Optional.of(island.getCompletedMissions().stream().filter(mission ->
@@ -579,58 +577,96 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
 
             if (superiorPlayer != null) {
+                if ((matcher = BAN_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                    return handlePlayersIndexPlaceholder(island.getBannedPlayers(), matcher.group(1));
+                }
+
                 if ((matcher = BLOCK_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches() ||
                         (matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName)) + "");
-                } else if ((matcher = BLOCK_LEVEL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = BLOCK_LEVEL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
                     return Optional.of(blockValue.getLevel() + "");
-                } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(island.getBlockLimit(Keys.ofMaterialAndData(keyName)) + "");
-                } else if ((matcher = BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
                     BigDecimal amount = new BigDecimal(island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName)));
                     return Optional.of(blockValue.getLevel().multiply(amount) + "");
-                } else if ((matcher = BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
                     BigDecimal amount = new BigDecimal(island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(keyName)));
                     return Optional.of(blockValue.getWorth().multiply(amount) + "");
-                } else if ((matcher = BLOCK_WORTH_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = BLOCK_WORTH_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     BlockValue blockValue = plugin.getBlockValues().getBlockValue(Keys.ofMaterialAndData(keyName));
                     return Optional.of(blockValue.getWorth() + "");
-                } else if ((matcher = DATA_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = COOP_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                    return handlePlayersIndexPlaceholder(island.getCoopPlayers(), matcher.group(1));
+                }
+
+                if ((matcher = DATA_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     Object data = island.getPersistentDataContainer().get(keyName);
                     if (data == null) {
                         return Optional.empty();
                     }
                     return Optional.of(data.toString());
-                } else if ((matcher = EFFECT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = EFFECT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String effectName = matcher.group(1);
                     PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
                     if (potionEffectType == null) {
                         return Optional.empty();
                     }
                     return Optional.of(island.getPotionEffectLevel(potionEffectType) + "");
-                } else if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(island.getEntitiesTracker().getEntityCount(Keys.ofEntityType(keyName)) + "");
-                } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1);
                     return Optional.of(island.getEntityLimit(Keys.ofEntityType(keyName)) + "");
-                } else if ((matcher = FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                }
+
+                if ((matcher = FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                     return handleFlagsPlaceholder(island, superiorPlayer, matcher.group(1));
-                } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                    return handleMembersPlaceholder(island, matcher.group(1));
-                } else if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = MEMBER_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                    return handlePlayersIndexPlaceholder(island.getIslandMembers(false), matcher.group(1));
+                }
+
+                if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     return handlePermissionsPlaceholder(island, superiorPlayer, matcher.group(1));
-                } else if ((matcher = ROLE_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = PLAYER_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                    return handlePlayersIndexPlaceholder(island.getAllPlayersInside(), matcher.group(1));
+                }
+
+                if ((matcher = ROLE_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String roleName = matcher.group(1);
                     PlayerRole playerRole;
                     try {
@@ -639,7 +675,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                         return Optional.empty();
                     }
                     return Optional.of(island.getIslandMembers(playerRole).size() + "");
-                } else if ((matcher = ROLE_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = ROLE_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String roleName = matcher.group(1);
                     PlayerRole playerRole;
                     try {
@@ -648,14 +686,26 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                         return Optional.empty();
                     }
                     return Optional.of(island.getRoleLimit(playerRole) + "");
-                } else if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                }
+
+                if ((matcher = UNIQUE_VISITOR_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                    return handlePlayersIndexPlaceholder(island.getUniqueVisitors(), matcher.group(1));
+                }
+
+                if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String upgradeName = matcher.group(1);
                     Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
                     if (upgrade == null) {
                         return Optional.empty();
                     }
                     return Optional.of(island.getUpgradeLevel(upgrade).getLevel() + "");
-                } else if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                }
+
+                if ((matcher = VISITOR_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                    return handlePlayersIndexPlaceholder(island.getIslandVisitors(), matcher.group(1));
+                }
+
+                if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                     String visitorName = matcher.group(1);
                     return Optional.of(island.getUniqueVisitorsWithTimes().stream()
                             .filter(uniqueVisitor -> uniqueVisitor.getKey().getName().equalsIgnoreCase(visitorName))
@@ -728,20 +778,19 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         return Optional.of(IslandUtils.getGeneratorPercentageDecimal(island, Keys.ofMaterialAndData(keyName), dimension) + "");
     }
 
-    private static Optional<String> handleMembersPlaceholder(@NotNull Island island, String placeholder) {
-        List<SuperiorPlayer> members = island.getIslandMembers(false);
-
-        int targetMemberIndex = -1;
+    private static Optional<String> handlePlayersIndexPlaceholder(List<SuperiorPlayer> superiorPlayers, String position) {
+        int index = -1;
 
         try {
-            targetMemberIndex = Integer.parseInt(placeholder) - 1;
+            index = Integer.parseInt(position) - 1;
         } catch (NumberFormatException ignored) {
         }
 
-        if (targetMemberIndex < 0 || targetMemberIndex >= members.size())
+        if (index < 0 || index >= superiorPlayers.size()) {
             return Optional.empty();
+        }
 
-        return Optional.of(members.get(targetMemberIndex).getName());
+        return Optional.of(superiorPlayers.get(index).getName());
     }
 
     private static Optional<String> handlePermissionsPlaceholder(@NotNull Island island,
