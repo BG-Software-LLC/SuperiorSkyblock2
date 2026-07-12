@@ -71,8 +71,9 @@ public class CmdTeamChat implements ISuperiorCommand {
                     ChatStates.GLOBAL : ChatStates.TEAM_CHAT;
 
             if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, newChatState) ||
-                    !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+                    !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer)) {
                 return;
+            }
 
             if (newChatState == ChatStates.TEAM_CHAT) {
                 if (oldChatState == ChatStates.LOCAL_CHAT) {
@@ -86,6 +87,15 @@ public class CmdTeamChat implements ISuperiorCommand {
 
             superiorPlayer.setChatState(newChatState);
         } else {
+            if (superiorPlayer.getChatState() != ChatStates.TEAM_CHAT) {
+                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.TEAM_CHAT) ||
+                        !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer)) {
+                    return;
+                }
+
+                superiorPlayer.setChatState(ChatStates.TEAM_CHAT);
+            }
+
             String message = CommandArguments.buildLongString(args, 1, false);
             IslandChat.handleIslandChat(island, superiorPlayer, message);
         }
