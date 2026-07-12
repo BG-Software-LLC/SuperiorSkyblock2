@@ -2240,7 +2240,8 @@ public class SIsland implements Island {
 
         forEachIslandMember(ignoredMembers, true, islandMember -> {
             MessagesService.Builder builder = messagesService.get().newBuilder();
-            builder.addTitle(title, subtitle, fadeIn, duration, fadeOut);
+            builder.addTitle(Formatters.COLOR_FORMATTER.format(title),
+                    Formatters.COLOR_FORMATTER.format(subtitle), fadeIn, duration, fadeOut);
             builder.build().sendMessage(islandMember.asPlayer());
         });
     }

@@ -73,8 +73,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addBossBar(@Nullable String message, BossBar.Color color, int duration) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
-                    .createBossBarComponent(message, color, BossBar.Style.SOLID, duration));
+            return addBossBar(message, color, BossBar.Style.SOLID, duration);
         }
 
         @Override
@@ -101,7 +100,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addSound(Sound sound, float volume, float pitch) {
-            return addMessageComponent(SoundComponent.of(new GameSoundImpl(sound, volume, pitch)));
+            return addSound(new GameSoundImpl(sound, volume, pitch));
         }
 
         @Override
