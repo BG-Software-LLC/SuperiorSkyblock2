@@ -4,9 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
-import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBarsService;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
-import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
@@ -19,17 +17,13 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
-public class MessagesProvider_Default implements MessagesProvider {
+public class MessagesProvider_Default extends BaseMessagesProvider {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public IMessageComponent createActionBarComponent(@Nullable String message) {
         return ActionBarComponent.of(message);
-    }
-
-    @Override
-    public IMessageComponent createBossBarComponent(@Nullable String message, BossBar.Color color,
-                                                    BossBar.Style style, int duration) {
-        return BossBarComponent.of(message, color, mapBossBarStyle(style), duration);
     }
 
     @Override
@@ -44,7 +38,26 @@ public class MessagesProvider_Default implements MessagesProvider {
 
     @Override
     public IMessageComponent createComplexMessageComponent(@Nullable BaseComponent[] components) {
-        return null;
+        if (components == null || components.length == 0)
+            return EmptyMessageComponent.getInstance();
+
+        String message = TextComponent.toLegacyText(components);
+        String command = null;
+        String suggest = null;
+        String tooltip = null;
+
+        for (BaseComponent component : components) {
+            if (component.getClickEvent() != null && component.getClickEvent().getAction() == ClickEvent.Action.RUN_COMMAND) {
+                command = component.getClickEvent().getValue();
+            } else if (component.getClickEvent() != null && component.getClickEvent().getAction() == ClickEvent.Action.SUGGEST_COMMAND) {
+                suggest = component.getClickEvent().getValue();
+            }
+            if (component.getHoverEvent() != null && component.getHoverEvent().getAction() == HoverEvent.Action.SHOW_TEXT) {
+                tooltip = TextComponent.toLegacyText(component.getHoverEvent().getValue());
+            }
+        }
+
+        return createComplexMessageComponent(message, command, suggest, tooltip);
     }
 
     @Override
@@ -72,33 +85,14 @@ public class MessagesProvider_Default implements MessagesProvider {
         }
     }
 
-    private static class ActionBarComponent implements IMessageComponent {
-
-        private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-        private final MessageContent messageContent;
+    private static class ActionBarComponent extends BaseMessageComponent {
 
         public static IMessageComponent of(@Nullable String message) {
             return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new ActionBarComponent(message);
         }
 
         private ActionBarComponent(String message) {
-            this.messageContent = MessageContent.parse(message);
-        }
-
-        @Override
-        public Type getType() {
-            return Type.ACTION_BAR;
-        }
-
-        @Override
-        public String getMessage() {
-            return this.messageContent.getContent(null).orElse("");
-        }
-
-        @Override
-        public String getMessage(Object... args) {
-            return this.messageContent.getContent(null, args).orElse("");
+            super(Type.ACTION_BAR, message);
         }
 
         @Override
@@ -114,85 +108,14 @@ public class MessagesProvider_Default implements MessagesProvider {
 
     }
 
-    private static class BossBarComponent implements IMessageComponent {
-
-        private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-        private static final LazyReference<BossBarsService> bossBarsService = new LazyReference<BossBarsService>() {
-            @Override
-            protected BossBarsService create() {
-                return plugin.getServices().getService(BossBarsService.class);
-            }
-        };
-
-        private final MessageContent messageContent;
-        private final BossBar.Color color;
-        private final BossBar.Style style;
-        private final int duration;
-
-        public static IMessageComponent of(@Nullable String message, BossBar.Color color, BossBar.Style style, int duration) {
-            return duration <= 0 || Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new BossBarComponent(message, color, style, duration);
-        }
-
-        private BossBarComponent(String message, BossBar.Color color, BossBar.Style style, int duration) {
-            this.messageContent = MessageContent.parse(message);
-            this.color = color;
-            this.style = style;
-            this.duration = duration;
-        }
-
-        @Override
-        public Type getType() {
-            return Type.BOSS_BAR;
-        }
-
-        @Override
-        public String getMessage() {
-            return this.messageContent.getContent(null).orElse("");
-        }
-
-        @Override
-        public String getMessage(Object... args) {
-            return this.messageContent.getContent(null, args).orElse("");
-        }
-
-        @Override
-        public void sendMessage(CommandSender sender, Object... args) {
-            if (!(sender instanceof Player)) {
-                return;
-            }
-
-            Player player = (Player) sender;
-            this.messageContent.getContent(player, args).ifPresent(message ->
-                    bossBarsService.get().createBossBar(player, message, this.color, this.style, this.duration));
-        }
-
-    }
-
-    private static class RawMessageComponent implements IMessageComponent {
-
-        protected final MessageContent messageContent;
+    private static class RawMessageComponent extends BaseMessageComponent {
 
         public static IMessageComponent of(@Nullable String message) {
             return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
         }
 
         private RawMessageComponent(String message) {
-            this.messageContent = MessageContent.parse(message);
-        }
-
-        @Override
-        public Type getType() {
-            return Type.RAW_MESSAGE;
-        }
-
-        @Override
-        public String getMessage() {
-            return this.messageContent.getContent(null).orElse("");
-        }
-
-        @Override
-        public String getMessage(Object... args) {
-            return this.messageContent.getContent(null, args).orElse("");
+            super(Type.RAW_MESSAGE, message);
         }
 
         @Override
@@ -203,7 +126,7 @@ public class MessagesProvider_Default implements MessagesProvider {
 
     }
 
-    private static class ComplexMessageComponent extends RawMessageComponent {
+    private static class ComplexMessageComponent extends BaseMessageComponent {
 
         private final Optional<MessageContent> hoverEvent;
         private final Optional<Pair<ClickEvent.Action, MessageContent>> clickEvent;
@@ -216,7 +139,7 @@ public class MessagesProvider_Default implements MessagesProvider {
 
         private ComplexMessageComponent(String message, @Nullable String command, @Nullable String suggest,
                                         @Nullable String tooltip) {
-            super(message);
+            super(Type.COMPLEX_MESSAGE, message);
 
             if (command != null) {
                 this.clickEvent = Optional.of(new Pair<>(ClickEvent.Action.RUN_COMMAND, MessageContent.parse(command)));
@@ -231,11 +154,6 @@ public class MessagesProvider_Default implements MessagesProvider {
             } else {
                 this.hoverEvent = Optional.empty();
             }
-        }
-
-        @Override
-        public Type getType() {
-            return Type.COMPLEX_MESSAGE;
         }
 
         @Override
@@ -268,11 +186,10 @@ public class MessagesProvider_Default implements MessagesProvider {
 
     }
 
-    private static class TitleComponent implements IMessageComponent {
+    private static class TitleComponent extends BaseMessageComponent {
 
         private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-        private final MessageContent titleContent;
         private final MessageContent subtitleContent;
         private final int fadeIn;
         private final int stay;
@@ -285,26 +202,11 @@ public class MessagesProvider_Default implements MessagesProvider {
         }
 
         private TitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage, int fadeIn, int stay, int fadeOut) {
-            this.titleContent = Text.isBlank(titleMessage) ? MessageContent.EMPTY : MessageContent.parse(titleMessage);
+            super(Type.TITLE, titleMessage);
             this.subtitleContent = Text.isBlank(subtitleMessage) ? MessageContent.EMPTY : MessageContent.parse(subtitleMessage);
             this.fadeIn = fadeIn;
             this.stay = stay;
             this.fadeOut = fadeOut;
-        }
-
-        @Override
-        public Type getType() {
-            return Type.TITLE;
-        }
-
-        @Override
-        public String getMessage() {
-            return this.titleContent.getContent(null).orElse("");
-        }
-
-        @Override
-        public String getMessage(Object... args) {
-            return this.titleContent.getContent(null, args).orElse("");
         }
 
         @Override
@@ -314,7 +216,7 @@ public class MessagesProvider_Default implements MessagesProvider {
             }
 
             Player player = (Player) sender;
-            String titleMessage = this.titleContent.getContent(player, args).orElse(null);
+            String titleMessage = this.messageContent.getContent(player, args).orElse(null);
             String subtitleMessage = this.subtitleContent.getContent(player, args).orElse(null);
 
             if (titleMessage != null && subtitleMessage != null) {

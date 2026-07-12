@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.messages;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
 
@@ -16,26 +15,12 @@ public interface MessagesProvider {
     IMessageComponent createActionBarComponent(@Nullable String message);
 
     /**
-     * Create a boss bar message component.
-     *
-     * @param message  The boss bar text.
-     * @param color    The boss bar color.
-     * @param style    The boss bar style.
-     * @param duration The boss bar duration, in ticks.
-     * @return The created message component.
-     */
-    IMessageComponent createBossBarComponent(@Nullable String message, BossBar.Color color,
-                                             BossBar.Style style, int duration);
-
-    /**
      * Create a raw message component.
      *
      * @param message The raw text.
      * @return The created message component.
      */
-    default IMessageComponent createRawMessageComponent(@Nullable String message) {
-        return createComplexMessageComponent(message, null, null, null);
-    }
+    IMessageComponent createRawMessageComponent(@Nullable String message);
 
     /**
      * Create a complex message component.

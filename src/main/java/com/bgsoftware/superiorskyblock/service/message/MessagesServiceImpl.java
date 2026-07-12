@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.messages.component.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.core.messages.component.SoundComponent;
 import com.bgsoftware.superiorskyblock.service.IService;
@@ -77,8 +78,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addBossBar(@Nullable String message, BossBar.Color color, BossBar.Style style, int duration) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
-                    .createBossBarComponent(message, color, style, duration));
+            return addMessageComponent(BossBarComponent.of(message, color, style, duration));
         }
 
         @Override
