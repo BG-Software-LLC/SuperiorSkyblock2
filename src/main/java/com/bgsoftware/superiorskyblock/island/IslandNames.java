@@ -118,14 +118,20 @@ public class IslandNames {
         return true;
     }
 
-    public static boolean isValidWarpCategoryName(SuperiorPlayer superiorPlayer, String categoryName) {
-        if (categoryName.isEmpty() || categoryName.contains(" ")) {
-            Message.WARP_CATEGORY_INVALID_NAME.send(superiorPlayer);
+    public static boolean isValidWarpCategoryName(@Nullable SuperiorPlayer superiorPlayer, @Nullable String categoryName) {
+        if (categoryName == null || categoryName.isEmpty() || categoryName.contains(" ")) {
+            if (superiorPlayer != null) {
+                Message.WARP_CATEGORY_INVALID_NAME.send(superiorPlayer);
+            }
+
             return false;
         }
 
         if (!isWarpNameLengthValid(categoryName)) {
-            Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
+            if (superiorPlayer != null) {
+                Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
+            }
+
             return false;
         }
 

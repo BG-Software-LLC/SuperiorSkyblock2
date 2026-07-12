@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
@@ -569,7 +570,11 @@ public class SettingsContainer {
         }
         this.messageDelays = Collections.unmodifiableMap(messageDelays);
         warpCategories = config.getBoolean("warp-categories", true);
-        defaultWarpCategoryName = config.getString("default-warp-category-name", "Default").split(" ")[0];
+        String defaultWarpCategoryName = config.getString("default-warp-category-name");
+        if (!IslandNames.isValidWarpCategoryName(null, defaultWarpCategoryName)) {
+            defaultWarpCategoryName = "Default";
+        }
+        this.defaultWarpCategoryName = defaultWarpCategoryName;
         physicsListener = config.getBoolean("physics-listener", true);
         chargeOnWarp = config.getDouble("charge-on-warp", 0D);
         publicWarps = config.getBoolean("public-warps");
