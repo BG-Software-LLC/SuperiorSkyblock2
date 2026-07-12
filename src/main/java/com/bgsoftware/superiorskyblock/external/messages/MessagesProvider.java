@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public interface MessagesProvider {
 
@@ -32,7 +33,29 @@ public interface MessagesProvider {
      * @param message The raw text.
      * @return The created message component.
      */
-    IMessageComponent createRawMessageComponent(@Nullable String message);
+    default IMessageComponent createRawMessageComponent(@Nullable String message) {
+        return createComplexMessageComponent(message, null, null, null);
+    }
+
+    /**
+     * Create a complex message component.
+     *
+     * @param message The content of the complex message.
+     * @param command The command to be executed when clicked on the message.
+     * @param suggest The command to suggest when clicked on the message.
+     * @param tooltip The text to show when hovering over the message.
+     * @return The created message component.
+     */
+    IMessageComponent createComplexMessageComponent(@Nullable String message, @Nullable String command,
+                                                    @Nullable String suggest, @Nullable String tooltip);
+
+    /**
+     * Create a complex message component.
+     *
+     * @param components The components of the complex message.
+     * @return The created message component.
+     */
+    IMessageComponent createComplexMessageComponent(@Nullable BaseComponent[] components);
 
     /**
      * Create a title message component.

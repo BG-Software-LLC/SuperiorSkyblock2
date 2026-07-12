@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.messages.component.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.core.messages.component.SoundComponent;
 import com.bgsoftware.superiorskyblock.service.IService;
@@ -89,7 +88,15 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addComplexMessage(@Nullable BaseComponent[] baseComponents) {
-            return addMessageComponent(ComplexMessageComponent.of(baseComponents));
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createComplexMessageComponent(baseComponents));
+        }
+
+        @Override
+        public boolean addComplexMessage(@Nullable String message, @Nullable String command, @Nullable String suggest,
+                                         @Nullable String tooltip) {
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createComplexMessageComponent(message, command, suggest, tooltip));
         }
 
         @Override

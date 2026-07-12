@@ -3,7 +3,10 @@ package com.bgsoftware.superiorskyblock.external.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
@@ -11,16 +14,21 @@ import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageCompo
 import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class MessagesProvider_MiniMessage implements MessagesProvider {
@@ -32,6 +40,12 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().tags(StandardTags.defaults()).build();
     private static final LegacyComponentSerializer LEGACY_COMPONENT_SERIALIZER = LegacyComponentSerializer.legacySection();
+    private static final LazyReference<BungeeComponentSerializer> BUNGEE_COMPONENT_SERIALIZER = new LazyReference<>() {
+        @Override
+        protected BungeeComponentSerializer create() {
+            return ServerVersion.isAtLeast(ServerVersion.v1_16) ? BungeeComponentSerializer.get() : BungeeComponentSerializer.legacy();
+        }
+    };
 
     public MessagesProvider_MiniMessage(SuperiorSkyblockPlugin plugin) {
         Log.info("Using MiniMessage as a messages provider.");
@@ -49,8 +63,35 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
     }
 
     @Override
-    public IMessageComponent createRawMessageComponent(@Nullable String message) {
-        return RawMessageComponent.of(message);
+    public IMessageComponent createComplexMessageComponent(@Nullable String message, @Nullable String command,
+                                                           @Nullable String suggest, @Nullable String tooltip) {
+        if (command == null && suggest == null && tooltip == null) {
+            return RawMessageComponent.of(message);
+        } else {
+            return ComplexMessageComponent.of(message, command, suggest, tooltip);
+        }
+    }
+
+    @Override
+    public IMessageComponent createComplexMessageComponent(@Nullable BaseComponent[] components) {
+        if (components == null || components.length == 0)
+            return EmptyMessageComponent.getInstance();
+
+        Component component = BUNGEE_COMPONENT_SERIALIZER.get().deserialize(components);
+        ClickEvent clickEvent = component.clickEvent();
+        HoverEvent<?> hoverEvent = component.hoverEvent();
+
+        component = component.clickEvent(null).hoverEvent(null);
+
+        String message = MINI_MESSAGE.serialize(component);
+        String command = clickEvent != null && clickEvent.action() == ClickEvent.Action.RUN_COMMAND ?
+                clickEvent.value() : null;
+        String suggest = clickEvent != null && clickEvent.action() == ClickEvent.Action.SUGGEST_COMMAND ?
+                clickEvent.value() : null;
+        String tooltip = hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_TEXT ?
+                MINI_MESSAGE.serialize((Component) hoverEvent.value()) : null;
+
+        return ComplexMessageComponent.of(message, command, suggest, tooltip);
     }
 
     @Override
@@ -194,7 +235,7 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
 
     private static class RawMessageComponent implements IMessageComponent {
 
-        private final MessageContent messageContent;
+        protected final MessageContent messageContent;
 
         public static IMessageComponent of(@Nullable String message) {
             return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
@@ -224,7 +265,69 @@ public class MessagesProvider_MiniMessage implements MessagesProvider {
             Player player = sender instanceof Player ? (Player) sender : null;
 
             this.messageContent.getContent(player, args).ifPresent(message ->
-                sender.sendMessage(deserialize(message, this.messageContent.hasLegacyColorCodes())));
+                    sender.sendMessage(deserialize(message, this.messageContent.hasLegacyColorCodes())));
+        }
+
+    }
+
+    private static class ComplexMessageComponent extends RawMessageComponent {
+
+        private final Optional<MessageContent> hoverEvent;
+        private final Optional<Pair<ClickEvent.Action, MessageContent>> clickEvent;
+
+        public static IMessageComponent of(@Nullable String message, @Nullable String command,
+                                           @Nullable String suggest, @Nullable String tooltip) {
+            return Text.isBlank(message) ? EmptyMessageComponent.getInstance() :
+                    new ComplexMessageComponent(message, command, suggest, tooltip);
+        }
+
+        private ComplexMessageComponent(String message, @Nullable String command, @Nullable String suggest,
+                                        @Nullable String tooltip) {
+            super(message);
+
+            if (command != null) {
+                this.clickEvent = Optional.of(new Pair<>(ClickEvent.Action.RUN_COMMAND, MessageContent.parse(command)));
+            } else if (suggest != null) {
+                this.clickEvent = Optional.of(new Pair<>(ClickEvent.Action.SUGGEST_COMMAND, MessageContent.parse(suggest)));
+            } else {
+                this.clickEvent = Optional.empty();
+            }
+
+            if (tooltip != null) {
+                this.hoverEvent = Optional.of(MessageContent.parse(tooltip));
+            } else {
+                this.hoverEvent = Optional.empty();
+            }
+        }
+
+        @Override
+        public Type getType() {
+            return Type.COMPLEX_MESSAGE;
+        }
+
+        @Override
+        public void sendMessage(CommandSender sender, Object... args) {
+            Player player = sender instanceof Player ? (Player) sender : null;
+
+            this.messageContent.getContent(player, args).ifPresent(message -> {
+                Component component = deserialize(message, this.messageContent.hasLegacyColorCodes());
+
+                if (this.clickEvent.isPresent()) {
+                    Optional<String> clickEventDataOpt = this.clickEvent.get().getValue().getContent(player, args);
+                    if (clickEventDataOpt.isPresent()) {
+                        component = component.clickEvent(ClickEvent.clickEvent(this.clickEvent.get().getKey(), clickEventDataOpt.get()));
+                    }
+                }
+
+                Optional<String> hoverEventDataOpt = this.hoverEvent.flatMap(
+                        hoverEventData -> hoverEventData.getContent(player, args));
+                if (hoverEventDataOpt.isPresent()) {
+                    component = component.hoverEvent(HoverEvent.showText(
+                            deserialize(hoverEventDataOpt.get(), this.hoverEvent.get().hasLegacyColorCodes())));
+                }
+
+                sender.sendMessage(component);
+            });
         }
 
     }

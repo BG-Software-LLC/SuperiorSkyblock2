@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.external.messages;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBarsService;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
@@ -9,8 +10,14 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageComponent;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 public class MessagesProvider_Default implements MessagesProvider {
 
@@ -26,8 +33,18 @@ public class MessagesProvider_Default implements MessagesProvider {
     }
 
     @Override
-    public IMessageComponent createRawMessageComponent(@Nullable String message) {
-        return RawMessageComponent.of(message);
+    public IMessageComponent createComplexMessageComponent(@Nullable String message, @Nullable String command,
+                                                           @Nullable String suggest, @Nullable String tooltip) {
+        if (command == null && suggest == null && tooltip == null) {
+            return RawMessageComponent.of(message);
+        } else {
+            return ComplexMessageComponent.of(message, command, suggest, tooltip);
+        }
+    }
+
+    @Override
+    public IMessageComponent createComplexMessageComponent(@Nullable BaseComponent[] components) {
+        return null;
     }
 
     @Override
@@ -153,7 +170,7 @@ public class MessagesProvider_Default implements MessagesProvider {
 
     private static class RawMessageComponent implements IMessageComponent {
 
-        private final MessageContent messageContent;
+        protected final MessageContent messageContent;
 
         public static IMessageComponent of(@Nullable String message) {
             return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
@@ -182,6 +199,71 @@ public class MessagesProvider_Default implements MessagesProvider {
         public void sendMessage(CommandSender sender, Object... args) {
             Player player = sender instanceof Player ? (Player) sender : null;
             this.messageContent.getContent(player, args).ifPresent(sender::sendMessage);
+        }
+
+    }
+
+    private static class ComplexMessageComponent extends RawMessageComponent {
+
+        private final Optional<MessageContent> hoverEvent;
+        private final Optional<Pair<ClickEvent.Action, MessageContent>> clickEvent;
+
+        public static IMessageComponent of(@Nullable String message, @Nullable String command,
+                                           @Nullable String suggest, @Nullable String tooltip) {
+            return Text.isBlank(message) ? EmptyMessageComponent.getInstance() :
+                    new ComplexMessageComponent(message, command, suggest, tooltip);
+        }
+
+        private ComplexMessageComponent(String message, @Nullable String command, @Nullable String suggest,
+                                        @Nullable String tooltip) {
+            super(message);
+
+            if (command != null) {
+                this.clickEvent = Optional.of(new Pair<>(ClickEvent.Action.RUN_COMMAND, MessageContent.parse(command)));
+            } else if (suggest != null) {
+                this.clickEvent = Optional.of(new Pair<>(ClickEvent.Action.SUGGEST_COMMAND, MessageContent.parse(suggest)));
+            } else {
+                this.clickEvent = Optional.empty();
+            }
+
+            if (tooltip != null) {
+                this.hoverEvent = Optional.of(MessageContent.parse(tooltip));
+            } else {
+                this.hoverEvent = Optional.empty();
+            }
+        }
+
+        @Override
+        public Type getType() {
+            return Type.COMPLEX_MESSAGE;
+        }
+
+        @Override
+        public void sendMessage(CommandSender sender, Object... args) {
+            Player player = sender instanceof Player ? (Player) sender : null;
+
+            this.messageContent.getContent(player, args).ifPresent(message -> {
+                BaseComponent[] components = TextComponent.fromLegacyText(message);
+
+                this.clickEvent.ifPresent(clickEventData -> {
+                    clickEventData.getValue().getContent(player, args).ifPresent(clickEventContent -> {
+                        ClickEvent clickEvent = new ClickEvent(clickEventData.getKey(), clickEventContent);
+                        for (BaseComponent component : components) {
+                            component.setClickEvent(clickEvent);
+                        }
+                    });
+                });
+
+                this.hoverEvent.flatMap(hoverEventContent -> hoverEventContent.getContent(player, args))
+                        .ifPresent(hoverEventContent -> {
+                            HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverEventContent));
+                            for (BaseComponent component : components) {
+                                component.setHoverEvent(hoverEvent);
+                            }
+                        });
+
+                sender.sendMessage(components);
+            });
         }
 
     }
