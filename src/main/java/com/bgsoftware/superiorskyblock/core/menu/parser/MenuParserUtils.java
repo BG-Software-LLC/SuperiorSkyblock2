@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.itemstack.MinecraftNamesMapper;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -76,38 +75,43 @@ public class MenuParserUtils {
     }
 
     public static TemplateItem getItemStackUnsafe(String fileName, ConfigurationSection section) throws MenuParseException {
-        if (section == null)
+        if (section == null) {
             return null;
+        }
 
         TemplateItem templateItem;
 
-        String sourceItem = section.getString("source");
-        if (sourceItem != null) {
-            templateItem = getItemStackUnsafe(fileName, section.getRoot().getConfigurationSection(sourceItem));
+        if (section.isString("source")) {
+            templateItem = getItemStackUnsafe(fileName, section.getRoot().getConfigurationSection(section.getString("source")));
         } else {
-            if (!section.isString("type"))
+            if (!section.isString("type")) {
                 return null;
+            }
+
+            String materialName = section.getString("type");
 
             Material type;
             short data;
-
             try {
-                String materialType = section.getString("type");
-                materialType = MinecraftNamesMapper.getMinecraftName(materialType)
-                        .map(minecraftKey -> NAMES_MAPPER.get().getMappedName(Material.class, minecraftKey).orElse(minecraftKey))
-                        .orElse(materialType);
-                if (materialType.contains(":")) {
-                    String[] materialSections = materialType.toUpperCase(Locale.ENGLISH).split(":");
-                    if (materialSections.length < 2)
+                materialName = MinecraftNamesMapper.getMinecraftName(materialName).map(minecraftKey ->
+                                NAMES_MAPPER.get().getMappedName(Material.class, minecraftKey).orElse(minecraftKey)).orElse(materialName);
+
+                if (materialName.contains(":")) {
+                    String[] materialSections = materialName.toUpperCase(Locale.ENGLISH).split(":");
+
+                    if (materialSections.length < 2) {
                         throw new IllegalArgumentException();
+                    }
+
                     type = Material.valueOf(materialSections[0]);
                     data = Short.parseShort(materialSections[1]);
                 } else {
-                    type = Material.valueOf(materialType.toUpperCase(Locale.ENGLISH));
+                    type = Material.valueOf(materialName.toUpperCase(Locale.ENGLISH));
                     data = (short) section.getInt("data");
                 }
             } catch (IllegalArgumentException error) {
-                throw new MenuParseException("Couldn't convert " + section.getCurrentPath() + " into an item stack. Check type & data sections!");
+                throw new MenuParseException("Couldn't convert '" + materialName.toUpperCase(Locale.ENGLISH) + "' into an item stack at "
+                        + section.getCurrentPath() + ", check type and data section!");
             }
 
             templateItem = new TemplateItem(new ItemBuilder(type, data));
@@ -115,118 +119,16 @@ public class MenuParserUtils {
 
         ItemBuilder itemBuilder = templateItem.getEditableBuilder();
 
-        if (section.isString("name"))
-            itemBuilder.withName(Formatters.COLOR_FORMATTER.format(section.getString("name")));
+        if (section.isString("name")) {
+            itemBuilder.withName(section.getString("name"));
+        }
 
-        if (section.isList("lore"))
+        if (section.isList("lore")) {
             itemBuilder.withLore(section.getStringList("lore"));
+        }
 
-        if (section.isInt("amount"))
+        if (section.isInt("amount")) {
             itemBuilder.withAmount(section.getInt("amount"));
-
-        if (section.isConfigurationSection("enchants")) {
-            for (String enchantmentName : section.getConfigurationSection("enchants").getKeys(false)) {
-                Enchantment enchantment;
-
-                try {
-                    enchantment = getMinecraftEnum(Enchantment.class, enchantmentName, Enchantment::getByName);
-                } catch (IllegalArgumentException ex) {
-                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            ".enchants.", enchantmentName.toUpperCase(Locale.ENGLISH), " into an enchantment, skipping...");
-                    continue;
-                }
-
-                itemBuilder.withEnchant(enchantment, section.getInt("enchants." + enchantmentName));
-            }
-        }
-
-        if (section.getBoolean("glow", false)) {
-            itemBuilder.makeItemGlow();
-        }
-
-        if (section.isList("flags")) {
-            for (String flag : section.getStringList("flags")) {
-                String flagName = flag.toUpperCase(Locale.ENGLISH);
-                try {
-                    itemBuilder.withFlags(ItemFlag.valueOf(flagName));
-                } catch (IllegalArgumentException error) {
-                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            " (", flagName, ") into an item flag, skipping...");
-                }
-            }
-        }
-
-        if (section.isString("skull")) {
-            itemBuilder.asSkullOf(section.getString("skull"));
-        }
-
-        if (section.getBoolean("unbreakable", false)) {
-            itemBuilder.setUnbreakable();
-        }
-
-        if (section.getBoolean("hideTooltip", false)) {
-            itemBuilder.setHideTooltip();
-        }
-
-        if (section.isConfigurationSection("effects")) {
-            ConfigurationSection effectsSection = section.getConfigurationSection("effects");
-            for (String effectName : effectsSection.getKeys(false)) {
-                PotionEffectType potionEffectType;
-
-                try {
-                    potionEffectType = getMinecraftEnum(PotionEffectType.class, effectName, PotionEffectType::getByName);
-                } catch (IllegalArgumentException error) {
-                    Log.warnFromFile(fileName, "Couldn't convert ", effectsSection.getCurrentPath(),
-                            ".", effectName.toUpperCase(Locale.ENGLISH), " into a potion effect, skipping...");
-                    continue;
-                }
-
-                int duration = effectsSection.getInt(effectName + ".duration", -1);
-                int amplifier = effectsSection.getInt(effectName + ".amplifier", 0);
-
-                if (duration == -1) {
-                    Log.warnFromFile(fileName, "Potion effect ", effectsSection.getCurrentPath(),
-                            ".", effectName, " is missing duration, skipping...");
-                    continue;
-                }
-
-                itemBuilder.withPotionEffect(new PotionEffect(potionEffectType, duration, amplifier));
-            }
-        }
-
-        if (section.isString("entity")) {
-            String entity = section.getString("entity");
-            try {
-                itemBuilder.withEntityType(getMinecraftEnum(EntityType.class, entity));
-            } catch (IllegalArgumentException ex) {
-                Log.warnFromFile(fileName, "Couldn't convert ", entity, " into an entity type, skipping...");
-            }
-        }
-
-        if (section.isConfigurationSection("bannerMeta")) {
-            for (String dyeColorName : section.getConfigurationSection("bannerMeta").getKeys(false)) {
-                DyeColor dyeColor;
-                PatternType patternType;
-
-                try {
-                    dyeColor = DyeColor.valueOf(dyeColorName.toUpperCase(Locale.ENGLISH));
-                } catch (IllegalArgumentException error) {
-                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            ".bannerMeta.", dyeColorName.toUpperCase(Locale.ENGLISH), " into an dye color, skipping...");
-                    continue;
-                }
-
-                try {
-                    patternType = PatternType.valueOf(section.getString("bannerMeta." + dyeColorName));
-                } catch (IllegalArgumentException error) {
-                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
-                            ".bannerMeta.", dyeColorName.toUpperCase(Locale.ENGLISH), ".",
-                            section.getString("bannerMeta." + dyeColorName), " into an pattern type, skipping...");
-                    continue;
-                }
-
-                itemBuilder.withBannerMeta(dyeColor, patternType);
-            }
         }
 
         if (section.isInt("customModel")) {
@@ -237,13 +139,137 @@ public class MenuParserUtils {
             itemBuilder.withItemModel(section.getString("itemModel"));
         }
 
-        if (section.isString("rarity")) {
-            String rarity = section.getString("rarity");
+        if (section.isString("skull")) {
+            itemBuilder.asSkullOf(section.getString("skull"));
+        }
+
+        if (section.getBoolean("glow", false)) {
+            itemBuilder.makeItemGlow();
+        }
+
+        if (section.getBoolean("hideTooltip", false)) {
+            itemBuilder.setHideTooltip();
+        }
+
+        if (section.getBoolean("unbreakable", false)) {
+            itemBuilder.setUnbreakable();
+        }
+
+        if (section.isConfigurationSection("bannerMeta")) {
+            for (String color : section.getConfigurationSection("bannerMeta").getKeys(false)) {
+                String dyeColorName = color.toUpperCase(Locale.ENGLISH);
+
+                DyeColor dyeColor;
+                try {
+                    dyeColor = DyeColor.valueOf(dyeColorName);
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert '", dyeColorName,
+                            "' into an dye color at ", section.getCurrentPath(), ".bannerMeta, skipping...");
+                    continue;
+                }
+
+                String patternTypeName = section.getString("bannerMeta." + color);
+
+                PatternType patternType;
+                try {
+                    patternType = PatternType.valueOf(patternTypeName);
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert '", patternTypeName,
+                            "' into an pattern type at ", section.getCurrentPath(), ".bannerMeta, skipping...");
+                    continue;
+                }
+
+                itemBuilder.withBannerMeta(dyeColor, patternType);
+            }
+        }
+
+        if (section.isConfigurationSection("effects")) {
+            ConfigurationSection effectsSection = section.getConfigurationSection("effects");
+            for (String effect : effectsSection.getKeys(false)) {
+                String effectName = effect.toUpperCase(Locale.ENGLISH);
+
+                PotionEffectType potionEffectType;
+                try {
+                    potionEffectType = getMinecraftEnum(PotionEffectType.class, effectName, PotionEffectType::getByName);
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert '", effectName,
+                            "' into an potion effect type at ", section.getCurrentPath(), ".effects, skipping...");
+                    continue;
+                }
+
+                int duration = effectsSection.getInt(effect + ".duration", -1);
+                int amplifier = effectsSection.getInt(effect + ".amplifier", 0);
+
+                if (duration == -1) {
+                    Log.warnFromFile(fileName, "Couldn't find duration for potion effect type '",
+                            effectName, "' at ", section.getCurrentPath(), ".effects, skipping...");
+                    continue;
+                }
+
+                itemBuilder.withPotionEffect(new PotionEffect(potionEffectType, duration, amplifier));
+            }
+        }
+
+        if (section.isConfigurationSection("enchants")) {
+            for (String enchant : section.getConfigurationSection("enchants").getKeys(false)) {
+                String enchantmentName = enchant.toUpperCase(Locale.ENGLISH);
+
+                try {
+                    Enchantment enchantment = getMinecraftEnum(Enchantment.class, enchantmentName, Enchantment::getByName);
+
+                    itemBuilder.withEnchant(enchantment, section.getInt("enchants." + enchant));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert '", enchantmentName,
+                            "' into an enchantment at ", section.getCurrentPath(), ".enchants', skipping...");
+                }
+            }
+        }
+
+        if (section.isString("entity")) {
+            String entityName = section.getString("entity").toUpperCase(Locale.ENGLISH);
 
             try {
-                itemBuilder.withRarity(rarity);
+                itemBuilder.withEntityType(getMinecraftEnum(EntityType.class, entityName));
             } catch (IllegalArgumentException error) {
-                Log.warnFromFile(fileName, "Couldn't convert ", rarity, " into a rarity, skipping...");
+                Log.warnFromFile(fileName, "Couldn't convert '", entityName,
+                        "' into an entity at " + section.getCurrentPath(), ".entity, skipping...");
+            }
+        }
+
+        if (section.isList("flags")) {
+            for (String flag : section.getStringList("flags")) {
+                String flagName = flag.toUpperCase(Locale.ENGLISH);
+
+                try {
+                    itemBuilder.withFlags(ItemFlag.valueOf(flagName));
+                } catch (IllegalArgumentException error) {
+                    Log.warnFromFile(fileName, "Couldn't convert '", flagName,
+                            "' into an item flag at ", section.getCurrentPath(), ".flags, skipping...");
+                }
+            }
+        }
+
+        if (section.isString("leatherColor")) {
+            String leatherColor = section.getString("leatherColor").toUpperCase(Locale.ENGLISH);
+            if (leatherColor.startsWith("#"))
+                leatherColor = leatherColor.substring(1);
+
+            try {
+                itemBuilder.withLeatherColor(Integer.parseInt(leatherColor, 16));
+            } catch (IllegalArgumentException error) {
+                Log.warnFromFile(fileName, "Couldn't convert '", leatherColor,
+                        "' into a color at ", section.getCurrentPath(), ".leatherColor, skipping...");
+            }
+        }
+
+        if (section.isString("rarity")) {
+            String rarityName = section.getString("rarity").toUpperCase(Locale.ENGLISH);
+
+            try {
+                itemBuilder.withRarity(rarityName);
+            } catch (IllegalArgumentException error) {
+                Log.warnFromFile(fileName, "Couldn't convert '", rarityName,
+                        "' into an rarity at ", section.getCurrentPath(), ".rarity, skipping...");
             }
         }
 
@@ -252,27 +278,17 @@ public class MenuParserUtils {
             String trimPattern = section.getString("trim.pattern");
 
             if (trimMaterial == null) {
-                Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern, skipping...");
+                Log.warnFromFile(fileName, "Couldn't find trim material for item with trim pattern at ",
+                        section.getCurrentPath(), ".trim, skipping...");
             } else if (trimPattern == null) {
-                Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material, skipping...");
+                Log.warnFromFile(fileName, "Couldn't find trim pattern for item with trim material at ",
+                        section.getCurrentPath(), ".trim, skipping...");
             } else {
                 try {
                     itemBuilder.withTrim(trimMaterial, trimPattern);
                 } catch (IllegalArgumentException error) {
-                    Log.warnFromFile(fileName, error.getMessage());
+                    Log.warnFromFile(fileName, error.getMessage(), " at ", section.getCurrentPath(), ".trim, skipping...");
                 }
-            }
-        }
-
-        if (section.isString("leatherColor")) {
-            String leatherColor = section.getString("leatherColor");
-            if (leatherColor.startsWith("#"))
-                leatherColor = leatherColor.substring(1);
-
-            try {
-                itemBuilder.withLeatherColor(Integer.parseInt(leatherColor, 16));
-            } catch (IllegalArgumentException error) {
-                Log.warnFromFile(fileName, "Couldn't convert ", leatherColor, " into a color, skipping...");
             }
         }
 
