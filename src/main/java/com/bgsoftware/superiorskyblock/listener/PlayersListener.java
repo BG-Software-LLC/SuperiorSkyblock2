@@ -420,7 +420,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
             e.setCancelled();
 
-            IslandChat.handleIslandChat(island, superiorPlayer, e.getArgs().message, ChatStates.LOCAL_CHAT);
+            IslandChat.handleIslandChat(island, superiorPlayer, ChatStates.LOCAL_CHAT, e.getArgs().message);
         } else if (superiorPlayer.getChatState() == ChatStates.TEAM_CHAT) {
             Island island = superiorPlayer.getIsland();
 
@@ -435,7 +435,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
             e.setCancelled();
 
-            IslandChat.handleIslandChat(island, superiorPlayer, e.getArgs().message, ChatStates.TEAM_CHAT);
+            IslandChat.handleIslandChat(island, superiorPlayer, ChatStates.TEAM_CHAT, e.getArgs().message);
         } else if (e.getArgs().format != null) {
             e.getArgs().format = Formatters.CHAT_FORMATTER.format(
                     new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, superiorPlayer.getIsland()));

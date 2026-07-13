@@ -88,7 +88,7 @@ public class CmdTeamChat implements ISuperiorCommand {
             superiorPlayer.setChatState(newChatState);
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandChat.handleIslandChat(island, superiorPlayer, message, ChatStates.TEAM_CHAT);
+            IslandChat.handleIslandChat(island, superiorPlayer, ChatStates.TEAM_CHAT, message);
         }
     }
 

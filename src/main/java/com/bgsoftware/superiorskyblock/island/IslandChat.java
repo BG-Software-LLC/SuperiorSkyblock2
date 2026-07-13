@@ -30,7 +30,7 @@ public class IslandChat {
         spies.remove(spy);
     }
 
-    public static void handleIslandChat(Island island, SuperiorPlayer superiorPlayer, String message, ChatState chatState) {
+    public static void handleIslandChat(Island island, SuperiorPlayer superiorPlayer, ChatState chatState, String message) {
         if (chatState != ChatStates.LOCAL_CHAT && chatState != ChatStates.TEAM_CHAT) {
             return;
         }

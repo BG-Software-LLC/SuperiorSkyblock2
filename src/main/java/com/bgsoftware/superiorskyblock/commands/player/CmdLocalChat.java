@@ -87,7 +87,7 @@ public class CmdLocalChat implements ISuperiorCommand {
             superiorPlayer.setChatState(newChatState);
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandChat.handleIslandChat(island, superiorPlayer, message, ChatStates.LOCAL_CHAT);
+            IslandChat.handleIslandChat(island, superiorPlayer, ChatStates.LOCAL_CHAT, message);
         }
     }
 
