@@ -428,10 +428,11 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_CHANGE_ROLE_PRIVILEGE_EVENT, islandChangeRolePrivilege).isCancelled();
     }
 
-    public static PluginEvent<IslandChat> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
+    public static PluginEvent<IslandChat> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer, ChatState chatState, String message) {
         IslandChat islandChat = new IslandChat();
         islandChat.island = island;
         islandChat.superiorPlayer = superiorPlayer;
+        islandChat.chatState = chatState;
         islandChat.message = message;
         return fireEvent(ISLAND_CHAT_EVENT, islandChat);
     }

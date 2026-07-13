@@ -254,6 +254,7 @@ public class PluginEventArgs {
 
     public static class IslandChat extends IslandDoActionArgs {
 
+        public ChatState chatState;
         public String message;
 
     }
