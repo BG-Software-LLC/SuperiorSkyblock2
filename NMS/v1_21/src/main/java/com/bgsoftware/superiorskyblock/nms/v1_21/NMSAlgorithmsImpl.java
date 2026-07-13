@@ -46,12 +46,12 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21
             TrimMaterial material = materialRegistry.get(NamespacedKey.minecraft(trimMaterial));
             TrimPattern pattern = patternRegistry.get(NamespacedKey.minecraft(trimPattern));
 
-            if (material == null)
-                throw new IllegalArgumentException("Couldn't convert " + trimMaterial.toUpperCase(Locale.ENGLISH) +
-                        " into trim material, skipping...");
-            if (pattern == null)
-                throw new IllegalArgumentException("Couldn't convert " + trimPattern.toUpperCase(Locale.ENGLISH) +
-                        " into trim pattern, skipping...");
+            if (material == null) {
+                throw new IllegalArgumentException("Couldn't convert '" + trimMaterial + "' into a trim material");
+            }
+            if (pattern == null) {
+                throw new IllegalArgumentException("Couldn't convert '" + trimPattern + "' into a trim pattern");
+            }
 
             ArmorTrim armorTrim = new ArmorTrim(material, pattern);
             armorMeta.setTrim(armorTrim);
