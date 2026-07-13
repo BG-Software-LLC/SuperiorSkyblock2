@@ -74,14 +74,8 @@ public class MultipleComponents implements IMessageComponent {
                     String command = section.getString(key + ".command");
                     String suggest = section.getString(key + ".suggest");
                     String tooltip = section.getString(key + ".tooltip");
-
-                    if (command != null || suggest != null || tooltip != null) {
-                        builder.addComplexMessage(ComplexMessageComponent.parseBaseComponents(
-                                Formatters.COLOR_FORMATTER.format(text), command, suggest, tooltip));
-                    } else {
-                        builder.addRawMessage(Formatters.COLOR_FORMATTER.format(text));
-                    }
-
+                    builder.addComplexMessage(Formatters.COLOR_FORMATTER.format(text), command, suggest,
+                            Formatters.COLOR_FORMATTER.format(tooltip));
                     break;
                 }
             }

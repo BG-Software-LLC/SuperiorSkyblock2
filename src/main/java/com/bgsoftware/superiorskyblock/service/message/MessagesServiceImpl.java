@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.messages.component.ComplexMessageComponent;
+import com.bgsoftware.superiorskyblock.core.messages.component.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.core.messages.component.SoundComponent;
 import com.bgsoftware.superiorskyblock.service.IService;
@@ -73,14 +73,12 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addBossBar(@Nullable String message, BossBar.Color color, int duration) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
-                    .createBossBarComponent(message, color, BossBar.Style.SOLID, duration));
+            return addBossBar(message, color, BossBar.Style.SOLID, duration);
         }
 
         @Override
         public boolean addBossBar(@Nullable String message, BossBar.Color color, BossBar.Style style, int duration) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
-                    .createBossBarComponent(message, color, style, duration));
+            return addMessageComponent(BossBarComponent.of(message, color, style, duration));
         }
 
         @Override
@@ -90,7 +88,15 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addComplexMessage(@Nullable BaseComponent[] baseComponents) {
-            return addMessageComponent(ComplexMessageComponent.of(baseComponents));
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createComplexMessageComponent(baseComponents));
+        }
+
+        @Override
+        public boolean addComplexMessage(@Nullable String message, @Nullable String command, @Nullable String suggest,
+                                         @Nullable String tooltip) {
+            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+                    .createComplexMessageComponent(message, command, suggest, tooltip));
         }
 
         @Override
@@ -101,7 +107,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addSound(Sound sound, float volume, float pitch) {
-            return addMessageComponent(SoundComponent.of(new GameSoundImpl(sound, volume, pitch)));
+            return addSound(new GameSoundImpl(sound, volume, pitch));
         }
 
         @Override

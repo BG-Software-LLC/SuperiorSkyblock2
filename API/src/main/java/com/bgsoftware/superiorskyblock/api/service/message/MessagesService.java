@@ -90,6 +90,19 @@ public interface MessagesService {
         boolean addComplexMessage(@Nullable BaseComponent[] baseComponents);
 
         /**
+         * Add a complex message to the message component.
+         * Note: {@param command} is prioritized over {@param suggest} when mixed together.
+         *
+         * @param message The content of the complex message.
+         * @param command The command to be executed when clicking the message.
+         * @param suggest The command to suggest when clicking the message.
+         * @param tooltip The text to show when hovering over the message.
+         * @return {@code true} if the complex message was successfully added.
+         */
+        boolean addComplexMessage(@Nullable String message, @Nullable String command, @Nullable String suggest,
+                                  @Nullable String tooltip);
+
+        /**
          * Add a raw message to the message component.
          *
          * @param message The raw text.

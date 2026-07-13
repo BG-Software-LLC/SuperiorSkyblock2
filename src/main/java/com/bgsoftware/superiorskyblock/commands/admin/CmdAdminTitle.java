@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -102,7 +103,8 @@ public class CmdAdminTitle implements IAdminPlayerCommand {
         }
 
         MessagesService.Builder builder = messagesService.get().newBuilder();
-        builder.addTitle(title, subtitle, fadeIn.getNumber(), duration.getNumber(), fadeOut.getNumber());
+        builder.addTitle(Formatters.COLOR_FORMATTER.format(title),
+                Formatters.COLOR_FORMATTER.format(subtitle), fadeIn.getNumber(), duration.getNumber(), fadeOut.getNumber());
         builder.build().sendMessage(targetPlayer.asPlayer());
 
         Message.TITLE_SENT.send(sender, targetPlayer.getName());

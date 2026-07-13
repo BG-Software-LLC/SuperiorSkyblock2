@@ -13,6 +13,7 @@ repositories {
 dependencies {
     compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.19.0")
+    compileOnly("net.kyori:adventure-text-serializer-bungeecord:4.4.1")
     compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
     compileOnly project(":API")
     compileOnly project(":")
