@@ -602,7 +602,7 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
     public static final PluginEventType<IslandChat> ISLAND_CHAT_EVENT = new PluginEventType<IslandChat>(IslandChatEvent.class) {
         @Override
         public Event createBukkitEvent(IslandChat args) {
-            return new IslandChatEvent(args.island, args.superiorPlayer, args.message);
+            return new IslandChatEvent(args.island, args.superiorPlayer, args.chatState, args.message);
         }
 
         @Override
