@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.external.messages;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ClassInfo;
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -33,6 +35,13 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
     // breaking binary compatibility with Adventure 4.x. Resolve the method
     // reflectively so a single build works on both versions.
     private static final ReflectMethod<Title.Times> TITLE_TIMES_FACTORY = getTitleTimesFactory();
+    private static final ReflectMethod<ClickEvent> CLICK_EVENT_CREATE = initializeClickEventCreation();
+    private static final ReflectMethod<Object> CLICK_EVENT_PAYLOAD_TEXT = new ReflectMethod<>(
+            new ClassInfo("net.kyori.adventure.text.event.ClickEvent$Payload", ClassInfo.PackageType.UNKNOWN),
+            "string", String.class);
+
+    private static final ClickEvent.Action RUN_COMMAND_CLICK_EVENT = getClickEvent("RUN_COMMAND");
+    private static final ClickEvent.Action SUGGEST_COMMAND_CLICK_EVENT = getClickEvent("SUGGEST_COMMAND");
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().tags(StandardTags.defaults()).build();
     private static final LegacyComponentSerializer LEGACY_COMPONENT_SERIALIZER = LegacyComponentSerializer.legacySection();
@@ -74,9 +83,9 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
         component = component.clickEvent(null).hoverEvent(null);
 
         String message = MINI_MESSAGE.serialize(component);
-        String command = clickEvent != null && clickEvent.action() == ClickEvent.Action.RUN_COMMAND ?
+        String command = clickEvent != null && clickEvent.action() == RUN_COMMAND_CLICK_EVENT ?
                 clickEvent.value() : null;
-        String suggest = clickEvent != null && clickEvent.action() == ClickEvent.Action.SUGGEST_COMMAND ?
+        String suggest = clickEvent != null && clickEvent.action() == SUGGEST_COMMAND_CLICK_EVENT ?
                 clickEvent.value() : null;
         String tooltip = hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_TEXT ?
                 MINI_MESSAGE.serialize((Component) hoverEvent.value()) : null;
@@ -123,6 +132,29 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
         } catch (ParsingException exception) {
             return LEGACY_COMPONENT_SERIALIZER.deserialize(message);
         }
+    }
+
+    private static ClickEvent.Action getClickEvent(String name) {
+        if (ClickEvent.Action.class.isAssignableFrom(Enum.class)) {
+            return ClickEvent.Action.valueOf(name);
+        } else {
+            ReflectField<ClickEvent.Action> ACTION_FIELD = new ReflectField<>(
+                    ClickEvent.Action.class, ClickEvent.Action.class, name);
+            return ACTION_FIELD.get(null);
+        }
+    }
+
+    private static ReflectMethod<ClickEvent> initializeClickEventCreation() {
+        ReflectMethod<ClickEvent> CREATE_METHOD = new ReflectMethod<>(
+                ClickEvent.class, "clickEvent", ClickEvent.Action.class, String.class);
+
+        if (!CREATE_METHOD.isValid()) {
+            CREATE_METHOD = new ReflectMethod<>(
+                    ClickEvent.class, "clickEvent", new ClassInfo(ClickEvent.Action.class),
+                    new ClassInfo("net.kyori.adventure.text.event.ClickEvent$Payload", ClassInfo.PackageType.UNKNOWN));
+        }
+
+        return CREATE_METHOD;
     }
 
     private static class ActionBarComponent extends BaseMessageComponent {
@@ -183,9 +215,9 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
             super(Type.COMPLEX_MESSAGE, message);
 
             if (command != null) {
-                this.clickEvent = Optional.of(new Pair<>(ClickEvent.Action.RUN_COMMAND, MessageContent.parse(command)));
+                this.clickEvent = Optional.of(new Pair<>(RUN_COMMAND_CLICK_EVENT, MessageContent.parse(command)));
             } else if (suggest != null) {
-                this.clickEvent = Optional.of(new Pair<>(ClickEvent.Action.SUGGEST_COMMAND, MessageContent.parse(suggest)));
+                this.clickEvent = Optional.of(new Pair<>(SUGGEST_COMMAND_CLICK_EVENT, MessageContent.parse(suggest)));
             } else {
                 this.clickEvent = Optional.empty();
             }
@@ -207,7 +239,9 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
                 if (this.clickEvent.isPresent()) {
                     Optional<String> clickEventDataOpt = this.clickEvent.get().getValue().getContent(player, args);
                     if (clickEventDataOpt.isPresent()) {
-                        component = component.clickEvent(ClickEvent.clickEvent(this.clickEvent.get().getKey(), clickEventDataOpt.get()));
+                        Object payload = CLICK_EVENT_PAYLOAD_TEXT.isValid() ?
+                                CLICK_EVENT_PAYLOAD_TEXT.invoke(null, clickEventDataOpt.get()) : clickEventDataOpt.get();
+                        component = component.clickEvent(CLICK_EVENT_CREATE.invoke(null, this.clickEvent.get().getKey(), payload));
                     }
                 }
 
