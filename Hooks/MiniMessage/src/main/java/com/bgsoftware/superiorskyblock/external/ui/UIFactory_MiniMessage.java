@@ -62,7 +62,7 @@ public class UIFactory_MiniMessage extends BaseUIFactory {
     };
 
     public UIFactory_MiniMessage(SuperiorSkyblockPlugin plugin) {
-        Log.info("Using MiniMessage as a messages provider.");
+        Log.info("Using MiniMessage as a ui factory.");
     }
 
     @Override
