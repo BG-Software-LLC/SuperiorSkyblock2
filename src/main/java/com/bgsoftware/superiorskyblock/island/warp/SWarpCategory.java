@@ -94,14 +94,9 @@ public class SWarpCategory implements WarpCategory {
         if (icon == null)
             return null;
 
-        try {
-            ItemBuilder itemBuilder = new ItemBuilder(icon)
-                    .replaceAll("{0}", name);
-            return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
-        } catch (Exception error) {
-            setIcon(null);
-            return null;
-        }
+        ItemBuilder itemBuilder = new ItemBuilder(icon)
+                .replaceAll("{0}", name);
+        return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
     }
 
     @Override

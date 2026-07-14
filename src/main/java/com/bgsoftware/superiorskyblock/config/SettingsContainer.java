@@ -543,7 +543,7 @@ public class SettingsContainer {
             islandPreviewsGameMode = GameMode.valueOf(islandPreviewsGameModeName);
         } catch (IllegalArgumentException error) {
             islandPreviewsGameMode = GameMode.SPECTATOR;
-            Log.warnFromFile("config.yml", "Invalid game mode ", islandPreviewsGameModeName + ", using SPECTATOR instead.");
+            Log.warnFromFile("config.yml", "Invalid game mode ", islandPreviewsGameModeName, ", using SPECTATOR instead.");
         }
         this.islandPreviewsGameMode = islandPreviewsGameMode;
         islandPreviewsMaxDistance = config.getInt("island-previews.max-distance", 100);
@@ -573,6 +573,7 @@ public class SettingsContainer {
         String defaultWarpCategoryName = config.getString("default-warp-category-name");
         if (!IslandNames.isValidWarpCategoryName(null, defaultWarpCategoryName)) {
             defaultWarpCategoryName = "Default";
+            Log.warn("config.yml", "Invalid default warp category name '", defaultWarpCategoryName, "', using 'Default' instead.");
         }
         this.defaultWarpCategoryName = defaultWarpCategoryName;
         physicsListener = config.getBoolean("physics-listener", true);

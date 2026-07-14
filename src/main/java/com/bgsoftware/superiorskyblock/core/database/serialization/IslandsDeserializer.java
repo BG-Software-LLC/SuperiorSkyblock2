@@ -247,9 +247,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<String> name = islandWarp.getString("name").map(_name -> {
-                return IslandNames.isWarpNameLengthValid(_name) ? _name : _name.substring(0, IslandNames.getMaxWarpNameLength());
-            });
+            Optional<String> name = islandWarp.getString("name");
             if (!name.isPresent() || name.get().isEmpty()) {
                 Log.warn("Cannot load warps with invalid names for ", uuid.get(), ", skipping...");
                 return;

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
@@ -119,7 +120,7 @@ public class IslandNames {
     }
 
     public static boolean isValidWarpCategoryName(@Nullable SuperiorPlayer superiorPlayer, @Nullable String categoryName) {
-        if (categoryName == null || categoryName.isEmpty() || categoryName.contains(" ")) {
+        if (Text.isBlank(categoryName) || categoryName.indexOf(' ') >= 0) {
             if (superiorPlayer != null) {
                 Message.WARP_CATEGORY_INVALID_NAME.send(superiorPlayer);
             }
