@@ -1,0 +1,25 @@
+group 'Hooks:MMOItems'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://nexus.phoenixdevt.fr/repository/maven-public/' }
+}
+
+dependencies {
+    compileOnly "net.Indyuce:MMOItems-API:6.10.1-SNAPSHOT"
+    compileOnly "io.lumine:MythicLib-dist:1.7.1-SNAPSHOT"
+    compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
+    compileOnly project(":API")
+    compileOnly project(":")
+}
+
+if (project.hasProperty('hook.compile_mmoitems') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_mmoitems").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
