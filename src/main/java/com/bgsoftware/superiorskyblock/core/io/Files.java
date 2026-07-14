@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.io;
 
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 import javax.annotation.Nullable;
@@ -45,12 +46,12 @@ public class Files {
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                     String line;
                     while ((line = reader.readLine()) != null)
-                        stringBuilder.append("\n").append(line);
+                        Text.appendWithLine(stringBuilder, line);
                 }
 
                 if (stringBuilder.length() > 0) {
                     try (FileWriter writer = new FileWriter(file)) {
-                        writer.write(stringBuilder.substring(1).replace(str, replace));
+                        writer.write(stringBuilder.toString().replace(str, replace));
                     }
                 }
             } catch (Exception error) {

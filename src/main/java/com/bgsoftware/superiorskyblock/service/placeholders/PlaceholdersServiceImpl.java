@@ -201,7 +201,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("description", (island, superiorPlayer) ->
                             island.getDescription())
                     .put("discord", (island, superiorPlayer) ->
-                            island.hasPermission(superiorPlayer, IslandPrivileges.DISCORD_SHOW) ? island.getDiscord() : "None")
+                            island.hasPermission(superiorPlayer, IslandPrivileges.DISCORD_SHOW) ? island.getDiscord() : IslandUtils.DEFAULT_NONE_VALUE)
                     .put("discord_all", (island, superiorPlayer) ->
                             island.getDiscord())
                     .put("drops_multiplier", (island, superiorPlayer) ->
@@ -251,7 +251,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("name_stripped", (island, superiorPlayer) ->
                             island.getStrippedName())
                     .put("paypal", (island, superiorPlayer) ->
-                            island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : "None")
+                            island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : IslandUtils.DEFAULT_NONE_VALUE)
                     .put("paypal_all", (island, superiorPlayer) ->
                             island.getPaypal())
                     .put("players_count", (island, superiorPlayer) ->

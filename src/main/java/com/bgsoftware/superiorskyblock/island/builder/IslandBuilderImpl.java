@@ -33,6 +33,7 @@ import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
@@ -73,8 +74,8 @@ public class IslandBuilderImpl implements Island.Builder {
     @Nullable
     public String islandType;
     public long creationTime = System.currentTimeMillis() / 1000;
-    public String discord = "None";
-    public String paypal = "None";
+    public String discord = IslandUtils.DEFAULT_NONE_VALUE;
+    public String paypal = IslandUtils.DEFAULT_NONE_VALUE;
     public BigDecimal bonusWorth = BigDecimal.ZERO;
     public BigDecimal bonusLevel = BigDecimal.ZERO;
     public boolean isLocked = plugin.getSettings().isLockedIslands();
