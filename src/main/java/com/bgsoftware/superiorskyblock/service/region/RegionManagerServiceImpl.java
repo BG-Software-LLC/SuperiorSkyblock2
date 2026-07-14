@@ -33,6 +33,7 @@ import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
@@ -608,7 +609,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             }
         }
 
-        if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
+        if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ() ||
+                superiorPlayer.asPlayer().getFallDistance() > 0) {
             // Handle moving while in teleport warmup.
             BukkitTask teleportTask = superiorPlayer.getTeleportTask();
             if (teleportTask != null) {
