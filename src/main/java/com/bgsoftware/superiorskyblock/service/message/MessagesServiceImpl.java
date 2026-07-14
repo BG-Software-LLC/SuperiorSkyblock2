@@ -43,7 +43,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
         if (config.isConfigurationSection(path)) {
             return MultipleComponents.parseSection(config.getConfigurationSection(path));
         } else {
-            return plugin.getProviders().getMessagesProvider()
+            return plugin.getProviders().getUIFactory()
                     .createRawMessageComponent(Formatters.COLOR_FORMATTER.format(config.getString(path)));
         }
     }
@@ -67,7 +67,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addActionBar(@Nullable String message) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+            return addMessageComponent(plugin.getProviders().getUIFactory()
                     .createActionBarComponent(message));
         }
 
@@ -88,20 +88,20 @@ public class MessagesServiceImpl implements MessagesService, IService {
 
         @Override
         public boolean addComplexMessage(@Nullable BaseComponent[] baseComponents) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+            return addMessageComponent(plugin.getProviders().getUIFactory()
                     .createComplexMessageComponent(baseComponents));
         }
 
         @Override
         public boolean addComplexMessage(@Nullable String message, @Nullable String command, @Nullable String suggest,
                                          @Nullable String tooltip) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+            return addMessageComponent(plugin.getProviders().getUIFactory()
                     .createComplexMessageComponent(message, command, suggest, tooltip));
         }
 
         @Override
         public boolean addRawMessage(@Nullable String message) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+            return addMessageComponent(plugin.getProviders().getUIFactory()
                     .createRawMessageComponent(message));
         }
 
@@ -118,7 +118,7 @@ public class MessagesServiceImpl implements MessagesService, IService {
         @Override
         public boolean addTitle(@Nullable String titleMessage, @Nullable String subtitleMessage,
                                 int fadeIn, int stay, int fadeOut) {
-            return addMessageComponent(plugin.getProviders().getMessagesProvider()
+            return addMessageComponent(plugin.getProviders().getUIFactory()
                     .createTitleComponent(titleMessage, subtitleMessage, fadeIn, stay, fadeOut));
         }
 

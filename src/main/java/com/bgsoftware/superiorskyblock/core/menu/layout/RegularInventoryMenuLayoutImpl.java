@@ -69,9 +69,9 @@ public class RegularInventoryMenuLayoutImpl<V extends MenuView<V, ?>> extends Ab
         Inventory inventory;
 
         if (inventoryType != InventoryType.CHEST) {
-            inventory = plugin.getProviders().getInventoryProvider().createInventory(holder, inventoryType, title);
+            inventory = plugin.getProviders().getUIFactory().createInventory(holder, inventoryType, title);
         } else {
-            inventory = plugin.getProviders().getInventoryProvider().createInventory(holder, this.buttons.length, title);
+            inventory = plugin.getProviders().getUIFactory().createInventory(holder, this.buttons.length, title);
         }
 
         if (inventory.getHolder() == null) {

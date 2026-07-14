@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.external.messages;
+package com.bgsoftware.superiorskyblock.external.ui;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -11,12 +11,18 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.List;
 import java.util.Optional;
 
-public class MessagesProvider_Default extends BaseMessagesProvider {
+public class UIFactory_Default extends BaseUIFactory {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -63,6 +69,26 @@ public class MessagesProvider_Default extends BaseMessagesProvider {
     public IMessageComponent createTitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage,
                                                   int fadeIn, int stay, int fadeOut) {
         return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
+    }
+
+    @Override
+    public void setItemMetaDisplayName(ItemMeta itemMeta, String displayName) {
+        itemMeta.setDisplayName(displayName);
+    }
+
+    @Override
+    public void setItemMetaLore(ItemMeta itemMeta, List<String> lore) {
+        itemMeta.setLore(lore);
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder inventoryHolder, int size, String title) {
+        return Bukkit.createInventory(inventoryHolder, size, title);
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder inventoryHolder, InventoryType inventoryType, String title) {
+        return Bukkit.createInventory(inventoryHolder, inventoryType, title);
     }
 
     private static class ActionBarComponent extends BaseMessageComponent {

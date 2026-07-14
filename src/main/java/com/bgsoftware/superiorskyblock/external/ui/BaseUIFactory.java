@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.external.messages;
+package com.bgsoftware.superiorskyblock.external.ui;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
 
-public abstract class BaseMessagesProvider implements MessagesProvider {
+public abstract class BaseUIFactory implements UIFactory {
 
     @Override
     public abstract IMessageComponent createActionBarComponent(@Nullable String message);

@@ -42,11 +42,9 @@ import com.bgsoftware.superiorskyblock.external.bossbar.BossBarProvider;
 import com.bgsoftware.superiorskyblock.external.bossbar.BossBarProvider_Default;
 import com.bgsoftware.superiorskyblock.external.chunks.ChunksProvider_Default;
 import com.bgsoftware.superiorskyblock.external.economy.EconomyProvider_Default;
-import com.bgsoftware.superiorskyblock.external.inventory.InventoryProvider;
-import com.bgsoftware.superiorskyblock.external.inventory.InventoryProvider_Default;
 import com.bgsoftware.superiorskyblock.external.menus.MenusProvider_Default;
-import com.bgsoftware.superiorskyblock.external.messages.MessagesProvider;
-import com.bgsoftware.superiorskyblock.external.messages.MessagesProvider_Default;
+import com.bgsoftware.superiorskyblock.external.ui.UIFactory;
+import com.bgsoftware.superiorskyblock.external.ui.UIFactory_Default;
 import com.bgsoftware.superiorskyblock.external.permissions.PermissionsProvider_Default;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.external.prices.PricesProvider_Default;
@@ -89,8 +87,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
-    private MessagesProvider messagesProvider = new MessagesProvider_Default();
-    private InventoryProvider inventoryProvider = new InventoryProvider_Default();
+    private UIFactory UIFactory = new UIFactory_Default();
     private BossBarProvider bossBarsProvider = new BossBarProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = new PricesProvider_Default();
@@ -138,10 +135,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerEconomyProviders();
             registerPlaceholdersProvider();
             registerChunksProvider();
-            registerInventoryProvider();
         });
 
-        registerMessagesProvider();
+        registerUIFactory();
         registerBossBarProvider();
 
         // We try to forcefully load prices after a second the server has enabled.
@@ -323,20 +319,12 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         this.stackedBlocksListeners.remove(stackedBlocksListener);
     }
 
-    public MessagesProvider getMessagesProvider() {
-        return messagesProvider;
+    public UIFactory getUIFactory() {
+        return UIFactory;
     }
 
-    public void setMessagesProvider(MessagesProvider messagesProvider) {
-        this.messagesProvider = messagesProvider;
-    }
-
-    public InventoryProvider getInventoryProvider() {
-        return inventoryProvider;
-    }
-
-    public void setInventoryProvider(InventoryProvider inventoryProvider) {
-        this.inventoryProvider = inventoryProvider;
+    public void setUIFactory(UIFactory UIFactory) {
+        this.UIFactory = UIFactory;
     }
 
     public BossBarProvider getBossBarProvider() {
@@ -644,24 +632,14 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         }
     }
 
-    private void registerMessagesProvider() {
-        Optional<MessagesProvider> messagesProvider = Optional.empty();
+    private void registerUIFactory() {
+        Optional<UIFactory> uIFactory = Optional.empty();
 
         if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
-            messagesProvider = createInstance("messages.MessagesProvider_MiniMessage");
+            uIFactory = createInstance("ui.UIFactory_MiniMessage");
         }
 
-        messagesProvider.ifPresent(this::setMessagesProvider);
-    }
-
-    private void registerInventoryProvider() {
-        Optional<InventoryProvider> inventoryProvider = Optional.empty();
-
-        if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
-            inventoryProvider = createInstance("inventory.InventoryProvider_MiniMessage");
-        }
-
-        inventoryProvider.ifPresent(this::setInventoryProvider);
+        uIFactory.ifPresent(this::setUIFactory);
     }
 
     private void registerBossBarProvider() {
