@@ -42,6 +42,8 @@ import com.bgsoftware.superiorskyblock.external.bossbar.BossBarProvider;
 import com.bgsoftware.superiorskyblock.external.bossbar.BossBarProvider_Default;
 import com.bgsoftware.superiorskyblock.external.chunks.ChunksProvider_Default;
 import com.bgsoftware.superiorskyblock.external.economy.EconomyProvider_Default;
+import com.bgsoftware.superiorskyblock.external.inventory.InventoryProvider;
+import com.bgsoftware.superiorskyblock.external.inventory.InventoryProvider_Default;
 import com.bgsoftware.superiorskyblock.external.menus.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.external.messages.MessagesProvider;
 import com.bgsoftware.superiorskyblock.external.messages.MessagesProvider_Default;
@@ -88,6 +90,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private MessagesProvider messagesProvider = new MessagesProvider_Default();
+    private InventoryProvider inventoryProvider = new InventoryProvider_Default();
     private BossBarProvider bossBarsProvider = new BossBarProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = new PricesProvider_Default();
@@ -135,6 +138,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerEconomyProviders();
             registerPlaceholdersProvider();
             registerChunksProvider();
+            registerInventoryProvider();
         });
 
         registerMessagesProvider();
@@ -325,6 +329,14 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     public void setMessagesProvider(MessagesProvider messagesProvider) {
         this.messagesProvider = messagesProvider;
+    }
+
+    public InventoryProvider getInventoryProvider() {
+        return inventoryProvider;
+    }
+
+    public void setInventoryProvider(InventoryProvider inventoryProvider) {
+        this.inventoryProvider = inventoryProvider;
     }
 
     public BossBarProvider getBossBarProvider() {
@@ -640,6 +652,16 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         }
 
         messagesProvider.ifPresent(this::setMessagesProvider);
+    }
+
+    private void registerInventoryProvider() {
+        Optional<InventoryProvider> inventoryProvider = Optional.empty();
+
+        if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
+            inventoryProvider = createInstance("inventory.InventoryProvider_MiniMessage");
+        }
+
+        inventoryProvider.ifPresent(this::setInventoryProvider);
     }
 
     private void registerBossBarProvider() {

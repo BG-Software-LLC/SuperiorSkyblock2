@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,7 +19,7 @@ public class SIslandChest implements IslandChest {
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
     private final Island island;
     private final int index;
-    private Inventory inventory = Bukkit.createInventory(this, 9, plugin.getSettings().getIslandChests().getChestTitle());
+    private Inventory inventory = plugin.getProviders().getInventoryProvider().createInventory(this, 9, plugin.getSettings().getIslandChests().getChestTitle());
     private int contentsUpdateCounter = 0;
 
     public SIslandChest(Island island, int index) {
@@ -30,7 +29,7 @@ public class SIslandChest implements IslandChest {
 
     public static SIslandChest createChest(Island island, int index, ItemStack[] contents) {
         SIslandChest islandChest = new SIslandChest(island, index);
-        islandChest.inventory = Bukkit.createInventory(islandChest, contents.length, plugin.getSettings().getIslandChests().getChestTitle());
+        islandChest.inventory = plugin.getProviders().getInventoryProvider().createInventory(islandChest, contents.length, plugin.getSettings().getIslandChests().getChestTitle());
         islandChest.inventory.setContents(contents);
         return islandChest;
     }
@@ -57,7 +56,7 @@ public class SIslandChest implements IslandChest {
                 updateFlag.set(true);
                 ItemStack[] oldContents = inventory.getContents();
                 Inventory oldInventory = inventory;
-                inventory = Bukkit.createInventory(this, 9 * rows, plugin.getSettings().getIslandChests().getChestTitle());
+                inventory = plugin.getProviders().getInventoryProvider().createInventory(this, 9 * rows, plugin.getSettings().getIslandChests().getChestTitle());
                 inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
                 inventory.getViewers().forEach(humanEntity -> {
                     if (humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))

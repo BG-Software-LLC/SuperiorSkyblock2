@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.external.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
@@ -64,25 +63,6 @@ public class MessagesProvider_Default extends BaseMessagesProvider {
     public IMessageComponent createTitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage,
                                                   int fadeIn, int stay, int fadeOut) {
         return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
-    }
-
-    private static BossBar.Style mapBossBarStyle(BossBar.Style style) {
-        switch (style) {
-            case SEGMENTED_6:
-            case NOTCHED_6:
-                return BossBar.Style.SEGMENTED_6;
-            case SEGMENTED_10:
-            case NOTCHED_10:
-                return BossBar.Style.SEGMENTED_10;
-            case SEGMENTED_12:
-            case NOTCHED_12:
-                return BossBar.Style.SEGMENTED_12;
-            case SEGMENTED_20:
-            case NOTCHED_20:
-                return BossBar.Style.SEGMENTED_20;
-            default:
-                return BossBar.Style.SOLID;
-        }
     }
 
     private static class ActionBarComponent extends BaseMessageComponent {

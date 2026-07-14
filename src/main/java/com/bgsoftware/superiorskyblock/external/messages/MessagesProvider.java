@@ -3,6 +3,12 @@ package com.bgsoftware.superiorskyblock.external.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 public interface MessagesProvider {
 
