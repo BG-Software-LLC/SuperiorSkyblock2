@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
+import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
@@ -13,6 +14,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +33,7 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
 
     protected final String identifier;
     protected final MenuLayout<V> menuLayout;
+    protected final boolean isInventoryMenuLayout;
     @Nullable
     protected final GameSound openingSound;
     protected final boolean isPreviousMoveAllowed;
@@ -42,6 +45,7 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
         Preconditions.checkNotNull(menuLayout, "menuLayout parameter cannot be null.");
         this.identifier = identifier;
         this.menuLayout = menuLayout;
+        this.isInventoryMenuLayout = menuLayout instanceof InventoryMenuLayout;
         this.openingSound = openingSound;
         this.isPreviousMoveAllowed = isPreviousMoveAllowed;
         this.isSkipOneItem = isSkipOneItem;
@@ -143,6 +147,12 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
     @Override
     public void onClick(ButtonClickContext<V> context) {
         Preconditions.checkNotNull(this.menuLayout, "menu wasn't initialized properly.");
+
+        if (this.isInventoryMenuLayout) {
+            ItemStack clickedItem = context.getMenuView().getInventory().getItem(context.getClickedSlot());
+            if (clickedItem == null)
+                return;
+        }
 
         V menuView = context.getMenuView();
 

@@ -49,6 +49,8 @@ public class IslandUtils {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final EnumerateMap<Dimension, Biome> DEFAULT_WORLD_BIOMES = new EnumerateMap<>(Dimension.values());
 
+    public static final String DEFAULT_NONE_VALUE = "None";
+
     private static Biome getDefaultBiomeForEnvironment(World.Environment environment) {
         switch (environment) {
             case NORMAL:

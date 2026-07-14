@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -128,9 +129,12 @@ public class CmdAdminShow implements IAdminIslandCommand {
         Message.ISLAND_INFO_BONUS_LEVEL.sendPlayerOrConsole(superiorPlayer, island.getBonusLevel());
         Message.ISLAND_INFO_WORTH.sendPlayerOrConsole(superiorPlayer, island.getWorth());
         Message.ISLAND_INFO_LEVEL.sendPlayerOrConsole(superiorPlayer, island.getIslandLevel());
-        Message.ISLAND_INFO_DISCORD.sendPlayerOrConsole(superiorPlayer, island.getDiscord());
 
-        if (!"None".equals(island.getPaypal())) {
+        if (!IslandUtils.DEFAULT_NONE_VALUE.equals(island.getDiscord())) {
+            Message.ISLAND_INFO_DISCORD.sendPlayerOrConsole(superiorPlayer, island.getDiscord());
+        }
+
+        if (!IslandUtils.DEFAULT_NONE_VALUE.equals(island.getPaypal())) {
             Message.ISLAND_INFO_PAYPAL.sendPlayerOrConsole(superiorPlayer, island.getPaypal());
         }
 
@@ -138,7 +142,8 @@ public class CmdAdminShow implements IAdminIslandCommand {
             if (!Message.ISLAND_INFO_ADMIN_UPGRADES.isEmpty(locale) && !Message.ISLAND_INFO_ADMIN_UPGRADE_LINE.isEmpty(locale)) {
                 StringBuilder upgradesString = new StringBuilder();
                 for (Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
-                    upgradesString.append(Message.ISLAND_INFO_ADMIN_UPGRADE_LINE.getMessage(locale, upgrade.getName(), island.getUpgradeLevel(upgrade).getLevel())).append("\n");
+                    Text.appendWithLine(upgradesString, Message.ISLAND_INFO_ADMIN_UPGRADE_LINE.getMessage(
+                            locale, upgrade.getName(), island.getUpgradeLevel(upgrade).getLevel()));
                 }
                 Message.ISLAND_INFO_ADMIN_UPGRADES.sendPlayerOrConsole(superiorPlayer, upgradesString);
             }
@@ -207,10 +212,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
                         if (!customGeneratorValues.containsKey(key))
                             lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
 
-                        if (islandDataMessage.length() != 0)
-                            islandDataMessage.append("\n");
-
-                        islandDataMessage.append(lineDataMessage);
+                        Text.appendWithLine(islandDataMessage, lineDataMessage);
                     }
 
                     if (islandDataMessage.length() > 0) {
@@ -235,8 +237,10 @@ public class CmdAdminShow implements IAdminIslandCommand {
             List<SuperiorPlayer> members = island.getIslandMembers(false);
 
             if (!Message.ISLAND_INFO_PLAYER_LINE.isEmpty(locale)) {
-                members.forEach(islandMember -> rolesStrings.computeIfAbsent(islandMember.getPlayerRole(), role -> new StringBuilder())
-                        .append(Message.ISLAND_INFO_PLAYER_LINE.getMessage(locale, islandMember.getName())).append("\n"));
+                members.forEach(islandMember -> {
+                    Text.appendWithLine(rolesStrings.computeIfAbsent(islandMember.getPlayerRole(), role -> new StringBuilder()),
+                            Message.ISLAND_INFO_PLAYER_LINE.getMessage(locale, islandMember.getName()));
+                });
             }
 
             rolesStrings.keySet().stream()
@@ -269,6 +273,9 @@ public class CmdAdminShow implements IAdminIslandCommand {
         Map<K, V> islandData = dataFunction.get();
         Map<K, V> islandCustomData = customDataFunction.get();
 
+        if (islandData.isEmpty())
+            return;
+
         StringBuilder islandDataMessage = new StringBuilder();
 
         islandData.forEach((key, value) -> {
@@ -276,11 +283,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
             lineDataMessage.append(Formatters.CAPITALIZED_FORMATTER.format(formatter == null ? key.toString() : formatter.apply(key)));
             if (!islandCustomData.containsKey(key))
                 lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-
-            if (islandDataMessage.length() != 0)
-                islandDataMessage.append("\n");
-
-            islandDataMessage.append(dataLineMessage.getMessage(locale, lineDataMessage.toString(), value));
+            Text.appendWithLine(islandDataMessage, dataLineMessage.getMessage(locale, lineDataMessage.toString(), value));
         });
 
         dataMessage.sendPlayerOrConsole(superiorPlayer, islandDataMessage);
