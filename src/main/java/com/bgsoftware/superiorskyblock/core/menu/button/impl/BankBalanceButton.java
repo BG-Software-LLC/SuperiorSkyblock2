@@ -23,9 +23,9 @@ public class BankBalanceButton extends AbstractMenuViewButton<IslandMenuView> {
     public ItemStack createViewItem() {
         Island island = menuView.getInventoryViewer().getIsland();
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
-        ItemStack buttonItem = super.createViewItem();
+        ItemBuilder itemBuilder = super.getButtonTemplateItem().getBuilder();
 
-        return new ItemBuilder(buttonItem)
+        return itemBuilder
                 .replaceAll("{0}", island.getIslandBank().getBalance() + "")
                 .replaceAll("{1}", Formatters.NUMBER_FORMATTER.format(island.getIslandBank().getBalance()))
                 .replaceAll("{2}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandBank().getBalance(), inventoryViewer.getUserLocale()))

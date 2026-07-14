@@ -17,10 +17,10 @@ public class RatingsPagedObjectButton extends AbstractPagedMenuButton<MenuIsland
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         SuperiorPlayer ratingPlayer = plugin.getPlayers().getSuperiorPlayer(pagedObject.getPlayerUUID());
 
-        return new ItemBuilder(buttonItem)
+        return itemBuilder
                 .replaceAll("{0}", ratingPlayer.getName())
                 .replaceAll("{1}", Formatters.RATING_FORMATTER.format(pagedObject.getRating().getValue(), ratingPlayer.getUserLocale()))
                 .asSkullOf(ratingPlayer)

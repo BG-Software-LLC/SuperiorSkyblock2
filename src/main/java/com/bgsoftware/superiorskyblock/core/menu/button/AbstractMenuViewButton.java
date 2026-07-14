@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
@@ -37,6 +38,11 @@ public abstract class AbstractMenuViewButton<V extends MenuView<V, ?>> implement
     public ItemStack createViewItem() {
         TemplateItem templateItem = this.templateButton.getButtonTemplateItem();
         return templateItem == null ? null : templateItem.getBuilder().build(menuView.getInventoryViewer());
+    }
+
+    @Nullable
+    public TemplateItem getButtonTemplateItem() {
+        return this.templateButton.getButtonTemplateItem();
     }
 
     @Override

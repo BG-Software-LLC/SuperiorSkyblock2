@@ -68,7 +68,7 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack item) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         ItemStack buttonItem = null;
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
 

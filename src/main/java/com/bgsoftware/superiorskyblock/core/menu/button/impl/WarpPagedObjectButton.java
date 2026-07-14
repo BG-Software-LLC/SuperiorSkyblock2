@@ -39,17 +39,17 @@ public class WarpPagedObjectButton extends AbstractPagedMenuButton<MenuWarps.Vie
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         SuperiorPlayer superiorPlayer = menuView.getInventoryViewer();
 
         ItemStack icon = pagedObject.getIcon(superiorPlayer);
-        ItemBuilder itemBuilder = new ItemBuilder(icon == null ? buttonItem : icon);
+        ItemBuilder newItemBuilder = icon == null ? itemBuilder : new ItemBuilder(icon);
 
         if (menuView.hasManagePerms() && !Menus.MENU_WARPS.getEditLore().isEmpty())
             itemBuilder.appendLore(Menus.MENU_WARPS.getEditLore());
 
         try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
-            return itemBuilder.replaceAll("{0}", pagedObject.getName())
+            return newItemBuilder.replaceAll("{0}", pagedObject.getName())
                     .replaceAll("{1}", Formatters.LOCATION_FORMATTER.format(pagedObject.getLocation(wrapper.getHandle())))
                     .replaceAll("{2}", pagedObject.hasPrivateFlag() ?
                             ensureNotNull(Message.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
