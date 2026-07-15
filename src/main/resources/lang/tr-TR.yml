@@ -59,11 +59,10 @@ CHANGED_BANK_LIMIT_ALL: '&e&lYükseltmeler | &7Tüm adaların banka limiti başa
   güncellendi.'
 CHANGED_BANK_LIMIT_NAME: '&e&lYükseltmeler | &7{0} adasının banka limiti başarıyla
   güncellendi.'
-CHANGED_BIOME: '&e&lAda | &7Biyom başarıyla {0} olarak değiştirildi. Değişiklikleri
-  görmek için sunucuya tekrar bağlanman gerekebilir.'
-CHANGED_BIOME_ALL: '&e&lAda | &7Tüm adalar için biyom başarıyla {0} olarak değiştirildi.'
-CHANGED_BIOME_NAME: '&e&lAda | &7{1} adası için biyom başarıyla {0} olarak değiştirildi.'
-CHANGED_BIOME_OTHER: '&e&lAda | &7{1}''in adası için biyom başarıyla {0} olarak değiştirildi.'
+CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBloklar | &7{0} konumundaki blok miktarı başarıyla {1}
   olarak değiştirildi.'
 CHANGED_BLOCK_LIMIT: '&e&lYükseltmeler | &7{0} Bloğunun {1}''in adası için limiti
@@ -340,6 +339,7 @@ COMMAND_DESCRIPTION_INVITE: Adana bir oyuncuyu davet et.
 COMMAND_DESCRIPTION_KICK: Adandan bir oyuncuyu at.
 COMMAND_DESCRIPTION_LANG: Kişisel dilini değiştir.
 COMMAND_DESCRIPTION_LEAVE: Adandan ayrıl.
+COMMAND_DESCRIPTION_LOCAL_CHAT: 'Toggle local chat mode.'
 COMMAND_DESCRIPTION_MEMBERS: Üyeler menüsünü aç.
 COMMAND_DESCRIPTION_MISSION: Bir görevi tamamla.
 COMMAND_DESCRIPTION_MISSIONS: Görevler menüsünü aç.
@@ -657,6 +657,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lAda | &7Adandan ayrıldın.'
 LEFT_ISLAND_COOP: '&e&lAda | &7Artık {0}''ın adasında co-op üyesi değilsin.'
 LEFT_ISLAND_COOP_NAME: '&e&lAda | &7Artık {0} adasında co-op üyesi değilsin.'
+LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the
   island {1}!'
@@ -852,6 +853,7 @@ SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
 SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lDoğuş | &7{0} başarıyla doğuşa ışınlandı.'
 SPAWN_SET_SUCCESS: '&e&lDoğuş | &7Doğuş konumu {0} olarak başarıyla güncellendi.'
+SPY_LOCAL_CHAT_FORMAT: '&7[Spy] &6[{0}] {1}&f: &7{2}'
 SPY_TEAM_CHAT_FORMAT: '&7[Casus] &e[{0}] {1}&f: &7{2}'
 SYNC_UPGRADES: '&e&lYükseltmeler | &7{0}''ın adasının tüm yükseltme değerleri başarıyla
   senkronize edildi.'
@@ -876,6 +878,8 @@ TOGGLED_FLY_OFF: '&e&lUçuş | &7Ada uçuşu &cKAPALI&7.'
 TOGGLED_FLY_ON: '&e&lUçuş | &7Ada uçuşu &aAÇIK&7.'
 TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
 TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
+TOGGLED_LOCAL_CHAT_OFF: '&e&lChat | &7Toggling local chat &cOFF&7.'
+TOGGLED_LOCAL_CHAT_ON: '&e&lChat | &7Toggling local chat &aON&7.'
 TOGGLED_SCHEMATIC_OFF: '&e&lŞematikler | &7Şematik modu &cKAPALI&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lŞematikler | &7Şematik modu &aAÇIK&7.
@@ -962,4 +966,5 @@ WITHDRAW_ERROR: '&c&lHata | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBanka | &7{1}''in ada bankasından ${0} çektin!'
 WITHDRAWN_MONEY_NAME: '&e&lBanka | &7{1} adasının bankasından ${0} çektin!'
 WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
+WORLD_NOT_GENERATED: '&e&lWorlds | &7The {0} world is not generated yet!'
 WORLD_NOT_UNLOCKED: '&e&lDünyalar | &7{0} dünyası henüz kilitli değil!'

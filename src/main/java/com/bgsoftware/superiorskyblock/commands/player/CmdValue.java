@@ -96,42 +96,21 @@ public class CmdValue implements ISuperiorCommand {
         if (keyName.isEmpty())
             keyName = Formatters.CAPITALIZED_FORMATTER.format(toCheck.getGlobalKey());
 
-        java.util.Locale locale = superiorPlayer.getUserLocale();
-
-        StringBuilder stringBuilder = new StringBuilder();
-
         BlockValue blockValue = plugin.getBlockValues().getBlockValue(toCheck);
 
-        {
-            BigDecimal blockWorth = blockValue.getWorth();
-            if (blockWorth.doubleValue() == 0) {
-                if (!Message.BLOCK_VALUE_WORTHLESS.isEmpty(locale))
-                    stringBuilder.append(Message.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName)).append("\n");
-            } else {
-                if (!Message.BLOCK_VALUE.isEmpty(locale))
-                    stringBuilder.append(Message.BLOCK_VALUE.getMessage(locale, keyName,
-                            Formatters.NUMBER_FORMATTER.format(blockWorth))).append("\n");
-            }
+        BigDecimal blockWorth = blockValue.getWorth();
+        if (blockWorth.doubleValue() == 0) {
+            Message.BLOCK_VALUE_WORTHLESS.send(superiorPlayer, keyName);
+        } else {
+            Message.BLOCK_VALUE.send(superiorPlayer, keyName, Formatters.NUMBER_FORMATTER.format(blockWorth));
         }
 
-        {
-            BigDecimal blockLevel = blockValue.getLevel();
-            if (blockLevel.doubleValue() == 0) {
-                if (!Message.BLOCK_LEVEL_WORTHLESS.isEmpty(locale)) {
-                    stringBuilder.append(Message.BLOCK_LEVEL_WORTHLESS.getMessage(locale, keyName)).append("\n");
-                }
-            } else {
-                if (!Message.BLOCK_LEVEL.isEmpty(locale))
-                    stringBuilder.append(Message.BLOCK_LEVEL.getMessage(locale, keyName,
-                            Formatters.NUMBER_FORMATTER.format(blockLevel))).append("\n");
-            }
+        BigDecimal blockLevel = blockValue.getLevel();
+        if (blockLevel.doubleValue() == 0) {
+            Message.BLOCK_LEVEL_WORTHLESS.send(superiorPlayer, keyName);
+        } else {
+            Message.BLOCK_LEVEL.send(superiorPlayer, keyName, Formatters.NUMBER_FORMATTER.format(blockLevel));
         }
-
-        if (stringBuilder.length() > 0 && stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
-            stringBuilder.setLength(stringBuilder.length() - 1);
-        }
-
-        Message.CUSTOM.send(superiorPlayer, stringBuilder.toString(), false);
     }
 
     @Override

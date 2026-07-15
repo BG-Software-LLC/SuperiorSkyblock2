@@ -163,19 +163,22 @@ public class ItemBuilder {
     }
 
     public ItemBuilder replaceLoreWithLines(String regex, String... lines) {
+        return replaceLoreWithLines(regex, Arrays.asList(lines));
+    }
+
+    public ItemBuilder replaceLoreWithLines(String regex, List<String> lines) {
         if (itemMeta == null || !itemMeta.hasLore())
             return this;
 
         List<String> currentLore = itemMeta.getLore();
 
-        List<String> loreList = new ArrayList<>(currentLore.size());
-        List<String> linesToAdd = Arrays.asList(lines);
-        boolean isEmpty = linesToAdd.isEmpty() || linesToAdd.stream().allMatch(String::isEmpty);
+        List<String> loreList = new LinkedList<>();
+        boolean isEmpty = lines.isEmpty() || lines.stream().allMatch(String::isEmpty);
 
         for (String line : currentLore) {
             if (line.contains(regex)) {
                 if (!isEmpty)
-                    loreList.addAll(linesToAdd);
+                    loreList.addAll(lines);
             } else {
                 loreList.add(line);
             }

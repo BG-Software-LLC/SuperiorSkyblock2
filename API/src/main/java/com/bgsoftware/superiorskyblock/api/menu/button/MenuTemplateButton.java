@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.menu.button;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import org.bukkit.inventory.ItemStack;
@@ -15,12 +16,22 @@ import java.util.List;
 public interface MenuTemplateButton<V extends MenuView<V, ?>> {
 
     /**
-     * Get the item to display in the menu.
+     * Get the item to display in the inventory menu.
      * The returned item has no changes to it (placeholders are unparsed, for example).
      * This item is later used in {@link MenuViewButton#createViewItem()}
+     * <p>
+     * This method is only relevant for buttons in inventory-based menus.
      */
     @Nullable
     ItemStack getButtonItem();
+
+    /**
+     * Get the dialog button.
+     * <p>
+     * This method is only relevant for buttons in dialog-based menus.
+     */
+    @Nullable
+    DialogButton getButtonDialog();
 
     /**
      * Get the sound to play when clicking the button.
@@ -77,6 +88,13 @@ public interface MenuTemplateButton<V extends MenuView<V, ?>> {
          * @param buttonItem The item.
          */
         Builder<V> setButtonItem(@Nullable ItemStack buttonItem);
+
+        /**
+         * Set the dialog button data.
+         *
+         * @param buttonDialog The data of the dialog button.
+         */
+        Builder<V> setButtonDialog(DialogButton buttonDialog);
 
         /**
          * Set the sound to play when clicking the button.

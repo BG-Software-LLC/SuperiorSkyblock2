@@ -16,13 +16,13 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpManage;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.warp.SignWarp;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.Objects;
 
@@ -33,8 +33,8 @@ public class WarpManageLocationButton extends AbstractMenuViewButton<MenuWarpMan
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        Player player = (Player) clickEvent.getWhoClicked();
+    public void onButtonClick(ButtonClickContext<MenuWarpManage.View> context) {
+        Player player = context.getPlayer();
         IslandWarp islandWarp = menuView.getIslandWarp();
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -81,8 +81,8 @@ public class WarpManageLocationButton extends AbstractMenuViewButton<MenuWarpMan
 
         @Override
         public MenuTemplateButton<MenuWarpManage.View> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, WarpManageLocationButton.class, WarpManageLocationButton::new);
+            return new MenuTemplateButtonImpl<>(this, WarpManageLocationButton.class,
+                    WarpManageLocationButton::new);
         }
 
     }

@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.mission;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,7 +47,7 @@ public class MissionData {
 
         if (section.isConfigurationSection("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                TemplateItem templateItem = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
+                TemplateItem templateItem = MenuParserUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
                 if (templateItem != null) {
                     ItemStack itemStack = templateItem.build();
                     itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
@@ -60,10 +60,10 @@ public class MissionData {
 
         String missionFilePath = "modules/missions/categories/" + missionCategoryName + "/" + this.missionName + ".yml";
 
-        this.notCompleted = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.not-completed"));
-        this.canComplete = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.can-complete"));
-        this.locked = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.locked"));
-        this.completed = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.completed"));
+        this.notCompleted = MenuParserUtils.getItemStack(missionFilePath, section.getConfigurationSection("icons.not-completed"));
+        this.canComplete = MenuParserUtils.getItemStack(missionFilePath, section.getConfigurationSection("icons.can-complete"));
+        this.locked = MenuParserUtils.getItemStack(missionFilePath, section.getConfigurationSection("icons.locked"));
+        this.completed = MenuParserUtils.getItemStack(missionFilePath, section.getConfigurationSection("icons.completed"));
     }
 
     public boolean isAutoReward() {

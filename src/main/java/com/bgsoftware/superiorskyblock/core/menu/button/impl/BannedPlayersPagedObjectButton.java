@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandBannedPlayers;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import org.bukkit.inventory.ItemStack;
 
 public class BannedPlayersPagedObjectButton extends AbstractPagedMenuButton<MenuIslandBannedPlayers.View, SuperiorPlayer> {
@@ -17,8 +17,8 @@ public class BannedPlayersPagedObjectButton extends AbstractPagedMenuButton<Menu
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "unban", pagedObject.getName());
+    public void onButtonClick(ButtonClickContext<MenuIslandBannedPlayers.View> context) {
+        plugin.getCommands().dispatchSubCommand(context.getPlayer(), "unban", pagedObject.getName());
     }
 
     @Override
@@ -34,8 +34,7 @@ public class BannedPlayersPagedObjectButton extends AbstractPagedMenuButton<Menu
 
         @Override
         public PagedMenuTemplateButton<MenuIslandBannedPlayers.View, SuperiorPlayer> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), BannedPlayersPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, BannedPlayersPagedObjectButton.class,
                     BannedPlayersPagedObjectButton::new);
         }
 

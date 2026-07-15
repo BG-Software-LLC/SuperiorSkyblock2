@@ -7,8 +7,8 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandMembers;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class MembersPagedObjectButton extends AbstractPagedMenuButton<MenuIslandMembers.View, SuperiorPlayer> {
@@ -18,7 +18,7 @@ public class MembersPagedObjectButton extends AbstractPagedMenuButton<MenuIsland
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuIslandMembers.View> context) {
         menuView.setPreviousMove(false);
         plugin.getMenus().openMemberManage(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), pagedObject);
     }
@@ -36,8 +36,7 @@ public class MembersPagedObjectButton extends AbstractPagedMenuButton<MenuIsland
 
         @Override
         public PagedMenuTemplateButton<MenuIslandMembers.View, SuperiorPlayer> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), MembersPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, MembersPagedObjectButton.class,
                     MembersPagedObjectButton::new);
         }
 

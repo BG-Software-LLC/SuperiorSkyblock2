@@ -2,13 +2,15 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -19,7 +21,7 @@ public class CmdTeamChat implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("teamchat", "chat", "tc");
+        return Arrays.asList("teamchat", "tc");
     }
 
     @Override
@@ -64,19 +66,29 @@ public class CmdTeamChat implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
         if (args.length == 1) {
-            if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
-                return;
+            ChatState oldChatState = superiorPlayer.getChatState();
+            ChatState newChatState = oldChatState == ChatStates.TEAM_CHAT ?
+                    ChatStates.GLOBAL : ChatStates.TEAM_CHAT;
 
-            if (superiorPlayer.hasTeamChatEnabled()) {
-                Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
-            } else {
-                Message.TOGGLED_TEAM_CHAT_ON.send(superiorPlayer);
+            if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, newChatState) ||
+                    !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer)) {
+                return;
             }
 
-            superiorPlayer.toggleTeamChat();
+            if (newChatState == ChatStates.TEAM_CHAT) {
+                if (oldChatState == ChatStates.LOCAL_CHAT) {
+                    Message.TOGGLED_LOCAL_CHAT_OFF.send(superiorPlayer);
+                }
+
+                Message.TOGGLED_TEAM_CHAT_ON.send(superiorPlayer);
+            } else {
+                Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
+            }
+
+            superiorPlayer.setChatState(newChatState);
         } else {
             String message = CommandArguments.buildLongString(args, 1, false);
-            IslandUtils.handleIslandChat(island, superiorPlayer, message);
+            IslandChat.handleIslandChat(island, superiorPlayer, ChatStates.TEAM_CHAT, message);
         }
     }
 

@@ -54,11 +54,10 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lהאיגש | &7םינקחשל ךלשמ �
 CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
 CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
 CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
-CHANGED_BIOME: '&e&lיא | &7תרשל שדחמ רבחתהל שי ,םייונישה תא תוארל תנמ לע .{0}
-  ל החלצהב הנוש יאה לש םויבה.'
-CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
-CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'
-CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''s island.'
+CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Successfully changed the block amount at {0} to {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
@@ -279,6 +278,7 @@ COMMAND_DESCRIPTION_INVITE: ךלש יאה לא ןקחש ןימזהל.
 COMMAND_DESCRIPTION_KICK: יאהמ ןקחש ףיעהל.
 COMMAND_DESCRIPTION_LANG: ךלש הפשה תא ףילחהל.
 COMMAND_DESCRIPTION_LEAVE: יאה תא בוזעל.
+COMMAND_DESCRIPTION_LOCAL_CHAT: 'Toggle local chat mode.'
 COMMAND_DESCRIPTION_MEMBERS: םינקחשה טירפת תא חותפל.
 COMMAND_DESCRIPTION_MISSION: המישמ םילשהל.
 COMMAND_DESCRIPTION_MISSIONS: תומישמה טירפת תא חותפל.
@@ -581,6 +581,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lיא | &7ךלש יאה תא תבזע.'
 LEFT_ISLAND_COOP: '&e&lיא | &7{0} לש יאה לש הלועפ ףתשמ אל התא.'
 LEFT_ISLAND_COOP_NAME: '&e&lיא | &7רמוע יאה לש הלועפ ףתשמ אל התא.'
+LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'
 LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
@@ -744,6 +745,7 @@ SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
 SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
+SPY_LOCAL_CHAT_FORMAT: '&7[Spy] &6[{0}] {1}&f: &7{2}'
 SPY_TEAM_CHAT_FORMAT: '&7[יומס] &e[{0}] {1}&f: &7{2}'
 SYNC_UPGRADES: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}''s island.'
 SYNC_UPGRADES_ALL: '&e&lUpgrades | &7Successfully synced all upgrade values of all the islands.'
@@ -764,6 +766,8 @@ TOGGLED_FLY_OFF: '&e&lהפועת | &7תיטמוטואה הפועתה בצמ תא
 TOGGLED_FLY_ON: '&e&lהפועת | &7תיטמוטואה הפועתה בצמ תא &aתקלדה&7.'
 TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
 TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
+TOGGLED_LOCAL_CHAT_OFF: '&e&lChat | &7Toggling local chat &cOFF&7.'
+TOGGLED_LOCAL_CHAT_ON: '&e&lChat | &7Toggling local chat &aON&7.'
 TOGGLED_SCHEMATIC_OFF: '&e&lםינבמ רצוי | &7םינבמה תריצי בצמ תא &cתיביכ&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lםינבמ רצוי | &7םינבמה תריצי בצמ תא &aתקלדה&7.

@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
@@ -14,12 +13,11 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Objects;
 
 public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
@@ -50,11 +48,11 @@ public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
 
         UpgradeLevel nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
 
-        UpgradeCost levelCost = upgradeLevel.getCost();
+        UpgradeCost levelCost = upgradeLevel.getCosts().get(0);
         String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
         String requirements = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(inventoryViewer);
 
-        boolean nextLevel = levelCost.hasEnoughBalance(inventoryViewer) &&
+        boolean nextLevel = IslandUtils.hasEnoughBalance(upgradeLevel.getCosts(), inventoryViewer) &&
                 (permission.isEmpty() || inventoryViewer.hasPermission(permission)) && requirements.isEmpty();
 
         TemplateItem buttonItem = nextLevel ? itemData.hasNextLevel : itemData.noNextLevel;
@@ -67,13 +65,13 @@ public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        Upgrade upgrade = plugin.getUpgrades().getUpgrade(clickEvent.getRawSlot());
+    public void onButtonClick(ButtonClickContext<IslandMenuView> context) {
+        Upgrade upgrade = plugin.getUpgrades().getUpgrade(context.getClickedSlot());
 
         if (upgrade == null)
             return;
 
-        plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "rankup", upgrade.getName());
+        plugin.getCommands().dispatchSubCommand(context.getPlayer(), "rankup", upgrade.getName());
         menuView.refreshView();
     }
 
@@ -87,7 +85,7 @@ public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
 
         @Override
         public MenuTemplateButton<IslandMenuView> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, upgrade);
+            return new Template(this, upgrade);
         }
 
     }
@@ -96,10 +94,8 @@ public class UpgradeButton extends AbstractMenuViewButton<IslandMenuView> {
 
         private final Upgrade upgrade;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Upgrade upgrade) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    UpgradeButton.class, UpgradeButton::new);
+        Template(AbstractBuilder<IslandMenuView> builder, Upgrade upgrade) {
+            super(builder, UpgradeButton.class, UpgradeButton::new);
             this.upgrade = Objects.requireNonNull(upgrade, "upgrade cannot be null");
         }
 

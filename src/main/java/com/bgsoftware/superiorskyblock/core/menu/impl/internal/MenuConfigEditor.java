@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedInventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -17,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.ConfigEditorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.ConfigEditorSaveButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
-import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -81,7 +81,7 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
     }
 
     public static MenuConfigEditor createInstance() {
-        PagedMenuLayoutImpl.Builder<MenuConfigEditor.View, ItemStack> patternBuilder = PagedMenuLayoutImpl.newBuilder();
+        PagedInventoryMenuLayout.Builder<MenuConfigEditor.View, ItemStack> patternBuilder = PagedInventoryMenuLayout.newBuilder();
 
         patternBuilder.setTitle(ChatColor.BOLD + "Settings Editor");
         patternBuilder.setInventoryType(InventoryType.CHEST);

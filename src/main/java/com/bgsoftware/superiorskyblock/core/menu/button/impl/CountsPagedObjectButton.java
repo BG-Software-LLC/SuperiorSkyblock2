@@ -17,7 +17,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonI
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -231,11 +230,6 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        // Dummy button
-    }
-
-    @Override
     public ItemStack modifyViewItem(ItemStack buttonItem) {
         Key rawKey = pagedObject.getBlockKey();
         Pair<Key, ItemStack> customKeyItem = plugin.getBlockValues().convertCustomKeyItem(rawKey);
@@ -295,8 +289,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
 
         @Override
         public PagedMenuTemplateButton<MenuCounts.View, MenuCounts.BlockCount> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), CountsPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, CountsPagedObjectButton.class,
                     CountsPagedObjectButton::new);
         }
 
