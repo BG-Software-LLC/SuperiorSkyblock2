@@ -23,7 +23,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -69,11 +69,6 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     }
 
     @Override
-    public void pasteSchematic(Island island, Location location, Runnable callback) {
-        pasteSchematic(island, location, callback, null);
-    }
-
-    @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         try {
             Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
@@ -89,7 +84,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
                 int targetMaxX = location.getBlockX() + (max.getBlockX() - origin.getBlockX());
                 int targetMaxZ = location.getBlockZ() + (max.getBlockZ() - origin.getBlockZ());
 
-                List<ChunkPosition> affected = new ArrayList<>();
+                List<ChunkPosition> affected = new LinkedList<>();
                 org.bukkit.World world = location.getWorld();
                 for (int x = targetMinX >> 4; x <= targetMaxX >> 4; x++) {
                     for (int z = targetMinZ >> 4; z <= targetMaxZ >> 4; z++) {
