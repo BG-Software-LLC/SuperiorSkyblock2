@@ -127,8 +127,18 @@ public class MenuActions {
         Float spawnYaw = creationConfig.getSpawnYaw();
         Float spawnPitch = creationConfig.getSpawnPitch();
 
-        plugin.getGrid().createIsland(clickedPlayer, schematic.getName(), creationConfig.getBonusWorth(),
-                creationConfig.getBonusLevel(), creationConfig.getBiome(), islandName, offset, spawnOffset, spawnYaw, spawnPitch);
+        Island.Builder builder = Island.newBuilder()
+                .setOwner(clickedPlayer)
+                .setSchematicName(schematic.getName())
+                .setName(islandName);
+
+        if (!offset) {
+            builder.setBonusWorth(creationConfig.getBonusWorth())
+                    .setBonusLevel(creationConfig.getBonusLevel());
+        }
+
+        plugin.getGrid().createIsland(builder, creationConfig.getBiome(), offset, spawnOffset, spawnYaw, spawnPitch);
+
 
     }
 

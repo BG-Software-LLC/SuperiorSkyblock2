@@ -192,13 +192,6 @@ public class GridManagerImpl extends Manager implements GridManager {
     public void createIsland(SuperiorPlayer superiorPlayer, String schematicName, BigDecimal bonusWorth,
                              BigDecimal bonusLevel, Biome biome, String islandName, boolean offset,
                              @Nullable BlockOffset spawnOffset) {
-        createIsland(superiorPlayer, schematicName, bonusWorth, bonusLevel, biome, islandName, offset, spawnOffset, null, null);
-    }
-
-    @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schematicName, BigDecimal bonusWorth,
-                             BigDecimal bonusLevel, Biome biome, String islandName, boolean offset,
-                             @Nullable BlockOffset spawnOffset, @Nullable Float spawnYaw, @Nullable Float spawnPitch) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
@@ -215,7 +208,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                     .setBonusLevel(bonusLevel);
         }
 
-        createIsland(builder, biome, offset, spawnOffset, spawnYaw, spawnPitch);
+        createIsland(builder, biome, offset, spawnOffset, null, null);
     }
 
     @Override
