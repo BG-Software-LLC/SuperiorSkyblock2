@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.api.enums.GeneratorHint;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
@@ -1167,10 +1168,10 @@ public interface SettingsManager {
             boolean isEnabled();
 
             /**
-             * Whether this dimension should use the void generator or the vanilla/datapack generator.
-             * Config-path: worlds.dimensions.<dimension>.use-void-generator
+             * The hint for the generator type to use for this dimension.
+             * Config-path: worlds.dimensions.<dimension>.generator-hint
              */
-            boolean isUseVoidGenerator();
+            GeneratorHint getGeneratorHint();
 
             /**
              * Whether this dimension is unlocked by default or not.

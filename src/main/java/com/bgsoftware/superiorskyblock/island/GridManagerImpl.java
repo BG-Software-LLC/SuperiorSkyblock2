@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
+import com.bgsoftware.superiorskyblock.api.enums.GeneratorHint;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
@@ -380,7 +381,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                             BukkitExecutor.sync(() -> {
                                 SettingsManager.Worlds.DimensionConfig dimensionConfig =
                                         plugin.getSettings().getWorlds().getDimensionConfig(defaultDimension);
-                                if (dimensionConfig == null || dimensionConfig.isUseVoidGenerator()) {
+                                if (dimensionConfig == null || dimensionConfig.getGeneratorHint() == GeneratorHint.VOID) {
                                     IslandUtils.resetChunksExcludedFromList(island, affectedChunks);
                                 }
                                 island.setBiome(biome, true);

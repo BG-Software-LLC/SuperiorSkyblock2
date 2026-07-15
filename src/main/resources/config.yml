@@ -354,6 +354,9 @@ worlds:
       schematic-offset: true
       # The environment of this world
       environment: NORMAL
+      # A hint for the type of generator used for the world.
+      # Supported values: VOID, CUSTOM
+      generator-hint: VOID
       # The default biome for the world.
       # If the biome is invalid, PLAINS will be set.
       biome: PLAINS
@@ -370,9 +373,9 @@ worlds:
       # Custom name for the nether world.
       # When empty, the name will be "<island-world>_nether"
       name: ''
-      # Should the nether world use the void generator? This can be useful to prevent
-      # players from escaping the nether world by building up.
-      use-void-generator: true
+      # A hint for the type of generator used for the world.
+      # Supported values: VOID, CUSTOM
+      generator-hint: VOID
       # Should the schematics in this world will not be counted towards worth and level values?
       schematic-offset: true
       # The environment of this world
@@ -396,6 +399,9 @@ worlds:
       schematic-offset: true
       # The environment of this world
       environment: THE_END
+      # A hint for the type of generator used for the world.
+      # Supported values: VOID, CUSTOM
+      generator-hint: VOID
       # The default biome for the world.
       # If the biome is invalid, THE_END will be used.
       biome: THE_END

@@ -22,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
+import com.bgsoftware.superiorskyblock.api.enums.GeneratorHint;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -180,7 +181,7 @@ public class WorldsProvider_Default implements WorldsProvider {
             plugin.getLogger().warning("The world " + worldName + " is already loaded! SuperiorSkyblock will hook into it. Ensure this is not your main survival world!");
         } else {
             SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
-            boolean useVoidGenerator = dimensionConfig == null || dimensionConfig.isUseVoidGenerator();
+            boolean useVoidGenerator = dimensionConfig == null || dimensionConfig.getGeneratorHint() == GeneratorHint.VOID;
 
             WorldCreator worldCreator = WorldCreator.name(worldName)
                     .environment(dimension.getEnvironment());
