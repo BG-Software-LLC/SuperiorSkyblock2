@@ -150,8 +150,6 @@ public class SettingsContainer {
     public final boolean kickConfirm;
     public final boolean leaveConfirm;
     public final boolean transferConfirm;
-    public final String spawnersProvider;
-    public final String stackedBlocksProvider;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
@@ -206,6 +204,9 @@ public class SettingsContainer {
     public final boolean defaultIslandFly;
     public final String defaultBorderColor;
     public final boolean obsidianToLava;
+    public final String spawnersProvider;
+    public final String stackedBlocksProvider;
+    public final String pricesProvider;
     public final BlockValuesManagerImpl.SyncWorthStatus syncWorth;
     public final boolean negativeWorth;
     public final boolean negativeLevel;
@@ -392,8 +393,6 @@ public class SettingsContainer {
         kickConfirm = config.getBoolean("kick-confirm");
         leaveConfirm = config.getBoolean("leave-confirm");
         transferConfirm = config.getBoolean("transfer-confirm");
-        spawnersProvider = config.getString("spawners-provider", "AUTO");
-        stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
         islandNamesRequiredForCreation = config.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = config.getInt("island-names.max-length", 16);
         islandNamesMinLength = config.getInt("island-names.min-length", 3);
@@ -513,6 +512,9 @@ public class SettingsContainer {
         defaultIslandFly = config.getBoolean("default-island-fly", false);
         defaultBorderColor = config.getString("default-border-color", "BLUE");
         obsidianToLava = config.getBoolean("obsidian-to-lava", false);
+        spawnersProvider = config.getString("spawners-provider", "AUTO");
+        stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
+        pricesProvider = config.getString("prices-provider", "AUTO");
         syncWorth = BlockValuesManagerImpl.SyncWorthStatus.of(config.getString("sync-worth", "NONE"));
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
