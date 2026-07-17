@@ -51,8 +51,7 @@ public class BlockLevelTicksTracker extends LevelTicks<Block> {
                 // Block was changed, let's call an update
                 GameEventArgs.BlockUpdateShapeEvent blockUpdateShapeEvent = new GameEventArgs.BlockUpdateShapeEvent();
                 blockUpdateShapeEvent.block = CraftBlock.at(this.serverLevel, blockPos);
-                blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(this.serverLevel, blockPos, oldState, null);
-                ((CraftBlockState) blockUpdateShapeEvent.oldState).setWorldHandle(this.serverLevel);
+                blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(blockUpdateShapeEvent.block.getWorld(), blockPos, oldState, null);
                 GameEvent<GameEventArgs.BlockUpdateShapeEvent> gameEvent = GameEventType.BLOCK_UPDATE_SHAPE_EVENT.createEvent(blockUpdateShapeEvent);
                 plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.MONITOR);
             }
