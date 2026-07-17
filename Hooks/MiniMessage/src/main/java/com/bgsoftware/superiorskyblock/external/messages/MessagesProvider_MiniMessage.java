@@ -31,14 +31,12 @@ import java.util.Optional;
 
 public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
 
+
     // Adventure 5.x renamed the Title.Times factory method from 'of' to 'times',
     // breaking binary compatibility with Adventure 4.x. Resolve the method
     // reflectively so a single build works on both versions.
     private static final ReflectMethod<Title.Times> TITLE_TIMES_FACTORY = getTitleTimesFactory();
-    private static final ReflectMethod<ClickEvent> CLICK_EVENT_CREATE = initializeClickEventCreation();
-    private static final ReflectMethod<Object> CLICK_EVENT_PAYLOAD_TEXT = new ReflectMethod<>(
-            new ClassInfo("net.kyori.adventure.text.event.ClickEvent$Payload", ClassInfo.PackageType.UNKNOWN),
-            "string", String.class);
+    private static final ClickEventCreator CLICK_EVENT_CREATE = initializeClickEventCreation();
 
     private static final ClickEvent.Action RUN_COMMAND_CLICK_EVENT = getClickEvent("RUN_COMMAND");
     private static final ClickEvent.Action SUGGEST_COMMAND_CLICK_EVENT = getClickEvent("SUGGEST_COMMAND");
@@ -144,17 +142,37 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
         }
     }
 
-    private static ReflectMethod<ClickEvent> initializeClickEventCreation() {
-        ReflectMethod<ClickEvent> CREATE_METHOD = new ReflectMethod<>(
+    private static ClickEventCreator initializeClickEventCreation() {
+        ReflectMethod<ClickEvent> STRING_CREATE_METHOD = new ReflectMethod<>(
                 ClickEvent.class, "clickEvent", ClickEvent.Action.class, String.class);
 
-        if (!CREATE_METHOD.isValid()) {
-            CREATE_METHOD = new ReflectMethod<>(
-                    ClickEvent.class, "clickEvent", new ClassInfo(ClickEvent.Action.class),
-                    new ClassInfo("net.kyori.adventure.text.event.ClickEvent$Payload", ClassInfo.PackageType.UNKNOWN));
+        if (STRING_CREATE_METHOD.isValid()) {
+            return (action, payload) -> {
+                return STRING_CREATE_METHOD.invoke(null, action, payload);
+            };
         }
 
-        return CREATE_METHOD;
+        ReflectMethod<ClickEvent> PAYLOAD_CREATE_METHOD = new ReflectMethod<>(
+                ClickEvent.class, "clickEvent", new ClassInfo(ClickEvent.Action.class),
+                new ClassInfo("net.kyori.adventure.text.event.ClickEvent$Payload", ClassInfo.PackageType.UNKNOWN));
+        ReflectMethod<Object> CLICK_EVENT_PAYLOAD_TEXT = new ReflectMethod<>(
+                new ClassInfo("net.kyori.adventure.text.event.ClickEvent$Payload", ClassInfo.PackageType.UNKNOWN),
+                "string", String.class);
+
+        if (PAYLOAD_CREATE_METHOD.isValid() && CLICK_EVENT_PAYLOAD_TEXT.isValid()) {
+            return (action, payload) -> {
+                Object textPayload = CLICK_EVENT_PAYLOAD_TEXT.invoke(null, payload);
+                return PAYLOAD_CREATE_METHOD.invoke(null, action, textPayload);
+            };
+        }
+
+        throw new IllegalStateException("Cannot find valid ClickEvent creator");
+    }
+
+    private interface ClickEventCreator {
+
+        ClickEvent create(ClickEvent.Action action, String payload);
+
     }
 
     private static class ActionBarComponent extends BaseMessageComponent {
@@ -239,9 +257,7 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
                 if (this.clickEvent.isPresent()) {
                     Optional<String> clickEventDataOpt = this.clickEvent.get().getValue().getContent(player, args);
                     if (clickEventDataOpt.isPresent()) {
-                        Object payload = CLICK_EVENT_PAYLOAD_TEXT.isValid() ?
-                                CLICK_EVENT_PAYLOAD_TEXT.invoke(null, clickEventDataOpt.get()) : clickEventDataOpt.get();
-                        component = component.clickEvent(CLICK_EVENT_CREATE.invoke(null, this.clickEvent.get().getKey(), payload));
+                        component = component.clickEvent(CLICK_EVENT_CREATE.create(this.clickEvent.get().getKey(), clickEventDataOpt.get()));
                     }
                 }
 
