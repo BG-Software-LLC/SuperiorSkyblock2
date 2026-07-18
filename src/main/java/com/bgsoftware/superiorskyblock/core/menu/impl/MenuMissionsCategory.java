@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
@@ -12,11 +11,12 @@ import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MissionsPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
@@ -124,13 +124,16 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", missionCategory.getName());
+        protected List<MissionReference> requestObjects() {
+            return missions;
         }
 
         @Override
-        protected List<MissionReference> requestObjects() {
-            return missions;
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = this.missionCategory.getName();
         }
 
         private int getCompletionStatus(Mission<?> mission) {
@@ -138,7 +141,7 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
             IMissionsHolder missionsHolder = mission.getIslandMission() ? inventoryViewer.getIsland() : inventoryViewer;
             return missionsHolder == null ? 0 :
                     !missionsHolder.canCompleteMissionAgain(mission) ? 2 :
-                            plugin.getMissions().canComplete(inventoryViewer, mission) ? 1 : 0;
+                    plugin.getMissions().canComplete(inventoryViewer, mission) ? 1 : 0;
         }
 
     }

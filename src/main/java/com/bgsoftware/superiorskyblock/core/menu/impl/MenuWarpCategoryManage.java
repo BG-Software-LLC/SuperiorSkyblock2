@@ -9,14 +9,14 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
-import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryManageIconButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryManageRenameButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.WarpCategoryManageWarpsButton;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
@@ -90,6 +90,7 @@ public class MenuWarpCategoryManage extends AbstractMenu<MenuWarpCategoryManage.
                        Menu<View, Args> menu, Args args) {
             super(inventoryViewer, previousMenuView, menu);
             this.warpCategory = args.warpCategory;
+
         }
 
         @Override
@@ -102,10 +103,12 @@ public class MenuWarpCategoryManage extends AbstractMenu<MenuWarpCategoryManage.
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", warpCategory.getName());
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = this.warpCategory.getName();
         }
-
     }
 
 }

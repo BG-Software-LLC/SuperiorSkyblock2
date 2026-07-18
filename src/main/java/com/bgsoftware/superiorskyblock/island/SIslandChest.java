@@ -19,7 +19,8 @@ public class SIslandChest implements IslandChest {
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
     private final Island island;
     private final int index;
-    private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(this, 9, plugin.getSettings().getIslandChests().getChestTitle());
+    private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(
+            this, 9, plugin.getSettings().getIslandChests().getChestTitle());
     private int contentsUpdateCounter = 0;
 
     public SIslandChest(Island island, int index) {
@@ -29,7 +30,8 @@ public class SIslandChest implements IslandChest {
 
     public static SIslandChest createChest(Island island, int index, ItemStack[] contents) {
         SIslandChest islandChest = new SIslandChest(island, index);
-        islandChest.inventory = plugin.getProviders().getUIProvider().createInventory(islandChest, contents.length, plugin.getSettings().getIslandChests().getChestTitle());
+        islandChest.inventory = plugin.getProviders().getUIProvider().createInventory(
+                islandChest, contents.length, plugin.getSettings().getIslandChests().getChestTitle());
         islandChest.inventory.setContents(contents);
         return islandChest;
     }

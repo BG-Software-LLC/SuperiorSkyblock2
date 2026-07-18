@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 
 public class MessageContent {
 
+    private static final Object[] EMPTY_ARGS = new Object[0];
+
     public static final MessageContent EMPTY = new MessageContent(Collections.emptyList()) {
         @Override
         public Optional<String> getContent(@Nullable OfflinePlayer unused, Object... unused2) {
@@ -101,6 +103,10 @@ public class MessageContent {
     private MessageContent(List<IPart> contentParts, boolean legacyColorCodes) {
         this.contentParts.addAll(contentParts);
         this.legacyColorCodes = legacyColorCodes;
+    }
+
+    public Optional<String> getContent(@Nullable OfflinePlayer offlinePlayer) {
+        return getContent(offlinePlayer, EMPTY_ARGS);
     }
 
     public Optional<String> getContent(@Nullable OfflinePlayer offlinePlayer, Object... arguments) {

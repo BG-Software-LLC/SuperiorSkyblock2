@@ -83,7 +83,7 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
     public static MenuConfigEditor createInstance() {
         PagedInventoryMenuLayout.Builder<MenuConfigEditor.View, ItemStack> patternBuilder = PagedInventoryMenuLayout.newBuilder();
 
-        patternBuilder.setTitle(ChatColor.BOLD + "Settings Editor");
+        patternBuilder.setTitle("{0}");
         patternBuilder.setInventoryType(InventoryType.CHEST);
         patternBuilder.setRowsCount(6);
 
@@ -145,6 +145,8 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
              Menu<View, Args> menu, Args args) {
             super(inventoryViewer, previousMenuView, menu);
             this.path = args.path;
+            this.cachedTitleArgs = new Object[]{path.isEmpty() ? ChatColor.BOLD + "Settings Editor" :
+                    ChatColor.BOLD + "Section: " + path};
         }
 
         public List<String> getPathSlots() {
@@ -153,11 +155,6 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
 
         public String getPath() {
             return path;
-        }
-
-        @Override
-        public String replaceTitle(String title) {
-            return path.isEmpty() ? title : ChatColor.BOLD + "Section: " + path;
         }
 
         @Override

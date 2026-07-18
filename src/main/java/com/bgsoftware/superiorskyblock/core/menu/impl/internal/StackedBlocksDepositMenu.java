@@ -29,7 +29,8 @@ public class StackedBlocksDepositMenu implements InventoryHolder {
     private final Location stackedBlock;
 
     public StackedBlocksDepositMenu(Location stackedBlock) {
-        this.inventory = plugin.getProviders().getUIProvider().createInventory(this, 36, plugin.getSettings().getStackedBlocks().getDepositMenu().getTitle());
+        this.inventory = plugin.getProviders().getUIProvider().createInventory(
+                this, 36, plugin.getSettings().getStackedBlocks().getDepositMenu().getTitle());
         this.stackedBlock = stackedBlock;
     }
 

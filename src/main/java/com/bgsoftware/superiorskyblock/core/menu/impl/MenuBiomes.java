@@ -169,6 +169,7 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
             this.dimension = args.dimension;
+            this.cachedTitleArgs = new Object[]{Formatters.CAPITALIZED_FORMATTER.format(dimension.getName())};
         }
 
         @Override
@@ -178,11 +179,6 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
         public Dimension getDimension() {
             return dimension;
-        }
-
-        @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
         }
 
         @Override

@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.google.common.base.Preconditions;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 public class DialogBodyItem implements DialogBodyElement {
 
@@ -14,8 +13,6 @@ public class DialogBodyItem implements DialogBodyElement {
 
     private final TemplateItem item;
     private final Config config;
-
-    private Object nmsHandle;
 
     public DialogBodyItem(TemplateItem item, @Nullable ItemConfig itemConfig) {
         this.item = item;
@@ -45,13 +42,6 @@ public class DialogBodyItem implements DialogBodyElement {
 
     public int getHeight() {
         return this.config.height;
-    }
-
-    public Object getNMSHandle(Function<DialogBodyItem, Object> nmsHandleCreator) {
-        if (this.nmsHandle == null)
-            this.nmsHandle = nmsHandleCreator.apply(this);
-
-        return this.nmsHandle;
     }
 
     public static class Config implements ItemConfig {

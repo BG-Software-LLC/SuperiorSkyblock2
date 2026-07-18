@@ -84,9 +84,13 @@ public class MenuWarpCategoryIconEdit extends AbstractMenu<AbstractIconProviderM
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", getIconProvider().getName());
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = getIconProvider().getName();
         }
+
     }
 
 }

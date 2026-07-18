@@ -39,6 +39,8 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
     private boolean closed = false;
     private boolean refreshing = false;
 
+    protected Object[] cachedTitleArgs = null;
+
     protected AbstractMenuView(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView, Menu<V, A> menu) {
         super(inventoryViewer, menu, previousMenuView);
     }
@@ -51,6 +53,8 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
 
         refreshing = true;
         previousMove = false;
+
+        updateTitleArgs();
 
         ((AbstractMenu) menu).refreshView(this).whenComplete((view, error) -> {
             if (error != null) {
@@ -118,8 +122,13 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         closeButton = true;
     }
 
-    public String replaceTitle(String title) {
-        return title;
+    @Nullable
+    public Object[] getTitleArgs() {
+        return this.cachedTitleArgs;
+    }
+
+    public void updateTitleArgs() {
+        // Do nothing
     }
 
     private void openView() {

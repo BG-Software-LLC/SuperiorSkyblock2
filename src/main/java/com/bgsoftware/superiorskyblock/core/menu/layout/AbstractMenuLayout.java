@@ -7,12 +7,16 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
+import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements MenuLayout<V> {
+
+    private static final Object[] EMPTY_ARGS = new Object[0];
 
     public static final char[] BUTTON_SYMBOLS = new char[]{
             '!', '@', '#', '$', '%', '^', '&', '*', '-', '_', '+', '=',
@@ -24,17 +28,24 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
 
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    protected final String title;
+    protected final MessageContent title;
+    protected final String rawTitle;
     protected final MenuTemplateButton<V>[] buttons;
 
     protected AbstractMenuLayout(AbstractBuilder<V, ?> builder) {
-        this.title = builder.title;
+        this.rawTitle = builder.title.replace("{}", "{0}"); // {} -> {0} so it works with MessageContent
+        this.title = MessageContent.parse(this.rawTitle);
         this.buttons = builder.buttons;
     }
 
     @Override
     public String getTitle() {
-        return title;
+        return this.rawTitle;
+    }
+
+    public String getTitle(V menuView) {
+        Object[] titleArgs = getMenuViewTitleArgs(menuView);
+        return this.title.getContent(menuView.getInventoryViewer().asOfflinePlayer(), titleArgs).orElse("");
     }
 
     @Override
@@ -45,6 +56,16 @@ public abstract class AbstractMenuLayout<V extends MenuView<V, ?>> implements Me
     @Override
     public Collection<MenuTemplateButton<V>> getButtons() {
         return new SequentialListBuilder<MenuTemplateButton<V>>().build(Arrays.asList(buttons));
+    }
+
+    private static Object[] getMenuViewTitleArgs(MenuView<?, ?> menuView) {
+        if (menuView instanceof AbstractMenuView) {
+            Object[] titleArgs = ((AbstractMenuView<?, ?>) menuView).getTitleArgs();
+            if (titleArgs != null)
+                return titleArgs;
+        }
+
+        return EMPTY_ARGS;
     }
 
     @SuppressWarnings("unchecked")

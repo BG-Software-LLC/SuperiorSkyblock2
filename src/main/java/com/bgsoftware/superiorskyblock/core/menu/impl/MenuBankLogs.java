@@ -105,11 +105,6 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", getFilteredPlayerName(filteredPlayer));
-        }
-
-        @Override
         protected List<BankTransaction> requestObjects() {
             List<BankTransaction> transactions = getTransactions();
 
@@ -122,6 +117,14 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
             transactions.sort(sorting);
 
             return Collections.unmodifiableList(transactions);
+        }
+
+        @Override
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = getFilteredPlayerName(filteredPlayer);
         }
 
         private List<BankTransaction> getTransactions() {
