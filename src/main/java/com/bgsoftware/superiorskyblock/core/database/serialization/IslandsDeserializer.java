@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
