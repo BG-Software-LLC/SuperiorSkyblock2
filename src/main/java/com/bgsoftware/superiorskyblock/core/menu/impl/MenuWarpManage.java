@@ -102,8 +102,11 @@ public class MenuWarpManage extends AbstractMenu<MenuWarpManage.View, MenuWarpMa
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", islandWarp.getName());
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = this.islandWarp.getName();
         }
 
     }

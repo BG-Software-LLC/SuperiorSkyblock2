@@ -1,10 +1,16 @@
-package com.bgsoftware.superiorskyblock.external.messages;
+package com.bgsoftware.superiorskyblock.external.ui;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 
-public interface MessagesProvider {
+import java.util.List;
+
+public interface UIProvider {
 
     /**
      * Create an action bar message component.
@@ -54,5 +60,41 @@ public interface MessagesProvider {
      */
     IMessageComponent createTitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage,
                                            int fadeIn, int stay, int fadeOut);
+
+    /**
+     * Set the display name of the given item meta.
+     *
+     * @param itemMeta    The item meta to modify.
+     * @param displayName The display name to set.
+     */
+    void setItemMetaDisplayName(ItemMeta itemMeta, String displayName);
+
+    /**
+     * Set the lore of the given item meta.
+     *
+     * @param itemMeta The item meta to modify.
+     * @param lore     The lore to set.
+     */
+    void setItemMetaLore(ItemMeta itemMeta, List<String> lore);
+
+    /**
+     * Create a chest inventory with the specified size.
+     *
+     * @param inventoryHolder The inventory holder.
+     * @param size            The inventory size.
+     * @param title           The inventory title.
+     * @return The created inventory.
+     */
+    Inventory createInventory(InventoryHolder inventoryHolder, int size, String title);
+
+    /**
+     * Create an inventory with the specified type.
+     *
+     * @param inventoryHolder The inventory holder.
+     * @param inventoryType   The inventory type.
+     * @param title           The inventory title.
+     * @return The created inventory.
+     */
+    Inventory createInventory(InventoryHolder inventoryHolder, InventoryType inventoryType, String title);
 
 }

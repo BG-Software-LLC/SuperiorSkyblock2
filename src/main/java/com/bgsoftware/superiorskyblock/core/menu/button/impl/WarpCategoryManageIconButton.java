@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class WarpCategoryManageIconButton extends AbstractMenuViewButton<MenuWarpCategoryManage.View> {
 
@@ -32,21 +31,20 @@ public class WarpCategoryManageIconButton extends AbstractMenuViewButton<MenuWar
     public ItemStack createViewItem() {
         WarpCategory warpCategory = menuView.getWarpCategory();
 
-        ItemBuilder itemBuilder = warpCategory.getRawIcon() == null ?
+        ItemBuilder newItemBuilder = warpCategory.getRawIcon() == null ?
                 WarpIcons.DEFAULT_WARP_CATEGORY_ICON.getBuilder() : new ItemBuilder(warpCategory.getRawIcon());
+        ItemBuilder itemBuilder = getButtonTemplateItem().getBuilder();
 
-        ItemStack buttonItem = super.createViewItem();
-
-        if (buttonItem != null && buttonItem.hasItemMeta()) {
-            ItemMeta itemMeta = buttonItem.getItemMeta();
-            if (itemMeta.hasDisplayName())
-                itemBuilder.withName(itemMeta.getDisplayName());
-
-            if (itemMeta.hasLore())
-                itemBuilder.appendLore(itemMeta.getLore());
+        if (itemBuilder != null) {
+            if (itemBuilder.hasDisplayName()) {
+                newItemBuilder.withName(itemBuilder.getDisplayName());
+            }
+            if (itemBuilder.hasLore()) {
+                newItemBuilder.appendLore(itemBuilder.getLore());
+            }
         }
 
-        return itemBuilder.build(warpCategory.getIsland().getOwner());
+        return newItemBuilder.build(menuView.getInventoryViewer());
     }
 
     @Override

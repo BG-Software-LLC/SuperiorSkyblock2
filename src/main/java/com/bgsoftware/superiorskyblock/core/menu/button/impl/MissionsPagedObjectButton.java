@@ -76,18 +76,17 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
+        SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Mission<?> mission = pagedObject.getMission();
 
         if (mission == null)
-            return buttonItem;
+            return itemBuilder.build(inventoryViewer);
 
         Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
 
         if (!missionDataOptional.isPresent())
-            return buttonItem;
-
-        SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
+            return itemBuilder.build(inventoryViewer);
 
         MissionData missionData = missionDataOptional.get();
         IMissionsHolder missionsHolder = mission.getIslandMission() ? inventoryViewer.getIsland() : inventoryViewer;
@@ -99,18 +98,18 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
         int progressValue = mission.getProgressValue(inventoryViewer);
         int amountCompleted = missionsHolder.getAmountMissionCompleted(mission);
 
-        ItemBuilder itemBuilder;
+        ItemBuilder newItemBuilder;
 
         if (!missionsHolder.canCompleteMissionAgain(mission))
-            itemBuilder = missionData.getCompleted();
+            newItemBuilder = missionData.getCompleted();
         else if (missionData.hasLocked() && !plugin.getMissions().hasAllRequirements(mission, inventoryViewer))
-            itemBuilder = missionData.getLocked();
+            newItemBuilder = missionData.getLocked();
         else if (plugin.getMissions().canComplete(inventoryViewer, mission))
-            itemBuilder = missionData.getCanComplete();
+            newItemBuilder = missionData.getCanComplete();
         else
-            itemBuilder = missionData.getNotCompleted();
+            newItemBuilder = missionData.getNotCompleted();
 
-        ItemStack itemStack = itemBuilder
+        ItemStack itemStack = newItemBuilder
                 .replaceAll("{0}", percentage + "")
                 .replaceAll("{1}", progressValue + "")
                 .replaceAll("{2}", amountCompleted + "")

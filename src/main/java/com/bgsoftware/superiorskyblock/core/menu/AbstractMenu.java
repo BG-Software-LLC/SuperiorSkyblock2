@@ -71,6 +71,8 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
     protected abstract V createViewInternal(SuperiorPlayer superiorPlayer, A args, @Nullable MenuView<?, ?> previousMenu);
 
     public CompletableFuture<V> refreshView(V view) {
+        view.updateTitleArgs();
+
         if (this.isInventoryMenu) {
             return refreshInventoryViewInternal(view);
         } else {

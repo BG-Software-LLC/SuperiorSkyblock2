@@ -3,7 +3,11 @@ package com.bgsoftware.superiorskyblock.core.menu.button;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
 
 public abstract class AbstractPagedMenuButton<V extends MenuView<V, ?>, E>
         extends AbstractMenuViewButton<V> implements PagedMenuViewButton<V, E> {
@@ -26,9 +30,14 @@ public abstract class AbstractPagedMenuButton<V extends MenuView<V, ?>, E>
 
     @Override
     public final ItemStack createViewItem() {
-        return modifyViewItem(super.createViewItem());
+        return modifyViewItem(Optional.ofNullable(getButtonTemplateItem()).map(TemplateItem::getBuilder).orElse(null));
     }
 
-    public abstract ItemStack modifyViewItem(ItemStack buttonItem);
+    @Override
+    public final ItemStack modifyViewItem(ItemStack buttonItem) {
+        return modifyViewItem(Optional.ofNullable(getButtonTemplateItem()).map(TemplateItem::getBuilder).orElse(null));
+    }
+
+    public abstract ItemStack modifyViewItem(ItemBuilder itemBuilder);
 
 }

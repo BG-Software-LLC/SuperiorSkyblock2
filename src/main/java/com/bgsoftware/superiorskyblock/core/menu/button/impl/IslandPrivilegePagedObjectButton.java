@@ -23,9 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,8 +47,8 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
-        return this.actions.modifyViewItem(buttonItem, this);
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
+        return this.actions.modifyViewItem(this);
     }
 
     private static void onSuccessfulPermissionChange(IslandPrivilegePagedObjectButton button,
@@ -102,7 +100,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
 
         void onButtonClick(ButtonClickContext<MenuIslandPrivileges.View> context, IslandPrivilegePagedObjectButton button);
 
-        ItemStack modifyViewItem(ItemStack buttonItem, IslandPrivilegePagedObjectButton button);
+        ItemStack modifyViewItem(IslandPrivilegePagedObjectButton button);
 
     }
 
@@ -159,7 +157,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
         }
 
         @Override
-        public ItemStack modifyViewItem(ItemStack buttonItem, IslandPrivilegePagedObjectButton button) {
+        public ItemStack modifyViewItem(IslandPrivilegePagedObjectButton button) {
             ItemBuilder itemBuilder = button.pagedObject.getRoleIslandPrivilegeItem();
             if (itemBuilder == null)
                 return new ItemStack(Material.AIR);
@@ -235,7 +233,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
         }
 
         @Override
-        public ItemStack modifyViewItem(ItemStack buttonItem, IslandPrivilegePagedObjectButton button) {
+        public ItemStack modifyViewItem(IslandPrivilegePagedObjectButton button) {
             IslandPrivilege islandPrivilege = button.pagedObject.getIslandPrivilege();
             Island targetIsland = button.menuView.getIsland();
             SuperiorPlayer permissiblePlayer = (SuperiorPlayer) button.menuView.getPermissionHolder();

@@ -13,10 +13,13 @@ import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogMenuType;
 import com.bgsoftware.superiorskyblock.api.menu.layout.DialogMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyItem;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyText;
+import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.external.ui.UIProvider_Default;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -44,10 +47,10 @@ import net.minecraft.server.dialog.action.StaticAction;
 import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.server.dialog.body.ItemBody;
 import net.minecraft.server.dialog.body.PlainMessage;
-import net.minecraft.world.item.ItemStack;
 import org.bukkit.NamespacedKey;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
 import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
 import java.net.URI;
@@ -75,6 +78,14 @@ public class NMSDialogsImpl implements NMSDialogs {
     private static final ${IDENTIFIER_CLASS} DIALOG_CLICK_CALLBACK_KEY =
             ${IDENTIFIER_CLASS}.fromNamespaceAndPath("superiorskyblock", "dialog_click_callback");
 
+    private static final LazyReference<TitleParser> TITLE_PARSER = new LazyReference<>() {
+        @Override
+        protected TitleParser create() {
+            return plugin.getProviders().getUIProvider() instanceof UIProvider_Default ?
+                    new VanillaTitleParser() :  new MiniMessageTitleParser();
+        }
+    };
+
     @Override
     public PlayerCustomClickEventFunctions<?> createCustomClickEventFunctions() {
         return PlayerCustomClickEventFunctionsImpl.INSTANCE;
@@ -84,7 +95,7 @@ public class NMSDialogsImpl implements NMSDialogs {
     public <V extends MenuView<V, ?>> DialogWrapper<V> createDialog(V menuView) {
         DialogWrapper<V> dialog = new DialogWrapper<>(menuView);
 
-        DialogMenuLayout<V> menuLayout = (DialogMenuLayout<V>) menuView.getMenu().getLayout();
+        RegularDialogMenuLayoutImpl<V> menuLayout = (RegularDialogMenuLayoutImpl<V>) menuView.getMenu().getLayout();
 
         List<ActionButton> buttons = new LinkedList<>();
         int slot = 0;
@@ -99,12 +110,12 @@ public class NMSDialogsImpl implements NMSDialogs {
         }
 
         CommonDialogData dialogData = new CommonDialogData(
-                Component.literal(menuLayout.getTitle()),
+                TITLE_PARSER.get().parse(menuLayout.getTitle(menuView)),
                 Optional.empty(), // Not implementing external titles for now (shown in dialogs of type list)
                 menuLayout.isCloseWithEscapeAllowed(),
                 false, // Pause is not relevant in multiplayer
                 DialogAction.CLOSE,
-                buildBodies(menuLayout),
+                buildBodies(menuLayout, menuView),
                 Collections.emptyList()
         );
 
@@ -158,13 +169,16 @@ public class NMSDialogsImpl implements NMSDialogs {
         }
     }
 
-    private List<DialogBody> buildBodies(DialogMenuLayout<?> menuLayout) {
+    private <V extends MenuView<V, ?>> List<DialogBody> buildBodies(DialogMenuLayout<V> menuLayout, V menuView) {
+        SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
+        Player player = inventoryViewer.asPlayer();
+
         List<DialogBody> bodies = new LinkedList<>();
         for (DialogBodyElement bodyElement : menuLayout.getBodyElements()) {
             if (bodyElement instanceof DialogBodyText) {
-                bodies.add(getPlainMessage(bodyElement));
+                bodies.add(getPlainMessage((DialogBodyText) bodyElement, player));
             } else if (bodyElement instanceof DialogBodyItem) {
-                bodies.add(getItemBody(bodyElement));
+                bodies.add(getItemBody((DialogBodyItem) bodyElement, inventoryViewer, player));
             } else {
                 throw new IllegalStateException("bodyElement: " + bodyElement);
             }
@@ -172,19 +186,17 @@ public class NMSDialogsImpl implements NMSDialogs {
         return bodies;
     }
 
-    private PlainMessage getPlainMessage(DialogBodyElement dialogBodyElement) {
-        return (PlainMessage) ((DialogBodyText) dialogBodyElement).getNMSHandle(dialogBodyText ->
-                new PlainMessage(Component.literal(dialogBodyText.getText()), dialogBodyText.getWidth()));
+    private PlainMessage getPlainMessage(DialogBodyText dialogBodyText, Player player) {
+        return new PlainMessage(TITLE_PARSER.get().parse(dialogBodyText.getText(player)), dialogBodyText.getWidth());
     }
 
-    private ItemBody getItemBody(DialogBodyElement dialogBodyElement) {
-        return (ItemBody) ((DialogBodyItem) dialogBodyElement).getNMSHandle(dialogBodyItem -> {
-            org.bukkit.inventory.ItemStack itemStack = dialogBodyItem.getItem().build();
-            Optional<PlainMessage> description = Optional.ofNullable(dialogBodyItem.getDescription()).map(this::getPlainMessage);
-            return new ItemBody(NMSUtilsVersioned.getItemBodyItemParameter(CraftItemStack.asNMSCopy(itemStack)),
-                    description, dialogBodyItem.isShowDecorations(), dialogBodyItem.isShowTooltip(),
-                    dialogBodyItem.getWidth(), dialogBodyItem.getHeight());
-        });
+    private ItemBody getItemBody(DialogBodyItem dialogBodyItem, SuperiorPlayer superiorPlayer, Player player) {
+        org.bukkit.inventory.ItemStack itemStack = dialogBodyItem.getItem().build(superiorPlayer);
+        Optional<PlainMessage> description = Optional.ofNullable(dialogBodyItem.getDescription())
+                .map(descElement -> getPlainMessage((DialogBodyText) descElement, player));
+        return new ItemBody(NMSUtilsVersioned.getItemBodyItemParameter(CraftItemStack.asNMSCopy(itemStack)),
+                description, dialogBodyItem.isShowDecorations(), dialogBodyItem.isShowTooltip(),
+                dialogBodyItem.getWidth(), dialogBodyItem.getHeight());
     }
 
     private Dialog buildDialog(DialogMenuType menuType, CommonDialogData dialogData, List<ActionButton> buttons) {
@@ -327,6 +339,43 @@ public class NMSDialogsImpl implements NMSDialogs {
         public void close() {
             release();
         }
+    }
+
+    private interface TitleParser {
+
+        Component parse(String title);
+
+    }
+
+    private static class VanillaTitleParser implements TitleParser {
+
+        @Override
+        public Component parse(String title) {
+            return Component.literal(title);
+        }
+    }
+
+    private static class MiniMessageTitleParser implements TitleParser {
+
+        private static final net.kyori.adventure.text.minimessage.MiniMessage MINI_MESSAGE =
+                net.kyori.adventure.text.minimessage.MiniMessage.builder().tags(
+                        net.kyori.adventure.text.minimessage.tag.standard.StandardTags.defaults()).build();
+        private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer LEGACY_COMPONENT_SERIALIZER =
+                net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection();
+
+        @Override
+        public Component parse(String title) {
+            return io.papermc.paper.adventure.PaperAdventure.asVanilla(deserialize(title));
+        }
+
+        private static net.kyori.adventure.text.Component deserialize(String text) {
+            try {
+                return MINI_MESSAGE.deserialize(text);
+            } catch (net.kyori.adventure.text.minimessage.ParsingException exception) {
+                return LEGACY_COMPONENT_SERIALIZER.deserialize(text);
+            }
+        }
+
     }
 
 }

@@ -26,11 +26,11 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIslands.View> {
 
@@ -110,34 +110,16 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
         if (islandItem == null)
             return null;
 
-        SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
+        Locale locale = menuView.getInventoryViewer().getUserLocale();
 
         SuperiorPlayer islandOwner = island.getOwner();
-        int place = plugin.getGrid().getIslandPosition(island, menuView.getSortingType()) + 1;
         ItemBuilder itemBuilder = islandItem.getBuilder().asSkullOf(islandOwner);
 
-        String islandName = !plugin.getSettings().getIslandNames().isIslandTop() ||
-                island.getName().isEmpty() ? islandOwner.getName() : island.getName();
+        if (itemBuilder.hasLore()) {
+            List<String> newLore = new LinkedList<>();
+            List<String> lore = itemBuilder.getLore();
 
-        itemBuilder.replaceName("{0}", islandName)
-                .replaceName("{1}", String.valueOf(place))
-                .replaceName("{2}", Formatters.NUMBER_FORMATTER.format(island.getIslandLevel()))
-                .replaceName("{3}", Formatters.NUMBER_FORMATTER.format(island.getWorth()))
-                .replaceName("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), inventoryViewer.getUserLocale()))
-                .replaceName("{6}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), inventoryViewer.getUserLocale()))
-                .replaceName("{7}", Formatters.NUMBER_FORMATTER.format(island.getTotalRating()))
-                .replaceName("{8}", Formatters.RATING_FORMATTER.format(island.getTotalRating(), inventoryViewer.getUserLocale()))
-                .replaceName("{9}", Formatters.NUMBER_FORMATTER.format(island.getRatingAmount()))
-                .replaceName("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size()))
-                .replaceName("{11}", Formatters.NUMBER_FORMATTER.format(island.getIslandBank().getBalance()))
-                .replaceName("{12}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandBank().getBalance(), inventoryViewer.getUserLocale()));
-
-        ItemMeta itemMeta = itemBuilder.getItemMeta();
-
-        if (itemMeta != null && itemMeta.hasLore()) {
-            List<String> lore = new LinkedList<>();
-
-            for (String line : itemMeta.getLore()) {
+            for (String line : lore) {
                 if (line.contains("{4}")) {
                     List<SuperiorPlayer> members = new LinkedList<>(island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader()));
                     String memberFormat = line.split("\\{4}:")[1];
@@ -149,10 +131,10 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
 
                         members.forEach(member -> {
                             String onlineMessage = member.isOnline() ?
-                                    Message.ISLAND_TOP_STATUS_ONLINE.getMessage(inventoryViewer.getUserLocale()) :
-                                    Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(inventoryViewer.getUserLocale());
+                                    Message.ISLAND_TOP_STATUS_ONLINE.getMessage(locale) :
+                                    Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(locale);
 
-                            lore.add(placeholdersService.get().parsePlaceholders(member.asOfflinePlayer(), memberFormat
+                            newLore.add(placeholdersService.get().parsePlaceholders(member.asOfflinePlayer(), memberFormat
                                     .replace("{}", member.getName())
                                     .replace("{0}", member.getName())
                                     .replace("{1}", onlineMessage == null ? "" : onlineMessage)
@@ -161,26 +143,30 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                         });
                     }
                 } else {
-                    lore.add(line
-                            .replace("{0}", island.getOwner().getName())
-                            .replace("{1}", String.valueOf(place))
-                            .replace("{2}", Formatters.NUMBER_FORMATTER.format(island.getIslandLevel()))
-                            .replace("{3}", Formatters.NUMBER_FORMATTER.format(island.getWorth()))
-                            .replace("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), inventoryViewer.getUserLocale()))
-                            .replace("{6}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), inventoryViewer.getUserLocale()))
-                            .replace("{7}", Formatters.NUMBER_FORMATTER.format(island.getTotalRating()))
-                            .replace("{8}", Formatters.RATING_FORMATTER.format(island.getTotalRating(), inventoryViewer.getUserLocale()))
-                            .replace("{9}", Formatters.NUMBER_FORMATTER.format(island.getRatingAmount()))
-                            .replace("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size()))
-                            .replace("{11}", Formatters.NUMBER_FORMATTER.format(island.getIslandBank().getBalance()))
-                            .replace("{12}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandBank().getBalance(), inventoryViewer.getUserLocale())));
+                    newLore.add(line);
                 }
             }
 
-            itemBuilder.withLore(lore);
+            itemBuilder.withLore(newLore);
         }
 
-        return itemBuilder.build(islandOwner);
+        String islandName = !plugin.getSettings().getIslandNames().isIslandTop() ||
+                island.getName().isEmpty() ? islandOwner.getName() : island.getName();
+        int place = plugin.getGrid().getIslandPosition(island, menuView.getSortingType()) + 1;
+
+        return itemBuilder.replaceAll("{0}", islandName)
+                .replaceAll("{1}", String.valueOf(place))
+                .replaceAll("{2}", Formatters.NUMBER_FORMATTER.format(island.getIslandLevel()))
+                .replaceAll("{3}", Formatters.NUMBER_FORMATTER.format(island.getWorth()))
+                .replaceAll("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), locale))
+                .replaceAll("{6}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), locale))
+                .replaceAll("{7}", Formatters.NUMBER_FORMATTER.format(island.getTotalRating()))
+                .replaceAll("{8}", Formatters.RATING_FORMATTER.format(island.getTotalRating(), locale))
+                .replaceAll("{9}", Formatters.NUMBER_FORMATTER.format(island.getRatingAmount()))
+                .replaceAll("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size()))
+                .replaceAll("{11}", Formatters.NUMBER_FORMATTER.format(island.getIslandBank().getBalance()))
+                .replaceAll("{12}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandBank().getBalance(), locale))
+                .build(islandOwner);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<MenuTopIslands.View> {

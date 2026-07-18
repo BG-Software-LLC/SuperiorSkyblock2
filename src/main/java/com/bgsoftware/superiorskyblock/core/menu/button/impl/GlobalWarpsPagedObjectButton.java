@@ -37,7 +37,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         String ownerName = pagedObject.getOwner().getName();
         String islandName = pagedObject.getName().isEmpty() ? ownerName : pagedObject.getName();
 
@@ -51,7 +51,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
         else
             description = EMPTY_STRING_ARRAY;
 
-        return new ItemBuilder(buttonItem)
+        return itemBuilder
                 .asSkullOf(pagedObject.getOwner())
                 .replaceAll("{0}", ownerName)
                 .replaceLoreWithLines("{1}", description)

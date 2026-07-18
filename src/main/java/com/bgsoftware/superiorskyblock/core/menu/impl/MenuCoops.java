@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.CoopsPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
@@ -55,14 +55,17 @@ public class MenuCoops extends AbstractPagedMenu<MenuCoops.View, IslandViewArgs,
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", String.valueOf(this.island.getCoopPlayers().size()))
-                    .replace("{1}", String.valueOf(this.island.getCoopLimit()));
+        protected List<SuperiorPlayer> requestObjects() {
+            return island.getCoopPlayers();
         }
 
         @Override
-        protected List<SuperiorPlayer> requestObjects() {
-            return island.getCoopPlayers();
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[2];
+            }
+            this.cachedTitleArgs[0] = String.valueOf(this.island.getCoopPlayers().size());
+            this.cachedTitleArgs[1] = String.valueOf(this.island.getCoopLimit());
         }
 
     }

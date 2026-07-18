@@ -6,11 +6,7 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
-import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
-import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
-import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
-import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -23,13 +19,6 @@ public class RegularInventoryMenuLayoutImpl<V extends MenuView<V, ?>> extends Ab
     private static final ReflectField<Object> INVENTORY = new ReflectField<>(
             new ClassInfo("inventory.CraftInventory", ClassInfo.PackageType.CRAFTBUKKIT),
             Object.class, "inventory").removeFinal();
-
-    private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
-        @Override
-        protected PlaceholdersService create() {
-            return plugin.getServices().getService(PlaceholdersService.class);
-        }
-    };
 
     protected final InventoryType inventoryType;
 
@@ -45,8 +34,7 @@ public class RegularInventoryMenuLayoutImpl<V extends MenuView<V, ?>> extends Ab
 
     @Override
     public final Inventory buildInventory(V menuView) {
-        String title = placeholdersService.get().parsePlaceholders(menuView.getInventoryViewer().asOfflinePlayer(),
-                menuView instanceof AbstractMenuView ? ((AbstractMenuView<?, ?>) menuView).replaceTitle(this.title) : this.title);
+        String title = getTitle(menuView);
 
         Inventory inventory = createInventory(menuView, title);
 
@@ -70,9 +58,9 @@ public class RegularInventoryMenuLayoutImpl<V extends MenuView<V, ?>> extends Ab
         Inventory inventory;
 
         if (inventoryType != InventoryType.CHEST) {
-            inventory = Bukkit.createInventory(holder, inventoryType, title);
+            inventory = plugin.getProviders().getUIProvider().createInventory(holder, inventoryType, title);
         } else {
-            inventory = Bukkit.createInventory(holder, this.buttons.length, title);
+            inventory = plugin.getProviders().getUIProvider().createInventory(holder, this.buttons.length, title);
         }
 
         if (inventory.getHolder() == null) {

@@ -2,38 +2,30 @@ package com.bgsoftware.superiorskyblock.core.menu.dialog.body;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
+import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import com.google.common.base.Preconditions;
+import org.bukkit.OfflinePlayer;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 public class DialogBodyText implements DialogBodyElement {
 
     private static final Config DEFAULT_CONFIG = new Config();
 
-    private final String text;
+    private final MessageContent text;
     private final Config config;
 
-    private Object nmsHandle;
-
     public DialogBodyText(String text, @Nullable TextConfig textConfig) {
-        this.text = text;
+        this.text = MessageContent.parse(text);
         this.config = textConfig == null || DEFAULT_CONFIG.equals(textConfig) ? DEFAULT_CONFIG : (Config) textConfig;
     }
 
-    public String getText() {
-        return text;
+    public String getText(OfflinePlayer offlinePlayer) {
+        return text.getContent(offlinePlayer).orElse("");
     }
 
     public int getWidth() {
         return this.config.width;
-    }
-
-    public Object getNMSHandle(Function<DialogBodyText, Object> nmsHandleCreator) {
-        if (this.nmsHandle == null)
-            this.nmsHandle = nmsHandleCreator.apply(this);
-
-        return this.nmsHandle;
     }
 
     public static class Config implements TextConfig {

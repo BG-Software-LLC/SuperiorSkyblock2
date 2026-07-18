@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.external.messages;
+package com.bgsoftware.superiorskyblock.external.ui;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ClassInfo;
@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -16,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.messages.component.EmptyMessageCompo
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
@@ -23,14 +25,20 @@ import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 
-public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
-
+public class UIProvider_MiniMessage extends BaseUIProvider {
 
     // Adventure 5.x renamed the Title.Times factory method from 'of' to 'times',
     // breaking binary compatibility with Adventure 4.x. Resolve the method
@@ -50,8 +58,8 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
         }
     };
 
-    public MessagesProvider_MiniMessage(SuperiorSkyblockPlugin plugin) {
-        Log.info("Using MiniMessage as a messages provider.");
+    public UIProvider_MiniMessage(SuperiorSkyblockPlugin plugin) {
+        Log.info("Using MiniMessage as a ui provider.");
     }
 
     @Override
@@ -97,6 +105,47 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
         return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
     }
 
+    @Override
+    public void setItemMetaDisplayName(ItemMeta itemMeta, String displayName) {
+        itemMeta.displayName(deserializeWithoutItalic(displayName));
+    }
+
+    @Override
+    public void setItemMetaLore(ItemMeta itemMeta, List<String> lore) {
+        itemMeta.lore(new SequentialListBuilder<Component>().build(lore, UIProvider_MiniMessage::deserializeWithoutItalic));
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder inventoryHolder, InventoryType inventoryType, String title) {
+        return Bukkit.createInventory(inventoryHolder, inventoryType, deserializeWithoutItalic(title));
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder inventoryHolder, int size, String title) {
+        return Bukkit.createInventory(inventoryHolder, size, deserializeWithoutItalic(title));
+    }
+
+    private static Component deserializeWithoutItalic(String message) {
+        Component component = deserialize(message, message.indexOf(ChatColor.COLOR_CHAR) >= 0);
+        if (component.decoration(TextDecoration.ITALIC) == TextDecoration.State.NOT_SET) {
+            component = component.decoration(TextDecoration.ITALIC, false);
+        }
+
+        return component;
+    }
+
+    private static Component deserialize(String message, boolean legacyColorCodes) {
+        if (legacyColorCodes) {
+            return LEGACY_COMPONENT_SERIALIZER.deserialize(message);
+        }
+
+        try {
+            return MINI_MESSAGE.deserialize(message);
+        } catch (ParsingException exception) {
+            return LEGACY_COMPONENT_SERIALIZER.deserialize(message);
+        }
+    }
+
     private static ReflectMethod<Title.Times> getTitleTimesFactory() {
         ReflectMethod<Title.Times> method = new ReflectMethod<>(Title.Times.class, "times",
                 Duration.class, Duration.class, Duration.class);
@@ -118,18 +167,6 @@ public class MessagesProvider_MiniMessage extends BaseMessagesProvider {
     private static Title.Times createTimes(int fadeIn, int stay, int fadeOut) {
         return TITLE_TIMES_FACTORY.invoke(null, Duration.ofMillis(fadeIn * 50L),
                 Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L));
-    }
-
-    private static Component deserialize(String message, boolean legacyColorCodes) {
-        if (legacyColorCodes) {
-            return LEGACY_COMPONENT_SERIALIZER.deserialize(message);
-        }
-
-        try {
-            return MINI_MESSAGE.deserialize(message);
-        } catch (ParsingException exception) {
-            return LEGACY_COMPONENT_SERIALIZER.deserialize(message);
-        }
     }
 
     private static ClickEvent.Action getClickEvent(String name) {
