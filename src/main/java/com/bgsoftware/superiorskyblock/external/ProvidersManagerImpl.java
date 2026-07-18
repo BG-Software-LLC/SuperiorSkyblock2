@@ -137,7 +137,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             registerChunksProvider();
         });
 
-        registerUIFactory();
+        registerUIProvider();
         registerBossBarProvider();
 
         // We try to forcefully load prices after a second the server has enabled.
@@ -632,7 +632,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         }
     }
 
-    private void registerUIFactory() {
+    private void registerUIProvider() {
         Optional<UIProvider> uiProvider = Optional.empty();
 
         if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
