@@ -663,8 +663,13 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     private void registerPricesProvider() {
-        ShopsProvider.SHOPGUIPLUS.createInstance(plugin)
-                .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, ShopsProvider.SHOPGUIPLUS, shopsBridge))
+        String pricesProviderName = plugin.getSettings().getPricesProvider();
+
+        Optional<ShopsProvider> shopsProvider = (pricesProviderName.equalsIgnoreCase("AUTO") ?
+                ShopsProvider.findAvailableProvider() : ShopsProvider.getShopsProvider(pricesProviderName));
+
+        shopsProvider.flatMap(provider -> provider.createInstance(plugin)
+                .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, provider, shopsBridge)))
                 .ifPresent(this::setPricesProvider);
     }
 
