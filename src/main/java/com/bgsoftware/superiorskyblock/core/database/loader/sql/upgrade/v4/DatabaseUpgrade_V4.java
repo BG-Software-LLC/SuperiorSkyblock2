@@ -45,8 +45,8 @@ public class DatabaseUpgrade_V4 implements Runnable {
             while (resultSet.next()) {
                 DatabaseResult databaseResult = new DatabaseResult(new ResultSetMapBridge(resultSet));
 
-                String uuid = databaseResult.getString("island").orElse(null);
-                if (uuid == null)
+                String island = databaseResult.getString("island").orElse(null);
+                if (island == null)
                     continue;
 
                 String name = databaseResult.getString("name").orElse(null);
@@ -68,7 +68,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
                     continue;
                 }
 
-                itemsToUpdateNames.add(new UpdateNameItem(uuid, name, newName));
+                itemsToUpdateNames.add(new UpdateNameItem(island, name, newName));
             }
         }).onFail(error -> isFailed.set(true)));
 
@@ -87,7 +87,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
                 if (!IslandNames.isWarpNameLengthValid(newName)) {
                     // Couldn't find a valid name. Removing this warp + warning in console
                     Log.warn("Could not find a suitable name for the ", itemType, " ", updateNameItem.oldName, " - removing and continuing...");
-                    itemsToDelete.add(new DeleteNameItem(updateNameItem.uuid, updateNameItem.oldName));
+                    itemsToDelete.add(new DeleteNameItem(updateNameItem.island, updateNameItem.oldName));
                     iterator.remove();
                     break;
                 }
@@ -104,21 +104,21 @@ public class DatabaseUpgrade_V4 implements Runnable {
 
         if (!itemsToDelete.isEmpty()) {
             CustomSQLDatabaseTransaction deleteTransaction = new CustomSQLDatabaseTransaction(
-                    "DELETE FROM {prefix}" + tableName + " WHERE uuid=? AND name=?");
+                    "DELETE FROM {prefix}" + tableName + " WHERE island=? AND name=?");
             deleteManyItems(itemsToDelete, deleteTransaction);
             transactionsList.add(deleteTransaction);
         }
 
         if (!itemsToUpdateNames.isEmpty()) {
             CustomSQLDatabaseTransaction updateTransaction = new CustomSQLDatabaseTransaction(
-                    "UPDATE {prefix}" + tableName + " SET name=? WHERE uuid=? AND name=?");
+                    "UPDATE {prefix}" + tableName + " SET name=? WHERE island=? AND name=?");
             updateManyItems(itemsToUpdateNames, updateTransaction);
             transactionsList.add(updateTransaction);
 
             if (isCategoryUpdate) {
                 // Update category names for warps as well
                 CustomSQLDatabaseTransaction categoryUpdateTransaction = new CustomSQLDatabaseTransaction(
-                        "UPDATE {prefix}islands_warps SET category=? WHERE uuid=? AND category=?");
+                        "UPDATE {prefix}islands_warps SET category=? WHERE island=? AND category=?");
                 updateManyItems(itemsToUpdateNames, categoryUpdateTransaction);
                 transactionsList.add(categoryUpdateTransaction);
             }
@@ -133,7 +133,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
     private static void deleteManyItems(List<DeleteNameItem> items, CustomSQLDatabaseTransaction deleteTransaction) {
         for (DeleteNameItem item : items) {
             deleteTransaction
-                    .bindObject(item.uuid)
+                    .bindObject(item.island)
                     .bindObject(item.name)
                     .newBatch();
         }
@@ -143,7 +143,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
         for (UpdateNameItem item : items) {
             updateTransaction
                     .bindObject(item.newName)
-                    .bindObject(item.uuid)
+                    .bindObject(item.island)
                     .bindObject(item.oldName)
                     .newBatch();
         }
@@ -151,12 +151,12 @@ public class DatabaseUpgrade_V4 implements Runnable {
 
     private static class DeleteNameItem {
 
-        private final String uuid;
+        private final String island;
         @Nullable
         private final String name;
 
-        DeleteNameItem(String uuid, @Nullable String name) {
-            this.uuid = uuid;
+        DeleteNameItem(String island, @Nullable String name) {
+            this.island = island;
             this.name = name;
         }
 
@@ -164,12 +164,12 @@ public class DatabaseUpgrade_V4 implements Runnable {
 
     private static class UpdateNameItem {
 
-        private final String uuid;
+        private final String island;
         private final String oldName;
         private String newName;
 
-        UpdateNameItem(String uuid, String oldName, String newName) {
-            this.uuid = uuid;
+        UpdateNameItem(String island, String oldName, String newName) {
+            this.island = island;
             this.oldName = oldName;
             this.newName = newName;
         }
