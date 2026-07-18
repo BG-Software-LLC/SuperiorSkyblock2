@@ -14,10 +14,12 @@ import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 
 import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -39,7 +41,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
         List<UpdateNameItem> itemsToUpdateNames = new LinkedList<>();
 
         MutableBoolean isFailed = new MutableBoolean(false);
-        Set<String> existingNames = new HashSet<>();
+        Map<String, IslandProgress> progress = new HashMap<>();
 
         DBSession.select(tableName, "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
@@ -57,14 +59,24 @@ public class DatabaseUpgrade_V4 implements Runnable {
 
                 String newName;
 
-                if (!IslandNames.isWarpNameLengthValid(name)) {
+                if (isCategoryUpdate && name.equals("Default Category")) {
+                    // "Default Category" changes to "Default" hard-coded
+                    // We change their names only at the end so no conflicts occur
+                    progress.computeIfAbsent(island, IslandProgress::new).detectedDefaultCategory = true;
+                    progress.computeIfAbsent(island, IslandProgress::new).existingNames.add("Default");
+                    continue;
+                } else if (isCategoryUpdate && name.equals("Default")) {
+                    // "Default Category" changes to "Default", therefore we don't want to keep a category
+                    // with the name "Default" - we force change it here.
+                    newName = "Default";
+                } else if (!IslandNames.isWarpNameLengthValid(name)) {
                     newName = name.substring(0, IslandNames.getMaxWarpNameLength());
                 } else if (name.contains(" ")) {
                     newName = name.replace(" ", "_");
                 } else if (name.length() != Formatters.STRIP_COLOR_FORMATTER.format(name).length()) {
                     newName = Formatters.STRIP_COLOR_FORMATTER.format(name);
                 } else {
-                    existingNames.add(name);
+                    progress.computeIfAbsent(island, IslandProgress::new).existingNames.add(name);
                     continue;
                 }
 
@@ -72,7 +84,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
             }
         }).onFail(error -> isFailed.set(true)));
 
-        if (isFailed.get() || itemsToUpdateNames.isEmpty())
+        if (isFailed.get())
             return;
 
         List<DeleteNameItem> itemsToDelete = new LinkedList<>();
@@ -81,8 +93,11 @@ public class DatabaseUpgrade_V4 implements Runnable {
         while (iterator.hasNext()) {
             UpdateNameItem updateNameItem = iterator.next();
             String newName = updateNameItem.newName;
+
+            Set<String> islandExistingNames = progress.computeIfAbsent(updateNameItem.island, IslandProgress::new).existingNames;
+
             int counter = 0;
-            while (Text.isBlank(newName) || existingNames.contains(newName)) {
+            while (Text.isBlank(newName) || islandExistingNames.contains(newName)) {
                 newName = updateNameItem.newName + (counter++);
                 if (!IslandNames.isWarpNameLengthValid(newName)) {
                     // Couldn't find a valid name. Removing this warp + warning in console
@@ -92,8 +107,17 @@ public class DatabaseUpgrade_V4 implements Runnable {
                     break;
                 }
             }
-            existingNames.add(newName);
+            islandExistingNames.add(newName);
             updateNameItem.newName = newName;
+        }
+
+        if (isCategoryUpdate) {
+            // Add all update names for default categories
+            for (IslandProgress islandProgress : progress.values()) {
+                if (islandProgress.detectedDefaultCategory) {
+                    itemsToUpdateNames.add(new UpdateNameItem(islandProgress.island, "Default Category", "Default"));
+                }
+            }
         }
 
         List<IDatabaseTransaction> transactionsList = new LinkedList<>();
@@ -147,6 +171,18 @@ public class DatabaseUpgrade_V4 implements Runnable {
                     .bindObject(item.oldName)
                     .newBatch();
         }
+    }
+
+    private static class IslandProgress {
+
+        private final String island;
+        private final Set<String> existingNames = new HashSet<>();
+        private boolean detectedDefaultCategory = false;
+
+        IslandProgress(String island) {
+            this.island = island;
+        }
+
     }
 
     private static class DeleteNameItem {
