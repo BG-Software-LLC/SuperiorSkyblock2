@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
 
-public abstract class BaseUIFactory implements UIFactory {
+public abstract class BaseUIProvider implements UIProvider {
 
     @Override
     public abstract IMessageComponent createActionBarComponent(@Nullable String message);

@@ -38,8 +38,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
-public class UIFactory_MiniMessage extends BaseUIFactory {
-
+public class UIProvider_MiniMessage extends BaseUIProvider {
 
     // Adventure 5.x renamed the Title.Times factory method from 'of' to 'times',
     // breaking binary compatibility with Adventure 4.x. Resolve the method
@@ -59,7 +58,7 @@ public class UIFactory_MiniMessage extends BaseUIFactory {
         }
     };
 
-    public UIFactory_MiniMessage(SuperiorSkyblockPlugin plugin) {
+    public UIProvider_MiniMessage(SuperiorSkyblockPlugin plugin) {
         Log.info("Using MiniMessage as a ui factory.");
     }
 
@@ -113,7 +112,7 @@ public class UIFactory_MiniMessage extends BaseUIFactory {
 
     @Override
     public void setItemMetaLore(ItemMeta itemMeta, List<String> lore) {
-        itemMeta.lore(new SequentialListBuilder<Component>().build(lore, UIFactory_MiniMessage::deserializeWithoutItalic));
+        itemMeta.lore(new SequentialListBuilder<Component>().build(lore, UIProvider_MiniMessage::deserializeWithoutItalic));
     }
 
     @Override

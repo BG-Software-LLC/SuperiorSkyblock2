@@ -10,7 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
-public interface UIFactory {
+public interface UIProvider {
 
     /**
      * Create an action bar message component.

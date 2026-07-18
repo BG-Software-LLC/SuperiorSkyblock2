@@ -22,7 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.List;
 import java.util.Optional;
 
-public class UIFactory_Default extends BaseUIFactory {
+public class UIProvider_Default extends BaseUIProvider {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 

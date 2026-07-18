@@ -379,10 +379,10 @@ public class ItemBuilder {
     public ItemStack build() {
         if (this.itemMeta != null) {
             if (hasDisplayName()) {
-                plugin.getProviders().getUIFactory().setItemMetaDisplayName(this.itemMeta, this.displayName);
+                plugin.getProviders().getUIProvider().setItemMetaDisplayName(this.itemMeta, this.displayName);
             }
             if (hasLore()) {
-                plugin.getProviders().getUIFactory().setItemMetaLore(this.itemMeta, this.lore);
+                plugin.getProviders().getUIProvider().setItemMetaLore(this.itemMeta, this.lore);
             }
         }
 
