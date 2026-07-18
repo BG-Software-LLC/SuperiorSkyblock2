@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersServ
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
-import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -70,9 +69,9 @@ public class RegularInventoryMenuLayoutImpl<V extends MenuView<V, ?>> extends Ab
         Inventory inventory;
 
         if (inventoryType != InventoryType.CHEST) {
-            inventory = Bukkit.createInventory(holder, inventoryType, title);
+            inventory = plugin.getProviders().getUIProvider().createInventory(holder, inventoryType, title);
         } else {
-            inventory = Bukkit.createInventory(holder, this.buttons.length, title);
+            inventory = plugin.getProviders().getUIProvider().createInventory(holder, this.buttons.length, title);
         }
 
         if (inventory.getHolder() == null) {

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
@@ -67,7 +68,7 @@ public class ConfigEditorPagedObjectButton extends AbstractPagedMenuButton<MenuC
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         return pagedObject;
     }
 

@@ -22,8 +22,8 @@ public class CoopsPagedObjectButton extends AbstractPagedMenuButton<MenuCoops.Vi
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
-        return new ItemBuilder(buttonItem)
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
+        return itemBuilder
                 .replaceAll("{0}", pagedObject.getName())
                 .replaceAll("{1}", pagedObject.getPlayerRole() + "")
                 .asSkullOf(pagedObject)

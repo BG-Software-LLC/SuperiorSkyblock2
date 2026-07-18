@@ -1,9 +1,8 @@
-package com.bgsoftware.superiorskyblock.external.messages;
+package com.bgsoftware.superiorskyblock.external.ui;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.MessageContent;
@@ -12,12 +11,18 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.List;
 import java.util.Optional;
 
-public class MessagesProvider_Default extends BaseMessagesProvider {
+public class UIProvider_Default extends BaseUIProvider {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -66,23 +71,24 @@ public class MessagesProvider_Default extends BaseMessagesProvider {
         return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
     }
 
-    private static BossBar.Style mapBossBarStyle(BossBar.Style style) {
-        switch (style) {
-            case SEGMENTED_6:
-            case NOTCHED_6:
-                return BossBar.Style.SEGMENTED_6;
-            case SEGMENTED_10:
-            case NOTCHED_10:
-                return BossBar.Style.SEGMENTED_10;
-            case SEGMENTED_12:
-            case NOTCHED_12:
-                return BossBar.Style.SEGMENTED_12;
-            case SEGMENTED_20:
-            case NOTCHED_20:
-                return BossBar.Style.SEGMENTED_20;
-            default:
-                return BossBar.Style.SOLID;
-        }
+    @Override
+    public void setItemMetaDisplayName(ItemMeta itemMeta, String displayName) {
+        itemMeta.setDisplayName(displayName);
+    }
+
+    @Override
+    public void setItemMetaLore(ItemMeta itemMeta, List<String> lore) {
+        itemMeta.setLore(lore);
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder inventoryHolder, int size, String title) {
+        return Bukkit.createInventory(inventoryHolder, size, title);
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder inventoryHolder, InventoryType inventoryType, String title) {
+        return Bukkit.createInventory(inventoryHolder, inventoryType, title);
     }
 
     private static class ActionBarComponent extends BaseMessageComponent {

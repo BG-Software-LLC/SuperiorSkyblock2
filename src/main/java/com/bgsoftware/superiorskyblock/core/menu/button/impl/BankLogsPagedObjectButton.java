@@ -31,9 +31,9 @@ public class BankLogsPagedObjectButton extends AbstractPagedMenuButton<MenuBankL
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
-        return new ItemBuilder(buttonItem)
+        return itemBuilder
                 .replaceAll("{0}", pagedObject.getPosition() + "")
                 .replaceAll("{1}", getFilteredPlayerName(pagedObject.getPlayer() == null ? CONSOLE_UUID : pagedObject.getPlayer()))
                 .replaceAll("{2}", (pagedObject.getAction() == BankAction.WITHDRAW_COMPLETED ?

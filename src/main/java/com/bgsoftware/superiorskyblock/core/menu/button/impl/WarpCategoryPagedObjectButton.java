@@ -22,7 +22,7 @@ public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuW
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         if (pagedObject == null) {
             return TemplateItem.AIR.build();
         }

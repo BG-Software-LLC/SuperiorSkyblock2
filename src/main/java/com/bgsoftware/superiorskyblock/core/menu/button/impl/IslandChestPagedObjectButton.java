@@ -23,8 +23,8 @@ public class IslandChestPagedObjectButton extends AbstractPagedMenuButton<MenuIs
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
-        return new ItemBuilder(buttonItem)
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
+        return itemBuilder
                 .replaceAll("{0}", (pagedObject.getIndex() + 1) + "")
                 .replaceAll("{1}", (pagedObject.getRows() * 9) + "")
                 .build(menuView.getInventoryViewer());
