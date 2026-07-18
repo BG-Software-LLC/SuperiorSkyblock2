@@ -8,11 +8,13 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
@@ -104,12 +106,12 @@ public class CmdShow implements ISuperiorCommand {
         Message.ISLAND_INFO_WORTH.sendPlayerOrConsole(superiorPlayer, island.getWorth());
         Message.ISLAND_INFO_LEVEL.sendPlayerOrConsole(superiorPlayer, island.getIslandLevel());
 
-        if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale) && !"None".equals(island.getDiscord()) &&
+        if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale) && !IslandUtils.DEFAULT_NONE_VALUE.equals(island.getDiscord()) &&
                 island.hasPermission(sender, IslandPrivileges.DISCORD_SHOW)) {
             Message.ISLAND_INFO_DISCORD.sendPlayerOrConsole(superiorPlayer, island.getDiscord());
         }
 
-        if (!Message.ISLAND_INFO_PAYPAL.isEmpty(locale) && !"None".equals(island.getPaypal()) &&
+        if (!Message.ISLAND_INFO_PAYPAL.isEmpty(locale) && !IslandUtils.DEFAULT_NONE_VALUE.equals(island.getPaypal()) &&
                 island.hasPermission(sender, IslandPrivileges.PAYPAL_SHOW)) {
             Message.ISLAND_INFO_PAYPAL.sendPlayerOrConsole(superiorPlayer, island.getPaypal());
         }
@@ -130,13 +132,15 @@ public class CmdShow implements ISuperiorCommand {
 
             if (!Message.ISLAND_INFO_PLAYER_LINE.isEmpty(locale)) {
                 members.forEach(islandMember -> {
-                    try {
-                        rolesStrings.get(islandMember.getPlayerRole())
-                                .append(Message.ISLAND_INFO_PLAYER_LINE.getMessage(locale, islandMember.getName())).append("\n");
-                    } catch (NullPointerException ex) {
+                    StringBuilder rolesString = rolesStrings.get(islandMember.getPlayerRole());
+
+                    if(rolesString == null) {
                         Log.warn("It seems like ", islandMember.getName(), " isn't part of the island of "
                                 , island.getOwner().getName(), ".");
+                        return;
                     }
+
+                    Text.appendWithLine(rolesString, Message.ISLAND_INFO_PLAYER_LINE.getMessage(locale, islandMember.getName()));
                 });
             }
 

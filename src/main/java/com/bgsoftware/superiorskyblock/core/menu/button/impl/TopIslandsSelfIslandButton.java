@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -141,7 +142,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                     List<SuperiorPlayer> members = new LinkedList<>(island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader()));
                     String memberFormat = line.split("\\{4}:")[1];
                     if (members.isEmpty()) {
-                        lore.add(memberFormat.replace("{}", "None"));
+                        lore.add(memberFormat.replace("{}", IslandUtils.DEFAULT_NONE_VALUE));
                     } else {
                         if (plugin.getSettings().getTopIslandMembersSorting() != TopIslandMembersSorting.NAMES)
                             members.sort(plugin.getSettings().getTopIslandMembersSorting().getComparator());

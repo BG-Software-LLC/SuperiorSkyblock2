@@ -23,7 +23,7 @@ public class PagedMenuTemplateButtonImpl<V extends MenuView<V, ?>, E> extends Ab
                                        PagedMenuViewButtonCreator<V, E> viewButtonCreator) {
         super(builder, viewButtonType);
         this.nullItem = builder.nullItem;
-        this.buttonIndex = builder.buttonIndex;
+        this.buttonIndex = builder.getButtonIndex();
         this.viewButtonCreator = viewButtonCreator;
     }
 

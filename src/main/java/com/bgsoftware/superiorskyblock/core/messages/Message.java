@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -854,6 +853,7 @@ public enum Message {
             plugin.saveResource("lang/en-US.yml", false);
             plugin.saveResource("lang/es-ES.yml", false);
             plugin.saveResource("lang/fr-FR.yml", false);
+            plugin.saveResource("lang/hu-HU.yml", false);
             plugin.saveResource("lang/it-IT.yml", false);
             plugin.saveResource("lang/iw-IL.yml", false);
             plugin.saveResource("lang/pl-PL.yml", false);

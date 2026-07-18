@@ -4,13 +4,11 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogMenuType;
 import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParseException;
 import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
-import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -30,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 public class MenuParserImpl implements MenuParser {
 
@@ -91,17 +88,11 @@ public class MenuParserImpl implements MenuParser {
         if (isDialog) {
             PagedDialogMenuLayoutImpl.Builder<V, E> dialogMenuLayoutBuilder = (PagedDialogMenuLayoutImpl.Builder<V, E>) menuLayoutBuilder;
 
-            if (cfg.isList("custom-order"))
-                dialogMenuLayoutBuilder.setCustomLayoutOrder(cfg.getIntegerList("custom-order"));
-
             menuSlotsMap = DialogMenuParser.parsePagedMenuPatternInternal(callerName, cfg, dialogMenuLayoutBuilder);
         } else {
             PagedInventoryMenuLayoutImpl.Builder<V, E> inventoryMenuLayoutBuilder = (PagedInventoryMenuLayoutImpl.Builder<V, E>) menuLayoutBuilder;
 
             inventoryMenuLayoutBuilder.setInventoryType(MenuParserUtils.getMinecraftEnum(InventoryType.class, menuType));
-
-            if (cfg.isList("custom-order"))
-                inventoryMenuLayoutBuilder.setCustomLayoutOrder(cfg.getIntegerList("custom-order"));
 
             menuSlotsMap = InventoryMenuParser.parsePagedMenuPatternInternal(callerName, cfg, inventoryMenuLayoutBuilder);
 
@@ -109,6 +100,9 @@ public class MenuParserImpl implements MenuParser {
             inventoryMenuLayoutBuilder.setCurrentPageSlots(parseButtonSlots(cfg, "current-page", menuSlotsMap));
             inventoryMenuLayoutBuilder.setNextPageSlots(parseButtonSlots(cfg, "next-page", menuSlotsMap));
             inventoryMenuLayoutBuilder.setPagedObjectSlots(parseButtonSlots(cfg, "slots", menuSlotsMap), pagedButtonBuilder);
+
+            if (cfg.isList("custom-order"))
+                inventoryMenuLayoutBuilder.setCustomLayoutOrder(cfg.getIntegerList("custom-order"));
         }
 
         return new MenuParseResult<>(menuLayoutBuilder, openingSound, previousMoveAllowed, skipOneItem, menuSlotsMap, cfg);

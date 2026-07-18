@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_3.world;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventFlags;
@@ -9,8 +10,10 @@ import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.LevelTicks;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.block.CraftBlockState;
 import org.bukkit.craftbukkit.block.CraftBlockStates;
@@ -21,6 +24,8 @@ import java.util.function.BiFunction;
 
 public class BlockLevelTicksTracker extends LevelTicks<Block> {
 
+    private static final ReflectMethod<CraftBlockState> BLOCK_STATE_CREATE = new ReflectMethod<>(
+            CraftBlockState.class, "getBlockState", World.class, BlockPos.class, BlockState.class, BlockEntity.class);
     private static final BiFunction<ServerLevel, Long, Boolean> IS_POSITION_TICKING_WITH_ENTITIES_LOADED_FUNCTION =
             initializePositionTickingWithEntitiesLoaded();
 
@@ -55,8 +60,7 @@ public class BlockLevelTicksTracker extends LevelTicks<Block> {
                 // Block was changed, let's call an update
                 GameEventArgs.BlockUpdateShapeEvent blockUpdateShapeEvent = new GameEventArgs.BlockUpdateShapeEvent();
                 blockUpdateShapeEvent.block = CraftBlock.at(this.serverLevel, blockPos);
-                blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(this.serverLevel, blockPos, oldState, null);
-                ((CraftBlockState) blockUpdateShapeEvent.oldState).setWorldHandle(this.serverLevel);
+                blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(blockUpdateShapeEvent.block.getWorld(), blockPos, oldState, null);
                 GameEvent<GameEventArgs.BlockUpdateShapeEvent> gameEvent = GameEventType.BLOCK_UPDATE_SHAPE_EVENT.createEvent(blockUpdateShapeEvent);
                 plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.MONITOR);
             }

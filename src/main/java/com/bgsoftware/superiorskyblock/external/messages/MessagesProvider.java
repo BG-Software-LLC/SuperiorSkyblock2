@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.external.messages;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public interface MessagesProvider {
 
@@ -15,24 +15,32 @@ public interface MessagesProvider {
     IMessageComponent createActionBarComponent(@Nullable String message);
 
     /**
-     * Create a boss bar message component.
-     *
-     * @param message  The boss bar text.
-     * @param color    The boss bar color.
-     * @param style    The boss bar style.
-     * @param duration The boss bar duration, in ticks.
-     * @return The created message component.
-     */
-    IMessageComponent createBossBarComponent(@Nullable String message, BossBar.Color color,
-                                             BossBar.Style style, int duration);
-
-    /**
      * Create a raw message component.
      *
      * @param message The raw text.
      * @return The created message component.
      */
     IMessageComponent createRawMessageComponent(@Nullable String message);
+
+    /**
+     * Create a complex message component.
+     *
+     * @param message The content of the complex message.
+     * @param command The command to be executed when clicked on the message.
+     * @param suggest The command to suggest when clicked on the message.
+     * @param tooltip The text to show when hovering over the message.
+     * @return The created message component.
+     */
+    IMessageComponent createComplexMessageComponent(@Nullable String message, @Nullable String command,
+                                                    @Nullable String suggest, @Nullable String tooltip);
+
+    /**
+     * Create a complex message component.
+     *
+     * @param components The components of the complex message.
+     * @return The created message component.
+     */
+    IMessageComponent createComplexMessageComponent(@Nullable BaseComponent[] components);
 
     /**
      * Create a title message component.

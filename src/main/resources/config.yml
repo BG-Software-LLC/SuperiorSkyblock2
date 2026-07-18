@@ -486,14 +486,6 @@ leave-confirm: true
 # Should a confirm gui be displayed when /is transfer is executed.
 transfer-confirm: true
 
-# If you want a specific spawners provider to use, specify it here.
-# Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
-spawners-provider: 'AUTO'
-
-# If you want a specific stacked-blocks provider to use, specify it here.
-# Providers: Auto, WildStacker, RoseStacker
-stacked-blocks-provider: 'AUTO'
-
 # All settings related to island names.
 island-names:
   # Should creation of islands will ask for name (/is create <name>)?
@@ -802,10 +794,21 @@ default-border-color: BLUE
 # Should obsidian get turned into a lava bucket when clicking it with a bucket in hand?
 obsidian-to-lava: false
 
-# Should the worth values be synced with other prices providers?
+# If you want a specific spawners provider to use, specify it here.
+# Providers: Auto, AdvancedSpawners, EpicSpawners, MergedSpawner, PvpingSpawners, RoseStacker, SilkSpawners, UltimateStacker, WildStacker
+spawners-provider: 'AUTO'
+
+# If you want a specific stacked-blocks provider to use, specify it here.
+# Providers: Auto, RoseStacker, WildStacker
+stacked-blocks-provider: 'AUTO'
+
+# If you want a specific prices provider to use, specify it here.
+# Providers: Auto, CMI, EconomyShopGUI, Essentials, ExcellentShop, GUIShop, newtShop, NextGens, QuantumShop, ShopGUIPlus, zShop
+prices-provider: 'AUTO'
+
+# Should the worth values be synced with the prices provider?
 # You can set the following values: NONE (disabled), BUY (buy prices), SELL (sell prices)
-# Supported Providers: ShopGUIPlus
-sync-worth: NONE
+sync-worth: 'NONE'
 
 # Can the worth value of the island be negative?
 negative-worth: true

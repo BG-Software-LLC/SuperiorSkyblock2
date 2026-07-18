@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.inventory.ItemStack;
 
@@ -110,7 +111,7 @@ public class SWarpCategory implements WarpCategory {
 
     private String getOwnerName() {
         SuperiorPlayer superiorPlayer = getIsland().getOwner();
-        return superiorPlayer == null ? "None" : superiorPlayer.getName();
+        return superiorPlayer == null ? IslandUtils.DEFAULT_NONE_VALUE : superiorPlayer.getName();
     }
 
 }
