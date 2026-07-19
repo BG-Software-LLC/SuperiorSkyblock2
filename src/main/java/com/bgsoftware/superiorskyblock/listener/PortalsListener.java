@@ -33,7 +33,6 @@ import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class PortalsListener extends AbstractGameEventListener {
 
@@ -83,8 +82,10 @@ public class PortalsListener extends AbstractGameEventListener {
             return;
         }
 
+        PortalType portalType = getPortalType(portalLocation);
+
         // Simulate end portal
-        if (world.getEnvironment() == World.Environment.THE_END) {
+        if (world.getEnvironment() == World.Environment.THE_END && portalType == PortalType.ENDER) {
             /* We teleport the player to his island instead of cancelling the event.
             Therefore, we must prevent the player from acting like he entered another island or left his island.*/
 
@@ -95,14 +96,18 @@ public class PortalsListener extends AbstractGameEventListener {
                 teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
 
             BukkitExecutor.sync(() -> {
-                Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+                Dimension dimension = getConfiguredPortalDestination(world, portalType);
+                if (dimension == null)
+                    dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+
+                Dimension finalDimension = dimension;
                 IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
                     islandWorldResult.ifRight(error -> {
                         if (teleportedPlayer != null)
                             teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
                     }).ifLeft(unused -> {
                         EntityTeleports.teleportUntilSuccess(entity,
-                                island.getIslandHome(dimension), 5, () -> {
+                                island.getIslandHome(finalDimension), 5, () -> {
                                     if (teleportedPlayer != null)
                                         teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
                                 });
@@ -110,16 +115,14 @@ public class PortalsListener extends AbstractGameEventListener {
                 });
 
             }, 5L);
+
+            return;
         }
 
         if (ServerVersion.isLessThan(ServerVersion.v1_16))
             return;
 
         boolean isPlayer = entity instanceof Player;
-
-        Material originalMaterial = portalLocation.getBlock().getType();
-
-        PortalType portalType = originalMaterial == Materials.NETHER_PORTAL.toBukkitType() ? PortalType.NETHER : PortalType.ENDER;
 
         if (isPlayer && (portalType == PortalType.NETHER ? Bukkit.getAllowNether() : Bukkit.getAllowEnd()))
             return;
@@ -154,8 +157,7 @@ public class PortalsListener extends AbstractGameEventListener {
             return;
         }
 
-        PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
-                PortalType.NETHER : PortalType.ENDER;
+        PortalType portalType = getPortalType(e.getArgs().from);
 
         Either<Location, EntityPortalResult> destinationResult = calculateDestination(island, superiorPlayer, e.getArgs().from, portalType);
 
@@ -183,8 +185,7 @@ public class PortalsListener extends AbstractGameEventListener {
 
         Entity entity = e.getArgs().entity;
 
-        PortalType portalType = (e.getArgs().cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) ?
-                PortalType.NETHER : PortalType.ENDER;
+        PortalType portalType = getPortalType(from);
 
         Either<Location, EntityPortalResult> destinationResult = calculateDestination(island, null, e.getArgs().from, portalType);
 
@@ -223,6 +224,20 @@ public class PortalsListener extends AbstractGameEventListener {
             Message.WORLD_NOT_ENABLED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(portalDestination.getName()));
 
         return Either.right(EntityPortalResult.DESTINATION_WORLD_DISABLED);
+    }
+
+    private PortalType getPortalType(Location portalLocation) {
+        Material originalMaterial = portalLocation.getBlock().getType();
+        return originalMaterial == Materials.NETHER_PORTAL.toBukkitType() ? PortalType.NETHER : PortalType.ENDER;
+    }
+
+    @Nullable
+    private Dimension getConfiguredPortalDestination(World world, PortalType portalType) {
+        Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(world);
+        if (portalDimension == null)
+            return null;
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(portalDimension);
+        return dimensionConfig == null ? null : dimensionConfig.getPortalDestination(portalType);
     }
 
     private void handleEntityPortalResult(EntityPortalResult portalResult, GameEvent<GameEventArgs.EntityPortalEvent> event) {
