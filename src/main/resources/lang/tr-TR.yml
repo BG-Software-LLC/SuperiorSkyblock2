@@ -918,6 +918,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lHata | &7Sadece {0} içinde tekrar yükseltme yapa
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lHata | &7Bu komutu başka adalarda kullanamazsın.'
 WARP_ALREADY_EXIST: '&c&lHata | &7Bu adla bir ışınlanma noktası zaten var.'
+WARP_CATEGORY_ALREADY_EXIST: '&c&lError | &7There is already a warp category with this name.'
 WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lIşınlanmalar | &7Yeni bir açıklama gir (İptal etmek için "-cancel" yaz):
   &e&lIşınlanmalar | &7Satırları "\n" kullanarak ayırabilirsin.
@@ -926,7 +927,7 @@ WARP_CATEGORY_ICON_NEW_NAME: '&e&lIşınlanmalar | &7Bir ad gir (İptal etmek i�
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lIşınlanmalar | &7Yeni bir materyal türü gir (İptal
   etmek için "-cancel" yaz):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lIşınlanmalar | &7Kategorinin simgesi başarıyla güncellendi.'
-WARP_CATEGORY_ILLEGAL_NAME: '&c&lHata | &7Işınlanma kategorisi adları boş olamaz.'
+WARP_CATEGORY_INVALID_NAME: '&c&lError | &7Warp category names cannot be empty and must be one word.'
 WARP_CATEGORY_NAME_TOO_LONG: '&c&lHata | Işınlanma kategorisi adları 255 karakterden
   uzun olamaz.'
 WARP_CATEGORY_SLOT: '&e&lIşınlanmalar | &7Yeni bir yuva gir (İptal etmek için "-cancel"
@@ -937,8 +938,6 @@ WARP_CATEGORY_SLOT_SUCCESS: '&e&lIşınlanmalar | &7Kategorinin yuvası başarı
   olarak değiştirildi.'
 WARP_CATEGORY_RENAME: '&e&lIşınlanmalar | &7Yeni bir ad gir (İptal etmek için "-cancel"
   yaz):'
-WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lHata | &7Bu ad zaten başka bir kategori tarafından
-  alınmış.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lIşınlanmalar | &7Kategori adı başarıyla {0} olarak
   değiştirildi.'
 WARP_ICON_NEW_LORE: |-
@@ -948,15 +947,13 @@ WARP_ICON_NEW_NAME: '&e&lIşınlanmalar | &7Bir ad gir (İptal etmek için "-can
 WARP_ICON_NEW_TYPE: '&e&lIşınlanmalar | &7Yeni bir materyal türü gir (İptal etmek
   için "-cancel" yaz):'
 WARP_ICON_UPDATED: '&e&lIşınlanmalar | &7Işınlanmanın simgesi başarıyla güncellendi.'
-WARP_ILLEGAL_NAME: '&c&lHata | &7Işınlanma adları boş olamaz.'
+WARP_INVALID_NAME: '&c&lError | &7Warp names cannot be empty and must be one word.'
 WARP_LOCATION_UPDATE: '&e&lIşınlanmalar | &7Işınlanmanın konumu senin konumuna başarıyla
   güncellendi.'
-WARP_NAME_TOO_LONG: '&c&lHata | Işınlanma adları 255 karakterden uzun olamaz.'
+WARP_NAME_TOO_LONG: '&c&lHata | &7Işınlanma adları 255 karakterden uzun olamaz.'
 WARP_PUBLIC_UPDATE: '&e&lIşınlanmalar | &7Işınlanma başarıyla halka açıldı.'
 WARP_PRIVATE_UPDATE: '&e&lIşınlanmalar | &7Işınlanma başarıyla halka kapatıldı.'
 WARP_RENAME: '&e&lIşınlanmalar | &7Yeni bir ad gir (İptal etmek için "-cancel" yaz):'
-WARP_RENAME_ALREADY_EXIST: '&c&lHata | &7Bu ad zaten başka bir ışınlanma tarafından
-  alınmış.'
 WARP_RENAME_SUCCESS: '&e&lIşınlanmalar | &7Işınlanma adı başarıyla {0} olarak değiştirildi.'
 WITHDRAW_ALL_MONEY: |-
   &e&lBanka | &7Ada bankasında sadece {0} dolar var.

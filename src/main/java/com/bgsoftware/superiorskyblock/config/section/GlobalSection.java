@@ -363,6 +363,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().warpCategories;
     }
 
+    public String getDefaultWarpCategoryName() {
+        return getContainer().defaultWarpCategoryName;
+    }
+
     public boolean isPhysicsListener() {
         return getContainer().physicsListener;
     }

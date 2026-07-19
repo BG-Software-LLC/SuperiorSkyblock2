@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
-import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -14,7 +13,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -100,19 +99,8 @@ public class IslandSigns {
 
         Reason result = Reason.SUCCESS;
 
-        if (warpName.isEmpty()) {
-            if (sendMessage)
-                Message.WARP_ILLEGAL_NAME.send(superiorPlayer);
-            result = Reason.ILLEGAL_NAME;
-        } else if (island.getWarp(warpName) != null) {
-            if (sendMessage)
-                Message.WARP_ALREADY_EXIST.send(superiorPlayer);
-            result = Reason.ALREADY_EXIST;
-        } else if (!IslandUtils.isWarpNameLengthValid(warpName)) {
-            if (sendMessage)
-                Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
-            result = Reason.NAME_TOO_LONG;
-        }
+        if (!IslandNames.isValidWarpName(superiorPlayer, island, warpName, sendMessage))
+            result = Reason.INVALID_NAME;
 
         if (!PluginEventsFactory.callIslandCreateWarpEvent(island, superiorPlayer, warpName, warpLocation, !privateFlag, null))
             result = Reason.EVENT_CANCELLED;
@@ -166,7 +154,7 @@ public class IslandSigns {
         for (int i = 1; i <= 3; i++)
             warpLines[i] = Formatters.COLOR_FORMATTER.format(warpLines[i]);
 
-        Location islandVisitorsLocation = island.getVisitorsLocation((Dimension) null /* unused */);
+        Location islandVisitorsLocation = island.getVisitorsLocation(null /* unused */);
         Block oldWelcomeSignBlock = islandVisitorsLocation == null ? null : islandVisitorsLocation.getBlock();
 
         if (oldWelcomeSignBlock != null && Materials.isSign(oldWelcomeSignBlock.getType())) {
@@ -200,9 +188,7 @@ public class IslandSigns {
     public enum Reason {
 
         NOT_IN_ISLAND,
-        ILLEGAL_NAME,
-        ALREADY_EXIST,
-        NAME_TOO_LONG,
+        INVALID_NAME,
         LIMIT_REACHED,
         EVENT_CANCELLED,
         SUCCESS

@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -247,9 +246,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<String> name = islandWarp.getString("name").map(_name -> {
-                return IslandUtils.isWarpNameLengthValid(_name) ? _name : _name.substring(0, IslandUtils.getMaxWarpNameLength());
-            });
+            Optional<String> name = islandWarp.getString("name");
             if (!name.isPresent() || name.get().isEmpty()) {
                 Log.warn("Cannot load warps with invalid names for ", uuid.get(), ", skipping...");
                 return;

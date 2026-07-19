@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
@@ -85,6 +86,57 @@ public class IslandNames {
 
     public static String getNameForLookup(String name) {
         return Formatters.STRIP_COLOR_FORMATTER.format(name).toLowerCase(Locale.ENGLISH);
+    }
+
+    public static boolean isWarpNameLengthValid(String warpName) {
+        return !warpName.isEmpty() && warpName.length() <= getMaxWarpNameLength();
+    }
+
+    public static int getMaxWarpNameLength() {
+        return 255;
+    }
+
+    public static boolean isValidWarpName(SuperiorPlayer superiorPlayer, Island island,
+                                          String warpName, boolean sendMessage) {
+        if (warpName.isEmpty() || warpName.contains(" ")) {
+            if (sendMessage)
+                Message.WARP_INVALID_NAME.send(superiorPlayer);
+            return false;
+        }
+
+        if (!isWarpNameLengthValid(warpName)) {
+            if (sendMessage)
+                Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
+            return false;
+        }
+
+        if (island.getWarp(warpName) != null) {
+            if (sendMessage)
+                Message.WARP_ALREADY_EXIST.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isValidWarpCategoryName(@Nullable SuperiorPlayer superiorPlayer, @Nullable String categoryName) {
+        if (Text.isBlank(categoryName) || categoryName.indexOf(' ') >= 0) {
+            if (superiorPlayer != null) {
+                Message.WARP_CATEGORY_INVALID_NAME.send(superiorPlayer);
+            }
+
+            return false;
+        }
+
+        if (!isWarpNameLengthValid(categoryName)) {
+            if (superiorPlayer != null) {
+                Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
 }

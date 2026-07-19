@@ -30,9 +30,10 @@ edit-lore:
 
 items:
   '@':
-    type: STAINED_GLASS_PANE
-    data: 15
-    name: '&f'
+    type: BOOK
+    name: '&6{0}'
+    lore:
+      - '&7This category has {1} warps.'
   '%':
     type: PAPER
     name: '&cPrevious Page'

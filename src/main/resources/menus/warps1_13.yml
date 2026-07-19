@@ -31,7 +31,7 @@ edit-lore:
 items:
   '@':
     type: BOOK
-    name: '&e{0} {2}'
+    name: '&6{0} {2}'
     lore:
       - '&7Located at {1}.'
   '%':

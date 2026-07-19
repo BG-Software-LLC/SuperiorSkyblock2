@@ -29,13 +29,14 @@ public class SWarpCategory implements WarpCategory {
 
     private String name;
     private int slot;
+    @Nullable
     private ItemStack icon;
 
     public SWarpCategory(UUID islandUUID, String name, int slot, @Nullable ItemStack icon) {
         this.islandUUID = islandUUID;
         this.name = name;
         this.slot = slot;
-        this.icon = icon == null ? WarpIcons.DEFAULT_WARP_CATEGORY_ICON.build() : icon;
+        this.icon = icon;
     }
 
     @Override
@@ -83,12 +84,17 @@ public class SWarpCategory implements WarpCategory {
     }
 
     @Override
+    @Nullable
     public ItemStack getRawIcon() {
-        return icon.clone();
+        return icon == null ? null : icon.clone();
     }
 
     @Override
+    @Nullable
     public ItemStack getIcon(@Nullable SuperiorPlayer superiorPlayer) {
+        if (icon == null)
+            return null;
+
         ItemBuilder itemBuilder = new ItemBuilder(icon)
                 .replaceAll("{0}", name);
         return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
@@ -98,7 +104,7 @@ public class SWarpCategory implements WarpCategory {
     public void setIcon(@Nullable ItemStack icon) {
         Log.debug(Debug.SET_WARP_CATEGORY_ICON, getOwnerName(), this.name, icon);
 
-        this.icon = icon == null ? WarpIcons.DEFAULT_WARP_CATEGORY_ICON.build() : icon.clone();
+        this.icon = icon == null ? null : icon.clone();
 
         IslandsDatabaseBridge.updateWarpCategoryIcon(getIsland(), this);
     }

@@ -35,6 +35,7 @@ public class SIslandWarp implements IslandWarp {
     private WorldPosition worldPosition;
     private WorldInfo worldInfo;
     private boolean isPrivate;
+    @Nullable
     private ItemStack icon;
 
     public SIslandWarp(String name, WorldInfo worldInfo, WorldPosition worldPosition, WarpCategory warpCategory, boolean isPrivate, @Nullable ItemStack icon) {
@@ -144,11 +145,13 @@ public class SIslandWarp implements IslandWarp {
     }
 
     @Override
+    @Nullable
     public ItemStack getRawIcon() {
         return icon == null ? null : icon.clone();
     }
 
     @Override
+    @Nullable
     public ItemStack getIcon(SuperiorPlayer superiorPlayer) {
         if (icon == null)
             return null;

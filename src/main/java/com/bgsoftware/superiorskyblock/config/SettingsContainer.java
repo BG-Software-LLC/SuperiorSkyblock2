@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
@@ -227,6 +228,7 @@ public class SettingsContainer {
     public final boolean dropsUpgradePlayersMultiply;
     public final Map<String, Long> messageDelays;
     public final boolean warpCategories;
+    public final String defaultWarpCategoryName;
     public final boolean physicsListener;
     public final double chargeOnWarp;
     public final boolean publicWarps;
@@ -543,7 +545,7 @@ public class SettingsContainer {
             islandPreviewsGameMode = GameMode.valueOf(islandPreviewsGameModeName);
         } catch (IllegalArgumentException error) {
             islandPreviewsGameMode = GameMode.SPECTATOR;
-            Log.warnFromFile("config.yml", "Invalid game mode ", islandPreviewsGameModeName + ", using SPECTATOR instead.");
+            Log.warnFromFile("config.yml", "Invalid game mode ", islandPreviewsGameModeName, ", using SPECTATOR instead.");
         }
         this.islandPreviewsGameMode = islandPreviewsGameMode;
         islandPreviewsMaxDistance = config.getInt("island-previews.max-distance", 100);
@@ -570,6 +572,12 @@ public class SettingsContainer {
         }
         this.messageDelays = Collections.unmodifiableMap(messageDelays);
         warpCategories = config.getBoolean("warp-categories", true);
+        String defaultWarpCategoryName = config.getString("default-warp-category-name");
+        if (!IslandNames.isValidWarpCategoryName(null, defaultWarpCategoryName)) {
+            defaultWarpCategoryName = "Default";
+            Log.warn("config.yml", "Invalid default warp category name '", defaultWarpCategoryName, "', using 'Default' instead.");
+        }
+        this.defaultWarpCategoryName = defaultWarpCategoryName;
         physicsListener = config.getBoolean("physics-listener", true);
         chargeOnWarp = config.getDouble("charge-on-warp", 0D);
         publicWarps = config.getBoolean("public-warps");

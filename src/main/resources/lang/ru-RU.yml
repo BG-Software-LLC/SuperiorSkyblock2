@@ -781,19 +781,19 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lОшибка | &7Вы можете улучшит�
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lОшибка | &7Вы не можете использовать эту команду на других островах.'
 WARP_ALREADY_EXIST: '&c&lОшибка | &7Варп с таким именем уже существует.'
+WARP_CATEGORY_ALREADY_EXIST: '&c&lError | &7There is already a warp category with this name.'
 WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lВарпы | &7Введите новую лор (введите "-cancel" для отмены):
   &e&lВарпы | &7Вы можете разделять строки, используя "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lВарпы | &7Введите имя (введите "-cancel" для отмены):'
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lВарпы | &7Введите новый тип материала (введите "-cancel" для отмены):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lВарпы | &7Успешно обновлен значок категории.'
-WARP_CATEGORY_ILLEGAL_NAME: '&c&lОшибка | &7Имена категорий варпов не могут быть пустыми.'
-WARP_CATEGORY_NAME_TOO_LONG: '&c&lОшибка | Имена категорий варпов не могут превышать 255 символов.'
+WARP_CATEGORY_INVALID_NAME: '&c&lError | &7Warp category names cannot be empty and must be one word.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lОшибка | &7Имена категорий варпов не могут превышать 255 символов.'
 WARP_CATEGORY_SLOT: '&e&lВарпы | &7Введите новый слот (введите "-cancel" для отмены):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lОшибка | &7Этот слот уже занят другой категорией.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lВарпы | &7Успешно изменен слот категории на {0}.'
 WARP_CATEGORY_RENAME: '&e&lВарпы | &7Введите новое имя (введите "-cancel" для отмены):'
-WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lОшибка | &7Это имя уже занято другой категорией.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lВарпы | &7Успешно переименована категория в {0}.'
 WARP_ICON_NEW_LORE: |-
   &e&lВарпы | &7Введите новую лор (введите "-cancel" для отмены):
@@ -801,13 +801,12 @@ WARP_ICON_NEW_LORE: |-
 WARP_ICON_NEW_NAME: '&e&lВарпы | &7Введите имя (введите "-cancel" для отмены):'
 WARP_ICON_NEW_TYPE: '&e&lВарпы | &7Введите новый тип материала (введите "-cancel" для отмены):'
 WARP_ICON_UPDATED: '&e&lВарпы | &7Успешно обновлен значок варпа.'
-WARP_ILLEGAL_NAME: '&c&lОшибка | &7Имена варпов не могут быть пустыми.'
+WARP_INVALID_NAME: '&c&lError | &7Warp names cannot be empty and must be one word.'
 WARP_LOCATION_UPDATE: '&e&lВарпы | &7Успешно обновлено местоположение варпа на ваше текущее местоположение.'
-WARP_NAME_TOO_LONG: '&c&lОшибка | Имена варпов не могут превышать 255 символов.'
+WARP_NAME_TOO_LONG: '&c&lОшибка | &7Имена варпов не могут превышать 255 символов.'
 WARP_PUBLIC_UPDATE: '&e&lВарпы | &7Успешно открыт варп для публики.'
 WARP_PRIVATE_UPDATE: '&e&lВарпы | &7Успешно закрыт варп для публики.'
 WARP_RENAME: '&e&lВарпы | &7Введите новое имя (введите "-cancel" для отмены):'
-WARP_RENAME_ALREADY_EXIST: '&c&lОшибка | &7Это имя уже занято другим варпом.'
 WARP_RENAME_SUCCESS: '&e&lВарпы | &7Успешно переименован варп в {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&lБанк | &7В банке острова только {0} долларов.
