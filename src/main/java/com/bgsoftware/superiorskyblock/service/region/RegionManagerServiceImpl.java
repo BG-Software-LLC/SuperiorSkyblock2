@@ -18,7 +18,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -33,6 +33,7 @@ import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
@@ -85,7 +86,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final Material GOLDEN_DANDELION_TYPE = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
-    private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
+    private static UnparsedEnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -99,13 +100,18 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private static void onSettingsUpdate() {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-        WORLD_PERMISSIONS_CACHE = new EnumerateSet<>(IslandPrivilege.values());
-        plugin.getSettings().getWorldPermissions().forEach(islandPrivilageName -> {
-            try {
-                WORLD_PERMISSIONS_CACHE.add(IslandPrivilege.getByName(islandPrivilageName));
-            } catch (Throwable ignored) {
+        WORLD_PERMISSIONS_CACHE = new UnparsedEnumerateSet<IslandPrivilege>(IslandPrivilege.values()) {
+            @Override
+            protected IslandPrivilege parseName(String name) {
+                return IslandPrivilege.getByName(name);
             }
-        });
+
+            @Override
+            protected String getName(IslandPrivilege islandPrivilege) {
+                return islandPrivilege.getName();
+            }
+        };
+        plugin.getSettings().getWorldPermissions().forEach(WORLD_PERMISSIONS_CACHE::addName);
     }
 
     @Override
@@ -187,7 +193,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             if (!isInteractableItem && stackedBlockAmount <= 1 && islandPrivilege == null)
                 return InteractionResult.SUCCESS;
 
-            EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
+            Material blockType = block.getType();
+            Material usedItemType = usedItem == null ? null : usedItem.getType();
+
+            EntityType spawnType = usedItem == null ? EntityType.UNKNOWN :
+                    Materials.isMinecart(usedItemType) && Materials.isRail(blockType) ? EntityType.MINECART :
+                    Materials.isBoat(blockType) ? EntityType.BOAT : BukkitItems.getEntityType(usedItem);
 
             if (spawnType != EntityType.UNKNOWN) {
                 List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(spawnType));
@@ -202,12 +213,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 return InteractionResult.SUCCESS;
             }
 
-            Material blockType = block.getType();
-            Material usedItemType = usedItem == null ? null : usedItem.getType();
-
-            if (usedItem != null && Materials.isMinecart(usedItemType) ? Materials.isRail(blockType) : Materials.isBoat(blockType)) {
-                islandPrivilege = IslandPrivileges.MINECART_PLACE;
-            } else if (usedItem != null && blockType == VAULT && usedItemType != TRIAL_KEY && usedItemType != OMINOUS_TRIAL_KEY) {
+            if (usedItem != null && blockType == VAULT && usedItemType != TRIAL_KEY && usedItemType != OMINOUS_TRIAL_KEY) {
                 return InteractionResult.SUCCESS;
             } else if (action == Action.PHYSICAL && blockType == FARMLAND || blockType == ROOTED_DIRT ||
                     (usedItem != null && Materials.isHoe(usedItemType))) {
@@ -603,7 +609,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             }
         }
 
-        if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
+        if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ() ||
+                superiorPlayer.asPlayer().getFallDistance() > 0) {
             // Handle moving while in teleport warmup.
             BukkitTask teleportTask = superiorPlayer.getTeleportTask();
             if (teleportTask != null) {

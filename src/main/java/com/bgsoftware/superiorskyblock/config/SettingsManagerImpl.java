@@ -290,16 +290,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public String getSpawnersProvider() {
-        return this.global.getSpawnersProvider();
-    }
-
-    @Override
-    public String getStackedBlocksProvider() {
-        return this.global.getStackedBlocksProvider();
-    }
-
-    @Override
     public boolean isDisbandInventoryClear() {
         List<ClearAction> clearActions = this.global.getClearActionsOnDisband();
         return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
@@ -529,6 +519,21 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public boolean isObsidianToLava() {
         return this.global.isObsidianToLava();
+    }
+
+    @Override
+    public String getSpawnersProvider() {
+        return this.global.getSpawnersProvider();
+    }
+
+    @Override
+    public String getStackedBlocksProvider() {
+        return this.global.getStackedBlocksProvider();
+    }
+
+    @Override
+    public String getPricesProvider() {
+        return this.global.getPricesProvider();
     }
 
     @Override
@@ -786,9 +791,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         if (cfg.get("island-level-formula") != null) {
             cfg.set("block-level-formula", cfg.getString("island-level-formula"));
             cfg.set("island-level-formula", null);
-        }
-        if (!cfg.isConfigurationSection("entity-categories")) {
-            cfg.createSection("entity-categories");
         }
         if (cfg.get("protected-message-delay") instanceof Number) {
             long delay = cfg.getLong("protected-message-delay") * 50;

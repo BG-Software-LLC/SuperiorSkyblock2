@@ -1,20 +1,15 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import org.bukkit.event.inventory.InventoryClickEvent;
-
-import java.util.List;
 
 public class LeaveButton extends AbstractMenuViewButton<BaseMenuView> {
 
@@ -28,7 +23,7 @@ public class LeaveButton extends AbstractMenuViewButton<BaseMenuView> {
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<BaseMenuView> context) {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Island island = inventoryViewer.getIsland();
 
@@ -50,7 +45,7 @@ public class LeaveButton extends AbstractMenuViewButton<BaseMenuView> {
 
         @Override
         public MenuTemplateButton<BaseMenuView> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, leaveIsland);
+            return new Template(this, leaveIsland);
         }
 
     }
@@ -59,10 +54,8 @@ public class LeaveButton extends AbstractMenuViewButton<BaseMenuView> {
 
         private final boolean leaveIsland;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, boolean leaveIsland) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    LeaveButton.class, LeaveButton::new);
+        Template(AbstractBuilder<BaseMenuView> builder, boolean leaveIsland) {
+            super(builder, LeaveButton.class, LeaveButton::new);
             this.leaveIsland = leaveIsland;
         }
 

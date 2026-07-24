@@ -195,14 +195,14 @@ public class EntityTeleports {
                 Location closestSafeSpot = null;
                 double closestSafeSpotDistance = 0;
 
-                int worldBuildLimit = islandsWorld.getMaxHeight() - 1;
+                int worldBuildLimit = islandsWorld.getMaxHeight();
                 int worldMinLimit = plugin.getNMSWorld().getMinHeight(islandsWorld);
 
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         int y = chunkSnapshot.getHighestBlockYAt(x, z);
 
-                        if (y < worldMinLimit || y + 2 > worldBuildLimit)
+                        if (y - 1 <= worldMinLimit || y + 1 >= worldBuildLimit)
                             continue;
 
                         int worldX = chunkSnapshot.getX() * 16 + x;
@@ -213,9 +213,9 @@ public class EntityTeleports {
                         // returned block and the block below it.
                         Location safeSpot;
                         if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
-                            safeSpot = new Location(islandsWorld, worldX, y + 1, worldZ);
-                        } else if (y - 1 >= worldMinLimit && WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
                             safeSpot = new Location(islandsWorld, worldX, y, worldZ);
+                        } else if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
+                            safeSpot = new Location(islandsWorld, worldX, y - 1, worldZ);
                         } else {
                             continue;
                         }

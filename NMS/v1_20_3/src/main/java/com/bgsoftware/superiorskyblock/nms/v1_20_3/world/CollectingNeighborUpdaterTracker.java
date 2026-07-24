@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_3.world;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -9,13 +10,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.CollectingNeighborUpdater;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockStates;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlockState;
 
 public class CollectingNeighborUpdaterTracker extends CollectingNeighborUpdater {
 
+    private static final ReflectMethod<CraftBlockState> BLOCK_STATE_CREATE = new ReflectMethod<>(
+            CraftBlockState.class, "getBlockState", World.class, BlockPos.class, BlockState.class, BlockEntity.class);
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Level level;
@@ -34,7 +39,7 @@ public class CollectingNeighborUpdaterTracker extends CollectingNeighborUpdater 
             // Block was changed, let's call an update
             GameEventArgs.BlockUpdateShapeEvent blockUpdateShapeEvent = new GameEventArgs.BlockUpdateShapeEvent();
             blockUpdateShapeEvent.block = CraftBlock.at(this.level, pos);
-            blockUpdateShapeEvent.oldState = CraftBlockStates.getUnplacedBlockState(this.level, pos, oldState);
+            blockUpdateShapeEvent.oldState = BLOCK_STATE_CREATE.invoke(null, blockUpdateShapeEvent.block.getWorld(), pos, oldState, null);
             GameEvent<GameEventArgs.BlockUpdateShapeEvent> gameEvent = GameEventType.BLOCK_UPDATE_SHAPE_EVENT.createEvent(blockUpdateShapeEvent);
             plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.MONITOR);
         }

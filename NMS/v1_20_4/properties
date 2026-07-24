@@ -1,4 +1,5 @@
 NMS_VERSION=v1_20_4
+SCULK_SENSOR_SUPPORT=true
 CRAFTBUKKIT_PACKAGE=org.bukkit.craftbukkit
 COMMON_NMS_PACKAGE=com.bgsoftware.superiorskyblock.nms.v1_20_3
 PAPER_CHUNK_BLOCK_CONTROLLER_CLASS=com.destroystokyo.paper.antixray.ChunkPacketBlockController
@@ -10,3 +11,6 @@ ABSTRACT_MINECART_SUBPACKAGE=vehicle
 GET_RANDOM_TICK_SPEED_METHOD=getInt(net.minecraft.world.level.GameRules.RULE_RANDOMTICKING)
 END_DRAGON_FIGHT_CLASS=EndDragonFight
 SPIKE_FEATURE_CLASS=SpikeFeature
+ENTITY_TYPE_VALUES_CLASS=net.minecraft.world.entity.EntityType
+BLOCK_ENTITY_TYPE_VALUES_CLASS=net.minecraft.world.level.block.entity.BlockEntityType
+VIBRATION_USER_GAME_EVENT_PARAMETER_CLASS=net.minecraft.core.Holder<GameEvent>

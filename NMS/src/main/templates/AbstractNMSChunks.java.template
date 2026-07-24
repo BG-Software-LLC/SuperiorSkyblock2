@@ -171,13 +171,13 @@ public abstract class AbstractNMSChunks implements NMSChunks {
 
         if (stop) {
             long packedPos = NMSUtils.getChunkPackedPos(chunk.getX(), chunk.getZ());
-            CropsBlockEntity cropsBlockEntity = CropsBlockEntity.remove(packedPos);
+            CropsBlockEntity cropsBlockEntity = CropsBlockEntity.remove(chunk.getWorld().getName(), packedPos);
             if (cropsBlockEntity != null)
                 cropsBlockEntity.remove();
         } else {
             ServerLevel serverLevel = ((CraftWorld) chunk.getWorld()).getHandle();
             LevelChunk levelChunk = serverLevel.getChunk(chunk.getX(), chunk.getZ());
-            CropsBlockEntity.create(island, levelChunk);
+            CropsBlockEntity.create(island, chunk.getWorld().getName(), levelChunk);
         }
     }
 
@@ -293,7 +293,7 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     }
 
     protected void removeEntities(LevelChunk levelChunk) {
-        ServerLevel serverLevel = levelChunk.level;
+        ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
 
         int chunkWorldCoordX = levelChunk.locX << 4;
         int chunkWorldCoordZ = levelChunk.locZ << 4;

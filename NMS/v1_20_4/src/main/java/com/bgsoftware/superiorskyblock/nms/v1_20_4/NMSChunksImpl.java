@@ -21,7 +21,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
+import net.minecraft.network.protocol.game.ClientboundChunkBatchFinishedPacket;
+import net.minecraft.network.protocol.game.ClientboundChunkBatchStartPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -55,6 +56,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_4.AbstractNMSChunks {
 
+    private static final ClientboundChunkBatchFinishedPacket CHUNK_BATCH_FINISHED_PACKET = new ClientboundChunkBatchFinishedPacket(1);
+
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
     }
@@ -81,14 +84,18 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_4.A
 
                 levelChunk.setUnsaved(true);
 
-                ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos);
                 ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk, levelChunk.level.getLightEngine(), null, null, true);
+                        levelChunk, levelChunk.getLevel().getLightEngine(), null, null);
 
                 playersToUpdate.forEach(player -> {
                     ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                    serverPlayer.connection.send(forgetLevelChunkPacket);
-                    serverPlayer.connection.send(mapChunkPacket);
+
+                    try {
+                        serverPlayer.connection.send(ClientboundChunkBatchStartPacket.INSTANCE);
+                        serverPlayer.connection.send(mapChunkPacket);
+                    } finally {
+                        serverPlayer.connection.send(CHUNK_BATCH_FINISHED_PACKET);
+                    }
                 });
             }
 

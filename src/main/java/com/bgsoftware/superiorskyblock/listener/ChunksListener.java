@@ -94,8 +94,6 @@ public class ChunksListener extends AbstractGameEventListener {
 
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
-
-        Arrays.stream(chunk.getEntities()).forEach(this.worldRecordService.get()::recordEntityDespawn);
     }
 
     private void handleChunkLoad(Chunk chunk, boolean isNewChunk) {
@@ -117,15 +115,15 @@ public class ChunksListener extends AbstractGameEventListener {
         World world = chunk.getWorld();
         Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
 
-        if (isNewChunk && dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-            Biome defaultWorldBiome = IslandUtils.getDefaultWorldBiome(dimension);
+        if (isNewChunk) {
+            Biome biome = island.getBiome(dimension);
             // We want to update the biome for new island chunks.
-            if (island.getBiome() != defaultWorldBiome) {
+            if (biome != IslandUtils.getDefaultWorldBiome(dimension)) {
                 List<Player> playersToUpdate;
                 try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
                     playersToUpdate = strategy.getPlayers(WorldInfo.of(world));
                 }
-                plugin.getNMSChunks().setBiome(Collections.singletonList(chunkPosition), island.getBiome(), playersToUpdate);
+                plugin.getNMSChunks().setBiome(Collections.singletonList(chunkPosition), biome, playersToUpdate);
             }
         }
 
@@ -150,10 +148,8 @@ public class ChunksListener extends AbstractGameEventListener {
         MutableBoolean recalculateEntities = new MutableBoolean(false);
 
         if (chunk.getX() == (islandCenter.getX() >> 4) && chunk.getZ() == (islandCenter.getZ() >> 4)) {
-            if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-                Block chunkBlock = chunk.getBlock(0, 100, 0);
-                island.setBiome(world.getBiome(chunkBlock.getX(), chunkBlock.getZ()), false);
-            }
+            Block chunkBlock = chunk.getBlock(0, 100, 0);
+            island.setBiome(dimension, world.getBiome(chunkBlock.getX(), chunkBlock.getZ()), 0);
 
             if (entityLimitsEnabled)
                 recalculateEntities.set(true);

@@ -1,10 +1,18 @@
 package com.bgsoftware.superiorskyblock.missions;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.ObjectsPool;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
+import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.KeyRequirements;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,25 +25,31 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static com.bgsoftware.superiorskyblock.core.ObjectsPools.Wrapper;
 
 @SuppressWarnings("unused")
 public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTracker> implements Listener {
 
+    private static final long COUNT_INVENTORY_THRESHOLD = TimeUnit.SECONDS.toMillis(1);
+    private final ObjectsPool<Wrapper<ItemProgress[]>> ITEM_PROGRESS_POOL = ObjectsPools.createNewPool(this::createProgressLookup);
+
     private final Map<KeyRequirements, Integer> requiredItems = new LinkedHashMap<>();
+    private int totalRequiredAmount;
 
     @Override
     protected void loadConfiguration(ConfigurationSection section) throws MissionLoadException {
@@ -50,6 +64,7 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
                     itemStacks.add(Key.ofMaterialAndData(itemStackName.toUpperCase(Locale.ENGLISH))));
             int requiredAmount = section.getInt("required-items." + key + ".amount");
             requiredItems.put(new KeyRequirements(itemStacks), requiredAmount);
+            this.totalRequiredAmount += requiredAmount;
         }
     }
 
@@ -65,56 +80,13 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
 
     @Override
     public double getProgress(SuperiorPlayer superiorPlayer) {
-        double progress = 0.0;
+        int totalItemAmount = getProgressValue(superiorPlayer);
+        if (totalItemAmount <= 0)
+            return 0D;
 
-        Player player = superiorPlayer.asPlayer();
+        double progress = (double) totalItemAmount / this.totalRequiredAmount;
 
-        if (player == null)
-            return progress;
-
-        Inventory inventory = player.getInventory();
-        Map<ItemStack, Integer> countedItems = countItems(inventory);
-
-        int totalRequiredAmount = 0;
-        int totalItemAmount = 0;
-
-        ItemsTracker itemsTracker = getOrCreate(superiorPlayer, s -> new ItemsTracker());
-
-        if (itemsTracker == null)
-            return 0.0;
-
-        for (Map.Entry<KeyRequirements, Integer> entry : requiredItems.entrySet()) {
-            KeyRequirements requirement = entry.getKey();
-            int requiredAmount = entry.getValue();
-
-            int itemAmount = 0;
-            for (Key item : requirement) {
-                try {
-                    //Get the amount of the item.
-                    Material type = Material.valueOf(item.getGlobalKey());
-                    short data = item.getSubKey().isEmpty() ? 0 : Short.parseShort(item.getSubKey());
-                    int currentItemAmount = countedItems.get(new ItemStack(type, 1, data));
-
-                    //Making sure to not exceed the required item amount
-                    if (itemAmount + currentItemAmount > requiredAmount)
-                        currentItemAmount = requiredAmount - itemAmount;
-
-                    //Summing the amount to a global variable
-                    itemAmount += currentItemAmount;
-
-                    //Adding the item to a list, so we can remove it later.
-                    itemsTracker.track(new ItemStack(type, currentItemAmount, data));
-                } catch (Exception ignored) {
-                }
-            }
-
-            totalRequiredAmount += requiredAmount;
-            totalItemAmount += itemAmount;
-        }
-
-        progress = Math.max(progress, (double) totalItemAmount / totalRequiredAmount);
-
-        return progress;
+        return Math.max(0, progress);
     }
 
     @Override
@@ -124,45 +96,41 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
         if (player == null)
             return 0;
 
-        Inventory inventory = player.getInventory();
-        Map<ItemStack, Integer> countedItems = countItems(inventory);
-
-        int totalItemAmount = 0;
-
         ItemsTracker itemsTracker = getOrCreate(superiorPlayer, s -> new ItemsTracker());
 
         if (itemsTracker == null)
             return 0;
 
-        for (Map.Entry<KeyRequirements, Integer> entry : requiredItems.entrySet()) {
-            KeyRequirements requirement = entry.getKey();
-            int requiredAmount = entry.getValue();
+        return countItemsForPlayerInternal(player, itemsTracker);
+    }
 
-            int itemAmount = 0;
-            for (Key item : requirement) {
-                try {
-                    //Get the amount of the item.
-                    Material type = Material.valueOf(item.getGlobalKey());
-                    short data = item.getSubKey().isEmpty() ? 0 : Short.parseShort(item.getSubKey());
-                    int currentItemAmount = countedItems.get(new ItemStack(type, 1, data));
+    private int countItemsForPlayerInternal(Player player, ItemsTracker itemsTracker) {
+        long currTime = System.currentTimeMillis();
 
-                    //Making sure to not exceed the required item amount
-                    if (itemAmount + currentItemAmount > requiredAmount)
-                        currentItemAmount = requiredAmount - itemAmount;
+        if (itemsTracker.lastCountTime > 0 && currTime < itemsTracker.lastCountTime)
+            return itemsTracker.totalItemAmount;
 
-                    //Summing the amount to a global variable
-                    itemAmount += currentItemAmount;
-
-                    //Adding the item to a list, so we can remove it later.
-                    itemsTracker.track(new ItemStack(type, currentItemAmount, data));
-                } catch (Exception ignored) {
-                }
+        try (Wrapper<ItemProgress[]> progressLookupWrapper = ITEM_PROGRESS_POOL.obtain()) {
+            ItemProgress[] progressLookup = progressLookupWrapper.getHandle();
+            for (ItemProgress itemProgress : progressLookup) {
+                itemProgress.count = 0;
             }
 
-            totalItemAmount += itemAmount;
+            itemsTracker.clear(currTime);
+
+            for (ItemStack itemStack : player.getInventory().getContents()) {
+                if (itemStack != null && itemStack.getType() != Material.AIR) {
+                    Pair<Key, Integer> missionItemData = getMissionItemData(itemStack);
+                    if (missionItemData != null) {
+                        ItemProgress itemProgress = progressLookup[missionItemData.getValue()];
+                        int counted = itemProgress.track(itemStack.getAmount());
+                        itemsTracker.track(itemStack, missionItemData.getKey(), counted);
+                    }
+                }
+            }
         }
 
-        return totalItemAmount;
+        return itemsTracker.totalItemAmount;
     }
 
     @Override
@@ -176,7 +144,32 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
         Player player = superiorPlayer.asPlayer();
         assert player != null;
 
-        removeItems(player.getInventory(), itemsTracker.getItems().toArray(new ItemStack[0]));
+        removeItems(player.getInventory(), itemsTracker);
+    }
+
+    @Override
+    public void formatItem(SuperiorPlayer superiorPlayer, ItemStack itemStack) {
+        ItemsTracker itemsTracker = getOrCreate(superiorPlayer, s -> new ItemsTracker());
+
+        if (itemsTracker == null)
+            return;
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        if (itemMeta == null)
+            return;
+
+        if (itemMeta.hasDisplayName())
+            itemMeta.setDisplayName(Placeholders.parseKeyPlaceholders(this.requiredItems, itemsTracker::getCount, itemMeta.getDisplayName(), true));
+
+        if (itemMeta.hasLore()) {
+            List<String> lore = new ArrayList<>();
+            for (String line : Objects.requireNonNull(itemMeta.getLore()))
+                lore.add(Placeholders.parseKeyPlaceholders(this.requiredItems, itemsTracker::getCount, line, true));
+            itemMeta.setLore(lore);
+        }
+
+        itemStack.setItemMeta(itemMeta);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -195,7 +188,7 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
     }
 
     private void handleItemPickup(Player player, @Nullable ItemStack itemStack) {
-        if (!isMissionItem(itemStack))
+        if (getMissionItemData(itemStack) == null)
             return;
 
         SuperiorPlayer superiorPlayer = this.plugin.getPlayers().getSuperiorPlayer(player);
@@ -209,70 +202,110 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
         }), 2L);
     }
 
-    private boolean isMissionItem(@Nullable ItemStack itemStack) {
-        if (itemStack == null)
-            return false;
+    @Nullable
+    private Pair<Key, Integer> getMissionItemData(@Nullable ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType() == Material.AIR)
+            return null;
 
-        for (KeyRequirements requirement : requiredItems.keySet()) {
-            if (requirement.contains(Key.of(itemStack)))
-                return true;
+        Key itemKey = Key.of(itemStack);
+
+        int index = 0;
+        for (KeyRequirements requirements : requiredItems.keySet()) {
+            if (requirements.contains(itemKey))
+                return new Pair<>(requirements.getKey(itemKey), index);
+            ++index;
         }
 
-        return false;
+        return null;
     }
 
-    private static Map<ItemStack, Integer> countItems(Inventory inventory) {
-        Map<ItemStack, Integer> countedItems = new HashMap<>();
+    private static void removeItems(PlayerInventory inventory, ItemsTracker itemsTracker) {
+        if (itemsTracker.itemsTracker.isEmpty())
+            return;
 
-        Arrays.stream(inventory.getContents()).filter(Objects::nonNull).forEach(itemStack -> {
-            ItemStack key = itemStack.clone();
-            key.setAmount(1);
-            countedItems.put(key, countedItems.getOrDefault(key, 0) + itemStack.getAmount());
-        });
-
-        return countedItems;
+        for (Pair<ItemStack, Integer> itemToRemove : itemsTracker.itemsTracker) {
+            ItemStack itemStack = itemToRemove.getKey();
+            int removeCount = itemToRemove.getValue();
+            int itemAmount = itemStack.getAmount();
+            int newCount = Math.max(0, itemAmount - removeCount);
+            itemStack.setAmount(newCount);
+        }
     }
 
-    private static void removeItems(PlayerInventory inventory, ItemStack... itemStacks) {
-        Collection<ItemStack> leftOvers = inventory.removeItem(itemStacks).values();
+    private ItemProgress[] createProgressLookup() {
+        ItemProgress[] lookupArray = new ItemProgress[this.requiredItems.size()];
 
-        if (leftOvers.isEmpty())
-            return;
+        int index = 0;
+        for (Integer requiredAmount : this.requiredItems.values())
+            lookupArray[index++] = new ItemProgress(requiredAmount);
 
-        // We try to remove the item from the offhand as well.
+        return lookupArray;
+    }
 
-        ItemStack offHandItem;
+    private static class ItemProgress {
 
-        try {
-            offHandItem = inventory.getItem(40);
-        } catch (Exception ignored) {
-            return;
+        private final int requiredCount;
+        private int count;
+
+        ItemProgress(int requiredCount) {
+            this.requiredCount = requiredCount;
         }
 
-        if (offHandItem != null && offHandItem.getType() != Material.AIR) {
-            for (ItemStack itemStack : leftOvers) {
-                if (offHandItem.isSimilar(itemStack)) {
-                    if (offHandItem.getAmount() > itemStack.getAmount()) {
-                        offHandItem.setAmount(offHandItem.getAmount() - itemStack.getAmount());
-                    } else {
-                        itemStack.setAmount(itemStack.getAmount() - offHandItem.getAmount());
-                        inventory.setItem(40, new ItemStack(Material.AIR));
-                    }
-                }
+        int track(int delta) {
+            int newCount = this.count + delta;
+
+            if (newCount >= this.requiredCount) {
+                int oldCount = this.count;
+                this.count = this.requiredCount;
+                return this.requiredCount - oldCount;
+            } else {
+                this.count = newCount;
+                return delta;
             }
         }
+
     }
 
-    public static class ItemsTracker {
+    public class ItemsTracker {
 
-        private final Set<ItemStack> itemsTracker = new HashSet<>();
+        private final Set<Pair<ItemStack, Integer>> itemsTracker = new HashSet<>();
+        private final KeyMap<Counter> countedItems = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        private int totalItemAmount = 0;
+        private long lastCountTime = -1;
 
-        void track(ItemStack itemStack) {
-            itemsTracker.add(itemStack.clone());
+        void track(ItemStack itemStack, Key itemKey, int count) {
+            if (count > 0) {
+                itemsTracker.add(new Pair<>(itemStack, count));
+                this.totalItemAmount += count;
+                this.countedItems.computeIfAbsent(itemKey, i -> new Counter(0)).inc(count);
+            }
         }
 
-        Set<ItemStack> getItems() {
-            return itemsTracker;
+        int getCount(Key key) {
+            Counter counter = this.countedItems.get(key);
+            return counter == null ? 0 : counter.get();
+        }
+
+        void clear(long currTime) {
+            itemsTracker.clear();
+            countedItems.clear();
+            totalItemAmount = 0;
+            lastCountTime = currTime + COUNT_INVENTORY_THRESHOLD;
+        }
+
+        @Nullable
+        private Key getMissionItemKey(@Nullable ItemStack itemStack) {
+            if (itemStack == null || itemStack.getType() == Material.AIR)
+                return null;
+
+            Key itemKey = Key.of(itemStack);
+
+            for (KeyRequirements requirements : requiredItems.keySet()) {
+                if (requirements.contains(itemKey))
+                    return requirements.getKey(itemKey);
+            }
+
+            return null;
         }
 
     }

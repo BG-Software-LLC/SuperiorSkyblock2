@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -338,6 +339,16 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public ChatState getChatState() {
+        return this.handle.getChatState();
+    }
+
+    @Override
+    public void setChatState(ChatState chatState) {
+        this.handle.setChatState(chatState);
+    }
+
+    @Override
     public boolean hasSchematicModeEnabled() {
         return this.handle.hasSchematicModeEnabled();
     }
@@ -353,16 +364,19 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public boolean hasTeamChatEnabled() {
         return this.handle.hasTeamChatEnabled();
     }
 
     @Override
+    @Deprecated
     public void toggleTeamChat() {
         this.handle.toggleTeamChat();
     }
 
     @Override
+    @Deprecated
     public void setTeamChat(boolean enabled) {
         this.handle.setTeamChat(enabled);
     }
@@ -583,6 +597,16 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void savePersistentDataContainer() {
         this.handle.savePersistentDataContainer();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
     }
 
 }

@@ -211,19 +211,32 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         Material handItemType = usedItem.getType();
         Material clickedBlockType = e.getArgs().clickedBlock.getType();
-        if (!Materials.isBoat(handItemType) && (!Materials.isMinecart(handItemType) || !Materials.isRail(clickedBlockType)))
+
+        EntityType spawnType = Materials.isMinecart(handItemType) && Materials.isRail(clickedBlockType) ? EntityType.MINECART :
+                Materials.isBoat(handItemType) ? EntityType.BOAT : null;
+        if (spawnType == null)
             return false;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
 
-        InteractionResult interactionResult;
+        List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(spawnType));
+
+        if (entityCategories.isEmpty())
+            return false;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
-                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), IslandPrivileges.MINECART_PLACE);
-        }
-        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
-            e.setCancelled();
-            return true;
+            Location clickedBlockLocation = e.getArgs().clickedBlock.getLocation(wrapper.getHandle());
+
+            for (EntityCategory entityCategory : entityCategories) {
+                if (entityCategory.getSpawnPrivilege() != null) {
+                    InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(
+                            superiorPlayer, clickedBlockLocation, entityCategory.getSpawnPrivilege());
+                    if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+                        e.setCancelled();
+                        return true;
+                    }
+                }
+            }
         }
 
         return false;

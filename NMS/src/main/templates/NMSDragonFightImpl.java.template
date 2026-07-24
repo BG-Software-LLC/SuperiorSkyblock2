@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEntityEnd
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.SpikesCache;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.google.common.cache.LoadingCache;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
@@ -43,13 +44,13 @@ public class NMSDragonFightImpl implements NMSDragonFight {
     private static boolean firstWorldPreparation = true;
 
     static {
-        ENTITY_TYPES_BUILDER.set(EntityType.ENDER_DRAGON, (EntityType.EntityFactory<EnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
+        ENTITY_TYPES_BUILDER.set(${ENTITY_TYPE_VALUES_CLASS}.ENDER_DRAGON, (EntityType.EntityFactory<EnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
     }
 
     @Override
     public void prepareEndWorld(World bukkitWorld) {
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        WORLD_DRAGON_BATTLE.set(serverLevel, new EndDragonFightWrapper(serverLevel));
+        WORLD_DRAGON_BATTLE.set(serverLevel, new EndDragonFightWrapper(serverLevel, BlockPos.ZERO));
 
         if (firstWorldPreparation) {
             firstWorldPreparation = false;

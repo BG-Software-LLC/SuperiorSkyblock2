@@ -32,6 +32,7 @@ import net.minecraft.server.v1_16_R3.IInventory;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.World;
+import org.bukkit.block.Biome;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -59,6 +60,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -205,6 +207,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
+        // Doesn't exist
+    }
+
+    @Override
     public void addPotion(PotionMeta potionMeta, PotionEffect potionEffect) {
         if (!potionMeta.hasCustomEffects())
             potionMeta.setColor(potionEffect.getType().getColor());
@@ -259,6 +266,15 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         MenuCreator menuCreator = MENUS_HOLDER_CREATORS.get(inventoryType);
         return menuCreator == null ? null : menuCreator.apply(defaultHolder, title);
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private static Enchantment initializeGlowEnchantment() {

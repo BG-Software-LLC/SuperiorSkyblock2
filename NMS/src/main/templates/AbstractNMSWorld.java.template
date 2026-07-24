@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
@@ -30,6 +31,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -88,7 +90,16 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
     @Override
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return getBlockKeyInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return ConstantKeys.AIR;
+        }
+    }
+
+    private Key getBlockKeyInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         Block block = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState().getBlock();
+
         Location location = new Location(
                 Bukkit.getWorld(chunkSnapshot.getWorldName()),
                 (chunkSnapshot.getX() << 4) + x,
@@ -97,6 +108,20 @@ public abstract class AbstractNMSWorld implements NMSWorld {
         );
 
         return Keys.of(KeyBlocksCache.getBlockKey(block), location);
+    }
+
+    @Override
+    public boolean canPlayerSuffocate(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        try {
+            return canPlayerSuffocateInternal(chunkSnapshot, x, y, z);
+        } catch (ArrayIndexOutOfBoundsException error) {
+            return true;
+        }
+    }
+
+    private boolean canPlayerSuffocateInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        BlockState blockState = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState();
+        return !blockState.getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).isEmpty();
     }
 
     @Override

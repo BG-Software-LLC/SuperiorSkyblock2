@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
@@ -7,12 +8,11 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IconDisplayButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IconEditLoreButton;
@@ -45,19 +45,19 @@ public class MenuWarpIconEdit extends AbstractMenu<AbstractIconProviderMenu.View
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<AbstractIconProviderMenu.View<IslandWarp>> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-type", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-type", menuSlotsMap),
                 new IconEditTypeButton.Builder<>(Message.WARP_ICON_NEW_TYPE));
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-rename", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-rename", menuSlotsMap),
                 new IconRenameButton.Builder<>(Message.WARP_ICON_NEW_NAME));
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-relore", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-relore", menuSlotsMap),
                 new IconEditLoreButton.Builder<>(Message.WARP_ICON_NEW_LORE));
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-confirm", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-confirm", menuSlotsMap),
                 new WarpIconEditConfirmButton.Builder());
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-slots", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-slots", menuSlotsMap),
                 new IconDisplayButton.Builder<>());
 
         return new MenuWarpIconEdit(menuParseResult);
@@ -86,8 +86,11 @@ public class MenuWarpIconEdit extends AbstractMenu<AbstractIconProviderMenu.View
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", getIconProvider().getName());
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = getIconProvider().getName();
         }
     }
 

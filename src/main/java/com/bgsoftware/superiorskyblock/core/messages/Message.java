@@ -19,13 +19,8 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -34,7 +29,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -294,6 +288,7 @@ public enum Message {
     COMMAND_DESCRIPTION_KICK,
     COMMAND_DESCRIPTION_LANG,
     COMMAND_DESCRIPTION_LEAVE,
+    COMMAND_DESCRIPTION_LOCAL_CHAT,
     COMMAND_DESCRIPTION_MEMBERS,
     COMMAND_DESCRIPTION_MISSION,
     COMMAND_DESCRIPTION_MISSIONS,
@@ -390,36 +385,7 @@ public enum Message {
     GOT_BANNED,
     GOT_DEMOTED,
     GOT_EXPELLED,
-    GOT_INVITE {
-        @Override
-        public void send(CommandSender sender, Locale locale, Object... args) {
-            if (!(sender instanceof Player)) {
-                super.send(sender, locale, args);
-            } else {
-                String message = getMessage(locale);
-
-                if (message == null)
-                    return;
-
-                BaseComponent[] baseComponents = TextComponent.fromLegacyText(message);
-                if (!GOT_INVITE_TOOLTIP.isEmpty(locale)) {
-                    for (BaseComponent baseComponent : baseComponents)
-                        baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(GOT_INVITE_TOOLTIP.getMessage(locale))}));
-                }
-
-                for (BaseComponent baseComponent : baseComponents)
-                    baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " accept " + args[0]));
-
-                IMessageComponent messageComponent = ComplexMessageComponent.of(baseComponents);
-                if (messageComponent != null) {
-                    PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
-                    if (!event.isCancelled())
-                        event.getArgs().messageComponent.sendMessage(sender, args);
-                }
-            }
-        }
-    },
-    GOT_INVITE_TOOLTIP,
+    GOT_INVITE,
     GOT_KICKED,
     GOT_PROMOTED,
     GOT_REVOKED,
@@ -583,6 +549,7 @@ public enum Message {
     LEFT_ISLAND,
     LEFT_ISLAND_COOP,
     LEFT_ISLAND_COOP_NAME,
+    LOCAL_CHAT_FORMAT,
     LOCK_WORLD_ANNOUNCEMENT_ALL,
     LOCK_WORLD_ANNOUNCEMENT_NAME,
     LOCK_WORLD_ANNOUNCEMENT,
@@ -733,6 +700,7 @@ public enum Message {
     SPAWN_PROTECTED_OPPED,
     SPAWN_SET_SUCCESS,
     SPAWN_TELEPORT_SUCCESS,
+    SPY_LOCAL_CHAT_FORMAT,
     SPY_TEAM_CHAT_FORMAT,
     SYNC_UPGRADES,
     SYNC_UPGRADES_ALL,
@@ -753,6 +721,8 @@ public enum Message {
     TOGGLED_FLY_ON,
     TOGGLED_FLY_OFF_OTHER,
     TOGGLED_FLY_ON_OTHER,
+    TOGGLED_LOCAL_CHAT_OFF,
+    TOGGLED_LOCAL_CHAT_ON,
     TOGGLED_SCHEMATIC_OFF,
     TOGGLED_SCHEMATIC_ON,
     TOGGLED_SPY_OFF,
@@ -815,6 +785,7 @@ public enum Message {
     WITHDRAW_ANNOUNCEMENT,
     WITHDRAW_ERROR,
     WORLD_NOT_ENABLED,
+    WORLD_NOT_GENERATED,
     WORLD_NOT_UNLOCKED,
 
     CUSTOM(true) {
@@ -831,26 +802,21 @@ public enum Message {
                 message = Formatters.COLOR_FORMATTER.format(message);
             }
 
-            for (MessagesServiceImpl.CustomComponentParser parser : messagesService.get().getCustomComponentParsers()) {
-                Optional<IMessageComponent> component = parser.parse(message);
-                if (component.isPresent()) {
-                    component.get().sendMessage(sender);
-                    return;
-                }
-            }
-
-            sender.sendMessage(message);
+            MessagesService.Builder builder = messagesService.get().newBuilder();
+            builder.addRawMessage(message);
+            builder.build().sendMessage(sender);
         }
 
     };
 
+    private static final String[] IGNORED_SECTIONS = new String[]{"lang/en-US.yml", "GOT_INVITE"};
     private static final Object[] EMPTY_ARGS = new Object[0];
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final LazyReference<MessagesServiceImpl> messagesService = new LazyReference<MessagesServiceImpl>() {
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
         @Override
-        protected MessagesServiceImpl create() {
-            return (MessagesServiceImpl) plugin.getServices().getService(MessagesService.class);
+        protected MessagesService create() {
+            return plugin.getServices().getService(MessagesService.class);
         }
     };
 
@@ -865,18 +831,13 @@ public enum Message {
     }
 
     Message(boolean isCustom) {
-        this(null, isCustom, 0L, null);
+        this.defaultMessage = null;
+        this.isCustom = isCustom;
     }
 
     Message(String defaultMessage) {
-        this(defaultMessage, false, 0L, null);
-    }
-
-    Message(String defaultMessage, boolean isCustom, long delay, @Nullable TimeUnit delayUnit) {
         this.defaultMessage = defaultMessage;
-        this.isCustom = isCustom;
-        if (delay > 0 && delayUnit != null)
-            delayedMessages = AutoRemovalCollection.newHashSet(delay, delayUnit);
+        this.isCustom = false;
     }
 
     public static void reload() {
@@ -893,6 +854,7 @@ public enum Message {
             plugin.saveResource("lang/en-US.yml", false);
             plugin.saveResource("lang/es-ES.yml", false);
             plugin.saveResource("lang/fr-FR.yml", false);
+            plugin.saveResource("lang/hu-HU.yml", false);
             plugin.saveResource("lang/it-IT.yml", false);
             plugin.saveResource("lang/iw-IL.yml", false);
             plugin.saveResource("lang/pl-PL.yml", false);
@@ -924,8 +886,18 @@ public enum Message {
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
 
+            // Additional saving, because we are not adding a new message, we are only changing the format of the old one,
+            // so cfg.syncWithConfig() will not detect it and will not save the file.
+            if (convertData(cfg)) {
+                try {
+                    cfg.save(langFile);
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
+                }
+            }
+
             try (InputStream langResourceStream = plugin.getResource("lang/" + langFile.getName())) {
-                cfg.syncWithConfig(langFile, langResourceStream == null ? plugin.getResource("lang/en-US.yml") : langResourceStream, "lang/en-US.yml");
+                cfg.syncWithConfig(langFile, langResourceStream == null ? plugin.getResource("lang/en-US.yml") : langResourceStream, IGNORED_SECTIONS);
             } catch (Exception error) {
                 Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
             }
@@ -950,9 +922,9 @@ public enum Message {
     }
 
     public boolean isEmpty(Locale locale) {
-        IMessageComponent messageContainer = getComponent(locale);
-        return messageContainer == null || messageContainer.getType() == IMessageComponent.Type.EMPTY ||
-                messageContainer.getMessage().isEmpty();
+        IMessageComponent messageComponent = getComponent(locale);
+        return messageComponent == null || messageComponent.getType() == IMessageComponent.Type.EMPTY ||
+                messageComponent.getMessage(EMPTY_ARGS).isEmpty();
     }
 
     @Nullable
@@ -968,6 +940,18 @@ public enum Message {
     @Nullable
     public String getMessage(Locale locale, Object... args) {
         return isEmpty(locale) ? defaultMessage : messages.get(locale).getMessage(args);
+    }
+
+    public final void sendPlayerOrConsole(@Nullable SuperiorPlayer superiorPlayer) {
+        sendPlayerOrConsole(superiorPlayer, EMPTY_ARGS);
+    }
+
+    public final void sendPlayerOrConsole(@Nullable SuperiorPlayer superiorPlayer, Object... args) {
+        if (superiorPlayer == null) {
+            send(Bukkit.getConsoleSender(), args);
+        } else {
+            send(superiorPlayer, args);
+        }
     }
 
     public final void send(SuperiorPlayer superiorPlayer) {
@@ -1029,6 +1013,20 @@ public enum Message {
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
         }
+    }
+
+    private static boolean convertData(CommentedConfiguration cfg) {
+        if (cfg.isString("GOT_INVITE_TOOLTIP")) {
+            cfg.set("GOT_INVITE.0.text", cfg.getString("GOT_INVITE"));
+            cfg.set("GOT_INVITE.0.tooltip", cfg.getString("GOT_INVITE_TOOLTIP"));
+            cfg.set("GOT_INVITE.0.command", "/is accept {0}");
+
+            cfg.set("GOT_INVITE_TOOLTIP", null);
+
+            return true;
+        }
+
+        return false;
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {

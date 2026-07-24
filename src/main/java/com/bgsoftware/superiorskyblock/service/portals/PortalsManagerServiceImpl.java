@@ -73,6 +73,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(destinationLocation.getWorld() != null, "destinationLocation's world cannot be null");
 
         Dimension destinationDimension = plugin.getGrid().getIslandsWorldDimension(destinationLocation.getWorld());
+        if (destinationDimension == null)
+            return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
+
         return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, destinationDimension, checkImmunedPortalsStatus, null);
     }
 
@@ -87,6 +90,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(destinationLocation.getWorld() != null, "destinationLocation's world cannot be null");
 
         Dimension destinationDimension = plugin.getGrid().getIslandsWorldDimension(destinationLocation.getWorld());
+        if (destinationDimension == null)
+            return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
+
         return handleEntityPortalInternal(entity, portalLocation, portalType, destinationDimension, null);
     }
 
@@ -103,7 +109,13 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
         Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(portalLocation.getWorld());
+        if (portalDimension == null)
+            return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+
         Dimension destinationDimension = getDestinationDimension(portalDimension, portalType);
+        if (destinationDimension == null)
+            return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
+
         return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, destinationDimension, checkImmunedPortalsStatus, island);
     }
 
@@ -123,6 +135,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(island.isInside(destinationLocation), "destinationLocation is not inside the island.");
 
         Dimension destinationDimension = plugin.getGrid().getIslandsWorldDimension(destinationLocation.getWorld());
+        if (destinationDimension == null)
+            return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
+
         return handlePlayerPortalInternal(superiorPlayer, portalLocation, portalType, destinationDimension, checkImmunedPortalsStatus, island);
     }
 
@@ -138,7 +153,13 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(island.isInside(portalLocation), "portalLocation is not inside the island.");
 
         Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(portalLocation.getWorld());
+        if (portalDimension == null)
+            return EntityPortalResult.PORTAL_NOT_IN_ISLAND;
+
         Dimension destinationDimension = getDestinationDimension(portalDimension, portalType);
+        if (destinationDimension == null)
+            return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
+
         return handleEntityPortalInternal(entity, portalLocation, portalType, destinationDimension, island);
     }
 
@@ -157,6 +178,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         Preconditions.checkArgument(island.isInside(destinationLocation), "destinationLocation is not inside the island.");
 
         Dimension destinationDimension = plugin.getGrid().getIslandsWorldDimension(destinationLocation.getWorld());
+        if (destinationDimension == null)
+            return EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD;
+
         return handleEntityPortalInternal(entity, portalLocation, portalType, destinationDimension, island);
     }
 
@@ -337,10 +361,13 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
         return EntityPortalResult.SUCCEED;
     }
 
+    @Nullable
     private Dimension getDestinationDimension(Dimension dimension, PortalType portalType) {
         SettingsManager.Worlds.DimensionConfig dimensionConfig = plugin.getSettings().getWorlds().getDimensionConfig(dimension);
-        Dimension destination = dimensionConfig == null ? null : dimensionConfig.getPortalDestination(portalType);
-        return destination == null ? plugin.getSettings().getWorlds().getDefaultWorldDimension() : destination;
+        if (dimensionConfig == null)
+            return null;
+
+        return dimensionConfig.getPortalDestination(portalType);
     }
 
 }

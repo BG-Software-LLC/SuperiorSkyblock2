@@ -10,8 +10,8 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
@@ -110,7 +110,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     @Override
     public CompletableFuture<List<CalculatedChunk.Blocks>> calculateChunks(List<ChunkPosition> chunkPositions,
-                                                                    Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache) {
+                                                                           Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache) {
         List<CalculatedChunk.Blocks> allCalculatedChunks = new LinkedList<>();
         List<ChunkPosition> chunkPositionsToCalculate = new LinkedList<>();
 
@@ -246,7 +246,7 @@ public class NMSChunksImpl implements NMSChunks {
 
         if (stop) {
             CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(
-                    ChunkCoordIntPair.a(chunk.getX(), chunk.getZ()));
+                    chunk.getWorld().getName(), ChunkCoordIntPair.a(chunk.getX(), chunk.getZ()));
             if (cropsTickingTileEntity != null) {
                 try {
                     cropsTickingTileEntity.getWorld().tileEntityList.remove(cropsTickingTileEntity);
@@ -255,7 +255,7 @@ public class NMSChunksImpl implements NMSChunks {
                 }
             }
         } else {
-            CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
+            CropsTickingTileEntity.create(island, chunk.getWorld().getName(), ((CraftChunk) chunk).getHandle());
         }
     }
 

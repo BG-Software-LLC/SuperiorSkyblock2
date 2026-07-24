@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -228,11 +229,14 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
                 }
             }
 
+            World world = block.getWorld();
+            int chunkX = block.getX() >> 4;
+            int chunkZ = block.getZ() >> 4;
+
             BukkitExecutor.sync(() -> {
-                if (dirtyChunks) {
+                if (dirtyChunks && world.isChunkLoaded(chunkX, chunkZ)) {
                     if (plugin.getNMSChunks().isChunkEmpty(block.getChunk())) {
-                        island.markChunkEmpty(block.getWorld(), block.getX() >> 4,
-                                block.getZ() >> 4, true);
+                        island.markChunkEmpty(world, chunkX, chunkZ, true);
                     }
                 }
                 if (handleNearbyBlocks) {

@@ -24,7 +24,6 @@ import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -32,6 +31,7 @@ import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
@@ -150,8 +150,6 @@ public class SettingsContainer {
     public final boolean kickConfirm;
     public final boolean leaveConfirm;
     public final boolean transferConfirm;
-    public final String spawnersProvider;
-    public final String stackedBlocksProvider;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
@@ -206,6 +204,9 @@ public class SettingsContainer {
     public final boolean defaultIslandFly;
     public final String defaultBorderColor;
     public final boolean obsidianToLava;
+    public final String spawnersProvider;
+    public final String stackedBlocksProvider;
+    public final String pricesProvider;
     public final BlockValuesManagerImpl.SyncWorthStatus syncWorth;
     public final boolean negativeWorth;
     public final boolean negativeLevel;
@@ -396,8 +397,6 @@ public class SettingsContainer {
         kickConfirm = config.getBoolean("kick-confirm");
         leaveConfirm = config.getBoolean("leave-confirm");
         transferConfirm = config.getBoolean("transfer-confirm");
-        spawnersProvider = config.getString("spawners-provider", "AUTO");
-        stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
         islandNamesRequiredForCreation = config.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = config.getInt("island-names.max-length", 16);
         islandNamesMinLength = config.getInt("island-names.min-length", 3);
@@ -465,7 +464,7 @@ public class SettingsContainer {
                     for (String slot : containerSection.getKeys(false)) {
                         try {
                             // Reading the item from the config
-                            TemplateItem templateItem = MenuParserImpl.getInstance().getItemStack("config.yml", containerSection.getConfigurationSection(slot));
+                            TemplateItem templateItem = MenuParserUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot));
 
                             if (templateItem == null)
                                 continue;
@@ -517,6 +516,9 @@ public class SettingsContainer {
         defaultIslandFly = config.getBoolean("default-island-fly", false);
         defaultBorderColor = config.getString("default-border-color", "BLUE");
         obsidianToLava = config.getBoolean("obsidian-to-lava", false);
+        spawnersProvider = config.getString("spawners-provider", "AUTO");
+        stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
+        pricesProvider = config.getString("prices-provider", "AUTO");
         syncWorth = BlockValuesManagerImpl.SyncWorthStatus.of(config.getString("sync-worth", "NONE"));
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
@@ -714,10 +716,18 @@ public class SettingsContainer {
     private SettingsManager.EntityCategories loadEntityCategories(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "entity-categories.yml");
 
-        if (!file.exists())
+        boolean removeInvalidEntityKeys = false;
+
+        if (!file.exists()) {
             plugin.saveResource("entity-categories.yml", false);
+            removeInvalidEntityKeys = true;
+        }
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        if (removeInvalidEntityKeys) {
+            EntityCategoriesSection.removeInvalidEntityKeys(cfg, file);
+        }
 
         return new EntityCategoriesSection(cfg);
     }

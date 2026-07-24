@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.menu.button;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import org.bukkit.inventory.ItemStack;
 
@@ -59,6 +60,13 @@ public interface PagedMenuTemplateButton<V extends MenuView<V, ?>, E> extends Me
          * @param nullItem The item to set.
          */
         Builder<V, E> setNullItem(ItemStack nullItem);
+
+        /**
+         * Set the item to display inside the menu for items that don't have a valid paged-object.
+         *
+         * @param dialogButton The item to set.
+         */
+        Builder<V, E> setNullButtonDialog(DialogButton dialogButton);
 
         /**
          * Get the {@link PagedMenuTemplateButton} from this builder.

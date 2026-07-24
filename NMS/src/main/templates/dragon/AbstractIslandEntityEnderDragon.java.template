@@ -39,7 +39,7 @@ public class AbstractIslandEntityEnderDragon extends EnderDragon {
     }
 
     protected AbstractIslandEntityEnderDragon(Level level) {
-        super(EntityType.ENDER_DRAGON, level);
+        super(${ENTITY_TYPE_VALUES_CLASS}.ENDER_DRAGON, level);
         this.serverLevel = (ServerLevel) level;
         this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(level.getWorld());
     }

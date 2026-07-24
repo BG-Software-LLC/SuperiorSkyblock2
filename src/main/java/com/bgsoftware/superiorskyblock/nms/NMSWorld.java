@@ -22,6 +22,8 @@ public interface NMSWorld {
 
     Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z);
 
+    boolean canPlayerSuffocate(ChunkSnapshot chunkSnapshot, int x, int y, int z);
+
     void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback);
 
     default void replaceTrialBlockPlayerDetector(Island island, Location location) {

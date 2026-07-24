@@ -9,7 +9,7 @@ public class EndDragonFightWrapper extends EndDragonFight {
 
     public final EndWorldEndDragonFightHandler HANDLER = new EndWorldEndDragonFightHandler();
 
-    public EndDragonFightWrapper(ServerLevel serverLevel) {
+    public EndDragonFightWrapper(ServerLevel serverLevel, BlockPos unused) {
         super(serverLevel, serverLevel.getSeed(), serverLevel.serverLevelData.endDragonFightData());
     }
 

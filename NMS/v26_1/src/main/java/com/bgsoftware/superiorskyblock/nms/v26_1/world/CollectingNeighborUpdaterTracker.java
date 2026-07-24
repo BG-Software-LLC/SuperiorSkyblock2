@@ -35,7 +35,7 @@ public class CollectingNeighborUpdaterTracker extends CollectingNeighborUpdater 
             // Block was changed, let's call an update
             GameEventArgs.BlockUpdateShapeEvent blockUpdateShapeEvent = new GameEventArgs.BlockUpdateShapeEvent();
             blockUpdateShapeEvent.block = CraftBlock.at(this.level, pos);
-            blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(this.level, pos, oldState, null);
+            blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(blockUpdateShapeEvent.block.getWorld(), pos, oldState, null);
             GameEvent<GameEventArgs.BlockUpdateShapeEvent> gameEvent = GameEventType.BLOCK_UPDATE_SHAPE_EVENT.createEvent(blockUpdateShapeEvent);
             plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.MONITOR);
         }

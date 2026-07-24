@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -10,7 +11,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
@@ -74,8 +75,8 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
                 Optional.ofNullable(settingsSection.getConfigurationSection(islandFlagName)).ifPresent(islandFlagSection -> {
                     if (islandFlagSection.getBoolean("display-menu", true)) {
                         islandFlags.add(loadIslandFlagInfo(islandFlagSection, islandFlagName, islandFlags.size()));
-                        detectedFlags.add(islandFlagName.toUpperCase(Locale.ENGLISH));
                     }
+                    detectedFlags.add(islandFlagName.toUpperCase(Locale.ENGLISH));
                 });
             }
         });
@@ -96,11 +97,11 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
         GameSound clickSound = null;
 
         if (islandFlagSection != null) {
-            enabledIslandFlagItem = MenuParserImpl.getInstance().getItemStack("menus/settings.yml",
+            enabledIslandFlagItem = MenuParserUtils.getItemStack("menus/settings.yml",
                     islandFlagSection.getConfigurationSection("settings-enabled"));
-            disabledIslandFlagItem = MenuParserImpl.getInstance().getItemStack("menus/settings.yml",
+            disabledIslandFlagItem = MenuParserUtils.getItemStack("menus/settings.yml",
                     islandFlagSection.getConfigurationSection("settings-disabled"));
-            clickSound = MenuParserImpl.getInstance().getSound(islandFlagSection.getConfigurationSection("sound"));
+            clickSound = MenuParserUtils.getSound(islandFlagSection.getConfigurationSection("sound"));
         }
 
         return new MenuIslandFlags.IslandFlagInfo(islandFlagName, enabledIslandFlagItem,
