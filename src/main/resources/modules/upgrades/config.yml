@@ -9,9 +9,9 @@
 # When disabled, all module commands and features will also be disabled.
 enabled: true
 
-# Settings related to crop growth multiplier.
+# Settings related to crop-growth multiplier.
 crop-growth:
-  # Whether crop growth multiplier should be enabled.
+  # Whether crop-growth multiplier should be enabled.
   # When disabled, the plugin will not alter crop growth.
   enabled: true
 
@@ -19,57 +19,57 @@ crop-growth:
   # When the value is non-positive, the multiplier will not work.
   interval: 5
 
-  # List of whitelisted crops that will be affected by the crop growth multiplier.
+  # List of whitelisted crops that will be affected by the crop-growth multiplier.
   # You can find a list of materials here: https://bg-software.com/materials/
   whitelisted-crops:
-    - 'SAPLING'
-    - 'OAK_SAPLING'
-    - 'SPRUCE_SAPLING'
-    - 'BIRCH_SAPLING'
-    - 'JUNGLE_SAPLING'
     - 'ACACIA_SAPLING'
-    - 'DARK_OAK_SAPLING'
-    - 'MANGROVE_PROPAGULE'
-    - 'CHERRY_SAPLING'
-    - 'PALE_OAK_SAPLING'
-    - 'BROWN_MUSHROOM'
-    - 'RED_MUSHROOM'
+    - 'ATTACHED_MELON_STEM'
+    - 'ATTACHED_PUMPKIN_STEM'
     - 'BAMBOO'
     - 'BAMBOO_SAPLING'
-    - 'SUGAR_CANE_BLOCK'
-    - 'SUGAR_CANE'
-    - 'CACTUS'
-    - 'WEEPING_VINES'
-    - 'TWISTING_VINES'
-    - 'VINE'
-    - 'CHORUS_FLOWER'
-    - 'WHEAT'
-    - 'COCOA'
-    - 'PUMPKIN_STEM'
-    - 'ATTACHED_PUMPKIN_STEM'
-    - 'MELON_STEM'
-    - 'ATTACHED_MELON_STEM'
     - 'BEETROOTS'
-    - 'TORCHFLOWER_CROP'
-    - 'PITCHER_CROP'
-    - 'CAVE_VINES'
-    - 'SWEET_BERRY_BUSH'
-    - 'NETHER_WART'
-    - 'NETHER_WARTS'
-    - 'KELP'
+    - 'BIRCH_SAPLING'
+    - 'BROWN_MUSHROOM'
+    - 'CACTUS'
     - 'CARROT'
     - 'CARROTS'
+    - 'CAVE_VINES'
+    - 'CHERRY_SAPLING'
+    - 'CHORUS_FLOWER'
+    - 'COCOA'
+    - 'CROPS'
+    - 'DARK_OAK_SAPLING'
+    - 'JUNGLE_SAPLING'
+    - 'KELP'
+    - 'MANGROVE_PROPAGULE'
+    - 'MELON_STEM'
+    - 'NETHER_WART'
+    - 'NETHER_WARTS'
+    - 'OAK_SAPLING'
+    - 'PALE_OAK_SAPLING'
+    - 'PITCHER_CROP'
     - 'POTATO'
     - 'POTATOES'
-    - 'CROPS'
+    - 'PUMPKIN_STEM'
+    - 'RED_MUSHROOM'
+    - 'SAPLING'
+    - 'SPRUCE_SAPLING'
+    - 'SUGAR_CANE'
+    - 'SUGAR_CANE_BLOCK'
+    - 'SWEET_BERRY_BUSH'
+    - 'TORCHFLOWER_CROP'
+    - 'TWISTING_VINES'
+    - 'VINE'
+    - 'WEEPING_VINES'
+    - 'WHEAT'
 
-# Settings related to mob drops multiplier.
+# Settings related to mob-drops multiplier.
 mob-drops:
-  # Whether mob drops multiplier should be enabled.
+  # Whether mob-drops multiplier should be enabled.
   # When disabled, the plugin will not alter mob drops.
   enabled: true
 
-  # Should mob drops multiplier will only multiply drops of entities that were killed by players.
+  # Should mob-drops multiplier will only multiply drops of entities that were killed by players.
   only-player-kills: false
 
   # List of whitelisted items that will be multiplied.
@@ -88,19 +88,19 @@ mob-drops:
   # You can disable this feature by setting the section to 'blacklisted-entities: []'
   blacklisted-entities: [ ]
 
-# Whether spawner rates multiplier should be enabled.
+# Whether spawner-rates multiplier should be enabled.
 # When disabled, the plugin will not alter spawner rates.
 spawner-rates: true
 
-# Whether island effects should be enabled.
+# Whether island-effects should be enabled.
 # When disabled, the plugin will not give any effects to any players.
 island-effects: true
 
-# Whether block limits should be enabled.
+# Whether block-limits should be enabled.
 # When disabled, the plugin will not limit placement of blocks.
 block-limits: true
 
-# Whether entity limits should be enabled.
+# Whether entity-limits should be enabled.
 # When disabled, the plugin will not limit spawning of entities.
 entity-limits: true
 

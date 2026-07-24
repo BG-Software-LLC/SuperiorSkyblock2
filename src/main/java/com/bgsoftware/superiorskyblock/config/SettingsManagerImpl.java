@@ -470,12 +470,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Deprecated
     public List<String> getCropsToGrow() {
         List<String> list = new ArrayList<>();
-
         for (Key key : BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops()) {
             list.add(key.toString());
         }
 
-        return list;
+        return Collections.unmodifiableList(list);
     }
 
     @Override
