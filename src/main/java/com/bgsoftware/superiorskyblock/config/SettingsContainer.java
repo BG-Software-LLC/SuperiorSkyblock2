@@ -192,8 +192,6 @@ public class SettingsContainer {
     public final List<String> pvpWorlds;
     public final boolean stopLeaving;
     public final boolean valuesMenu;
-    public final List<String> cropsToGrow;
-    public final int cropsInterval;
     public final boolean onlyBackButton;
     public final boolean buildOutsideIsland;
     public final int defaultDisbandCount;
@@ -224,11 +222,6 @@ public class SettingsContainer {
     public final List<String> islandPreviewsBlockedCommands;
     public final Map<String, Location> islandPreviewsLocations;
     public final boolean tabCompleteHideVanished;
-    public final boolean mobDropsOnlyPlayerKills;
-    public final KeySet mobDropsWhitelistedItems;
-    public final KeySet mobDropsBlacklistedItems;
-    public final KeySet mobDropsWhitelistedEntities;
-    public final KeySet mobDropsBlacklistedEntities;
     public final Map<String, Long> messageDelays;
     public final boolean warpCategories;
     public final boolean physicsListener;
@@ -504,8 +497,6 @@ public class SettingsContainer {
         pvpWorlds = Collections.unmodifiableList(config.getStringList("pvp-worlds"));
         stopLeaving = config.getBoolean("stop-leaving", false);
         valuesMenu = config.getBoolean("values-menu", true);
-        cropsToGrow = Collections.unmodifiableList(config.getStringList("crops-to-grow"));
-        cropsInterval = config.getInt("crops-interval", 5);
         onlyBackButton = config.getBoolean("only-back-button", false);
         buildOutsideIsland = config.getBoolean("build-outside-island", false);
         defaultDisbandCount = config.getInt("default-disband-count", 5);
@@ -565,15 +556,6 @@ public class SettingsContainer {
         }
         this.islandPreviewsLocations = Collections.unmodifiableMap(islandPreviewsLocations);
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
-        mobDropsOnlyPlayerKills = config.getBoolean("mob-drops.only-player-kills", false);
-        mobDropsWhitelistedItems = KeySets.unmodifiableKeySet(
-                KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("mob-drops.whitelisted-items")));
-        mobDropsBlacklistedItems = KeySets.unmodifiableKeySet(
-                KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("mob-drops.blacklisted-items")));
-        mobDropsWhitelistedEntities = KeySets.unmodifiableKeySet(
-                KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, config.getStringList("mob-drops.whitelisted-entities")));
-        mobDropsBlacklistedEntities = KeySets.unmodifiableKeySet(
-                KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, config.getStringList("mob-drops.blacklisted-entities")));
         Map<String, Long> messageDelays = new HashMap<>();
         if (config.isConfigurationSection("message-delays")) {
             for (String message : config.getConfigurationSection("message-delays").getKeys(false)) {

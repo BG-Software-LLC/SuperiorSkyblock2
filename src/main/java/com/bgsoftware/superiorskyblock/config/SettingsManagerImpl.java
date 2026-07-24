@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.config.section.IslandChestsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandNamesSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandPreviewsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandRolesSection;
-import com.bgsoftware.superiorskyblock.config.section.MobDropsSection;
 import com.bgsoftware.superiorskyblock.config.section.SpawnSection;
 import com.bgsoftware.superiorskyblock.config.section.StackedBlocksSection;
 import com.bgsoftware.superiorskyblock.config.section.VisitorsSignSection;
@@ -30,6 +29,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,7 +72,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     private final DefaultContainersSection defaultContainers = new DefaultContainersSection();
     private final IslandChestsSection islandChests = new IslandChestsSection();
     private final IslandPreviewsSection islandPreviews = new IslandPreviewsSection();
-    private final MobDropsSection mobDrops = new MobDropsSection();
 
     public SettingsManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -467,13 +467,21 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public List<String> getCropsToGrow() {
-        return this.global.getCropsToGrow();
+        List<String> list = new ArrayList<>();
+
+        for (Key key : BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops()) {
+            list.add(key.toString());
+        }
+
+        return list;
     }
 
     @Override
+    @Deprecated
     public int getCropsInterval() {
-        return this.global.getCropsInterval();
+        return BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval();
     }
 
     @Override
@@ -603,13 +611,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public boolean isDropsUpgradePlayersMultiply() {
-        return this.mobDrops.isOnlyPlayerKills();
-    }
-
-    @Override
-    public MobDropsSection getMobDrops() {
-        return this.mobDrops;
+        return BuiltinModules.UPGRADES.getConfiguration().isMobDropsOnlyPlayerKills();
     }
 
     @Override
@@ -764,13 +768,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.defaultContainers.setContainer(container);
         this.islandChests.setContainer(container);
         this.islandPreviews.setContainer(container);
-        this.mobDrops.setContainer(container);
     }
 
     private void convertData(YamlConfiguration cfg) {
-        if (cfg.isBoolean("drops-upgrade-players-multiply")) {
-            cfg.set("mob-drops.only-player-kills", cfg.getBoolean("drops-upgrade-players-multiply"));
-            cfg.set("drops-upgrade-players-multiply", null);
         if (cfg.getConfigurationSection("worlds.dimensions") == null) {
             cfg.set("worlds.dimensions.normal", cfg.getConfigurationSection("worlds.normal"));
             cfg.set("worlds.dimensions.normal.environment", "NORMAL");

@@ -709,55 +709,6 @@ stop-leaving: false
 # Should the values menu be enabled?
 values-menu: true
 
-# A list of crops that will be affected by the crop growth multiplier.
-# You can find a list of materials here: https://bg-software.com/materials/
-crops-to-grow:
-  - 'SAPLING'
-  - 'OAK_SAPLING'
-  - 'SPRUCE_SAPLING'
-  - 'BIRCH_SAPLING'
-  - 'JUNGLE_SAPLING'
-  - 'ACACIA_SAPLING'
-  - 'DARK_OAK_SAPLING'
-  - 'MANGROVE_PROPAGULE'
-  - 'CHERRY_SAPLING'
-  - 'PALE_OAK_SAPLING'
-  - 'BROWN_MUSHROOM'
-  - 'RED_MUSHROOM'
-  - 'BAMBOO'
-  - 'BAMBOO_SAPLING'
-  - 'SUGAR_CANE_BLOCK'
-  - 'SUGAR_CANE'
-  - 'CACTUS'
-  - 'WEEPING_VINES'
-  - 'TWISTING_VINES'
-  - 'VINE'
-  - 'CHORUS_FLOWER'
-  - 'WHEAT'
-  - 'COCOA'
-  - 'PUMPKIN_STEM'
-  - 'ATTACHED_PUMPKIN_STEM'
-  - 'MELON_STEM'
-  - 'ATTACHED_MELON_STEM'
-  - 'BEETROOTS'
-  - 'TORCHFLOWER_CROP'
-  - 'PITCHER_CROP'
-  - 'CAVE_VINES'
-  - 'SWEET_BERRY_BUSH'
-  - 'NETHER_WART'
-  - 'NETHER_WARTS'
-  - 'KELP'
-  - 'CARROT'
-  - 'CARROTS'
-  - 'POTATO'
-  - 'POTATOES'
-  - 'CROPS'
-
-# How frequency should the crops task run? (in ticks)
-# You can disable this feature by setting it to 0.
-# Warning: When disabled, crops-growth multiplier will not function!
-crops-interval: 5
-
 # Should only the back button work for closing menus?
 only-back-button: false
 

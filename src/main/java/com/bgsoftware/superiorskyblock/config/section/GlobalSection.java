@@ -255,14 +255,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().valuesMenu;
     }
 
-    public List<String> getCropsToGrow() {
-        return getContainer().cropsToGrow;
-    }
-
-    public int getCropsInterval() {
-        return getContainer().cropsInterval;
-    }
-
     public boolean isOnlyBackButton() {
         return getContainer().onlyBackButton;
     }
