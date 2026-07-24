@@ -3,8 +3,10 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetMobDrops;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
@@ -26,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class UpgradeTypeMobDrops implements IUpgradeType {
 
@@ -91,7 +92,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             if (island == null)
                 return;
 
-            if (plugin.getSettings().getMobDrops().isOnlyPlayerKills()) {
+            if (BuiltinModules.UPGRADES.getConfiguration().isMobDropsOnlyPlayerKills()) {
                 EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
                 if (!(lastDamage instanceof EntityDamageByEntityEvent) ||
                         !BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()).isPresent())
@@ -153,22 +154,22 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
     }
 
     private boolean isWhitelisted(ItemStack itemStack) {
-        Set<Key> whitelistedItems = plugin.getSettings().getMobDrops().getWhitelistedItems();
+        KeySet whitelistedItems = BuiltinModules.UPGRADES.getConfiguration().getMobDropsWhitelistedItems();
         return whitelistedItems.isEmpty() || whitelistedItems.contains(Key.of(itemStack));
     }
 
     private boolean isBlacklisted(ItemStack itemStack) {
-        Set<Key> blacklistedItems = plugin.getSettings().getMobDrops().getBlacklistedItems();
+        KeySet blacklistedItems = BuiltinModules.UPGRADES.getConfiguration().getMobDropsBlacklistedItems();
         return blacklistedItems.contains(Key.of(itemStack));
     }
 
     private boolean isWhitelisted(Entity entity) {
-        Set<Key> whitelistedEntities = plugin.getSettings().getMobDrops().getWhitelistedEntities();
+        KeySet whitelistedEntities = BuiltinModules.UPGRADES.getConfiguration().getMobDropsWhitelistedEntities();
         return whitelistedEntities.isEmpty() || whitelistedEntities.contains(Key.of(entity));
     }
 
     private boolean isBlacklisted(Entity entity) {
-        Set<Key> blacklistedEntities = plugin.getSettings().getMobDrops().getBlacklistedEntities();
+        KeySet blacklistedEntities = BuiltinModules.UPGRADES.getConfiguration().getMobDropsBlacklistedEntities();
         return blacklistedEntities.contains(Key.of(entity));
     }
 

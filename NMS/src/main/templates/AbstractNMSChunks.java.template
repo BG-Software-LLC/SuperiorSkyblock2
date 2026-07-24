@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsBlockEntity;
@@ -165,7 +166,7 @@ public abstract class AbstractNMSChunks implements NMSChunks {
 
     @Override
     public void startTickingChunk(Island island, Chunk chunk, boolean stop) {
-        if (plugin.getSettings().getCropsInterval() <= 0)
+        if (BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval() <= 0)
             return;
 
         if (stop) {

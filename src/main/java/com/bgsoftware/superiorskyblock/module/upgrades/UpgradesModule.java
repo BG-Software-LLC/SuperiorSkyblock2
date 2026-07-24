@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
@@ -18,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
@@ -44,17 +46,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> {
@@ -72,14 +64,15 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
     @Override
     protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {
-        File oldUpgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
         boolean updatedConfig = false;
 
+        File oldUpgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
         if (oldUpgradesFile.exists()) {
             CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldUpgradesFile);
 
-            if (oldConfig.isConfigurationSection("upgrades"))
+            if (oldConfig.isConfigurationSection("upgrades")) {
                 config.set("upgrades", oldConfig.getConfigurationSection("upgrades"));
+            }
 
             oldUpgradesFile.delete();
         }
@@ -87,20 +80,38 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         if (!config.isBoolean("enabled")) {
             boolean status = false;
 
-            if (config.getBoolean("crop-growth", true))
+            if (config.getBoolean("crop-growth", true)) {
                 status = true;
-            else if (config.getBoolean("mob-drops", true))
+            } else if (config.getBoolean("mob-drops", true)) {
                 status = true;
-            else if (config.getBoolean("island-effects", true))
+            } else if (config.getBoolean("island-effects", true)) {
                 status = true;
-            else if (config.getBoolean("spawner-rates", true))
+            } else if (config.getBoolean("spawner-rates", true)) {
                 status = true;
-            else if (config.getBoolean("block-limits", true))
+            } else if (config.getBoolean("block-limits", true)) {
                 status = true;
-            else if (config.getBoolean("entity-limits", true))
+            } else if (config.getBoolean("entity-limits", true)) {
                 status = true;
+            }
 
             config.set("enabled", status);
+            updatedConfig = true;
+        }
+
+        File oldConfigFile = new File(plugin.getDataFolder(), "config.yml");
+        if (oldConfigFile.exists()) {
+            CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldConfigFile);
+
+            if (oldConfig.isList("crops-to-grow")) {
+                config.set("crop-growth.whitelisted-crops", oldConfig.getList("crops-to-grow"));
+            }
+            if (oldConfig.isInt("crops-interval")) {
+                config.set("crop-growth.interval", oldConfig.getInt("crops-interval"));
+            }
+            if (oldConfig.isBoolean("drops-upgrade-players-multiply")) {
+                config.set("mob-drops.only-player-kills", oldConfig.getBoolean("drops-upgrade-players-multiply"));
+            }
+
             updatedConfig = true;
         }
 
@@ -181,15 +192,65 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
         private final boolean enabled;
         private final List<IUpgradeType> enabledUpgrades = new LinkedList<>();
+        private final int cropGrowthInterval;
+        private final KeySet cropGrowthWhitelistedCrops;
+        private final boolean mobDropsOnlyPlayerKills;
+        private final KeySet mobDropsWhitelistedItems;
+        private final KeySet mobDropsBlacklistedItems;
+        private final KeySet mobDropsWhitelistedEntities;
+        private final KeySet mobDropsBlacklistedEntities;
 
         Configuration(CommentedConfiguration config) {
             this.enabled = config.getBoolean("enabled", true);
+
+            this.cropGrowthInterval = config.getInt("crop-growth.interval", 5);
+            this.cropGrowthWhitelistedCrops = KeySets.unmodifiableKeySet(
+                    KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("crop-growth.whitelisted-crops")));
+
+            this.mobDropsOnlyPlayerKills = config.getBoolean("mob-drops.only-player-kills", false);
+            this.mobDropsWhitelistedItems = KeySets.unmodifiableKeySet(
+                    KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("mob-drops.whitelisted-items")));
+            this.mobDropsBlacklistedItems = KeySets.unmodifiableKeySet(
+                    KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("mob-drops.blacklisted-items")));
+            this.mobDropsWhitelistedEntities = KeySets.unmodifiableKeySet(
+                    KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, config.getStringList("mob-drops.whitelisted-entities")));
+            this.mobDropsBlacklistedEntities = KeySets.unmodifiableKeySet(
+                    KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, config.getStringList("mob-drops.blacklisted-entities")));
+
             loadUpgrades(config);
         }
 
         @Override
         public boolean isEnabled() {
             return this.enabled;
+        }
+
+        public int getCropGrowthInterval() {
+            return this.cropGrowthInterval;
+        }
+
+        public KeySet getCropGrowthWhitelistedCrops() {
+            return this.cropGrowthWhitelistedCrops;
+        }
+
+        public boolean isMobDropsOnlyPlayerKills() {
+            return this.mobDropsOnlyPlayerKills;
+        }
+
+        public KeySet getMobDropsWhitelistedItems() {
+            return this.mobDropsWhitelistedItems;
+        }
+
+        public KeySet getMobDropsBlacklistedItems() {
+            return this.mobDropsBlacklistedItems;
+        }
+
+        public KeySet getMobDropsWhitelistedEntities() {
+            return this.mobDropsWhitelistedEntities;
+        }
+
+        public KeySet getMobDropsBlacklistedEntities() {
+            return this.mobDropsBlacklistedEntities;
         }
 
         private void loadUpgrades(CommentedConfiguration config) {

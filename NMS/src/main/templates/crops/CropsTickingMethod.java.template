@@ -54,7 +54,7 @@ public abstract class CropsTickingMethod {
 
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
-        plugin.getSettings().getCropsToGrow().forEach(cropName -> {
+        BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops().forEach(cropName -> {
             Key key = Keys.ofMaterialAndData(cropName);
             if (key instanceof MaterialKey materialKey) {
                 Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());

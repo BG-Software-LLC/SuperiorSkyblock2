@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
@@ -74,7 +75,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
     public void tick() {
         assert world != null;
 
-        if (++currentTick <= plugin.getSettings().getCropsInterval())
+        if (++currentTick <= BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval())
             return;
 
         Chunk chunk = this.chunk.get();
@@ -88,7 +89,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
         currentTick = 0;
 
         int worldRandomTick = world.getGameRules().getInt(GameRules.RANDOM_TICK_SPEED);
-        int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * plugin.getSettings().getCropsInterval());
+        int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval());
         if (chunkRandomTickSpeed > 0)
             CropsTickingMethod.tick(chunk, chunkRandomTickSpeed);
     }
