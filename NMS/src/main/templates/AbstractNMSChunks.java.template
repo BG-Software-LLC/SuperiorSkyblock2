@@ -28,8 +28,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -46,7 +44,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import ${CRAFTBUKKIT_PACKAGE}.CraftChunk;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
-import ${CRAFTBUKKIT_PACKAGE}.util.CraftNamespacedKey;
 
 import java.util.Arrays;
 import java.util.Collection;
