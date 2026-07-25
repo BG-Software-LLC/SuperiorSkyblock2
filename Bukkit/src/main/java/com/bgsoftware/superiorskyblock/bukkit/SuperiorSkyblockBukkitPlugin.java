@@ -41,6 +41,7 @@ import com.bgsoftware.superiorskyblock.platform.IPlatform;
 import com.bgsoftware.superiorskyblock.bukkit.platform.BukkitPlatform;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
 import com.bgsoftware.superiorskyblock.service.BaseServicesHandler;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -190,6 +191,7 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
     @Override
     public void onLoad() {
         this.plugin.onLoad();
+        new Metrics(this, 4119);
     }
 
     @Override

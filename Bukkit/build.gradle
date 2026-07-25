@@ -13,6 +13,7 @@ dependencies {
     implementation project(':API')
 
     implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b22'
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
 
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
@@ -44,7 +45,7 @@ shadowJar {
 
     archiveClassifier.set('')
 
-    from project(':Core').sourceSets.main.output
+    from sourceSets.main.output
 
     from(project(':Core').configurations.runtimeClasspath.filter { it.name.endsWith('.jar') }.collect { zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
@@ -101,6 +102,7 @@ shadowJar {
         // Bukkit's own runtime libraries that must be bundled (they are relocated into
         // com.bgsoftware.superiorskyblock.libs by the root build script)
         include dependency('com.bgsoftware.common.nmsloader:NMSLoader')
+        include dependency('org.bstats:bstats-bukkit')
     }
 }
 

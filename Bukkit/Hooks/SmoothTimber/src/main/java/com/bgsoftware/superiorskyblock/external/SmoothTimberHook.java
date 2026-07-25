@@ -26,7 +26,7 @@ public class SmoothTimberHook {
 
     public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         SmoothTimberHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new ChopListener(), javaPlugin);
+        javaPlugin.getServer().getPluginManager().registerEvents(new ChopListener(), javaPlugin);
     }
 
     private static class ChopListener implements Listener {

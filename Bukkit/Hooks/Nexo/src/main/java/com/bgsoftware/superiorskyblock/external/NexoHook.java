@@ -66,7 +66,7 @@ public class NexoHook {
 
     public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         NexoHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new NexoListener(), javaPlugin);
+        javaPlugin.getServer().getPluginManager().registerEvents(new NexoListener(), javaPlugin);
         if (!registered) {
             registered = true;
             plugin.getProviders().registerCustomBlocksProvider(new NexuCustomBlocksProvider());

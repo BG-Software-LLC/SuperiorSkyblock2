@@ -15,8 +15,6 @@ dependencies {
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
     implementation 'com.bgsoftware.common.databasebridge:DatabaseBridge:b2'
 
-    implementation 'org.bstats:bstats-bukkit:3.0.0'
-
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'

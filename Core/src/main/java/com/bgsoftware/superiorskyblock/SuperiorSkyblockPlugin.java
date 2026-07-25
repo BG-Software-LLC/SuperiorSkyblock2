@@ -81,10 +81,8 @@ import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -214,7 +212,6 @@ public abstract class SuperiorSkyblockPlugin {
 
         getServices().loadDefaultServices(this);
 
-        new Metrics(getBukkitPlugin(), 4119);
         StatsClient client = StatsClient.getInstance();
         client.start();
 
@@ -649,10 +646,6 @@ public abstract class SuperiorSkyblockPlugin {
 
     public PluginDescriptionFile getDescription() {
         return getBukkitPlugin().getDescription();
-    }
-
-    public Server getServer() {
-        return getBukkitPlugin().getServer();
     }
 
     public Logger getLogger() {

@@ -70,13 +70,13 @@ public class SlimefunHook {
             new ProtectionModuleImpl(javaPlugin).register();
         }
 
-        plugin.getServer().getPluginManager().registerEvents(new AndroidMineListener(), javaPlugin);
+        javaPlugin.getServer().getPluginManager().registerEvents(new AndroidMineListener(), javaPlugin);
 
         if (isClassLoaded("io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent"))
-            plugin.getServer().getPluginManager().registerEvents(new AutoPlacerPlaceListener(), javaPlugin);
+            javaPlugin.getServer().getPluginManager().registerEvents(new AutoPlacerPlaceListener(), javaPlugin);
 
         if (BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD.isValid())
-            plugin.getServer().getPluginManager().registerEvents(new ChunkWipeListener(), javaPlugin);
+            javaPlugin.getServer().getPluginManager().registerEvents(new ChunkWipeListener(), javaPlugin);
     }
 
     private static boolean isClassLoaded(String clazz) {

@@ -91,7 +91,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public void registerCommand(BukkitCommand command) {
-        ((CraftServer) plugin.getServer()).getCommandMap().register("superiorskyblock2", command);
+        ((CraftServer) Bukkit.getServer()).getCommandMap().register("superiorskyblock2", command);
     }
 
     @Override

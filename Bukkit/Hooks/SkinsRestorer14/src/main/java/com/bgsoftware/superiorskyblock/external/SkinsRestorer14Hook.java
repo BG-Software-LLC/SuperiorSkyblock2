@@ -49,7 +49,7 @@ public class SkinsRestorer14Hook {
         SkinsRestorer14Hook.plugin = plugin;
 
         plugin.getProviders().registerSkinsListener(SkinsRestorer14Hook::setSkinTexture);
-        plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), javaPlugin);
+        javaPlugin.getServer().getPluginManager().registerEvents(new SkinsListener(), javaPlugin);
     }
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {

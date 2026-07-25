@@ -39,7 +39,7 @@ public class CraftEngineHook {
     private static boolean registered = false;
 
     public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
-        plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), javaPlugin);
+        javaPlugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), javaPlugin);
         if (!registered) {
             registered = true;
             plugin.getBlockValues().registerKeyParser(new CraftEngineKeyParser(), collectCustomKeys());

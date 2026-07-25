@@ -105,7 +105,7 @@ public class OraxenHook {
 
     public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         OraxenHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new OraxenListener(), javaPlugin);
+        javaPlugin.getServer().getPluginManager().registerEvents(new OraxenListener(), javaPlugin);
         if (!registered) {
             registered = true;
             plugin.getProviders().registerCustomBlocksProvider(new OraxenCustomBlocksProvider());

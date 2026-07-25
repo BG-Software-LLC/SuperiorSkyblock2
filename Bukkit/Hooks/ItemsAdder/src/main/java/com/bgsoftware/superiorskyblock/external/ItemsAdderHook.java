@@ -44,7 +44,7 @@ public class ItemsAdderHook {
 
     public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         ItemsAdderHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), javaPlugin);
+        javaPlugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), javaPlugin);
         if (!registered) {
             registered = true;
             plugin.getBlockValues().registerKeyParser(new ItemsAdderKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
