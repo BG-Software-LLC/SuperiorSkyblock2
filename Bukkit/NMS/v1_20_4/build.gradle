@@ -1,0 +1,27 @@
+plugins {
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+group 'NMS:v1_20_4'
+
+dependencies {
+    paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT")
+    compileOnly project(":Bukkit:NMS:Spigot-1_20_3")
+    compileOnly project(":Bukkit:NMS:Paper-1_20_3")
+    compileOnly project(":API")
+    compileOnly project(":Core")
+}
+
+assemble {
+    dependsOn(reobfJar)
+}
+
+if (project.hasProperty('nms.compile_v1_20') && !Boolean.valueOf(project.findProperty("nms.compile_v1_20").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

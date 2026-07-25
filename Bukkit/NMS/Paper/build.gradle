@@ -1,0 +1,8 @@
+group 'NMS:Paper'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
+    compileOnly project(":Bukkit:NMS:Spigot")
+    compileOnly project(":API")
+    compileOnly project(":Core")
+}

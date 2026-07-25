@@ -1,0 +1,114 @@
+group 'Bukkit'
+
+repositories {
+    mavenCentral()
+}
+
+// Future platform modules (siblings of this one) should mirror this file but only
+// depend on Core/API, loop rootProject.subprojects.findAll { it.path.startsWith(':Missions:') }
+// for missions shading, and skip the NMS/Hooks branches below entirely (those are
+// Bukkit-specific).
+dependencies {
+    implementation project(':Core')
+    implementation project(':API')
+}
+
+rootProject.subprojects.findAll { it.path != project.path }.each { evaluationDependsOn(it.path) }
+
+// shadowJar uses an empty archiveClassifier, so it writes to the same path the
+// plain 'jar' task would; disable 'jar' to avoid two tasks racing to the same file.
+tasks.named('jar') {
+    enabled = false
+}
+
+shadowJar {
+    relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.org.bstats'
+
+    archiveClassifier.set('')
+
+    from project(':Core').sourceSets.main.output
+
+    from(project(':Core').configurations.runtimeClasspath.filter { it.name.endsWith('.jar') }.collect { zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    rootProject.subprojects.each { sub ->
+        if (sub.path.startsWith(':Bukkit:NMS:v1')) {
+            try {
+                def reobfTask = sub.tasks.named('reobfJar')
+                dependsOn(reobfTask)
+                from(reobfTask.map { it.outputJar }) {
+                    exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+                    rename { sub.name }
+                    into("nms")
+                }
+                return;
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (sub.path.startsWith(':Bukkit:NMS:v')) {
+            def shadowJarTask = sub.tasks.named("shadowJar")
+            dependsOn(shadowJarTask)
+
+            from(shadowJarTask.map { it.archiveFile }) {
+                exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+                rename { sub.name }
+                into("nms")
+            }
+        } else if (sub.path.startsWith(':Bukkit:Hooks:')) {
+            from sub.sourceSets.main.output
+        }
+    }
+
+    def missionsProject = project(':Missions');
+
+    missionsProject.subprojects.forEach { sub ->
+        def shadowJarTask = sub.tasks.named("shadowJar")
+        dependsOn(shadowJarTask)
+
+        from(shadowJarTask.map { it.archiveFile }) {
+            exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+            rename { sub.name }
+            into("modules/missions")
+        }
+    }
+
+    dependencies {
+        // This includes Core and API in the final JAR
+        include project(':Core')
+        include project(':API')
+    }
+}
+
+tasks.register('cleanTarget', Delete) {
+    delete rootProject.targetFolder
+}
+
+tasks.register('collectArtifacts', Copy) {
+    group = 'build'
+
+    dependsOn('cleanTarget')
+    dependsOn(tasks.named('shadowJar'))
+    dependsOn(project(':API').tasks.named('shadowJar'))
+
+    from(tasks.named('shadowJar').map { it.archiveFile }) {
+        rename { rootProject.name + "-" + rootProject.buildVersion + ".jar" }
+    }
+
+    from(project(':API').tasks.named('shadowJar').map { it.archiveFile }) {
+        rename { rootProject.name + "-API.jar" }
+    }
+
+    into(rootProject.targetFolder)
+}
+
+tasks.named('build') {
+    dependsOn(tasks.named('shadowJar'))
+}
+
+tasks.named('shadowJar') {
+    finalizedBy('collectArtifacts')
+}
