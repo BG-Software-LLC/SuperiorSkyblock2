@@ -110,18 +110,40 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
             updatedConfig = true;
         }
 
-        File oldConfigFile = new File(plugin.getDataFolder(), "config.yml");
-        if (oldConfigFile.exists()) {
-            CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldConfigFile);
+        if (!config.isConfigurationSection("crop-growth") && !config.isConfigurationSection("mob-drops")) {
+            config.set("crop-growth.enabled", config.getBoolean("crop-growth"));
+            config.set("mob-drops.enabled", config.getBoolean("mob-drops"));
 
-            if (oldConfig.isList("crops-to-grow")) {
-                config.set("crop-growth.whitelisted-crops", oldConfig.getList("crops-to-grow"));
-            }
-            if (oldConfig.isInt("crops-interval")) {
-                config.set("crop-growth.interval", oldConfig.getInt("crops-interval"));
-            }
-            if (oldConfig.isBoolean("drops-upgrade-players-multiply")) {
-                config.set("mob-drops.only-player-kills", oldConfig.getBoolean("drops-upgrade-players-multiply"));
+            File oldConfigFile = new File(plugin.getDataFolder(), "config.yml");
+            if (oldConfigFile.exists()) {
+                CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldConfigFile);
+
+                boolean saveOldConfig = false;
+                if (oldConfig.isList("crops-to-grow")) {
+                    config.set("crop-growth.whitelisted-crops", oldConfig.getList("crops-to-grow"));
+                    oldConfig.set("crops-to-grow", null);
+                    saveOldConfig = true;
+                }
+                if (oldConfig.isInt("crops-interval")) {
+                    config.set("crop-growth.interval", oldConfig.getInt("crops-interval"));
+                    oldConfig.set("crops-interval", null);
+                    saveOldConfig = true;
+                }
+                if (oldConfig.isBoolean("drops-upgrade-players-multiply")) {
+                    config.set("mob-drops.only-player-kills", oldConfig.getBoolean("drops-upgrade-players-multiply"));
+                    oldConfig.set("drops-upgrade-players-multiply", null);
+                    saveOldConfig = true;
+                }
+
+                // We need to save this here instead of in SettingsManagerImpl,
+                // because the save operation there happens earlier, so we would lose the settings.
+                if (saveOldConfig) {
+                    try {
+                        oldConfig.save(oldConfigFile);
+                    } catch (Exception error) {
+                        this.logger().e("An error occurred while saving config file:", error);
+                    }
+                }
             }
 
             updatedConfig = true;
@@ -270,18 +292,18 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
             if (!enabled) return;
 
-            if (config.getBoolean("crop-growth", true))
+            if (config.getBoolean("crop-growth.enabled", true))
                 enabledUpgrades.add(new UpgradeTypeCropGrowth(plugin));
-            if (config.getBoolean("mob-drops", true))
+            if (config.getBoolean("mob-drops.enabled", true))
                 enabledUpgrades.add(new UpgradeTypeMobDrops(plugin));
-            if (config.getBoolean("island-effects", true))
-                enabledUpgrades.add(new UpgradeTypeIslandEffects(plugin));
             if (config.getBoolean("spawner-rates", true))
                 enabledUpgrades.add(new UpgradeTypeSpawnerRates(plugin));
             if (config.getBoolean("block-limits", true))
                 enabledUpgrades.add(new UpgradeTypeBlockLimits(plugin));
             if (config.getBoolean("entity-limits", true))
                 enabledUpgrades.add(new UpgradeTypeEntityLimits(plugin));
+            if (config.getBoolean("island-effects", true))
+                enabledUpgrades.add(new UpgradeTypeIslandEffects(plugin));
 
             ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
             if (upgrades != null) {
@@ -291,7 +313,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
                     SUpgrade upgrade = new SUpgrade(upgradeName);
                     for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
-                        loadUpgradeLevelFromSection(plugin, upgrade, _level, upgrades.getConfigurationSection(upgradeName + "." + _level));
+                        loadUpgradeLevelFromSection(upgrade, _level, upgrades.getConfigurationSection(upgradeName + "." + _level));
                     }
 
                     plugin.getUpgrades().addUpgrade(upgrade);
@@ -303,11 +325,10 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
     }
 
-    private void loadUpgradeLevelFromSection(SuperiorSkyblockPlugin plugin, SUpgrade upgrade,
-                                             String sectionName, ConfigurationSection levelSection) {
+    private void loadUpgradeLevelFromSection(SUpgrade upgrade, String sectionName, ConfigurationSection levelSection) {
         int level = Integer.parseInt(sectionName);
 
-        List<UpgradeCost> upgradeCosts = loadUpgradeCosts(plugin, upgrade, level, levelSection);
+        List<UpgradeCost> upgradeCosts = loadUpgradeCosts(upgrade, level, levelSection);
         if (upgradeCosts.isEmpty()) {
             this.logger().w("Upgrade by name " + upgrade.getName() + " (level " + level + ") has no price. Skipping...");
             return;
@@ -390,15 +411,14 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         upgrade.addUpgradeLevel(level, upgradeLevel);
     }
 
-    private List<UpgradeCost> loadUpgradeCosts(SuperiorSkyblockPlugin plugin, SUpgrade upgrade,
-                                               int level, ConfigurationSection levelSection) {
+    private List<UpgradeCost> loadUpgradeCosts(SUpgrade upgrade, int level, ConfigurationSection levelSection) {
         if (levelSection.isConfigurationSection("prices")) {
             List<UpgradeCost> upgradeCosts = new LinkedList<>();
 
             for (String name : levelSection.getConfigurationSection("prices").getKeys(false)) {
                 ConfigurationSection priceSection = levelSection.getConfigurationSection("prices." + name);
 
-                UpgradeCost upgradeCost = loadUpgradeCost(plugin, upgrade, level, priceSection);
+                UpgradeCost upgradeCost = loadUpgradeCost(upgrade, level, priceSection);
 
                 if (!(upgradeCost instanceof EmptyUpgradeCost)) {
                     upgradeCosts.add(upgradeCost);
@@ -407,15 +427,14 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
             return upgradeCosts;
         } else {
-            UpgradeCost upgradeCost = loadUpgradeCost(plugin, upgrade, level, levelSection);
+            UpgradeCost upgradeCost = loadUpgradeCost(upgrade, level, levelSection);
 
             return upgradeCost instanceof EmptyUpgradeCost ? Collections.emptyList()
                     : Collections.singletonList(upgradeCost);
         }
     }
 
-    private UpgradeCost loadUpgradeCost(SuperiorSkyblockPlugin plugin, SUpgrade upgrade,
-                                        int level, ConfigurationSection priceSection) {
+    private UpgradeCost loadUpgradeCost(SUpgrade upgrade, int level, ConfigurationSection priceSection) {
         String priceType = priceSection.getString("price-type", "money");
         UpgradeCostLoader costLoader = plugin.getUpgrades().getUpgradeCostLoader(priceType);
 
