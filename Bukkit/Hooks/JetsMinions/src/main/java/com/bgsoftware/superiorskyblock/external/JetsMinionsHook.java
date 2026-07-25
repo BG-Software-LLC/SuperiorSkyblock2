@@ -40,7 +40,7 @@ public class JetsMinionsHook implements Listener {
     }
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new JetsMinionsHook(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new JetsMinionsHook(plugin), plugin.getBukkitPlugin());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -72,7 +72,7 @@ public class ProfilerSession {
 
 
         public final long time = System.nanoTime();
-        public final double tps = plugin.getNMSAlgorithms().getCurrentTps();
+        public final double tps = plugin.getPlatform().getServerManager().getCurrentTps();
 
     }
 

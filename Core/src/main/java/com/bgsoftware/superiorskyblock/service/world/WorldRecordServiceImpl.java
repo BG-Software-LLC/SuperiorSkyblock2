@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.service.IService;
@@ -233,7 +232,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             int chunkX = block.getX() >> 4;
             int chunkZ = block.getZ() >> 4;
 
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 if (dirtyChunks && world.isChunkLoaded(chunkX, chunkZ)) {
                     if (plugin.getNMSChunks().isChunkEmpty(block.getChunk())) {
                         island.markChunkEmpty(world, chunkX, chunkZ, true);

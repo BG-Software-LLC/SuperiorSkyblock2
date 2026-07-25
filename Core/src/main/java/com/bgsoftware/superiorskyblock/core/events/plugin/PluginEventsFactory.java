@@ -1135,19 +1135,19 @@ public class PluginEventsFactory {
 
     public static void callPluginInitializedEvent() {
         PluginInitialized pluginInitialized = new PluginInitialized();
-        pluginInitialized.plugin = plugin;
+        pluginInitialized.plugin = plugin.getApi();
         fireEvent(PLUGIN_INITIALIZED_EVENT, pluginInitialized);
     }
 
     public static PluginEvent<PluginInitialize> callPluginInitializeEvent() {
         PluginInitialize pluginInitialize = new PluginInitialize();
-        pluginInitialize.plugin = plugin;
+        pluginInitialize.plugin = plugin.getApi();
         return fireEvent(PLUGIN_INITIALIZE_EVENT, pluginInitialize);
     }
 
     public static boolean callPluginLoadDataEvent() {
         PluginLoadData pluginLoadData = new PluginLoadData();
-        pluginLoadData.plugin = plugin;
+        pluginLoadData.plugin = plugin.getApi();
         return !fireEvent(PLUGIN_LOAD_DATA_EVENT, pluginLoadData).isCancelled();
     }
 

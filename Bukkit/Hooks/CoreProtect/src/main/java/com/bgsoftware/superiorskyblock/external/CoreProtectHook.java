@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
@@ -27,7 +26,7 @@ public class CoreProtectHook {
     private static void recordBlockAction(OfflinePlayer offlinePlayer, Block block,
                                           IStackedBlocksListener.Action action) {
         if (!Bukkit.isPrimaryThread()) {
-            BukkitExecutor.sync(() -> recordBlockAction(offlinePlayer, block, action));
+            plugin.getPlatform().getScheduler().runSync(() -> recordBlockAction(offlinePlayer, block, action));
             return;
         }
 

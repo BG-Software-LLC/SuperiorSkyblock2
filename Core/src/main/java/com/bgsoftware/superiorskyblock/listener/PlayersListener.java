@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
@@ -144,13 +143,13 @@ public class PlayersListener extends AbstractGameEventListener {
 
         boolean teleportToSpawn = moveResult != MoveResult.SUCCESS;
 
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             if (!player.isOnline())
                 return;
 
             // Updating skin of the player
             if (!plugin.getProviders().notifySkinsListeners(superiorPlayer))
-                plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
+                plugin.getPlatform().getServerManager().setSkinTexture(superiorPlayer);
 
             if (!superiorPlayer.hasBypassModeEnabled()) {
                 Island delayedIsland;
@@ -168,7 +167,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
             // Checking auto language detection
             if (plugin.getSettings().isAutoLanguageDetection() && !player.hasPlayedBefore()) {
-                Locale playerLocale = plugin.getNMSPlayers().getPlayerLocale(player);
+                Locale playerLocale = plugin.getPlatform().getServerManager().getPlayerLocale(player);
                 if (playerLocale != null && PlayerLocales.isValidLocale(playerLocale) &&
                         !superiorPlayer.getUserLocale().equals(playerLocale)) {
                     if (PluginEventsFactory.callPlayerChangeLanguageEvent(superiorPlayer, playerLocale))
@@ -307,7 +306,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
         if (island != null && superiorPlayer.hasIslandFlyEnabled() && !player.getAllowFlight() &&
                 island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 player.setAllowFlight(true);
                 player.setFlying(true);
             }, 1L);
@@ -527,7 +526,7 @@ public class PlayersListener extends AbstractGameEventListener {
         Location respawnLocation = e.getArgs().bukkitEvent.getRespawnLocation();
         Player player = e.getArgs().player;
 
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             if (!player.isOnline())
                 return;
 

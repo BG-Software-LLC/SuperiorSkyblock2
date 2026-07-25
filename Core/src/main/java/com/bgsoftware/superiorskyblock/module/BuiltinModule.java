@@ -22,14 +22,14 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
 
     @Override
     public final void onEnable(SuperiorSkyblock plugin) {
-        onEnable((SuperiorSkyblockPlugin) plugin);
+        onEnable(SuperiorSkyblockPlugin.getPlugin());
     }
 
     protected abstract void onEnable(SuperiorSkyblockPlugin plugin);
 
     @Override
     public final void onReload(SuperiorSkyblock plugin) {
-        onReload((SuperiorSkyblockPlugin) plugin);
+        onReload(SuperiorSkyblockPlugin.getPlugin());
     }
 
     protected void onReload(SuperiorSkyblockPlugin plugin) {
@@ -38,35 +38,35 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
 
     @Override
     public void onDisable(SuperiorSkyblock plugin) {
-        onDisable((SuperiorSkyblockPlugin) plugin);
+        onDisable(SuperiorSkyblockPlugin.getPlugin());
     }
 
     protected abstract void onDisable(SuperiorSkyblockPlugin plugin);
 
     @Override
     public void loadData(SuperiorSkyblock plugin) {
-        loadData((SuperiorSkyblockPlugin) plugin);
+        loadData(SuperiorSkyblockPlugin.getPlugin());
     }
 
     protected abstract void loadData(SuperiorSkyblockPlugin plugin);
 
     @Override
     public Listener[] getModuleListeners(SuperiorSkyblock plugin) {
-        return !isEnabled() ? null : getModuleListeners((SuperiorSkyblockPlugin) plugin);
+        return !isEnabled() ? null : getModuleListeners(SuperiorSkyblockPlugin.getPlugin());
     }
 
     protected abstract Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin);
 
     @Override
     public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblock plugin) {
-        return !isEnabled() ? null : getSuperiorCommands((SuperiorSkyblockPlugin) plugin);
+        return !isEnabled() ? null : getSuperiorCommands(SuperiorSkyblockPlugin.getPlugin());
     }
 
     protected abstract SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin);
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblock plugin) {
-        return !isEnabled() ? null : getSuperiorAdminCommands((SuperiorSkyblockPlugin) plugin);
+        return !isEnabled() ? null : getSuperiorAdminCommands(SuperiorSkyblockPlugin.getPlugin());
     }
 
     protected abstract SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin);
@@ -77,7 +77,7 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
 
     @Override
     protected void onPluginInit(SuperiorSkyblock plugin) {
-        onPluginInit((SuperiorSkyblockPlugin) plugin);
+        onPluginInit(SuperiorSkyblockPlugin.getPlugin());
     }
 
     protected void onPluginInit(SuperiorSkyblockPlugin plugin) {

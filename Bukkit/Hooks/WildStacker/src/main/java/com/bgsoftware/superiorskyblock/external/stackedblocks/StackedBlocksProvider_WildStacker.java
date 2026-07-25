@@ -49,7 +49,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
     public StackedBlocksProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
 
         if (!registered) {
             registered = true;

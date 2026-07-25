@@ -25,7 +25,7 @@ public class SpawnersProvider_AdvancedSpawners implements SpawnersProvider_AutoD
 
     public SpawnersProvider_AdvancedSpawners(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_AdvancedSpawners.StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_AdvancedSpawners.StackerListener(), plugin.getBukkitPlugin());
         Log.info("Using AdvancedSpawners as a spawners provider.");
     }
 

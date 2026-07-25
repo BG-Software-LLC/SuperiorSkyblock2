@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_Dev999;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_RC13;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -62,21 +61,21 @@ public class SlimefunHook {
         SlimefunHook.plugin = plugin;
 
         if (isClassLoaded("me.mrCookieSlime.Slimefun.SlimefunPlugin")) {
-            ProtectionModule_RC13.register(plugin, SlimefunHook::checkPermission);
+            ProtectionModule_RC13.register(plugin.getBukkitPlugin(), SlimefunHook::checkPermission);
         } else if (isClassLoaded("io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule")) {
-            ProtectionModule_Dev999.register(plugin, SlimefunHook::checkPermission);
+            ProtectionModule_Dev999.register(plugin.getBukkitPlugin(), SlimefunHook::checkPermission);
         } else if (isClassLoaded("io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin")) {
             // Dev 744 version, which is the one we use here.
-            new ProtectionModuleImpl(plugin).register();
+            new ProtectionModuleImpl(plugin.getBukkitPlugin()).register();
         }
 
-        plugin.getServer().getPluginManager().registerEvents(new AndroidMineListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new AndroidMineListener(), plugin.getBukkitPlugin());
 
         if (isClassLoaded("io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent"))
-            plugin.getServer().getPluginManager().registerEvents(new AutoPlacerPlaceListener(), plugin);
+            plugin.getServer().getPluginManager().registerEvents(new AutoPlacerPlaceListener(), plugin.getBukkitPlugin());
 
         if (BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD.isValid())
-            plugin.getServer().getPluginManager().registerEvents(new ChunkWipeListener(), plugin);
+            plugin.getServer().getPluginManager().registerEvents(new ChunkWipeListener(), plugin.getBukkitPlugin());
     }
 
     private static boolean isClassLoaded(String clazz) {
@@ -151,7 +150,7 @@ public class SlimefunHook {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onChunkWipe(IslandChunkResetEvent e) {
-            BukkitExecutor.async(() -> {
+            plugin.getPlatform().getScheduler().runAsync(() -> {
                 // Might be unsafe to call async. Should fix:
                 // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/2474
                 BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD.invoke(null, e.getWorld(), e.getChunkX(), e.getChunkZ(), true);

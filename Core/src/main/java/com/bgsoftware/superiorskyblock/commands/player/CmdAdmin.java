@@ -102,7 +102,7 @@ public class CmdAdmin implements ISuperiorCommand {
                     return;
                 }
 
-                command.execute(plugin, sender, args);
+                command.execute(plugin.getApi(), sender, args);
                 return;
             }
 
@@ -186,7 +186,7 @@ public class CmdAdmin implements ISuperiorCommand {
             SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
             if (command != null) {
                 return CommandsHelper.hasCommandAccess(command, sender) ?
-                        command.tabComplete(plugin, sender, args) : Collections.emptyList();
+                        command.tabComplete(plugin.getApi(), sender, args) : Collections.emptyList();
             }
         } else if (args.length == 1) {
             return Collections.emptyList();

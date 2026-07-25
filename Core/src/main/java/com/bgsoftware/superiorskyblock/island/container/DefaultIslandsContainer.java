@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.container.grid.IslandsGrid;
@@ -194,7 +193,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
             return;
         }
 
-        BukkitExecutor.ensureAsync(() -> sortIslandsInternal(sortingType, onFinish));
+        plugin.getPlatform().getScheduler().ensureAsync(() -> sortIslandsInternal(sortingType, onFinish));
     }
 
     @Override

@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -94,7 +93,7 @@ public class PortalsListener extends AbstractGameEventListener {
             if (teleportedPlayer != null)
                 teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
 
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
                 IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
                     islandWorldResult.ifRight(error -> {

@@ -24,7 +24,7 @@ public class PlaceholdersProvider_MVdWPlaceholderAPI implements PlaceholdersProv
 
     public PlaceholdersProvider_MVdWPlaceholderAPI(SuperiorSkyblockPlugin plugin) {
         Log.info("Using MVdWPlaceholderAPI for placeholders support.");
-        PlaceholderAPI.registerPlaceholder(plugin, "superior_*", e ->
+        PlaceholderAPI.registerPlaceholder(plugin.getBukkitPlugin(), "superior_*", e ->
                 ((PlaceholdersServiceImpl) placeholdersService.get()).handlePluginPlaceholder(e.getOfflinePlayer(),
                         e.getPlaceholder().replace("superior_", "")));
     }

@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -151,7 +150,7 @@ public class NMSUtils {
         CompletableFuture<Void> pendingTask = new CompletableFuture<>();
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
-        BukkitExecutor.createTask().runAsync(v -> {
+        plugin.getPlatform().getScheduler().createTask().runAsync(v -> {
             CountDownLatch countDownLatch;
             if (chunkCallback.isWaitForChunkLoad) {
                 countDownLatch = chunkCallback.chunkLoadLatch = new CountDownLatch(chunks.size());
@@ -350,7 +349,7 @@ public class NMSUtils {
 
             ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, null).whenComplete((bukkitChunk, error) -> {
                 if (error == null) {
-                    BukkitExecutor.ensureMain(() -> {
+                    plugin.getPlatform().getScheduler().ensureMain(() -> {
                         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
                         onLoadedChunk(chunk);
                     });

@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class CmdAdminPurge implements ISuperiorCommand {
             if (islands.isEmpty()) {
                 Message.NO_ISLANDS_TO_PURGE.send(sender);
             } else {
-                BukkitExecutor.async(() -> islands.forEach(island -> plugin.getGrid().addIslandToPurge(island)));
+                plugin.getPlatform().getScheduler().runAsync(() -> islands.forEach(island -> plugin.getGrid().addIslandToPurge(island)));
                 Message.PURGED_ISLANDS.send(sender, islands.size());
             }
         }

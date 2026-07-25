@@ -31,7 +31,7 @@ public class SpawnersProvider_RoseStacker1_5 implements SpawnersProvider_AutoDet
 
     public SpawnersProvider_RoseStacker1_5(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
         Log.info("Using RoseStacker as a spawners provider.");
     }
 

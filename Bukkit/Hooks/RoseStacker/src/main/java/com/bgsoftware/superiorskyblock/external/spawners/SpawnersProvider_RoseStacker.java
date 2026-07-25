@@ -31,7 +31,7 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
 
     public SpawnersProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
         Log.info("Using RoseStacker as a spawners provider.");
     }
 

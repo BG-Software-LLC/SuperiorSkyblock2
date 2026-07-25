@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.schematic.SchematicEntity;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
@@ -185,7 +184,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-        BukkitExecutor.ensureAsync(() -> pasteSchematicInternal(island, location, callback, onFailure));
+        plugin.getPlatform().getScheduler().ensureAsync(() -> pasteSchematicInternal(island, location, callback, onFailure));
     }
 
     private void pasteSchematicInternal(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
@@ -260,7 +259,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
                     if (cropGrowthEnabled && island.isInsideRange(chunk)) {
-                        BukkitExecutor.ensureMain(() -> plugin.getNMSChunks().startTickingChunk(island, chunk, false));
+                        plugin.getPlatform().getScheduler().ensureMain(() -> plugin.getNMSChunks().startTickingChunk(island, chunk, false));
                     }
 
                     island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
@@ -282,7 +281,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
             Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
 
-            BukkitExecutor.ensureMain(() -> {
+            plugin.getPlatform().getScheduler().ensureMain(() -> {
                 try {
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
                     worldEditSession.finish(island);
@@ -370,7 +369,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         this.affectedChunks = new LinkedList<>(affectedChunks);
         // We spawn the entities with a delay, waiting for players to teleport to the island first.
         this.onTeleportCallback = () -> {
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 for (SchematicEntity entity : data.entities) {
                     entity.spawnEntity(min);
                 }

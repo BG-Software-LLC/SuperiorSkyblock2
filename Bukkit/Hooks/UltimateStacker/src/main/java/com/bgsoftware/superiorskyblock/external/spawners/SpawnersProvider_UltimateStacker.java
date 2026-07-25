@@ -26,7 +26,7 @@ public class SpawnersProvider_UltimateStacker implements SpawnersProviderItemMet
 
     public SpawnersProvider_UltimateStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
         Log.info("Using UltimateStacker as a spawners provider.");
     }
 

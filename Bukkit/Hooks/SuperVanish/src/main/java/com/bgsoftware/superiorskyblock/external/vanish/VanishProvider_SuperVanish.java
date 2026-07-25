@@ -18,7 +18,7 @@ public class VanishProvider_SuperVanish implements VanishProvider, Listener {
 
     public VanishProvider_SuperVanish(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(this, plugin.getBukkitPlugin());
         Log.info("Hooked into SuperVanish for support of vanish status of players.");
     }
 

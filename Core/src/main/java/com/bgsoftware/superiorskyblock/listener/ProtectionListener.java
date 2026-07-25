@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -614,7 +613,7 @@ public class ProtectionListener extends AbstractGameEventListener {
                 if (hitBlock != null) {
                     ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
                     hitBlock.setType(Material.AIR);
-                    BukkitExecutor.sync(() -> {
+                    plugin.getPlatform().getScheduler().runSync(() -> {
                         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                             cachedBlock.setBlock(hitBlock.getLocation(wrapper.getHandle()));
                         }

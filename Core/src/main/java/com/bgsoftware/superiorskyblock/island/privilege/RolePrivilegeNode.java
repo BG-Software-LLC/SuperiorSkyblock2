@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.island.privilege;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.google.common.base.Preconditions;
 
@@ -12,6 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class RolePrivilegeNode extends PrivilegeNodeAbstract {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Nullable
     private final SPlayerRole playerRole;
@@ -26,7 +28,7 @@ public class RolePrivilegeNode extends PrivilegeNodeAbstract {
         if (linkedNode != null)
             this.linkedNodes.add(linkedNode);
         if (!Text.isBlank(permissions))
-            BukkitExecutor.sync(() -> setPermissions(permissions, playerRole != null), 1L);
+            plugin.getPlatform().getScheduler().runSync(() -> setPermissions(permissions, playerRole != null), 1L);
     }
 
     private RolePrivilegeNode(EnumerateMap<IslandPrivilege, PrivilegeStatus> privileges,

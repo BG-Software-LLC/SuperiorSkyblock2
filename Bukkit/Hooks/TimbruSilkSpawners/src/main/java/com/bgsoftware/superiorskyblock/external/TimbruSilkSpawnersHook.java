@@ -18,7 +18,7 @@ import java.util.Locale;
 public class TimbruSilkSpawnersHook {
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new SpawnersListener(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new SpawnersListener(plugin), plugin.getBukkitPlugin());
     }
 
     private TimbruSilkSpawnersHook() {

@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_12_R1.Block;
@@ -126,7 +125,7 @@ public class NMSUtils {
         CompletableFuture<Void> pendingTask = new CompletableFuture<>();
         PENDING_CHUNK_ACTIONS.add(pendingTask);
 
-        BukkitExecutor.createTask().runAsync(v -> {
+        plugin.getPlatform().getScheduler().createTask().runAsync(v -> {
             chunks.forEach(chunkPosition -> {
                 WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 

@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmTransfer;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 
 public class TransferButton extends AbstractMenuViewButton<MenuConfirmTransfer.View> {
@@ -28,7 +27,7 @@ public class TransferButton extends AbstractMenuViewButton<MenuConfirmTransfer.V
         if (getTemplate().newOwner)
             IslandUtils.handleTransferIsland(clickedPlayer, menuView.getIsland(), menuView.getSuperiorPlayer());
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        plugin.getPlatform().getScheduler().runSync(menuView::closeView, 1L);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<MenuConfirmTransfer.View> {

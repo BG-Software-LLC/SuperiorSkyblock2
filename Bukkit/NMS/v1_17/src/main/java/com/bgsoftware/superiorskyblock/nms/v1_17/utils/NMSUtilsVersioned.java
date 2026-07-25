@@ -6,7 +6,8 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.platform.scheduler.NestedTask;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_17.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_17.utils.TickingBlockList;
@@ -70,6 +71,8 @@ import java.util.function.BiConsumer;
 
 public class NMSUtilsVersioned {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final ReflectField<IOWorker> ENTITY_STORAGE_WORKER = new ReflectField<>(
             EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
     private static final ReflectMethod<CompletableFuture<CompoundTag>> WORKER_LOAD_ASYNC = new ReflectMethod<>(
@@ -88,9 +91,9 @@ public class NMSUtilsVersioned {
         chunkMap.write(chunkPos, chunkCompoundTag);
     }
 
-    public static BukkitExecutor.NestedTask<Void> runActionOnUnloadedEntityChunks(
+    public static NestedTask<Void> runActionOnUnloadedEntityChunks(
             Collection<ChunkPosition> chunks, NMSUtils.ChunkCallback chunkCallback, CountDownLatch countDownLatch) {
-        return BukkitExecutor.createTask().runSync(v -> {
+        return plugin.getPlatform().getScheduler().createTask().runSync(v -> {
             chunks.forEach(chunkPosition -> {
                 ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
                 IOWorker worker = ENTITY_STORAGE_WORKER.get(serverLevel.entityManager.permanentStorage);

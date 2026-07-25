@@ -26,7 +26,6 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.IService;
@@ -325,7 +324,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         if (closeInventory && interactionResult != InteractionResult.SUCCESS) {
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 Player player = superiorPlayer.asPlayer();
                 if (player != null && player.isOnline()) {
                     Inventory openInventory = player.getOpenInventory().getTopInventory();
@@ -448,7 +447,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(item, "item cannot be null");
 
-        if (plugin.getNMSPlayers().wasThrownByPlayer(item, superiorPlayer))
+        if (plugin.getPlatform().getServerManager().wasThrownByPlayer(item, superiorPlayer))
             return InteractionResult.SUCCESS;
 
         // We do not care about spawn island when spawn protection is disabled,
@@ -669,7 +668,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     }
 
     private void forgetVoidTeleportPlayerStatus(SuperiorPlayer superiorPlayer) {
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             superiorPlayer.removePlayerStatus(PlayerStatus.VOID_TELEPORT);
         }, 40L);
     }
@@ -771,9 +770,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         if (equalIslands) {
             if (!equalWorlds) {
-                BukkitExecutor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
+                plugin.getPlatform().getScheduler().runSync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
                 superiorPlayer.setPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
-                BukkitExecutor.sync(() -> {
+                plugin.getPlatform().getScheduler().runSync(() -> {
                     superiorPlayer.removePlayerStatus(PlayerStatus.PORTALS_IMMUNED);
                 }, 100L);
             }
@@ -792,20 +791,20 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Message.ENTER_PVP_ISLAND.send(superiorPlayer);
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
                 superiorPlayer.setPlayerStatus(PlayerStatus.PVP_IMMUNED);
-                BukkitExecutor.sync(() -> {
+                plugin.getPlatform().getScheduler().runSync(() -> {
                     superiorPlayer.removePlayerStatus(PlayerStatus.PVP_IMMUNED);
                 }, 200L);
             }
         }
 
         superiorPlayer.setPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             superiorPlayer.removePlayerStatus(PlayerStatus.PORTALS_IMMUNED);
         }, 100L);
 
         Player player = superiorPlayer.asPlayer();
         if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 // Update player time and player weather with a delay.
                 // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
                 if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
@@ -827,12 +826,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         if (superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()) {
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 if (player != null) toIsland.updateIslandFly(superiorPlayer);
             }, 5L);
         }
 
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             toIsland.applyEffects(superiorPlayer);
             plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland);
         }, 1L);

@@ -77,7 +77,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.core.threads.SynchronizedTasks;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
@@ -128,7 +127,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -189,8 +187,8 @@ public class SIsland implements Island {
     private final IslandCalculationAlgorithm calculationAlgorithm;
     private final IslandBlocksTrackerAlgorithm blocksTracker;
     private final IslandEntitiesTrackerAlgorithm entitiesTracker;
-    private final Synchronized<BukkitTask> bankInterestTask = Synchronized.of(null);
-    private final Synchronized<Set<BukkitTask>> activeTasks = Synchronized.of(Collections.newSetFromMap(new WeakHashMap<>()));
+    private final Synchronized<Object> bankInterestTask = Synchronized.of(null);
+    private final Synchronized<Set<Object>> activeTasks = Synchronized.of(Collections.newSetFromMap(new WeakHashMap<>()));
     private final DirtyChunksContainer dirtyChunksContainer;
     private final LazyReference<IslandCache> islandCache = new LazyReference<IslandCache>() {
         @Override
@@ -531,7 +529,7 @@ public class SIsland implements Island {
         superiorPlayer.addInvite(this);
 
         //Revoke the invite after 5 minutes
-        registerTask(BukkitExecutor.sync(() -> revokeInvite(superiorPlayer), 6000L));
+        registerTask(plugin.getPlatform().getScheduler().runSync(() -> revokeInvite(superiorPlayer), 6000L));
     }
 
     @Override
@@ -1760,9 +1758,9 @@ public class SIsland implements Island {
         });
 
         this.activeTasks.write(activeTasks -> {
-            activeTasks.forEach(BukkitTask::cancel);
+            activeTasks.forEach(task -> plugin.getPlatform().getScheduler().cancelTask(task));
         });
-        this.bankInterestTask.set((BukkitTask) null);
+        this.bankInterestTask.set((Object) null);
 
         invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
         coopPlayers.forEach(coopPlayer -> coopPlayer.removeCoop(this));
@@ -1864,7 +1862,7 @@ public class SIsland implements Island {
             return;
         }
 
-        registerTask(BukkitExecutor.ensureMain(() -> {
+        registerTask(plugin.getPlatform().getScheduler().ensureMain(() -> {
             calcIslandWorthInternal(asker, callback);
         }));
     }
@@ -1928,7 +1926,7 @@ public class SIsland implements Island {
             // We now collect the new chunks after the size was changed
             List<Chunk> newChunks = getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED);
 
-            registerTask(BukkitExecutor.ensureMain(() -> {
+            registerTask(plugin.getPlatform().getScheduler().ensureMain(() -> {
                 // We stop all old chunks from being ticked.
                 oldChunks.getValue().forEach(chunk -> plugin.getNMSChunks().startTickingChunk(this, chunk, true));
                 // We start ticking all the new chunks
@@ -2258,7 +2256,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, Arrays.toString(ignoredMembers));
 
-        registerTask(BukkitExecutor.ensureMain(() -> {
+        registerTask(plugin.getPlatform().getScheduler().ensureMain(() -> {
             forEachIslandMember(ignoredMembers, onlyOnlineMembers, islandMember -> {
                 String playerCommand = command;
 
@@ -2431,9 +2429,8 @@ public class SIsland implements Island {
 
     private void resetBankInterestTask(long ticksToNextInterest) {
         this.bankInterestTask.set(bankInterestTask -> {
-            if (bankInterestTask != null)
-                bankInterestTask.cancel();
-            return registerTask(BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest));
+            plugin.getPlatform().getScheduler().cancelTask(bankInterestTask);
+            return registerTask(plugin.getPlatform().getScheduler().runSync(() -> giveInterest(true), ticksToNextInterest));
         });
     }
 
@@ -3453,7 +3450,7 @@ public class SIsland implements Island {
         if (level == IntValue.getNonSynced(oldPotionLevel, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
-        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+        registerTask(plugin.getPlatform().getScheduler().ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             assert player != null;
             if (oldPotionLevel != null && oldPotionLevel.get() > level)
@@ -3477,7 +3474,7 @@ public class SIsland implements Island {
         if (oldEffectLevel == null)
             return;
 
-        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+        registerTask(plugin.getPlatform().getScheduler().ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             if (player != null)
                 player.removePotionEffect(type);
@@ -4726,7 +4723,7 @@ public class SIsland implements Island {
         BigDecimal newLevel = getIslandLevel();
 
         if (oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
-            registerTask(BukkitExecutor.async(() ->
+            registerTask(plugin.getPlatform().getScheduler().runAsync(() ->
                     PluginEventsFactory.callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L));
         }
 
@@ -5362,7 +5359,7 @@ public class SIsland implements Island {
         }
     }
 
-    private BukkitTask registerTask(@Nullable BukkitTask bukkitTask) {
+    private Object registerTask(@Nullable Object bukkitTask) {
         if (bukkitTask != null) {
             this.activeTasks.write(activeTasks -> activeTasks.add(bukkitTask));
         }

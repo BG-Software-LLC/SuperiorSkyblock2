@@ -15,11 +15,11 @@ public interface ISuperiorCommand extends SuperiorCommand {
     }
 
     default void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        execute((SuperiorSkyblockPlugin) plugin, sender, args);
+        execute(SuperiorSkyblockPlugin.getPlugin(), sender, args);
     }
 
     default List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        return tabComplete((SuperiorSkyblockPlugin) plugin, sender, args);
+        return tabComplete(SuperiorSkyblockPlugin.getPlugin(), sender, args);
     }
 
     void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args);

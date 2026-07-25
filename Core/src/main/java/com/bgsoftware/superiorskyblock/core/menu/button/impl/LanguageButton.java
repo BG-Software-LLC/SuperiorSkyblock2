@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -38,7 +37,7 @@ public class LanguageButton extends AbstractMenuViewButton<BaseMenuView> {
 
         Message.CHANGED_LANGUAGE.send(inventoryViewer);
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        plugin.getPlatform().getScheduler().runSync(menuView::closeView, 1L);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<BaseMenuView> {

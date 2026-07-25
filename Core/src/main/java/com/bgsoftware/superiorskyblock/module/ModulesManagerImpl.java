@@ -93,7 +93,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         Log.info("Disabling the module ", pluginModule.getName(), "...");
 
         try {
-            pluginModule.onDisable(plugin);
+            pluginModule.onDisable(plugin.getApi());
         } catch (Throwable error) {
             Log.error("An unexpected error occurred while disabling the module ", pluginModule.getName(), ".");
             Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
@@ -138,7 +138,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         Log.info("Enabling the module ", pluginModule.getName(), "...");
 
         try {
-            pluginModule.onEnable(plugin);
+            pluginModule.onEnable(plugin.getApi());
         } catch (Throwable error) {
             Log.error("An unexpected error occurred while enabling the module ", pluginModule.getName(), ".");
             Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
@@ -183,7 +183,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
     private void reloadModuleInternal(PluginModule pluginModule) {
         try {
-            pluginModule.onReload(plugin);
+            pluginModule.onReload(plugin.getApi());
         } catch (Throwable error) {
             Log.error("An unexpected error occurred while reloading the module ", pluginModule.getName(), ".");
             Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
@@ -197,16 +197,16 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
     }
 
     private void startupModuleInternal(PluginModule pluginModule) {
-        Listener[] listeners = pluginModule.getModuleListeners(plugin);
-        SuperiorCommand[] commands = pluginModule.getSuperiorCommands(plugin);
-        SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands(plugin);
+        Listener[] listeners = pluginModule.getModuleListeners(plugin.getApi());
+        SuperiorCommand[] commands = pluginModule.getSuperiorCommands(plugin.getApi());
+        SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands(plugin.getApi());
 
         if (listeners != null || commands != null || adminCommands != null)
             this.modulesContainer.addModuleData(pluginModule, new ModuleData(listeners, commands, adminCommands));
 
         if (listeners != null) {
             for (Listener listener : listeners)
-                Bukkit.getPluginManager().registerEvents(listener, plugin);
+                Bukkit.getPluginManager().registerEvents(listener, plugin.getBukkitPlugin());
         }
 
         if (commands != null) {
@@ -223,7 +223,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
     public void loadModulesData(SuperiorSkyblockPlugin plugin) {
         getModules().forEach(pluginModule -> {
             try {
-                pluginModule.loadData(plugin);
+                pluginModule.loadData(plugin.getApi());
             } catch (Throwable error) {
                 Log.error("An unexpected error occurred while loading data for the module ", pluginModule.getName(), ".");
                 Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");

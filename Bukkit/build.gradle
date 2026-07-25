@@ -11,6 +11,21 @@ repositories {
 dependencies {
     implementation project(':Core')
     implementation project(':API')
+
+    // Spigot jars
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
+}
+
+processResources {
+    outputs.upToDateWhen { false }
+    eachFile { details ->
+        if (details.name.contentEquals('plugin.yml')) {
+            filter { String line ->
+                line.replace('${project.version}', rootProject.buildVersion)
+            }
+        }
+    }
 }
 
 rootProject.subprojects.findAll { it.path != project.path }.each { evaluationDependsOn(it.path) }

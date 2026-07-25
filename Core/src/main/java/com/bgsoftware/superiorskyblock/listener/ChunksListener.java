@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
@@ -155,13 +154,13 @@ public class ChunksListener extends AbstractGameEventListener {
                 recalculateEntities.set(true);
         }
 
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             if (chunk.isLoaded())
                 // Update holograms of stacked blocks in delay so the chunk is entirely loaded.
                 plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
         }, 10L);
 
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             if (!pendingLoadedChunksForIsland.remove(chunk) || !chunk.isLoaded())
                 return;
 

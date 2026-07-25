@@ -4,16 +4,15 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
-public class CalcTask extends BukkitRunnable {
+public class CalcTask {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static BukkitTask calcTask;
+    private static Object calcTask;
 
     private CalcTask() {
-        calcTask = runTaskTimerAsynchronously(plugin, plugin.getSettings().getCalcInterval(), plugin.getSettings().getCalcInterval());
+        long calcInterval = plugin.getSettings().getCalcInterval();
+        calcTask = plugin.getPlatform().getScheduler().runAsyncTimer(this::run, calcInterval, calcInterval);
     }
 
     public static void startTask() {
@@ -23,14 +22,11 @@ public class CalcTask extends BukkitRunnable {
     }
 
     public static void cancelTask() {
-        if (calcTask != null) {
-            calcTask.cancel();
-            calcTask = null;
-        }
+        plugin.getPlatform().getScheduler().cancelTask(calcTask);
+        calcTask = null;
     }
 
-    @Override
-    public void run() {
+    private void run() {
         if (Bukkit.getOnlinePlayers().size() > 0) {
             announceToPlayers(false);
             announceToOps("&7&o[SuperiorSkyblock] Calculating islands...");

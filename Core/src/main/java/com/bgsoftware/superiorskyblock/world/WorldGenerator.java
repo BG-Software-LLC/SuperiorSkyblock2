@@ -76,7 +76,7 @@ public class WorldGenerator {
                         if (constructor.getParameterCount() == 0) {
                             return (ChunkGenerator) generatorClass.newInstance();
                         } else if (constructor.getParameterTypes()[0].equals(JavaPlugin.class) || constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)) {
-                            return (ChunkGenerator) constructor.newInstance(plugin);
+                            return (ChunkGenerator) constructor.newInstance(plugin.getApi());
                         }
                     }
                 }

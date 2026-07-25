@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
@@ -18,7 +19,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
@@ -51,7 +51,7 @@ public class EntityTeleports {
             Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
                     Duration.ofMillis(warmupInMillis), superiorPlayer.getUserLocale()));
 
-            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() -> teleportCallback.accept(true), warmupInMillis / 50));
+            superiorPlayer.setTeleportTask((BukkitTask) plugin.getPlatform().getScheduler().runSync(() -> teleportCallback.accept(true), warmupInMillis / 50));
         } else {
             teleportCallback.accept(false);
         }
@@ -76,7 +76,7 @@ public class EntityTeleports {
         teleport(entity, location, succeed -> {
             if (!succeed) {
                 if (cooldown > 0) {
-                    BukkitExecutor.sync(() -> teleportUntilSuccess(entity, location, cooldown, onFinish), cooldown);
+                    plugin.getPlatform().getScheduler().runSync(() -> teleportUntilSuccess(entity, location, cooldown, onFinish), cooldown);
                 } else {
                     teleportUntilSuccess(entity, location, cooldown, onFinish);
                 }
@@ -191,7 +191,7 @@ public class EntityTeleports {
                 return;
             }
 
-            BukkitExecutor.createTask().runAsync(v -> {
+            plugin.getPlatform().getScheduler().createTask().runAsync(v -> {
                 Location closestSafeSpot = null;
                 double closestSafeSpotDistance = 0;
 

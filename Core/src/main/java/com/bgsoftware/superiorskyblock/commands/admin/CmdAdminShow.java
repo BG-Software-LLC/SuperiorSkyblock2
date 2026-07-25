@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
@@ -93,7 +92,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
         if (island == null)
             return;
 
-        BukkitExecutor.ensureAsync(() -> doShowIslandInfo(plugin, sender, island));
+        plugin.getPlatform().getScheduler().ensureAsync(() -> doShowIslandInfo(plugin, sender, island));
     }
 
     private static void doShowIslandInfo(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island) {

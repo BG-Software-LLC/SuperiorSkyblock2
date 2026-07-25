@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.inventory.ItemStack;
 
 public class BorderColorToggleButton extends AbstractMenuViewButton<BaseMenuView> {
@@ -35,7 +34,7 @@ public class BorderColorToggleButton extends AbstractMenuViewButton<BaseMenuView
     @Override
     public void onButtonClick(ButtonClickContext<BaseMenuView> context) {
         plugin.getCommands().dispatchSubCommand(context.getPlayer(), "toggle", "border");
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        plugin.getPlatform().getScheduler().runSync(menuView::closeView, 1L);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<BaseMenuView> {

@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
 import com.nexomc.nexo.api.NexoBlocks;
 import com.nexomc.nexo.api.NexoFurniture;
@@ -66,11 +65,11 @@ public class NexoHook {
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         NexoHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new NexoListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new NexoListener(), plugin.getBukkitPlugin());
         if (!registered) {
             registered = true;
             plugin.getProviders().registerCustomBlocksProvider(new NexuCustomBlocksProvider());
-            BukkitExecutor.sync(NexoHook::initializeMechanics, 1L);
+            plugin.getPlatform().getScheduler().runSync(NexoHook::initializeMechanics, 1L);
             plugin.getBlockValues().registerKeyParser(new NexoKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
         }
     }

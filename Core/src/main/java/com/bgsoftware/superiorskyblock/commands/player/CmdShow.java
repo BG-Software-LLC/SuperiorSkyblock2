@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -75,7 +74,7 @@ public class CmdShow implements ISuperiorCommand {
         if (island == null)
             return;
 
-        BukkitExecutor.ensureAsync(() -> doShowIslandInfo(plugin, sender, island));
+        plugin.getPlatform().getScheduler().ensureAsync(() -> doShowIslandInfo(plugin, sender, island));
     }
 
     private static void doShowIslandInfo(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island) {

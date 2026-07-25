@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.mojang.authlib.properties.Property;
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.exception.SkinRequestException;
@@ -19,13 +18,13 @@ public class SkinsRestorerHook {
     }
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
-        BukkitExecutor.ensureAsync(() -> setSkinTextureInternal(superiorPlayer));
+        plugin.getPlatform().getScheduler().ensureAsync(() -> setSkinTextureInternal(superiorPlayer));
     }
 
     private static void setSkinTextureInternal(SuperiorPlayer superiorPlayer) {
         Property property = getSkin(superiorPlayer);
         if (property != null)
-            BukkitExecutor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
+            plugin.getPlatform().getScheduler().runSync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
     }
 
     public static Property getSkin(SuperiorPlayer superiorPlayer) {

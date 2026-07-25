@@ -21,7 +21,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -60,7 +59,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
     @Override
     public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
         CompletableFuture<IslandCalculationResult> result = new CompletableFuture<>();
-        BukkitExecutor.ensureMain(() -> calculateIslandInternal(island, result));
+        plugin.getPlatform().getScheduler().ensureMain(() -> calculateIslandInternal(island, result));
         return result;
     }
 
@@ -96,7 +95,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
         Set<SpawnerInfo> spawnersToCheck = new HashSet<>();
         Set<ChunkPosition> chunksToCheck = new HashSet<>();
 
-        BukkitExecutor.createTask().runAsync(v -> {
+        plugin.getPlatform().getScheduler().createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(worldCalculatedChunks -> worldCalculatedChunks.forEach(calculatedChunk -> {
                 Log.debugResult(Debug.CHUNK_CALCULATION_BLOCKS, "Chunk Finished", calculatedChunk.getPosition());
 

@@ -96,7 +96,7 @@ public class ClearActions {
             offlinePlayerData = null;
             onlinePlayer = offlinePlayer.getPlayer();
         } else {
-            offlinePlayerData = plugin.getNMSPlayers().createOfflinePlayerData(offlinePlayer);
+            offlinePlayerData = (OfflinePlayerData) plugin.getPlatform().getServerManager().createOfflinePlayerData(offlinePlayer);
             onlinePlayer = offlinePlayerData.getFakeOnlinePlayer();
         }
 

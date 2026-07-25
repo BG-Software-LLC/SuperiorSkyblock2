@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContextImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -47,7 +46,7 @@ public class MenusListener extends AbstractGameEventListener {
         if (clickedItem != null && inventory != null && inventory.getHolder() instanceof MenuView) {
             int entityId = e.getArgs().bukkitEvent.getWhoClicked().getEntityId();
             latestClickedItem.put(entityId, clickedItem);
-            BukkitExecutor.sync(() -> latestClickedItem.remove(entityId), 20L);
+            plugin.getPlatform().getScheduler().runSync(() -> latestClickedItem.remove(entityId), 20L);
         }
     }
 
@@ -55,7 +54,7 @@ public class MenusListener extends AbstractGameEventListener {
         Player player = (Player) e.getArgs().bukkitEvent.getPlayer();
         ItemStack clickedItem = latestClickedItem.remove(player.getEntityId());
         if (clickedItem != null) {
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 player.getInventory().removeItem(clickedItem);
                 player.updateInventory();
             }, 1L);

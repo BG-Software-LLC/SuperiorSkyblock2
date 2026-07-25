@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.external.slimefun;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionManager;
@@ -52,7 +52,7 @@ public class ProtectionModule_Dev999 {
         }
 
         void register() {
-            BukkitExecutor.sync(() -> {
+            SuperiorSkyblockPlugin.getPlugin().getPlatform().getScheduler().runSync(() -> {
                 if (OLD_REGISTER_MODULE.isValid()) {
                     OLD_REGISTER_MODULE.invoke(Slimefun.getProtectionManager(), Bukkit.getServer(), plugin.getName(),
                             (Function<Plugin, ProtectionModule>) pl -> this);

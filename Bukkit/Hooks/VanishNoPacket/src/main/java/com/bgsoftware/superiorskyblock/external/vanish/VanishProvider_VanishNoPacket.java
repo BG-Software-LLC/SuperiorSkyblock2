@@ -21,7 +21,7 @@ public class VanishProvider_VanishNoPacket implements VanishProvider, Listener {
     public VanishProvider_VanishNoPacket(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.instance = JavaPlugin.getPlugin(VanishPlugin.class);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(this, plugin.getBukkitPlugin());
         Log.info("Hooked into VanishNoPacket for support of vanish status of players.");
     }
 

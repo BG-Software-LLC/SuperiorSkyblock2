@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
@@ -74,7 +73,7 @@ public class CmdTeam implements ISuperiorCommand {
 
         List<SuperiorPlayer> members = island.getIslandMembers(true);
 
-        BukkitExecutor.ensureAsync(() -> doShowTeamStatus(superiorPlayer, locale, island, members));
+        plugin.getPlatform().getScheduler().ensureAsync(() -> doShowTeamStatus(superiorPlayer, locale, island, members));
     }
 
     private static void doShowTeamStatus(@Nullable SuperiorPlayer superiorPlayer, Locale locale, Island island, List<SuperiorPlayer> members) {

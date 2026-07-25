@@ -46,8 +46,8 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
 
     public SpawnersProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new WildStackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new WildStackerListener(), plugin.getBukkitPlugin());
         Log.info("Using WildStacker as a spawners provider.");
     }
 

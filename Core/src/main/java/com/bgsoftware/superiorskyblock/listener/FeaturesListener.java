@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -86,7 +85,7 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (placeholdersPopulator != null)
             placeholdersPopulator.populate(event.getArgs(), placeholdersReplaces);
 
-        BukkitExecutor.ensureMain(() -> {
+        plugin.getPlatform().getScheduler().ensureMain(() -> {
             for (String command : commands) {
                 for (Map.Entry<String, String> replaceEntry : placeholdersReplaces.entrySet())
                     command = command.replace(replaceEntry.getKey(), replaceEntry.getValue());

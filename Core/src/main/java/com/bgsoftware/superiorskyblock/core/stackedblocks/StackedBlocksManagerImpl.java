@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.container.StackedBlocksContainer;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -61,7 +60,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         });
 
         if (updateBlockKeys.get()) {
-            BukkitExecutor.sync(this::updateStackedBlockKeys);
+            plugin.getPlatform().getScheduler().runSync(this::updateStackedBlockKeys);
         }
 
         Log.info("Finished stacked blocks!");
@@ -124,7 +123,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             stackedBlock.setBlockKey(blockKey);
             stackedBlock.setAmount(amount);
             // Must be called with delay in order to fix issue #632
-            BukkitExecutor.sync(stackedBlock::updateName, 2L);
+            plugin.getPlatform().getScheduler().runSync(stackedBlock::updateName, 2L);
             StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
         } else {
             this.stackedBlocksContainer.removeStackedBlock(location);

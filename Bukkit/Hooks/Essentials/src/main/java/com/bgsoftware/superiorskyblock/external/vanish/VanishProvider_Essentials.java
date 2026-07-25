@@ -21,7 +21,7 @@ public class VanishProvider_Essentials implements VanishProvider, Listener {
     public VanishProvider_Essentials(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.instance = JavaPlugin.getPlugin(Essentials.class);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(this, plugin.getBukkitPlugin());
         Log.info("Hooked into Essentials for support of vanish status of players.");
     }
 

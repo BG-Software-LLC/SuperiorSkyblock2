@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -313,7 +312,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
     private void onCopperGolemCancel(Location entityLocation) {
         Block copperChestBlock = entityLocation.getBlock().getRelative(BlockFace.DOWN);
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             if (copperChestBlock.getType() == COPPER_CHEST) {
                 copperChestBlock.setType(COPPER_BLOCK);
             }

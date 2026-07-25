@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.google.common.base.Preconditions;
@@ -149,7 +148,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                             chunkEntities.add(plugin.getNMSChunks().calculateChunkEntities(worldChunks));
                     }));
 
-            BukkitExecutor.async(() -> {
+            plugin.getPlatform().getScheduler().runAsync(() -> {
                 try {
                     KeyMap<Counter> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
 

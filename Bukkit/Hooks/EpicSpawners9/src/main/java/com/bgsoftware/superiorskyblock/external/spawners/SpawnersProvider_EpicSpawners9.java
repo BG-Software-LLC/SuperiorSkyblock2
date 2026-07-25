@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import com.songoda.epicspawners.api.EpicSpawnersApi;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
@@ -31,7 +30,7 @@ public class SpawnersProvider_EpicSpawners9 implements SpawnersProvider {
 
     public SpawnersProvider_EpicSpawners9(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
         Log.info("Using EpicSpawners as a spawners provider.");
     }
 
@@ -77,7 +76,7 @@ public class SpawnersProvider_EpicSpawners9 implements SpawnersProvider {
                 // Custom spawners are egg spawners. Therefore, we want to remove one egg spawner from the counts and
                 // replace it with the custom spawner. We subtract the spawner 1 tick later, so it will be registered
                 // before removing it.
-                BukkitExecutor.sync(() -> island.handleBlockBreak(ConstantKeys.EGG_MOB_SPAWNER, 1), 1L);
+                plugin.getPlatform().getScheduler().runSync(() -> island.handleBlockBreak(ConstantKeys.EGG_MOB_SPAWNER, 1), 1L);
             } else {
                 // Vanilla spawners are listened in the vanilla listeners as well, and therefore 1 spawner is already
                 // being counted by the other listeners. We need to subtract 1 so the counts will be adjusted correctly.

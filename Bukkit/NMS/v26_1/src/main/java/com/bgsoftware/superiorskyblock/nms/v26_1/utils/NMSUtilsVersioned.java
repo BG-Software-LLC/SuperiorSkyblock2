@@ -8,7 +8,8 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.platform.scheduler.NestedTask;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v26_1.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.v26_1.utils.TickingBlockList;
@@ -95,6 +96,8 @@ import java.util.stream.Stream;
 
 public class NMSUtilsVersioned {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Component[] COMPONENT_ARRAY_TYPE = new Component[0];
@@ -119,10 +122,10 @@ public class NMSUtilsVersioned {
         chunkMap.write(chunkPos, () -> chunkCompoundTag);
     }
 
-    public static BukkitExecutor.NestedTask<Void> runActionOnUnloadedEntityChunks(
+    public static NestedTask<Void> runActionOnUnloadedEntityChunks(
             Collection<ChunkPosition> chunks, NMSUtils.ChunkCallback chunkCallback, CountDownLatch countDownLatch) {
         if (SERVER_LEVEL_ENTITY_MANAGER.isValid()) {
-            return BukkitExecutor.createTask().runSync(v -> {
+            return plugin.getPlatform().getScheduler().createTask().runSync(v -> {
                 chunks.forEach(chunkPosition -> {
                     ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 
@@ -148,7 +151,7 @@ public class NMSUtilsVersioned {
                 });
             });
         } else {
-            return BukkitExecutor.createTask().runAsync(v -> {
+            return plugin.getPlatform().getScheduler().createTask().runAsync(v -> {
                 chunks.forEach(chunkPosition -> {
                     ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 

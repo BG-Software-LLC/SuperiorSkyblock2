@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import dev.lone.itemsadder.api.CustomBlock;
 import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.Location;
@@ -44,7 +43,7 @@ public class ItemsAdderHook {
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         ItemsAdderHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), plugin.getBukkitPlugin());
         if (!registered) {
             registered = true;
             plugin.getBlockValues().registerKeyParser(new ItemsAdderKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
@@ -79,7 +78,7 @@ public class ItemsAdderHook {
 
             Block placeBlock = e.getClickedBlock().getRelative(e.getBlockFace());
 
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 if (placeBlock.getType() == Material.NOTE_BLOCK) {
                     try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                         Key itemKey = Keys.of(ITEMS_ADDER_PREFIX, customBlock.getId().toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
@@ -95,7 +94,7 @@ public class ItemsAdderHook {
             CustomBlock clickedBlock = CustomBlock.byAlreadyPlaced(e.getClickedBlock());
             if (clickedBlock != null) {
                 Key blockKey = Key.of(e.getClickedBlock());
-                BukkitExecutor.sync(() -> {
+                plugin.getPlatform().getScheduler().runSync(() -> {
                     if (e.getClickedBlock().getType() == Material.AIR) {
                         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                             worldRecordService.get().recordBlockBreak(blockKey,

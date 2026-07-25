@@ -21,7 +21,7 @@ public class ChangeSkinHook implements Listener {
     }
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new PlayerChangeSkinListener(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerChangeSkinListener(plugin), plugin.getBukkitPlugin());
     }
 
     private static class PlayerChangeSkinListener implements Listener {

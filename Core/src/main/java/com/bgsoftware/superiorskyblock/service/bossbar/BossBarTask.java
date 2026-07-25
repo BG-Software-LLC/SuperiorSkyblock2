@@ -4,14 +4,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 
-public class BossBarTask extends BukkitRunnable {
+public class BossBarTask {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -22,6 +21,7 @@ public class BossBarTask extends BukkitRunnable {
     private final BossBar bossBar;
     private final double progressToRemovePerTick;
     private boolean reachedEndTask = false;
+    private Object taskHandle;
 
     public static BossBarTask create(BossBar bossBar, double ticksToRun) {
         return ticksToRun <= 0 ? EMPTY_TASK : new BossBarTask(bossBar, ticksToRun);
@@ -31,12 +31,11 @@ public class BossBarTask extends BukkitRunnable {
         this.bossBar = bossBar;
         this.progressToRemovePerTick = this.bossBar.getProgress() / ticksToRun;
         if (progressToRemovePerTick > 0) {
-            runTaskTimer(plugin, 1L, 1L);
+            taskHandle = plugin.getPlatform().getScheduler().runSyncTimer(this::run, 1L, 1L);
         }
     }
 
-    @Override
-    public void run() {
+    private void run() {
         if (reachedEndTask) {
             cancel();
         } else {
@@ -45,10 +44,10 @@ public class BossBarTask extends BukkitRunnable {
         }
     }
 
-    @Override
-    public synchronized void cancel() throws IllegalStateException {
+    public synchronized void cancel() {
         this.bossBar.removeAll();
-        super.cancel();
+        plugin.getPlatform().getScheduler().cancelTask(taskHandle);
+        taskHandle = null;
     }
 
     public void registerTask(Player player) {

@@ -25,7 +25,7 @@ public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMeta
     public SpawnersProvider_PvpingSpawners(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
         Log.info("Using PvpingSpawners as a spawners provider.");
     }
 

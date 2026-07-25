@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -80,7 +79,7 @@ public class DataManager extends Manager {
 
     public void saveDatabase(boolean async) {
         if (async && Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> saveDatabase(false));
+            plugin.getPlatform().getScheduler().runAsync(() -> saveDatabase(false));
             return;
         }
 

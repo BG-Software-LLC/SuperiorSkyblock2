@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -277,7 +276,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         BlockState oldBlockState = clickedBlock.getState();
         Key oldSpawnerKey = Keys.of(oldBlockState);
 
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             if (!chunk.isLoaded())
                 return;
 
@@ -413,7 +412,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
                 Key copperBlock = Keys.of(copperOrChestBlock);
                 this.worldRecordService.get().recordBlockBreak(copperBlock, entityLocation, 1, 0);
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.CARVED_PUMPKIN, entityLocation, 1, 0);
-                BukkitExecutor.sync(() -> {
+                plugin.getPlatform().getScheduler().runSync(() -> {
                     Key chestBlock = Keys.of(copperOrChestBlock);
                     this.worldRecordService.get().recordBlockPlace(chestBlock, entityLocation, 1, null, REGULAR_RECORD_FLAGS);
                 }, 1L);
@@ -462,7 +461,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
             // Do not save block counts
             this.worldRecordService.get().recordBlockBreak(toBlock, 1, WorldRecordFlags.DIRTY_CHUNKS);
         } else {
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 // Ignore cobblestone blocks, otherwise it will add +1 to the count of cobblestone when generated
                 // from cobblestone generator
                 if (toBlock.getType() != Material.COBBLESTONE) {

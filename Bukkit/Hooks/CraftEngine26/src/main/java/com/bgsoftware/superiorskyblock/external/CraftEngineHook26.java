@@ -37,7 +37,7 @@ public class CraftEngineHook26 {
     private static boolean registered = false;
 
     public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new ListenerImpl(), plugin);
+        Bukkit.getPluginManager().registerEvents(new ListenerImpl(), plugin.getBukkitPlugin());
         if (!registered) {
             registered = true;
             plugin.getBlockValues().registerKeyParser(new CraftEngineKeyParser(), collectCustomKeys());

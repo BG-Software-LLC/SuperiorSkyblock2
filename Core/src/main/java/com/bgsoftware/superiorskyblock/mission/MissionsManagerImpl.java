@@ -24,7 +24,6 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
@@ -74,7 +73,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         if (!BuiltinModules.MISSIONS.isEnabled())
             return;
 
-        BukkitExecutor.asyncTimer(this::saveMissionsData, 6000L); // Save missions data every 5 minutes
+        plugin.getPlatform().getScheduler().runAsyncTimer(this::saveMissionsData, 6000L, 6000L); // Save missions data every 5 minutes
     }
 
     public void clearData() {
@@ -267,7 +266,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
         }
 
-        BukkitExecutor.ensureAsync(() -> rewardMissionAsyncInternal(mission, missionData, superiorPlayer,
+        plugin.getPlatform().getScheduler().ensureAsync(() -> rewardMissionAsyncInternal(mission, missionData, superiorPlayer,
                 missionsHolder, checkAutoReward, forceReward, result));
     }
 
@@ -368,7 +367,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
         }
 
         if (!rewardedItems.isEmpty() || !event.getArgs().commandRewards.isEmpty()) {
-            BukkitExecutor.ensureMain(() -> {
+            plugin.getPlatform().getScheduler().ensureMain(() -> {
                 if (!rewardedItems.isEmpty()) {
                     superiorPlayer.runIfOnline(player -> {
                         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -495,7 +494,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             return;
 
         // Convert the data in the data files as well
-        BukkitExecutor.async(() -> {
+        plugin.getPlatform().getScheduler().runAsync(() -> {
             for (File file : Files.listFolderFiles(dataFolder, false)) {
                 synchronized (DATA_FOLDER_MUTEX) {
                     Files.replaceString(file, oldPlayer.getUniqueId() + "", newPlayer.getUniqueId() + "");
@@ -574,7 +573,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 boolean onlyShowIfRequiredCompleted = missionSection.getBoolean("only-show-if-required-completed", false);
 
                 mission = createInstance(missionClass, missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
-                mission.load(plugin, missionSection);
+                mission.load(plugin.getBukkitPlugin(), missionSection);
                 this.missionsContainer.addMission(mission);
                 newMission = mission;
             }

@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -199,7 +198,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
         if (entity instanceof Fireball) {
             originalFireballsDamager.put(entity.getEntityId(), ((Fireball) entity).getShooter());
-            BukkitExecutor.sync(() -> originalFireballsDamager.remove(entity.getEntityId()), 40L);
+            plugin.getPlatform().getScheduler().runSync(() -> originalFireballsDamager.remove(entity.getEntityId()), 40L);
         }
     }
 
@@ -347,7 +346,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
             List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
 
-            BukkitExecutor.sync(() -> nearbyEntities.forEach(nearbyEntity -> {
+            plugin.getPlatform().getScheduler().runSync(() -> nearbyEntities.forEach(nearbyEntity -> {
                 if (nearbyEntity instanceof LivingEntity && !nearbyEntity.getUniqueId().equals(shooterPlayer.getUniqueId()))
                     ((LivingEntity) nearbyEntity).removePotionEffect(PotionEffectType.POISON);
             }), 1L);

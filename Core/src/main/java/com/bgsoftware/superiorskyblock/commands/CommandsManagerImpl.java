@@ -68,7 +68,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             pluginCommand.setAliases(Arrays.asList(Arrays.copyOfRange(commandSections, 1, commandSections.length)));
         }
 
-        plugin.getNMSAlgorithms().registerCommand(pluginCommand);
+        plugin.getPlatform().getServerManager().registerCommand(pluginCommand);
 
         playerCommandsMap.loadDefaultCommands();
         adminCommandsMap.loadDefaultCommands();
@@ -306,7 +306,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                         }
                     }
 
-                    command.execute(plugin, sender, args);
+                    command.execute(plugin.getApi(), sender, args);
                     return false;
                 }
 
@@ -345,7 +345,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
                 if (command != null) {
                     return CommandsHelper.shouldDisplayCommandForPlayer(command, sender) ?
-                            command.tabComplete(plugin, sender, args) : Collections.emptyList();
+                            command.tabComplete(plugin.getApi(), sender, args) : Collections.emptyList();
                 }
             }
 

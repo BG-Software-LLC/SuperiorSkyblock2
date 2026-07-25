@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.nms.v1_21_7.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_21_7.utils.NMSUtilsVersioned;
@@ -355,7 +354,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_7.A
 
             @Override
             public void onFinish() {
-                BukkitExecutor.ensureMain(() -> {
+                plugin.getPlatform().getScheduler().ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
                         ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getListOrEmpty("Entities");
                         allCalculatedChunks.add(calculatedChunk(unloadedChunkCompound.chunkPosition(),

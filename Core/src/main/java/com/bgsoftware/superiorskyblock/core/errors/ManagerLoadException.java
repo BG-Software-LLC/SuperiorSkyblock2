@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.core.errors;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import org.bukkit.Bukkit;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -35,7 +34,7 @@ public class ManagerLoadException extends Exception {
         error.printStackTrace();
 
         if (error.getErrorLevel() == ErrorLevel.SERVER_SHUTDOWN) {
-            Bukkit.shutdown();
+            plugin.getPlatform().getServerManager().shutdown();
             return false;
         }
 

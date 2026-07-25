@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContext
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -86,7 +85,7 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
             if (error != null) {
                 result.completeExceptionally(error);
             } else {
-                BukkitExecutor.sync(() -> {
+                plugin.getPlatform().getScheduler().runSync(() -> {
                     view.setInventory(inventory);
                     result.complete(view);
                 });
@@ -101,7 +100,7 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
             if (error != null) {
                 result.completeExceptionally(error);
             } else {
-                BukkitExecutor.sync(() -> {
+                plugin.getPlatform().getScheduler().runSync(() -> {
                     view.setDialog(dialog);
                     result.complete(view);
                 });
@@ -116,7 +115,7 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
         }
 
         CompletableFuture<Inventory> inventoryFuture = new CompletableFuture<>();
-        BukkitExecutor.async(() -> inventoryFuture.complete(((InventoryMenuLayout<V>) this.menuLayout).buildInventory(menuView)));
+        plugin.getPlatform().getScheduler().runAsync(() -> inventoryFuture.complete(((InventoryMenuLayout<V>) this.menuLayout).buildInventory(menuView)));
         return inventoryFuture;
     }
 
@@ -126,7 +125,7 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
         }
 
         CompletableFuture<DialogWrapper> dialogFuture = new CompletableFuture<>();
-        BukkitExecutor.async(() -> dialogFuture.complete(((RegularDialogMenuLayoutImpl<V>) this.menuLayout).buildDialog(menuView)));
+        plugin.getPlatform().getScheduler().runAsync(() -> dialogFuture.complete(((RegularDialogMenuLayoutImpl<V>) this.menuLayout).buildDialog(menuView)));
         return dialogFuture;
     }
 

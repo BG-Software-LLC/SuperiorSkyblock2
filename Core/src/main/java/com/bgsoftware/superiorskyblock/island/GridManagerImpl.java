@@ -38,7 +38,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
@@ -136,7 +135,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         loadServerUuid();
 
         this.lastIsland = SBlockPosition.of(0, 100, 0);
-        BukkitExecutor.sync(this::updateSpawn);
+        plugin.getPlatform().getScheduler().runSync(this::updateSpawn);
     }
 
     public void updateSpawn() {
@@ -235,7 +234,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         try {
             if (!Bukkit.isPrimaryThread()) {
-                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset));
+                plugin.getPlatform().getScheduler().runSync(() -> createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset));
             } else {
                 createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset);
             }
@@ -355,7 +354,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         island.setIslandHome(defaultDimension, SWorldPosition.of(homeLocation));
 
-        BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
+        plugin.getPlatform().getScheduler().runSync(() -> builder.owner.runIfOnline(player -> {
             if (updateGameMode)
                 player.setGameMode(GameMode.SURVIVAL);
 
@@ -376,7 +375,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                     if (result) {
                         if (affectedChunks != null) {
-                            BukkitExecutor.sync(() -> {
+                            plugin.getPlatform().getScheduler().runSync(() -> {
                                 IslandUtils.resetChunksExcludedFromList(island, affectedChunks);
                                 island.setBiome(biome, true);
                             }, 10L);
@@ -430,7 +429,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             superiorPlayer.teleport(previewLocation, result -> {
                 if (result) {
                     this.islandPreviews.startIslandPreview(new SIslandPreview(superiorPlayer, previewLocation, schematic, islandName, superiorPlayer.asPlayer().getGameMode()));
-                    BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(plugin.getSettings().getIslandPreviews().getGameMode())));
+                    plugin.getPlatform().getScheduler().ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(plugin.getSettings().getIslandPreviews().getGameMode())));
                     Message.ISLAND_PREVIEW_START.send(superiorPlayer, schematic.getName());
                 }
             });
@@ -444,7 +443,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         IslandPreview islandPreview = this.islandPreviews.endIslandPreview(superiorPlayer);
         if (islandPreview != null) {
             superiorPlayer.runIfOnline(player -> {
-                BukkitExecutor.ensureMain(() -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
+                plugin.getPlatform().getScheduler().ensureMain(() -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
                     if (teleportResult && superiorPlayer.isOnline())
                         player.setGameMode(islandPreview.getPreviousGameMode());
                 }));
@@ -456,7 +455,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public void cancelAllIslandPreviews() {
         if (!Bukkit.isPrimaryThread()) {
-            BukkitExecutor.sync(this::cancelAllIslandPreviewsSync);
+            plugin.getPlatform().getScheduler().runSync(this::cancelAllIslandPreviewsSync);
         } else {
             cancelAllIslandPreviewsSync();
         }

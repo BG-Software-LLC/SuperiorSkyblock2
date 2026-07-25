@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuBlank;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -207,7 +206,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         closed = true;
 
         if (!nextMove && !closeButton && plugin.getSettings().isOnlyBackButton()) {
-            BukkitExecutor.sync(this::openView);
+            plugin.getPlatform().getScheduler().runSync(this::openView);
         } else if (this.previousMenuView != null && this.menu.isPreviousMoveAllowed()) {
             PluginEvent<PluginEventArgs.PlayerCloseMenu> event = PluginEventsFactory.callPlayerCloseMenuEvent(
                     this.inventoryViewer, this, previousMove ? this.previousMenuView : null);
@@ -216,11 +215,11 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
                 if (!event.isCancelled()) {
                     MenuView<?, ?> newMenu = event.getArgs().newMenuView;
                     if (newMenu != null)
-                        BukkitExecutor.sync(newMenu::refreshView);
+                        plugin.getPlatform().getScheduler().runSync(newMenu::refreshView);
 
                 }
             } else if (event.isCancelled()) {
-                BukkitExecutor.sync(this::openView);
+                plugin.getPlatform().getScheduler().runSync(this::openView);
             } else {
                 previousMove = true;
             }

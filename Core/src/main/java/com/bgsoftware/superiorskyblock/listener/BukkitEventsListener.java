@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -866,7 +865,7 @@ public class BukkitEventsListener implements Listener {
             }
             if (applyBukkitEventFunction != null)
                 applyBukkitEventFunction.apply((E) event, gameEvent);
-        }, plugin, false);
+        }, plugin.getBukkitPlugin(), false);
     }
 
     private static ItemStack getHandItem(Player player, PlayerHand usedHand, boolean clone, @Nullable Supplier<ItemStack> defItem) {
@@ -913,7 +912,7 @@ public class BukkitEventsListener implements Listener {
         public GameEvent<GameEventArgs.EntityDeathEvent> execute(GameEventType<GameEventArgs.EntityDeathEvent> eventType, GameEventPriority priority, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent e) {
             Location entityLocation = e.getEntity().getLocation();
 
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 if (e.getEntity().isValid() && !e.getEntity().isDead())
                     return;
 

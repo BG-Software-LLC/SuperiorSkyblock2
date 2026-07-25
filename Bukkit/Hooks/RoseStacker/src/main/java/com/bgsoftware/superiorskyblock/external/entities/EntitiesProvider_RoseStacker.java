@@ -28,7 +28,7 @@ public class EntitiesProvider_RoseStacker implements EntitiesProvider {
     public EntitiesProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
 
-        plugin.getServer().getPluginManager().registerEvents(new DeathListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new DeathListener(), plugin.getBukkitPlugin());
     }
 
     @Override

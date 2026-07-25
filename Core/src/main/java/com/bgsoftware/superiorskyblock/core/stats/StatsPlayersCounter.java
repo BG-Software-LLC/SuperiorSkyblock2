@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.core.stats;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.google.gson.JsonObject;
-import org.bukkit.Bukkit;
 
 public class StatsPlayersCounter implements IStatsCollector {
 
@@ -18,7 +17,7 @@ public class StatsPlayersCounter implements IStatsCollector {
 
     @Override
     public void collect(JsonObject statsObject) {
-        statsObject.addProperty("online_players", Bukkit.getOnlinePlayers().size());
+        statsObject.addProperty("online_players", plugin.getPlatform().getServerManager().getOnlinePlayersCount());
 
         int currentAllPlayers = plugin.getPlayers().getAllPlayers().size();
         if (currentAllPlayers != this.lastAllPlayers) {

@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;
@@ -405,7 +404,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             compoundValue.put("pitch", FloatTag.of(schematicOptions.getPitch()));
             compoundValue.put("version", StringTag.of(ServerVersion.getBukkitVersion()));
             if (!ServerVersion.isLegacy())
-                compoundValue.put("minecraftDataVersion", IntTag.of(plugin.getNMSAlgorithms().getDataVersion()));
+                compoundValue.put("minecraftDataVersion", IntTag.of(plugin.getPlatform().getServerManager().getDataVersion()));
 
             CompoundTag schematicTag = CompoundTag.of(compoundValue);
             SuperiorSchematic schematic = new SuperiorSchematic(schematicOptions.getSchematicName(), schematicTag);
@@ -413,7 +412,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             saveIntoFile(schematicOptions.getSchematicName(), schematicTag);
 
             if (callable != null)
-                BukkitExecutor.sync(callable);
+                plugin.getPlatform().getScheduler().runSync(callable);
         });
 
     }

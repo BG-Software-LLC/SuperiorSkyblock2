@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Chunk;
 
 import java.util.HashSet;
@@ -75,7 +74,7 @@ public class ChunksProvider {
             ChunkPosition clonedChunkPos = chunkPosition.copy();
 
             pendingRequests.put(clonedChunkPos, new PendingChunkLoadRequest(completableFuture, chunkConsumers));
-            BukkitExecutor.ensureMain(() -> {
+            plugin.getPlatform().getScheduler().ensureMain(() -> {
                 chunksExecutor.addWorker(new ChunkLoadWorker(clonedChunkPos, chunkLoadReason));
                 if (!chunksExecutor.isRunning())
                     start();
@@ -92,7 +91,7 @@ public class ChunksProvider {
     }
 
     public static void start() {
-        chunksExecutor.start(plugin);
+        chunksExecutor.start(plugin.getBukkitPlugin());
     }
 
     private static class ChunkLoadWorker implements IWorker {

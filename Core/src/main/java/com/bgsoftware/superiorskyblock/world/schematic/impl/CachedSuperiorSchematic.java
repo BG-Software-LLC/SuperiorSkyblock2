@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.schematic.SchematicBlock;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
@@ -59,7 +58,7 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-        BukkitExecutor.ensureAsync(() -> pasteSchematicInternal(island, location, callback, onFailure));
+        plugin.getPlatform().getScheduler().ensureAsync(() -> pasteSchematicInternal(island, location, callback, onFailure));
     }
 
     private void pasteSchematicInternal(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {

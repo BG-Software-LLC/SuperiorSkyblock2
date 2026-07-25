@@ -23,7 +23,7 @@ public class SpawnersProvider_MergedSpawner implements SpawnersProvider_AutoDete
 
     public SpawnersProvider_MergedSpawner(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), plugin.getBukkitPlugin());
         Log.info("Using MergedSpawner as a spawners provider.");
     }
 

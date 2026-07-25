@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEntityLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveEntityLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEntityLimit;
@@ -307,7 +306,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             int originalAmount = usedItem.getAmount();
             ItemStack breedItem = usedItem.clone();
 
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 ItemStack inventoryItem = usedHand == PlayerHand.MAIN_HAND ?
                         e.getPlayer().getInventory().getItem(mainHandSlot) :
                         BukkitItems.getHandItem(e.getPlayer(), PlayerHand.OFF_HAND);

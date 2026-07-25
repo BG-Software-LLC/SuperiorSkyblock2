@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
@@ -192,7 +191,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         if (plugin.getSettings().isLightsUpdate() && !lights.isEmpty()) {
             // For each light block, we calculate its light
             // We only update the lights after all the chunks were loaded.
-            BukkitExecutor.sync(() -> {
+            plugin.getPlatform().getScheduler().runSync(() -> {
                 if (WORLD_SERVER_UPDATE_LIGHT_PAPER.isValid()) {
                     lights.forEach(blockPosition -> WORLD_SERVER_UPDATE_LIGHT_PAPER.invoke(worldServer, EnumSkyBlock.BLOCK, blockPosition));
                 } else {

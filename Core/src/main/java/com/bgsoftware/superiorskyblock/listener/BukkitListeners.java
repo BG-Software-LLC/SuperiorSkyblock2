@@ -49,7 +49,7 @@ public class BukkitListeners {
 
     public void unregisterListeners() {
         plugin.getGameEventsDispatcher().clearCallbacks();
-        HandlerList.unregisterAll(this.plugin);
+        HandlerList.unregisterAll(this.plugin.getBukkitPlugin());
     }
 
     public void registerListenerFailureFilter() {
@@ -64,7 +64,7 @@ public class BukkitListeners {
 
     private void safeEventsRegister(Listener listener) {
         listenerRegisterFailure = "";
-        plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(listener, plugin.getBukkitPlugin());
         if (!listenerRegisterFailure.isEmpty())
             throw new RuntimeException(listenerRegisterFailure);
     }

@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBiomes;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -57,7 +56,7 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
                 Formatters.CAPITALIZED_FORMATTER.format(event.getArgs().biome.name()),
                 Formatters.CAPITALIZED_FORMATTER.format(menuView.getDimension().getName()));
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        plugin.getPlatform().getScheduler().runSync(menuView::closeView, 1L);
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
@@ -55,7 +54,7 @@ public class WorldReader {
     public void finish(Runnable onFinish) {
         this.finishCalled = true;
 
-        BukkitExecutor.async(() -> {
+        plugin.getPlatform().getScheduler().runAsync(() -> {
             MutableBoolean failed = new MutableBoolean(false);
 
             chunkReaderFutures.forEachCompleted(chunkReader -> {

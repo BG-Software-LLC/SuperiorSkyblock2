@@ -50,7 +50,6 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
@@ -179,7 +178,7 @@ public class SpawnIsland implements Island {
 
         this.dirtyChunksContainer = new DirtyChunksContainer(this);
 
-        BukkitExecutor.sync(() -> biome = getCenter(null /* unused */).getBlock().getBiome());
+        plugin.getPlatform().getScheduler().runSync(() -> biome = getCenter(null /* unused */).getBlock().getBiome());
     }
 
     @Override

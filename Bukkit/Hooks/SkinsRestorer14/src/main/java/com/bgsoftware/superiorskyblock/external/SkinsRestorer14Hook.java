@@ -4,7 +4,6 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.mojang.authlib.properties.Property;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.bukkit.events.SkinApplyBukkitEvent;
@@ -50,17 +49,17 @@ public class SkinsRestorer14Hook {
         SkinsRestorer14Hook.plugin = plugin;
 
         plugin.getProviders().registerSkinsListener(SkinsRestorer14Hook::setSkinTexture);
-        plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), plugin.getBukkitPlugin());
     }
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
-        BukkitExecutor.ensureAsync(() -> setSkinTextureInternal(superiorPlayer));
+        plugin.getPlatform().getScheduler().ensureAsync(() -> setSkinTextureInternal(superiorPlayer));
     }
 
     private static void setSkinTextureInternal(SuperiorPlayer superiorPlayer) {
         Property property = getSkin(superiorPlayer);
         if (property != null)
-            BukkitExecutor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
+            plugin.getPlatform().getScheduler().runSync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
     }
 
     private static Property getSkin(SuperiorPlayer superiorPlayer) {

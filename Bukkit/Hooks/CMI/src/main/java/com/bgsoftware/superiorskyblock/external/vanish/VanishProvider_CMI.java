@@ -19,7 +19,7 @@ public class VanishProvider_CMI implements VanishProvider, Listener {
 
     public VanishProvider_CMI(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(this, plugin.getBukkitPlugin());
         Log.info("Hooked into CMI for support of vanish status of players.");
     }
 

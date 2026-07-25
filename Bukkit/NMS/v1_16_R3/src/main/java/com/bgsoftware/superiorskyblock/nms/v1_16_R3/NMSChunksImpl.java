@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops.CropsTickingMethod;
@@ -319,7 +318,7 @@ public class NMSChunksImpl implements NMSChunks {
 
             @Override
             public void onFinish() {
-                BukkitExecutor.sync(() -> {
+                plugin.getPlatform().getScheduler().runSync(() -> {
                     for (Pair<ChunkPosition, NBTTagList> worldUnloadedEntityTagsPair : unloadedEntityTags) {
                         WorldServer worldServer = ((CraftWorld) worldUnloadedEntityTagsPair.getKey().getWorld()).getHandle();
                         KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);

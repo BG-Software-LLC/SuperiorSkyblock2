@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -116,7 +115,7 @@ public class IslandOutsideListener extends AbstractGameEventListener {
 
         if (delayTeleport) {
             // If we don't delay the teleport, it will not occur due to the cancellation of PlayerMoveEvent
-            BukkitExecutor.sync(() -> handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, forceTeleport), 1L);
+            plugin.getPlatform().getScheduler().runSync(() -> handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, forceTeleport), 1L);
         } else {
             handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, forceTeleport);
         }

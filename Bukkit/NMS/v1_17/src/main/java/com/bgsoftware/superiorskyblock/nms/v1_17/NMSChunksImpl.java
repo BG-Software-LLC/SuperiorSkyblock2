@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.nms.v1_17;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
@@ -265,7 +264,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
 
             @Override
             public void onFinish() {
-                BukkitExecutor.ensureMain(() -> {
+                plugin.getPlatform().getScheduler().ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
                         ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getCompound("Level")
                                 .getList("Entities", 10);

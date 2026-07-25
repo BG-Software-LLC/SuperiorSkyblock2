@@ -7,7 +7,8 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.platform.scheduler.NestedTask;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_19.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_19.utils.TickingBlockList;
@@ -73,6 +74,8 @@ import java.util.function.BiConsumer;
 
 public class NMSUtilsVersioned {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final ReflectField<PersistentEntitySectionManager<Entity>> SERVER_LEVEL_ENTITY_MANAGER = new ReflectField<>(
             ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
     private static final ReflectField<IOWorker> ENTITY_STORAGE_WORKER = new ReflectField<>(
@@ -91,10 +94,10 @@ public class NMSUtilsVersioned {
         chunkMap.write(chunkPos, chunkCompoundTag);
     }
 
-    public static BukkitExecutor.NestedTask<Void> runActionOnUnloadedEntityChunks(
+    public static NestedTask<Void> runActionOnUnloadedEntityChunks(
             Collection<ChunkPosition> chunks, NMSUtils.ChunkCallback chunkCallback, CountDownLatch countDownLatch) {
         if (SERVER_LEVEL_ENTITY_MANAGER.isValid()) {
-            return BukkitExecutor.createTask().runSync(v -> {
+            return plugin.getPlatform().getScheduler().createTask().runSync(v -> {
                 chunks.forEach(chunkPosition -> {
                     ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
                     PersistentEntitySectionManager<Entity> entityManager = SERVER_LEVEL_ENTITY_MANAGER.get(serverLevel);
@@ -119,7 +122,7 @@ public class NMSUtilsVersioned {
                 });
             });
         } else {
-            return BukkitExecutor.createTask().runAsync(v -> {
+            return plugin.getPlatform().getScheduler().createTask().runAsync(v -> {
                 chunks.forEach(chunkPosition -> {
                     ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 

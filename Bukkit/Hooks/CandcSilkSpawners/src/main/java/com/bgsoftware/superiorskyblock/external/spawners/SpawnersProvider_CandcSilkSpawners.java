@@ -22,7 +22,7 @@ public class SpawnersProvider_CandcSilkSpawners implements SpawnersProvider_Auto
 
     public SpawnersProvider_CandcSilkSpawners(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
         Log.info("Using SilkSpawners as a spawners provider.");
     }
 

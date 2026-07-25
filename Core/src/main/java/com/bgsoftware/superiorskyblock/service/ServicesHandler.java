@@ -53,7 +53,7 @@ public class ServicesHandler {
         Preconditions.checkArgument(!services.containsKey(apiClass), "Service for class " + apiClass + " already exists.");
 
         services.put(apiClass, serviceImpl);
-        Bukkit.getServicesManager().register(apiClass, serviceImpl, plugin, ServicePriority.Normal);
+        Bukkit.getServicesManager().register(apiClass, serviceImpl, plugin.getBukkitPlugin(), ServicePriority.Normal);
     }
 
 }

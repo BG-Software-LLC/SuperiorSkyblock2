@@ -186,7 +186,7 @@ public class SuperiorSchematicDeserializer {
         if (compoundTag == null || dataVersion == -1)
             return compoundTag;
 
-        int currentDataVersion = plugin.getNMSAlgorithms().getDataVersion();
+        int currentDataVersion = plugin.getPlatform().getServerManager().getDataVersion();
         if (currentDataVersion <= dataVersion)
             return compoundTag;
 

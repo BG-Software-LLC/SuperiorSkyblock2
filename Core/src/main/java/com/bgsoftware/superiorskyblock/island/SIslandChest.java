@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -53,7 +52,7 @@ public class SIslandChest implements IslandChest {
 
     @Override
     public void setRows(int rows) {
-        BukkitExecutor.ensureMain(() -> {
+        plugin.getPlatform().getScheduler().ensureMain(() -> {
             try {
                 updateFlag.set(true);
                 ItemStack[] oldContents = inventory.getContents();

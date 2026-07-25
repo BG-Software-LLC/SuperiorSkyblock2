@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.signs.IslandSigns;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -78,7 +77,7 @@ public class SignsListener extends AbstractGameEventListener {
 
         // We want to update the sign only one tick later, so other plugins don't interface with it
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1916
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             BlockState blockState = block.getState();
             if (blockState instanceof Sign) {
                 Sign sign = (Sign) blockState;

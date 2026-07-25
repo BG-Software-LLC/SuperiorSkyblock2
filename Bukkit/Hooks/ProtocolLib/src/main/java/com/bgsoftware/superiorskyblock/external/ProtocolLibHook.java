@@ -26,7 +26,7 @@ public class ProtocolLibHook {
     private static class ChangePlayerLanguageListener extends PacketAdapter {
 
         private ChangePlayerLanguageListener(SuperiorSkyblockPlugin plugin) {
-            super(plugin, PacketType.Play.Client.SETTINGS);
+            super(plugin.getBukkitPlugin(), PacketType.Play.Client.SETTINGS);
         }
 
         @Override

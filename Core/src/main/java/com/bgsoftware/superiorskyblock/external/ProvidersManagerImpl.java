@@ -34,7 +34,6 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.external.async.AsyncProvider;
 import com.bgsoftware.superiorskyblock.external.async.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
@@ -122,7 +121,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     @Override
     public void loadData() {
-        BukkitExecutor.sync(() -> {
+        plugin.getPlatform().getScheduler().runSync(() -> {
             registerGeneralHooks();
             registerSpawnersProvider();
             registerStackedBlocksProvider();
@@ -141,7 +140,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         registerBossBarProvider();
 
         // We try to forcefully load prices after a second the server has enabled.
-        BukkitExecutor.sync(this::forcePricesLoad, 60L);
+        plugin.getPlatform().getScheduler().runSync(this::forcePricesLoad, 60L);
     }
 
     @Override
@@ -514,11 +513,11 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
         if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine")) {
             // We load the hook with an extra delay to let CraftEngine load its data first
-            Plugin plugin = Bukkit.getPluginManager().getPlugin("CraftEngine");
-            if (plugin.getDescription().getVersion().startsWith("0.0.")) {
-                BukkitExecutor.sync(() -> registerHook("CraftEngineHook"), 5L);
+            Plugin craftEnginePlugin = Bukkit.getPluginManager().getPlugin("CraftEngine");
+            if (craftEnginePlugin.getDescription().getVersion().startsWith("0.0.")) {
+                plugin.getPlatform().getScheduler().runSync(() -> registerHook("CraftEngineHook"), 5L);
             } else {
-                BukkitExecutor.sync(() -> registerHook("CraftEngineHook26"), 5L);
+                plugin.getPlatform().getScheduler().runSync(() -> registerHook("CraftEngineHook26"), 5L);
             }
         }
 
@@ -668,7 +667,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         Optional<ShopsProvider> shopsProvider = (pricesProviderName.equalsIgnoreCase("AUTO") ?
                 ShopsProvider.findAvailableProvider() : ShopsProvider.getShopsProvider(pricesProviderName));
 
-        shopsProvider.flatMap(provider -> provider.createInstance(plugin)
+        shopsProvider.flatMap(provider -> provider.createInstance(plugin.getBukkitPlugin())
                 .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, provider, shopsBridge)))
                 .ifPresent(this::setPricesProvider);
     }

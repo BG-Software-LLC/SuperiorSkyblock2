@@ -1,9 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.threads;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+
 import javax.annotation.Nullable;
 import java.util.concurrent.CountDownLatch;
 
 public class SynchronizedTasks {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Nullable
     private final CountDownLatch countDownLatch;
@@ -21,7 +25,7 @@ public class SynchronizedTasks {
     }
 
     public void waitAllAsync() {
-        BukkitExecutor.ensureAsync(this::waitAllAsyncInternal);
+        plugin.getPlatform().getScheduler().ensureAsync(this::waitAllAsyncInternal);
     }
 
     private void waitAllAsyncInternal() {
