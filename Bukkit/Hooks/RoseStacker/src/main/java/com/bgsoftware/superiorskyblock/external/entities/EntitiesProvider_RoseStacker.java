@@ -15,6 +15,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -25,10 +26,10 @@ public class EntitiesProvider_RoseStacker implements EntitiesProvider {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public EntitiesProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
+    public EntitiesProvider_RoseStacker(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
 
-        plugin.getServer().getPluginManager().registerEvents(new DeathListener(), plugin.getBukkitPlugin());
+        plugin.getServer().getPluginManager().registerEvents(new DeathListener(), javaPlugin);
     }
 
     @Override

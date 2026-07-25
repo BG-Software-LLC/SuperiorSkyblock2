@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
 public class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
@@ -29,9 +30,9 @@ public class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
     private final EpicSpawners instance = EpicSpawners.getInstance();
     private final SuperiorSkyblockPlugin plugin;
 
-    public SpawnersProvider_EpicSpawners7(SuperiorSkyblockPlugin plugin) {
+    public SpawnersProvider_EpicSpawners7(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_EpicSpawners7.StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_EpicSpawners7.StackerListener(), javaPlugin);
         Log.info("Using EpicSpawners as a spawners provider.");
     }
 

@@ -10,22 +10,13 @@ import com.bgsoftware.superiorskyblock.service.portals.PortalsManagerServiceImpl
 import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksInteractionServiceImpl;
 import com.bgsoftware.superiorskyblock.service.world.WorldRecordServiceImpl;
-import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.ServicePriority;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class ServicesHandler {
+public abstract class BaseServicesHandler {
 
-    private final Map<Class<?>, IService> services = new IdentityHashMap<>();
-
-    private final SuperiorSkyblockPlugin plugin;
-
-    public ServicesHandler(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
-    }
+    protected final Map<Class<?>, IService> services = new IdentityHashMap<>();
 
     public <T> T getService(Class<T> serviceClass) {
         Object service = services.get(serviceClass);
@@ -47,13 +38,6 @@ public class ServicesHandler {
         registerService(new WorldRecordServiceImpl(plugin));
     }
 
-    private <T extends IService> void registerService(T serviceImpl) {
-        Class apiClass = serviceImpl.getAPIClass();
-
-        Preconditions.checkArgument(!services.containsKey(apiClass), "Service for class " + apiClass + " already exists.");
-
-        services.put(apiClass, serviceImpl);
-        Bukkit.getServicesManager().register(apiClass, serviceImpl, plugin.getBukkitPlugin(), ServicePriority.Normal);
-    }
+    protected abstract <T extends IService> void registerService(T serviceImpl);
 
 }

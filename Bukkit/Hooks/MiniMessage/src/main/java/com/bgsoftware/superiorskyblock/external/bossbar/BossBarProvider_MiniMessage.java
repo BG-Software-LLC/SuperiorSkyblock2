@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.bossbar;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
 import net.kyori.adventure.text.Component;
@@ -8,6 +9,7 @@ import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -23,6 +25,10 @@ public class BossBarProvider_MiniMessage implements BossBarProvider {
     static {
         for (BossBar.Color color : BossBar.Color.values())
             COLORS_MAP.put(color, net.kyori.adventure.bossbar.BossBar.Color.valueOf(color.name()));
+    }
+
+    public BossBarProvider_MiniMessage(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
+
     }
 
     @Override

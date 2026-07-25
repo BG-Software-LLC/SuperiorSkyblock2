@@ -12,6 +12,7 @@ import com.syntaxphoenix.spigot.smoothtimber.event.AsyncPlayerChopTreeEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class SmoothTimberHook {
 
@@ -23,9 +24,9 @@ public class SmoothTimberHook {
         }
     };
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         SmoothTimberHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new ChopListener(), plugin.getBukkitPlugin());
+        plugin.getServer().getPluginManager().registerEvents(new ChopListener(), javaPlugin);
     }
 
     private static class ChopListener implements Listener {

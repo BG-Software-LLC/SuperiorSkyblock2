@@ -16,14 +16,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class SpawnersProvider_MergedSpawner implements SpawnersProvider_AutoDetect {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public SpawnersProvider_MergedSpawner(SuperiorSkyblockPlugin plugin) {
+    public SpawnersProvider_MergedSpawner(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), javaPlugin);
         Log.info("Using MergedSpawner as a spawners provider.");
     }
 

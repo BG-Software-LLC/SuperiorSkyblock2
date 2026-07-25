@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
+import com.bgsoftware.superiorskyblock.bukkit.service.BukkitServicesHandler;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
@@ -39,7 +40,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.platform.IPlatform;
 import com.bgsoftware.superiorskyblock.bukkit.platform.BukkitPlatform;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
-import com.bgsoftware.superiorskyblock.service.ServicesHandler;
+import com.bgsoftware.superiorskyblock.service.BaseServicesHandler;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -71,6 +72,8 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
      * it is being constructed.
      */
     private final BukkitPlatform platform = new BukkitPlatform(this);
+    private final BukkitServicesHandler servicesHandler = new BukkitServicesHandler(this);
+
     private final SuperiorSkyblockPlugin plugin = new SuperiorSkyblockPlugin() {
 
         @Override
@@ -86,6 +89,11 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
         @Override
         public SuperiorSkyblock getApi() {
             return SuperiorSkyblockBukkitPlugin.this;
+        }
+
+        @Override
+        public BaseServicesHandler getServices() {
+            return SuperiorSkyblockBukkitPlugin.this.servicesHandler;
         }
 
         @Override
@@ -307,7 +315,7 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
         return this.plugin.getGameEventsDispatcher();
     }
 
-    public ServicesHandler getServices() {
+    public BaseServicesHandler getServices() {
         return this.plugin.getServices();
     }
 

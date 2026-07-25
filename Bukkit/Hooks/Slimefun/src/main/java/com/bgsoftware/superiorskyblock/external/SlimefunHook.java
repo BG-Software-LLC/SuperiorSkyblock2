@@ -34,6 +34,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class SlimefunHook {
 
@@ -57,25 +58,25 @@ public class SlimefunHook {
     };
     private static SuperiorSkyblockPlugin plugin;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         SlimefunHook.plugin = plugin;
 
         if (isClassLoaded("me.mrCookieSlime.Slimefun.SlimefunPlugin")) {
-            ProtectionModule_RC13.register(plugin.getBukkitPlugin(), SlimefunHook::checkPermission);
+            ProtectionModule_RC13.register(javaPlugin, SlimefunHook::checkPermission);
         } else if (isClassLoaded("io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule")) {
-            ProtectionModule_Dev999.register(plugin.getBukkitPlugin(), SlimefunHook::checkPermission);
+            ProtectionModule_Dev999.register(javaPlugin, SlimefunHook::checkPermission);
         } else if (isClassLoaded("io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin")) {
             // Dev 744 version, which is the one we use here.
-            new ProtectionModuleImpl(plugin.getBukkitPlugin()).register();
+            new ProtectionModuleImpl(javaPlugin).register();
         }
 
-        plugin.getServer().getPluginManager().registerEvents(new AndroidMineListener(), plugin.getBukkitPlugin());
+        plugin.getServer().getPluginManager().registerEvents(new AndroidMineListener(), javaPlugin);
 
         if (isClassLoaded("io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent"))
-            plugin.getServer().getPluginManager().registerEvents(new AutoPlacerPlaceListener(), plugin.getBukkitPlugin());
+            plugin.getServer().getPluginManager().registerEvents(new AutoPlacerPlaceListener(), javaPlugin);
 
         if (BLOCK_STORAGE_CLEAR_ALL_BLOCK_INFO_AT_CHUNK_METHOD.isValid())
-            plugin.getServer().getPluginManager().registerEvents(new ChunkWipeListener(), plugin.getBukkitPlugin());
+            plugin.getServer().getPluginManager().registerEvents(new ChunkWipeListener(), javaPlugin);
     }
 
     private static boolean isClassLoaded(String clazz) {

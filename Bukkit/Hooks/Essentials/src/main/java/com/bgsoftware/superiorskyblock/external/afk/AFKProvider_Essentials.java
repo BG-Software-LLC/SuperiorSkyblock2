@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.afk;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.earth2me.essentials.Essentials;
@@ -11,7 +12,7 @@ public class AFKProvider_Essentials implements AFKProvider {
 
     private final Essentials instance;
 
-    public AFKProvider_Essentials() {
+    public AFKProvider_Essentials(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         instance = JavaPlugin.getPlugin(Essentials.class);
         Log.info("Hooked into Essentials for support of afk status of players.");
     }

@@ -12,13 +12,14 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Locale;
 
 public class TimbruSilkSpawnersHook {
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new SpawnersListener(plugin), plugin.getBukkitPlugin());
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
+        Bukkit.getPluginManager().registerEvents(new SpawnersListener(plugin), javaPlugin);
     }
 
     private TimbruSilkSpawnersHook() {

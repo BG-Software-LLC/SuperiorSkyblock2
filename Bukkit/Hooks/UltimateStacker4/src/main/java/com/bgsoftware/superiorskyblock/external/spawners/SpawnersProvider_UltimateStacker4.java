@@ -17,14 +17,15 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class SpawnersProvider_UltimateStacker4 implements SpawnersProviderItemMetaSpawnerType {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public SpawnersProvider_UltimateStacker4(SuperiorSkyblockPlugin plugin) {
+    public SpawnersProvider_UltimateStacker4(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), javaPlugin);
         Log.info("Using UltimateStacker as a spawners provider.");
     }
 

@@ -5,6 +5,7 @@ import com.infernalsuite.aswm.api.SlimePlugin;
 import com.infernalsuite.aswm.api.loaders.SlimeLoader;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
 public class AdvancedSlimePaperHook {
@@ -30,7 +31,7 @@ public class AdvancedSlimePaperHook {
         }
     }
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         slimeWorldPlugin = Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
         plugin.getProviders().registerWorldsListener(AdvancedSlimePaperHook::loadWorld);
     }

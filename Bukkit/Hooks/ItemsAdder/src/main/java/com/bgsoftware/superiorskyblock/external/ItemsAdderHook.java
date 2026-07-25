@@ -21,6 +21,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Locale;
 
@@ -41,9 +42,9 @@ public class ItemsAdderHook {
 
     private static SuperiorSkyblockPlugin plugin;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         ItemsAdderHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), plugin.getBukkitPlugin());
+        plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), javaPlugin);
         if (!registered) {
             registered = true;
             plugin.getBlockValues().registerKeyParser(new ItemsAdderKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);

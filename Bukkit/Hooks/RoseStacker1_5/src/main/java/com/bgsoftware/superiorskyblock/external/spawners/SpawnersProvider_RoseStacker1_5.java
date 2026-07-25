@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
@@ -29,9 +30,9 @@ public class SpawnersProvider_RoseStacker1_5 implements SpawnersProvider_AutoDet
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public SpawnersProvider_RoseStacker1_5(SuperiorSkyblockPlugin plugin) {
+    public SpawnersProvider_RoseStacker1_5(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), javaPlugin);
         Log.info("Using RoseStacker as a spawners provider.");
     }
 

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class ChangeSkinHook implements Listener {
 
@@ -20,8 +21,8 @@ public class ChangeSkinHook implements Listener {
     private ChangeSkinHook() {
     }
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new PlayerChangeSkinListener(plugin), plugin.getBukkitPlugin());
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
+        Bukkit.getPluginManager().registerEvents(new PlayerChangeSkinListener(plugin), javaPlugin);
     }
 
     private static class PlayerChangeSkinListener implements Listener {

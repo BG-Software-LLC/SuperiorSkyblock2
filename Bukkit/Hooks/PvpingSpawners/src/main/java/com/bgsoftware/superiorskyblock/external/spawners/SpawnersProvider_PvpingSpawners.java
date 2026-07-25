@@ -12,6 +12,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 import skyblock.hassan.plugin.Main;
 import skyblock.hassan.plugin.api.SpawnerStackEvent;
 import skyblock.hassan.plugin.api.SpawnerUnstackEvent;
@@ -22,10 +23,10 @@ public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMeta
     private final SuperiorSkyblockPlugin plugin;
     private final Main main;
 
-    public SpawnersProvider_PvpingSpawners(SuperiorSkyblockPlugin plugin) {
+    public SpawnersProvider_PvpingSpawners(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
         main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), javaPlugin);
         Log.info("Using PvpingSpawners as a spawners provider.");
     }
 

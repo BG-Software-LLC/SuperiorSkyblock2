@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings({"deprecation", "unused"})
 public class CoreProtectHook {
@@ -17,7 +18,7 @@ public class CoreProtectHook {
     private static SuperiorSkyblockPlugin plugin;
     private static Plugin coreProtect;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         CoreProtectHook.plugin = plugin;
         coreProtect = Bukkit.getPluginManager().getPlugin("CoreProtect");
         plugin.getProviders().registerStackedBlocksListener(CoreProtectHook::recordBlockAction);

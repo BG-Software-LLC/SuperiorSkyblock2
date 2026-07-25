@@ -9,6 +9,7 @@ import net.skinsrestorer.api.event.SkinApplyEvent;
 import net.skinsrestorer.api.exception.DataRequestException;
 import net.skinsrestorer.api.property.SkinProperty;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.function.Consumer;
 
@@ -26,7 +27,7 @@ public class SkinsRestorer15Hook {
         }
     }
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         SkinsRestorer15Hook.plugin = plugin;
         skinsRestorer = SkinsRestorerProvider.get();
 

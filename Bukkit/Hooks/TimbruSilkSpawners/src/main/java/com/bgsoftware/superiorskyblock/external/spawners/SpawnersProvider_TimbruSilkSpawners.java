@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.spawners;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -8,6 +9,7 @@ import de.dustplanet.util.SilkUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Locale;
 
@@ -15,7 +17,7 @@ public class SpawnersProvider_TimbruSilkSpawners implements SpawnersProvider_Aut
 
     private final SilkUtil silkUtil;
 
-    public SpawnersProvider_TimbruSilkSpawners() {
+    public SpawnersProvider_TimbruSilkSpawners(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.silkUtil = SilkUtil.hookIntoSilkSpanwers();
         Log.info("Using SilkSpawners as a spawners provider.");
     }

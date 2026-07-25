@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class JetsMinionsHook implements Listener {
 
@@ -39,8 +40,8 @@ public class JetsMinionsHook implements Listener {
         this.plugin = plugin;
     }
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new JetsMinionsHook(plugin), plugin.getBukkitPlugin());
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
+        Bukkit.getPluginManager().registerEvents(new JetsMinionsHook(plugin), javaPlugin);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -31,6 +31,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 
@@ -44,10 +45,10 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
         }
     };
 
-    public SpawnersProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
+    public SpawnersProvider_WildStacker(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
-        Bukkit.getPluginManager().registerEvents(new WildStackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), javaPlugin);
+        Bukkit.getPluginManager().registerEvents(new WildStackerListener(), javaPlugin);
         Log.info("Using WildStacker as a spawners provider.");
     }
 

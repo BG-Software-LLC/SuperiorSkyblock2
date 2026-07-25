@@ -33,6 +33,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.Duration;
 import java.util.List;
@@ -58,7 +59,7 @@ public class UIProvider_MiniMessage extends BaseUIProvider {
         }
     };
 
-    public UIProvider_MiniMessage(SuperiorSkyblockPlugin plugin) {
+    public UIProvider_MiniMessage(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         Log.info("Using MiniMessage as a ui provider.");
     }
 

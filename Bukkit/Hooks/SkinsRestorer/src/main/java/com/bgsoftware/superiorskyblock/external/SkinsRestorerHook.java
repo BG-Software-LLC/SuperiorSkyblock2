@@ -6,13 +6,14 @@ import com.mojang.authlib.properties.Property;
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.exception.SkinRequestException;
 import skinsrestorer.shared.storage.SkinStorage;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
 public class SkinsRestorerHook {
 
     private static SuperiorSkyblockPlugin plugin;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         SkinsRestorerHook.plugin = plugin;
         plugin.getProviders().registerSkinsListener(SkinsRestorerHook::setSkinTexture);
     }

@@ -12,14 +12,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class VanishProvider_CMI implements VanishProvider, Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public VanishProvider_CMI(SuperiorSkyblockPlugin plugin) {
+    public VanishProvider_CMI(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(this, plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(this, javaPlugin);
         Log.info("Hooked into CMI for support of vanish status of players.");
     }
 

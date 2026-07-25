@@ -76,7 +76,7 @@ import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
-import com.bgsoftware.superiorskyblock.service.ServicesHandler;
+import com.bgsoftware.superiorskyblock.service.BaseServicesHandler;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
@@ -122,7 +122,6 @@ public abstract class SuperiorSkyblockPlugin {
     private final UpgradesManagerImpl upgradesHandler;
     private final CommandsManagerImpl commandsHandler;
     private final ModulesManagerImpl modulesHandler;
-    private final ServicesHandler servicesHandler;
     private final SettingsManagerImpl settingsHandler;
 
     /* Global handlers */
@@ -154,7 +153,6 @@ public abstract class SuperiorSkyblockPlugin {
         this.upgradesHandler = new UpgradesManagerImpl(this, new DefaultUpgradesContainer());
         this.commandsHandler = new CommandsManagerImpl(this, new PlayerCommandsMap(this), new AdminCommandsMap(this));
         this.modulesHandler = new ModulesManagerImpl(this, new DefaultModulesContainer(this));
-        this.servicesHandler = new ServicesHandler(this);
         this.settingsHandler = new SettingsManagerImpl(this);
 
         this.updater = new Updater(getBukkitPlugin(), "superiorskyblock2");
@@ -214,7 +212,7 @@ public abstract class SuperiorSkyblockPlugin {
             return;
         }
 
-        this.servicesHandler.loadDefaultServices(this);
+        getServices().loadDefaultServices(this);
 
         new Metrics(getBukkitPlugin(), 4119);
         StatsClient client = StatsClient.getInstance();
@@ -610,9 +608,7 @@ public abstract class SuperiorSkyblockPlugin {
      */
     public abstract SuperiorSkyblock getApi();
 
-    public ServicesHandler getServices() {
-        return servicesHandler;
-    }
+    public abstract BaseServicesHandler getServices();
 
     public abstract NMSAlgorithms getNMSAlgorithms();
 

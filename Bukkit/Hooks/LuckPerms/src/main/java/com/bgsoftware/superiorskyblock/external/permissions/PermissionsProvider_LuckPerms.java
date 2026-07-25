@@ -15,6 +15,7 @@ import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.node.types.RegexPermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class PermissionsProvider_LuckPerms implements PermissionsProvider {
         }
     }
 
-    public PermissionsProvider_LuckPerms(SuperiorSkyblockPlugin plugin) {
+    public PermissionsProvider_LuckPerms(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.luckPerms = Bukkit.getServicesManager().getRegistration(LuckPerms.class).getProvider();
         this.luckPerms.getEventBus().subscribe(plugin, NodeAddEvent.class, this::onPermissionsAdd);
         this.luckPerms.getEventBus().subscribe(plugin, NodeRemoveEvent.class, this::onPermissionsRemove);

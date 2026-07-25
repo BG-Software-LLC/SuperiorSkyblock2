@@ -10,6 +10,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Locale;
 
@@ -17,16 +18,16 @@ public class ProtocolLibHook {
 
     private static SuperiorSkyblockPlugin plugin;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         ProtocolLibHook.plugin = plugin;
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-        protocolManager.addPacketListener(new ChangePlayerLanguageListener(plugin));
+        protocolManager.addPacketListener(new ChangePlayerLanguageListener(javaPlugin));
     }
 
     private static class ChangePlayerLanguageListener extends PacketAdapter {
 
-        private ChangePlayerLanguageListener(SuperiorSkyblockPlugin plugin) {
-            super(plugin.getBukkitPlugin(), PacketType.Play.Client.SETTINGS);
+        private ChangePlayerLanguageListener(JavaPlugin javaPlugin) {
+            super(javaPlugin, PacketType.Play.Client.SETTINGS);
         }
 
         @Override

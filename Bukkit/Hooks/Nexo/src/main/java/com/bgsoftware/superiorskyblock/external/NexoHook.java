@@ -39,6 +39,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -63,9 +64,9 @@ public class NexoHook {
 
     private static SuperiorSkyblockPlugin plugin;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         NexoHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new NexoListener(), plugin.getBukkitPlugin());
+        plugin.getServer().getPluginManager().registerEvents(new NexoListener(), javaPlugin);
         if (!registered) {
             registered = true;
             plugin.getProviders().registerCustomBlocksProvider(new NexuCustomBlocksProvider());

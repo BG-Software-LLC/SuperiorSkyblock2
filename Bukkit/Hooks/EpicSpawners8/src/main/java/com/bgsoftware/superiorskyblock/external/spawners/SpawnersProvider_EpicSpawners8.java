@@ -22,15 +22,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
 public class SpawnersProvider_EpicSpawners8 implements SpawnersProvider {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public SpawnersProvider_EpicSpawners8(SuperiorSkyblockPlugin plugin) {
+    public SpawnersProvider_EpicSpawners8(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), javaPlugin);
         Log.info("Using EpicSpawners as a spawners provider.");
     }
 

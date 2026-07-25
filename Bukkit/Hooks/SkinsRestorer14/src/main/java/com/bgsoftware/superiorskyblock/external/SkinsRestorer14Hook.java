@@ -45,11 +45,11 @@ public class SkinsRestorer14Hook {
         return false;
     }
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         SkinsRestorer14Hook.plugin = plugin;
 
         plugin.getProviders().registerSkinsListener(SkinsRestorer14Hook::setSkinTexture);
-        plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), plugin.getBukkitPlugin());
+        plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), javaPlugin);
     }
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {

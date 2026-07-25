@@ -27,6 +27,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,9 +44,9 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
         }
     };
 
-    public StackedBlocksProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
+    public StackedBlocksProvider_RoseStacker(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), javaPlugin);
         Log.info("Using RoseStacker as a stacked-blocks provider.");
     }
 

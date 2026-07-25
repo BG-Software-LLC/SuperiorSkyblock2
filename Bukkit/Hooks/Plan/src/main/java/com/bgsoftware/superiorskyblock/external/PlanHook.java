@@ -16,10 +16,11 @@ import com.djrapitops.plan.extension.table.Table;
 
 import java.math.BigDecimal;
 import java.util.List;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlanHook {
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         try {
             Log.info("Plan detected - attempting to register SuperiorSkyblock DataExtension.");
 

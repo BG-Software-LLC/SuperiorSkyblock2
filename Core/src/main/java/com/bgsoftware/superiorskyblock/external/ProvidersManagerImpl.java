@@ -65,6 +65,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -760,8 +761,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             if (!isHookCompatible(clazz))
                 return;
 
-            Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
-            registerMethod.invoke(null, plugin);
+            Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class, JavaPlugin.class);
+            registerMethod.invoke(null, plugin, plugin.getBukkitPlugin());
         } catch (Throwable error) {
             if (error.getClass() != UnsupportedClassVersionError.class)
                 Log.error(error, "An unexpected error occurred while registering hook ", className, ":");
@@ -806,14 +807,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             if (!isHookCompatible(clazz))
                 return Optional.empty();
 
-            try {
-                Constructor<?> constructor = clazz.getConstructor(SuperiorSkyblockPlugin.class);
-                // noinspection unchecked
-                return Optional.of((T) constructor.newInstance(plugin));
-            } catch (NoSuchMethodException error) {
-                // noinspection unchecked
-                return Optional.of((T) clazz.newInstance());
-            }
+            Constructor<?> constructor = clazz.getConstructor(SuperiorSkyblockPlugin.class, JavaPlugin.class);
+            // noinspection unchecked
+            return Optional.of((T) constructor.newInstance(plugin, plugin.getBukkitPlugin()));
         } catch (ClassNotFoundException ignored) {
             return Optional.empty();
         } catch (Exception error) {

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.regex.Pattern;
 
@@ -22,9 +23,9 @@ public class PlaceholdersProvider_MVdWPlaceholderAPI implements PlaceholdersProv
 
     private static final Pattern BUILT_IN_NUMERIC_PLACEHOLDER = Pattern.compile("\\{(\\d)}");
 
-    public PlaceholdersProvider_MVdWPlaceholderAPI(SuperiorSkyblockPlugin plugin) {
+    public PlaceholdersProvider_MVdWPlaceholderAPI(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         Log.info("Using MVdWPlaceholderAPI for placeholders support.");
-        PlaceholderAPI.registerPlaceholder(plugin.getBukkitPlugin(), "superior_*", e ->
+        PlaceholderAPI.registerPlaceholder(javaPlugin, "superior_*", e ->
                 ((PlaceholdersServiceImpl) placeholdersService.get()).handlePluginPlaceholder(e.getOfflinePlayer(),
                         e.getPlaceholder().replace("superior_", "")));
     }

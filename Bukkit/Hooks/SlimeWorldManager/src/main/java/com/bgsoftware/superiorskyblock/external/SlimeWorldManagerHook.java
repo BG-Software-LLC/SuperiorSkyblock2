@@ -6,13 +6,14 @@ import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.grinderwolf.swm.plugin.config.WorldData;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
 public class SlimeWorldManagerHook {
 
     private static Plugin slimeWorldPlugin = null;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         slimeWorldPlugin = Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
         plugin.getProviders().registerWorldsListener(SlimeWorldManagerHook::loadWorld);
     }

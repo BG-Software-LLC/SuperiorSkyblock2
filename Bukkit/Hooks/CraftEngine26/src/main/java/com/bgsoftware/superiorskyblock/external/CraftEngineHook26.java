@@ -25,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Locale;
 
@@ -36,8 +37,8 @@ public class CraftEngineHook26 {
     private static final KeyMap<BlockDefinition> BLOCK_DEFINITION_TO_BLOCKS_CACHE = collectBlockDefinitionToBlocksCache();
     private static boolean registered = false;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new ListenerImpl(), plugin.getBukkitPlugin());
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
+        Bukkit.getPluginManager().registerEvents(new ListenerImpl(), javaPlugin);
         if (!registered) {
             registered = true;
             plugin.getBlockValues().registerKeyParser(new CraftEngineKeyParser(), collectCustomKeys());

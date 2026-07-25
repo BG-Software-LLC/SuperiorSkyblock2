@@ -42,6 +42,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -102,9 +103,9 @@ public class OraxenHook {
 
     private static SuperiorSkyblockPlugin plugin;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    public static void register(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         OraxenHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new OraxenListener(), plugin.getBukkitPlugin());
+        plugin.getServer().getPluginManager().registerEvents(new OraxenListener(), javaPlugin);
         if (!registered) {
             registered = true;
             plugin.getProviders().registerCustomBlocksProvider(new OraxenCustomBlocksProvider());

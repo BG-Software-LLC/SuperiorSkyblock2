@@ -11,14 +11,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class VanishProvider_SuperVanish implements VanishProvider, Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public VanishProvider_SuperVanish(SuperiorSkyblockPlugin plugin) {
+    public VanishProvider_SuperVanish(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(this, plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(this, javaPlugin);
         Log.info("Hooked into SuperVanish for support of vanish status of players.");
     }
 

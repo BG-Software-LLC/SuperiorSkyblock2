@@ -8,13 +8,14 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unused")
 public class PlaceholdersProvider_PlaceholderAPI implements PlaceholdersProvider {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public PlaceholdersProvider_PlaceholderAPI(SuperiorSkyblockPlugin plugin) {
+    public PlaceholdersProvider_PlaceholderAPI(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
         new EZPlaceholder((PlaceholdersServiceImpl) plugin.getServices().getService(PlaceholdersService.class)).register();
 

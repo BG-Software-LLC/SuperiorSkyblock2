@@ -37,6 +37,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -47,9 +48,9 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public StackedBlocksProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
+    public StackedBlocksProvider_WildStacker(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin.getBukkitPlugin());
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), javaPlugin);
 
         if (!registered) {
             registered = true;

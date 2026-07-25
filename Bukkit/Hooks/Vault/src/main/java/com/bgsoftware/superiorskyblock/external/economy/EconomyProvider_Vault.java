@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.external.economy;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Precision;
@@ -11,6 +12,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,6 +20,10 @@ import java.math.RoundingMode;
 public class EconomyProvider_Vault implements EconomyProvider {
 
     private static Economy econ;
+
+    public EconomyProvider_Vault(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
+
+    }
 
     public static boolean isCompatible() {
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
