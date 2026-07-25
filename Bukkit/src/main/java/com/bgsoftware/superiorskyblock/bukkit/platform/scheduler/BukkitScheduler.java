@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.platform.bukkit.scheduler;
+package com.bgsoftware.superiorskyblock.bukkit.platform.scheduler;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.platform.scheduler.NestedTask;

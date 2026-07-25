@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
@@ -79,9 +79,9 @@ public class NMSChunksImpl implements NMSChunks {
     private static final ReflectField<Collection<Entity>[]> ENTITY_SLICE_ARRAY = new ReflectField<>(
             Chunk.class, null, "entitySlices");
 
-    private final SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockBukkitPlugin plugin;
 
-    public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSChunksImpl(SuperiorSkyblockBukkitPlugin plugin) {
         this.plugin = plugin;
         KeyBlocksCache.cacheAllBlocks();
         CropsTickingMethod.register();

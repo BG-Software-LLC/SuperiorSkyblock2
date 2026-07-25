@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
@@ -57,9 +57,9 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractNMSChunks implements NMSChunks {
 
-    protected final SuperiorSkyblockPlugin plugin;
+    protected final SuperiorSkyblockBukkitPlugin plugin;
 
-    protected AbstractNMSChunks(SuperiorSkyblockPlugin plugin) {
+    protected AbstractNMSChunks(SuperiorSkyblockBukkitPlugin plugin) {
         this.plugin = plugin;
         KeyBlocksCache.cacheAllBlocks();
         CropsTickingMethod.register();

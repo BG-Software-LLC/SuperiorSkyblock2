@@ -12,6 +12,8 @@ dependencies {
     implementation project(':Core')
     implementation project(':API')
 
+    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b22'
+
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
@@ -30,10 +32,11 @@ processResources {
 
 rootProject.subprojects.findAll { it.path != project.path }.each { evaluationDependsOn(it.path) }
 
-// shadowJar uses an empty archiveClassifier, so it writes to the same path the
-// plain 'jar' task would; disable 'jar' to avoid two tasks racing to the same file.
+// 'jar' produces the thin jar that other subprojects (NMS) compile against, so it must stay
+// enabled. shadowJar uses an empty archiveClassifier, so give 'jar' a classifier to avoid two
+// tasks racing to the same file.
 tasks.named('jar') {
-    enabled = false
+    archiveClassifier.set('plain')
 }
 
 shadowJar {
@@ -95,6 +98,9 @@ shadowJar {
         // This includes Core and API in the final JAR
         include project(':Core')
         include project(':API')
+        // Bukkit's own runtime libraries that must be bundled (they are relocated into
+        // com.bgsoftware.superiorskyblock.libs by the root build script)
+        include dependency('com.bgsoftware.common.nmsloader:NMSLoader')
     }
 }
 

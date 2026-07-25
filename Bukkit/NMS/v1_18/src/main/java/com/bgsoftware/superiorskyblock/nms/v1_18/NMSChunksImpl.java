@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
@@ -50,7 +50,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_18.AbstractNMSChunks {
 
-    public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSChunksImpl(SuperiorSkyblockBukkitPlugin plugin) {
         super(plugin);
     }
 

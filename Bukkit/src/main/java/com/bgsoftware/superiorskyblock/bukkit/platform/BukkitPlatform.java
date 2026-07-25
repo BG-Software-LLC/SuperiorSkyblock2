@@ -1,8 +1,8 @@
-package com.bgsoftware.superiorskyblock.platform.bukkit;
+package com.bgsoftware.superiorskyblock.bukkit.platform;
 
 import com.bgsoftware.superiorskyblock.platform.IPlatform;
-import com.bgsoftware.superiorskyblock.platform.bukkit.scheduler.BukkitScheduler;
-import com.bgsoftware.superiorskyblock.platform.bukkit.server.BukkitServerManager;
+import com.bgsoftware.superiorskyblock.bukkit.platform.scheduler.BukkitScheduler;
+import com.bgsoftware.superiorskyblock.bukkit.platform.server.BukkitServerManager;
 import com.bgsoftware.superiorskyblock.platform.scheduler.IScheduler;
 import com.bgsoftware.superiorskyblock.platform.server.IServerManager;
 import org.bukkit.plugin.java.JavaPlugin;

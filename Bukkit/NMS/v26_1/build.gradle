@@ -14,6 +14,7 @@ group 'NMS:v26_1'
 
 dependencies {
     paperweight.paperDevBundle("26.1.2.build.+")
+    compileOnly project(":Bukkit")
     compileOnly project(":Bukkit:NMS:Spigot-1_20_3")
     compileOnly project(":Bukkit:NMS:Paper-1_20_3")
     compileOnly project(":API")

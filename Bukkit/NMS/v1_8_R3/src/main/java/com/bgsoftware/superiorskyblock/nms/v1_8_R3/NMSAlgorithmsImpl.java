@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
@@ -47,9 +48,9 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
-    private final SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockBukkitPlugin plugin;
 
-    public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSAlgorithmsImpl(SuperiorSkyblockBukkitPlugin plugin) {
         this.plugin = plugin;
     }
 

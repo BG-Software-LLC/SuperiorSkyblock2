@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms;
+package com.bgsoftware.superiorskyblock.bukkit.nms;
 
 import com.bgsoftware.common.nmsloader.NMSLoadException;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
+import com.bgsoftware.superiorskyblock.nms.NMSDragonFightImpl;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;

@@ -2,10 +2,6 @@ package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.dependencies.DependenciesManager;
-import com.bgsoftware.common.nmsloader.INMSLoader;
-import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
-import com.bgsoftware.common.nmsloader.NMSLoadException;
-import com.bgsoftware.common.nmsloader.config.NMSConfiguration;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
@@ -68,7 +64,6 @@ import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
-import com.bgsoftware.superiorskyblock.nms.NMSDragonFightChooser;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
@@ -139,18 +134,6 @@ public abstract class SuperiorSkyblockPlugin {
     @Nullable
     private IEventsDispatcher eventsDispatcher = null;
 
-    /* NMS */
-    @Nullable
-    private NMSAlgorithms nmsAlgorithms;
-    private NMSChunks nmsChunks;
-    private Optional<NMSDialogs> nmsDialogs;
-    private NMSDragonFight nmsDragonFight;
-    private NMSEntities nmsEntities;
-    private NMSHolograms nmsHolograms;
-    private NMSPlayers nmsPlayers;
-    private NMSTags nmsTags;
-    private NMSWorld nmsWorld;
-
     private PluginLoadingStage loadingStage = PluginLoadingStage.START;
 
     protected SuperiorSkyblockPlugin() {
@@ -183,6 +166,8 @@ public abstract class SuperiorSkyblockPlugin {
     public static SuperiorSkyblockPlugin getPlugin() {
         return plugin;
     }
+
+    protected abstract boolean loadNMSAdapter();
 
     public void onLoad() {
         pluginEventsDispatcher.registerDefaultListeners();
@@ -320,7 +305,7 @@ public abstract class SuperiorSkyblockPlugin {
             // Calculate the maximum amount of islands that fit into the world.
             long maxIslands = calculateMaxPossibleIslands();
             if (maxIslands < 1000) {
-                Log.warn("It seems like you configured your max-world-size in server.properties to be a small number (", nmsAlgorithms.getMaxWorldSize(), ").");
+                Log.warn("It seems like you configured your max-world-size in server.properties to be a small number (", getNMSAlgorithms().getMaxWorldSize(), ").");
                 Log.warn("This can lead to weird behaviors when new islands are generated beyond this limit.");
                 Log.warn("Increase the value to for better experience (Default: 29999984)");
             }
@@ -411,7 +396,7 @@ public abstract class SuperiorSkyblockPlugin {
             }
 
             if (loadingStage.isAtLeast(PluginLoadingStage.NMS_INITIALIZED))
-                nmsChunks.shutdown();
+                getNMSChunks().shutdown();
 
             if (loadingStage.isAtLeast(PluginLoadingStage.START_ENABLE)) {
                 Log.info("Shutting down executor");
@@ -431,36 +416,6 @@ public abstract class SuperiorSkyblockPlugin {
 
     public Updater getUpdater() {
         return updater;
-    }
-
-    private boolean loadNMSAdapter() {
-        try {
-            JavaPlugin bukkitPlugin = getBukkitPlugin();
-            INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(bukkitPlugin, NMSConfiguration.forPlugin(bukkitPlugin));
-
-            this.nmsAlgorithms = nmsLoader.loadNMSHandler(NMSAlgorithms.class);
-            this.nmsChunks = nmsLoader.loadNMSHandler(NMSChunks.class);
-            this.nmsEntities = nmsLoader.loadNMSHandler(NMSEntities.class);
-            this.nmsHolograms = nmsLoader.loadNMSHandler(NMSHolograms.class);
-            this.nmsPlayers = nmsLoader.loadNMSHandler(NMSPlayers.class);
-            this.nmsTags = nmsLoader.loadNMSHandler(NMSTags.class);
-            this.nmsWorld = nmsLoader.loadNMSHandler(NMSWorld.class);
-            this.nmsDragonFight = new NMSDragonFightChooser(plugin, () -> nmsLoader.loadNMSHandler(NMSDragonFight.class));
-
-            try {
-                this.nmsDialogs = Optional.of(nmsLoader.loadNMSHandler(NMSDialogs.class));
-            } catch (NMSLoadException e) {
-                // Failed to load NMSDialogs
-                this.nmsDialogs = Optional.empty();
-            }
-
-            return true;
-        } catch (NMSLoadException error) {
-            new ManagerLoadException(error, "The plugin doesn't support your minecraft version.\n" + "Please try a different version.",
-                    ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
-
-            return false;
-        }
     }
 
     private boolean checkScriptEngine() {
@@ -661,41 +616,23 @@ public abstract class SuperiorSkyblockPlugin {
         return servicesHandler;
     }
 
-    public NMSAlgorithms getNMSAlgorithms() {
-        return nmsAlgorithms;
-    }
+    public abstract NMSAlgorithms getNMSAlgorithms();
 
-    public NMSChunks getNMSChunks() {
-        return nmsChunks;
-    }
+    public abstract NMSChunks getNMSChunks();
 
-    public Optional<NMSDialogs> getNMSDialogs() {
-        return nmsDialogs;
-    }
+    public abstract Optional<NMSDialogs> getNMSDialogs();
 
-    public NMSDragonFight getNMSDragonFight() {
-        return nmsDragonFight;
-    }
+    public abstract NMSDragonFight getNMSDragonFight();
 
-    public NMSEntities getNMSEntities() {
-        return nmsEntities;
-    }
+    public abstract NMSEntities getNMSEntities();
 
-    public NMSHolograms getNMSHolograms() {
-        return nmsHolograms;
-    }
+    public abstract NMSHolograms getNMSHolograms();
 
-    public NMSPlayers getNMSPlayers() {
-        return nmsPlayers;
-    }
+    public abstract NMSPlayers getNMSPlayers();
 
-    public NMSTags getNMSTags() {
-        return nmsTags;
-    }
+    public abstract NMSTags getNMSTags();
 
-    public NMSWorld getNMSWorld() {
-        return nmsWorld;
-    }
+    public abstract NMSWorld getNMSWorld();
 
     /**
      * Get the class loader that loaded the plugin.
@@ -749,7 +686,7 @@ public abstract class SuperiorSkyblockPlugin {
 
     private long calculateMaxPossibleIslands() {
         int islandDistance = settingsHandler.getMaxIslandSize() * 3;
-        long worldDistance = nmsAlgorithms.getMaxWorldSize() * 2L;
+        long worldDistance = getNMSAlgorithms().getMaxWorldSize() * 2L;
         long islandsPerSide = worldDistance / islandDistance;
         return islandsPerSide * islandsPerSide;
     }

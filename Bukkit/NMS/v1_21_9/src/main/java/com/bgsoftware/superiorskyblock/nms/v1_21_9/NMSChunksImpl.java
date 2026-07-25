@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_9;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
@@ -66,7 +66,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSChunksImpl(SuperiorSkyblockBukkitPlugin plugin) {
         super(plugin);
     }
 

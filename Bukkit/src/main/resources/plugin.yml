@@ -1,6 +1,6 @@
 name: SuperiorSkyblock2
 version: ${project.version}
-main: com.bgsoftware.superiorskyblock.SuperiorSkyblockBukkitPlugin
+main: com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin
 
 description: Feature packed Skyblock core.
 website: https://bg-software.com/

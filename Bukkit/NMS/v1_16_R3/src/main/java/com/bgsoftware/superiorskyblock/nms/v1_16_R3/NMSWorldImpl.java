@@ -2,11 +2,11 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -73,9 +73,9 @@ public class NMSWorldImpl implements NMSWorld {
 
     private static boolean alreadyWarned = false;
 
-    private final SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockBukkitPlugin plugin;
 
-    public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSWorldImpl(SuperiorSkyblockBukkitPlugin plugin) {
         this.plugin = plugin;
     }
 

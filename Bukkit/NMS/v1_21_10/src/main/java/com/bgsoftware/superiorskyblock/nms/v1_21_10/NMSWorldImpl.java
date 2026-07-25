@@ -1,9 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_21_10;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.nms.v1_21_10.NMSUtils;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.nms.v1_21_10.trial.IslandPlayerDetector;
 import com.bgsoftware.superiorskyblock.nms.v1_21_10.vibration.IslandVibrationUser;
 import com.bgsoftware.superiorskyblock.nms.v1_21_10.world.BlockLevelTicksTracker;
@@ -47,7 +46,7 @@ public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_10.A
     private static final ReflectField<LevelTicks<Block>> BLOCK_TICKS = new ReflectField<LevelTicks<Block>>(
             ServerLevel.class, LevelTicks.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
-    public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSWorldImpl(SuperiorSkyblockBukkitPlugin plugin) {
         super(plugin);
     }
 

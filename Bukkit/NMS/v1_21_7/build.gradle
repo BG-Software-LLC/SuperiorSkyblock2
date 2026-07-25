@@ -12,6 +12,7 @@ group 'NMS:v1_21_7'
 
 dependencies {
     paperweight.paperDevBundle("1.21.7-R0.1-SNAPSHOT")
+    compileOnly project(":Bukkit")
     compileOnly project(":Bukkit:NMS:Spigot-1_20_3")
     compileOnly project(":Bukkit:NMS:Paper-1_20_3")
     compileOnly project(":API")

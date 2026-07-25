@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -82,9 +82,9 @@ public abstract class AbstractNMSWorld implements NMSWorld {
     private static final ReflectField<Integer> NOISE_GENERATOR_SETTINGS_SEA_LEVEL = new ReflectField<Integer>(
             NoiseGeneratorSettings.class, Integer.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
-    protected final SuperiorSkyblockPlugin plugin;
+    protected final SuperiorSkyblockBukkitPlugin plugin;
 
-    protected AbstractNMSWorld(SuperiorSkyblockPlugin plugin) {
+    protected AbstractNMSWorld(SuperiorSkyblockBukkitPlugin plugin) {
         this.plugin = plugin;
     }
 

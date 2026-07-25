@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_3;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
@@ -57,7 +57,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.A
     private static final ClientboundChunkBatchStartPacket CHUNK_BATCH_START_PACKET = new ClientboundChunkBatchStartPacket();
     private static final ClientboundChunkBatchFinishedPacket CHUNK_BATCH_FINISHED_PACKET = new ClientboundChunkBatchFinishedPacket(1);
 
-    public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSChunksImpl(SuperiorSkyblockBukkitPlugin plugin) {
         super(plugin);
     }
 

@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.v1_18.vibration.IslandSculkSensorBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18.world.BlockLevelTicksTracker;
@@ -31,7 +31,7 @@ public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v1_18.Abst
 
     private static boolean alreadyWarned = false;
 
-    public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSWorldImpl(SuperiorSkyblockBukkitPlugin plugin) {
         super(plugin);
     }
 

@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
 import net.minecraft.server.v1_16_R3.Entity;
-import net.minecraft.server.v1_16_R3.EntityMinecartFurnace;
-import net.minecraft.server.v1_16_R3.IMaterial;
 import net.minecraft.server.v1_16_R3.Items;
 import net.minecraft.server.v1_16_R3.RecipeItemStack;
 import org.bukkit.Material;

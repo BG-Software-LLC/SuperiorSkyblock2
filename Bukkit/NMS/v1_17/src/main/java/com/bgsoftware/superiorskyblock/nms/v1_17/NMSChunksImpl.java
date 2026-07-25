@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
@@ -55,7 +55,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
     private static final ReflectField<ChunkBiomeContainer> CHUNK_BIOME_CONTAINER = new ReflectField<>(
             LevelChunk.class, ChunkBiomeContainer.class, Modifier.PRIVATE, 1);
 
-    public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
+    public NMSChunksImpl(SuperiorSkyblockBukkitPlugin plugin) {
         super(plugin);
     }
 

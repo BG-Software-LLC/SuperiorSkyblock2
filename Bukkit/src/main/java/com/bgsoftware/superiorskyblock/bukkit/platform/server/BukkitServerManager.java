@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.platform.bukkit.server;
+package com.bgsoftware.superiorskyblock.bukkit.platform.server;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
