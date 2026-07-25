@@ -55,7 +55,7 @@ import com.bgsoftware.superiorskyblock.island.upgrade.container.DefaultUpgradesC
 import com.bgsoftware.superiorskyblock.island.upgrade.loaders.ItemsUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.island.upgrade.loaders.PlaceholdersUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.island.upgrade.loaders.VaultUpgradeCostLoader;
-import com.bgsoftware.superiorskyblock.listener.BukkitListeners;
+import com.bgsoftware.superiorskyblock.listener.GameListeners;
 import com.bgsoftware.superiorskyblock.mission.MissionsManagerImpl;
 import com.bgsoftware.superiorskyblock.mission.container.DefaultMissionsContainer;
 import com.bgsoftware.superiorskyblock.module.ModulesManagerImpl;
@@ -127,7 +127,7 @@ public abstract class SuperiorSkyblockPlugin {
 
     /* Global handlers */
     private final Updater updater;
-    private final BukkitListeners bukkitListeners;
+    private final GameListeners bukkitListeners;
     private final PluginEventsDispatcher pluginEventsDispatcher;
     private final GameEventsDispatcher gameEventsDispatcher;
     private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
@@ -158,7 +158,7 @@ public abstract class SuperiorSkyblockPlugin {
         this.settingsHandler = new SettingsManagerImpl(this);
 
         this.updater = new Updater(getBukkitPlugin(), "superiorskyblock2");
-        this.bukkitListeners = new BukkitListeners(this);
+        this.bukkitListeners = new GameListeners(this);
         this.pluginEventsDispatcher = new PluginEventsDispatcher(this);
         this.gameEventsDispatcher = new GameEventsDispatcher(this);
     }
@@ -173,8 +173,6 @@ public abstract class SuperiorSkyblockPlugin {
         pluginEventsDispatcher.registerDefaultListeners();
 
         DependenciesManager.inject(getBukkitPlugin());
-
-        bukkitListeners.registerListenerFailureFilter();
 
         try {
             SuperiorSkyblockAPI.setPluginInstance(getApi());

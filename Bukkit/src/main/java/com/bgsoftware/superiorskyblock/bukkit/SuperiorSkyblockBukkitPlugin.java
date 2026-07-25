@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
@@ -37,6 +38,8 @@ import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.platform.IPlatform;
 import com.bgsoftware.superiorskyblock.bukkit.platform.BukkitPlatform;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
+import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -294,6 +297,54 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
     @Override
     public void setEventsDispatcher(@Nullable IEventsDispatcher eventsDispatcher) {
         this.plugin.setEventsDispatcher(eventsDispatcher);
+    }
+
+    public PluginEventsDispatcher getPluginEventsDispatcher() {
+        return this.plugin.getPluginEventsDispatcher();
+    }
+
+    public GameEventsDispatcher getGameEventsDispatcher() {
+        return this.plugin.getGameEventsDispatcher();
+    }
+
+    public ServicesHandler getServices() {
+        return this.plugin.getServices();
+    }
+
+    public NMSAlgorithms getNMSAlgorithms() {
+        return this.nmsAlgorithms;
+    }
+
+    public NMSChunks getNMSChunks() {
+        return this.nmsChunks;
+    }
+
+    public Optional<NMSDialogs> getNMSDialogs() {
+        return this.nmsDialogs;
+    }
+
+    public NMSDragonFight getNMSDragonFight() {
+        return this.nmsDragonFight;
+    }
+
+    public NMSEntities getNMSEntities() {
+        return this.nmsEntities;
+    }
+
+    public NMSHolograms getNMSHolograms() {
+        return this.nmsHolograms;
+    }
+
+    public NMSPlayers getNMSPlayers() {
+        return this.nmsPlayers;
+    }
+
+    public NMSTags getNMSTags() {
+        return this.nmsTags;
+    }
+
+    public NMSWorld getNMSWorld() {
+        return this.nmsWorld;
     }
 
     public BukkitPlatform getPlatform() {

@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
-import com.bgsoftware.superiorskyblock.listener.BukkitEventsListener;
+import com.bgsoftware.superiorskyblock.platform.event.IEventsManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -103,7 +103,7 @@ public interface NMSAlgorithms {
         return BIOME_ENUM_BRIDGE;
     }
 
-    default BukkitEventsListener.GameEventCreator getGenericGameCreator() {
+    default IEventsManager.GameEventCreator getGenericGameCreator() {
         throw new UnsupportedOperationException("Not supported in this version");
     }
 

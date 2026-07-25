@@ -7,6 +7,9 @@ import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.Files;
@@ -20,13 +23,11 @@ import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,13 +47,14 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
     private Set<Runnable> pendingCommands = new HashSet<>();
 
-    private PluginCommand pluginCommand;
     private String label = null;
 
     public CommandsManagerImpl(SuperiorSkyblockPlugin plugin, CommandsMap playerCommandsMap, CommandsMap adminCommandsMap) {
         super(plugin);
         this.playerCommandsMap = playerCommandsMap;
         this.adminCommandsMap = adminCommandsMap;
+        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.COMMAND_EXECUTE_EVENT, this::onCommandExecute);
+        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.COMMAND_TAB_COMPLETE_EVENT, this::onCommandTabComplete);
     }
 
     @Override
@@ -60,15 +62,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         String islandCommand = plugin.getSettings().getIslandCommand();
         label = islandCommand.split(",")[0];
 
-        pluginCommand = new PluginCommand(label);
-
-        String[] commandSections = islandCommand.split(",");
-
-        if (commandSections.length > 1) {
-            pluginCommand.setAliases(Arrays.asList(Arrays.copyOfRange(commandSections, 1, commandSections.length)));
-        }
-
-        plugin.getPlatform().getServerManager().registerCommand(pluginCommand);
+        plugin.getPlatform().getServerManager().registerCommand(label);
 
         playerCommandsMap.loadDefaultCommands();
         adminCommandsMap.loadDefaultCommands();
@@ -168,7 +162,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             System.arraycopy(argsSplit, 0, commandArguments, 1, argsSplit.length);
         }
 
-        pluginCommand.execute(sender, "", commandArguments);
+        onCommandExecute(sender, commandArguments);
     }
 
     public String getLabel() {
@@ -236,136 +230,131 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
     }
 
-    private class PluginCommand extends BukkitCommand {
+    private void onCommandExecute(PluginEvent<PluginEventArgs.CommandExecute> event) {
+        onCommandExecute(event.getArgs().sender, event.getArgs().args);
+    }
 
-        PluginCommand(String islandCommandLabel) {
-            super(islandCommandLabel);
-        }
+    private void onCommandExecute(CommandSender sender, String[] args) {
+        java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-        @Override
-        public boolean execute(CommandSender sender, String label, String[] args) {
-            java.util.Locale locale = PlayerLocales.getLocale(sender);
+        String executedSubCommand;
 
-            String executedSubCommand;
+        if (args.length > 0) {
+            executedSubCommand = args[0];
 
-            if (args.length > 0) {
-                executedSubCommand = args[0];
+            Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
 
-                Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
+            SuperiorCommand command = playerCommandsMap.getCommand(executedSubCommand);
+            if (command != null) {
+                if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
+                    Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
+                    return;
+                }
 
-                SuperiorCommand command = playerCommandsMap.getCommand(executedSubCommand);
-                if (command != null) {
-                    if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
-                        Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
-                        return false;
-                    }
+                if (!CommandsHelper.hasCommandAccess(command, sender)) {
+                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
 
-                    if (!CommandsHelper.hasCommandAccess(command, sender)) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
+                    if (!plugin.getSettings().isHelpOnNoPermission())
+                        Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
+                    else if (!"help".equalsIgnoreCase(executedSubCommand))
+                        dispatchSubCommand(sender, "help");
 
-                        if (!plugin.getSettings().isHelpOnNoPermission())
-                            Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
-                        else if (!"help".equalsIgnoreCase(executedSubCommand))
-                            dispatchSubCommand(sender, "help");
+                    return;
+                }
 
-                        return false;
-                    }
+                if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
+                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
+                    Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
+                    return;
+                }
 
-                    if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
-                        Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
-                        return false;
-                    }
+                if (sender instanceof Player) {
+                    UUID uuid = ((Player) sender).getUniqueId();
+                    SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
+                    if (!superiorPlayer.hasPermission("superior.admin.bypass.cooldowns")) {
+                        Pair<Integer, String> commandCooldown = getCooldown(command);
+                        if (commandCooldown != null) {
+                            String commandLabel = command.getAliases().get(0);
 
-                    if (sender instanceof Player) {
-                        UUID uuid = ((Player) sender).getUniqueId();
-                        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
-                        if (!superiorPlayer.hasPermission("superior.admin.bypass.cooldowns")) {
-                            Pair<Integer, String> commandCooldown = getCooldown(command);
-                            if (commandCooldown != null) {
-                                String commandLabel = command.getAliases().get(0);
+                            Map<String, Long> playerCooldowns = commandsCooldown.get(uuid);
+                            long timeNow = System.currentTimeMillis();
 
-                                Map<String, Long> playerCooldowns = commandsCooldown.get(uuid);
-                                long timeNow = System.currentTimeMillis();
-
-                                if (playerCooldowns != null) {
-                                    Long timeToExecute = playerCooldowns.get(commandLabel);
-                                    if (timeToExecute != null) {
-                                        if (timeNow < timeToExecute) {
-                                            String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
-                                            Log.debugResult(Debug.EXECUTE_COMMAND, "Return Cooldown", formattedTime);
-                                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
-                                            return false;
-                                        }
+                            if (playerCooldowns != null) {
+                                Long timeToExecute = playerCooldowns.get(commandLabel);
+                                if (timeToExecute != null) {
+                                    if (timeNow < timeToExecute) {
+                                        String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
+                                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Cooldown", formattedTime);
+                                        Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
+                                        return;
                                     }
                                 }
-
-                                commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
-                                        timeNow + commandCooldown.getKey());
                             }
-                        }
-                    }
 
-                    command.execute(plugin.getApi(), sender, args);
-                    return false;
-                }
-
-                if (!plugin.getSettings().isHelpOnInvalidCommand())
-                    Message.INVALID_COMMAND.send(sender, locale, executedSubCommand);
-                else if (!"help".equalsIgnoreCase(executedSubCommand))
-                    dispatchSubCommand(sender, "help");
-
-                return false;
-            }
-
-            if (sender instanceof Player) {
-                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-
-                if (superiorPlayer != null) {
-                    String subCommandToExecute;
-
-                    if (!superiorPlayer.hasIsland())
-                        subCommandToExecute = "create";
-                    else if (superiorPlayer.hasToggledPanel())
-                        subCommandToExecute = "panel";
-                    else
-                        subCommandToExecute = "tp";
-
-                    dispatchSubCommand(sender, subCommandToExecute);
-                    return false;
-                }
-            }
-
-            return false;
-        }
-
-        @Override
-        public List<String> tabComplete(CommandSender sender, String label, String[] args) {
-            if (args.length > 0) {
-                SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
-                if (command != null) {
-                    return CommandsHelper.shouldDisplayCommandForPlayer(command, sender) ?
-                            command.tabComplete(plugin.getApi(), sender, args) : Collections.emptyList();
-                }
-            }
-
-            List<String> list = new LinkedList<>();
-
-            for (SuperiorCommand subCommand : getSubCommands()) {
-                if (CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender)) {
-                    List<String> aliases = new LinkedList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
-                    for (String alias : aliases) {
-                        if (alias.contains(args[0].toLowerCase(Locale.ENGLISH))) {
-                            list.add(alias);
+                            commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
+                                    timeNow + commandCooldown.getKey());
                         }
                     }
                 }
+
+                command.execute(plugin.getApi(), sender, args);
+                return;
             }
 
-            return list;
+            if (!plugin.getSettings().isHelpOnInvalidCommand())
+                Message.INVALID_COMMAND.send(sender, locale, executedSubCommand);
+            else if (!"help".equalsIgnoreCase(executedSubCommand))
+                dispatchSubCommand(sender, "help");
+
+            return;
         }
 
+        if (sender instanceof Player) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+
+            if (superiorPlayer != null) {
+                String subCommandToExecute;
+
+                if (!superiorPlayer.hasIsland())
+                    subCommandToExecute = "create";
+                else if (superiorPlayer.hasToggledPanel())
+                    subCommandToExecute = "panel";
+                else
+                    subCommandToExecute = "tp";
+
+                dispatchSubCommand(sender, subCommandToExecute);
+            }
+        }
+    }
+
+    private void onCommandTabComplete(PluginEvent<PluginEventArgs.CommandTabComplete> event) {
+        event.getArgs().tabCompletes = onCommandTabComplete(event.getArgs().sender, event.getArgs().args);
+    }
+
+    private List<String> onCommandTabComplete(CommandSender sender, String[] args) {
+        if (args.length > 0) {
+            SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
+            if (command != null) {
+                return CommandsHelper.shouldDisplayCommandForPlayer(command, sender) ?
+                        command.tabComplete(plugin.getApi(), sender, args) : Collections.emptyList();
+            }
+        }
+
+        List<String> list = new LinkedList<>();
+
+        for (SuperiorCommand subCommand : getSubCommands()) {
+            if (CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender)) {
+                List<String> aliases = new LinkedList<>(subCommand.getAliases());
+                aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
+                for (String alias : aliases) {
+                    if (alias.contains(args[0].toLowerCase(Locale.ENGLISH))) {
+                        list.add(alias);
+                    }
+                }
+            }
+        }
+
+        return list;
     }
 
     @Nullable

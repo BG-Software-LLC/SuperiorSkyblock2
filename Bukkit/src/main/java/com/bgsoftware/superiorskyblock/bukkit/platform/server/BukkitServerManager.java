@@ -3,15 +3,16 @@ package com.bgsoftware.superiorskyblock.bukkit.platform.server;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.bukkit.commands.BukkitPluginCommand;
 import com.bgsoftware.superiorskyblock.platform.server.IServerManager;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -52,7 +53,15 @@ public class BukkitServerManager implements IServerManager {
     }
 
     @Override
-    public void registerCommand(BukkitCommand command) {
+    public void registerCommand(String label) {
+        BukkitPluginCommand command = new BukkitPluginCommand(plugin, label);
+
+        String[] commandSections = plugin.getSettings().getIslandCommand().split(",");
+
+        if (commandSections.length > 1) {
+            command.setAliases(Arrays.asList(Arrays.copyOfRange(commandSections, 1, commandSections.length)));
+        }
+
         plugin().getNMSAlgorithms().registerCommand(command);
     }
 

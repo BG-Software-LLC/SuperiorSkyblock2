@@ -77,6 +77,21 @@ public class PluginEventArgs {
 
     }
 
+    public static class CommandExecute extends PluginEventArgs {
+
+        public CommandSender sender;
+        public String[] args;
+
+    }
+
+    public static class CommandTabComplete extends PluginEventArgs {
+
+        public CommandSender sender;
+        public String[] args;
+        public List<String> tabCompletes;
+
+    }
+
     public static class IslandBan extends IslandDoActionArgs {
 
         public SuperiorPlayer targetPlayer;

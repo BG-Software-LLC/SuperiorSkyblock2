@@ -1,9 +1,9 @@
-package com.bgsoftware.superiorskyblock.listener;
+package com.bgsoftware.superiorskyblock.bukkit.event;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
@@ -12,9 +12,12 @@ import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.IEventsManager;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.platform.event.args.IEventArgs;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,6 +47,7 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -65,6 +69,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -78,6 +83,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -85,6 +91,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
+import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -107,9 +114,9 @@ public class BukkitEventsListener implements Listener {
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
 
-    private final SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockBukkitPlugin plugin;
 
-    public BukkitEventsListener(SuperiorSkyblockPlugin plugin) {
+    public BukkitEventsListener(SuperiorSkyblockBukkitPlugin plugin) {
         this.plugin = plugin;
 
         // Block Events
@@ -532,7 +539,7 @@ public class BukkitEventsListener implements Listener {
         entityPortalEvent.cause = e.getTo() == null ? e.getCause() :
                 e.getTo().getWorld().getEnvironment() == World.Environment.THE_END ||
                         e.getFrom().getWorld().getEnvironment() == World.Environment.THE_END ?
-                        PlayerTeleportEvent.TeleportCause.END_PORTAL : PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
+                PlayerTeleportEvent.TeleportCause.END_PORTAL : PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
         entityPortalEvent.from = e.getFrom();
         entityPortalEvent.to = e.getTo();
         return eventType.createEvent(entityPortalEvent);
@@ -814,13 +821,13 @@ public class BukkitEventsListener implements Listener {
 
     private <E extends Event, Args extends IEventArgs> void createEventListener(GameEventType<Args> eventType,
                                                                                 Class<E> bukkitEventClass,
-                                                                                GameEventCreator<Args, E> function) {
+                                                                                IEventsManager.GameEventCreator<Args, E> function) {
         createEventListener(eventType, bukkitEventClass, function, null);
     }
 
     private <E extends Event, Args extends IEventArgs> void createEventListener(GameEventType<Args> eventType,
                                                                                 Class<E> bukkitEventClass,
-                                                                                GameEventCreator<Args, E> function,
+                                                                                IEventsManager.GameEventCreator<Args, E> function,
                                                                                 @Nullable ApplyBukkitEventFunction<E, Args> applyBukkitEventFunction) {
         Map<GameEventPriority, List<EventCallback>> callbacks = plugin.getGameEventsDispatcher().getCallbacks(eventType);
         if (!callbacks.isEmpty()) {
@@ -832,7 +839,7 @@ public class BukkitEventsListener implements Listener {
     private <E extends Event, Args extends IEventArgs> void createEventListenerForPriority(GameEventType<Args> eventType,
                                                                                            Class<E> bukkitEventClass,
                                                                                            GameEventPriority gameEventPriority,
-                                                                                           GameEventCreator<Args, E> function,
+                                                                                           IEventsManager.GameEventCreator<Args, E> function,
                                                                                            @Nullable ApplyBukkitEventFunction<E, Args> applyBukkitEventFunction) {
         EventPriority bukkitEventPriority = EventPriority.valueOf(gameEventPriority.name());
         plugin.getServer().getPluginManager().registerEvent(bukkitEventClass, this, bukkitEventPriority, (listener, event) -> {
@@ -865,7 +872,7 @@ public class BukkitEventsListener implements Listener {
             }
             if (applyBukkitEventFunction != null)
                 applyBukkitEventFunction.apply((E) event, gameEvent);
-        }, plugin.getBukkitPlugin(), false);
+        }, plugin, false);
     }
 
     private static ItemStack getHandItem(Player player, PlayerHand usedHand, boolean clone, @Nullable Supplier<ItemStack> defItem) {
@@ -878,13 +885,6 @@ public class BukkitEventsListener implements Listener {
         return itemStack;
     }
 
-    public interface GameEventCreator<Args extends IEventArgs, E extends Event> {
-
-        @Nullable
-        GameEvent<Args> execute(GameEventType<Args> eventType, GameEventPriority priority, E e);
-
-    }
-
     private interface ApplyBukkitEventFunction<E, Args extends IEventArgs> {
 
         void apply(E bukkitEvent, GameEvent<Args> event);
@@ -895,7 +895,7 @@ public class BukkitEventsListener implements Listener {
      * SPECIAL EVENTS
      */
 
-    private static class SpongeAbsorbEventFunction implements GameEventCreator<GameEventArgs.SpongeAbsorbEvent, org.bukkit.event.block.SpongeAbsorbEvent> {
+    private static class SpongeAbsorbEventFunction implements IEventsManager.GameEventCreator<GameEventArgs.SpongeAbsorbEvent, SpongeAbsorbEvent> {
 
         @Override
         public GameEvent<GameEventArgs.SpongeAbsorbEvent> execute(GameEventType<GameEventArgs.SpongeAbsorbEvent> eventType, GameEventPriority priority, org.bukkit.event.block.SpongeAbsorbEvent e) {
@@ -906,7 +906,7 @@ public class BukkitEventsListener implements Listener {
         }
     }
 
-    private class EntityRemoveFromWorldEventFunction implements GameEventCreator<GameEventArgs.EntityDeathEvent, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent> {
+    private class EntityRemoveFromWorldEventFunction implements IEventsManager.GameEventCreator<GameEventArgs.EntityDeathEvent, EntityRemoveFromWorldEvent> {
 
         @Override
         public GameEvent<GameEventArgs.EntityDeathEvent> execute(GameEventType<GameEventArgs.EntityDeathEvent> eventType, GameEventPriority priority, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent e) {
@@ -933,7 +933,7 @@ public class BukkitEventsListener implements Listener {
     }
 
     private class AsyncChatEventFunctions implements
-            GameEventCreator<GameEventArgs.PlayerChatEvent, io.papermc.paper.event.player.AsyncChatEvent>,
+            IEventsManager.GameEventCreator<GameEventArgs.PlayerChatEvent, AsyncChatEvent>,
             ApplyBukkitEventFunction<io.papermc.paper.event.player.AsyncChatEvent, GameEventArgs.PlayerChatEvent> {
 
         @Override
@@ -951,7 +951,7 @@ public class BukkitEventsListener implements Listener {
 
     }
 
-    private static class PlayerPickupArrowEventFunctions implements GameEventCreator<GameEventArgs.PlayerPickupArrowEvent, org.bukkit.event.player.PlayerPickupArrowEvent> {
+    private static class PlayerPickupArrowEventFunctions implements IEventsManager.GameEventCreator<GameEventArgs.PlayerPickupArrowEvent, PlayerPickupArrowEvent> {
 
         @Override
         public GameEvent<GameEventArgs.PlayerPickupArrowEvent> execute(GameEventType<GameEventArgs.PlayerPickupArrowEvent> eventType, GameEventPriority priority, org.bukkit.event.player.PlayerPickupArrowEvent e) {
@@ -963,7 +963,7 @@ public class BukkitEventsListener implements Listener {
 
     }
 
-    private static class PlayerPickupItemEventFunctions implements GameEventCreator<GameEventArgs.PlayerPickupItemEvent, org.bukkit.event.player.PlayerAttemptPickupItemEvent> {
+    private static class PlayerPickupItemEventFunctions implements IEventsManager.GameEventCreator<GameEventArgs.PlayerPickupItemEvent, PlayerAttemptPickupItemEvent> {
 
         @Override
         public GameEvent<GameEventArgs.PlayerPickupItemEvent> execute(GameEventType<GameEventArgs.PlayerPickupItemEvent> eventType, GameEventPriority priority, org.bukkit.event.player.PlayerAttemptPickupItemEvent e) {
@@ -975,7 +975,7 @@ public class BukkitEventsListener implements Listener {
 
     }
 
-    private static class RaidTriggerEventFunctions implements GameEventCreator<GameEventArgs.RaidTriggerEvent, org.bukkit.event.raid.RaidTriggerEvent> {
+    private static class RaidTriggerEventFunctions implements IEventsManager.GameEventCreator<GameEventArgs.RaidTriggerEvent, RaidTriggerEvent> {
 
         @Override
         public GameEvent<GameEventArgs.RaidTriggerEvent> execute(GameEventType<GameEventArgs.RaidTriggerEvent> eventType, GameEventPriority priority, org.bukkit.event.raid.RaidTriggerEvent e) {

@@ -24,8 +24,7 @@ public interface IServerManager {
 
     boolean isPlayerOnline(UUID uuid);
 
-    // Absorbed from NMSAlgorithms (server-level, not per-world/per-item)
-    void registerCommand(BukkitCommand command);
+    void registerCommand(String label);
 
     double getCurrentTps();
 

@@ -125,6 +125,8 @@ import java.util.Locale;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.AttemptPlayerSendMessage;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.BlockStack;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.BlockUnstack;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.CommandExecute;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.CommandTabComplete;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.Empty;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandBan;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandBankDeposit;
@@ -259,6 +261,18 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
     public static final PluginEventType<Empty> WORLD_PROVIDER_UPDATE_EVENT = new PluginEventType<Empty>(null) {
         @Override
         public Event createBukkitEvent(Empty args) {
+            return null;
+        }
+    };
+    public static final PluginEventType<CommandExecute> COMMAND_EXECUTE_EVENT = new PluginEventType<CommandExecute>(null) {
+        @Override
+        public Event createBukkitEvent(CommandExecute args) {
+            return null;
+        }
+    };
+    public static final PluginEventType<CommandTabComplete> COMMAND_TAB_COMPLETE_EVENT = new PluginEventType<CommandTabComplete>(null) {
+        @Override
+        public Event createBukkitEvent(CommandTabComplete args) {
             return null;
         }
     };
