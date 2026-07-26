@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.bukkit;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.nmsloader.INMSLoader;
 import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
 import com.bgsoftware.common.nmsloader.NMSLoadException;
@@ -24,28 +25,33 @@ import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
+import com.bgsoftware.superiorskyblock.bukkit.nms.NMSDragonFightChooser;
+import com.bgsoftware.superiorskyblock.bukkit.platform.BukkitPlatform;
 import com.bgsoftware.superiorskyblock.bukkit.service.BukkitServicesHandler;
+import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
+import com.bgsoftware.superiorskyblock.bukkit.external.BukkitProvidersManager;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
-import com.bgsoftware.superiorskyblock.bukkit.nms.NMSDragonFightChooser;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.platform.IPlatform;
-import com.bgsoftware.superiorskyblock.bukkit.platform.BukkitPlatform;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventsDispatcher;
-import com.bgsoftware.superiorskyblock.service.BaseServicesHandler;
+import com.bgsoftware.superiorskyblock.service.AbstractServicesHandler;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * The Bukkit entry point of the plugin. It creates the platform-agnostic {@link SuperiorSkyblockPlugin},
@@ -55,6 +61,8 @@ import java.util.Optional;
  * and missions - all of its methods are delegated to {@link SuperiorSkyblockPlugin}.
  */
 public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements SuperiorSkyblock {
+
+    private static SuperiorSkyblockBukkitPlugin instance;
 
     /* NMS */
     @Nullable
@@ -72,14 +80,14 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
      * The platform must be created before the plugin itself, as the plugin relies on it while
      * it is being constructed.
      */
-    private final BukkitPlatform platform = new BukkitPlatform(this);
-    private final BukkitServicesHandler servicesHandler = new BukkitServicesHandler(this);
-
     private final SuperiorSkyblockPlugin plugin = new SuperiorSkyblockPlugin() {
+
+        private final BukkitPlatform platform = new BukkitPlatform(SuperiorSkyblockBukkitPlugin.this);
+        private final BukkitServicesHandler servicesHandler = new BukkitServicesHandler(SuperiorSkyblockBukkitPlugin.this);
 
         @Override
         public IPlatform getPlatform() {
-            return SuperiorSkyblockBukkitPlugin.this.platform;
+            return platform;
         }
 
         @Override
@@ -93,8 +101,8 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
         }
 
         @Override
-        public BaseServicesHandler getServices() {
-            return SuperiorSkyblockBukkitPlugin.this.servicesHandler;
+        public AbstractServicesHandler getServices() {
+            return servicesHandler;
         }
 
         @Override
@@ -108,10 +116,45 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
         }
 
         @Override
+        public String getPluginName() {
+            return getDescription().getName();
+        }
+
+        @Override
+        public File getDataFolder() {
+            return SuperiorSkyblockBukkitPlugin.this.getDataFolder();
+        }
+
+        @Override
+        public Logger getLogger() {
+            return SuperiorSkyblockBukkitPlugin.this.getLogger();
+        }
+
+        @Override
+        public String getPluginVersion() {
+            return getDescription().getVersion();
+        }
+
+        @Override
+        public InputStream getResource(String resourcePath) {
+            return SuperiorSkyblockBukkitPlugin.this.getResource(resourcePath);
+        }
+
+        @Override
+        public void saveResource(String resourcePath) {
+            SuperiorSkyblockBukkitPlugin.this.saveResource(resourcePath, false);
+        }
+
+        @Override
+        protected void prepareWorlds() {
+            providersManager.getWorldsProvider().prepareWorlds();
+        }
+
+        @Override
         protected boolean loadNMSAdapter() {
             try {
-                JavaPlugin bukkitPlugin = getBukkitPlugin();
-                INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(bukkitPlugin, NMSConfiguration.forPlugin(bukkitPlugin));
+                INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(SuperiorSkyblockBukkitPlugin.this,
+                        NMSConfiguration.forPlugin(SuperiorSkyblockBukkitPlugin.this));
 
                 nmsAlgorithms = nmsLoader.loadNMSHandler(NMSAlgorithms.class);
                 nmsChunks = nmsLoader.loadNMSHandler(NMSChunks.class);
@@ -182,7 +225,19 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
         public NMSWorld getNMSWorld() {
             return SuperiorSkyblockBukkitPlugin.this.nmsWorld;
         }
+
+        @Override
+        public void reloadPlugin(PluginReloadReason reloadReason) throws ManagerLoadException {
+            providersManager.loadData();
+            super.reloadPlugin(reloadReason);
+        }
     };
+
+    private final BukkitProvidersManager providersManager = new BukkitProvidersManager(plugin);
+
+    public SuperiorSkyblockBukkitPlugin() {
+        instance = this;
+    }
 
     /*
      * JavaPlugin lifecycle
@@ -190,7 +245,10 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
 
     @Override
     public void onLoad() {
+        DependenciesManager.inject(this);
+
         this.plugin.onLoad();
+
         new Metrics(this, 4119);
     }
 
@@ -260,7 +318,7 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
 
     @Override
     public ProvidersManager getProviders() {
-        return this.plugin.getProviders();
+        return providersManager;
     }
 
     @Override
@@ -309,6 +367,8 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
         this.plugin.setEventsDispatcher(eventsDispatcher);
     }
 
+
+
     public PluginEventsDispatcher getPluginEventsDispatcher() {
         return this.plugin.getPluginEventsDispatcher();
     }
@@ -317,7 +377,7 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
         return this.plugin.getGameEventsDispatcher();
     }
 
-    public BaseServicesHandler getServices() {
+    public AbstractServicesHandler getServices() {
         return this.plugin.getServices();
     }
 
@@ -358,7 +418,15 @@ public class SuperiorSkyblockBukkitPlugin extends JavaPlugin implements Superior
     }
 
     public BukkitPlatform getPlatform() {
-        return this.platform;
+        return (BukkitPlatform) plugin.getPlatform();
+    }
+
+    public SuperiorSkyblockPlugin getHandle() {
+        return plugin;
+    }
+
+    public static SuperiorSkyblockBukkitPlugin getPlugin() {
+        return instance;
     }
 
 }

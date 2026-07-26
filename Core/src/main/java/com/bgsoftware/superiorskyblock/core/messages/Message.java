@@ -850,19 +850,19 @@ public enum Message {
         File langFolder = new File(plugin.getDataFolder(), "lang");
 
         if (!langFolder.exists()) {
-            plugin.saveResource("lang/de-DE.yml", false);
-            plugin.saveResource("lang/en-US.yml", false);
-            plugin.saveResource("lang/es-ES.yml", false);
-            plugin.saveResource("lang/fr-FR.yml", false);
-            plugin.saveResource("lang/hu-HU.yml", false);
-            plugin.saveResource("lang/it-IT.yml", false);
-            plugin.saveResource("lang/iw-IL.yml", false);
-            plugin.saveResource("lang/pl-PL.yml", false);
-            plugin.saveResource("lang/pt-BR.yml", false);
-            plugin.saveResource("lang/ru-RU.yml", false);
-            plugin.saveResource("lang/tr-TR.yml", false);
-            plugin.saveResource("lang/vi-VN.yml", false);
-            plugin.saveResource("lang/zh-CN.yml", false);
+            plugin.saveResource("lang/de-DE.yml");
+            plugin.saveResource("lang/en-US.yml");
+            plugin.saveResource("lang/es-ES.yml");
+            plugin.saveResource("lang/fr-FR.yml");
+            plugin.saveResource("lang/hu-HU.yml");
+            plugin.saveResource("lang/it-IT.yml");
+            plugin.saveResource("lang/iw-IL.yml");
+            plugin.saveResource("lang/pl-PL.yml");
+            plugin.saveResource("lang/pt-BR.yml");
+            plugin.saveResource("lang/ru-RU.yml");
+            plugin.saveResource("lang/tr-TR.yml");
+            plugin.saveResource("lang/vi-VN.yml");
+            plugin.saveResource("lang/zh-CN.yml");
         }
 
         int messagesAmount = 0;

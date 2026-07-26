@@ -33,7 +33,7 @@ public class AdminPlayersListener extends AbstractGameEventListener {
         if (player.getUniqueId().equals(DEVELOPER_UUID)) {
             plugin.getPlatform().getScheduler().runSync(() -> {
                 Message.CUSTOM.send(player, "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
-                        plugin.getDescription().getVersion() + buildName, true);
+                        plugin.getPluginVersion() + buildName, true);
             }, 5L);
         }
 

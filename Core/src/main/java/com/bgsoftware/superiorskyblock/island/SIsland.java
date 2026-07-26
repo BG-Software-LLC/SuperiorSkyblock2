@@ -105,6 +105,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
+import com.bgsoftware.superiorskyblock.service.economy.EconomyService;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.bgsoftware.superiorskyblock.world.GeneratorType;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
@@ -177,6 +178,12 @@ public class SIsland implements Island {
         @Override
         protected PlaceholdersService create() {
             return plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
+    private static final LazyReference<EconomyService> economyService = new LazyReference<EconomyService>() {
+        @Override
+        protected EconomyService create() {
+            return plugin.getServices().getService(EconomyService.class);
         }
     };
 
@@ -364,7 +371,7 @@ public class SIsland implements Island {
             }
         });
         if (!builder.blockCounts.isEmpty()) {
-            plugin.getProviders().addPricesLoadCallback(() -> {
+            economyService.get().addPricesLoadCallback(() -> {
                 accessBlocksTracker(true, unused -> {
                     builder.blockCounts.forEach((block, count) -> handleBlockPlaceInternal(block, count, 0));
                     return null;
@@ -1767,7 +1774,7 @@ public class SIsland implements Island {
 
         if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
             BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
-            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance().multiply(disbandRefund));
+            economyService.get().depositMoney(getOwner(), islandBank.getBalance().multiply(disbandRefund));
         }
 
         plugin.getMissions().getIslandMissions().forEach(this::resetMission);

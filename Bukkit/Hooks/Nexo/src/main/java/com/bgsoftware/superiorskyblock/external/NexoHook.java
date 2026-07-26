@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
+import com.bgsoftware.superiorskyblock.bukkit.external.blocks.ICustomBlocksProvider;
 import com.nexomc.nexo.api.NexoBlocks;
 import com.nexomc.nexo.api.NexoFurniture;
 import com.nexomc.nexo.api.NexoItems;

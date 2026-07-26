@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.bukkit.SuperiorSkyblockBukkitPlugin;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
@@ -66,7 +67,7 @@ import java.util.function.BiFunction;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockBukkitPlugin plugin = SuperiorSkyblockBukkitPlugin.getPlugin();
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 

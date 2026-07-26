@@ -670,7 +670,7 @@ public class SettingsContainer {
         File file = new File(plugin.getDataFolder(), "interactables.yml");
 
         if (!file.exists())
-            plugin.saveResource("interactables.yml", false);
+            plugin.saveResource("interactables.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
@@ -707,7 +707,7 @@ public class SettingsContainer {
         boolean removeInvalidEntityKeys = false;
 
         if (!file.exists()) {
-            plugin.saveResource("entity-categories.yml", false);
+            plugin.saveResource("entity-categories.yml");
             removeInvalidEntityKeys = true;
         }
 

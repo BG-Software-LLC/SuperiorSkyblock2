@@ -1,0 +1,773 @@
+package com.bgsoftware.superiorskyblock.bukkit.external;
+
+import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.common.shopsbridge.ShopsProvider;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
+import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldLoadListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.bukkit.external.async.AsyncProvider;
+import com.bgsoftware.superiorskyblock.bukkit.external.async.AsyncProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.blocks.ICustomBlocksProvider;
+import com.bgsoftware.superiorskyblock.bukkit.external.bossbar.BossBarProvider;
+import com.bgsoftware.superiorskyblock.bukkit.external.bossbar.BossBarProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.chunks.ChunksProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.economy.EconomyProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.menus.MenusProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.permissions.PermissionsProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.placeholders.PlaceholdersProvider;
+import com.bgsoftware.superiorskyblock.bukkit.external.prices.PricesProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.prices.PricesProvider_ShopsBridgeWrapper;
+import com.bgsoftware.superiorskyblock.bukkit.external.spawners.SpawnersProvider_AutoDetect;
+import com.bgsoftware.superiorskyblock.bukkit.external.spawners.SpawnersProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.stackedblocks.StackedBlocksProvider_AutoDetect;
+import com.bgsoftware.superiorskyblock.bukkit.external.stackedblocks.StackedBlocksProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.ui.UIProvider;
+import com.bgsoftware.superiorskyblock.bukkit.external.ui.UIProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.vanish.VanishProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.worlds.DefaultWorldLoadListener;
+import com.bgsoftware.superiorskyblock.bukkit.external.worlds.WorldsProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.service.placeholders.BukkitPlaceholdersService;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.JavaVersion;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.service.economy.EconomyService;
+import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+
+public class BukkitProvidersManager extends Manager implements ProvidersManager {
+
+    private final List<AFKProvider> AFKProvidersList = new LinkedList<>();
+    private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
+    private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
+    private UIProvider uiProvider = new UIProvider_Default();
+    private BossBarProvider bossBarsProvider = new BossBarProvider_Default();
+    private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
+    private PricesProvider pricesProvider = new PricesProvider_Default();
+    private VanishProvider vanishProvider = new VanishProvider_Default();
+    private AsyncProvider asyncProvider = new AsyncProvider_Default();
+    private WorldsProvider worldsProvider;
+    private boolean isCustomWorldsProvider;
+    private ChunksProvider chunksProvider = new ChunksProvider_Default();
+    private MenusProvider menusProvider;
+    private boolean listenToSpawnerChanges = true;
+
+    private final LazyReference<BukkitPlaceholdersService> placeholdersService = new LazyReference<BukkitPlaceholdersService>() {
+        @Override
+        protected BukkitPlaceholdersService create() {
+            return (BukkitPlaceholdersService) plugin.getServices().getService(PlaceholdersService.class);
+        }
+    };
+    private final LazyReference<EconomyService> economyService = new LazyReference<EconomyService>() {
+        @Override
+        protected EconomyService create() {
+            return plugin.getServices().getService(EconomyService.class);
+        }
+    };
+
+    protected final List<ISkinsListener> skinsListeners = new LinkedList<>();
+    protected final List<IStackedBlocksListener> stackedBlocksListeners = new LinkedList<>();
+    protected final List<IWorldsListener> worldsListeners = new LinkedList<>();
+    protected final List<ICustomBlocksProvider> customBlocksProviders = new LinkedList<>();
+    protected final List<EntitiesProvider> entitiesProviders = new LinkedList<>();
+
+    protected final IWorldLoadListener DEFAULT_WORLD_LOAD_LISTENER = new DefaultWorldLoadListener(plugin);
+
+    public BukkitProvidersManager(SuperiorSkyblockPlugin plugin) {
+        super(plugin);
+        setWorldsProviderInternal(new WorldsProvider_Default(plugin));
+        this.menusProvider = new MenusProvider_Default(plugin);
+    }
+
+    @Override
+    public void loadData() {
+        plugin.getPlatform().getScheduler().runSync(() -> {
+            registerGeneralHooks();
+            registerSpawnersProvider();
+            registerStackedBlocksProvider();
+            registerEntitiesProvider();
+            registerPermissionsProvider();
+            registerPricesProvider();
+            registerVanishProvider();
+            registerAFKProvider();
+            registerAsyncProvider();
+            registerEconomyProviders();
+            registerPlaceholdersProvider();
+            registerChunksProvider();
+        });
+
+        registerUIProvider();
+        registerBossBarProvider();
+
+        // We try to forcefully load prices after a second the server has enabled.
+        plugin.getPlatform().getScheduler().runSync(economyService.get()::forcePricesLoad, 60L);
+    }
+
+    @Override
+    public SpawnersProvider getSpawnersProvider() {
+        return this.spawnersProvider;
+    }
+
+    @Override
+    public void setSpawnersProvider(SpawnersProvider spawnersProvider) {
+        Preconditions.checkNotNull(spawnersProvider, "spawnersProvider parameter cannot be null.");
+        this.spawnersProvider = spawnersProvider;
+    }
+
+    @Override
+    public StackedBlocksProvider getStackedBlocksProvider() {
+        return this.stackedBlocksProvider;
+    }
+
+    @Override
+    public void setStackedBlocksProvider(StackedBlocksProvider stackedBlocksProvider) {
+        Preconditions.checkNotNull(stackedBlocksProvider, "stackedBlocksProvider parameter cannot be null.");
+        this.stackedBlocksProvider = stackedBlocksProvider;
+    }
+
+    @Override
+    public List<EntitiesProvider> getEntitiesProviders() {
+        return Collections.unmodifiableList(this.entitiesProviders);
+    }
+
+    @Override
+    public void addEntitiesProvider(EntitiesProvider entitiesProvider) {
+        Preconditions.checkNotNull(entitiesProvider, "entitiesProvider parameter cannot be null.");
+        this.entitiesProviders.add(entitiesProvider);
+    }
+
+    @Override
+    public EconomyProvider getEconomyProvider() {
+        return this.economyService.get().getEconomyProvider();
+    }
+
+    @Override
+    public void setEconomyProvider(EconomyProvider economyProvider) {
+        Preconditions.checkNotNull(economyProvider, "economyProvider parameter cannot be null.");
+        this.economyService.get().setEconomyProvider(economyProvider);
+    }
+
+    @Override
+    public WorldsProvider getWorldsProvider() {
+        return this.worldsProvider;
+    }
+
+    @Override
+    public void setWorldsProvider(WorldsProvider worldsProvider) {
+        Preconditions.checkNotNull(worldsProvider, "worldsProvider parameter cannot be null.");
+        setWorldsProviderInternal(worldsProvider);
+        PluginEventsFactory.callWorldsProviderUpdateEvent();
+    }
+
+    private void setWorldsProviderInternal(WorldsProvider worldsProvider) {
+        this.worldsProvider = worldsProvider;
+        this.isCustomWorldsProvider = !(worldsProvider instanceof WorldsProvider_Default);
+        try {
+            this.worldsProvider.addWorldLoadListener(DEFAULT_WORLD_LOAD_LISTENER);
+        } catch (UnsupportedOperationException ignored) {
+            // Ignore UnsupportedOperationException
+        }
+    }
+
+    @Override
+    public ChunksProvider getChunksProvider() {
+        return chunksProvider;
+    }
+
+    @Override
+    public void setChunksProvider(ChunksProvider chunksProvider) {
+        Preconditions.checkNotNull(chunksProvider, "chunksProvider parameter cannot be null.");
+        this.chunksProvider = chunksProvider;
+    }
+
+    @Override
+    public EconomyProvider getBankEconomyProvider() {
+        return this.economyService.get().getEconomyBankProvider();
+    }
+
+    @Override
+    public void setBankEconomyProvider(EconomyProvider bankEconomyProvider) {
+        Preconditions.checkNotNull(bankEconomyProvider, "bankEconomyProvider parameter cannot be null.");
+        this.economyService.get().setEconomyBankProvider(bankEconomyProvider);
+    }
+
+    @Override
+    public List<AFKProvider> getAFKProviders() {
+        return Collections.unmodifiableList(this.AFKProvidersList);
+    }
+
+    @Override
+    public void addAFKProvider(AFKProvider afkProvider) {
+        Preconditions.checkNotNull(afkProvider, "afkProvider parameter cannot be null.");
+        AFKProvidersList.add(afkProvider);
+    }
+
+    @Override
+    public MenusProvider getMenusProvider() {
+        return this.menusProvider;
+    }
+
+    @Override
+    public void setMenusProvider(MenusProvider menusProvider) {
+        Preconditions.checkNotNull(menusProvider, "menusProvider parameter cannot be null.");
+        this.menusProvider = menusProvider;
+    }
+
+    @Override
+    public PermissionsProvider getPermissionsProvider() {
+        return permissionsProvider;
+    }
+
+    @Override
+    public void setPermissionsProvider(PermissionsProvider permissionsProvider) {
+        this.permissionsProvider = permissionsProvider;
+    }
+
+    @Override
+    public PricesProvider getPricesProvider() {
+        return pricesProvider;
+    }
+
+    @Override
+    public void setPricesProvider(PricesProvider pricesProvider) {
+        this.pricesProvider = pricesProvider;
+        this.pricesProvider.getWhenPricesAreReady().whenComplete((result, error) ->
+                economyService.get().forcePricesLoad());
+    }
+
+    @Override
+    public VanishProvider getVanishProvider() {
+        return vanishProvider;
+    }
+
+    @Override
+    public void setVanishProvider(VanishProvider vanishProvider) {
+        this.vanishProvider = vanishProvider;
+    }
+
+    @Override
+    public void registerSkinsListener(ISkinsListener skinsListener) {
+        this.skinsListeners.add(skinsListener);
+    }
+
+    @Override
+    public void unregisterSkinsListener(ISkinsListener skinsListener) {
+        this.skinsListeners.remove(skinsListener);
+    }
+
+    public boolean notifySkinsListeners(SuperiorPlayer superiorPlayer) {
+        this.skinsListeners.forEach(skinsListener -> skinsListener.setSkinTexture(superiorPlayer));
+        return !this.skinsListeners.isEmpty();
+    }
+
+    @Override
+    public void registerStackedBlocksListener(IStackedBlocksListener stackedBlocksListener) {
+        this.stackedBlocksListeners.add(stackedBlocksListener);
+    }
+
+    @Override
+    public void unregisterStackedBlocksListener(IStackedBlocksListener stackedBlocksListener) {
+        this.stackedBlocksListeners.remove(stackedBlocksListener);
+    }
+
+    public UIProvider getUIProvider() {
+        return uiProvider;
+    }
+
+    public void setUIProvider(UIProvider uiProvider) {
+        this.uiProvider = uiProvider;
+    }
+
+    public BossBarProvider getBossBarProvider() {
+        return bossBarsProvider;
+    }
+
+    public void setBossBarProvider(BossBarProvider bossBarsProvider) {
+        this.bossBarsProvider = bossBarsProvider;
+    }
+
+    public void registerCustomBlocksProvider(ICustomBlocksProvider customBlocksProvider) {
+        this.customBlocksProviders.add(customBlocksProvider);
+    }
+
+    public List<ICustomBlocksProvider> getCustomBlocksProviders() {
+        return customBlocksProviders;
+    }
+
+    public void notifyStackedBlocksListeners(OfflinePlayer offlinePlayer, Block block,
+                                             IStackedBlocksListener.Action action) {
+        this.stackedBlocksListeners.forEach(stackedBlocksListener ->
+                stackedBlocksListener.recordBlockAction(offlinePlayer, block, action));
+    }
+
+    @Override
+    public void registerWorldsListener(IWorldsListener worldsListener) {
+        this.worldsListeners.add(worldsListener);
+    }
+
+    @Override
+    public void unregisterWorldsListener(IWorldsListener worldsListener) {
+        this.worldsListeners.remove(worldsListener);
+    }
+
+    public void runWorldsListeners(String worldName) {
+        this.worldsListeners.forEach(worldsListener -> worldsListener.loadWorld(worldName));
+    }
+
+    public Key getSpawnerKey(ItemStack itemStack) {
+        String type = spawnersProvider.getSpawnerType(itemStack);
+        return type == null ? SpawnerKey.GLOBAL_KEY : Keys.ofSpawner(type);
+    }
+
+    public boolean hasSnapshotsSupport() {
+        return spawnersProvider instanceof SpawnersSnapshotProvider ||
+                stackedBlocksProvider instanceof StackedBlocksSnapshotProvider;
+    }
+
+    public void takeSnapshots(Chunk chunk) {
+        if (spawnersProvider instanceof SpawnersSnapshotProvider) {
+            ((SpawnersSnapshotProvider) spawnersProvider).takeSnapshot(chunk);
+        }
+        if (stackedBlocksProvider instanceof StackedBlocksSnapshotProvider) {
+            ((StackedBlocksSnapshotProvider) stackedBlocksProvider).takeSnapshot(chunk);
+        }
+    }
+
+    public void releaseSnapshots(ChunkPosition chunkPosition) {
+        if (spawnersProvider instanceof SpawnersSnapshotProvider) {
+            ((SpawnersSnapshotProvider) spawnersProvider).releaseSnapshot(
+                    chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
+        }
+        if (stackedBlocksProvider instanceof StackedBlocksSnapshotProvider) {
+            ((StackedBlocksSnapshotProvider) stackedBlocksProvider).releaseSnapshot(
+                    chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
+        }
+    }
+
+    public AsyncProvider getAsyncProvider() {
+        return asyncProvider;
+    }
+
+    public boolean hasCustomWorldsSupport() {
+        return this.isCustomWorldsProvider;
+    }
+
+    public boolean isAFK(Player player) {
+        return AFKProvidersList.stream().anyMatch(afkProvider -> afkProvider.isAFK(player));
+    }
+
+    public boolean shouldListenToSpawnerChanges() {
+        return listenToSpawnerChanges;
+    }
+
+    private void registerGeneralHooks() {
+        if (canRegisterHook("JetsMinions"))
+            registerHook("JetsMinionsHook");
+
+        if (canRegisterHook("SkinsRestorer")) {
+            String version = Bukkit.getPluginManager().getPlugin("SkinsRestorer").getDescription().getVersion();
+            if (version.startsWith("14")) {
+                registerHook("SkinsRestorer14Hook");
+            } else if (version.startsWith("15")) {
+                registerHook("SkinsRestorer15Hook");
+            } else {
+                registerHook("SkinsRestorerHook");
+            }
+        }
+
+        if (canRegisterHook("ChangeSkin"))
+            registerHook("ChangeSkinHook");
+
+        if (canRegisterHook("Slimefun"))
+            registerHook("SlimefunHook");
+
+        if (canRegisterHook("CoreProtect"))
+            registerHook("CoreProtectHook");
+
+        if (isHookEnabled("SlimeWorldManager") && JavaVersion.isAtLeast(17)) {
+            if (isOldSlimeWorldManager()) {
+                registerHook("SlimeWorldManagerHook");
+            } else {
+                registerHook("AdvancedSlimePaperHook");
+            }
+        }
+
+        if (canRegisterHook("ProtocolLib"))
+            registerHook("ProtocolLibHook");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("Oraxen"))
+            registerHook("OraxenHook");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("Nexo"))
+            registerHook("NexoHook");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
+            registerHook("ItemsAdderHook");
+
+        if (canRegisterHook("Plan"))
+            registerHook("PlanHook");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine")) {
+            // We load the hook with an extra delay to let CraftEngine load its data first
+            Plugin craftEnginePlugin = Bukkit.getPluginManager().getPlugin("CraftEngine");
+            if (craftEnginePlugin.getDescription().getVersion().startsWith("0.0.")) {
+                plugin.getPlatform().getScheduler().runSync(() -> registerHook("CraftEngineHook"), 5L);
+            } else {
+                plugin.getPlatform().getScheduler().runSync(() -> registerHook("CraftEngineHook26"), 5L);
+            }
+        }
+
+        if (canRegisterHook("SmoothTimber"))
+            registerHook("SmoothTimberHook");
+
+        if (canRegisterHook("SilkSpawners")) {
+            List<String> pluginAuthors = Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors();
+            if (pluginAuthors.contains("mushroomhostage")) {
+                registerHook("TimbruSilkSpawnersHook");
+            }
+        }
+
+    }
+
+    private void registerSpawnersProvider() {
+        if (!(spawnersProvider instanceof SpawnersProvider_AutoDetect))
+            return;
+
+        String configSpawnersProvider = plugin.getSettings().getSpawnersProvider();
+        boolean auto = configSpawnersProvider.equalsIgnoreCase("Auto");
+
+        Optional<SpawnersProvider> spawnersProvider = Optional.empty();
+
+        if (canRegisterHook("MergedSpawner") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
+            spawnersProvider = createInstance("spawners.SpawnersProvider_MergedSpawner");
+            listenToSpawnerChanges = false;
+        } else if (canRegisterHook("AdvancedSpawners") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("AdvancedSpawners"))) {
+            spawnersProvider = createInstance("spawners.SpawnersProvider_AdvancedSpawners");
+        } else if (canRegisterHook("WildStacker") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("WildStacker"))) {
+            spawnersProvider = createInstance("spawners.SpawnersProvider_WildStacker");
+        } else if (canRegisterHook("SilkSpawners") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
+            Plugin silkSpawnersPlugin = Bukkit.getPluginManager().getPlugin("SilkSpawners");
+            if (silkSpawnersPlugin.getDescription().getAuthors().contains("CandC_9_12")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_CandcSilkSpawners");
+            } else if (silkSpawnersPlugin.getDescription().getAuthors().contains("mushroomhostage")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_TimbruSilkSpawners");
+            }
+        } else if (canRegisterHook("PvpingSpawners") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
+            spawnersProvider = createInstance("spawners.SpawnersProvider_PvpingSpawners");
+        } else if (canRegisterHook("EpicSpawners") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
+            String version = Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion();
+            if (version.startsWith("9")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners9");
+            } else if (version.startsWith("8")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners8");
+            } else if (version.startsWith("7")) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners7");
+            } else {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_EpicSpawners6");
+            }
+        } else if (canRegisterHook("UltimateStacker") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
+            String version = Bukkit.getPluginManager().getPlugin("UltimateStacker").getDescription().getVersion();
+            int majorVersion = Integer.parseInt(String.valueOf(version.charAt(0)));
+            if (majorVersion >= 4) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker4");
+            } else if (majorVersion == 3) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker3");
+            } else {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_UltimateStacker");
+            }
+            listenToSpawnerChanges = false;
+        } else if (canRegisterHook("RoseStacker") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("RoseStacker"))) {
+            if (hasRoseStackerPreSpawnEventSupport()) {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker1_5");
+            } else {
+                spawnersProvider = createInstance("spawners.SpawnersProvider_RoseStacker");
+            }
+            listenToSpawnerChanges = false;
+        }
+
+        spawnersProvider.ifPresent(this::setSpawnersProvider);
+    }
+
+    private void registerStackedBlocksProvider() {
+        if (!(stackedBlocksProvider instanceof StackedBlocksProvider_AutoDetect))
+            return;
+
+        String configStackedBlocksProvider = plugin.getSettings().getStackedBlocksProvider();
+        boolean auto = configStackedBlocksProvider.equalsIgnoreCase("Auto");
+
+        Optional<StackedBlocksProvider> stackedBlocksProvider = Optional.empty();
+
+        if (canRegisterHook("WildStacker") &&
+                (auto || configStackedBlocksProvider.equalsIgnoreCase("WildStacker"))) {
+            stackedBlocksProvider = createInstance("stackedblocks.StackedBlocksProvider_WildStacker");
+        } else if (canRegisterHook("RoseStacker") &&
+                (auto || configStackedBlocksProvider.equalsIgnoreCase("RoseStacker"))) {
+            stackedBlocksProvider = createInstance("stackedblocks.StackedBlocksProvider_RoseStacker");
+        }
+
+        stackedBlocksProvider.ifPresent(this::setStackedBlocksProvider);
+    }
+
+    private void registerEntitiesProvider() {
+        if (canRegisterHook("WildStacker")) {
+            Optional<EntitiesProvider> entitiesProvider = createInstance("entities.EntitiesProvider_WildStacker");
+            entitiesProvider.ifPresent(this::addEntitiesProvider);
+        }
+        if (canRegisterHook("RoseStacker")) {
+            Optional<EntitiesProvider> entitiesProvider = createInstance("entities.EntitiesProvider_RoseStacker");
+            entitiesProvider.ifPresent(this::addEntitiesProvider);
+        }
+    }
+
+    private void registerUIProvider() {
+        Optional<UIProvider> uiProvider = Optional.empty();
+
+        if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
+            uiProvider = createInstance("ui.UIProvider_MiniMessage");
+        }
+
+        uiProvider.ifPresent(this::setUIProvider);
+    }
+
+    private void registerBossBarProvider() {
+        Optional<BossBarProvider> bossBarProvider = Optional.empty();
+
+        if (isHookEnabled("MiniMessage") && hasMiniMessageSupport()) {
+            bossBarProvider = createInstance("bossbar.BossBarProvider_MiniMessage");
+        }
+
+        bossBarProvider.ifPresent(this::setBossBarProvider);
+    }
+
+    private void registerPermissionsProvider() {
+        Optional<PermissionsProvider> permissionsProvider = Optional.empty();
+
+        if (canRegisterHook("LuckPerms")) {
+            permissionsProvider = createInstance("permissions.PermissionsProvider_LuckPerms");
+        }
+
+        permissionsProvider.ifPresent(this::setPermissionsProvider);
+    }
+
+    private void registerPricesProvider() {
+        String pricesProviderName = plugin.getSettings().getPricesProvider();
+
+        Optional<ShopsProvider> shopsProvider = (pricesProviderName.equalsIgnoreCase("AUTO") ?
+                ShopsProvider.findAvailableProvider() : ShopsProvider.getShopsProvider(pricesProviderName));
+
+        shopsProvider.flatMap(provider -> provider.createInstance(javaPlugin)
+                        .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, provider, shopsBridge)))
+                .ifPresent(this::setPricesProvider);
+    }
+
+    private void registerVanishProvider() {
+        Optional<VanishProvider> vanishProvider = Optional.empty();
+
+        if (canRegisterHook("VanishNoPacket")) {
+            vanishProvider = createInstance("vanish.VanishProvider_VanishNoPacket");
+        } else if (canRegisterHook("SuperVanish") ||
+                canRegisterHook("PremiumVanish")) {
+            vanishProvider = createInstance("vanish.VanishProvider_SuperVanish");
+        } else if (canRegisterHook("Essentials")) {
+            vanishProvider = createInstance("vanish.VanishProvider_Essentials");
+        } else if (canRegisterHook("CMI")) {
+            vanishProvider = createInstance("vanish.VanishProvider_CMI");
+        }
+
+        vanishProvider.ifPresent(this::setVanishProvider);
+    }
+
+    private void registerAFKProvider() {
+        if (canRegisterHook("CMI")) {
+            Optional<AFKProvider> afkProvider = createInstance("afk.AFKProvider_CMI");
+            afkProvider.ifPresent(this::addAFKProvider);
+        }
+        if (canRegisterHook("Essentials")) {
+            Optional<AFKProvider> afkProvider = createInstance("afk.AFKProvider_Essentials");
+            afkProvider.ifPresent(this::addAFKProvider);
+        }
+    }
+
+    private void registerAsyncProvider() {
+        if (hasPaperAsyncSupport()) {
+            Optional<AsyncProvider> asyncProviderOptional = createInstance("async.AsyncProvider_Paper");
+            asyncProviderOptional.ifPresent(asyncProvider -> {
+                this.asyncProvider = asyncProvider;
+            });
+        }
+    }
+
+    private void registerEconomyProviders() {
+        if (canRegisterHook("Vault")) {
+            EconomyProvider economyProvider = economyService.get().getEconomyProvider();
+            EconomyProvider bankEconomyProvider = economyService.get().getEconomyProvider();
+
+            if (economyProvider instanceof EconomyProvider_Default ||
+                    bankEconomyProvider instanceof EconomyProvider_Default) {
+                Optional<EconomyProvider> economyProviderOptional = createInstance("economy.EconomyProvider_Vault");
+                economyProviderOptional.ifPresent(newEconomyProvider -> {
+                    if (economyProvider instanceof EconomyProvider_Default)
+                        setEconomyProvider(newEconomyProvider);
+                    if (bankEconomyProvider instanceof EconomyProvider_Default)
+                        setBankEconomyProvider(newEconomyProvider);
+                });
+            }
+        }
+    }
+
+    private void registerPlaceholdersProvider() {
+        List<PlaceholdersProvider> placeholdersProviders = new LinkedList<>();
+
+        if (canRegisterHook("MVdWPlaceholderAPI")) {
+            Optional<PlaceholdersProvider> placeholdersProvider = createInstance("placeholders.PlaceholdersProvider_MVdWPlaceholderAPI");
+            placeholdersProvider.ifPresent(placeholdersProviders::add);
+        }
+        if (canRegisterHook("PlaceholderAPI")) {
+            Optional<PlaceholdersProvider> placeholdersProvider = createInstance("placeholders.PlaceholdersProvider_PlaceholderAPI");
+            placeholdersProvider.ifPresent(placeholdersProviders::add);
+        }
+
+        this.placeholdersService.get().register(placeholdersProviders);
+    }
+
+    private void registerChunksProvider() {
+        if (hasPaperAsyncSupport()) {
+            Optional<ChunksProvider> chunksProviderOptional = createInstance("chunks.ChunksProvider_Paper");
+            chunksProviderOptional.ifPresent(chunksProvider -> {
+                try {
+                    setChunksProvider(chunksProvider);
+                    Log.info("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
+                } catch (Exception error) {
+                    Log.error(error, "Detected PaperSpigot but failed to load async chunk-loading support due to an unexpected error:");
+                }
+            });
+        }
+    }
+
+    private void registerHook(String className) {
+        try {
+            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.external." + className);
+
+            if (!isHookCompatible(clazz))
+                return;
+
+            Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class, JavaPlugin.class);
+            registerMethod.invoke(null, plugin, plugin.getBukkitPlugin());
+        } catch (Throwable error) {
+            if (error.getClass() != UnsupportedClassVersionError.class)
+                Log.error(error, "An unexpected error occurred while registering hook ", className, ":");
+        }
+    }
+
+    protected <T> Optional<T> createInstance(String className) {
+        try {
+            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.external." + className);
+
+            if (!isHookCompatible(clazz))
+                return Optional.empty();
+
+            Constructor<?> constructor = clazz.getConstructor(SuperiorSkyblockPlugin.class, JavaPlugin.class);
+            // noinspection unchecked
+            return Optional.of((T) constructor.newInstance(plugin, plugin.getBukkitPlugin()));
+        } catch (ClassNotFoundException ignored) {
+            return Optional.empty();
+        } catch (Exception error) {
+            Log.entering("ENTER", className);
+            Log.error(error, "An unexpected error occurred while creating hook instance:");
+            return Optional.empty();
+        }
+    }
+
+    protected boolean canRegisterHook(String pluginName) {
+        return Bukkit.getPluginManager().isPluginEnabled(pluginName) && isHookEnabled(pluginName);
+    }
+
+    protected boolean isHookEnabled(String pluginName) {
+        return !plugin.getSettings().getDisabledHooks().contains(pluginName.toLowerCase(Locale.ENGLISH));
+    }
+
+    protected boolean isHookCompatible(Class<?> clazz) {
+        ReflectMethod<Boolean> compatibleMethod = new ReflectMethod<>(clazz, "isCompatible");
+        return !compatibleMethod.isValid() || compatibleMethod.invoke(null);
+    }
+
+    private static boolean hasPaperAsyncSupport() {
+        return new ReflectMethod<>(World.class, "getChunkAtAsync", int.class, int.class).isValid();
+    }
+
+    private static boolean isOldSlimeWorldManager() {
+        try {
+            Class.forName("com.grinderwolf.swm.api.SlimePlugin");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }
+
+    private static boolean hasMiniMessageSupport() {
+        try {
+            Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+            return ServerVersion.isAtLeast(ServerVersion.v1_18);
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }
+
+    private static boolean hasRoseStackerPreSpawnEventSupport() {
+        try {
+            Class.forName("dev.rosewood.rosestacker.event.PreStackedSpawnerSpawnEvent");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }
+
+}

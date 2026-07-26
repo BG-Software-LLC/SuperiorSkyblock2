@@ -8,11 +8,9 @@ dependencies {
     implementation project(":API")
 
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:b1'
-    implementation 'com.bgsoftware.common.updater:Updater:b1'
+    implementation 'com.bgsoftware.common.updater:Updater:b2'
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:b8'
-    implementation 'com.bgsoftware.common.executors:Executors:b3'
-    implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
-    implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
+    implementation 'com.bgsoftware.common.executors:Executors:b4'
     implementation 'com.bgsoftware.common.databasebridge:DatabaseBridge:b2'
 
     // Spigot jars

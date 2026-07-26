@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.core.formatting.impl;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.IFormatter;
-import com.bgsoftware.superiorskyblock.external.text.ITextFormatter;
+import com.bgsoftware.superiorskyblock.bukkit.external.text.ITextFormatter;
 import org.bukkit.ChatColor;
 
 import java.util.LinkedList;

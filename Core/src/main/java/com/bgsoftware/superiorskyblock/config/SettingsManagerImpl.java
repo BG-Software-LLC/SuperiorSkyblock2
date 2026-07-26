@@ -80,7 +80,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         if (!file.exists())
-            plugin.saveResource("config.yml", false);
+            plugin.saveResource("config.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         convertData(cfg);
@@ -724,7 +724,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         if (!file.exists())
-            plugin.saveResource("config.yml", false);
+            plugin.saveResource("config.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
@@ -905,7 +905,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         File file = new File(plugin.getDataFolder(), "interactables.yml");
 
         if (!file.exists())
-            plugin.saveResource("interactables.yml", false);
+            plugin.saveResource("interactables.yml");
 
         CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
 
@@ -927,7 +927,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         File file = new File(plugin.getDataFolder(), "entity-categories.yml");
 
         if (!file.exists())
-            plugin.saveResource("entity-categories.yml", false);
+            plugin.saveResource("entity-categories.yml");
 
         CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
 

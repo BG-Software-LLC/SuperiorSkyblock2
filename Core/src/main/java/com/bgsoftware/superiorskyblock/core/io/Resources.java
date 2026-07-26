@@ -23,7 +23,7 @@ public class Resources {
             //noinspection ResultOfMethodCallIgnored
             dstFile.delete();
 
-        plugin.saveResource(resourcePath, true);
+        plugin.saveResource(resourcePath);
 
         File file = new File(plugin.getDataFolder(), resourcePath);
         //noinspection ResultOfMethodCallIgnored
@@ -48,7 +48,7 @@ public class Resources {
             }
 
             File file = new File(plugin.getDataFolder(), resourcePath);
-            plugin.saveResource(resourcePath, true);
+            plugin.saveResource(resourcePath);
 
             if (!destination.equals(resourcePath)) {
                 File dest = new File(plugin.getDataFolder(), destination);

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.world.chunk;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.executors.IWorker;
 import com.bgsoftware.common.executors.WorkerExecutor;
+import com.bgsoftware.common.executors.IScheduler;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
@@ -90,8 +91,20 @@ public class ChunksProvider {
             chunksExecutor.stop();
     }
 
+    private static final IScheduler SCHEDULER = new IScheduler() {
+
+        public Object createTimer(Runnable runnable, long delay, long interval) {
+            return plugin.getPlatform().getScheduler().runSyncTimer(runnable, delay, interval);
+        }
+
+        public void cancelTask(Object task) {
+            plugin.getPlatform().getScheduler().cancelTask(task);
+        }
+
+    };
+
     public static void start() {
-        chunksExecutor.start(plugin.getBukkitPlugin());
+        chunksExecutor.start(SCHEDULER);
     }
 
     private static class ChunkLoadWorker implements IWorker {

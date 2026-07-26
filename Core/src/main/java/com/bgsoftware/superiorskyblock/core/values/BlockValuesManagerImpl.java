@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -17,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
+import com.bgsoftware.superiorskyblock.service.economy.EconomyService;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
@@ -57,6 +59,13 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         CACHED_BIG_DECIMALS = mapBuilder.build();
     }
 
+    private static final LazyReference<EconomyService> economyService = new LazyReference<EconomyService>() {
+        @Override
+        protected EconomyService create() {
+            return SuperiorSkyblockPlugin.getPlugin().getServices().getService(EconomyService.class);
+        }
+    };
+
     private static final Bindings bindings = createBindings();
 
     private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
@@ -86,7 +95,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         this.customValuesContainer.clear();
 
         loadDefaultValues();
-        plugin.getProviders().addPricesLoadCallback(this::convertWorthValuesToLevels);
+        economyService.get().addPricesLoadCallback(this::convertWorthValuesToLevels);
     }
 
     @Override
@@ -318,7 +327,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         File file = new File(plugin.getDataFolder(), fileName);
 
         if (!file.exists())
-            plugin.saveResource(fileName, true);
+            plugin.saveResource(fileName);
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 

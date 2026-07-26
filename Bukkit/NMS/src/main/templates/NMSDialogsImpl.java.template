@@ -19,7 +19,7 @@ import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyItem;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyText;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
-import com.bgsoftware.superiorskyblock.external.ui.UIProvider_Default;
+import com.bgsoftware.superiorskyblock.bukkit.external.ui.UIProvider_Default;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;

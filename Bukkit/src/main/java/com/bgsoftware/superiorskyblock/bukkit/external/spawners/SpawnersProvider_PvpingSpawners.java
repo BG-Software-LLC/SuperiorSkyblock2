@@ -1,0 +1,72 @@
+package com.bgsoftware.superiorskyblock.bukkit.external.spawners;
+
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
+import skyblock.hassan.plugin.Main;
+import skyblock.hassan.plugin.api.SpawnerStackEvent;
+import skyblock.hassan.plugin.api.SpawnerUnstackEvent;
+import skyblock.hassan.plugin.spawners.StackedSpawner;
+
+public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMetaSpawnerType {
+
+    private final SuperiorSkyblockPlugin plugin;
+    private final Main main;
+
+    public SpawnersProvider_PvpingSpawners(SuperiorSkyblockPlugin plugin, JavaPlugin javaPlugin) {
+        this.plugin = plugin;
+        main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), javaPlugin);
+        Log.info("Using PvpingSpawners as a spawners provider.");
+    }
+
+    @Override
+    public Pair<Integer, String> getSpawner(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+
+        int blockCount = -1;
+        if (Bukkit.isPrimaryThread()) {
+            StackedSpawner stackedSpawner = main.getProps().getStackedSpawner(main, (CreatureSpawner) location.getBlock().getState());
+            blockCount = stackedSpawner.getSize();
+        }
+
+        return new Pair<>(blockCount, null);
+    }
+
+    @SuppressWarnings("unused")
+    private class StackerListener implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerStack(SpawnerStackEvent e) {
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location spawnerLocation = e.getSpawner().getLocation(wrapper.getHandle());
+                island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation(spawnerLocation));
+                if (island != null)
+                    island.handleBlockPlace(spawnerLocation.getBlock(), e.getSpawnerAmount());
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerUnstack(SpawnerUnstackEvent e) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location spawnerLocation = e.getSpawner().getLocation(wrapper.getHandle());
+                Island island = plugin.getGrid().getIslandAt(spawnerLocation);
+                if (island != null)
+                    island.handleBlockBreak(spawnerLocation.getBlock(), e.getSpawnerAmount());
+            }
+        }
+
+    }
+
+}

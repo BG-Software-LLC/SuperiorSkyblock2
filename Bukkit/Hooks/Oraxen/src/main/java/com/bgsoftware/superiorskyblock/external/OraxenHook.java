@@ -16,7 +16,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
+import com.bgsoftware.superiorskyblock.bukkit.external.blocks.ICustomBlocksProvider;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import io.th0rgal.oraxen.api.OraxenFurniture;
 import io.th0rgal.oraxen.api.OraxenItems;

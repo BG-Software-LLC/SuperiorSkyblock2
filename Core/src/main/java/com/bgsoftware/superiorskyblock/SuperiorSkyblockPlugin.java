@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
@@ -38,7 +37,6 @@ import com.bgsoftware.superiorskyblock.core.task.CalcTask;
 import com.bgsoftware.superiorskyblock.core.task.ShutdownTask;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
-import com.bgsoftware.superiorskyblock.external.ProvidersManagerImpl;
 import com.bgsoftware.superiorskyblock.island.GridManagerImpl;
 import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
@@ -76,7 +74,7 @@ import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
-import com.bgsoftware.superiorskyblock.service.BaseServicesHandler;
+import com.bgsoftware.superiorskyblock.service.AbstractServicesHandler;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
@@ -85,7 +83,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -116,7 +113,6 @@ public abstract class SuperiorSkyblockPlugin {
     private final MissionsManagerImpl missionsHandler;
     private final MenusManagerImpl menusHandler;
     private final KeysManagerImpl keysHandler;
-    private final ProvidersManagerImpl providersHandler;
     private final UpgradesManagerImpl upgradesHandler;
     private final CommandsManagerImpl commandsHandler;
     private final ModulesManagerImpl modulesHandler;
@@ -147,13 +143,12 @@ public abstract class SuperiorSkyblockPlugin {
         this.missionsHandler = new MissionsManagerImpl(this, new DefaultMissionsContainer());
         this.menusHandler = new MenusManagerImpl(this);
         this.keysHandler = new KeysManagerImpl(this);
-        this.providersHandler = new ProvidersManagerImpl(this);
         this.upgradesHandler = new UpgradesManagerImpl(this, new DefaultUpgradesContainer());
         this.commandsHandler = new CommandsManagerImpl(this, new PlayerCommandsMap(this), new AdminCommandsMap(this));
         this.modulesHandler = new ModulesManagerImpl(this, new DefaultModulesContainer(this));
         this.settingsHandler = new SettingsManagerImpl(this);
 
-        this.updater = new Updater(getBukkitPlugin(), "superiorskyblock2");
+        this.updater = new Updater("superiorskyblock2", getPluginVersion());
         this.bukkitListeners = new GameListeners(this);
         this.pluginEventsDispatcher = new PluginEventsDispatcher(this);
         this.gameEventsDispatcher = new GameEventsDispatcher(this);
@@ -167,8 +162,6 @@ public abstract class SuperiorSkyblockPlugin {
 
     public void onLoad() {
         pluginEventsDispatcher.registerDefaultListeners();
-
-        DependenciesManager.inject(getBukkitPlugin());
 
         try {
             SuperiorSkyblockAPI.setPluginInstance(getApi());
@@ -221,7 +214,7 @@ public abstract class SuperiorSkyblockPlugin {
     public void onEnable() {
         try {
             if (loadingStage != PluginLoadingStage.LOADED) {
-                ManagerLoadException.handle(new ManagerLoadException("Failed to load " + getDescription().getName() + ".\n" +
+                ManagerLoadException.handle(new ManagerLoadException("Failed to load " + getPluginName() + ".\n" +
                         "Failed on " + loadingStage.next() + "\n\n" +
                         "Shutting down the server...", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN));
                 return;
@@ -259,7 +252,7 @@ public abstract class SuperiorSkyblockPlugin {
             modulesHandler.runModuleLifecycle(ModuleLoadTime.BEFORE_WORLD_CREATION, false);
 
             try {
-                providersHandler.getWorldsProvider().prepareWorlds();
+                prepareWorlds();
             } catch (RuntimeException ex) {
                 ManagerLoadException handlerError = new ManagerLoadException(ex, ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 Log.error(handlerError, "An error occurred while preparing worlds:");
@@ -340,6 +333,8 @@ public abstract class SuperiorSkyblockPlugin {
             Bukkit.shutdown();
         }
     }
+
+    protected abstract void prepareWorlds();
 
     public void onDisable() {
         try {
@@ -424,12 +419,11 @@ public abstract class SuperiorSkyblockPlugin {
         }
     }
 
+
     public void reloadPlugin(PluginReloadReason reloadReason) throws ManagerLoadException {
         if (reloadReason == PluginReloadReason.COMMAND) {
             bukkitListeners.unregisterListeners();
         }
-
-        providersHandler.loadData();
 
         ItemSkulls.readTextures(this);
 
@@ -540,10 +534,6 @@ public abstract class SuperiorSkyblockPlugin {
         return keysHandler;
     }
 
-    public ProvidersManagerImpl getProviders() {
-        return providersHandler;
-    }
-
     public UpgradesManagerImpl getUpgrades() {
         return upgradesHandler;
     }
@@ -605,7 +595,7 @@ public abstract class SuperiorSkyblockPlugin {
      */
     public abstract SuperiorSkyblock getApi();
 
-    public abstract BaseServicesHandler getServices();
+    public abstract AbstractServicesHandler getServices();
 
     public abstract NMSAlgorithms getNMSAlgorithms();
 
@@ -635,35 +625,18 @@ public abstract class SuperiorSkyblockPlugin {
      */
     public abstract String getFileName();
 
-    /*
-     * The following methods are provided by the platform, and are kept with their original names so
-     * the rest of the plugin can keep using them as if they were still inherited from JavaPlugin.
-     */
+    public abstract String getPluginName();
 
-    public String getName() {
-        return getBukkitPlugin().getName();
-    }
+    public abstract File getDataFolder();
 
-    public PluginDescriptionFile getDescription() {
-        return getBukkitPlugin().getDescription();
-    }
+    public abstract Logger getLogger();
 
-    public Logger getLogger() {
-        return getBukkitPlugin().getLogger();
-    }
-
-    public File getDataFolder() {
-        return getBukkitPlugin().getDataFolder();
-    }
+    public abstract String getPluginVersion();
 
     @Nullable
-    public InputStream getResource(String resourcePath) {
-        return getBukkitPlugin().getResource(resourcePath);
-    }
+    public abstract InputStream getResource(String resourcePath);
 
-    public void saveResource(String resourcePath, boolean replace) {
-        getBukkitPlugin().saveResource(resourcePath, replace);
-    }
+    public abstract void saveResource(String resourcePath);
 
     private void loadUpgradeCostLoaders() {
         upgradesHandler.registerUpgradeCostLoader("money", new VaultUpgradeCostLoader());

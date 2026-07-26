@@ -12,7 +12,10 @@ dependencies {
     implementation project(':Core')
     implementation project(':API')
 
+    implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
     implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b22'
+    implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b11:all@jar'
+
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 
     // Spigot jars
@@ -102,6 +105,8 @@ shadowJar {
         // Bukkit's own runtime libraries that must be bundled (they are relocated into
         // com.bgsoftware.superiorskyblock.libs by the root build script)
         include dependency('com.bgsoftware.common.nmsloader:NMSLoader')
+        include dependency('com.bgsoftware.common.dependencies:DependenciesManager')
+        include dependency('com.bgsoftware.common.shopsbridge:ShopsBridge')
         include dependency('org.bstats:bstats-bukkit')
     }
 }

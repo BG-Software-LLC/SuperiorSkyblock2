@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
@@ -25,6 +26,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.service.economy.EconomyService;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -40,9 +42,16 @@ import java.util.function.Supplier;
 
 public class SIslandBank implements IslandBank {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final BigDecimal MONEY_FAILURE = BigDecimal.valueOf(-1);
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<EconomyService> economyService = new LazyReference<EconomyService>() {
+        @Override
+        protected EconomyService create() {
+            return plugin.getServices().getService(EconomyService.class);
+        }
+    };
 
     private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
     private final Island island;
@@ -85,7 +94,7 @@ public class SIslandBank implements IslandBank {
         } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Invalid amount";
         } else {
-            BigDecimal playerBalance = plugin.getProviders().getBankEconomyProvider().getBalance(superiorPlayer);
+            BigDecimal playerBalance = economyService.get().getBankBalance(superiorPlayer);
 
             PluginEvent<PluginEventArgs.IslandBankDeposit> event = PluginEventsFactory.callIslandBankDepositEvent(island, superiorPlayer, amount);
 
@@ -96,8 +105,7 @@ public class SIslandBank implements IslandBank {
             } else if (!canDepositMoney(amount)) {
                 failureReason = "Exceed bank limit";
             } else {
-                EconomyProvider.EconomyResult result = plugin.getProviders()
-                        .withdrawMoneyForBanks(superiorPlayer, amount);
+                EconomyProvider.EconomyResult result = economyService.get().withdrawBankMoney(superiorPlayer, amount);
                 failureReason = result.getErrorMessage();
                 amount = BigDecimal.valueOf(result.getTransactionMoney());
             }
@@ -200,7 +208,7 @@ public class SIslandBank implements IslandBank {
             if (event.isCancelled()) {
                 failureReason = event.getArgs().failureReason;
             } else if (commandsToExecute == null || commandsToExecute.isEmpty()) {
-                EconomyProvider.EconomyResult result = plugin.getProviders().depositMoneyForBanks(superiorPlayer, withdrawAmount);
+                EconomyProvider.EconomyResult result = economyService.get().depositBankMoney(superiorPlayer, withdrawAmount);
                 failureReason = result.getErrorMessage();
                 withdrawAmount = BigDecimal.valueOf(result.getTransactionMoney());
             } else {

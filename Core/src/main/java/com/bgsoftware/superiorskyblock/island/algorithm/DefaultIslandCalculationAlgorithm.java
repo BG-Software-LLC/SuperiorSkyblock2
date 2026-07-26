@@ -22,7 +22,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
-import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
+import com.bgsoftware.superiorskyblock.bukkit.external.blocks.ICustomBlocksProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import org.bukkit.Location;
