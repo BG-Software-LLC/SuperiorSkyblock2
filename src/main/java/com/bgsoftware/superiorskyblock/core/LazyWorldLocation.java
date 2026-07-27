@@ -13,9 +13,16 @@ import org.bukkit.World;
  */
 public class LazyWorldLocation extends Location {
 
+    /**
+     * Incremented every time a world is unloaded. Cached world references that were resolved
+     * with an older generation must be resolved again, as they may point to an unloaded world.
+     */
+    private static int worldsGeneration = 0;
+
     @Nullable
     private String worldName;
     private boolean updatedWorld = false;
+    private int cachedWorldsGeneration = 0;
 
     public static LazyWorldLocation of(Location location) {
         if (location instanceof LazyWorldLocation)
@@ -58,7 +65,7 @@ public class LazyWorldLocation extends Location {
 
     @Override
     public World getWorld() {
-        if (!this.updatedWorld) {
+        if (!this.updatedWorld || this.cachedWorldsGeneration != worldsGeneration) {
             updateWorldInternal(worldName == null ? null : Bukkit.getWorld(worldName));
         }
 
@@ -74,6 +81,7 @@ public class LazyWorldLocation extends Location {
     private void updateWorldInternal(@Nullable World world) {
         super.setWorld(world);
         this.updatedWorld = true;
+        this.cachedWorldsGeneration = worldsGeneration;
     }
 
     @Override
@@ -84,6 +92,23 @@ public class LazyWorldLocation extends Location {
     public Location clone(boolean keepLazy) {
         return keepLazy || getWorld() == null ? new LazyWorldLocation(this.worldName, getX(), getY(), getZ(), getYaw(), getPitch()) :
                 super.clone();
+    }
+
+    /**
+     * Invalidates all cached world references of lazy locations.
+     * Must be called whenever a world is unloaded, as accessing blocks or chunks of an unloaded
+     * world throws an exception - its chunk-system is shut down.
+     */
+    public static void notifyWorldUnloaded() {
+        ++worldsGeneration;
+    }
+
+    /**
+     * Checks whether the given world is currently loaded on the server.
+     * A reference of an unloaded world may still be held by objects, but must never be accessed.
+     */
+    public static boolean isWorldLoaded(@Nullable World world) {
+        return world != null && Bukkit.getWorld(world.getName()) == world;
     }
 
     public static String getWorldName(Location location) {

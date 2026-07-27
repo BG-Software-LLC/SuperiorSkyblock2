@@ -66,7 +66,13 @@ public class StackedBlock {
         }
 
         World world = this.location.getWorld();
-        if (world == null)
+        // The world may have been unloaded while the stacked block is still tracked.
+        if (!LazyWorldLocation.isWorldLoaded(world))
+            return;
+
+        // We do not want to force-load the chunk of the block just to update its hologram.
+        // On unloaded worlds such a request throws an exception, as their chunk-system is shut down.
+        if (!world.isChunkLoaded(this.location.getBlockX() >> 4, this.location.getBlockZ() >> 4))
             return;
 
         Key currentBlockKey = Keys.of(location.getBlock());
