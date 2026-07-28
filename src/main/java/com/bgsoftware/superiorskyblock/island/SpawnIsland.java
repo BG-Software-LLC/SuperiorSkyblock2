@@ -641,7 +641,7 @@ public class SpawnIsland implements Island {
         if (bukkitWorld == null || !bukkitWorld.equals(this.spawnWorld))
             return false;
 
-        return this.islandArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+        return this.islandArea.expandAndIntercepts(location.getX(), location.getZ(), extraRadius);
     }
 
     @Override

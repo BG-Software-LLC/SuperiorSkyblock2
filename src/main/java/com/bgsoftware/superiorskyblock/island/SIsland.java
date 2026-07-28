@@ -1251,7 +1251,7 @@ public class SIsland implements Island {
     @Override
     public boolean isInside(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        return isIslandWorld(location) && this.entireArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+        return isIslandWorld(location) && this.entireArea.expandAndIntercepts(location.getX(), location.getZ(), extraRadius);
     }
 
     @Override
@@ -1352,7 +1352,7 @@ public class SIsland implements Island {
     @Override
     public boolean isInsideRange(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        return isIslandWorld(location) && this.protectedArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+        return isIslandWorld(location) && this.protectedArea.expandAndIntercepts(location.getX(), location.getZ(), extraRadius);
     }
 
     @Override
