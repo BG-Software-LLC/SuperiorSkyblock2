@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import com.bgsoftware.superiorskyblock.api.enums.GeneratorHint;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -74,6 +75,7 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
     public static abstract class BaseDimensionConfig implements DimensionConfig {
 
         private final boolean isEnabled;
+        private final GeneratorHint generatorHint;
         private final boolean isUnlocked;
         private final boolean isSchematicOffset;
         private final String biome;
@@ -82,6 +84,15 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
 
         protected BaseDimensionConfig(ConfigurationSection section, Dimension dimension, String defaultName) {
             this.isEnabled = section.getBoolean("enabled");
+            String generatorHintStr = section.getString("generator-hint", "VOID");
+            GeneratorHint generatorHint;
+            try {
+                generatorHint = GeneratorHint.valueOf(generatorHintStr.toUpperCase());
+            } catch (Exception error) {
+                Log.warnFromFile("config.yml", "Invalid generator hint ", generatorHintStr, " - using VOID instead.");
+                generatorHint = GeneratorHint.VOID;
+            }
+            this.generatorHint = generatorHint;
             this.isUnlocked = section.getBoolean("unlock");
             this.isSchematicOffset = section.getBoolean("schematic-offset");
             this.biome = section.getString("biome");
@@ -147,6 +158,11 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
         @Override
         public boolean isEnabled() {
             return this.isEnabled;
+        }
+
+        @Override
+        public GeneratorHint getGeneratorHint() {
+            return this.generatorHint;
         }
 
         @Override
