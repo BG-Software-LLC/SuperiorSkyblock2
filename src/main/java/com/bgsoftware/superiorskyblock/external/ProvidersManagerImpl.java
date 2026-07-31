@@ -87,7 +87,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
-    private UIProvider uiProvider = new UIProvider_Default();
+    private UIProvider uiProvider;
     private BossBarProvider bossBarsProvider = new BossBarProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = new PricesProvider_Default();
@@ -116,6 +116,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     public ProvidersManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
+        this.uiProvider = new UIProvider_Default(plugin);
         setWorldsProviderInternal(new WorldsProvider_Default(plugin));
         this.menusProvider = new MenusProvider_Default(plugin);
     }

@@ -24,20 +24,25 @@ import java.util.Optional;
 
 public class UIProvider_Default extends BaseUIProvider {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final SuperiorSkyblockPlugin plugin;
+
+    public UIProvider_Default(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public IMessageComponent createActionBarComponent(@Nullable String message) {
-        return ActionBarComponent.of(message);
+        return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new ActionBarComponent(message);
     }
 
     @Override
     public IMessageComponent createComplexMessageComponent(@Nullable String message, @Nullable String command,
                                                            @Nullable String suggest, @Nullable String tooltip) {
         if (command == null && suggest == null && tooltip == null) {
-            return RawMessageComponent.of(message);
+            return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
         } else {
-            return ComplexMessageComponent.of(message, command, suggest, tooltip);
+            return Text.isBlank(message) ? EmptyMessageComponent.getInstance() :
+                    new ComplexMessageComponent(message, command, suggest, tooltip);
         }
     }
 
@@ -68,7 +73,8 @@ public class UIProvider_Default extends BaseUIProvider {
     @Override
     public IMessageComponent createTitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage,
                                                   int fadeIn, int stay, int fadeOut) {
-        return TitleComponent.of(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
+        return stay <= 0 || (Text.isBlank(titleMessage) && Text.isBlank(subtitleMessage)) ?
+                EmptyMessageComponent.getInstance() : new TitleComponent(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
     }
 
     @Override
@@ -91,11 +97,7 @@ public class UIProvider_Default extends BaseUIProvider {
         return Bukkit.createInventory(inventoryHolder, inventoryType, title);
     }
 
-    private static class ActionBarComponent extends BaseMessageComponent {
-
-        public static IMessageComponent of(@Nullable String message) {
-            return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new ActionBarComponent(message);
-        }
+    private class ActionBarComponent extends BaseMessageComponent {
 
         private ActionBarComponent(String message) {
             super(Type.ACTION_BAR, message);
@@ -114,11 +116,7 @@ public class UIProvider_Default extends BaseUIProvider {
 
     }
 
-    private static class RawMessageComponent extends BaseMessageComponent {
-
-        public static IMessageComponent of(@Nullable String message) {
-            return Text.isBlank(message) ? EmptyMessageComponent.getInstance() : new RawMessageComponent(message);
-        }
+    private class RawMessageComponent extends BaseMessageComponent {
 
         private RawMessageComponent(String message) {
             super(Type.RAW_MESSAGE, message);
@@ -132,16 +130,10 @@ public class UIProvider_Default extends BaseUIProvider {
 
     }
 
-    private static class ComplexMessageComponent extends BaseMessageComponent {
+    private class ComplexMessageComponent extends BaseMessageComponent {
 
         private final Optional<MessageContent> hoverEvent;
         private final Optional<Pair<ClickEvent.Action, MessageContent>> clickEvent;
-
-        public static IMessageComponent of(@Nullable String message, @Nullable String command,
-                                           @Nullable String suggest, @Nullable String tooltip) {
-            return Text.isBlank(message) ? EmptyMessageComponent.getInstance() :
-                    new ComplexMessageComponent(message, command, suggest, tooltip);
-        }
 
         private ComplexMessageComponent(String message, @Nullable String command, @Nullable String suggest,
                                         @Nullable String tooltip) {
@@ -192,20 +184,12 @@ public class UIProvider_Default extends BaseUIProvider {
 
     }
 
-    private static class TitleComponent extends BaseMessageComponent {
-
-        private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private class TitleComponent extends BaseMessageComponent {
 
         private final MessageContent subtitleContent;
         private final int fadeIn;
         private final int stay;
         private final int fadeOut;
-
-        public static IMessageComponent of(@Nullable String titleMessage, @Nullable String subtitleMessage,
-                                           int fadeIn, int stay, int fadeOut) {
-            return stay <= 0 || (Text.isBlank(titleMessage) && Text.isBlank(subtitleMessage)) ?
-                    EmptyMessageComponent.getInstance() : new TitleComponent(titleMessage, subtitleMessage, fadeIn, stay, fadeOut);
-        }
 
         private TitleComponent(@Nullable String titleMessage, @Nullable String subtitleMessage, int fadeIn, int stay, int fadeOut) {
             super(Type.TITLE, titleMessage);
