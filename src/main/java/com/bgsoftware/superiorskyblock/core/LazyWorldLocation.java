@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * LazyWorldLocation will update the world again if it's null on initialize.
  */
@@ -17,7 +19,7 @@ public class LazyWorldLocation extends Location {
      * Incremented every time a world is unloaded. Cached world references that were resolved
      * with an older generation must be resolved again, as they may point to an unloaded world.
      */
-    private static long worldsGeneration = Long.MIN_VALUE;
+    private static final AtomicLong worldsGeneration = new AtomicLong(Long.MIN_VALUE);
 
     @Nullable
     private String worldName;
@@ -65,7 +67,7 @@ public class LazyWorldLocation extends Location {
 
     @Override
     public World getWorld() {
-        if (!this.updatedWorld || this.cachedWorldsGeneration != worldsGeneration) {
+        if (!this.updatedWorld || this.cachedWorldsGeneration != worldsGeneration.get()) {
             updateWorldInternal(worldName == null ? null : Bukkit.getWorld(worldName));
         }
 
@@ -81,7 +83,7 @@ public class LazyWorldLocation extends Location {
     private void updateWorldInternal(@Nullable World world) {
         super.setWorld(world);
         this.updatedWorld = true;
-        this.cachedWorldsGeneration = worldsGeneration;
+        this.cachedWorldsGeneration = worldsGeneration.get();
     }
 
     @Override
@@ -100,7 +102,7 @@ public class LazyWorldLocation extends Location {
      * world throws an exception - its chunk-system is shut down.
      */
     public static void notifyWorldUnloaded() {
-        ++worldsGeneration;
+        worldsGeneration.incrementAndGet();
     }
 
     /**
