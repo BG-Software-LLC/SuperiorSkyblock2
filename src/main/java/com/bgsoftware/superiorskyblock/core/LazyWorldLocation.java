@@ -17,12 +17,12 @@ public class LazyWorldLocation extends Location {
      * Incremented every time a world is unloaded. Cached world references that were resolved
      * with an older generation must be resolved again, as they may point to an unloaded world.
      */
-    private static int worldsGeneration = 0;
+    private static long worldsGeneration = Long.MIN_VALUE;
 
     @Nullable
     private String worldName;
     private boolean updatedWorld = false;
-    private int cachedWorldsGeneration = 0;
+    private long cachedWorldsGeneration = Long.MIN_VALUE;
 
     public static LazyWorldLocation of(Location location) {
         if (location instanceof LazyWorldLocation)
