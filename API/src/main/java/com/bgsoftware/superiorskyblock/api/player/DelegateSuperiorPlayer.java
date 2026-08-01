@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
 import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -187,6 +188,11 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
+        this.handle.teleportWithResult(location, teleportResult);
+    }
+
+    @Override
     public void teleport(Island island) {
         this.handle.teleport(island);
     }
@@ -197,13 +203,23 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void teleportWithResult(Island island, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
+        this.handle.teleportWithResult(island, teleportResult);
+    }
+
+    @Override
     public void teleport(Island island, Dimension dimension) {
         this.handle.teleport(island, dimension);
     }
 
     @Override
-    public void teleport(Island island, Dimension dimension, Consumer<Boolean> teleportResult) {
+    public void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult) {
         this.handle.teleport(island, dimension, teleportResult);
+    }
+
+    @Override
+    public void teleportWithResult(Island island, Dimension dimension, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
+        this.handle.teleportWithResult(island, dimension, teleportResult);
     }
 
     @Override

@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
@@ -4797,8 +4798,8 @@ public class SIsland implements Island {
             return;
         }
 
-        superiorPlayer.teleport(location, success -> {
-            if (success) {
+        superiorPlayer.teleportWithResult(location, result -> {
+            if (result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
                 Message.TELEPORTED_TO_WARP.send(superiorPlayer);
                 if (superiorPlayer.isShownAsOnline()) {
                     IslandUtils.sendMessage(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
