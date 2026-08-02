@@ -826,7 +826,7 @@ WARP_SET_OUTSIDE_ISLAND: '&c&lError | &7You cannot set warps outside your island
 WARP_SIGN_DEACTIVATED: '&7&oThe sign linked to this warp has been deactivated...'
 WARP_SIGN_EDIT: '&c&lError | &7You cannot edit this sign because it is linked to the warp.'
 WARP_TELEPORT_ANNOUNCEMENT: '&e&lWarps | &7The player {0} teleported to your warp {1}.'
-WARP_TELEPORT_SUCCESS: '&e&lWarps | &7Successfully teleported to the warp {1} of the {0}''s island'
+WARP_TELEPORT_SUCCESS: '&e&lWarps | &7Successfully teleported to the warp {1} of the {0}''s island.'
 WARP_TELEPORT_SUCCESS_NAME: '&e&lWarps | &7Successfully teleported to the warp {1} of the island {0}.'
 WARP_TELEPORT_UNSAFE: '&c&lError | &7You cannot teleport to that warp because the location is unsafe.'
 WITHDRAW_ALL_MONEY: |-
