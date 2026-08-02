@@ -4,22 +4,16 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.IslandNames;
-import org.bukkit.ChatColor;
+import com.bgsoftware.superiorskyblock.module.visit.utils.VisitUtils;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-
-import java.util.List;
 
 public class IslandSigns {
 
@@ -29,26 +23,51 @@ public class IslandSigns {
 
     }
 
-    public static Result handleSignPlace(SuperiorPlayer superiorPlayer, Location warpLocation, String[] warpLines,
-                                         boolean sendMessage) {
+    public static Result handleSignPlace(@Nullable SuperiorPlayer superiorPlayer, Location location, String[] lines) {
         // Adjust to the middle of the block
-        warpLocation.add(0.5, 0, 0.5);
+        location.add(0.5, 0, 0.5);
 
-        Island island = plugin.getGrid().getIslandAt(warpLocation);
-        if (island == null)
+        Island island = plugin.getGrid().getIslandAt(location);
+
+        if (island == null) {
             return new Result(Reason.NOT_IN_ISLAND, false);
+        }
 
-        superiorPlayer.runIfOnline(player -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                warpLocation.setYaw(player.getLocation(wrapper.getHandle()).getYaw());
+        IslandWarp islandWarp = island.getWarp(location);
+
+        if (islandWarp != null) {
+            Message.WARP_SIGN_EDIT.send(superiorPlayer);
+
+            return new Result(Reason.SIGN_EDIT, true);
+        } else {
+            Dimension dimension = plugin.getGrid().getIslandsWorldDimension(location.getWorld());
+
+            if (isSamePosition(island.getVisitorsLocation(dimension), location)) {
+                Message.VISITOR_HOME_SIGN_EDIT.send(superiorPlayer);
+
+                return new Result(Reason.SIGN_EDIT, true);
             }
-        });
+        }
 
-        if (isWarpSign(warpLines[0])) {
-            Reason reason = handleWarpSignPlace(superiorPlayer, island, warpLocation, warpLines, sendMessage);
+        // If the sign was placed by a player, we set the location's yaw to the player's yaw.
+        // We do not do this when the sign is placed during island creation, it doesn't make sense.
+        if (superiorPlayer != null) {
+            superiorPlayer.runIfOnline(player -> {
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    location.setYaw(player.getLocation(wrapper.getHandle()).getYaw());
+                }
+            });
+        }
+
+        if (WarpsUtils.isWarpSignCreateLine(lines[0])) {
+            Reason reason = WarpsUtils.handleWarpSignPlace(superiorPlayer, island, location, lines);
+
             return new Result(reason, true);
-        } else if (isVisitorsSign(warpLines[0])) {
-            return handleVisitorsSignPlace(superiorPlayer, island, warpLocation, warpLines, sendMessage);
+        } else if (VisitUtils.isVisitorSignCreateLine(lines[0])) {
+            Dimension dimension = plugin.getGrid().getIslandsWorldDimension(location.getWorld());
+            Reason reason = VisitUtils.handleSignPlace(superiorPlayer, island, dimension, location, lines);
+
+            return new Result(reason, true);
         }
 
         return new Result(Reason.SUCCESS, false);
@@ -56,27 +75,36 @@ public class IslandSigns {
 
     public static Result handleSignBreak(@Nullable Island island, @Nullable SuperiorPlayer superiorPlayer, Sign sign) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location signLocation = sign.getLocation(wrapper.getHandle());
+            Location location = sign.getLocation(wrapper.getHandle());
 
             if (island == null) {
-                island = plugin.getGrid().getIslandAt(signLocation);
-                if (island == null)
+                island = plugin.getGrid().getIslandAt(location);
+
+                if (island == null) {
                     return new Result(Reason.NOT_IN_ISLAND, false);
+                }
             }
 
-            IslandWarp islandWarp = island.getWarp(signLocation);
+            String[] lines = sign.getLines();
+            IslandWarp islandWarp = island.getWarp(location);
 
-            if (islandWarp != null) {
-                if (!PluginEventsFactory.callIslandDeleteWarpEvent(island, superiorPlayer, islandWarp))
+            if (islandWarp != null && WarpsUtils.isWarpSignLines(islandWarp, lines)) {
+                if (!PluginEventsFactory.callIslandDeleteWarpEvent(island, superiorPlayer, islandWarp)) {
                     return new Result(Reason.EVENT_CANCELLED, true);
+                }
 
-                island.deleteWarp(superiorPlayer, signLocation);
+                island.deleteWarp(superiorPlayer, location);
             } else {
-                if (sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())) {
-                    if (!PluginEventsFactory.callIslandRemoveVisitorHomeEvent(island, superiorPlayer))
-                        return new Result(Reason.EVENT_CANCELLED, true);
+                Dimension dimension = plugin.getGrid().getIslandsWorldDimension(location.getWorld());
 
-                    island.setVisitorsLocation(null);
+                if (isSamePosition(island.getVisitorsLocation(dimension), location) && VisitUtils.isVisitorSignLines(lines)) {
+                    if (!PluginEventsFactory.callIslandRemoveVisitorHomeEvent(island, superiorPlayer)) {
+                        return new Result(Reason.EVENT_CANCELLED, true);
+                    }
+
+                    island.setVisitorsLocation(dimension, null);
+
+                    Message.VISITOR_HOME_REMOVE.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
                 }
             }
         }
@@ -84,112 +112,22 @@ public class IslandSigns {
         return new Result(Reason.SUCCESS, false);
     }
 
-    private static Reason handleWarpSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation,
-                                              String[] signLines, boolean sendMessage) {
-        int warpsLimit = island.getWarpsLimit();
-        if (warpsLimit >= 0 && island.getIslandWarps().size() >= warpsLimit) {
-            if (sendMessage)
-                Message.NO_MORE_WARPS.send(superiorPlayer);
-
-            return Reason.LIMIT_REACHED;
+    private static boolean isSamePosition(Location location1, Location location2) {
+        if (location1 == null || location2 == null) {
+            return false;
         }
 
-        String warpName = Formatters.STRIP_COLOR_FORMATTER.format(signLines[1].trim());
-        boolean privateFlag = signLines[2].equalsIgnoreCase("private");
-
-        Reason result = Reason.SUCCESS;
-
-        if (!IslandNames.isValidWarpName(superiorPlayer, island, warpName, sendMessage))
-            result = Reason.INVALID_NAME;
-
-        if (!PluginEventsFactory.callIslandCreateWarpEvent(island, superiorPlayer, warpName, warpLocation, !privateFlag, null))
-            result = Reason.EVENT_CANCELLED;
-
-        if (result != Reason.SUCCESS)
-            return result;
-
-        List<String> signWarp = plugin.getSettings().getSignWarp();
-
-        for (int i = 0; i < signWarp.size(); i++)
-            signLines[i] = signWarp.get(i).replace("{0}", warpName);
-
-        IslandWarp islandWarp = island.createWarp(warpName, warpLocation, null);
-        islandWarp.setPrivateFlag(privateFlag);
-        if (sendMessage)
-            Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(warpLocation));
-
-        return Reason.SUCCESS;
-    }
-
-    private static Result handleVisitorsSignPlace(SuperiorPlayer superiorPlayer, Island island, Location visitorsLocation,
-                                                  String[] warpLines, boolean sendMessage) {
-        int warpsLimit = island.getWarpsLimit();
-        if (warpsLimit >= 0 && island.getIslandWarps().size() >= warpsLimit) {
-            if (sendMessage)
-                Message.NO_MORE_WARPS.send(superiorPlayer);
-
-            return new Result(Reason.LIMIT_REACHED, true);
-        }
-
-        PluginEvent<PluginEventArgs.IslandSetVisitorHome> setVisitorHomeEvent =
-                PluginEventsFactory.callIslandSetVisitorHomeEvent(island, superiorPlayer, visitorsLocation);
-
-        if (setVisitorHomeEvent.isCancelled())
-            return new Result(Reason.EVENT_CANCELLED, false);
-
-        StringBuilder descriptionBuilder = new StringBuilder();
-
-        for (int i = 1; i < 4; i++) {
-            String line = warpLines[i];
-            if (!line.isEmpty()) {
-                String formattedLine = plugin.getSettings().getVisitorsSign().getDescriptionLineFormat().replace("{0}", line);
-                Text.appendWithLine(descriptionBuilder, ChatColor.RESET).append(formattedLine);
-            }
-        }
-
-        String description = descriptionBuilder.toString();
-
-        warpLines[0] = plugin.getSettings().getVisitorsSign().getActive();
-
-        for (int i = 1; i <= 3; i++)
-            warpLines[i] = Formatters.COLOR_FORMATTER.format(warpLines[i]);
-
-        Location islandVisitorsLocation = island.getVisitorsLocation(null /* unused */);
-        Block oldWelcomeSignBlock = islandVisitorsLocation == null ? null : islandVisitorsLocation.getBlock();
-
-        if (oldWelcomeSignBlock != null && Materials.isSign(oldWelcomeSignBlock.getType())) {
-            Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
-            oldWelcomeSign.setLine(0, plugin.getSettings().getVisitorsSign().getInactive());
-            oldWelcomeSign.update();
-        }
-
-        island.setVisitorsLocation(setVisitorHomeEvent.getArgs().islandVisitorHome);
-
-        PluginEvent<PluginEventArgs.IslandChangeDescription> changeDescriptionEvent =
-                PluginEventsFactory.callIslandChangeDescriptionEvent(island, superiorPlayer, description);
-
-        if (!changeDescriptionEvent.isCancelled())
-            island.setDescription(changeDescriptionEvent.getArgs().description);
-
-        if (sendMessage)
-            Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(visitorsLocation));
-
-        return new Result(Reason.SUCCESS, true);
-    }
-
-    private static boolean isWarpSign(String firstSignLine) {
-        return firstSignLine.equalsIgnoreCase(plugin.getSettings().getSignWarpLine());
-    }
-
-    private static boolean isVisitorsSign(String firstSignLine) {
-        return firstSignLine.equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getLine());
+        return location1.getBlockX() == location2.getBlockX() && location1.getBlockY() == location2.getBlockY()
+                && location1.getBlockZ() == location2.getBlockZ();
     }
 
     public enum Reason {
 
         NOT_IN_ISLAND,
-        INVALID_NAME,
+        SIGN_EDIT,
+        NOT_DEFAULT_DIMENSION,
         LIMIT_REACHED,
+        INVALID_NAME,
         EVENT_CANCELLED,
         SUCCESS
 

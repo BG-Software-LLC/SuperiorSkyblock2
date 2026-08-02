@@ -270,7 +270,7 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void placeSign(Island island, Location location) {
+    public void placeSign(Location location) {
         TileEntitySign tileEntitySign = NMSUtils.getTileEntityAt(location, TileEntitySign.class);
         if (tileEntitySign == null)
             return;
@@ -283,7 +283,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         IChatBaseComponent[] newLines;
 
-        IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, strippedLines, false);
+        IslandSigns.Result result = IslandSigns.handleSignPlace(null, location, strippedLines);
         if (result.isCancelEvent()) {
             newLines = CraftSign.sanitizeLines(strippedLines);
         } else {

@@ -21,11 +21,9 @@ previous-page: '%'
 current-page: '*'
 next-page: '^'
 
-# This lore is added to category icons.
+# Lore that will be appended to the end of the warp category icon's lore
+# if the player has permission to manage that warp category.
 edit-lore:
-  - '&f '
-  - '&f '
-  - '&7&o(( &f&oLeft-Click &7&oto see island warps. ))'
   - '&7&o(( &f&oRight-Click &7&oto edit the category. ))'
 
 items:
@@ -34,6 +32,8 @@ items:
     name: '&6{0}'
     lore:
       - '&7This category has {1} warps.'
+      - ''
+      - '&7&o(( &f&oClick &7&oto see island warps. ))'
   '%':
     type: PAPER
     name: '&cPrevious Page'
@@ -49,3 +49,9 @@ items:
     type: STAINED_GLASS_PANE
     data: 15
     name: '&f'
+
+sounds:
+  '@':
+    type: ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

@@ -121,9 +121,9 @@ public class SchematicBlock {
         return id != null && isSignId(id);
     }
 
-    public void doPostPlace(Island island) {
+    public void doPostPlace() {
         try {
-            plugin.getNMSWorld().placeSign(island, location);
+            plugin.getNMSWorld().placeSign(location);
         } finally {
             this.tileEntityData = null;
         }

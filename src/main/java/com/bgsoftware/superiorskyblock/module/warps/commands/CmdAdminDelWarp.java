@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands.admin;
+package com.bgsoftware.superiorskyblock.module.warps.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.warp.SignWarp;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -65,16 +65,18 @@ public class CmdAdminDelWarp implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
         IslandWarp islandWarp = CommandArguments.getWarp(sender, island, args, 3);
 
-        if (islandWarp == null)
+        if (islandWarp == null) {
             return;
+        }
 
-        if (!PluginEventsFactory.callIslandDeleteWarpEvent(islandWarp.getIsland(), sender, islandWarp))
+        if (!PluginEventsFactory.callIslandDeleteWarpEvent(islandWarp.getIsland(), sender, islandWarp)) {
             return;
+        }
 
         island.deleteWarp(islandWarp.getName());
-        Message.DELETE_WARP.send(sender, islandWarp.getName());
+        Message.WARP_DELETE.send(sender, islandWarp.getName());
 
-        SignWarp.trySignWarpBreak(islandWarp, sender);
+        WarpsUtils.deactivateWarpSign(islandWarp, sender);
     }
 
     @Override

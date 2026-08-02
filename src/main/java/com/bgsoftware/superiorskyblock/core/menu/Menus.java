@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmTransfer;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuControlPanel;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCoops;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuDimensionSelection;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandBannedPlayers;
@@ -33,6 +34,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissions;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuPlayerLanguage;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuVisitIslands;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryIconEdit;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
@@ -61,6 +63,7 @@ public class Menus {
     public static MenuControlPanel MENU_CONTROL_PANEL;
     public static MenuCoops MENU_COOPS;
     public static MenuCounts MENU_COUNTS;
+    public static MenuDimensionSelection MENU_DIMENSION_SELECTION;
     public static MenuGlobalWarps MENU_GLOBAL_WARPS;
     public static MenuIslandBank MENU_ISLAND_BANK;
     public static MenuIslandBannedPlayers MENU_ISLAND_BANNED_PLAYERS;
@@ -81,6 +84,7 @@ public class Menus {
     public static MenuMissionsCategory MENU_MISSIONS_CATEGORY;
     public static MenuPlayerLanguage MENU_PLAYER_LANGUAGE;
     public static MenuTopIslands MENU_TOP_ISLANDS;
+    public static MenuVisitIslands MENU_VISIT_ISLANDS;
     public static MenuWarpCategories MENU_WARP_CATEGORIES;
     public static MenuWarpCategoryIconEdit MENU_WARP_CATEGORY_ICON_EDIT;
     public static MenuWarpCategoryManage MENU_WARP_CATEGORY_MANAGE;
@@ -108,6 +112,7 @@ public class Menus {
         MENU_CONTROL_PANEL = createMenu(MenuControlPanel.createInstance());
         MENU_COOPS = createMenu(MenuCoops.createInstance());
         MENU_COUNTS = createMenu(MenuCounts.createInstance());
+        MENU_DIMENSION_SELECTION = createMenu(MenuDimensionSelection.createInstance());
         MENU_GLOBAL_WARPS = createMenu(MenuGlobalWarps.createInstance());
         MENU_ISLAND_BANK = createMenu(MenuIslandBank.createInstance());
         MENU_ISLAND_BANNED_PLAYERS = createMenu(MenuIslandBannedPlayers.createInstance());
@@ -128,6 +133,7 @@ public class Menus {
         MENU_MISSIONS_CATEGORY = createMenu(MenuMissionsCategory.createInstance());
         MENU_PLAYER_LANGUAGE = createMenu(MenuPlayerLanguage.createInstance());
         MENU_TOP_ISLANDS = createMenu(MenuTopIslands.createInstance());
+        MENU_VISIT_ISLANDS = createMenu(MenuVisitIslands.createInstance());
         MENU_WARP_CATEGORIES = createMenu(MenuWarpCategories.createInstance());
         MENU_WARP_CATEGORY_ICON_EDIT = createMenu(MenuWarpCategoryIconEdit.createInstance());
         MENU_WARP_CATEGORY_MANAGE = createMenu(MenuWarpCategoryManage.createInstance());

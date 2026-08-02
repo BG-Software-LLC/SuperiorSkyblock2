@@ -22,7 +22,7 @@ public interface IslandWarp {
 
     /**
      * Set the name of the warp.
-     * Do not call this method - use Island#renameWarp instead!
+     * Do not call this method - use {@link Island#renameWarp(IslandWarp, String)} instead!
      *
      * @param name The new name to set.
      */
@@ -43,6 +43,7 @@ public interface IslandWarp {
 
     /**
      * Set the location of the warp.
+     * Do not call this method - use {@link Island#relocateWarp(IslandWarp, Location)}  instead!
      *
      * @param location The new location to set.
      */

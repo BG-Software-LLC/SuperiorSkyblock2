@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
@@ -13,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonI
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.inventory.ItemStack;
 
 public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuWarpCategories.View, WarpCategory> {
@@ -28,32 +28,34 @@ public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuW
         }
 
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
-        Island island = menuView.getIsland();
 
-        boolean isMember = island.isMember(inventoryViewer);
+        boolean isMember = menuView.getIsland().isMember(inventoryViewer);
         long accessAmount = pagedObject.getWarps().stream().filter(
                 islandWarp -> isMember || !islandWarp.hasPrivateFlag()
         ).count();
 
-        if (accessAmount == 0)
+        if (accessAmount == 0) {
             return null;
-
-        ItemStack icon = pagedObject.getIcon(inventoryViewer);
-        ItemBuilder itemBuilder = new ItemBuilder(icon == null ? buttonItem : icon);
-
-        if (menuView.hasManagePerms() && !Menus.MENU_WARP_CATEGORIES.getEditLore().isEmpty()) {
-            itemBuilder.appendLore(Menus.MENU_WARP_CATEGORIES.getEditLore());
         }
 
-        return itemBuilder.replaceAll("{0}", pagedObject.getName())
-                .replaceAll("{1}", pagedObject.getWarps().size() + "").build(inventoryViewer);
+        ItemStack icon = pagedObject.getIcon(inventoryViewer);
+        ItemBuilder newItemBuilder = icon == null ? itemBuilder : new ItemBuilder(icon);
+
+        if (BuiltinModules.WARPS.getConfiguration().isMenusWarpCategoryManageEnabled()
+                && menuView.hasManagePerms() && !Menus.MENU_WARP_CATEGORIES.getEditLore().isEmpty()) {
+            newItemBuilder.appendLore(Menus.MENU_WARP_CATEGORIES.getEditLore());
+        }
+
+        return newItemBuilder.replaceAll("{0}", pagedObject.getName())
+                .replaceAll("{1}", accessAmount + "").build(inventoryViewer);
     }
 
     @Override
     public void onButtonClick(ButtonClickContext<MenuWarpCategories.View> context) {
         menuView.setPreviousMove(false);
 
-        if (menuView.hasManagePerms() && context.getClickType().isRightClick()) {
+        if (BuiltinModules.WARPS.getConfiguration().isMenusWarpCategoryManageEnabled()
+                && menuView.hasManagePerms() && context.getClickType().isRightClick()) {
             plugin.getMenus().openWarpCategoryManage(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), pagedObject);
         } else {
             plugin.getMenus().openWarps(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), pagedObject);

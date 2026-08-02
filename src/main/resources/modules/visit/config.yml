@@ -1,0 +1,55 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# Whether the module should be enabled.
+# When disabled, all module commands and features will also be disabled.
+enabled: true
+
+# Whether visitor homes should only exist in the default dimension.
+# When disabled, islands will have a visitor home in every dimension.
+only-default-dimension: false
+
+# The teleport warmup before teleporting to a visitor home (in milliseconds).
+# Players cannot move during the warmup, or the teleportation will be cancelled.
+# You can disable this feature by setting it to 0.
+teleport-warmup: 0
+
+# Settings related to the menus.
+menus:
+  # Whether the visit-islands menu should be enabled.
+  # When disabled, players will only be able to teleport to visitor homes by entering the exact command arguments.
+  visit-islands-enabled: true
+
+  # The sorting type used to determine the order of islands in the visit-islands menu.
+  # The default available sorting types: BANK, LEVEL, PLAYERS, RATING, WORTH
+  # Custom sorting types can be registered using the API.
+  visit-islands-order: "WORTH"
+
+# Settings related to island descriptions.
+descriptions:
+  # Whether island descriptions should be enabled.
+  # When disabled, players will not be able to set island descriptions using visitor signs.
+  enabled: true
+
+  # The format used to save island description lines.
+  # {0} represents the description entered on that line.
+  line-format: "&8 - {0}"
+
+# Settings related to visitor signs.
+signs:
+  # Whether a visitor sign should be required to visit islands.
+  # When disabled, visitors will be teleported to the island's home instead.
+  required-for-visit: true
+
+  # The text that players must enter on the first line of a sign to create a visitor sign.
+  create-line: "[Welcome]"
+
+  # The text that will be displayed on the first line of a sign linked to a visitor home.
+  active-line: "&a[Welcome]"
+
+  # The text that will be displayed on the first line of a sign no longer linked to a visitor home.
+  inactive-line: "&c[Welcome]"

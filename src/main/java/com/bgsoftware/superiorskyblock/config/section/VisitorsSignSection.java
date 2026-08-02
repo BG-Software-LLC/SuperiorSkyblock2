@@ -2,32 +2,38 @@ package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 
 public class VisitorsSignSection extends SettingsContainerHolder implements SettingsManager.VisitorsSign {
 
     @Override
+    @Deprecated
     public boolean isRequiredForVisit() {
-        return getContainer().visitorsSignRequiredForVisit;
+        return BuiltinModules.VISIT.getConfiguration().isSignsRequiredForVisit();
     }
 
     @Override
+    @Deprecated
     public String getLine() {
-        return getContainer().visitorsSignLine;
+        return BuiltinModules.VISIT.getConfiguration().getSignsCreateLine();
     }
 
     @Override
+    @Deprecated
     public String getActive() {
-        return getContainer().visitorsSignActive;
+        return BuiltinModules.VISIT.getConfiguration().getSignsActiveLine();
     }
 
     @Override
+    @Deprecated
     public String getInactive() {
-        return getContainer().visitorsSignInactive;
+        return BuiltinModules.VISIT.getConfiguration().getSignsInactiveLine();
     }
 
     @Override
+    @Deprecated
     public String getDescriptionLineFormat() {
-        return getContainer().visitorsSignDescriptionLineFormat;
+        return BuiltinModules.VISIT.getConfiguration().getDescriptionsLineFormat();
     }
 
 }

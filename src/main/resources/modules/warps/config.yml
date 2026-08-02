@@ -1,0 +1,92 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# Whether the module should be enabled.
+# When disabled, all module commands and features will also be disabled.
+enabled: true
+
+# Whether unsafe warps should be deleted.
+# When enabled, unsafe warps will be removed if someone tries to teleport to them.
+delete-unsafe: true
+
+# Whether warps should be private by default.
+# When enabled, only island members will be able to teleport to newly created warps.
+private-by-default: false
+
+# The amount of money to charge when players use island warps.
+# You can disable this feature by setting it to 0.
+charge-on-teleport: 0
+
+# The teleport warmup for island warps (in milliseconds).
+# Players cannot move during the warmup, or the teleportation will be cancelled.
+# You can disable this feature by setting it to 0.
+teleport-warmup: 0
+
+# Settings related to the menus.
+menus:
+  # The sorting type used to determine the order of islands in the global-warps menu.
+  # The default available sorting types: BANK, LEVEL, PLAYERS, RATING, WORTH
+  # Custom sorting types can be registered using the API.
+  global-warps-order: "WORTH"
+
+  # Whether the warp-manage menu should be enabled.
+  # When disabled, players will not be able to right-click a warp item in the menu to manage it.
+  warp-manage-enabled: true
+
+  # Whether the warp-category-manage menu should be enabled.
+  # When disabled, players will not be able to right-click a warp category item in the menu to manage it.
+  warp-category-manage-enabled: true
+
+# Settings related to warp categories.
+categories:
+  # Whether warp categories should be enabled.
+  # When disabled, all warps will be placed in the default category.
+  enabled: true
+
+  # The name of the default warp category. It must be a single word and cannot contain spaces.
+  # If a player creates a warp without specifying a category and no categories exist,
+  # a new category with this name will be created.
+  default-name: 'Default'
+
+# Settings related to warp names and warp category names.
+names:
+  # The minimum length for names.
+  min-length: 1
+
+  # The maximum length for names.
+  max-length: 16
+
+  # List of blacklisted names.
+  # Regular expressions are supported for advanced matching.
+  blacklist: [ ]
+
+# Settings related to warp signs.
+signs:
+  # Whether warp signs should be enabled.
+  # When disabled, players can only create warps using the setwarp command.
+  enabled: true
+
+  # The text that players must enter on the first line of a sign to create a warp.
+  create-line: '[IslandWarp]'
+
+  # List of sign lines for warp signs linked to a warp.
+  # {0} represents the warp name.
+  # {1} represents the warp category name.
+  active-lines:
+    - '&a[IslandWarp]'
+    - '{0}'
+    - '{1}'
+    - ''
+
+  # List of sign lines for warp signs no longer linked to a warp.
+  # {0} represents the warp name.
+  # {1} represents the warp category name.
+  inactive-lines:
+    - '&c[IslandWarp]'
+    - '{0}'
+    - '{1}'
+    - ''

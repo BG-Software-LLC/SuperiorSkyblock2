@@ -21,15 +21,13 @@ previous-page: '%'
 current-page: '*'
 next-page: '^'
 
-# Should the current biome be glowing?
+# Whether the item of the currently selected biome should glow.
 current-biome-glow: false
 
-# How should the dimension in which the player changes biome be selected?
-# DEFAULT  - Always uses the default dimension.
-# ARGUMENT - Uses the dimension from the command argument, or the default if invalid.
-# LOCATION - Uses the player's current dimension, or the default if is not inside the island world.
-# AUTO     - Prioritizes ARGUMENT, then LOCATION or DEFAULT if the previous ones fail.
-dimension-selection-mode: DEFAULT
+# Whether players should be able to change biomes only in default dimension.
+# When disabled, players will be able to specify the dimension as a command argument
+# or select it via the dimension-selection menu.
+only-default-dimension: true
 
 items:
   '$':

@@ -1,0 +1,126 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lTop Islands'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ # @ @ @'
+  - '@ $ @ @ # # # @ @'
+  - '@ @ @ # # # # # @'
+  - '~ ~ ~ ~ % ~ ~ ~ ~'
+  - '@ @ ! @ - @ + @ @'
+
+slots: '#'
+previous-page: '!'
+current-page: '-'
+next-page: '+'
+
+player-island: '$'
+sort-islands: '%'
+
+messages:
+  selected-sorting-type: '&8 - &a{0}'
+  unselected-sorting-type: '&8 - &7{0}'
+
+# When enabled, instead of showing warps upon right click, the visitor warp locations will be shown.
+visitor-warps: false
+
+items:
+  '#':
+    island:
+      type: PLAYER_HEAD
+      name: '&e&l[!] Island: &6&n{0}&7 (#{1})'
+      lore:
+        - '&7'
+        - '&6&l* &e&lPlace &7#{1}'
+        - '&7'
+        - '&6&l* &e&lLevel: &7{2}'
+        - '&6&l* &e&lWorth &7${3}'
+        - '&6&l* &e&lRating {8} &7({9})'
+        - '&6&l* &e&lPlayers &7{10}'
+        - '&6&l* &e&lBank &7${11}'
+        - '&7'
+        - '&6&l* &e&lMembers:'
+        - '{4}:&f  - &7{}'
+        - '&7'
+        - '&7&o(( &f&oLeft-Click &7&oto view their items. ))'
+        - '&7&o(( &f&oRight-Click &7&oto view their warps. ))'
+    no-island:
+      type: PLAYER_HEAD
+      name: '&cInvalid Island'
+  '%':
+    BANK:
+      display-name: 'Bank'
+      type: EMERALD
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    LEVEL:
+      display-name: 'Level'
+      type: GOLD_INGOT
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    PLAYERS:
+      display-name: 'Players'
+      type: PLAYER_HEAD
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    RATING:
+      display-name: 'Rating'
+      type: NETHER_STAR
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    WORTH:
+      display-name: 'Worth'
+      type: DIAMOND
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+  '!':
+    type: PAPER
+    name: '{0}Previous Page'
+  '-':
+    type: SUNFLOWER
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '+':
+    type: PAPER
+    name: '{0}Next Page'
+  '~':
+    type: BLACK_STAINED_GLASS_PANE
+    name: '&f'
+
+sounds:
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '%':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

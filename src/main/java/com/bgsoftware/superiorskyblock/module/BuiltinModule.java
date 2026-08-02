@@ -91,8 +91,7 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
 
         CommentedConfiguration config = CommentedConfiguration.loadConfiguration(configFile);
 
-        boolean commitChanges = onConfigCreate(plugin, config, firstTime);
-        if (commitChanges) {
+        if (onConfigCreate(plugin, config, firstTime)) {
             try {
                 config.save(configFile);
             } catch (Exception error) {
@@ -107,7 +106,6 @@ public abstract class BuiltinModule<T extends IModuleConfiguration> extends Plug
         } catch (Exception error) {
             this.logger().e("An error occurred while loading config file:", error);
         }
-
 
         this.configuration = createConfigFile(config);
     }

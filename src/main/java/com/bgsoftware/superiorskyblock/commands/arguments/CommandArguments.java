@@ -436,6 +436,21 @@ public class CommandArguments {
         return dimension;
     }
 
+    public static Dimension getEnabledDimension(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        Dimension dimension = getDimension(sender, argument);
+
+        if (dimension == null) {
+            return null;
+        }
+
+        if (!plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
+            Message.WORLD_NOT_ENABLED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
+            return null;
+        }
+
+        return dimension;
+    }
+
     public static Schematic getSchematic(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
         Schematic schematic = plugin.getSchematics().getSchematic(argument);
 

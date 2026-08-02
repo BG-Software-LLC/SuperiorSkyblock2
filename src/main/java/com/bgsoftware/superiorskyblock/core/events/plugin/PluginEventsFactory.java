@@ -32,6 +32,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
 import org.bukkit.block.Biome;
@@ -544,7 +545,7 @@ public class PluginEventsFactory {
 
     public static boolean callIslandCreateWarpEvent(Island island, SuperiorPlayer superiorPlayer, String warpName,
                                                     Location location, @Nullable WarpCategory warpCategory) {
-        return callIslandCreateWarpEvent(island, superiorPlayer, warpName, location, plugin.getSettings().isPublicWarps(), warpCategory);
+        return callIslandCreateWarpEvent(island, superiorPlayer, warpName, location, !BuiltinModules.WARPS.getConfiguration().isPrivateByDefault(), warpCategory);
     }
 
     public static boolean callIslandCreateWarpEvent(Island island, SuperiorPlayer superiorPlayer, String warpName,

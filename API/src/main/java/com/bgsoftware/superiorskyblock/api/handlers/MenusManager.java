@@ -34,6 +34,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 public interface MenusManager {
 
@@ -229,13 +230,35 @@ public interface MenusManager {
     void refreshCounts(Island island);
 
     /**
+     * Open the dimension-selection menu.
+     * Used by commands that require selecting a dimension before continuing, such as /is biomes and /is visit.
+     *
+     * @param targetPlayer The player to open the menu for.
+     * @param previousMenu The previous menu that was opened, if exists.
+     * @param onSelect     The action to execute when a dimension is selected.
+     */
+    void openDimensionSelection(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Consumer<Dimension> onSelect);
+
+    /**
      * Open the global-warps menu.
      * Used when running the /is warp command.
      *
      * @param targetPlayer The player to open the menu for.
      * @param previousMenu The previous menu that was opened, if exists.
+     * @deprecated Use {@link #openGlobalWarps(SuperiorPlayer, ISuperiorMenu, SortingType)}
      */
+    @Deprecated
     void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu);
+
+    /**
+     * Open the global-warps menu.
+     * Used when running the /is warp command.
+     *
+     * @param targetPlayer The player to open the menu for.
+     * @param previousMenu The previous menu that was opened, if exists.
+     * @param sortingType  The type of sorting of islands to use.
+     */
+    void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SortingType sortingType);
 
     /**
      * Open the global warps menu for a player.
@@ -248,8 +271,18 @@ public interface MenusManager {
 
     /**
      * Refresh the global-warps menu.
+     *
+     * @deprecated See {@link #refreshGlobalWarps(SortingType)}
      */
+    @Deprecated
     void refreshGlobalWarps();
+
+    /**
+     * Refresh the global-warps menu for a specific sorting type.
+     *
+     * @param sortingType The sorting type to refresh.
+     */
+    void refreshGlobalWarps(SortingType sortingType);
 
     /**
      * Open the island-bank menu.
@@ -724,6 +757,24 @@ public interface MenusManager {
      * @param island The island to refresh the menus for.
      */
     void refreshValues(Island island);
+
+    /**
+     * Open the visit-islands menu.
+     * Used when running the /is visit command.
+     *
+     * @param targetPlayer The player to open the menu for.
+     * @param previousMenu The previous menu that was opened, if exists.
+     * @param sortingType  The type of sorting of islands to use.
+     * @param dimension    The dimension to use.
+     */
+    void openVisitIslands(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SortingType sortingType, Dimension dimension);
+
+    /**
+     * Refresh the visit-islands menu for a specific sorting type.
+     *
+     * @param sortingType The sorting type to refresh.
+     */
+    void refreshVisitIslands(SortingType sortingType);
 
     /**
      * Open the visitors-menu.

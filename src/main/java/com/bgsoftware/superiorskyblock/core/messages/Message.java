@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public enum Message {
 
@@ -173,6 +174,7 @@ public enum Message {
     COMMAND_ARGUMENT_VALUE("value"),
     COMMAND_ARGUMENT_WARP_CATEGORY("warp-category"),
     COMMAND_ARGUMENT_WARP_NAME("warp-name"),
+    COMMAND_ARGUMENT_WARP_PRIVATE("private"),
     COMMAND_ARGUMENT_WORLD("world"),
     COMMAND_COOLDOWN_FORMAT,
     COMMAND_DESCRIPTION_ACCEPT,
@@ -336,8 +338,6 @@ public enum Message {
     DEBUG_MODE_FILTER_ADD,
     DEBUG_MODE_FILTER_CLEAR,
     DEBUG_MODE_FILTER_REMOVE,
-    DELETE_WARP,
-    DELETE_WARP_SIGN_BROKE,
     DEMOTED_MEMBER,
     DEMOTE_LEADER,
     DEMOTE_PLAYERS_WITH_LOWER_ROLE,
@@ -431,8 +431,6 @@ public enum Message {
     INVALID_TITLE,
     INVALID_TOGGLE_MODE,
     INVALID_UPGRADE,
-    INVALID_VISIT_LOCATION,
-    INVALID_VISIT_LOCATION_BYPASS,
     INVALID_WARP,
     INVALID_WORLD,
     INVITE_ANNOUNCEMENT,
@@ -693,8 +691,6 @@ public enum Message {
     SET_UPGRADE_LEVEL,
     SET_UPGRADE_LEVEL_ALL,
     SET_UPGRADE_LEVEL_NAME,
-    SET_WARP,
-    SET_WARP_OUTSIDE,
     SIZE_BIGGER_MAX,
     SPAWN_PROTECTED,
     SPAWN_PROTECTED_OPPED,
@@ -708,8 +704,6 @@ public enum Message {
     TEAM_CHAT_FORMAT,
     TELEPORTED_FAILED,
     TELEPORTED_SUCCESS,
-    TELEPORTED_TO_WARP,
-    TELEPORTED_TO_WARP_ANNOUNCEMENT,
     TELEPORT_LOCATION_OUTSIDE_ISLAND,
     TELEPORT_OUTSIDE_ISLAND,
     TELEPORT_WARMUP,
@@ -748,36 +742,63 @@ public enum Message {
     UNLOCK_WORLD_ANNOUNCEMENT_ALL,
     UNLOCK_WORLD_ANNOUNCEMENT_NAME,
     UNLOCK_WORLD_ANNOUNCEMENT,
-    UNSAFE_WARP,
     UPDATED_PERMISSION,
     UPDATED_SETTINGS,
     UPGRADE_COOLDOWN_FORMAT,
     VAULT_NOT_INSTALLED,
     VISITOR_BLOCK_COMMAND,
+    VISITOR_HOME_REMOVE,
+    VISITOR_HOME_SET,
+    VISITOR_HOME_SET_PREVIOUS_REMOVED,
+    VISITOR_HOME_SET_OUTSIDE_DEFAULT_DIMENSION,
+    VISITOR_HOME_SIGN_DEACTIVATED,
+    VISITOR_HOME_SIGN_EDIT,
+    VISITOR_HOME_TELEPORT_ANNOUNCEMENT,
+    VISITOR_HOME_TELEPORT_NOT_SET,
+    VISITOR_HOME_TELEPORT_NOT_SET_BYPASS,
+    VISITOR_HOME_TELEPORT_SUCCESS,
+    VISITOR_HOME_TELEPORT_SUCCESS_NAME,
+    VISITOR_HOME_TELEPORT_UNSAFE,
+    VISITOR_HOME_TELEPORT_UNSAFE_BYPASS,
     WARP_ALREADY_EXIST,
     WARP_CATEGORY_ALREADY_EXIST,
     WARP_CATEGORY_ICON_NEW_LORE,
     WARP_CATEGORY_ICON_NEW_NAME,
     WARP_CATEGORY_ICON_NEW_TYPE,
     WARP_CATEGORY_ICON_UPDATED,
-    WARP_CATEGORY_INVALID_NAME,
+    WARP_CATEGORY_MANAGE_CANCEL_TEXT,
+    WARP_CATEGORY_NAME_BLACKLISTED,
+    WARP_CATEGORY_NAME_INVALID,
     WARP_CATEGORY_NAME_TOO_LONG,
+    WARP_CATEGORY_NAME_TOO_SHORT,
     WARP_CATEGORY_RENAME,
     WARP_CATEGORY_RENAME_SUCCESS,
     WARP_CATEGORY_SLOT,
     WARP_CATEGORY_SLOT_ALREADY_TAKEN,
     WARP_CATEGORY_SLOT_SUCCESS,
+    WARP_DELETE,
     WARP_ICON_NEW_LORE,
     WARP_ICON_NEW_NAME,
     WARP_ICON_NEW_TYPE,
     WARP_ICON_UPDATED,
-    WARP_INVALID_NAME,
     WARP_LOCATION_UPDATE,
+    WARP_MANAGE_CANCEL_TEXT,
+    WARP_NAME_BLACKLISTED,
+    WARP_NAME_INVALID,
     WARP_NAME_TOO_LONG,
+    WARP_NAME_TOO_SHORT,
     WARP_PRIVATE_UPDATE,
     WARP_PUBLIC_UPDATE,
     WARP_RENAME,
     WARP_RENAME_SUCCESS,
+    WARP_SET,
+    WARP_SET_OUTSIDE_ISLAND,
+    WARP_SIGN_DEACTIVATED,
+    WARP_SIGN_EDIT,
+    WARP_TELEPORT_ANNOUNCEMENT,
+    WARP_TELEPORT_SUCCESS,
+    WARP_TELEPORT_SUCCESS_NAME,
+    WARP_TELEPORT_UNSAFE,
     WITHDRAWN_MONEY,
     WITHDRAWN_MONEY_NAME,
     WITHDRAW_ALL_MONEY,
@@ -819,6 +840,7 @@ public enum Message {
         }
     };
 
+    @Nullable
     private final String defaultMessage;
     private final boolean isCustom;
     private final Map<Locale, IMessageComponent> messages = new ArrayMap<>();
@@ -880,13 +902,12 @@ public enum Message {
 
             PlayerLocales.registerLocale(fileLocale);
 
-            if (plugin.getSettings().getDefaultLanguage().equalsIgnoreCase(fileName))
+            if (plugin.getSettings().getDefaultLanguage().equalsIgnoreCase(fileName)) {
                 PlayerLocales.setDefaultLocale(fileLocale);
+            }
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
 
-            // Additional saving, because we are not adding a new message, we are only changing the format of the old one,
-            // so cfg.syncWithConfig() will not detect it and will not save the file.
             if (convertData(cfg)) {
                 try {
                     cfg.save(langFile);
@@ -901,11 +922,13 @@ public enum Message {
                 Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
             }
 
-            for (Message locale : values()) {
-                if (!locale.isCustom()) {
-                    locale.setMessage(fileLocale, messagesService.get().parseComponent(cfg, locale.name()));
-                    if (countMessages)
+            for (Message message : values()) {
+                if (!message.isCustom()) {
+                    message.setMessage(fileLocale, messagesService.get().parseComponent(cfg, message.name()));
+
+                    if (countMessages) {
                         messagesAmount++;
+                    }
                 }
             }
 
@@ -958,8 +981,9 @@ public enum Message {
     }
 
     public final void send(SuperiorPlayer superiorPlayer, Object... args) {
-        if (PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
+        if (superiorPlayer != null && PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args)) {
             superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), args));
+        }
     }
 
     public final void send(CommandSender sender) {
@@ -969,8 +993,10 @@ public enum Message {
     public final void send(CommandSender sender, Object... args) {
         if (sender instanceof Player) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-            if (!PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
+
+            if (!PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args)) {
                 return;
+            }
         }
 
         send(sender, PlayerLocales.getLocale(sender), args);
@@ -981,19 +1007,27 @@ public enum Message {
     }
 
     public void send(CommandSender sender, Locale locale, Object... args) {
-        IMessageComponent messageComponent = getComponent(locale);
-        if (messageComponent == null)
+        if (sender == null) {
             return;
+        }
+
+        IMessageComponent messageComponent = getComponent(locale);
+        if (messageComponent == null) {
+            return;
+        }
 
         if (sender instanceof Player) {
             UUID playerUUID = ((Player) sender).getUniqueId();
-            if (delayedMessages != null && !delayedMessages.add(playerUUID))
+
+            if (delayedMessages != null && !delayedMessages.add(playerUUID)) {
                 return;
+            }
         }
 
         PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
         if (!event.isCancelled()) {
             event.getArgs().messageComponent.sendMessage(sender, args);
+
             if (!(sender instanceof Player) && Log.isDebugged(Debug.SHOW_STACKTRACE)) {
                 Thread.dumpStack();
             }
@@ -1015,17 +1049,35 @@ public enum Message {
     }
 
     private static boolean convertData(CommentedConfiguration cfg) {
+        AtomicBoolean converted = new AtomicBoolean(false);
+
         if (cfg.isString("GOT_INVITE_TOOLTIP")) {
             cfg.set("GOT_INVITE.0.text", cfg.getString("GOT_INVITE"));
             cfg.set("GOT_INVITE.0.tooltip", cfg.getString("GOT_INVITE_TOOLTIP"));
             cfg.set("GOT_INVITE.0.command", "/is accept {0}");
 
             cfg.set("GOT_INVITE_TOOLTIP", null);
-
-            return true;
+            converted.set(true);
         }
+        convertMessageName(cfg, "INVALID_VISIT_LOCATION", "VISITOR_HOME_TELEPORT_NOT_SET", converted);
+        convertMessageName(cfg, "INVALID_VISIT_LOCATION_BYPASS", "VISITOR_HOME_TELEPORT_NOT_SET_BYPASS", converted);
+        convertMessageName(cfg, "DELETE_WARP", "WARP_DELETE", converted);
+        convertMessageName(cfg, "DELETE_WARP_SIGN_BROKE", "WARP_SIGN_DEACTIVATED", converted);
+        convertMessageName(cfg, "SET_WARP", "WARP_SET", converted);
+        convertMessageName(cfg, "SET_WARP_OUTSIDE", "WARP_SET_OUTSIDE_ISLAND", converted);
+        convertMessageName(cfg, "TELEPORTED_TO_WARP", "WARP_TELEPORT", converted);
+        convertMessageName(cfg, "TELEPORTED_TO_WARP_ANNOUNCEMENT", "WARP_TELEPORT_ANNOUNCEMENT", converted);
+        convertMessageName(cfg, "UNSAFE_WARP", "WARP_TELEPORT_UNSAFE", converted);
 
-        return false;
+        return converted.get();
+    }
+
+    private static void convertMessageName(CommentedConfiguration cfg, String oldName, String newName, AtomicBoolean converted) {
+        if (cfg.get(oldName) != null) {
+            cfg.set(newName, cfg.get(oldName));
+            cfg.set(oldName, null);
+            converted.set(true);
+        }
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
@@ -1036,10 +1088,11 @@ public enum Message {
         for (Message message : values()) {
             long delay = plugin.getSettings().getMessageDelays().getOrDefault(message.name(), 0L);
 
-            if (delay > 0L)
+            if (delay > 0L) {
                 message.delayedMessages = AutoRemovalCollection.newHashSet(delay, TimeUnit.MILLISECONDS);
-            else
+            } else {
                 message.delayedMessages = null;
+            }
         }
     }
 

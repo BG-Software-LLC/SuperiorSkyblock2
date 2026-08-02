@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.enums.DimensionSelectionMode;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -44,22 +43,22 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
     private final List<BiomeInfo> biomes;
     private final boolean currentBiomeGlow;
-    private final DimensionSelectionMode dimensionSelectionMode;
+    private final boolean onlyDefaultDimension;
 
-    private MenuBiomes(MenuParseResult<View> parseResult, List<BiomeInfo> islandFlags,
-                       boolean currentBiomeGlow, DimensionSelectionMode dimensionSelectionMode) {
+    private MenuBiomes(MenuParseResult<View> parseResult, List<BiomeInfo> biomes,
+                       boolean currentBiomeGlow, boolean onlyDefaultDimension) {
         super(MenuIdentifiers.MENU_BIOMES, parseResult, false);
-        this.biomes = islandFlags;
+        this.biomes = biomes;
         this.currentBiomeGlow = currentBiomeGlow;
-        this.dimensionSelectionMode = dimensionSelectionMode;
+        this.onlyDefaultDimension = onlyDefaultDimension;
     }
 
     public boolean isCurrentBiomeGlow() {
         return currentBiomeGlow;
     }
 
-    public DimensionSelectionMode getDimensionSelectionMode() {
-        return dimensionSelectionMode;
+    public boolean isOnlyDefaultDimension() {
+        return onlyDefaultDimension;
     }
 
     @Override
@@ -79,14 +78,8 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
         YamlConfiguration cfg = menuParseResult.getConfig();
 
-        boolean shouldCurrentBiomeGlow = cfg.getBoolean("current-biome-glow", false);
-        DimensionSelectionMode dimensionSelectionMode;
-
-        try {
-            dimensionSelectionMode = DimensionSelectionMode.valueOf(cfg.getString("dimension-selection-mode", "NONE"));
-        } catch (IllegalArgumentException e) {
-            dimensionSelectionMode = DimensionSelectionMode.DEFAULT;
-        }
+        boolean currentBiomeGlow = cfg.getBoolean("current-biome-glow", false);
+        boolean onlyDefaultDimension = cfg.getBoolean("only-default-dimension", false);
 
         List<BiomeInfo> biomes = new LinkedList<>();
         Optional.ofNullable(cfg.getConfigurationSection("biomes")).ifPresent(biomesSection -> {
@@ -104,7 +97,7 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
             }
         });
 
-        return new MenuBiomes(menuParseResult, biomes, shouldCurrentBiomeGlow, dimensionSelectionMode);
+        return new MenuBiomes(menuParseResult, biomes, currentBiomeGlow, onlyDefaultDimension);
     }
 
     private static BiomeInfo loadBiomeInfo(ConfigurationSection biomeSection, Biome biome, int position) {
@@ -272,8 +265,9 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/biomes-gui.yml");
 
-        if (!oldFile.exists())
+        if (!oldFile.exists()) {
             return convertToPagedMenu(newMenu);
+        }
 
         //We want to reset the items of newMenu.
         ConfigurationSection itemsSection = newMenu.createSection("items");
@@ -311,8 +305,9 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
     }
 
     private static boolean convertToPagedMenu(YamlConfiguration cfg) {
-        if (cfg.isConfigurationSection("biomes"))
-            return false;
+        if (cfg.isConfigurationSection("biomes")) {
+            return convertDimensionSelection(cfg);
+        }
 
         Set<Character> biomeChars = new HashSet<>();
 
@@ -374,8 +369,26 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
             cfg.set("pattern", newPattern);
             cfg.set("slots", String.valueOf(newChar));
-            cfg.set("dimension-selection-mode", "DEFAULT");
+            cfg.set("only-default-dimension", true);
         }
+
+        return true;
+    }
+
+    private static boolean convertDimensionSelection(YamlConfiguration cfg) {
+        if (!cfg.isString("dimension-selection-mode")) {
+            return false;
+        }
+
+        String mode = cfg.getString("dimension-selection-mode");
+
+        if (mode.equalsIgnoreCase("DEFAULT")) {
+            cfg.set("only-default-dimension", true);
+        } else {
+            cfg.set("only-default-dimension", false);
+        }
+
+        cfg.set("dimension-selection-mode", null);
 
         return true;
     }
