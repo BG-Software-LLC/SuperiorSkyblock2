@@ -24,6 +24,8 @@ next-page: '^'
 # Lore that will be appended to the end of the warp icon's lore
 # if the player has permission to manage that warp.
 edit-lore:
+  - ''
+  - ''
   - '&7&o(( &f&oRight-Click &7&oto edit warp. ))'
 
 items:
@@ -32,8 +34,6 @@ items:
     name: '&6{0} {2}'
     lore:
       - '&7This warp is located at {1}.'
-      - ''
-      - '&7&o(( &f&oClick &7&oto warp to the location. ))'
   '%':
     type: PAPER
     name: '{0}Previous Page'

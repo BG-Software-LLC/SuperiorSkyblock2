@@ -48,6 +48,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.File;
@@ -622,10 +623,7 @@ public class MenusProvider_Default implements MenusProvider {
         // We want skip one item to only work if the player can't edit warps, otherwise he
         // won't be able to edit them as the menu will get skipped if only one warp exists.
         if (Menus.MENU_WARPS.isSkipOneItem() && !targetCategory.getIsland().hasPermission(targetPlayer, IslandPrivileges.SET_WARP)) {
-            List<IslandWarp> availableWarps = targetCategory.getIsland().isMember(targetPlayer) ? targetCategory.getWarps() :
-                    targetCategory.getWarps().stream()
-                            .filter(islandWarp -> !islandWarp.hasPrivateFlag())
-                            .collect(Collectors.toList());
+            List<IslandWarp> availableWarps = WarpsUtils.getAvailableWarps(targetCategory, targetPlayer);
 
             if (availableWarps.size() == 1) {
                 MenuActions.simulateWarpsClick(targetPlayer, targetCategory.getIsland(), availableWarps.get(0));

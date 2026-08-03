@@ -34,8 +34,6 @@ items:
     name: '&e{0}''s Island'
     lore:
       - '&7This island has {2} warps.'
-      - ''
-      - '&7&o(( &f&oClick &7&oto see all warps of this island. ))'
   '~':
     BANK:
       display-name: 'Bank'

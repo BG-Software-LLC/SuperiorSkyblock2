@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import org.bukkit.inventory.ItemStack;
 
 public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuWarpCategories.View, WarpCategory> {
@@ -29,12 +30,8 @@ public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuW
 
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
 
-        boolean isMember = menuView.getIsland().isMember(inventoryViewer);
-        long accessAmount = pagedObject.getWarps().stream().filter(
-                islandWarp -> isMember || !islandWarp.hasPrivateFlag()
-        ).count();
-
-        if (accessAmount == 0) {
+        long availableWarps = WarpsUtils.getAvailableWarps(pagedObject, inventoryViewer).size();
+        if (availableWarps == 0) {
             return null;
         }
 
@@ -47,7 +44,7 @@ public class WarpCategoryPagedObjectButton extends AbstractPagedMenuButton<MenuW
         }
 
         return newItemBuilder.replaceAll("{0}", pagedObject.getName())
-                .replaceAll("{1}", accessAmount + "").build(inventoryViewer);
+                .replaceAll("{1}", availableWarps + "").build(inventoryViewer);
     }
 
     @Override

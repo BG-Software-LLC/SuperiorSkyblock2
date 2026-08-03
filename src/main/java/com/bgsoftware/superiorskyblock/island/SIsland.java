@@ -3846,7 +3846,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(warpName, "warp parameter cannot be null.");
 
-        WarpsUtils.warpPlayerInternal(superiorPlayer, this, null, warpName, force);
+        WarpsUtils.warpPlayerInternal(superiorPlayer, this, getOwner(), warpName, force);
     }
 
     @Override

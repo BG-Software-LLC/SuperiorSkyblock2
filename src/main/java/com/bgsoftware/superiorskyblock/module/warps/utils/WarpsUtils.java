@@ -30,6 +30,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -181,6 +182,36 @@ public class WarpsUtils {
                 }
             }
         });
+    }
+
+    public static List<IslandWarp> getAvailableWarps(WarpCategory warpCategory, SuperiorPlayer superiorPlayer) {
+        if (warpCategory.getIsland().isMember(superiorPlayer)) {
+            return warpCategory.getWarps();
+        }
+
+        List<IslandWarp> availableWarps = new ArrayList<>();
+
+        for (IslandWarp islandWarp : warpCategory.getWarps()) {
+            if (!islandWarp.hasPrivateFlag()) {
+                availableWarps.add(islandWarp);
+            }
+        }
+
+        return availableWarps;
+    }
+
+    public static boolean hasAvailableWarps(WarpCategory warpCategory, SuperiorPlayer superiorPlayer) {
+        if (warpCategory.getIsland().isMember(superiorPlayer)) {
+            return !warpCategory.getWarps().isEmpty();
+        }
+
+        for (IslandWarp islandWarp : warpCategory.getWarps()) {
+            if (!islandWarp.hasPrivateFlag()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static boolean isWarpSignCreateLine(String line) {

@@ -24,6 +24,8 @@ next-page: '^'
 # Lore that will be appended to the end of the warp category icon's lore
 # if the player has permission to manage that warp category.
 edit-lore:
+  - ''
+  - ''
   - '&7&o(( &f&oRight-Click &7&oto edit the category. ))'
 
 items:
@@ -32,8 +34,6 @@ items:
     name: '&6{0}'
     lore:
       - '&7This category has {1} warps.'
-      - ''
-      - '&7&o(( &f&oClick &7&oto see island warps. ))'
   '%':
     type: PAPER
     name: '&cPrevious Page'

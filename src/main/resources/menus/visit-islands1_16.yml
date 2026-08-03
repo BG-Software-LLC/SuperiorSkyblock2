@@ -34,8 +34,6 @@ items:
     lore:
       - '&7Description:'
       - '{1}'
-      - ''
-      - '&7&o(( &f&oClick &7&oto visit this island. ))'
   '~':
     BANK:
       display-name: 'Bank'
