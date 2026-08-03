@@ -1,0 +1,105 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lIsland Warps'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '$ $ $ $ ~ $ $ $ $'
+  - '# # % # * # ^ # #'
+
+slots: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
+
+sort-islands: '~'
+
+messages:
+  selected-sorting-type: '&8 - &a{0}'
+  unselected-sorting-type: '&8 - &7{0}'
+
+items:
+  '@':
+    type: PLAYER_HEAD
+    name: '&e{0}''s Island'
+    lore:
+      - '&7This island has {2} warps.'
+  '~':
+    BANK:
+      display-name: 'Bank'
+      type: EMERALD
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    LEVEL:
+      display-name: 'Level'
+      type: GOLD_INGOT
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    PLAYERS:
+      display-name: 'Players'
+      type: PLAYER_HEAD
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    RATING:
+      display-name: 'Rating'
+      type: NETHER_STAR
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    WORTH:
+      display-name: 'Worth'
+      type: DIAMOND
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+  '%':
+    type: PAPER
+    name: '{0}Previous Page'
+  '*':
+    type: SUNFLOWER
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '^':
+    type: PAPER
+    name: '{0}Next Page'
+  '$':
+    type: BLACK_STAINED_GLASS_PANE
+    name: '&f'
+
+sounds:
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '~':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

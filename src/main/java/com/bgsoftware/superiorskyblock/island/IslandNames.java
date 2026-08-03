@@ -4,8 +4,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.config.StringMatcher;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -19,6 +23,9 @@ public class IslandNames {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private static StringMatcher blacklistedIslandNamesCache = null;
+    private static StringMatcher blacklistedWarpNamesCache = null;
+
     private IslandNames() {
 
     }
@@ -31,13 +38,12 @@ public class IslandNames {
         String strippedName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
 
         int maxLength = plugin.getSettings().getIslandNames().getMaxLength();
-        int minLength = plugin.getSettings().getIslandNames().getMinLength();
-
         if (strippedName.length() > maxLength) {
             Message.NAME_TOO_LONG.send(sender, maxLength);
             return false;
         }
 
+        int minLength = plugin.getSettings().getIslandNames().getMinLength();
         if (strippedName.length() < minLength) {
             Message.NAME_TOO_SHORT.send(sender, minLength);
             return false;
@@ -48,8 +54,7 @@ public class IslandNames {
             return false;
         }
 
-        String lookupName = islandName.toLowerCase(Locale.ENGLISH);
-        if (plugin.getSettings().getIslandNames().getFilteredNames().stream().anyMatch(lookupName::contains)) {
+        if (isIslandNameBlacklisted(islandName.toLowerCase(Locale.ENGLISH))) {
             Message.NAME_BLACKLISTED.send(sender);
             return false;
         }
@@ -89,30 +94,35 @@ public class IslandNames {
     }
 
     public static boolean isWarpNameLengthValid(String warpName) {
-        return !warpName.isEmpty() && warpName.length() <= getMaxWarpNameLength();
+        return !Text.isBlank(warpName) && warpName.length() >= BuiltinModules.WARPS.getConfiguration().getNamesMinLength()
+                && warpName.length() <= BuiltinModules.WARPS.getConfiguration().getNamesMaxLength();
     }
 
-    public static int getMaxWarpNameLength() {
-        return 255;
-    }
-
-    public static boolean isValidWarpName(SuperiorPlayer superiorPlayer, Island island,
-                                          String warpName, boolean sendMessage) {
-        if (warpName.isEmpty() || warpName.contains(" ")) {
-            if (sendMessage)
-                Message.WARP_INVALID_NAME.send(superiorPlayer);
+    public static boolean isValidWarpName(@Nullable SuperiorPlayer superiorPlayer, Island island, @Nullable String warpName) {
+        if (Text.isBlank(warpName) || warpName.indexOf(" ") > 0) {
+            Message.WARP_NAME_INVALID.send(superiorPlayer);
             return false;
         }
 
-        if (!isWarpNameLengthValid(warpName)) {
-            if (sendMessage)
-                Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
+        int maxLength = BuiltinModules.WARPS.getConfiguration().getNamesMaxLength();
+        if (warpName.length() > maxLength) {
+            Message.WARP_NAME_TOO_LONG.send(superiorPlayer, maxLength);
+            return false;
+        }
+
+        int minLength = BuiltinModules.WARPS.getConfiguration().getNamesMinLength();
+        if (warpName.length() < minLength) {
+            Message.WARP_NAME_TOO_SHORT.send(superiorPlayer, minLength);
+            return false;
+        }
+
+        if (isWarpNameBlacklisted(warpName.toLowerCase(Locale.ENGLISH))) {
+            Message.WARP_NAME_BLACKLISTED.send(superiorPlayer);
             return false;
         }
 
         if (island.getWarp(warpName) != null) {
-            if (sendMessage)
-                Message.WARP_ALREADY_EXIST.send(superiorPlayer);
+            Message.WARP_ALREADY_EXIST.send(superiorPlayer);
             return false;
         }
 
@@ -120,23 +130,54 @@ public class IslandNames {
     }
 
     public static boolean isValidWarpCategoryName(@Nullable SuperiorPlayer superiorPlayer, @Nullable String categoryName) {
-        if (Text.isBlank(categoryName) || categoryName.indexOf(' ') >= 0) {
-            if (superiorPlayer != null) {
-                Message.WARP_CATEGORY_INVALID_NAME.send(superiorPlayer);
-            }
-
+        if (Text.isBlank(categoryName) || categoryName.indexOf(" ") > 0) {
+            Message.WARP_CATEGORY_NAME_INVALID.send(superiorPlayer);
             return false;
         }
 
-        if (!isWarpNameLengthValid(categoryName)) {
-            if (superiorPlayer != null) {
-                Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
-            }
+        int maxLength = BuiltinModules.WARPS.getConfiguration().getNamesMaxLength();
+        if (categoryName.length() > maxLength) {
+            Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
+            return false;
+        }
 
+        int minLength = BuiltinModules.WARPS.getConfiguration().getNamesMinLength();
+        if (categoryName.length() < minLength) {
+            Message.WARP_CATEGORY_NAME_TOO_SHORT.send(superiorPlayer);
+            return false;
+        }
+
+        if (isWarpNameBlacklisted(categoryName.toLowerCase(Locale.ENGLISH))) {
+            Message.WARP_CATEGORY_NAME_BLACKLISTED.send(superiorPlayer);
             return false;
         }
 
         return true;
+    }
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, IslandNames::onSettingsUpdate);
+    }
+
+    private static boolean isIslandNameBlacklisted(String name) {
+        if (blacklistedIslandNamesCache == null) {
+            blacklistedIslandNamesCache = new StringMatcher(plugin.getSettings().getIslandNames().getFilteredNames());
+        }
+
+        return blacklistedIslandNamesCache.matches(name);
+    }
+
+    private static boolean isWarpNameBlacklisted(String name) {
+        if (blacklistedWarpNamesCache == null) {
+            blacklistedWarpNamesCache = new StringMatcher(BuiltinModules.WARPS.getConfiguration().getNamesBlacklist());
+        }
+
+        return blacklistedWarpNamesCache.matches(name);
+    }
+
+    private static void onSettingsUpdate() {
+        blacklistedIslandNamesCache = null;
+        blacklistedWarpNamesCache = null;
     }
 
 }

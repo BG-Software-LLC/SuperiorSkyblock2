@@ -46,6 +46,8 @@ import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutI
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularInventoryMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -56,6 +58,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class MenusManagerImpl extends Manager implements MenusManager {
 
@@ -172,8 +175,19 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
+    public void openDimensionSelection(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Consumer<Dimension> onSelect) {
+        plugin.getProviders().getMenusProvider().openDimensionSelection(targetPlayer, previousMenu, onSelect);
+    }
+
+    @Override
+    @Deprecated
     public void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
-        plugin.getProviders().getMenusProvider().openGlobalWarps(targetPlayer, previousMenu);
+        openGlobalWarps(targetPlayer, previousMenu, SortingTypes.getGlobalWarpsSortingType());
+    }
+
+    @Override
+    public void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SortingType sortingType) {
+        plugin.getProviders().getMenusProvider().openGlobalWarps(targetPlayer, previousMenu, sortingType);
     }
 
     @Override
@@ -182,8 +196,14 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
+    @Deprecated
     public void refreshGlobalWarps() {
-        plugin.getProviders().getMenusProvider().refreshGlobalWarps();
+        refreshGlobalWarps(SortingTypes.getGlobalWarpsSortingType());
+    }
+
+    @Override
+    public void refreshGlobalWarps(SortingType sortingType) {
+        plugin.getProviders().getMenusProvider().refreshGlobalWarps(sortingType);
     }
 
     @Override
@@ -452,6 +472,16 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
+    public void openVisitIslands(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SortingType sortingType, Dimension dimension) {
+        plugin.getProviders().getMenusProvider().openVisitIslands(targetPlayer, previousMenu, sortingType, dimension);
+    }
+
+    @Override
+    public void refreshVisitIslands(SortingType sortingType) {
+        plugin.getProviders().getMenusProvider().refreshVisitIslands(sortingType);
+    }
+
+    @Override
     public void openVisitors(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         plugin.getProviders().getMenusProvider().openVisitors(targetPlayer, previousMenu, targetIsland);
     }
@@ -519,7 +549,7 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     @Override
     public void openIslandWarpsMenu(SuperiorPlayer superiorPlayer, Island island) {
         openWarps(superiorPlayer, null, island.getWarpCategories().values().stream().findFirst()
-                .orElseGet(() -> island.createWarpCategory(plugin.getSettings().getDefaultWarpCategoryName())));
+                .orElseGet(() -> island.createWarpCategory(BuiltinModules.WARPS.getConfiguration().getCategoriesDefaultName())));
     }
 
     @Override

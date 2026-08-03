@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
+import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -47,6 +48,7 @@ public class PluginEventsDispatcher extends EventsDispatcher<
         WorldsProvider_Default.registerListeners(this);
         IslandPrivileges.registerListeners(this);
         Dimensions.registerListeners(this);
+        IslandNames.registerListeners(this);
     }
 
     public void registerCallback(PluginEventType<?> type, Runnable callback) {

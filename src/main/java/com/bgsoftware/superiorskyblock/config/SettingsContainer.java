@@ -34,7 +34,6 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
-import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
@@ -113,18 +112,10 @@ public class SettingsContainer {
     public final RoundingMode islandLevelRoundingMode;
     public final boolean autoBlocksTracking;
     public final SortingType islandTopOrder;
-    public final SortingType globalWarpsOrder;
     public boolean coopMembers;
     public boolean editPlayerPermissions;
     public final ConfigurationSection islandRolesSection;
     public final long calcInterval;
-    public final String signWarpLine;
-    public final List<String> signWarp;
-    public final boolean visitorsSignRequiredForVisit;
-    public final String visitorsSignLine;
-    public final String visitorsSignActive;
-    public final String visitorsSignInactive;
-    public final String visitorsSignDescriptionLineFormat;
     public final Dimension defaultWorldDimension;
     public final String defaultWorldName;
     public final String islandWorldName;
@@ -185,9 +176,7 @@ public class SettingsContainer {
     public final Map<InventoryType, ListTag> defaultContainersContents;
     public final List<String> defaultSignLines;
     public final Map<String, List<String>> eventCommands;
-    public final long warpsWarmup;
     public final long homeWarmup;
-    public final long visitWarmup;
     public final boolean liquidUpdate;
     public final boolean lightsUpdate;
     public final List<String> pvpWorlds;
@@ -227,18 +216,13 @@ public class SettingsContainer {
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
     public final Map<String, Long> messageDelays;
-    public final boolean warpCategories;
-    public final String defaultWarpCategoryName;
     public final boolean physicsListener;
-    public final double chargeOnWarp;
-    public final boolean publicWarps;
     public final boolean lockedIslands;
     public final long recalcTaskTimeout;
     public final boolean autoLanguageDetection;
     public final boolean autoUncoopWhenAlone;
     public final TopIslandMembersSorting islandTopMembersSorting;
     public final int bossBarLimit;
-    public final boolean deleteUnsafeWarps;
     public final List<RespawnAction> playerRespawnActions;
     public final BigInteger blockCountsSaveThreshold;
     public final boolean chatSigningSupport;
@@ -340,27 +324,9 @@ public class SettingsContainer {
             Log.warnFromFile("config.yml", "Invalid island-top-order '" + rawTop + "', using 'WORTH'.");
         }
         this.islandTopOrder = parsedTop;
-
-        String rawGlobalWarps = config.getString("global-warps-order", "WORTH").toUpperCase(Locale.ENGLISH);
-        SortingType foundGlobalWarpsOrder = SortingType.getByName(rawGlobalWarps);
-        if (foundGlobalWarpsOrder == null) {
-            foundGlobalWarpsOrder = SortingType.getByName("WORTH");
-            Log.warnFromFile("config.yml", "Invalid global-warps-order '" + rawGlobalWarps + "', using 'WORTH'.");
-        }
-        this.globalWarpsOrder = foundGlobalWarpsOrder;
         coopMembers = config.getBoolean("coop-members", true);
         editPlayerPermissions = config.getBoolean("edit-player-permissions", true);
         islandRolesSection = config.getConfigurationSection("island-roles");
-        signWarpLine = config.getString("sign-warp-line", "[IslandWarp]");
-        List<String> signWarp = Formatters.formatList(config.getStringList("sign-warp"), Formatters.COLOR_FORMATTER);
-        while (signWarp.size() < 4)
-            signWarp.add("");
-        this.signWarp = Collections.unmodifiableList(signWarp);
-        visitorsSignRequiredForVisit = config.getBoolean("visitors-sign.required-for-visit", true);
-        visitorsSignLine = config.getString("visitors-sign.line", "[Welcome]");
-        visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
-        visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));
-        visitorsSignDescriptionLineFormat = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.description-line-format", "{0}"));
         loadDimensions(config.getConfigurationSection("worlds.dimensions"));
         islandWorldName = config.getString("worlds.world-name", "SuperiorWorld");
         worldsDifficulty = config.getString("worlds.difficulty", "EASY").toUpperCase(Locale.ENGLISH);
@@ -494,9 +460,7 @@ public class SettingsContainer {
             }
         }
         this.eventCommands = Collections.unmodifiableMap(eventCommands);
-        warpsWarmup = config.getLong("warps-warmup", 0);
         homeWarmup = config.getLong("home-warmup", 0);
-        visitWarmup = config.getLong("visit-warmup", 0);
         liquidUpdate = config.getBoolean("liquid-update", false);
         lightsUpdate = config.getBoolean("lights-update", true);
         pvpWorlds = Collections.unmodifiableList(config.getStringList("pvp-worlds"));
@@ -571,16 +535,7 @@ public class SettingsContainer {
             }
         }
         this.messageDelays = Collections.unmodifiableMap(messageDelays);
-        warpCategories = config.getBoolean("warp-categories", true);
-        String defaultWarpCategoryName = config.getString("default-warp-category-name");
-        if (!IslandNames.isValidWarpCategoryName(null, defaultWarpCategoryName)) {
-            defaultWarpCategoryName = "Default";
-            Log.warn("config.yml", "Invalid default warp category name '", defaultWarpCategoryName, "', using 'Default' instead.");
-        }
-        this.defaultWarpCategoryName = defaultWarpCategoryName;
         physicsListener = config.getBoolean("physics-listener", true);
-        chargeOnWarp = config.getDouble("charge-on-warp", 0D);
-        publicWarps = config.getBoolean("public-warps");
         lockedIslands = config.getBoolean("locked-islands", false);
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
         autoLanguageDetection = config.getBoolean("auto-language-detection", true);
@@ -589,7 +544,6 @@ public class SettingsContainer {
                         config.getString("island-top-members-sorting").toUpperCase(Locale.ENGLISH)))
                 .orElse(TopIslandMembersSorting.NAMES);
         bossBarLimit = config.getInt("bossbar-limit", 1);
-        deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
         List<RespawnAction> playerRespawnActions = new LinkedList<>();
         config.getStringList("player-respawn").forEach(respawnAction -> {
             try {

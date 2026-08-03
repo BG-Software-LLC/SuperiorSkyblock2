@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Warps'
+title: '&lWarp Categories'
 previous-menu: true
 
 pattern:
@@ -16,35 +16,38 @@ pattern:
   - '$ $ $ $ $ $ $ $ $'
   - '# # % # * # ^ # #'
 
-warps: '@'
+slots: '@'
 previous-page: '%'
 current-page: '*'
 next-page: '^'
 
-# When enabled, instead of showing warps, the visitor warp locations will be shown.
-# To show the description, use the {1} placeholder.
-visitor-warps: false
+# Lore that will be appended to the end of the warp category icon's lore
+# if the player has permission to manage that warp category.
+edit-lore:
+  - ''
+  - ''
+  - '&7&o(( &f&oRight-Click &7&oto edit the category. ))'
 
 items:
   '@':
-    type: PLAYER_HEAD
-    name: '&e{0}''s Island'
+    type: BOOK
+    name: '&6{0}'
     lore:
-      - '&7Click to see all warps of this island.'
-      - '&8>> &7This island has {2} warps.'
+      - '&7This category has {1} warps.'
   '%':
     type: PAPER
-    name: '{0}Previous Page'
+    name: '&cPrevious Page'
   '*':
-    type: SUNFLOWER
+    type: DOUBLE_PLANT
     name: '&aCurrent Page'
     lore:
-      - '&7Page {0}'
+      - '&7Page 1'
   '^':
     type: PAPER
-    name: '{0}Next Page'
+    name: '&cNext Page'
   '$':
-    type: BLACK_STAINED_GLASS_PANE
+    type: STAINED_GLASS_PANE
+    data: 15
     name: '&f'
 
 sounds:

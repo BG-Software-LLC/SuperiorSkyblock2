@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractIconProviderMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 
@@ -27,12 +28,13 @@ public class IconEditLoreButton<E> extends AbstractMenuViewButton<AbstractIconPr
     public void onButtonClick(ButtonClickContext<AbstractIconProviderMenu.View<E>> context) {
         Player player = context.getPlayer();
 
-        getTemplate().newLoreMessage.send(player);
+        String cancelText = getTemplate().cancelMessage.getMessage(PlayerLocales.getLocale(player));
+        getTemplate().newLoreMessage.send(player, cancelText);
 
         menuView.closeView();
 
         PlayerChat.listen(player, message -> {
-            if (!message.equalsIgnoreCase("-cancel")) {
+            if (!message.equalsIgnoreCase(cancelText)) {
                 menuView.getIconTemplate().getEditableBuilder().withLore(message.split("\\\\n"));
             }
 
@@ -47,14 +49,16 @@ public class IconEditLoreButton<E> extends AbstractMenuViewButton<AbstractIconPr
     public static class Builder<E> extends AbstractMenuTemplateButton.AbstractBuilder<AbstractIconProviderMenu.View<E>> {
 
         private final Message newLoreMessage;
+        private final Message cancelMessage;
 
-        public Builder(Message newLoreMessage) {
+        public Builder(Message newLoreMessage, Message cancelMessage) {
             this.newLoreMessage = newLoreMessage;
+            this.cancelMessage = cancelMessage;
         }
 
         @Override
         public MenuTemplateButton<AbstractIconProviderMenu.View<E>> build() {
-            return new Template<>(this, newLoreMessage);
+            return new Template<>(this, newLoreMessage, cancelMessage);
         }
 
     }
@@ -62,10 +66,12 @@ public class IconEditLoreButton<E> extends AbstractMenuViewButton<AbstractIconPr
     public static class Template<E> extends MenuTemplateButtonImpl<AbstractIconProviderMenu.View<E>> {
 
         private final Message newLoreMessage;
+        private final Message cancelMessage;
 
-        Template(AbstractBuilder<AbstractIconProviderMenu.View<E>> builder, Message newLoreMessage) {
+        Template(AbstractBuilder<AbstractIconProviderMenu.View<E>> builder, Message newLoreMessage, Message cancelMessage) {
             super(builder, IconEditLoreButton.class, IconEditLoreButton::new);
             this.newLoreMessage = Objects.requireNonNull(newLoreMessage, "newLoreMessage cannot be null");
+            this.cancelMessage = Objects.requireNonNull(cancelMessage, "cancelMessage cannot be null");
         }
 
     }

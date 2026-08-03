@@ -29,10 +29,13 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBiomes;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmBan;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmKick;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmTransfer;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuDimensionSelection;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandPrivileges;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuVisitIslands;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryIconEdit;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpIconEdit;
@@ -43,12 +46,16 @@ import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.PlayerViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.File;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MenusProvider_Default implements MenusProvider {
@@ -195,14 +202,34 @@ public class MenusProvider_Default implements MenusProvider {
     }
 
     @Override
-    public void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
+    public void openDimensionSelection(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Consumer<Dimension> onSelect) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
-        Menus.MENU_GLOBAL_WARPS.createView(targetPlayer, EmptyViewArgs.INSTANCE, previousMenu);
+        Preconditions.checkNotNull(onSelect, "onSelect parameter cannot be null.");
+        Menus.MENU_DIMENSION_SELECTION.createView(targetPlayer, new MenuDimensionSelection.Args(onSelect), previousMenu);
     }
 
     @Override
+    @Deprecated
+    public void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu) {
+        openGlobalWarps(targetPlayer, previousMenu, SortingTypes.getGlobalWarpsSortingType());
+    }
+
+    @Override
+    public void openGlobalWarps(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SortingType sortingType) {
+        Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
+        Menus.MENU_GLOBAL_WARPS.createView(targetPlayer, new MenuGlobalWarps.Args(sortingType), previousMenu);
+    }
+
+    @Override
+    @Deprecated
     public void refreshGlobalWarps() {
-        Menus.MENU_GLOBAL_WARPS.refreshViews();
+        refreshGlobalWarps(SortingTypes.getGlobalWarpsSortingType());
+    }
+
+    @Override
+    public void refreshGlobalWarps(SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+        Menus.MENU_GLOBAL_WARPS.refreshViews(sortingType);
     }
 
     @Override
@@ -494,6 +521,19 @@ public class MenusProvider_Default implements MenusProvider {
     }
 
     @Override
+    public void openVisitIslands(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, SortingType sortingType, Dimension dimension) {
+        Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        Menus.MENU_VISIT_ISLANDS.createView(targetPlayer, new MenuVisitIslands.Args(sortingType, dimension), previousMenu);
+    }
+
+    @Override
+    public void refreshVisitIslands(SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+        Menus.MENU_VISIT_ISLANDS.refreshViews(sortingType);
+    }
+
+    @Override
     public void openVisitors(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
@@ -514,11 +554,11 @@ public class MenusProvider_Default implements MenusProvider {
         // The warp categories menu should be opened only if:
         //      A) its enabled
         //      B) there are more than 1 category
-        if (plugin.getSettings().isWarpCategories() && targetIsland.getWarpCategories().size() > 1) {
+        if (BuiltinModules.WARPS.getConfiguration().isCategoriesEnabled() && targetIsland.getWarpCategories().size() > 1) {
             Menus.MENU_WARP_CATEGORIES.createView(targetPlayer, new IslandViewArgs(targetIsland), previousMenu);
         } else {
             WarpCategory warpCategory = targetIsland.getWarpCategories().values().stream().findFirst()
-                    .orElseGet(() -> targetIsland.createWarpCategory(plugin.getSettings().getDefaultWarpCategoryName()));
+                    .orElseGet(() -> targetIsland.createWarpCategory(BuiltinModules.WARPS.getConfiguration().getCategoriesDefaultName()));
             openWarps(targetPlayer, previousMenu, warpCategory);
         }
     }
@@ -583,10 +623,7 @@ public class MenusProvider_Default implements MenusProvider {
         // We want skip one item to only work if the player can't edit warps, otherwise he
         // won't be able to edit them as the menu will get skipped if only one warp exists.
         if (Menus.MENU_WARPS.isSkipOneItem() && !targetCategory.getIsland().hasPermission(targetPlayer, IslandPrivileges.SET_WARP)) {
-            List<IslandWarp> availableWarps = targetCategory.getIsland().isMember(targetPlayer) ? targetCategory.getWarps() :
-                    targetCategory.getWarps().stream()
-                            .filter(islandWarp -> !islandWarp.hasPrivateFlag())
-                            .collect(Collectors.toList());
+            List<IslandWarp> availableWarps = WarpsUtils.getAvailableWarps(targetCategory, targetPlayer);
 
             if (availableWarps.size() == 1) {
                 MenuActions.simulateWarpsClick(targetPlayer, targetCategory.getIsland(), availableWarps.get(0));

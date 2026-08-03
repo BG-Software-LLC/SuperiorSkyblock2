@@ -20,7 +20,6 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminAddDisbands());
         registerCommand(new CmdAdminAddSize());
         registerCommand(new CmdAdminAddTeamLimit());
-        registerCommand(new CmdAdminAddWarpsLimit());
         registerCommand(new CmdAdminBypass());
         registerCommand(new CmdAdminChest());
         registerCommand(new CmdAdminClose());
@@ -28,7 +27,6 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminCount());
         registerCommand(new CmdAdminData());
         registerCommand(new CmdAdminDebug());
-        registerCommand(new CmdAdminDelWarp());
         registerCommand(new CmdAdminDemote());
         registerCommand(new CmdAdminDisband());
         registerCommand(new CmdAdminFly());
@@ -67,7 +65,6 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminSetSpawn());
         registerCommand(new CmdAdminSetTeamLimit());
         registerCommand(new CmdAdminSettings());
-        registerCommand(new CmdAdminSetWarpsLimit());
         registerCommand(new CmdAdminShow());
         registerCommand(new CmdAdminSpawn());
         registerCommand(new CmdAdminSpy());

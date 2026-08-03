@@ -169,13 +169,10 @@ island-level-rounding-mode: 'HALF_UP'
 # placement and breaking of blocks.
 auto-blocks-tracking: true
 
-# How should the island top be ordered by default?
-# Use WORTH, LEVEL, RATING or PLAYERS.
+# The sorting type used to determine the order of islands in the top-islands menu.
+# The default available sorting types: BANK, LEVEL, PLAYERS, RATING, WORTH
+# Custom sorting types can be registered using the API.
 island-top-order: 'WORTH'
-
-# How should the global warps be ordered by default?
-# Use WORTH, LEVEL, RATING or PLAYERS.
-global-warps-order: 'WORTH'
 
 # Whether coop members should be enabled or not.
 coop-members: true
@@ -302,32 +299,6 @@ island-roles:
       weight: 3
       permissions:
         - ALL
-
-# Set the line to create the warp sign.
-sign-warp-line: '[IslandWarp]'
-
-# Set the lines of the island warp.
-sign-warp:
-  - '&a[Island Warp]'
-  - ''
-  - ''
-  - ''
-
-# All settings related to the visitors sign.
-visitors-sign:
-  # Whether a visitors sign is required for others to visit islands.
-  # If set to false, visitors will be teleported to the regular island home when using `/is visit`
-  required-for-visit: true
-  # Set the line to create the visitors sign.
-  line: '[Welcome]'
-  # The line that will be displayed when the sign is active.
-  active: '&a[Welcome]'
-  # The line that will be displayed when the sign is inactive.
-  inactive: '&c[Welcome]'
-  # The format in which the island description lines will be saved, players can set the island description
-  # by entering it in the next lines of the Visitors Sign. Useful if you want to display a description
-  # in the global-warps menu and want to give it a default color. {0} represents the text on that line.
-  description-line-format: '{0}'
 
 # Settings related to the island worlds.
 worlds:
@@ -498,6 +469,7 @@ island-names:
   min-length: 3
 
   # A list of names that will be blacklisted.
+  # Regular expressions are supported for advanced matching.
   filtered-names:
     - fuck
     - duck
@@ -680,17 +652,9 @@ default-signs: [ ]
 event-commands:
   IslandCreateEvent: [ ]
 
-# A delay before getting teleported to a warp (in milliseconds).
-# Players cannot move in that time, or the teleportation will be cancelled.
-warps-warmup: 0
-
 # A delay before getting teleported to your island (in milliseconds).
 # Players cannot move in that time, or the teleportation will be cancelled.
 home-warmup: 0
-
-# A delay before getting teleported to another island (in milliseconds).
-# Players cannot move in that time, or the teleportation will be cancelled.
-visit-warmup: 0
 
 # Should liquids get updated when pasting schematics?
 liquid-update: false
@@ -700,6 +664,7 @@ liquid-update: false
 lights-update: true
 
 # A list of worlds that PvP will be enabled between island members.
+# Regular expressions are supported for advanced matching.
 pvp-worlds:
   - 'PvP'
 
@@ -892,25 +857,10 @@ message-delays:
   WORLD_NOT_ENABLED: 3000
   WORLD_NOT_UNLOCKED: 3000
 
-# Should players be able to create warp categories?
-warp-categories: true
-
-# The name of the default warp category. The name must be a single word - cannot contain spaces!
-# If a player creates a warp without specifying a category, and no warp category already exists,
-# a new category with that name will be created.
-default-warp-category-name: 'Default'
-
 # Should the physics listener be activated?
 # This must be enabled if one of the stacked blocks can be affected by gravity or other things.
 # Disabling this listener can help with performance.
 physics-listener: true
-
-# Should players be charged when using island warps?
-# You can set an amount of money to charge, 0 to disable the feature.
-charge-on-warp: 0
-
-# Should island warps be public by default?
-public-warps: false
 
 # Should islands be locked by default?
 locked-islands: false
@@ -936,10 +886,6 @@ island-top-members-sorting: NAMES
 # Limit of the amount of bossbar tasks each player can have at the same time.
 # Once the limit is reached, the old ones will get removed.
 bossbar-limit: 1
-
-# Delete unsafe warps when players try to teleport to them automatically.
-# If disabled, warps that are unsafe will stay until players manually delete them.
-delete-unsafe-warps: true
 
 # List of actions to perform when a player respawns.
 # The plugin will try to perform the actions in the order they are entered here, from top to bottom,

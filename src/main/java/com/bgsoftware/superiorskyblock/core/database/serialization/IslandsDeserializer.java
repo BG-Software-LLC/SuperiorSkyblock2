@@ -260,7 +260,7 @@ public class IslandsDeserializer {
 
             Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_warps");
             builder.addWarp(name.get(), islandWarp.getString("category").orElse(""),
-                    location.get(), islandWarp.getBoolean("private").orElse(!plugin.getSettings().isPublicWarps()),
+                    location.get(), islandWarp.getBoolean("private").orElse(BuiltinModules.WARPS.getConfiguration().isPrivateByDefault()),
                     islandWarp.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null));
         });
     }

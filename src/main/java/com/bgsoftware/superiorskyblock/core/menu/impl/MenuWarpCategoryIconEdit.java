@@ -50,11 +50,11 @@ public class MenuWarpCategoryIconEdit extends AbstractMenu<AbstractIconProviderM
         MenuLayout.Builder<AbstractIconProviderMenu.View<WarpCategory>> patternBuilder = menuParseResult.getLayoutBuilder();
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-type", menuSlotsMap),
-                new IconEditTypeButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_TYPE));
+                new IconEditTypeButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_TYPE, Message.WARP_CATEGORY_MANAGE_CANCEL_TEXT));
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-rename", menuSlotsMap),
-                new IconRenameButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_NAME));
+                new IconRenameButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_NAME, Message.WARP_CATEGORY_MANAGE_CANCEL_TEXT));
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-relore", menuSlotsMap),
-                new IconEditLoreButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_LORE));
+                new IconEditLoreButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_LORE, Message.WARP_CATEGORY_MANAGE_CANCEL_TEXT));
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-confirm", menuSlotsMap),
                 new WarpCategoryIconEditConfirmButton.Builder());
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-slots", menuSlotsMap),

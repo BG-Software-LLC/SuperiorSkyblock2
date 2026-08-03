@@ -105,10 +105,9 @@ import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
-import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.bgsoftware.superiorskyblock.world.GeneratorType;
-import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Preconditions;
@@ -283,6 +282,7 @@ public class SIsland implements Island {
     private volatile String formattedName;
     private volatile String strippedName;
     private volatile String description;
+    private final Synchronized<EnumerateMap<Dimension, String>> descriptions = Synchronized.of(new EnumerateMap<>(Dimension.values()));
 
     public SIsland(IslandBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -964,39 +964,57 @@ public class SIsland implements Island {
             IslandsDatabaseBridge.saveIslandHome(this, dimension, newHome);
     }
 
-    @Nullable
     @Override
-    public Location getVisitorsLocation(Dimension unused) {
-        WorldPosition visitorsPosition = getVisitorsPosition(null /*unused*/);
-        return visitorsPosition == null ? null : IslandWorlds.setWorldToLocation(
-                this, plugin.getSettings().getWorlds().getDefaultWorldDimension(), visitorsPosition);
+    public Location getVisitorsLocation(Dimension dimension) {
+        WorldPosition worldPosition = getVisitorsPosition(dimension);
+        return worldPosition == null ? null : IslandWorlds.setWorldToLocation(this, dimension, worldPosition);
     }
 
     @Override
-    public WorldPosition getVisitorsPosition(Dimension unused) {
-        Dimension defaultWorldDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
-        return this.visitorHomes.readAndGet(visitorHomes ->
-                visitorHomes.get(defaultWorldDimension));
+    public WorldPosition getVisitorsPosition(Dimension dimension) {
+        return this.visitorHomes.readAndGet(visitorHomes -> visitorHomes.get(dimension));
     }
 
     @Override
-    public void setVisitorsLocation(@Nullable Location visitorsLocation) {
-        setVisitorsLocation(null /*unused*/, visitorsLocation == null ? null : SWorldPosition.of(visitorsLocation));
+    public Map<Dimension, Location> getVisitorHomesLocations() {
+        Map<Dimension, Location> visitorHomes = this.visitorHomes.readAndGet(map ->
+                map.collect(Dimension.values(), this::worldPositionToLocation));
+        return visitorHomes.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(visitorHomes);
     }
 
     @Override
-    public void setVisitorsLocation(Dimension unused, @Nullable WorldPosition visitorsPosition) {
-        Log.debug(Debug.SET_VISITOR_HOME, owner.getName(), visitorsPosition);
+    public Map<Dimension, WorldPosition> getVisitorHomesPositions() {
+        Map<Dimension, WorldPosition> visitorHomes = this.visitorHomes.readAndGet(map ->
+                map.collect(Dimension.values()));
+        return visitorHomes.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(visitorHomes);
+    }
 
-        Dimension defaultWorldDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+    @Override
+    public void setVisitorsLocation(@Nullable Location location) {
+        if (location == null) {
+            setVisitorsLocation(plugin.getSettings().getWorlds().getDefaultWorldDimension(), null);
+        } else {
+            Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(location.getWorld());
+            setVisitorsLocation(dimension, SWorldPosition.of(location));
+        }
+    }
 
-        WorldPosition newHome = adjustPositionToCenterOfBlock(visitorsPosition);
+    @Override
+    public void setVisitorsLocation(Dimension dimension, @Nullable WorldPosition worldPosition) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        Log.debug(Debug.SET_VISITOR_HOME, owner.getName(), worldPosition);
+
+        WorldPosition newHome = adjustPositionToCenterOfBlock(worldPosition);
 
         WorldPosition oldHome = visitorHomes.writeAndGet(visitorHomes ->
-                newHome == null ? visitorHomes.remove(defaultWorldDimension) : visitorHomes.put(defaultWorldDimension, newHome));
+                newHome == null ? visitorHomes.remove(dimension) : visitorHomes.put(dimension, newHome));
 
-        if (!Objects.equals(oldHome, newHome))
-            IslandsDatabaseBridge.saveVisitorLocation(this, defaultWorldDimension, newHome);
+        if (Objects.equals(oldHome, newHome)) {
+            return;
+        }
+
+        IslandsDatabaseBridge.saveVisitorLocation(this, dimension, newHome);
     }
 
     @Override
@@ -3646,21 +3664,26 @@ public class SIsland implements Island {
         return Collections.unmodifiableMap(roleLimits);
     }
 
+    /*
+     * Warps related methods
+     */
+
     @Override
     public WarpCategory createWarpCategory(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
         Log.debug(Debug.CREATE_WARP_CATEGORY, owner.getName(), name);
 
-        WarpCategory warpCategory = warpCategories.get(name.toLowerCase(Locale.ENGLISH));
+        WarpCategory warpCategory = this.warpCategories.get(name.toLowerCase(Locale.ENGLISH));
 
         if (warpCategory == null) {
             Log.debugResult(Debug.CREATE_WARP_CATEGORY, "Result New Category", name);
-            List<Integer> occupiedSlots = warpCategories.values().stream().map(WarpCategory::getSlot).collect(Collectors.toList());
+            List<Integer> occupiedSlots = this.warpCategories.values().stream().map(WarpCategory::getSlot).collect(Collectors.toList());
 
             int slot = 0;
-            while (occupiedSlots.contains(slot))
+            while (occupiedSlots.contains(slot)) {
                 ++slot;
+            }
 
             warpCategory = loadWarpCategory(name, slot, null);
 
@@ -3677,12 +3700,13 @@ public class SIsland implements Island {
     @Override
     public WarpCategory getWarpCategory(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return warpCategories.get(name.toLowerCase(Locale.ENGLISH));
+
+        return this.warpCategories.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
     public WarpCategory getWarpCategory(int slot) {
-        return warpCategories.values().stream().filter(warpCategory -> warpCategory.getSlot() == slot)
+        return this.warpCategories.values().stream().filter(warpCategory -> warpCategory.getSlot() == slot)
                 .findAny().orElse(null);
     }
 
@@ -3690,9 +3714,12 @@ public class SIsland implements Island {
     public void renameCategory(WarpCategory warpCategory, String newName) {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
         Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
+        Preconditions.checkArgument(IslandNames.isWarpNameLengthValid(newName), "newName parameter length cannot be invalid.");
+        Preconditions.checkState(getWarpCategory(newName) == null, "Cannot rename warp categories to an already existing warp categories.");
 
-        warpCategories.remove(warpCategory.getName().toLowerCase(Locale.ENGLISH));
-        warpCategories.put(newName.toLowerCase(Locale.ENGLISH), warpCategory);
+        this.warpCategories.remove(warpCategory.getName().toLowerCase(Locale.ENGLISH));
+        this.warpCategories.put(newName.toLowerCase(Locale.ENGLISH), warpCategory);
+
         warpCategory.setName(newName);
     }
 
@@ -3702,10 +3729,11 @@ public class SIsland implements Island {
 
         Log.debug(Debug.DELETE_WARP_CATEGORY, owner.getName(), warpCategory.getName());
 
-        boolean validCategoryRemoval = warpCategories.remove(warpCategory.getName().toLowerCase(Locale.ENGLISH)) != null;
+        boolean validCategoryRemoval = this.warpCategories.remove(warpCategory.getName().toLowerCase(Locale.ENGLISH)) != null;
 
-        if (!validCategoryRemoval)
+        if (!validCategoryRemoval) {
             return;
+        }
 
         IslandsDatabaseBridge.removeWarpCategory(this, warpCategory);
 
@@ -3721,19 +3749,20 @@ public class SIsland implements Island {
 
     @Override
     public Map<String, WarpCategory> getWarpCategories() {
-        return Collections.unmodifiableMap(warpCategories);
+        return Collections.unmodifiableMap(this.warpCategories);
     }
 
     @Override
     public IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        if (!(location instanceof LazyWorldLocation))
+        if (!(location instanceof LazyWorldLocation)) {
             Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        }
 
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, LazyWorldLocation.getWorldName(location));
         WorldPosition worldPosition = SWorldPosition.of(location);
 
-        return createIslandInternal(name, worldInfo, worldPosition, warpCategory);
+        return createWarpInternal(name, worldInfo, worldPosition, warpCategory);
     }
 
     @Override
@@ -3741,53 +3770,70 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
         Preconditions.checkNotNull(position, "position parameter cannot be null.");
 
-        return createIslandInternal(name, worldInfo, position, warpCategory);
+        return createWarpInternal(name, worldInfo, position, warpCategory);
     }
 
-    private IslandWarp createIslandInternal(String name, WorldInfo worldInfo, WorldPosition worldPosition, @Nullable WarpCategory warpCategory) {
+    private IslandWarp createWarpInternal(String name, WorldInfo worldInfo, WorldPosition worldPosition, @Nullable WarpCategory warpCategory) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkState(getWarp(name) == null, "Warp already exists: " + name);
 
         Log.debug(Debug.CREATE_WARP, owner.getName(), name, worldInfo, worldPosition, warpCategory);
 
         IslandWarp islandWarp = loadIslandWarp(name, worldInfo, worldPosition, warpCategory,
-                !plugin.getSettings().isPublicWarps(), null);
+                BuiltinModules.WARPS.getConfiguration().isPrivateByDefault(), null);
 
         IslandsDatabaseBridge.saveWarp(this, islandWarp);
 
-        plugin.getMenus().refreshGlobalWarps();
+        plugin.getMenus().refreshGlobalWarps(SortingTypes.getGlobalWarpsSortingType());
         plugin.getMenus().refreshWarps(islandWarp.getCategory());
 
         return islandWarp;
     }
 
-    /*
-     *  Warps related methods
-     */
-
     @Override
     public void renameWarp(IslandWarp islandWarp, String newName) {
         Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
         Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
-        Preconditions.checkArgument(IslandNames.isWarpNameLengthValid(newName), "Warp names cannot be longer than 255 chars.");
+        Preconditions.checkArgument(IslandNames.isWarpNameLengthValid(newName), "newName parameter length cannot be invalid.");
         Preconditions.checkState(getWarp(newName) == null, "Cannot rename warps to an already existing warps.");
 
-        warpsByName.remove(islandWarp.getName().toLowerCase(Locale.ENGLISH));
-        warpsByName.put(newName.toLowerCase(Locale.ENGLISH), islandWarp);
+        this.warpsByName.remove(islandWarp.getName().toLowerCase(Locale.ENGLISH));
+        this.warpsByName.put(newName.toLowerCase(Locale.ENGLISH), islandWarp);
+
         islandWarp.setName(newName);
+    }
+
+    @Override
+    public void relocateWarp(IslandWarp islandWarp, Location newLocation) {
+        Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
+        Preconditions.checkNotNull(newLocation, "newLocation parameter cannot be null.");
+        if (!(newLocation instanceof LazyWorldLocation)) {
+            Preconditions.checkNotNull(newLocation.getWorld(), "location's world cannot be null.");
+        }
+        Preconditions.checkState(getWarp(newLocation) == null, "Cannot relocate warps to an already existing warp.");
+
+        try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
+            Location location = islandWarp.getLocation(wrapper.getHandle());
+            this.warpsByLocation.write(warpsByLocation -> warpsByLocation.remove(location));
+            this.warpsByLocation.write(warpsByLocation -> warpsByLocation.put(newLocation, islandWarp));
+        }
+
+        islandWarp.setLocation(newLocation);
     }
 
     @Override
     public IslandWarp getWarp(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+
         return this.warpsByLocation.readAndGet(warpsByLocation -> warpsByLocation.get(location));
     }
 
     @Override
     public IslandWarp getWarp(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return warpsByName.get(name.toLowerCase(Locale.ENGLISH));
+
+        return this.warpsByName.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
@@ -3800,26 +3846,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(warpName, "warp parameter cannot be null.");
 
-        IslandWarp islandWarp = getWarp(warpName);
-
-        if (islandWarp == null) {
-            Message.INVALID_WARP.send(superiorPlayer, warpName);
-            return;
-        }
-
-        if (!force && !superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
-            if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
-                    .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
-                Message.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
-                return;
-            }
-
-            plugin.getProviders().getEconomyProvider().withdrawMoney(superiorPlayer,
-                    plugin.getSettings().getChargeOnWarp());
-        }
-
-        EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getWarpsWarmup(),
-                unused -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp));
+        WarpsUtils.warpPlayerInternal(superiorPlayer, this, getOwner(), warpName, force);
     }
 
     @Override
@@ -3830,13 +3857,13 @@ public class SIsland implements Island {
         IslandWarp islandWarp = this.warpsByLocation.writeAndGet(
                 warpsByLocation -> warpsByLocation.remove(location));
 
-        if (islandWarp == null)
+        if (islandWarp == null) {
             return;
+        }
 
         deleteWarp(islandWarp.getName());
 
-        if (superiorPlayer != null)
-            Message.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
+        Message.WARP_DELETE.send(superiorPlayer, islandWarp.getName());
     }
 
     @Override
@@ -3862,16 +3889,21 @@ public class SIsland implements Island {
                 deleteCategory(warpCategory);
         }
 
-        plugin.getMenus().refreshGlobalWarps();
+        plugin.getMenus().refreshGlobalWarps(SortingTypes.getGlobalWarpsSortingType());
 
-        if (warpCategory != null)
+        if (warpCategory != null) {
             plugin.getMenus().refreshWarps(warpCategory);
+        }
     }
 
     @Override
     public Map<String, IslandWarp> getIslandWarps() {
-        return Collections.unmodifiableMap(warpsByName);
+        return Collections.unmodifiableMap(this.warpsByName);
     }
+
+    /*
+     * Ratings related methods
+     */
 
     @Override
     public Rating getRating(SuperiorPlayer superiorPlayer) {
@@ -4630,15 +4662,18 @@ public class SIsland implements Island {
 
     private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {
         WarpCategory warpCategory = new SWarpCategory(getUniqueId(), name, slot, icon);
-        warpCategories.put(name.toLowerCase(Locale.ENGLISH), warpCategory);
+
+        this.warpCategories.put(name.toLowerCase(Locale.ENGLISH), warpCategory);
+
         return warpCategory;
     }
 
     public IslandWarp loadIslandWarp(String name, WorldInfo worldInfo, WorldPosition worldPosition, @Nullable WarpCategory warpCategory,
                                      boolean isPrivate, @Nullable ItemStack icon) {
-        if (warpCategory == null)
-            warpCategory = warpCategories.values().stream().findFirst().orElseGet(() ->
-                    createWarpCategory(plugin.getSettings().getDefaultWarpCategoryName()));
+        if (warpCategory == null) {
+            warpCategory = this.warpCategories.values().stream().findFirst().orElseGet(() ->
+                    createWarpCategory(BuiltinModules.WARPS.getConfiguration().getCategoriesDefaultName()));
+        }
 
         IslandWarp islandWarp = new SIslandWarp(name, worldInfo, worldPosition, warpCategory, isPrivate, icon);
 
@@ -4646,10 +4681,11 @@ public class SIsland implements Island {
 
         String warpName = islandWarp.getName().toLowerCase(Locale.ENGLISH);
 
-        if (warpsByName.containsKey(warpName))
+        if (this.warpsByName.containsKey(warpName)) {
             deleteWarp(warpName);
+        }
 
-        warpsByName.put(warpName, islandWarp);
+        this.warpsByName.put(warpName, islandWarp);
 
         this.warpsByLocation.write(warpsByLocation ->
                 warpsByLocation.put(LazyWorldLocation.of(worldInfo, worldPosition), islandWarp));
@@ -4757,56 +4793,6 @@ public class SIsland implements Island {
 
         // Syncing all real upgrades
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), overrideCustom));
-    }
-
-    /*
-     *  Island top methods
-     */
-
-    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {
-        try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
-            Location location = islandWarp.getLocation(wrapper.getHandle());
-
-            if (location.getWorld() == null) {
-                Location clonedLocation = location.clone();
-                IslandWorlds.accessIslandWorldAsync(this, location, true, islandWorldResult -> {
-                    islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
-                        clonedLocation.setWorld(world);
-                        warpPlayerWithoutWarmupWorldLoaded(superiorPlayer, islandWarp, clonedLocation);
-                    });
-                });
-            } else {
-                warpPlayerWithoutWarmupWorldLoaded(superiorPlayer, islandWarp, location);
-            }
-        }
-    }
-
-    private void warpPlayerWithoutWarmupWorldLoaded(SuperiorPlayer superiorPlayer, IslandWarp islandWarp, Location location) {
-        // Warp doesn't exist anymore.
-        if (getWarp(islandWarp.getName()) == null) {
-            Message.INVALID_WARP.send(superiorPlayer, islandWarp.getName());
-            deleteWarp(islandWarp.getName());
-            return;
-        }
-
-        superiorPlayer.setTeleportTask(null);
-
-        if (!isInsideRange(location) || !WorldBlocks.isSafeBlock(location.getBlock())) {
-            Message.UNSAFE_WARP.send(superiorPlayer);
-            if (plugin.getSettings().getDeleteUnsafeWarps())
-                deleteWarp(islandWarp.getName());
-            return;
-        }
-
-        superiorPlayer.teleport(location, success -> {
-            if (success) {
-                Message.TELEPORTED_TO_WARP.send(superiorPlayer);
-                if (superiorPlayer.isShownAsOnline()) {
-                    IslandUtils.sendMessage(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
-                            Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), islandWarp.getName());
-                }
-            }
-        });
     }
 
     /*
@@ -4936,7 +4922,7 @@ public class SIsland implements Island {
         if (other == null)
             return -1;
 
-        SortingType sortingType = SortingTypes.getIslandTopSorting();
+        SortingType sortingType = SortingTypes.getTopIslandsSortingType();
         Comparator<Island> comparator = sortingType.getComparator();
 
         int result = comparator.compare(this, other);
@@ -5415,6 +5401,7 @@ public class SIsland implements Island {
     }
 
     private static class IslandBiome {
+
         private Biome biome;
         private CompletableFuture<Biome> task;
 

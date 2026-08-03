@@ -364,7 +364,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * If the world is unloaded, the location's getWorld method will return null.
      *
      * @param dimension The dimension to get the visitors-location from.
-     *                  Currently unused, it has no effect.
      */
     @Nullable
     Location getVisitorsLocation(Dimension dimension);
@@ -373,10 +372,20 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the visitors' teleport position of the island.
      *
      * @param dimension The dimension to get the visitors-position from.
-     *                  Currently unused, it has no effect.
      */
     @Nullable
     WorldPosition getVisitorsPosition(Dimension dimension);
+
+    /**
+     * Get all the visitor home locations of the island.
+     * If the world is not loaded, the location's getWorld will return null.
+     */
+    Map<Dimension, Location> getVisitorHomesLocations();
+
+    /**
+     * Get all the visitor home positions of the island.
+     */
+    Map<Dimension, WorldPosition> getVisitorHomesPositions();
 
     /**
      * Set the visitors' teleport location of the island.
@@ -389,7 +398,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Set the visitors' teleport position of the island.
      *
      * @param dimension        The dimension to change the visitors-position.
-     *                         Currently unused, it has no effect.
      * @param visitorsPosition The new visitors position.
      */
     void setVisitorsLocation(Dimension dimension, @Nullable WorldPosition visitorsPosition);
@@ -2477,6 +2485,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param newName    A new name to set.
      */
     void renameWarp(IslandWarp islandWarp, String newName);
+
+    /**
+     * Relocate a warp.
+     *
+     * @param islandWarp  The warp to relocate.
+     * @param newLocation A new location to set.
+     */
+    void relocateWarp(IslandWarp islandWarp, Location newLocation);
 
     /**
      * Get an island warp in a specific location.

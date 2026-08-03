@@ -24,7 +24,7 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.config.PvPWorldsCache;
+import com.bgsoftware.superiorskyblock.core.config.StringMatcher;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -70,7 +70,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static PvPWorldsCache pvpWorldsCache = null;
+    private static StringMatcher pvpWorldsCache = null;
 
     private final DatabaseBridge databaseBridge;
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm;
@@ -1196,10 +1196,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     private static boolean isPvPWorldInternal(String worldName) {
-        if (pvpWorldsCache == null)
-            pvpWorldsCache = new PvPWorldsCache(plugin.getSettings().getPvPWorlds());
+        if (pvpWorldsCache == null) {
+            pvpWorldsCache = new StringMatcher(plugin.getSettings().getPvPWorlds());
+        }
 
-        return pvpWorldsCache.isPvPWorld(worldName);
+        return pvpWorldsCache.matches(worldName);
     }
 
     private static void onSettingsUpdate() {

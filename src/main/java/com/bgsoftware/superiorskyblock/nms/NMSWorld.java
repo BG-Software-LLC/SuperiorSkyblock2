@@ -62,7 +62,7 @@ public interface NMSWorld {
 
     boolean canPlayerSuffocate(Block block);
 
-    void placeSign(Island island, Location location);
+    void placeSign(Location location);
 
     void playGeneratorSound(Location location);
 

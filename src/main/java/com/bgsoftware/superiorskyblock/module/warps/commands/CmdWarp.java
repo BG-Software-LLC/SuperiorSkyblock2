@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands.player;
+package com.bgsoftware.superiorskyblock.module.warps.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -63,36 +64,36 @@ public class CmdWarp implements ISuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        Island targetIsland = null;
+        IslandArgument islandArgument = null;
         String targetWarpName = null;
 
         switch (args.length) {
             case 1: {
-                IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
-                targetIsland = arguments.getIsland();
+                islandArgument = CommandArguments.getSenderIsland(plugin, sender);
                 break;
             }
             case 2: {
                 if (superiorPlayer.hasIsland()) {
-                    IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
-                    targetIsland = arguments.getIsland();
+                    islandArgument = CommandArguments.getSenderIsland(plugin, sender);
                     targetWarpName = args[1];
                 } else {
-                    IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[1]);
-                    targetIsland = arguments.getIsland();
+                    islandArgument = CommandArguments.getIsland(plugin, sender, args[1]);
                 }
                 break;
             }
             case 3: {
-                IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[1]);
-                targetIsland = arguments.getIsland();
+                islandArgument = CommandArguments.getIsland(plugin, sender, args[1]);
                 targetWarpName = args[2];
                 break;
             }
         }
 
-        if (targetIsland == null)
+        if (islandArgument == null || islandArgument.getIsland() == null) {
             return;
+        }
+
+        Island targetIsland = islandArgument.getIsland();
+        SuperiorPlayer targetPlayer = islandArgument.getSuperiorPlayer();
 
         IslandWarp islandWarp = targetWarpName == null ? null : targetIsland.getWarp(targetWarpName);
 
@@ -121,8 +122,9 @@ public class CmdWarp implements ISuperiorCommand {
             return;
         }
 
-        if (PluginEventsFactory.callIslandWarpTeleportEvent(targetIsland, superiorPlayer, islandWarp))
-            targetIsland.warpPlayer(superiorPlayer, targetWarpName);
+        if (PluginEventsFactory.callIslandWarpTeleportEvent(targetIsland, superiorPlayer, islandWarp)) {
+            WarpsUtils.warpPlayerInternal(superiorPlayer, targetIsland, targetPlayer, targetWarpName, false);
+        }
     }
 
     @Override
@@ -146,7 +148,7 @@ public class CmdWarp implements ISuperiorCommand {
                 return tabCompletes.isEmpty() ? Collections.emptyList() : tabCompletes;
             }
             case 3: {
-                Island targetIsland = plugin.getGrid().getIsland(args[1]);
+                Island targetIsland = CommandTabCompletes.getIsland(plugin, args[1]);
                 if (targetIsland != null) {
                     return new SequentialListBuilder<Map.Entry<String, IslandWarp>>()
                             .filter(islandWarpEntry -> targetIsland.isMember(superiorPlayer) || !islandWarpEntry.getValue().hasPrivateFlag())

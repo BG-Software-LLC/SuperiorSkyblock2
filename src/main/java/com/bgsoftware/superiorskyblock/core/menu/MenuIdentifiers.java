@@ -16,6 +16,7 @@ public class MenuIdentifiers {
     public static final String MENU_COOPS = "MenuCoops";
     public static final String MENU_COUNTS = "MenuCounts";
     public static final String MENU_CUSTOM_PREFIX = "MenuCustom_";
+    public static final String MENU_DIMENSION_SELECTION = "MenuDimensionSelection";
     public static final String MENU_GLOBAL_WARPS = "MenuGlobalWarps";
     public static final String MENU_ISLAND_BANK = "MenuIslandBank";
     public static final String MENU_ISLAND_BANNED_PLAYERS = "MenuIslandBannedPlayers";
@@ -36,6 +37,7 @@ public class MenuIdentifiers {
     public static final String MENU_MISSIONS_CATEGORY = "MenuMissionsCategory";
     public static final String MENU_PLAYER_LANGUAGE = "MenuPlayerLanguage";
     public static final String MENU_TOP_ISLANDS = "MenuTopIslands";
+    public static final String MENU_VISIT_ISLANDS = "MenuVisitIslands";
     public static final String MENU_WARP_CATEGORIES = "MenuWarpCategories";
     public static final String MENU_WARP_CATEGORIES_ICON_EDIT = "MenuWarpCategoryIconEdit";
     public static final String MENU_WARP_CATEGORIES_MANAGE = "MenuWarpCategoryManage";
