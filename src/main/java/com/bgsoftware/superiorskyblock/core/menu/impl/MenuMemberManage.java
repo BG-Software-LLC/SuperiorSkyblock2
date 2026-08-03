@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
-import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
@@ -10,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MemberManageButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
@@ -56,6 +56,8 @@ public class MenuMemberManage extends AbstractMenu<PlayerMenuView, PlayerViewArg
                 new MemberManageButton.Builder().setManageAction(MemberManageButton.ManageAction.BAN_MEMBER));
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "kick", menuSlotsMap),
                 new MemberManageButton.Builder().setManageAction(MemberManageButton.ManageAction.KICK_MEMBER));
+
+        MenuMemberRole.parseMemberRoleButton("member-manage.yml", menuSlotsMap, cfg, patternBuilder);
 
         return new MenuMemberManage(menuParseResult);
     }

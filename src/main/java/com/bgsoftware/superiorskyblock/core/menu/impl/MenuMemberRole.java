@@ -54,6 +54,13 @@ public class MenuMemberRole extends AbstractMenu<PlayerMenuView, PlayerViewArgs>
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<PlayerMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
+        parseMemberRoleButton("member-role.yml", menuSlotsMap, cfg, patternBuilder);
+
+        return new MenuMemberRole(menuParseResult);
+    }
+
+    public static void parseMemberRoleButton(String fileName, MenuSlotsMap menuSlotsMap, YamlConfiguration cfg,
+                                              MenuLayout.Builder<PlayerMenuView> patternBuilder) {
         if (cfg.isConfigurationSection("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
                 ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + itemsSectionName);
@@ -66,26 +73,25 @@ public class MenuMemberRole extends AbstractMenu<PlayerMenuView, PlayerViewArgs>
                     try {
                         playerRole = SPlayerRole.of((String) roleObject);
                     } catch (IllegalArgumentException error) {
-                        Log.warnFromFile("member-role.yml", "Invalid role name: ", roleObject);
+                        Log.warnFromFile(fileName, "Invalid role name: ", roleObject);
                         continue;
                     }
                 } else if (roleObject instanceof Integer) {
                     playerRole = SPlayerRole.of((Integer) roleObject);
                     if (playerRole == null) {
-                        Log.warnFromFile("member-role.yml", "&cInvalid role id: ", roleObject);
+                        Log.warnFromFile(fileName, "&cInvalid role id: ", roleObject);
                         continue;
                     }
                 }
 
-                if (playerRole == null)
+                if (playerRole == null) {
                     continue;
+                }
 
                 patternBuilder.mapButtons(menuSlotsMap.getSlots(itemsSectionName),
                         new MemberRoleButton.Builder().setPlayerRole(playerRole));
             }
         }
-
-        return new MenuMemberRole(menuParseResult);
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
