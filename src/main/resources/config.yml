@@ -464,12 +464,11 @@ coop-damage: true
 island-top-include-leader: true
 
 # Set default placeholders that will be returned if the island is null.
-# Please use the <placeholder>:<default> format.
 # You can find a list of placeholders here: https://bg-software.com/superiorskyblock/#placeholders
 default-placeholders:
-  - 'superior_island_leader:N/A'
-  - 'superior_island_level:0'
-  - 'superior_island_worth:0'
+  'superior_island_leader': 'N/A'
+  'superior_island_level': '0'
+  'superior_island_worth': '0'
 
 # Should a confirm gui be displayed when /is ban is executed.
 ban-confirm: true
