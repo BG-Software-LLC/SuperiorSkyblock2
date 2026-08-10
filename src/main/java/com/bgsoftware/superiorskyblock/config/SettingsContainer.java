@@ -264,32 +264,38 @@ public class SettingsContainer {
         maxIslandSize = config.getInt("max-island-size", 200);
         defaultIslandSize = Math.max(config.getInt("default-values.island-size", 20), 1);
         KeyMap<Integer> defaultBlockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        for (String blockName : config.getConfigurationSection("default-values.block-limits").getKeys(false)) {
-            int limit = config.getInt("default-values.block-limits." + blockName);
-            if (limit >= 0) {
-                Key materialKey = Keys.ofMaterialAndData(blockName);
-                defaultBlockLimits.put(materialKey, limit);
-                plugin.getBlockValues().addCustomBlockKey(materialKey);
+        if (config.isConfigurationSection("default-values.block-limits")) {
+            for (String blockName : config.getConfigurationSection("default-values.block-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.block-limits." + blockName);
+                if (limit >= 0) {
+                    Key materialKey = Keys.ofMaterialAndData(blockName);
+                    defaultBlockLimits.put(materialKey, limit);
+                    plugin.getBlockValues().addCustomBlockKey(materialKey);
+                }
             }
         }
         this.defaultBlockLimits = KeyMaps.unmodifiableKeyMap(defaultBlockLimits);
         KeyMap<Integer> defaultEntityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
-        for (String entityName : config.getConfigurationSection("default-values.entity-limits").getKeys(false)) {
-            int limit = config.getInt("default-values.entity-limits." + entityName);
-            if (limit >= 0) {
-                defaultEntityLimits.put(Keys.ofEntityType(entityName), limit);
+        if (config.isConfigurationSection("default-values.entity-limits")) {
+            for (String entityName : config.getConfigurationSection("default-values.entity-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.entity-limits." + entityName);
+                if (limit >= 0) {
+                    defaultEntityLimits.put(Keys.ofEntityType(entityName), limit);
+                }
             }
         }
         this.defaultEntityLimits = KeyMaps.unmodifiableKeyMap(defaultEntityLimits);
         Map<PotionEffectType, Integer> defaultIslandEffects = new ArrayMap<>();
-        for (String effectName : config.getConfigurationSection("default-values.island-effects").getKeys(false)) {
-            int level = config.getInt("default-values.island-effects." + effectName);
-            if (level >= 0) {
-                PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
-                if (potionEffectType == null) {
-                    Log.errorFromFile("config.yml", "Invalid potion effect " + effectName + ", skipping...");
-                } else {
-                    defaultIslandEffects.put(potionEffectType, level - 1);
+        if (config.isConfigurationSection("default-values.island-effects")) {
+            for (String effectName : config.getConfigurationSection("default-values.island-effects").getKeys(false)) {
+                int level = config.getInt("default-values.island-effects." + effectName);
+                if (level >= 0) {
+                    PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
+                    if (potionEffectType == null) {
+                        Log.errorFromFile("config.yml", "Invalid potion effect " + effectName + ", skipping...");
+                    } else {
+                        defaultIslandEffects.put(potionEffectType, level - 1);
+                    }
                 }
             }
         }
@@ -302,13 +308,15 @@ public class SettingsContainer {
         defaultMobDrops = Math.max(config.getDouble("default-values.mob-drops", 1D), IslandUpgradeConstants.NO_LIMIT_VALUE);
         defaultBankLimit = new BigDecimal(config.getString("default-values.bank-limit", "-1")).max(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE);
         defaultRoleLimits = CollectionsFactory.createInt2IntHashMap();
-        for (String roleId : config.getConfigurationSection("default-values.role-limits").getKeys(false)) {
-            int limit = config.getInt("default-values.role-limits." + roleId);
-            if (limit >= 0) {
-                try {
-                    defaultRoleLimits.put(Integer.parseInt(roleId), limit);
-                } catch (NumberFormatException error) {
-                    Log.warnFromFile("config.yml", "Invalid role id for limit: " + roleId + ", skipping...");
+        if (config.isConfigurationSection("default-values.role-limits")) {
+            for (String roleId : config.getConfigurationSection("default-values.role-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.role-limits." + roleId);
+                if (limit >= 0) {
+                    try {
+                        defaultRoleLimits.put(Integer.parseInt(roleId), limit);
+                    } catch (NumberFormatException error) {
+                        Log.warnFromFile("config.yml", "Invalid role id for limit: " + roleId + ", skipping...");
+                    }
                 }
             }
         }
@@ -319,9 +327,11 @@ public class SettingsContainer {
         whitelistedStackedBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("stacked-blocks.whitelisted"));
         stackedBlocksName = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.custom-name"));
         KeyMap<Integer> stackedBlocksLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        for (String materialName : config.getConfigurationSection("stacked-blocks.limits").getKeys(false)) {
-            int limit = config.getInt("stacked-blocks.limits." + materialName);
-            stackedBlocksLimits.put(Keys.ofMaterialAndData(materialName), limit);
+        if (config.isConfigurationSection("stacked-blocks.limits")) {
+            for (String materialName : config.getConfigurationSection("stacked-blocks.limits").getKeys(false)) {
+                int limit = config.getInt("stacked-blocks.limits." + materialName);
+                stackedBlocksLimits.put(Keys.ofMaterialAndData(materialName), limit);
+            }
         }
         this.stackedBlocksLimits = KeyMaps.unmodifiableKeyMap(stackedBlocksLimits);
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
@@ -388,10 +398,12 @@ public class SettingsContainer {
         coopDamage = config.getBoolean("coop-damage", true);
         islandTopIncludeLeader = config.getBoolean("island-top-include-leader", true);
         Map<String, String> defaultPlaceholders = new HashMap<>();
-        for (String placeholderName : config.getConfigurationSection("default-placeholders").getKeys(false)) {
-            String placeholder = placeholderName.replace("superior_", "").toLowerCase(Locale.ENGLISH);
-            String replacement = config.getString("default-placeholders." + placeholder);
-            defaultPlaceholders.put(placeholder, replacement);
+        if (config.isConfigurationSection("default-placeholders")) {
+            for (String placeholderName : config.getConfigurationSection("default-placeholders").getKeys(false)) {
+                String placeholder = placeholderName.replace("superior_", "").toLowerCase(Locale.ENGLISH);
+                String replacement = config.getString("default-placeholders." + placeholder);
+                defaultPlaceholders.put(placeholder, replacement);
+            }
         }
         this.defaultPlaceholders = Collections.unmodifiableMap(defaultPlaceholders);
         banConfirm = config.getBoolean("ban-confirm");
@@ -422,30 +434,36 @@ public class SettingsContainer {
         defaultSettings = Collections.unmodifiableList(config.getStringList("default-settings")
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList()));
         defaultGenerator = new EnumerateMap<>(Dimension.values());
-        for (String dimensionName : config.getConfigurationSection("default-values.generator").getKeys(false)) {
-            try {
-                Dimension dimension = Dimension.getByName(dimensionName.toUpperCase(Locale.ENGLISH));
+        if (config.isConfigurationSection("default-values.generator")) {
+            for (String dimensionName : config.getConfigurationSection("default-values.generator").getKeys(false)) {
+                try {
+                    Dimension dimension = Dimension.getByName(dimensionName.toUpperCase(Locale.ENGLISH));
 
-                KeyMap<Integer> defaultGenerator = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-                for (String materialName : config.getConfigurationSection("default-values.generator." + dimensionName).getKeys(false)) {
-                    int percentage = config.getInt("default-values.generator." + dimensionName + "." + materialName);
-                    if (percentage >= 0) {
-                        defaultGenerator.put(Keys.ofMaterialAndData(materialName), percentage);
+                    KeyMap<Integer> defaultGenerator = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+                    if (config.isConfigurationSection("default-values.generator." + dimensionName)) {
+                        for (String materialName : config.getConfigurationSection("default-values.generator." + dimensionName).getKeys(false)) {
+                            int percentage = config.getInt("default-values.generator." + dimensionName + "." + materialName);
+                            if (percentage >= 0) {
+                                defaultGenerator.put(Keys.ofMaterialAndData(materialName), percentage);
+                            }
+                        }
                     }
+                    this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
+                } catch (Exception error) {
+                    Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading default generator values for ", dimensionName + ":");
                 }
-                this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
-            } catch (Exception error) {
-                Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading default generator values for ", dimensionName + ":");
             }
         }
         disableRedstoneOffline = config.getBoolean("disable-redstone-offline", true);
         disableRedstoneAFK = config.getBoolean("afk-integrations.disable-redstone", false);
         disableSpawningAFK = config.getBoolean("afk-integrations.disable-spawning", true);
         Map<String, Pair<Integer, String>> commandsCooldown = new HashMap<>();
-        for (String subCommand : config.getConfigurationSection("commands-cooldown").getKeys(false)) {
-            int cooldown = config.getInt("commands-cooldown." + subCommand + ".cooldown");
-            String permission = config.getString("commands-cooldown." + subCommand + ".bypass-permission");
-            commandsCooldown.put(subCommand, new Pair<>(cooldown, permission));
+        if (config.isConfigurationSection("commands-cooldown")) {
+            for (String subCommand : config.getConfigurationSection("commands-cooldown").getKeys(false)) {
+                int cooldown = config.getInt("commands-cooldown." + subCommand + ".cooldown");
+                String permission = config.getString("commands-cooldown." + subCommand + ".bypass-permission");
+                commandsCooldown.put(subCommand, new Pair<>(cooldown, permission));
+            }
         }
         this.commandsCooldown = Collections.unmodifiableMap(commandsCooldown);
         upgradeCooldown = config.getLong("upgrade-cooldown", -1L);
@@ -610,7 +628,12 @@ public class SettingsContainer {
         entityCategories = loadEntityCategories(plugin);
     }
 
-    private void loadDimensions(ConfigurationSection dimensionsSection) {
+    private void loadDimensions(ConfigurationSection dimensionsSection) throws ManagerLoadException {
+        // If the section is null, it will not be possible to load any dimension, so the plugin cannot start.
+        if (dimensionsSection == null) {
+            throw new ManagerLoadException("Cannot find any island world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
+
         // First register all dimensions
         for (String dimensionName : dimensionsSection.getKeys(false)) {
             String environmentName = dimensionsSection.getString(dimensionName + ".environment");
@@ -630,6 +653,7 @@ public class SettingsContainer {
     }
 
     private void loadDimensionConfigs(ConfigurationSection dimensionsSection) throws ManagerLoadException {
+        // We don't need to check if section is null, because loadDimensions() will do that beforehand.
         for (String dimensionName : dimensionsSection.getKeys(false)) {
             ConfigurationSection dimensionSection = dimensionsSection.getConfigurationSection(dimensionName);
 

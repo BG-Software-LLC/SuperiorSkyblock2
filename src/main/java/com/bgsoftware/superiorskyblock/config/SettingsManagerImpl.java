@@ -939,7 +939,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         if (cfg.isList(path)) {
             List<String> list = cfg.getStringList(path);
 
-            cfg.set(path, null);
+            cfg.createSection(path);
 
             for (String line : list) {
                 String[] sections = line.split(":");
