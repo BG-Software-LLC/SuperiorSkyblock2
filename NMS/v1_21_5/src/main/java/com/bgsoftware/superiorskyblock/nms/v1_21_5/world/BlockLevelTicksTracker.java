@@ -42,8 +42,8 @@ public class BlockLevelTicksTracker extends LevelTicks<Block> {
                 ticker.accept(blockPos, block);
             } finally {
                 List<GameEvent<?>> capturedEvents = plugin.getGameEventsDispatcher().stopCaptureEvents();
-                // Remove BlockPhysicsEvent which we don't listen to
-                capturedEvents.removeIf(gameEvent -> gameEvent.getType() == GameEventType.BLOCK_PHYSICS_EVENT);
+                // Remove events that do not record a block change, so they never suppress the BlockUpdateShapeEvent
+                capturedEvents.removeIf(GameEvent::doesNotRecordBlockChange);
                 // We don't want to fire the BlockUpdateShapeEvent if another event was fired in the tick method.
                 // This is to prevent blocks from being considered updated twice.
                 if (!capturedEvents.isEmpty())
