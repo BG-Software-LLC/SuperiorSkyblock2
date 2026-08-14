@@ -79,6 +79,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         boolean updatedConfig = false;
 
         File oldUpgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
+
         if (oldUpgradesFile.exists()) {
             CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldUpgradesFile);
 
@@ -92,11 +93,9 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
         if (!config.isBoolean("enabled")) {
             boolean status = false;
 
-            if (config.getBoolean("crop-growth", true)) {
+            if (config.getBoolean("crop-growth.enabled", true)) {
                 status = true;
-            } else if (config.getBoolean("mob-drops", true)) {
-                status = true;
-            } else if (config.getBoolean("island-effects", true)) {
+            } else if (config.getBoolean("mob-drops.enabled", true)) {
                 status = true;
             } else if (config.getBoolean("spawner-rates", true)) {
                 status = true;
@@ -104,48 +103,11 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
                 status = true;
             } else if (config.getBoolean("entity-limits", true)) {
                 status = true;
+            } else if (config.getBoolean("island-effects", true)) {
+                status = true;
             }
 
             config.set("enabled", status);
-            updatedConfig = true;
-        }
-
-        if (!config.isConfigurationSection("crop-growth") && !config.isConfigurationSection("mob-drops")) {
-            config.set("crop-growth.enabled", config.getBoolean("crop-growth"));
-            config.set("mob-drops.enabled", config.getBoolean("mob-drops"));
-
-            File oldConfigFile = new File(plugin.getDataFolder(), "config.yml");
-            if (oldConfigFile.exists()) {
-                CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldConfigFile);
-
-                boolean saveOldConfig = false;
-                if (oldConfig.isList("crops-to-grow")) {
-                    config.set("crop-growth.whitelisted-crops", oldConfig.getList("crops-to-grow"));
-                    oldConfig.set("crops-to-grow", null);
-                    saveOldConfig = true;
-                }
-                if (oldConfig.isInt("crops-interval")) {
-                    config.set("crop-growth.interval", oldConfig.getInt("crops-interval"));
-                    oldConfig.set("crops-interval", null);
-                    saveOldConfig = true;
-                }
-                if (oldConfig.isBoolean("drops-upgrade-players-multiply")) {
-                    config.set("mob-drops.only-player-kills", oldConfig.getBoolean("drops-upgrade-players-multiply"));
-                    oldConfig.set("drops-upgrade-players-multiply", null);
-                    saveOldConfig = true;
-                }
-
-                // We need to save this here instead of in SettingsManagerImpl,
-                // because the save operation there happens earlier, so we would lose the settings.
-                if (saveOldConfig) {
-                    try {
-                        oldConfig.save(oldConfigFile);
-                    } catch (Exception error) {
-                        this.logger().e("An error occurred while saving config file:", error);
-                    }
-                }
-            }
-
             updatedConfig = true;
         }
 
