@@ -455,53 +455,84 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location) {
-        teleport(location, null);
+        teleportWithResult(location, null);
     }
 
     @Override
     public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
+        if(teleportResult == null) {
+            teleportWithResult(location, null);
+        } else {
+            teleportWithResult(location, result ->
+                    teleportResult.accept(result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS));
+        }
+    }
+
+    @Override
+    public void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         Player player = asPlayer();
         if (player != null) {
-            playerTeleportAlgorithm.teleport(player, location).whenComplete((result, error) -> {
-                if (teleportResult != null)
-                    teleportResult.accept(error == null && result);
+            playerTeleportAlgorithm.teleportWithResult(player, location).whenComplete((result, error) -> {
+                if (teleportResult != null) {
+                    teleportResult.accept(error != null ? PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR : result);
+                }
             });
         } else if (teleportResult != null) {
-            teleportResult.accept(false);
+            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
         }
     }
 
     @Override
     public void teleport(Island island) {
-        this.teleport(island, (Consumer<Boolean>) null);
+        this.teleportWithResult(island, null);
     }
 
     @Override
     public void teleport(Island island, Dimension dimension) {
-        this.teleport(island, dimension, null);
+        this.teleportWithResult(island, dimension, null);
     }
 
     @Override
     public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
-        this.teleport(island, plugin.getSettings().getWorlds().getDefaultWorldDimension(), teleportResult);
+        if(teleportResult == null) {
+            teleportWithResult(island, null);
+        } else {
+            teleportWithResult(island, result ->
+                    teleportResult.accept(result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS));
+        }
+    }
+
+    @Override
+    public void teleportWithResult(Island island, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
+        this.teleportWithResult(island, plugin.getSettings().getWorlds().getDefaultWorldDimension(), teleportResult);
     }
 
     @Override
     public void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult) {
+        if(teleportResult == null) {
+            teleportWithResult(island, dimension, null);
+        } else {
+            teleportWithResult(island, dimension, result ->
+                    teleportResult.accept(result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS));
+        }
+    }
+
+    @Override
+    public void teleportWithResult(Island island, Dimension dimension,
+                                   @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         Player player = asPlayer();
         if (player != null) {
             setPlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
-            playerTeleportAlgorithm.teleport(player, island, dimension).whenComplete((result, error) -> {
-                boolean successful = error == null && result;
-
+            playerTeleportAlgorithm.teleportWithResult(player, island, dimension).whenComplete((result, error) -> {
                 player.setFallDistance(0f);
                 removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
 
-                if (teleportResult != null)
-                    teleportResult.accept(successful);
+                if (teleportResult != null) {
+                    teleportResult.accept(error != null ? PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR : result);
+                }
             });
         } else if (teleportResult != null) {
-            teleportResult.accept(false);
+            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
         }
     }
 

@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
@@ -33,7 +34,6 @@ import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
@@ -651,14 +651,15 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
             superiorPlayer.setPlayerStatus(PlayerStatus.VOID_TELEPORT);
 
-            superiorPlayer.teleport(fromIsland, result -> {
-                if (!result) {
-                    Message.TELEPORTED_FAILED.send(superiorPlayer);
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), result2 -> {
+            superiorPlayer.teleportWithResult(fromIsland, result -> {
+                if (result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
+                    forgetVoidTeleportPlayerStatus(superiorPlayer);
+                } else {
+                    superiorPlayer.teleportWithResult(plugin.getGrid().getSpawnIsland(), unused -> {
                         forgetVoidTeleportPlayerStatus(superiorPlayer);
                     });
-                } else {
-                    forgetVoidTeleportPlayerStatus(superiorPlayer);
+                    if (result != PlayerTeleportAlgorithm.TeleportResult.CUSTOM)
+                        Message.TELEPORTED_FAILED.send(superiorPlayer);
                 }
             });
 

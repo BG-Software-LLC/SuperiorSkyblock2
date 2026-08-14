@@ -6,7 +6,7 @@ import com.bgsoftware.common.annotations.IntType;
  * The integer value element annotated with {@link IslandBiomeFlags} represents flags related to what to update
  * when the biome is changed. It is mainly used within the {@link Island} interface and its methods.
  */
-@IntType({IslandBiomeFlags.UPDATE_BLOCKS, IslandBiomeFlags.UPDATE_ALL_DIMENSIONS})
+@IntType({IslandBiomeFlags.UPDATE_BLOCKS, IslandBiomeFlags.UPDATE_DIMENSION, IslandBiomeFlags.UPDATE_ALL_DIMENSIONS})
 public @interface IslandBiomeFlags {
 
     /**

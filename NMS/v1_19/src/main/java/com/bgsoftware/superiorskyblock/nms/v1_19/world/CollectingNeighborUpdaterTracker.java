@@ -21,7 +21,7 @@ import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockStates;
 public class CollectingNeighborUpdaterTracker extends CollectingNeighborUpdater {
 
     private static final ReflectMethod<CraftBlockState> BLOCK_STATE_CREATE = new ReflectMethod<>(
-            CraftBlockState.class, "getBlockState", World.class, BlockPos.class, BlockState.class, BlockEntity.class);
+            CraftBlockStates.class, "getBlockState", World.class, BlockPos.class, BlockState.class, BlockEntity.class);
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -35,13 +35,19 @@ public class CollectingNeighborUpdaterTracker extends CollectingNeighborUpdater 
     @Override
     public void shapeUpdate(Direction direction, BlockState state, BlockPos pos, BlockPos neighborPos, int flags, int recursionLeft) {
         BlockState oldState = this.level.getBlockState(pos);
+        // The block entity must be captured before the update, as it might be removed by it.
+        BlockEntity oldBlockEntity = oldState.hasBlockEntity() ? this.level.getBlockEntity(pos) : null;
         super.shapeUpdate(direction, state, pos, neighborPos, flags, recursionLeft);
         BlockState newState = this.level.getBlockState(pos);
         if (oldState.getBlock() != newState.getBlock()) {
+            // We cannot create a snapshot of the old state without its block entity.
+            if (oldState.hasBlockEntity() && oldBlockEntity == null)
+                return;
+
             // Block was changed, let's call an update
             GameEventArgs.BlockUpdateShapeEvent blockUpdateShapeEvent = new GameEventArgs.BlockUpdateShapeEvent();
             blockUpdateShapeEvent.block = CraftBlock.at(this.level, pos);
-            blockUpdateShapeEvent.oldState = BLOCK_STATE_CREATE.invoke(null, blockUpdateShapeEvent.block.getWorld(), pos, oldState, null);
+            blockUpdateShapeEvent.oldState = BLOCK_STATE_CREATE.invoke(null, blockUpdateShapeEvent.block.getWorld(), pos, oldState, oldBlockEntity);
             GameEvent<GameEventArgs.BlockUpdateShapeEvent> gameEvent = GameEventType.BLOCK_UPDATE_SHAPE_EVENT.createEvent(blockUpdateShapeEvent);
             plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.MONITOR);
         }
