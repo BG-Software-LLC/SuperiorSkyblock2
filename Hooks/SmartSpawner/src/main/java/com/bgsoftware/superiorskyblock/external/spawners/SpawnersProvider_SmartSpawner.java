@@ -100,7 +100,7 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
             }
 
             island.handleBlockBreak(oldEntity, spawnerData.getStackSize());
-            island.handleBlockPlace(location.getBlock(), spawnerData.getStackSize());
+            island.handleBlockPlace(newEntity, spawnerData.getStackSize());
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
