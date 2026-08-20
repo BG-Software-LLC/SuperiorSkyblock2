@@ -2,13 +2,16 @@ package com.bgsoftware.superiorskyblock.external.spawners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import github.nighter.smartspawner.api.SmartSpawnerAPI;
 import github.nighter.smartspawner.api.SmartSpawnerProvider;
 import github.nighter.smartspawner.api.data.SpawnerDataDTO;
 import github.nighter.smartspawner.api.events.SpawnerBreakEvent;
+import github.nighter.smartspawner.api.events.SpawnerEggChangeEvent;
 import github.nighter.smartspawner.api.events.SpawnerPlaceEvent;
 import github.nighter.smartspawner.api.events.SpawnerPlayerBreakEvent;
 import github.nighter.smartspawner.api.events.SpawnerRemoveEvent;
@@ -68,6 +71,25 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
 
             if (island != null) {
                 island.handleBlockBreak(location.getBlock(), e.getQuantity());
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerEggChangeEvent(SpawnerEggChangeEvent e) {
+            Location location = e.getLocation();
+            Island island = plugin.getGrid().getIslandAt(location);
+
+            if (island != null) {
+                Key oldEntity = Keys.ofSpawner(e.getOldEntityType());
+                Key newEntity = Keys.ofSpawner(e.getNewEntityType());
+
+                SpawnerDataDTO spawnerData = api.getSpawnerByLocation(location);
+
+                if (spawnerData != null) {
+                    int stackSize = spawnerData.getStackSize();
+                    island.handleBlockBreak(oldEntity, stackSize);
+                    island.handleBlockPlace(newEntity, stackSize);
+                }
             }
         }
 

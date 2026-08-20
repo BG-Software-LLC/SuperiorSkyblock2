@@ -547,6 +547,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("SmartSpawner") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("SmartSpawner"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_SmartSpawner");
+            listenToSpawnerChanges = false;
         } else if (canRegisterHook("MergedSpawner") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_MergedSpawner");
