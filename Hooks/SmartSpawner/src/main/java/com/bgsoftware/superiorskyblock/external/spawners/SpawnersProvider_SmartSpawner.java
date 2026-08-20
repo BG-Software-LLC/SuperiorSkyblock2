@@ -4,8 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.google.common.base.Preconditions;
 import github.nighter.smartspawner.api.SmartSpawnerAPI;
 import github.nighter.smartspawner.api.SmartSpawnerProvider;
@@ -74,36 +76,55 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
             }
         }
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onSpawnerEggChangeEvent(SpawnerEggChangeEvent e) {
             Location location = e.getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
 
-            if (island != null) {
-                Key oldEntity = Keys.ofSpawner(e.getOldEntityType());
-                Key newEntity = Keys.ofSpawner(e.getNewEntityType());
-
-                SpawnerDataDTO spawnerData = api.getSpawnerByLocation(location);
-
-                if (spawnerData != null) {
-                    int stackSize = spawnerData.getStackSize();
-                    island.handleBlockBreak(oldEntity, stackSize);
-                    island.handleBlockPlace(newEntity, stackSize);
-                }
+            if (island == null) {
+                return;
             }
+
+            Key oldEntity = Keys.ofSpawner(e.getOldEntityType());
+            Key newEntity = Keys.ofSpawner(e.getNewEntityType());
+            SpawnerDataDTO spawnerData = api.getSpawnerByLocation(location);
+
+            if (spawnerData == null) {
+                return;
+            }
+
+            if (island.hasReachedBlockLimit(newEntity, spawnerData.getStackSize())) {
+                e.setCancelled(true);
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(newEntity.toString()));
+                return;
+            }
+
+            island.handleBlockBreak(oldEntity, spawnerData.getStackSize());
+            island.handleBlockPlace(location.getBlock(), spawnerData.getStackSize());
         }
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onSpawnerPlace(SpawnerPlaceEvent e) {
             Location location = e.getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
 
-            if (island != null) {
-                // SmartSpawner calls SpawnerPlaceEvent before completing the spawner setup.
-                // It initializes the CreatureSpawner and creates SpawnerData 2 ticks later.
-                Bukkit.getScheduler().runTaskLater(plugin, () ->
-                        island.handleBlockPlace(location.getBlock(), e.getQuantity()), 3L);
+            if (island == null) {
+                return;
             }
+
+            Key key = Key.ofSpawner(e.getEntityType());
+
+            if (island.hasReachedBlockLimit(key, e.getQuantity())) {
+                e.setCancelled(true);
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(key.toString()));
+                return;
+            }
+
+            // SmartSpawner calls SpawnerPlaceEvent before completing the spawner setup.
+            // It initializes the CreatureSpawner and creates SpawnerData 2 ticks later.
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                island.handleBlockPlace(location.getBlock(), e.getQuantity());
+            }, 3L);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -126,14 +147,31 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
             }
         }
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onSpawnerStack(SpawnerStackEvent e) {
             Location location = e.getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
 
-            if (island != null) {
-                island.handleBlockPlace(location.getBlock(), e.getNewStackSize() - e.getOldStackSize());
+            if (island == null) {
+                return;
             }
+
+            int amount = e.getNewStackSize() - e.getOldStackSize();
+            SpawnerDataDTO spawnerData = api.getSpawnerByLocation(location);
+
+            if (spawnerData == null) {
+                return;
+            }
+
+            Key key = Key.ofSpawner(spawnerData.getEntityType());
+
+            if (island.hasReachedBlockLimit(key, amount)) {
+                e.setCancelled(true);
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(key.toString()));
+                return;
+            }
+
+            island.handleBlockPlace(location.getBlock(), amount);
         }
 
     }

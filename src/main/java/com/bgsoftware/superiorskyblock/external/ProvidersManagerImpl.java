@@ -98,6 +98,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private ChunksProvider chunksProvider = new ChunksProvider_Default();
     private MenusProvider menusProvider;
     private boolean listenToSpawnerChanges = true;
+    private boolean listenToSpawnerChangesUsingEggs = true;
 
     private final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
         @Override
@@ -466,6 +467,10 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         return listenToSpawnerChanges;
     }
 
+    public boolean shouldListenToSpawnerChangesUsingEggs() {
+        return listenToSpawnerChangesUsingEggs;
+    }
+
     private void registerGeneralHooks() {
         if (canRegisterHook("JetsMinions"))
             registerHook("JetsMinionsHook");
@@ -548,6 +553,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
                 (auto || configSpawnersProvider.equalsIgnoreCase("SmartSpawner"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_SmartSpawner");
             listenToSpawnerChanges = false;
+            listenToSpawnerChangesUsingEggs = false;
         } else if (canRegisterHook("MergedSpawner") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_MergedSpawner");
