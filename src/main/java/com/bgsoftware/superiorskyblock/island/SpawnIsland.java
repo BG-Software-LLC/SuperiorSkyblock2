@@ -92,6 +92,7 @@ import java.util.function.Consumer;
 public class SpawnIsland implements Island {
 
     private static final UUID spawnUUID = new UUID(0, 0);
+    private static final int spawnId = 0;
     private static final LazyReference<SSuperiorPlayer> ownerPlayer = new LazyReference<SSuperiorPlayer>() {
         @Override
         protected SSuperiorPlayer create() {
@@ -190,6 +191,11 @@ public class SpawnIsland implements Island {
     @Override
     public UUID getUniqueId() {
         return spawnUUID;
+    }
+
+    @Override
+    public int getId() {
+        return spawnId;
     }
 
     @Override
@@ -1963,6 +1969,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public Map<UUID, Rating> getRatings() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<SuperiorPlayer, Rating> getRatingsAsPlayers() {
         return Collections.emptyMap();
     }
 

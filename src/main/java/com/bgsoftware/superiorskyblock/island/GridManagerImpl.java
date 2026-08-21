@@ -64,7 +64,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -74,6 +73,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -852,21 +852,32 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
-    public void calcAllIslands(Runnable callback) {
+    public void calcAllIslands(@Nullable Runnable callback) {
         Log.debug(Debug.CALCULATE_ALL_ISLANDS);
 
-        List<Island> islands = new ArrayList<>();
+        List<Island> islands = this.islandsContainer.getIslandsUnsorted();
 
-        {
-            for (Island island : this.islandsContainer.getIslandsUnsorted()) {
-                if (!island.isBeingRecalculated())
-                    islands.add(island);
+        CountDownLatch countDownLatch = new CountDownLatch(islands.size());
+
+        for (Island island : islands) {
+            if (!island.isBeingRecalculated()) {
+                island.calcIslandWorth(null, countDownLatch::countDown);
+            } else {
+                countDownLatch.countDown();
             }
         }
 
-        for (int i = 0; i < islands.size(); i++) {
-            islands.get(i).calcIslandWorth(null, i + 1 < islands.size() ? null : callback);
-        }
+        if (callback == null)
+            return;
+
+        BukkitExecutor.async(() -> {
+            try {
+                countDownLatch.await();
+            } catch (Throwable error) {
+                Log.error(error, "An error occurred while waiting for islands to calculate");
+            }
+            BukkitExecutor.sync(callback);
+        });
     }
 
     public void startCalcTask() {

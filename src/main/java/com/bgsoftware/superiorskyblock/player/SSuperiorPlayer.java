@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
+import com.bgsoftware.superiorskyblock.core.LazyInt;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
@@ -63,12 +64,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final AtomicInteger ID_COUNTER = new AtomicInteger(0);
 
     private static PvPWorldsCache pvpWorldsCache = null;
 
@@ -89,6 +93,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private final List<Island> coopIslands = new LinkedList<>();
 
     private final UUID uuid;
+    private final LazyInt id = new LazyInt() {
+        @Override
+        protected int create() {
+            int id = ID_COUNTER.getAndIncrement();
+            plugin.getPlayers().getPlayersContainer().setPlayerId(SSuperiorPlayer.this, id);
+            return id;
+        }
+    };
 
     private Island playerIsland = null;
     private String name;
@@ -181,6 +193,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public UUID getUniqueId() {
         return uuid;
+    }
+
+    @Override
+    public int getId() {
+        return this.id.get();
     }
 
     @Override
@@ -460,7 +477,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
-        if(teleportResult == null) {
+        if (teleportResult == null) {
             teleportWithResult(location, null);
         } else {
             teleportWithResult(location, result ->
@@ -494,7 +511,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
-        if(teleportResult == null) {
+        if (teleportResult == null) {
             teleportWithResult(island, null);
         } else {
             teleportWithResult(island, result ->
@@ -509,7 +526,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult) {
-        if(teleportResult == null) {
+        if (teleportResult == null) {
             teleportWithResult(island, dimension, null);
         } else {
             teleportWithResult(island, dimension, result ->

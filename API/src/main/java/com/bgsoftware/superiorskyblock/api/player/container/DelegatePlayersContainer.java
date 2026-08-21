@@ -27,6 +27,16 @@ public class DelegatePlayersContainer implements PlayersContainer {
     }
 
     @Override
+    public SuperiorPlayer getSuperiorPlayer(int id) {
+        return this.handle.getSuperiorPlayer(id);
+    }
+
+    @Override
+    public void setPlayerId(SuperiorPlayer superiorPlayer, int id) {
+        this.handle.setPlayerId(superiorPlayer, id);
+    }
+
+    @Override
     public List<SuperiorPlayer> getAllPlayers() {
         return this.handle.getAllPlayers();
     }

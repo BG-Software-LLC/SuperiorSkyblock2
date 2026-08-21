@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
@@ -34,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -234,7 +236,8 @@ public class CmdAdminShow implements IAdminIslandCommand {
         if (!Message.ISLAND_INFO_ROLES.isEmpty(locale)) {
             Map<PlayerRole, StringBuilder> rolesStrings = new LinkedHashMap<>();
 
-            List<SuperiorPlayer> members = island.getIslandMembers(false);
+            List<SuperiorPlayer> members = new LinkedList<>(island.getIslandMembers(false));
+            members.sort(SortingComparators.PLAYER_NAMES_COMPARATOR);
 
             if (!Message.ISLAND_INFO_PLAYER_LINE.isEmpty(locale)) {
                 members.forEach(islandMember -> {

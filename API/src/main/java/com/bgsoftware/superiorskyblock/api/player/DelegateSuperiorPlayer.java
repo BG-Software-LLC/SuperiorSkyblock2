@@ -43,6 +43,11 @@ public class DelegateSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public int getId() {
+        return this.handle.getId();
+    }
+
+    @Override
     public String getName() {
         return this.handle.getName();
     }

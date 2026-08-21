@@ -27,6 +27,7 @@ import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvide
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.google.common.collect.ImmutableMap;
@@ -321,8 +322,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             island.getSpawnerRatesMultiplier() + "")
                     .put("team_limit", (island, superiorPlayer) ->
                             island.getTeamLimit() + "")
-                    .put("team_list", (island, superiorPlayer) ->
-                            Formatters.COMMA_FORMATTER.format(island.getIslandMembers(true).stream().map(SuperiorPlayer::getName)))
+                    .put("team_list", (island, superiorPlayer) -> {
+                        List<SuperiorPlayer> islandMembers = new LinkedList<>(island.getIslandMembers(true));
+                        islandMembers.sort(SortingComparators.PLAYER_NAMES_COMPARATOR);
+                        return Formatters.COMMA_FORMATTER.format(islandMembers.stream().map(SuperiorPlayer::getName));
+                    })
                     .put("team_size", (island, superiorPlayer) ->
                             island.getIslandMembers(true).size() + "")
                     .put("team_size_online", (island, superiorPlayer) ->

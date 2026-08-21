@@ -25,6 +25,23 @@ public interface PlayersContainer {
     SuperiorPlayer getSuperiorPlayer(UUID uuid);
 
     /**
+     * Get a player by its id.
+     *
+     * @param id The id of the player.
+     */
+    @Nullable
+    SuperiorPlayer getSuperiorPlayer(int id);
+
+    /**
+     * Update a player with its id.
+     * Do not call this method unless you know what you're doing.
+     *
+     * @param superiorPlayer The player to set the id to.
+     * @param id             The id to set.
+     */
+    void setPlayerId(SuperiorPlayer superiorPlayer, int id);
+
+    /**
      * Get all the players.
      */
     List<SuperiorPlayer> getAllPlayers();

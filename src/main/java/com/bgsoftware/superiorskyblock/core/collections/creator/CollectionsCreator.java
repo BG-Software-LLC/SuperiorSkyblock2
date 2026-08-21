@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.collections.creator;
 import com.bgsoftware.superiorskyblock.core.collections.view.Char2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.IntSetView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 
 public interface CollectionsCreator {
@@ -22,5 +23,9 @@ public interface CollectionsCreator {
     <V> Long2ObjectMapView<V> createLong2ObjectArrayMap();
 
     <V> Char2ObjectMapView<V> createChar2ObjectArrayMap();
+
+    IntSetView createIntLinkedHashSet();
+
+    IntSetView createIntHashSet();
 
 }

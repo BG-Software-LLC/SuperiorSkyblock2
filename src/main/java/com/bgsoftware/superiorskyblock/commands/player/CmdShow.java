@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
@@ -24,6 +25,7 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -128,7 +130,8 @@ public class CmdShow implements ISuperiorCommand {
             plugin.getRoles().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
                     .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
 
-            List<SuperiorPlayer> members = island.getIslandMembers(false);
+            List<SuperiorPlayer> members = new LinkedList<>(island.getIslandMembers(false));
+            members.sort(SortingComparators.PLAYER_NAMES_COMPARATOR);
 
             if (!Message.ISLAND_INFO_PLAYER_LINE.isEmpty(locale)) {
                 members.forEach(islandMember -> {

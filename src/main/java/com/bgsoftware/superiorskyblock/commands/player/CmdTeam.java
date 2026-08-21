@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,7 +73,7 @@ public class CmdTeam implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Locale locale = superiorPlayer != null ? superiorPlayer.getUserLocale() : PlayerLocales.getDefaultLocale();
 
-        List<SuperiorPlayer> members = island.getIslandMembers(true);
+        List<SuperiorPlayer> members = new LinkedList<>(island.getIslandMembers(true));
 
         BukkitExecutor.ensureAsync(() -> doShowTeamStatus(superiorPlayer, locale, island, members));
     }

@@ -16,11 +16,13 @@ import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
+import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MenuIslandMembers extends AbstractPagedMenu<MenuIslandMembers.View, IslandViewArgs, SuperiorPlayer> {
@@ -63,7 +65,9 @@ public class MenuIslandMembers extends AbstractPagedMenu<MenuIslandMembers.View,
 
         @Override
         protected List<SuperiorPlayer> requestObjects() {
-            return island.getIslandMembers(true);
+            List<SuperiorPlayer> islandMembers = new LinkedList<>(island.getIslandMembers(true));
+            islandMembers.sort(SortingComparators.PLAYER_NAMES_COMPARATOR);
+            return islandMembers;
         }
 
         @Override

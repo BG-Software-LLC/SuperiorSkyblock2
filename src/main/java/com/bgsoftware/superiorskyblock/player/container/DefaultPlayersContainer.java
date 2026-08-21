@@ -1,9 +1,13 @@
 package com.bgsoftware.superiorskyblock.player.container;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 
 import java.util.List;
 import java.util.Locale;
@@ -14,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultPlayersContainer implements PlayersContainer {
 
     private final Map<UUID, SuperiorPlayer> players = new ConcurrentHashMap<>();
+    private final Synchronized<Int2ObjectMapView<SuperiorPlayer>> playersByIds = Synchronized.of(CollectionsFactory.createInt2ObjectLinkedHashMap());
     private final Map<String, SuperiorPlayer> playersByNames = new ConcurrentHashMap<>();
 
     @Nullable
@@ -36,6 +41,17 @@ public class DefaultPlayersContainer implements PlayersContainer {
     @Override
     public SuperiorPlayer getSuperiorPlayer(UUID uuid) {
         return this.players.get(uuid);
+    }
+
+    @Nullable
+    @Override
+    public SuperiorPlayer getSuperiorPlayer(int id) {
+        return this.playersByIds.readAndGet(playersByIds -> playersByIds.get(id));
+    }
+
+    @Override
+    public void setPlayerId(SuperiorPlayer superiorPlayer, int id) {
+        this.playersByIds.write(playersByIds -> playersByIds.put(id, superiorPlayer));
     }
 
     @Override

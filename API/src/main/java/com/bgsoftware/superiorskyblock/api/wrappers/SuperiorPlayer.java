@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Identified;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
@@ -31,16 +32,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, IDatabaseBridgeHolder {
+public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, IDatabaseBridgeHolder, Identified {
 
     /*
      *   General Methods
      */
-
-    /**
-     * Get the UUID of the player.
-     */
-    UUID getUniqueId();
 
     /**
      * Get the last known name of the player.

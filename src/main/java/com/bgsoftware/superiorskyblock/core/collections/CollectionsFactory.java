@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.core.collections.creator.JavaCollectionsC
 import com.bgsoftware.superiorskyblock.core.collections.view.Char2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.IntSetView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 
 public class CollectionsFactory {
@@ -46,6 +47,14 @@ public class CollectionsFactory {
 
     public static <V> Char2ObjectMapView<V> createChar2ObjectArrayMap() {
         return creator.createChar2ObjectArrayMap();
+    }
+
+    public static IntSetView createIntLinkedHashSet() {
+        return creator.createIntLinkedHashSet();
+    }
+
+    public static IntSetView createIntHashSet() {
+        return creator.createIntHashSet();
     }
 
     private static CollectionsCreator findSuitableCollectionsCreator() {

@@ -83,6 +83,10 @@ public class EnumerateMap<K extends Enumerable, V> {
         }
     }
 
+    public void putAll(Map<K, V> other) {
+        other.forEach((key, value) -> values[key.ordinal()] = value);
+    }
+
     @Nullable
     public V remove(K key) {
         if (!isValidKey(key))

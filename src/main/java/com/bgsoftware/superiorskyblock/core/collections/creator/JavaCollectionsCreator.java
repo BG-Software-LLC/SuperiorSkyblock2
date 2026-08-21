@@ -6,14 +6,18 @@ import com.bgsoftware.superiorskyblock.core.collections.view.CharIterator;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.IntIterator;
+import com.bgsoftware.superiorskyblock.core.collections.view.IntSetView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 
 public class JavaCollectionsCreator implements CollectionsCreator {
 
@@ -61,6 +65,16 @@ public class JavaCollectionsCreator implements CollectionsCreator {
     @Override
     public <V> Char2ObjectMapView<V> createChar2ObjectArrayMap() {
         return new Char2ObjectJavaMapView<>(new ArrayMap<>());
+    }
+
+    @Override
+    public IntSetView createIntLinkedHashSet() {
+        return new IntSetJavaSetView(new LinkedHashSet<>());
+    }
+
+    @Override
+    public IntSetView createIntHashSet() {
+        return new IntSetJavaSetView(new HashSet<>());
     }
 
     private static class Int2ObjectJavaMapView<V> implements Int2ObjectMapView<V> {
@@ -210,7 +224,7 @@ public class JavaCollectionsCreator implements CollectionsCreator {
 
         @Override
         public IntIterator keyIterator() {
-            return new IntIteratorWrapper(this.delegate.values().iterator());
+            return new IntIteratorWrapper(this.delegate.keySet().iterator());
         }
 
         @Override
@@ -468,6 +482,40 @@ public class JavaCollectionsCreator implements CollectionsCreator {
         }
 
 
+    }
+
+    private static class IntSetJavaSetView implements IntSetView {
+
+        private final Set<Integer> delegate;
+
+        IntSetJavaSetView(Set<Integer> delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public int size() {
+            return this.delegate.size();
+        }
+
+        @Override
+        public boolean add(int value) {
+            return this.delegate.add(value);
+        }
+
+        @Override
+        public boolean remove(int value) {
+            return this.delegate.remove(value);
+        }
+
+        @Override
+        public boolean contains(int value) {
+            return this.delegate.contains(value);
+        }
+
+        @Override
+        public IntIterator iterator() {
+            return new IntIteratorWrapper(this.delegate.iterator());
+        }
     }
 
     private static class IntIteratorWrapper implements IntIterator {

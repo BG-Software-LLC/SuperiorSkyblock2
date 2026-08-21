@@ -36,6 +36,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -58,6 +59,11 @@ public class DelegateIsland implements Island {
     @Override
     public UUID getUniqueId() {
         return this.handle.getUniqueId();
+    }
+
+    @Override
+    public int getId() {
+        return this.handle.getId();
     }
 
     @Override
@@ -1812,8 +1818,14 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public Map<UUID, Rating> getRatings() {
         return this.handle.getRatings();
+    }
+
+    @Override
+    public Map<SuperiorPlayer, Rating> getRatingsAsPlayers() {
+        return this.handle.getRatingsAsPlayers();
     }
 
     @Override

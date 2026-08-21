@@ -35,6 +35,23 @@ public interface IslandsContainer {
     Island getIslandByUUID(UUID uuid);
 
     /**
+     * Get an island by its id.
+     *
+     * @param id The id of the island.
+     */
+    @Nullable
+    Island getIslandById(int id);
+
+    /**
+     * Update an island with its id.
+     * Do not call this method unless you know what you're doing.
+     *
+     * @param island The island to set the id to.
+     * @param id     The id to set.
+     */
+    void setIslandId(Island island, int id);
+
+    /**
      * Get an island by its name.
      *
      * @param name The name of the island.

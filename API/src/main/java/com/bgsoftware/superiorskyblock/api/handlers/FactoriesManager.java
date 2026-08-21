@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.factory.DatabaseBridgeFactory;
 import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
 import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.schematic.SchematicOptions;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -208,5 +209,10 @@ public interface FactoriesManager {
      * @param schematicName The name of the schematic to create.
      */
     SchematicOptions.Builder createSchematicOptionsBuilder(String schematicName);
+
+    /**
+     * Create a new builder for a {@link IslandFlag.Config} object.
+     */
+    IslandFlag.Config.Builder createIslandFlagConfigBuilder();
 
 }

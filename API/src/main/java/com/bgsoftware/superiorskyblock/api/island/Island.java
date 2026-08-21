@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Identified;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
@@ -50,7 +51,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public interface Island extends Comparable<Island>, IMissionsHolder, IPersistentDataHolder, IDatabaseBridgeHolder {
+public interface Island extends Comparable<Island>, IMissionsHolder, IPersistentDataHolder, IDatabaseBridgeHolder, Identified {
 
     /*
      *  General methods
@@ -60,11 +61,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the owner of the island.
      */
     SuperiorPlayer getOwner();
-
-    /**
-     * Get the unique-id of the island.
-     */
-    UUID getUniqueId();
 
     /**
      * Get the creation time of the island.
@@ -1245,6 +1241,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * The current biome of the island.
+     *
      * @deprecated See {@link #getBiome(Dimension)}
      */
     @Deprecated
@@ -1257,6 +1254,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Change the biome of the island's area.
+     *
      * @deprecated See {@link #setBiome(Dimension, Biome)}
      */
     @Deprecated
@@ -2569,8 +2567,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get all the ratings of the island.
+     *
+     * @deprecated See {@link #getRatingsAsPlayers()}
      */
+    @Deprecated
     Map<UUID, Rating> getRatings();
+
+    /**
+     * Get all the ratings of the island.
+     */
+    Map<SuperiorPlayer, Rating> getRatingsAsPlayers();
 
     /**
      * Remove all the ratings of the island.

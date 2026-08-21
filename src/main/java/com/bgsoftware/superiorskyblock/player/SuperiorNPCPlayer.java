@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyInt;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
@@ -34,17 +35,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable {
 
     private static final ObjectsPool<SuperiorNPCPlayer> POOL = new ObjectsPool<>(SuperiorNPCPlayer::new);
 
+    private static final AtomicInteger ID_COUNTER = new AtomicInteger(1);
+
     public static SuperiorNPCPlayer obtain(Player npc) {
         return POOL.obtain().initialize(npc);
     }
 
     private Player npc;
+    private LazyInt id;
 
     private SuperiorNPCPlayer() {
 
@@ -52,6 +57,12 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     private SuperiorNPCPlayer initialize(Player npc) {
         this.npc = npc;
+        this.id = new LazyInt() {
+            @Override
+            protected int create() {
+                return -ID_COUNTER.getAndIncrement();
+            }
+        };
         return this;
     }
 
@@ -64,6 +75,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     @Override
     public UUID getUniqueId() {
         return npc.getUniqueId();
+    }
+
+    @Override
+    public int getId() {
+        return id.get();
     }
 
     @Override
@@ -210,7 +226,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     @Override
     public void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
-        if(teleportResult != null)
+        if (teleportResult != null)
             teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
     }
 
@@ -232,7 +248,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     @Override
     public void teleportWithResult(Island island, Dimension dimension, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
-        if(teleportResult != null)
+        if (teleportResult != null)
             teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
     }
 
@@ -244,7 +260,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     @Override
     public void teleportWithResult(Island island, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
-        if(teleportResult != null)
+        if (teleportResult != null)
             teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
     }
 

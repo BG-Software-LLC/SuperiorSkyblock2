@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.core.collections.view.CharIterator;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.IntIterator;
+import com.bgsoftware.superiorskyblock.core.collections.view.IntSetView;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
@@ -15,6 +16,10 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -70,6 +75,16 @@ public class FastUtilCollectionsCreator implements CollectionsCreator {
     @Override
     public <V> Char2ObjectMapView<V> createChar2ObjectArrayMap() {
         return new Char2ObjectFastUtilMapView<>(new Char2ObjectArrayMap<>());
+    }
+
+    @Override
+    public IntSetView createIntLinkedHashSet() {
+        return new IntSetFastUtilSetView(new IntLinkedOpenHashSet());
+    }
+
+    @Override
+    public IntSetView createIntHashSet() {
+        return new IntSetFastUtilSetView(new IntOpenHashSet());
     }
 
     private static class Int2ObjectFastUtilMapView<V> implements Int2ObjectMapView<V> {
@@ -474,6 +489,40 @@ public class FastUtilCollectionsCreator implements CollectionsCreator {
 
         }
 
+    }
+
+    private static class IntSetFastUtilSetView implements IntSetView {
+
+        private final IntSet delegate;
+
+        IntSetFastUtilSetView(IntSet delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public int size() {
+            return this.delegate.size();
+        }
+
+        @Override
+        public boolean add(int value) {
+            return this.delegate.add(value);
+        }
+
+        @Override
+        public boolean remove(int value) {
+            return this.delegate.remove(value);
+        }
+
+        @Override
+        public boolean contains(int value) {
+            return this.delegate.contains(value);
+        }
+
+        @Override
+        public IntIterator iterator() {
+            return new IntIteratorWrapper(this.delegate.iterator());
+        }
     }
 
     private static class IntIteratorWrapper implements IntIterator {

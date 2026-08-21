@@ -27,6 +27,8 @@ import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.IdMap;
+import com.bgsoftware.superiorskyblock.core.collections.IdSet;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
@@ -88,13 +90,13 @@ public class IslandBuilderImpl implements Island.Builder {
     public final KeyMap<BigInteger> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     public final KeyMap<BigInteger> entityCounts = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final EnumerateMap<Dimension, WorldPosition> islandHomes = new EnumerateMap<>(Dimension.values());
-    public final List<SuperiorPlayer> members = new LinkedList<>();
-    public final List<SuperiorPlayer> bannedPlayers = new LinkedList<>();
-    public final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new LinkedHashMap<>();
+    public final IdSet<SuperiorPlayer> members = IdSet.newPlayersLinkedSet();
+    public final IdSet<SuperiorPlayer> bannedPlayers = IdSet.newPlayersLinkedSet();
+    public final IdMap<SuperiorPlayer, PermissionNode> playerPermissions = IdMap.newPlayersMap();
     public final Map<IslandPrivilege, Integer> rolePermissions = new LinkedHashMap<>();
     public final Map<String, Integer> upgrades = new LinkedHashMap<>();
     public final KeyMap<IntValue> blockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-    public final Map<UUID, Rating> ratings = new LinkedHashMap<>();
+    public final IdMap<SuperiorPlayer, Rating> ratings = IdMap.newPlayersMap();
     public final Map<MissionReference, Counter> completedMissions = new LinkedHashMap<>();
     public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
     public final EnumerateMap<Dimension, KeyMap<IntValue>> cobbleGeneratorValues = new EnumerateMap<>(Dimension.values());
@@ -387,7 +389,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public List<SuperiorPlayer> getIslandMembers() {
-        return Collections.unmodifiableList(this.members);
+        return this.members.asListView();
     }
 
     @Override
@@ -399,21 +401,22 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public List<SuperiorPlayer> getBannedPlayers() {
-        return Collections.unmodifiableList(this.bannedPlayers);
+        return this.bannedPlayers.asListView();
     }
 
     @Override
     public Island.Builder setPlayerPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
-        this.playerPermissions.computeIfAbsent(superiorPlayer, p -> new PlayerPrivilegeNode(superiorPlayer, null))
-                .loadPrivilege(islandPrivilege, (byte) (value ? 1 : 0));
+        PlayerPrivilegeNode playerPrivilegeNode = (PlayerPrivilegeNode) this.playerPermissions.computeIfAbsent(superiorPlayer,
+                p -> new PlayerPrivilegeNode(superiorPlayer, null));
+        playerPrivilegeNode.loadPrivilege(islandPrivilege, (byte) (value ? 1 : 0));
         return this;
     }
 
     @Override
     public Map<SuperiorPlayer, PermissionNode> getPlayerPermissions() {
-        return Collections.unmodifiableMap(this.playerPermissions);
+        return this.playerPermissions.asMapView();
     }
 
     @Override
@@ -463,16 +466,13 @@ public class IslandBuilderImpl implements Island.Builder {
     public Island.Builder setRating(SuperiorPlayer superiorPlayer, Rating rating) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(rating, "rating parameter cannot be null.");
-        this.ratings.put(superiorPlayer.getUniqueId(), rating);
+        this.ratings.put(superiorPlayer, rating);
         return this;
     }
 
     @Override
     public Map<SuperiorPlayer, Rating> getRatings() {
-        return Collections.unmodifiableMap(this.ratings.entrySet().stream().collect(Collectors.toMap(
-                entry -> plugin.getPlayers().getSuperiorPlayer(entry.getKey()),
-                Map.Entry::getValue
-        )));
+        return this.ratings.asMapView();
     }
 
     @Override

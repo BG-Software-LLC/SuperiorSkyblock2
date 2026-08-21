@@ -33,6 +33,16 @@ public class DelegateIslandsContainer implements IslandsContainer {
     }
 
     @Override
+    public Island getIslandById(int id) {
+        return this.handle.getIslandById(id);
+    }
+
+    @Override
+    public void setIslandId(Island island, int id) {
+        this.handle.setIslandId(island, id);
+    }
+
+    @Override
     public Island getIslandByName(String name) {
         return this.handle.getIslandByName(name);
     }

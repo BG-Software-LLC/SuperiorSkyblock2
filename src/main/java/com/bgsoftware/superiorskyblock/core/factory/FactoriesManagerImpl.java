@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
@@ -42,6 +43,7 @@ import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandEntitiesTra
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
+import com.bgsoftware.superiorskyblock.island.flag.IslandFlagConfigBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
@@ -212,6 +214,11 @@ public class FactoriesManagerImpl implements FactoriesManager {
     public SchematicOptions.Builder createSchematicOptionsBuilder(String schematicName) {
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null");
         return new SchematicOptionsBuilderImpl(schematicName);
+    }
+
+    @Override
+    public IslandFlag.Config.Builder createIslandFlagConfigBuilder() {
+        return new IslandFlagConfigBuilderImpl();
     }
 
     public IslandBank createIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {

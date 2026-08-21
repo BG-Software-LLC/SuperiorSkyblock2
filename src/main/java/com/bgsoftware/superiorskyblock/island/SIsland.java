@@ -47,6 +47,7 @@ import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
+import com.bgsoftware.superiorskyblock.core.LazyInt;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -57,9 +58,12 @@ import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.IdMap;
+import com.bgsoftware.superiorskyblock.core.collections.IdSet;
 import com.bgsoftware.superiorskyblock.core.collections.Location2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.view.IntSetView;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
@@ -75,6 +79,7 @@ import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
@@ -88,10 +93,8 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.cache.IslandCacheImpl;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
-import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
-import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
@@ -113,12 +116,11 @@ import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -157,9 +159,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
 public class SIsland implements Island {
@@ -167,6 +171,8 @@ public class SIsland implements Island {
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final UUID[] EMPTY_IGNORED_MEMBERS = new UUID[0];
     private static final Object[] EMPTY_MESSAGE_ARGS = new Object[0];
+    // Starting id as 1. 0 is saved for SpawnIsland.
+    private static final AtomicInteger ID_COUNTER = new AtomicInteger(1);
 
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -205,6 +211,14 @@ public class SIsland implements Island {
      * Island Identifiers
      */
     private final UUID uuid;
+    private final LazyInt id = new LazyInt() {
+        @Override
+        protected int create() {
+            int id = ID_COUNTER.getAndIncrement();
+            plugin.getGrid().getIslandsContainer().setIslandId(SIsland.this, id);
+            return id;
+        }
+    };
     private final BlockPosition center;
     private final long creationTime;
     @Nullable
@@ -228,14 +242,15 @@ public class SIsland implements Island {
     /*
      * Island Player-Trackers
      */
-    private final Synchronized<SortedSet<SuperiorPlayer>> members = Synchronized.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
-    private final Synchronized<SortedSet<SuperiorPlayer>> playersInside = Synchronized.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
+    private final Synchronized<IdSet<SuperiorPlayer>> members = Synchronized.of(IdSet.newPlayersLinkedSet());
+    private final Synchronized<IdSet<SuperiorPlayer>> playersInside = Synchronized.of(IdSet.newPlayersLinkedSet());
+    private List<SuperiorPlayer> playersInsideCache = null;
     private final Synchronized<SortedSet<UniqueVisitor>> uniqueVisitors = Synchronized.of(new TreeSet<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
-    private final Set<SuperiorPlayer> bannedPlayers = Sets.newConcurrentHashSet();
-    private final Set<SuperiorPlayer> coopPlayers = Sets.newConcurrentHashSet();
-    private final Set<SuperiorPlayer> invitedPlayers = Sets.newConcurrentHashSet();
-    private final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new ConcurrentHashMap<>();
-    private final Map<UUID, Rating> ratings = new ConcurrentHashMap<>();
+    private final Synchronized<IdSet<SuperiorPlayer>> bannedPlayers = Synchronized.of(IdSet.newPlayersLinkedSet());
+    private final Synchronized<IdSet<SuperiorPlayer>> invitedPlayers = Synchronized.of(IdSet.newPlayersLinkedSet());
+    private final Synchronized<IdSet<SuperiorPlayer>> coopPlayers = Synchronized.of(IdSet.newPlayersLinkedSet());
+    private final Synchronized<IdMap<SuperiorPlayer, PermissionNode>> playerPermissions = Synchronized.of(IdMap.newPlayersMap());
+    private final Synchronized<IdMap<SuperiorPlayer, Rating>> ratings = Synchronized.of(IdMap.newPlayersMap());
     /*
      * Island Warps
      */
@@ -247,8 +262,8 @@ public class SIsland implements Island {
      */
     private final Synchronized<EnumerateMap<Dimension, WorldPosition>> islandHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     private final Synchronized<EnumerateMap<Dimension, WorldPosition>> visitorHomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
-    private final Map<IslandPrivilege, Integer> rolePermissions = new ConcurrentHashMap<>();
-    private final Map<IslandFlag, Byte> islandFlags = new ConcurrentHashMap<>();
+    private final Synchronized<EnumerateMap<IslandPrivilege, Integer>> rolePermissions = Synchronized.of(new EnumerateMap<>(IslandPrivilege.values()));
+    private final Synchronized<EnumerateMap<IslandFlag, Byte>> islandFlags = Synchronized.of(new EnumerateMap<>(IslandFlag.values()));
     private final IslandUpgrades upgrades = new IslandUpgrades();
     private final AtomicReference<BigDecimal> islandWorth = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> islandLevel = new AtomicReference<>(BigDecimal.ZERO);
@@ -313,15 +328,19 @@ public class SIsland implements Island {
             members.addAll(builder.members);
             members.forEach(member -> member.setIsland(this));
         });
-        this.bannedPlayers.addAll(builder.bannedPlayers);
-        this.playerPermissions.putAll(builder.playerPermissions);
-        this.playerPermissions.values().forEach(permissionNode -> permissionNode.setIsland(this));
-        this.rolePermissions.putAll(builder.rolePermissions);
+        this.bannedPlayers.write(bannedPlayers -> bannedPlayers.addAll(builder.bannedPlayers));
+        this.playerPermissions.write(playerPermissions -> {
+            playerPermissions.putAll(builder.playerPermissions);
+            Iterator<PermissionNode> iterator = playerPermissions.valueIterator();
+            while (iterator.hasNext())
+                ((PlayerPrivilegeNode) iterator.next()).setIsland(this);
+        });
+        this.rolePermissions.write(rolePermissions -> rolePermissions.putAll(builder.rolePermissions));
         this.upgrades.setUpgradeLevels(builder.upgrades);
         this.blockLimits.putAll(builder.blockLimits);
-        this.ratings.putAll(builder.ratings);
+        this.ratings.write(ratings -> ratings.putAll(builder.ratings));
         this.completedMissions.putAll(builder.completedMissions);
-        this.islandFlags.putAll(builder.islandFlags);
+        this.islandFlags.write(islandFlags -> islandFlags.putAll(builder.islandFlags));
         this.cobbleGeneratorValues.write(cobbleGeneratorValues -> cobbleGeneratorValues.putAll(builder.cobbleGeneratorValues));
         this.uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.addAll(builder.uniqueVisitors));
         this.entityLimits.putAll(builder.entityLimits);
@@ -434,6 +453,11 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getId() {
+        return this.id.get();
+    }
+
+    @Override
     public long getCreationTime() {
         return creationTime;
     }
@@ -459,36 +483,42 @@ public class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
-        List<SuperiorPlayer> members = this.members.readAndGet(_members -> new SequentialListBuilder<SuperiorPlayer>()
-                .mutable()
-                .build(_members));
-
-        if (includeOwner)
-            members.add(owner);
-
-        return Collections.unmodifiableList(members);
+        if (includeOwner) {
+            return this.members.readAndGet(members ->
+                    members.asListView((Consumer<IntSetView>) ids -> ids.add(owner.getId())));
+        } else {
+            return this.members.readAndGet(IdSet::asListView);
+        }
     }
 
     @Override
     public List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles) {
         Preconditions.checkNotNull(playerRoles, "playerRoles parameter cannot be null.");
 
-        List<PlayerRole> rolesToFilter = Arrays.asList(playerRoles);
-        List<SuperiorPlayer> members = this.members.readAndGet(_members -> new SequentialListBuilder<SuperiorPlayer>()
-                .mutable()
-                .filter(superiorPlayer -> rolesToFilter.contains(superiorPlayer.getPlayerRole()))
-                .build(_members));
+        if (playerRoles.length == 0)
+            return Collections.emptyList();
 
+        IntSetView playerRolesFilter = CollectionsFactory.createIntHashSet();
+        MutableBoolean includeOwner = new MutableBoolean(false);
 
-        if (rolesToFilter.contains(SPlayerRole.lastRole()))
-            members.add(owner);
+        for (PlayerRole playerRole : playerRoles) {
+            playerRolesFilter.add(playerRole.getId());
+            if (playerRole == SPlayerRole.lastRole())
+                includeOwner.set(true);
+        }
 
-        return Collections.unmodifiableList(members);
+        return this.members.readAndGet(members -> members.asListView(
+                id -> playerRolesFilter.contains(plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(id).getPlayerRole().getId()),
+                ids -> {
+                    if (includeOwner.get())
+                        ids.add(owner.getId());
+                }
+        ));
     }
 
     @Override
     public List<SuperiorPlayer> getBannedPlayers() {
-        return new SequentialListBuilder<SuperiorPlayer>().build(this.bannedPlayers);
+        return this.bannedPlayers.readAndGet(IdSet::asListView);
     }
 
     @Override
@@ -498,16 +528,15 @@ public class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
-        return playersInside.readAndGet(playersInside -> new SequentialListBuilder<SuperiorPlayer>()
-                .filter(superiorPlayer -> !isMember(superiorPlayer) && (vanishPlayers || superiorPlayer.isShownAsOnline()))
-                .build(playersInside));
+        return this.playersInside.readAndGet(playersInside -> playersInside.asListView(id ->
+                !isMemberById(id) && (vanishPlayers || plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(id).isShownAsOnline())));
     }
 
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
-        return playersInside.readAndGet(playersInside -> new SequentialListBuilder<SuperiorPlayer>()
-                .filter(SuperiorPlayer::isOnline)
-                .build(playersInside));
+        return playersInsideCache != null ? playersInsideCache : this.playersInside.readAndGet(
+                playersInside -> playersInside.asListView((IntPredicate) id ->
+                        plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(id).isOnline()));
     }
 
     @Override
@@ -528,9 +557,11 @@ public class SIsland implements Island {
 
         Log.debug(Debug.INVITE_MEMBER, owner.getName(), superiorPlayer.getName());
 
-        invitedPlayers.add(superiorPlayer);
-        superiorPlayer.addInvite(this);
+        boolean added = invitedPlayers.writeAndGet(invitedPlayers -> invitedPlayers.add(superiorPlayer));
+        if (!added)
+            return;
 
+        superiorPlayer.addInvite(this);
         //Revoke the invite after 5 minutes
         registerTask(BukkitExecutor.sync(() -> revokeInvite(superiorPlayer), 6000L));
     }
@@ -541,19 +572,22 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REVOKE_INVITE, owner.getName(), superiorPlayer.getName());
 
-        invitedPlayers.remove(superiorPlayer);
+        boolean removed = this.invitedPlayers.writeAndGet(invitedPlayers -> invitedPlayers.remove(superiorPlayer));
+        if (!removed)
+            return;
+
         superiorPlayer.removeInvite(this);
     }
 
     @Override
     public boolean isInvited(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return invitedPlayers.contains(superiorPlayer);
+        return this.invitedPlayers.readAndGet(invitedPlayers -> invitedPlayers.contains(superiorPlayer));
     }
 
     @Override
     public List<SuperiorPlayer> getInvitedPlayers() {
-        return new SequentialListBuilder<SuperiorPlayer>().build(this.invitedPlayers);
+        return this.invitedPlayers.readAndGet(IdSet::asListView);
     }
 
     @Override
@@ -614,13 +648,6 @@ public class SIsland implements Island {
 
         if (!superiorPlayer.equals(owner)) {
             boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
-
-            if (!removedMember) {
-                // If the remove method failed, we iterate through all the members and remove the member manually.
-                // Should fix issues if members are not in the correct order.
-                // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
-                removedMember = members.writeAndGet(members -> members.removeIf(superiorPlayer::equals));
-            }
 
             // This player is not a member of the island.
             if (!removedMember)
@@ -686,6 +713,10 @@ public class SIsland implements Island {
         return owner.equals(superiorPlayer.getIslandLeader());
     }
 
+    private boolean isMemberById(int id) {
+        return this.members.readAndGet(members -> members.contains(id));
+    }
+
     @Override
     public void banMember(SuperiorPlayer superiorPlayer) {
         banMember(superiorPlayer, null);
@@ -697,7 +728,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.BAN_PLAYER, owner.getName(), superiorPlayer.getName(), whom);
 
-        boolean bannedPlayer = bannedPlayers.add(superiorPlayer);
+        boolean bannedPlayer = this.bannedPlayers.writeAndGet(bannedPlayers -> bannedPlayers.add(superiorPlayer));
 
         // This player is already banned.
         if (!bannedPlayer)
@@ -726,7 +757,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.UNBAN_PLAYER, owner.getName(), superiorPlayer.getName());
 
-        boolean unbannedPlayer = bannedPlayers.remove(superiorPlayer);
+        boolean unbannedPlayer = this.bannedPlayers.writeAndGet(
+                bannedPlayers -> bannedPlayers.remove(superiorPlayer));
 
         if (unbannedPlayer) {
             plugin.getMenus().refreshIslandBannedPlayers(this);
@@ -738,7 +770,7 @@ public class SIsland implements Island {
     @Override
     public boolean isBanned(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return bannedPlayers.contains(superiorPlayer);
+        return this.bannedPlayers.readAndGet(bannedPlayers -> bannedPlayers.contains(superiorPlayer));
     }
 
     @Override
@@ -747,7 +779,11 @@ public class SIsland implements Island {
 
         Log.debug(Debug.ADD_COOP, owner.getName(), superiorPlayer.getName());
 
-        boolean coopPlayer = coopPlayers.add(superiorPlayer);
+        if (!plugin.getSettings().isCoopMembers())
+            return;
+
+        boolean coopPlayer = this.coopPlayers.writeAndGet(
+                coopPlayers -> coopPlayers.add(superiorPlayer));
 
         if (!coopPlayer)
             return;
@@ -762,7 +798,11 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_COOP, owner.getName(), superiorPlayer.getName());
 
-        boolean uncoopPlayer = coopPlayers.remove(superiorPlayer);
+        if (!plugin.getSettings().isCoopMembers())
+            return;
+
+        boolean uncoopPlayer = this.coopPlayers.writeAndGet(
+                coopPlayers -> coopPlayers.remove(superiorPlayer));
 
         // This player was not coop.
         if (!uncoopPlayer)
@@ -788,12 +828,13 @@ public class SIsland implements Island {
     @Override
     public boolean isCoop(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return plugin.getSettings().isCoopMembers() && coopPlayers.contains(superiorPlayer);
+        return plugin.getSettings().isCoopMembers() && this.coopPlayers.readAndGet(
+                coopPlayers -> coopPlayers.contains(superiorPlayer));
     }
 
     @Override
     public List<SuperiorPlayer> getCoopPlayers() {
-        return new SequentialListBuilder<SuperiorPlayer>().build(this.coopPlayers);
+        return plugin.getSettings().isCoopMembers() ? this.coopPlayers.readAndGet(IdSet::asListView) : Collections.emptyList();
     }
 
     @Override
@@ -1557,7 +1598,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_PERMISSION, owner.getName(), playerRole, islandPrivilege);
 
-        Integer oldRoleId = rolePermissions.put(islandPrivilege, playerRole.getId());
+        Integer oldRoleId = this.rolePermissions.writeAndGet(
+                rolePermissions -> rolePermissions.put(islandPrivilege, playerRole.getId()));
 
         if (oldRoleId != null && oldRoleId == playerRole.getId())
             return;
@@ -1575,10 +1617,15 @@ public class SIsland implements Island {
     public void resetPermissions() {
         Log.debug(Debug.RESET_PERMISSIONS, owner.getName());
 
-        if (rolePermissions.isEmpty())
-            return;
+        boolean cleaned = this.rolePermissions.writeAndGet(rolePermissions -> {
+            if (rolePermissions.isEmpty())
+                return false;
+            rolePermissions.clear();
+            return true;
+        });
 
-        rolePermissions.clear();
+        if (!cleaned)
+            return;
 
         getAllPlayersInside().forEach(superiorPlayer -> {
             updateIslandFly(superiorPlayer);
@@ -1598,10 +1645,11 @@ public class SIsland implements Island {
         Log.debug(Debug.SET_PERMISSION, owner.getName(),
                 superiorPlayer.getName(), islandPrivilege, value);
 
-        PlayerPrivilegeNode privilegeNode = playerPermissions.computeIfAbsent(superiorPlayer,
-                s -> new PlayerPrivilegeNode(superiorPlayer, this));
-
-        privilegeNode.setPermission(islandPrivilege, value);
+        this.playerPermissions.write(playerPermissions -> {
+            PlayerPrivilegeNode privilegeNode = (PlayerPrivilegeNode) playerPermissions.computeIfAbsent(superiorPlayer,
+                    s -> new PlayerPrivilegeNode(superiorPlayer, this));
+            privilegeNode.setPermission(islandPrivilege, value);
+        });
 
         superiorPlayer.runIfOnline(player -> {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -1626,7 +1674,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.RESET_PERMISSIONS, owner.getName(), superiorPlayer.getName());
 
-        PlayerPrivilegeNode oldPrivilegeNode = playerPermissions.remove(superiorPlayer);
+        PermissionNode oldPrivilegeNode = this.playerPermissions.writeAndGet(
+                playerPermissions -> playerPermissions.remove(superiorPlayer));
 
         if (oldPrivilegeNode == null)
             return;
@@ -1642,16 +1691,20 @@ public class SIsland implements Island {
     }
 
     @Override
-    public PrivilegeNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
+    public PlayerPrivilegeNode getPermissionNode(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return playerPermissions.getOrDefault(superiorPlayer, new PlayerPrivilegeNode(superiorPlayer, this));
+        return this.playerPermissions.readAndGet(playerPermissions -> {
+            PlayerPrivilegeNode privilegeNode = (PlayerPrivilegeNode) playerPermissions.get(superiorPlayer);
+            return privilegeNode == null ? new PlayerPrivilegeNode(superiorPlayer, this) : privilegeNode;
+        });
     }
 
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
 
-        Integer playerRoleId = rolePermissions.get(islandPrivilege);
+        Integer playerRoleId = this.rolePermissions.readAndGet(
+                rolePermissions -> rolePermissions.get(islandPrivilege));
 
         if (playerRoleId != null)
             return plugin.getRoles().getPlayerRoleFromId(playerRoleId);
@@ -1672,15 +1725,14 @@ public class SIsland implements Island {
 
     @Override
     public Map<SuperiorPlayer, PermissionNode> getPlayerPermissions() {
-        return Collections.unmodifiableMap(playerPermissions);
+        return this.playerPermissions.readAndGet(IdMap::asMapView);
     }
 
     @Override
     public Map<IslandPrivilege, PlayerRole> getRolePermissions() {
-        return Collections.unmodifiableMap(this.rolePermissions.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> plugin.getRoles().getPlayerRoleFromId(entry.getValue())
-        )));
+        return Collections.unmodifiableMap(Maps.transformValues((Map<IslandPrivilege, Integer>) this.rolePermissions.readAndGet(
+                        rolePermissions -> rolePermissions.collect(IslandPrivilege.values())),
+                id -> plugin.getRoles().getPlayerRoleFromId(id)));
     }
 
     @Override
@@ -1765,8 +1817,10 @@ public class SIsland implements Island {
         });
         this.bankInterestTask.set((BukkitTask) null);
 
-        invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
-        coopPlayers.forEach(coopPlayer -> coopPlayer.removeCoop(this));
+        this.invitedPlayers.read(invitedPlayers ->
+                invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this)));
+        this.coopPlayers.read(coopPlayers ->
+                coopPlayers.forEach(coopPlayer -> coopPlayer.removeCoop(this)));
 
         if (BuiltinModules.BANK.getConfiguration().hasDisbandRefund()) {
             BigDecimal disbandRefund = BuiltinModules.BANK.getConfiguration().getDisbandRefund();
@@ -3876,7 +3930,7 @@ public class SIsland implements Island {
 
     @Override
     public Rating getRating(SuperiorPlayer superiorPlayer) {
-        return ratings.getOrDefault(superiorPlayer.getUniqueId(), Rating.UNKNOWN);
+        return this.ratings.readAndGet(ratings -> ratings.getOrDefault(superiorPlayer, Rating.UNKNOWN));
     }
 
     @Override
@@ -3893,7 +3947,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_RATING, owner.getName(), superiorPlayer.getName(), rating);
 
-        Rating oldRating = ratings.put(superiorPlayer.getUniqueId(), rating);
+        Rating oldRating = this.ratings.writeAndGet(ratings -> ratings.put(superiorPlayer, rating));
 
         if (rating == oldRating)
             return;
@@ -3911,7 +3965,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_RATING, owner.getName(), superiorPlayer.getName());
 
-        Rating oldRating = ratings.remove(superiorPlayer.getUniqueId());
+        Rating oldRating = this.ratings.writeAndGet(ratings -> ratings.remove(superiorPlayer));
 
         if (oldRating == null)
             return;
@@ -3925,32 +3979,54 @@ public class SIsland implements Island {
 
     @Override
     public double getTotalRating() {
-        double avg = 0;
+        return this.ratings.readAndGet(ratings -> {
+            if (ratings.size() == 0)
+                return 0D;
 
-        for (Rating rating : ratings.values())
-            avg += rating.getValue();
+            double avg = 0;
+            Iterator<Rating> iterator = ratings.valueIterator();
+            while (iterator.hasNext())
+                avg += iterator.next().getValue();
 
-        return avg == 0 ? 0 : avg / getRatingAmount();
+            return avg == 0 ? 0D : avg / getRatingAmount();
+        });
     }
 
     @Override
     public int getRatingAmount() {
-        return ratings.size();
+        return this.ratings.readAndGet(IdMap::size);
     }
 
     @Override
+    @Deprecated
     public Map<UUID, Rating> getRatings() {
-        return Collections.unmodifiableMap(ratings);
+        Map<SuperiorPlayer, Rating> ratingMap = getRatingsAsPlayers();
+        if (ratingMap.isEmpty())
+            return Collections.emptyMap();
+
+        Map<UUID, Rating> ratingsResult = new LinkedHashMap<>();
+        ratingMap.forEach((player, value) -> ratingsResult.put(player.getUniqueId(), value));
+        return Collections.unmodifiableMap(ratingsResult);
+    }
+
+    @Override
+    public Map<SuperiorPlayer, Rating> getRatingsAsPlayers() {
+        return this.ratings.readAndGet(IdMap::asMapView);
     }
 
     @Override
     public void removeRatings() {
         Log.debug(Debug.REMOVE_RATINGS, owner.getName());
 
-        if (ratings.isEmpty())
-            return;
+        boolean cleared = this.ratings.writeAndGet(ratings -> {
+            if (ratings.size() == 0)
+                return false;
+            ratings.clear();
+            return true;
+        });
 
-        ratings.clear();
+        if (!cleared)
+            return;
 
         plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_RATING, this);
 
@@ -3962,12 +4038,16 @@ public class SIsland implements Island {
     @Override
     public boolean hasSettingsEnabled(IslandFlag settings) {
         Preconditions.checkNotNull(settings, "settings parameter cannot be null.");
-        return islandFlags.getOrDefault(settings, (byte) (DEFAULT_FLAGS_CACHE.contains(settings) ? 1 : 0)) == 1;
+        return this.islandFlags.readAndGet(islandFlags -> {
+            Byte value = islandFlags.get(settings);
+            return value != null ? value == 1 : DEFAULT_FLAGS_CACHE.contains(settings);
+        });
     }
 
     @Override
     public Map<IslandFlag, Byte> getAllSettings() {
-        return Collections.unmodifiableMap(islandFlags);
+        return Collections.unmodifiableMap(this.islandFlags.readAndGet(
+                islandFlags -> islandFlags.collect(IslandFlag.values())));
     }
 
     @Override
@@ -3976,89 +4056,25 @@ public class SIsland implements Island {
 
         Log.debug(Debug.ENABLE_ISLAND_FLAG, owner.getName(), settings.getName());
 
-        Byte oldStatus = islandFlags.put(settings, (byte) 1);
+        Byte oldStatus = this.islandFlags.writeAndGet(
+                islandFlags -> islandFlags.put(settings, (byte) 1));
 
-        if (Objects.equals(oldStatus, 1))
+        if (oldStatus != null && oldStatus == 1)
             return;
 
-        boolean disableTime = false;
-        boolean disableWeather = false;
+        IslandFlag.Config islandFlagConfig = settings.getConfig();
+        if (islandFlagConfig != null) {
+            islandFlagConfig.onEnable(this);
 
-        //Updating times / weather if necessary
-        switch (settings.getName()) {
-            case "ALWAYS_DAY":
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Player player = superiorPlayer.asPlayer();
-                    if (player != null)
-                        player.setPlayerTime(0, false);
-                });
-                disableTime = true;
-                break;
-            case "ALWAYS_MIDDLE_DAY":
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Player player = superiorPlayer.asPlayer();
-                    if (player != null)
-                        player.setPlayerTime(6000, false);
-                });
-                disableTime = true;
-                break;
-            case "ALWAYS_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Player player = superiorPlayer.asPlayer();
-                    if (player != null)
-                        player.setPlayerTime(14000, false);
-                });
-                disableTime = true;
-                break;
-            case "ALWAYS_MIDDLE_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Player player = superiorPlayer.asPlayer();
-                    if (player != null)
-                        player.setPlayerTime(18000, false);
-                });
-                disableTime = true;
-                break;
-            case "ALWAYS_SHINY":
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Player player = superiorPlayer.asPlayer();
-                    if (player != null)
-                        player.setPlayerWeather(WeatherType.CLEAR);
-                });
-                disableWeather = true;
-                break;
-            case "ALWAYS_RAIN":
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Player player = superiorPlayer.asPlayer();
-                    if (player != null)
-                        player.setPlayerWeather(WeatherType.DOWNFALL);
-                });
-                disableWeather = true;
-                break;
-            case "PVP":
-                if (plugin.getSettings().isTeleportOnPvPEnable())
-                    getIslandVisitors().forEach(superiorPlayer -> {
-                        superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                        Message.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
+            if (islandFlagConfig.hasConflictingFlags()) {
+                this.islandFlags.write(islandFlags -> {
+                    islandFlagConfig.forEachConflicting(conflictingFlag -> {
+                        if (conflictingFlag != settings && islandFlags.remove(conflictingFlag) != null)
+                            IslandsDatabaseBridge.removeIslandFlag(this, conflictingFlag);
                     });
-                break;
-        }
 
-        if (disableTime) {
-            if (settings != IslandFlags.ALWAYS_DAY && islandFlags.remove(IslandFlags.ALWAYS_DAY) != null)
-                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_DAY);
-            if (settings != IslandFlags.ALWAYS_MIDDLE_DAY && islandFlags.remove(IslandFlags.ALWAYS_MIDDLE_DAY) != null)
-                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_MIDDLE_DAY);
-            if (settings != IslandFlags.ALWAYS_NIGHT && islandFlags.remove(IslandFlags.ALWAYS_NIGHT) != null)
-                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_NIGHT);
-            if (settings != IslandFlags.ALWAYS_MIDDLE_NIGHT && islandFlags.remove(IslandFlags.ALWAYS_MIDDLE_NIGHT) != null)
-                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_MIDDLE_NIGHT);
-        }
-
-        if (disableWeather) {
-            if (settings != IslandFlags.ALWAYS_RAIN && islandFlags.remove(IslandFlags.ALWAYS_RAIN) != null)
-                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_RAIN);
-            if (settings != IslandFlags.ALWAYS_SHINY && islandFlags.remove(IslandFlags.ALWAYS_SHINY) != null)
-                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_SHINY);
+                });
+            }
         }
 
         IslandsDatabaseBridge.saveIslandFlag(this, settings, 1);
@@ -4076,31 +4092,14 @@ public class SIsland implements Island {
 
         Log.debug(Debug.DISABLE_ISLAND_FLAG, owner.getName(), settings.getName());
 
-        Byte oldStatus = islandFlags.put(settings, (byte) 0);
+        Byte oldStatus = this.islandFlags.writeAndGet(islandFlags -> islandFlags.put(settings, (byte) 0));
 
-        if (Objects.equals(oldStatus, 0))
+        if (oldStatus != null && oldStatus == 0)
             return;
 
-        switch (settings.getName()) {
-            case "ALWAYS_DAY":
-            case "ALWAYS_MIDDLE_DAY":
-            case "ALWAYS_NIGHT":
-            case "ALWAYS_MIDDLE_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Player player = superiorPlayer.asPlayer();
-                    if (player != null)
-                        player.resetPlayerTime();
-                });
-                break;
-            case "ALWAYS_RAIN":
-            case "ALWAYS_SHINY":
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Player player = superiorPlayer.asPlayer();
-                    if (player != null)
-                        player.resetPlayerWeather();
-                });
-                break;
-        }
+        IslandFlag.Config islandFlagConfig = settings.getConfig();
+        if (islandFlagConfig != null)
+            islandFlagConfig.onDisable(this);
 
         IslandsDatabaseBridge.saveIslandFlag(this, settings, 0);
 
@@ -4111,57 +4110,37 @@ public class SIsland implements Island {
     public void resetSettings() {
         Log.debug(Debug.RESET_ISLAND_FLAGS, owner.getName());
 
-        if (islandFlags.isEmpty())
+        boolean cleared = this.islandFlags.readAndGet(islandFlags -> {
+            if (islandFlags.isEmpty())
+                return false;
+            islandFlags.clear();
+            return true;
+        });
+        if (!cleared)
             return;
 
-        islandFlags.clear();
+        try {
+            // IslandFlag will call many times `getAllPlayersInside`.
+            // Therefore, we cache the values of `getAllPlayersInside` once for this period as an optimization
+            playersInsideCache = getAllPlayersInside();
 
-        Long time = null;
-        WeatherType weather = null;
-        boolean enablePvP = false;
-
-        for (String islandFlag : plugin.getSettings().getDefaultSettings()) {
-            switch (islandFlag) {
-                case "ALWAYS_DAY":
-                    time = 0L;
-                    break;
-                case "ALWAYS_MIDDLE_DAY":
-                    time = 6000L;
-                    break;
-                case "ALWAYS_NIGHT":
-                    time = 14000L;
-                    break;
-                case "ALWAYS_MIDDLE_NIGHT":
-                    time = 18000L;
-                    break;
-                case "ALWAYS_SHINY":
-                    weather = WeatherType.CLEAR;
-                    break;
-                case "ALWAYS_RAIN":
-                    weather = WeatherType.DOWNFALL;
-                    break;
-                case "PVP":
-                    enablePvP = true;
-                    break;
-            }
-        }
-
-        boolean teleportOnPvPEnable = plugin.getSettings().isTeleportOnPvPEnable();
-
-        for (SuperiorPlayer superiorPlayer : getAllPlayersInside()) {
-            Player player = superiorPlayer.asPlayer();
-            if (player != null) {
-                if (time == null) player.resetPlayerTime();
-                else player.setPlayerTime(time, false);
-
-                if (weather == null) player.resetPlayerWeather();
-                else player.setPlayerWeather(weather);
-
-                if (enablePvP && teleportOnPvPEnable && isVisitor(superiorPlayer, false)) {
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                    Message.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
+            // Reset time and weather
+            for (SuperiorPlayer superiorPlayer : playersInsideCache) {
+                Player player = superiorPlayer.asPlayer();
+                if (player != null) {
+                    player.resetPlayerTime();
+                    player.resetPlayerWeather();
                 }
             }
+
+            for (IslandFlag islandFlag : IslandFlag.values()) {
+                IslandFlag.Config config;
+                if (DEFAULT_FLAGS_CACHE.contains(islandFlag) && (config = islandFlag.getConfig()) != null) {
+                    config.onEnable(this);
+                }
+            }
+        } finally {
+            playersInsideCache = null;
         }
 
         IslandsDatabaseBridge.clearIslandFlags(this);
@@ -4592,6 +4571,9 @@ public class SIsland implements Island {
                         Message.ISLAND_WORTH_ERROR.send(asker);
                 }
 
+                if (callback != null)
+                    callback.run();
+
                 return;
             }
 
@@ -4701,20 +4683,24 @@ public class SIsland implements Island {
     }
 
     private void replaceBannedPlayer(SuperiorPlayer originalPlayer, @Nullable SuperiorPlayer newPlayer) {
-        if (bannedPlayers.remove(originalPlayer)) {
-            Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Banned Player");
-            if (newPlayer != null)
-                bannedPlayers.add(newPlayer);
-        }
+        this.bannedPlayers.write(bannedPlayers -> {
+            if (bannedPlayers.remove(originalPlayer)) {
+                Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Banned Player");
+                if (newPlayer != null)
+                    bannedPlayers.add(newPlayer);
+            }
+        });
     }
 
     private void replacePermissions(SuperiorPlayer originalPlayer, @Nullable SuperiorPlayer newPlayer) {
-        PlayerPrivilegeNode playerPermissionNode = playerPermissions.remove(originalPlayer);
-        if (playerPermissionNode != null) {
-            Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Permissions");
-            if (newPlayer != null)
-                playerPermissions.put(newPlayer, playerPermissionNode);
-        }
+        this.playerPermissions.write(playerPermissions -> {
+            PermissionNode playerPermissionNode = playerPermissions.remove(originalPlayer);
+            if (playerPermissionNode != null) {
+                Log.debugResult(Debug.REPLACE_PLAYER, "Action", "Replace Permissions");
+                if (newPlayer != null)
+                    playerPermissions.put(newPlayer, playerPermissionNode);
+            }
+        });
     }
 
     private void saveBlockCounts(BigInteger currentTotalBlocksCount, BigDecimal oldWorth, BigDecimal oldLevel) {

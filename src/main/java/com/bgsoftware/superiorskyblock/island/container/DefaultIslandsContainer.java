@@ -12,7 +12,9 @@ import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -41,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultIslandsContainer implements IslandsContainer {
 
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
+    private final Synchronized<Int2ObjectMapView<Island>> islandsByIds = Synchronized.of(CollectionsFactory.createInt2ObjectLinkedHashMap());
     private final Map<String, Island> islandsByNames = new ConcurrentHashMap<>();
     private IslandsGrid islandsGrid;
 
@@ -117,6 +120,17 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Override
     public Island getIslandByUUID(UUID uuid) {
         return this.islandsByUUID.get(uuid);
+    }
+
+    @Nullable
+    @Override
+    public Island getIslandById(int id) {
+        return this.islandsByIds.readAndGet(islandsByIds -> islandsByIds.get(id));
+    }
+
+    @Override
+    public void setIslandId(Island island, int id) {
+        this.islandsByIds.write(islandsByIds -> islandsByIds.put(id, island));
     }
 
     @Override

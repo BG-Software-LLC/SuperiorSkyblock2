@@ -126,8 +126,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                     if (members.isEmpty()) {
                         lore.add(memberFormat.replace("{}", IslandUtils.DEFAULT_NONE_VALUE));
                     } else {
-                        if (plugin.getSettings().getTopIslandMembersSorting() != TopIslandMembersSorting.NAMES)
-                            members.sort(plugin.getSettings().getTopIslandMembersSorting().getComparator());
+                        members.sort(plugin.getSettings().getTopIslandMembersSorting().getComparator());
 
                         members.forEach(member -> {
                             String onlineMessage = member.isOnline() ?
