@@ -507,6 +507,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (Bukkit.getPluginManager().isPluginEnabled("Nexo"))
             registerHook("NexoHook");
 
+        if (Bukkit.getPluginManager().isPluginEnabled("Nova"))
+            registerHook("NovaHook");
+
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
             registerHook("ItemsAdderHook");
 
