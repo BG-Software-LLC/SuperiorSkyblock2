@@ -231,7 +231,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
     @Override
     public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         Key rawKey = pagedObject.getBlockKey();
-        Pair<Key, ItemStack> customKeyItem = plugin.getBlockValues().convertCustomKeyItem(rawKey);
+        Pair<Key, ItemStack> customKeyItem = plugin.getKeys().convertCustomKeyItem(rawKey);
 
         BigDecimal amount = new BigDecimal(pagedObject.getAmount());
 

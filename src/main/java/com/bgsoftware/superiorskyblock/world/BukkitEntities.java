@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
@@ -119,11 +118,6 @@ public class BukkitEntities {
         }
 
         return Optional.empty();
-    }
-
-    public static Key getLimitEntityType(Entity entity) {
-        // TODO - Is this really necessary?
-        return Keys.of(entity.getType());
     }
 
     public static boolean canHaveLimit(EntityType entityType) {

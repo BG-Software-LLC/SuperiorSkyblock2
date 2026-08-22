@@ -1,10 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.key;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
+import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMapStrategy;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
@@ -13,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.google.common.base.Preconditions;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -27,6 +31,9 @@ import java.util.function.Supplier;
 
 public class KeysManagerImpl extends Manager implements KeysManager {
 
+    private static final KeyMap<CustomKeyParser> customMaterialKeyParsers = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+    private static final KeyMap<CustomKeyParser> customEntityTypeKeyParsers = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
+
     public KeysManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
     }
@@ -34,6 +41,71 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     @Override
     public void loadData() {
         // No data to be loaded.
+    }
+
+    @Override
+    public void registerCustomMaterialKeyParser(CustomKeyParser customKeyParser, Key... keys) {
+        Preconditions.checkNotNull(customKeyParser, "customKeyParser parameter cannot be null.");
+        Preconditions.checkNotNull(keys, "blockTypes parameter cannot be null.");
+
+        for (Key key : keys) {
+            customMaterialKeyParsers.put(key, customKeyParser);
+        }
+    }
+
+    @Override
+    public void registerCustomEntityTypeKeyParser(CustomKeyParser customKeyParser, Key... keys) {
+        Preconditions.checkNotNull(customKeyParser, "customKeyParser parameter cannot be null.");
+        Preconditions.checkNotNull(keys, "blockTypes parameter cannot be null.");
+
+        for (Key key : keys) {
+            customEntityTypeKeyParsers.put(key, customKeyParser);
+        }
+    }
+
+    public Key convertKey(Key original, Location location) {
+        CustomKeyParser customKeyParser = customMaterialKeyParsers.get(original);
+
+        if (customKeyParser == null) {
+            return original;
+        }
+
+        Key key = customKeyParser.getCustomKey(location);
+
+        return key == null ? original : key;
+    }
+
+    public Key convertKey(Key original, ItemStack itemStack) {
+        CustomKeyParser customKeyParser = customMaterialKeyParsers.get(original);
+
+        if (customKeyParser == null) {
+            return original;
+        }
+
+        return customKeyParser.getCustomKey(itemStack, original);
+    }
+
+    public Key convertKey(Key original, Entity entity) {
+        CustomKeyParser customKeyParser = customEntityTypeKeyParsers.get(original);
+
+        if (customKeyParser == null) {
+            return original;
+        }
+
+        Key key = customKeyParser.getCustomKey(entity);
+
+        return key == null ? original : key;
+    }
+
+    @Nullable
+    public Pair<Key, ItemStack> convertCustomKeyItem(Key original) {
+        for (Map.Entry<Key, CustomKeyParser> entry : customMaterialKeyParsers.entrySet()) {
+            if (entry.getValue().isCustomKey(original)) {
+                return new Pair<>(entry.getKey(), entry.getValue().getCustomKeyItem(original));
+            }
+        }
+
+        return new Pair<>(original, null);
     }
 
     @Override

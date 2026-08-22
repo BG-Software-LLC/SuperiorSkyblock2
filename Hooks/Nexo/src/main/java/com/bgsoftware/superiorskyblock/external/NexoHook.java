@@ -71,7 +71,7 @@ public class NexoHook {
             registered = true;
             plugin.getProviders().registerCustomBlocksProvider(new NexuCustomBlocksProvider());
             BukkitExecutor.sync(NexoHook::initializeMechanics, 1L);
-            plugin.getBlockValues().registerKeyParser(new NexoKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
+            plugin.getKeys().registerCustomMaterialKeyParser(new NexoKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
         }
     }
 
