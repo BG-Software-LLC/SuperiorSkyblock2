@@ -46,7 +46,7 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     @Override
     public void registerCustomMaterialKeyParser(CustomKeyParser customKeyParser, Key... keys) {
         Preconditions.checkNotNull(customKeyParser, "customKeyParser parameter cannot be null.");
-        Preconditions.checkNotNull(keys, "blockTypes parameter cannot be null.");
+        Preconditions.checkNotNull(keys, "keys parameter cannot be null.");
 
         for (Key key : keys) {
             customMaterialKeyParsers.put(key, customKeyParser);
@@ -56,7 +56,7 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     @Override
     public void registerCustomEntityTypeKeyParser(CustomKeyParser customKeyParser, Key... keys) {
         Preconditions.checkNotNull(customKeyParser, "customKeyParser parameter cannot be null.");
-        Preconditions.checkNotNull(keys, "blockTypes parameter cannot be null.");
+        Preconditions.checkNotNull(keys, "keys parameter cannot be null.");
 
         for (Key key : keys) {
             customEntityTypeKeyParsers.put(key, customKeyParser);
