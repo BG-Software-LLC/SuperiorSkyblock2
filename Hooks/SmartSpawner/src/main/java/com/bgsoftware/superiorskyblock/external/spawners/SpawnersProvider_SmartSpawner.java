@@ -149,6 +149,12 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onSpawnerStack(SpawnerStackEvent e) {
+            // Check if the source was the placement of a new spawner.
+            // If so, we need to skip it, because the SpawnerPlaceEvent is also triggered in that case.
+            if (e.getSource() != SpawnerStackEvent.StackSource.PLACE && e.getSource() != SpawnerStackEvent.StackSource.GUI) {
+                return;
+            }
+
             Location location = e.getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
 
