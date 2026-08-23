@@ -5,6 +5,7 @@ import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
@@ -224,6 +225,7 @@ public class SIsland implements Island {
     private final Synchronized<EnumerateMap<Dimension, KeyMap<IntValue>>> cobbleGeneratorValues = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     private final Map<PotionEffectType, IntValue> islandEffects = new ConcurrentHashMap<>();
     private final KeyMap<IntValue> blockLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+    private final Map<String, IntValue> entityCategoryLimits = new ConcurrentHashMap<>();
     private final KeyMap<IntValue> entityLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
     /*
      * Island Player-Trackers
@@ -324,6 +326,7 @@ public class SIsland implements Island {
         this.islandFlags.putAll(builder.islandFlags);
         this.cobbleGeneratorValues.write(cobbleGeneratorValues -> cobbleGeneratorValues.putAll(builder.cobbleGeneratorValues));
         this.uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.addAll(builder.uniqueVisitors));
+        this.entityCategoryLimits.putAll(builder.entityCategoryLimits);
         this.entityLimits.putAll(builder.entityLimits);
         this.islandEffects.putAll(builder.islandEffects);
         IslandChest[] islandChests = new IslandChest[builder.islandChests.size()];
@@ -3279,6 +3282,119 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getEntityCategoryLimit(EntityCategory entityCategory) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+
+        String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
+        IntValue entityCategoryLimit = this.entityCategoryLimits.get(entityCategoryName);
+
+        return entityCategoryLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : entityCategoryLimit.get();
+    }
+
+    @Override
+    public Map<EntityCategory, Integer> getEntityCategoryLimits() {
+        if (this.entityCategoryLimits.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<EntityCategory, Integer> entityCategoryLimits = new HashMap<>();
+        this.entityCategoryLimits.forEach((entityCategoryName, limit) -> {
+            EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entityCategoryName);
+
+            if (entityCategory != null) {
+                entityCategoryLimits.put(entityCategory, limit.get());
+            }
+        });
+
+        return Collections.unmodifiableMap(entityCategoryLimits);
+    }
+
+    @Override
+    public Map<EntityCategory, Integer> getCustomEntityCategoryLimits() {
+        if (this.entityCategoryLimits.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<EntityCategory, Integer> entityCategoryLimits = new HashMap<>();
+        this.entityCategoryLimits.forEach((entityCategoryName, limit) -> {
+            if (!limit.isSynced()) {
+                EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entityCategoryName);
+
+                if (entityCategory != null) {
+                    entityCategoryLimits.put(entityCategory, limit.get());
+                }
+            }
+        });
+
+        return Collections.unmodifiableMap(entityCategoryLimits);
+    }
+
+    @Override
+    public void clearEntityCategoryLimits() {
+        Log.debug(Debug.CLEAR_ENTITY_CATEGORY_LIMITS, owner.getName());
+
+        if (this.entityCategoryLimits.isEmpty()) {
+            return;
+        }
+
+        this.entityCategoryLimits.clear();
+        IslandsDatabaseBridge.clearEntityCategoryLimits(this);
+    }
+
+    @Override
+    public void setEntityCategoryLimit(EntityCategory entityCategory, int limit) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+
+        int finalLimit = Math.max(0, limit);
+
+        Log.debug(Debug.SET_ENTITY_CATEGORY_LIMIT, owner.getName(), entityCategory.getName(), finalLimit);
+
+        String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
+        IntValue oldLimit = this.entityCategoryLimits.put(entityCategoryName, IntValue.fixed(limit));
+
+        if (limit == IntValue.getNonSynced(oldLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+            return;
+        }
+
+        IslandsDatabaseBridge.saveEntityCategoryLimit(this, entityCategory, limit);
+    }
+
+    @Override
+    public void removeEntityCategoryLimit(EntityCategory entityCategory) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+
+        Log.debug(Debug.REMOVE_ENTITY_CATEGORY_LIMIT, owner.getName(), entityCategory.getName());
+
+        String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
+        IntValue oldLimit = this.entityCategoryLimits.remove(entityCategoryName);
+
+        if (oldLimit == null) {
+            return;
+        }
+
+        IslandsDatabaseBridge.removeEntityCategoryLimit(this, entityCategory);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory) {
+        return hasReachedEntityCategoryLimit(entityCategory, 1);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory, int amount) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+        Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
+
+        int limit = getEntityCategoryLimit(entityCategory);
+
+        if (limit < 0) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCategoryCount(entityCategory) + amount > limit);
+    }
+
+    @Override
     public int getEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         return getEntityLimit(Keys.of(entityType));
@@ -4991,6 +5107,13 @@ public class SIsland implements Island {
                 this.blockLimits.put(block, IntValue.syncedFixed(defaultValue));
         });
 
+        this.entityCategoryLimits.forEach((entityCategory, limit) -> {
+            Integer defaultValue = plugin.getSettings().getDefaultValues().getEntityCategoryLimits().get(entityCategory);
+            if (defaultValue != null && (int) limit.get() == defaultValue) {
+                this.entityCategoryLimits.put(entityCategory, IntValue.syncedFixed(defaultValue));
+            }
+        });
+
         this.entityLimits.forEach((entity, limit) -> {
             Integer defaultValue = plugin.getSettings().getDefaultValues().getEntityLimits().get(entity);
             if (defaultValue != null && (int) limit.get() == defaultValue)
@@ -5195,6 +5318,18 @@ public class SIsland implements Island {
                     blockLimits.remove(entry.getKey());
                 } else {
                     blockLimits.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+
+        for (Map.Entry<EntityCategory, IntValue> entry : upgradeLevel.getEntityCategoryLimitsUpgradeValue().entrySet()) {
+            String entityCategoryName = entry.getKey().getName().toLowerCase(Locale.ENGLISH);
+            IntValue currentValue = this.entityCategoryLimits.get(entityCategoryName);
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    this.entityCategoryLimits.remove(entityCategoryName);
+                } else {
+                    this.entityCategoryLimits.put(entityCategoryName, entry.getValue());
                 }
             }
         }

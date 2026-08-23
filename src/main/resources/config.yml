@@ -55,6 +55,13 @@ default-values:
   block-limits:
     HOPPER: 8
 
+  # Set the default entity category limits of all islands.
+  # The following example will set a limit of 10 Monsters in islands:
+  #   entity-limits:
+  #     MONSTER: 10
+  # You can manage entity categories in the entity-categories.yml file.
+  entity-category-limits: []
+
   # Set the default entity limits of all islands.
   # The following example will set a limit of 4 Minecarts in islands:
   #   entity-limits:

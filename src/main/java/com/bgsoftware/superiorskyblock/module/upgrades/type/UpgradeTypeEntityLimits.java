@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
@@ -16,8 +18,11 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEntityCategoryLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEntityLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveEntityCategoryLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveEntityLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEntityCategoryLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEntityLimit;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
@@ -76,7 +81,9 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return Arrays.asList(new CmdAdminAddEntityLimit(), new CmdAdminRemoveEntityLimit(), new CmdAdminSetEntityLimit());
+        return Arrays.asList(new CmdAdminAddEntityCategoryLimit(), new CmdAdminAddEntityLimit(),
+                new CmdAdminRemoveEntityCategoryLimit(), new CmdAdminRemoveEntityLimit(),
+                new CmdAdminSetEntityCategoryLimit(), new CmdAdminSetEntityLimit());
     }
 
     private Optional<Listener> checkEntityBreedListener() {
@@ -86,6 +93,28 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
         } catch (ClassNotFoundException error) {
             return Optional.empty();
         }
+    }
+
+    private boolean hasReachedLimit(Island island, @Nullable Player player, Key entityKey) {
+        if (island.hasReachedEntityLimit(entityKey).join()) {
+            if (player != null) {
+                Message.REACHED_ENTITY_LIMIT.send(player, Formatters.CAPITALIZED_FORMATTER.format(entityKey.toString()));
+            }
+
+            return true;
+        }
+
+        for (EntityCategory entityCategory : plugin.getSettings().getEntityCategoriesMap().getCategories(entityKey)) {
+            if (island.hasReachedEntityCategoryLimit(entityCategory).join()) {
+                if (player != null) {
+                    Message.REACHED_ENTITY_CATEGORY_LIMIT.send(player, Formatters.CAPITALIZED_FORMATTER.format(entityCategory.getName()));
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private class EntityLimitsListener implements Listener {
@@ -105,18 +134,18 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 return;
 
             SpawningPlayerData spawningPlayerData = getSpawningPlayerFromSpawnEvent(e);
-            Player spawningPlayer = spawningPlayerData == null ? null : spawningPlayerData.player.get();
+            Player player = spawningPlayerData == null ? null : spawningPlayerData.player.get();
+            boolean playerIsOnline = player != null && player.isOnline();
 
-            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+            boolean hasReachedLimit = hasReachedLimit(island, playerIsOnline ? player : null, Keys.of(entity));
 
             if (hasReachedLimit) {
                 e.setCancelled(true);
-                if (spawningPlayer != null && spawningPlayer.isOnline()) {
-                    Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+                if (playerIsOnline) {
                     List<ItemStack> itemsToGiveBack = spawningPlayerData.itemStacks;
                     try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                        Location location = spawningPlayer.getLocation(wrapper.getHandle());
-                        PlayerInventory inventory = spawningPlayer.getInventory();
+                        Location location = player.getLocation(wrapper.getHandle());
+                        PlayerInventory inventory = player.getInventory();
                         for (ItemStack itemStack : itemsToGiveBack) {
                             BukkitItems.addItem(itemStack, inventory, location);
                         }
@@ -141,11 +170,10 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+            boolean hasReachedLimit = hasReachedLimit(island, e.getPlayer(), Keys.of(entityType));
 
             if (hasReachedLimit) {
                 e.setCancelled(true);
-                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
             }
         }
 
@@ -205,15 +233,13 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
                 vehicleOwnerData = vehiclesOwners.remove(entityLocation);
             }
 
-            Player vehicleOwner = vehicleOwnerData == null ? null : vehicleOwnerData.player.get();
+            Player player = vehicleOwnerData == null ? null : vehicleOwnerData.player.get();
+            boolean playerIsOnline = player != null && player.isOnline();
 
-            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+            boolean hasReachedLimit = hasReachedLimit(island, playerIsOnline ? player : null, Keys.of(entity));
 
             if (hasReachedLimit) {
                 entity.remove();
-                if (vehicleOwner != null && vehicleOwner.isOnline()) {
-                    Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
-                }
             }
         }
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.events.args;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
@@ -145,6 +146,13 @@ public class PluginEventArgs {
 
         public PotionEffectType effectType;
         public int effectLevel;
+
+    }
+
+    public static class IslandChangeEntityCategoryLimit extends IslandDoActionArgs {
+
+        public EntityCategory entityCategory;
+        public int entityCategoryLimit;
 
     }
 
@@ -443,6 +451,12 @@ public class PluginEventArgs {
     public static class IslandRemoveEffect extends IslandDoActionArgs {
 
         public PotionEffectType effectType;
+
+    }
+
+    public static class IslandRemoveEntityCategoryLimit extends IslandDoActionArgs {
+
+        public EntityCategory entityCategory;
 
     }
 
