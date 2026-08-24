@@ -400,7 +400,6 @@ public class SIsland implements Island {
         plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
 
         updateDatesFormatter();
-        startBankInterest();
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
@@ -413,6 +412,10 @@ public class SIsland implements Island {
 
         this.islandBank.setBalance(builder.balance);
         builder.bankTransactions.forEach(this.islandBank::loadTransaction);
+
+        // We need to load the transactions and balance before the bank interest process starts.
+        startBankInterest();
+
         if (builder.persistentData.length > 0)
             getPersistentDataContainer().load(builder.persistentData);
 
