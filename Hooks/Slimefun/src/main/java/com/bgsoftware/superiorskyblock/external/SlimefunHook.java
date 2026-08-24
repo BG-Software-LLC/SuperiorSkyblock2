@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_RC13;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServiceHelper;
+import com.bgsoftware.superiorskyblock.world.block.BuiltinBlockCategory;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin;
@@ -93,14 +94,21 @@ public class SlimefunHook {
     }
 
     private static boolean checkPermission(OfflinePlayer offlinePlayer, Location location, String protectableAction) {
+        if (!plugin.getGrid().isIslandsWorld(location.getWorld())) {
+            return true;
+        }
+
         Island island = plugin.getGrid().getIslandAt(location);
+
+        if (island == null) {
+            return false;
+        }
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
 
-        if (!plugin.getGrid().isIslandsWorld(location.getWorld()))
-            return true;
-
-        if (protectableAction.equals("PVP") || protectableAction.equals("ATTACK_PLAYER"))
-            return island != null && island.hasSettingsEnabled(IslandFlags.PVP);
+        if (protectableAction.equals("PVP") || protectableAction.equals("ATTACK_PLAYER")) {
+            return island.hasSettingsEnabled(IslandFlags.PVP);
+        }
 
         List<IslandPrivilege> islandPrivileges;
         switch (protectableAction) {
@@ -111,24 +119,24 @@ public class SlimefunHook {
                 break;
             }
             case "PLACE_BLOCK": {
-                BlockCategory blockCategory = plugin.getSettings().getBlockCategoriesMap().getCategoryByName("ALL");
-                islandPrivileges = Collections.singletonList(blockCategory == null ? null : blockCategory.getPlacePrivilege());
+                BlockCategory blockCategory = BuiltinBlockCategory.ALL.getBlockCategory();
+                islandPrivileges = Collections.singletonList(blockCategory.getPlacePrivilege());
                 break;
             }
             default: {
-                BlockCategory blockCategory = plugin.getSettings().getBlockCategoriesMap().getCategoryByName("ALL");
-                islandPrivileges = Collections.singletonList(blockCategory == null ? null : blockCategory.getBreakPrivilege());
+                BlockCategory blockCategory = BuiltinBlockCategory.ALL.getBlockCategory();
+                islandPrivileges = Collections.singletonList(blockCategory.getBreakPrivilege());
                 break;
             }
         }
 
         for (IslandPrivilege islandPrivilege : islandPrivileges) {
-            if (island != null && islandPrivilege != null && island.hasPermission(superiorPlayer, islandPrivilege)) {
-                return true;
+            if (!island.hasPermission(superiorPlayer, islandPrivilege)) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     private static class AndroidMineListener implements Listener {

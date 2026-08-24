@@ -33,6 +33,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -1001,31 +1002,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         }
     }
 
-    private boolean convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
-        if (!cfg.isList("interactables")) {
-            return false;
-        }
-
-        File file = new File(plugin.getDataFolder(), "interactables.yml");
-
-        if (!file.exists()) {
-            plugin.saveResource("interactables.yml", false);
-        }
-
-        CommentedConfiguration commentedCfg = CommentedConfiguration.loadConfiguration(file);
-
-        commentedCfg.set("interactables", cfg.getStringList("interactables"));
-
-        try {
-            commentedCfg.save(file);
-            cfg.set("interactables", null);
-        } catch (Exception error) {
-            Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
-        }
-
-        return true;
-    }
-
     private boolean convertEntityCategories(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
         if (!cfg.isConfigurationSection("entity-categories")) {
             return false;
@@ -1100,24 +1076,32 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         CommentedConfiguration blockCategoriesCfg = CommentedConfiguration.loadConfiguration(blockCategoriesFile);
 
-        if (cfg.isList("valuable-blocks")) {
-            blockCategoriesCfg.set("VALUABLE_BLOCKS.blocks", cfg.getStringList("valuable-blocks"));
-        }
+        ConfigurationSection customCategories = blockCategoriesCfg.getConfigurationSection("custom-categories");
 
-        for (String categoryName : blockCategoriesCfg.getKeys(false)) {
-            if (!categoryName.equals("ALL") && blockCategoriesCfg.isList(categoryName + ".blocks")) {
-                blockCategoriesCfg.set(categoryName + ".blocks", null);
+        if (customCategories != null) {
+            for (String categoryName : customCategories.getKeys(false)) {
+                if (customCategories.isList(categoryName + ".blocks")) {
+                    blockCategoriesCfg.set("custom-categories." + categoryName + ".blocks", null);
+                }
             }
         }
 
-        for (String islandPrivilegeName : interactablesCfg.getKeys(false)) {
-            blockCategoriesCfg.set(islandPrivilegeName + ".blocks", interactablesCfg.getStringList(islandPrivilegeName));
-            blockCategoriesCfg.set(islandPrivilegeName + ".actions.INTERACT", islandPrivilegeName);
+        if (cfg.isList("valuable-blocks")) {
+            blockCategoriesCfg.set("custom-categories.VALUABLE_BLOCKS.blocks", cfg.getStringList("valuable-blocks"));
+            blockCategoriesCfg.set("custom-categories.VALUABLE_BLOCKS.actions.BREAK", "VALUABLE_BREAK");
         }
 
-        for (String categoryName : blockCategoriesCfg.getKeys(false)) {
-            if (!categoryName.equals("ALL") && !blockCategoriesCfg.isList(categoryName + ".blocks")) {
-                blockCategoriesCfg.set(categoryName, null);
+        for (String islandPrivilegeName : interactablesCfg.getKeys(false)) {
+            blockCategoriesCfg.set("custom-categories." + islandPrivilegeName + ".blocks", interactablesCfg.getStringList(islandPrivilegeName));
+            blockCategoriesCfg.set("custom-categories." + islandPrivilegeName + ".actions.INTERACT", islandPrivilegeName);
+        }
+
+        customCategories = blockCategoriesCfg.getConfigurationSection("custom-categories");
+        if (customCategories != null) {
+            for (String categoryName : customCategories.getKeys(false)) {
+                if (!customCategories.isList(categoryName + ".blocks")) {
+                    blockCategoriesCfg.set("custom-categories." + categoryName, null);
+                }
             }
         }
 

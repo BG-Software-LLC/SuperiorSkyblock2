@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 public interface BlockCategory {
 
     /**
-     * Get the name of the entity category.
+     * Get the name of the block category.
      */
     String getName();
 

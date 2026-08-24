@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.world.block.BuiltinBlockCategory;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -41,14 +42,14 @@ public class PlayerPermissionsStore {
     public void refreshCache(Player player) {
         // We want to refresh cache for common permissions
 
-        BlockCategory blockCategory = plugin.getSettings().getBlockCategoriesMap().getCategoryByName("ALL");
+        BlockCategory blockCategory = BuiltinBlockCategory.ALL.getBlockCategory();
 
-        IslandPrivilege breakPrivilege = blockCategory == null ? null : blockCategory.getBreakPrivilege();
+        IslandPrivilege breakPrivilege = blockCategory.getBreakPrivilege();
         if (breakPrivilege != null) {
             hasBypassPermission(player, breakPrivilege);
         }
 
-        IslandPrivilege placePrivilege = blockCategory == null ? null : blockCategory.getBreakPrivilege();
+        IslandPrivilege placePrivilege = blockCategory.getBreakPrivilege();
         if (breakPrivilege != null) {
             hasBypassPermission(player, placePrivilege);
         }

@@ -709,13 +709,21 @@ public class SettingsContainer {
             removeInvalidEntityKeys = true;
         }
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
+
+        EntityCategoriesSection.convertToSections(config, file);
 
         if (removeInvalidEntityKeys) {
-            EntityCategoriesSection.removeInvalidEntityKeys(cfg, file);
+            EntityCategoriesSection.removeInvalidEntityKeys(config, file);
         }
 
-        return new EntityCategoriesSection(cfg);
+        try {
+            config.syncWithConfig(file, plugin.getResource("entity-categories.yml"), "custom-categories");
+        } catch (Exception error) {
+            Log.error(error, file, "An unexpected error occurred while loading file:");
+        }
+
+        return new EntityCategoriesSection(config);
     }
 
     private SettingsManager.BlockCategories loadBlockCategories(SuperiorSkyblockPlugin plugin) {
@@ -728,13 +736,19 @@ public class SettingsContainer {
             removeInvalidBlockKeys = true;
         }
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
         if (removeInvalidBlockKeys) {
-            BlockCategoriesSection.removeInvalidBlocks(cfg, file);
+            BlockCategoriesSection.removeInvalidBlocks(config, file);
         }
 
-        return new BlockCategoriesSection(cfg);
+        try {
+            config.syncWithConfig(file, plugin.getResource("block-categories.yml"), "custom-categories");
+        } catch (Exception error) {
+            Log.error(error, file, "An unexpected error occurred while loading file:");
+        }
+
+        return new BlockCategoriesSection(config);
     }
 
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {

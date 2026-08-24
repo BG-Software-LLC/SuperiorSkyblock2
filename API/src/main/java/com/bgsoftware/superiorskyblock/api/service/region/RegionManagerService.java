@@ -157,8 +157,8 @@ public interface RegionManagerService {
     /**
      * Handle a custom interaction of a player.
      *
-     * @param superiorPlayer  The player that made the interaction.
-     * @param location        The location of the interaction.
+     * @param superiorPlayer   The player that made the interaction.
+     * @param location         The location of the interaction.
      * @param islandPrivileges The privileges required for doing the interaction.
      * @return The result of the interaction.
      */

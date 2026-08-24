@@ -178,22 +178,6 @@ public interface SettingsManager {
     VoidTeleport getVoidTeleport();
 
     /**
-     * Get all the interactable blocks.
-     *
-     * @deprecated See {@link #getInteractablesMap}
-     */
-    @Deprecated
-    List<String> getInteractables();
-
-    /**
-     * Get all the interactable blocks and their interact privilege.
-     *
-     * @deprecated See {@link #getBlockCategoriesMap()}
-     */
-    @Deprecated
-    Interactables getInteractablesMap();
-
-    /**
      * Get all the safe blocks.
      */
     Collection<Key> getSafeBlocks();
@@ -792,21 +776,38 @@ public interface SettingsManager {
     boolean isCacheSchematics();
 
     /**
+     * Get all the interactable blocks.
+     *
+     * @deprecated See {@link #getInteractablesMap}
+     */
+    @Deprecated
+    List<String> getInteractables();
+
+    /**
+     * Get all the interactable blocks and their interact privilege.
+     *
+     * @deprecated See {@link #getBlockCategoriesMap()}
+     */
+    @Deprecated
+    Interactables getInteractablesMap();
+
+    /**
      * Custom entity categories to be used by the plugin.
-     * Config-path: entity-categories
+     *
+     * @deprecated See {@link #getBlockCategoriesMap()}
      */
     @Deprecated
     Map<String, KeySet> getEntityCategories();
 
     /**
-     * Custom entity categories to be used by the plugin.
-     */
-    EntityCategories getEntityCategoriesMap();
-
-    /**
      * Custom block categories to be used by the plugin.
      */
     BlockCategories getBlockCategoriesMap();
+
+    /**
+     * Custom entity categories to be used by the plugin.
+     */
+    EntityCategories getEntityCategoriesMap();
 
     interface Database {
 
@@ -1469,12 +1470,12 @@ public interface SettingsManager {
         /**
          * Get the block categories for a specific block key.
          *
-         * @param key The block's key
+         * @param key The block's key.
          */
         List<BlockCategory> getCategories(Key key);
 
         /**
-         * Get a block category by its name
+         * Get a block category by its name.
          *
          * @param name The name of the category.
          */
@@ -1493,12 +1494,12 @@ public interface SettingsManager {
         /**
          * Get the entity categories for a specific entity key.
          *
-         * @param key The entity's key
+         * @param key The entity's key.
          */
         List<EntityCategory> getCategories(Key key);
 
         /**
-         * Get an entity category by its name
+         * Get an entity category by its name.
          *
          * @param name The name of the category.
          */
