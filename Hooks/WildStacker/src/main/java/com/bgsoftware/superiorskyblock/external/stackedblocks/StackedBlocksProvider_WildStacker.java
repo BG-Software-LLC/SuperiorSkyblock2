@@ -167,6 +167,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
                 if (!island.hasPermission(player, islandPrivilege)) {
                     e.setCancelled(true);
                     ProtectionHelper.sendProtectionMessage(player);
+                    return;
                 }
             }
         }
@@ -234,6 +235,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
                 if (!island.hasPermission(player, islandPrivilege)) {
                     e.setCancelled(true);
                     ProtectionHelper.sendProtectionMessage(player);
+                    return;
                 }
             }
         }

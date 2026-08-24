@@ -15,7 +15,6 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class GlobalSection extends SettingsContainerHolder {
 
@@ -339,10 +338,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().commandAliases;
     }
 
-    public Set<Key> getValuableBlocks() {
-        return getContainer().valuableBlocks;
-    }
-
     public boolean isTabCompleteHideVanished() {
         return getContainer().tabCompleteHideVanished;
     }
@@ -427,12 +422,12 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().cacheSchematics;
     }
 
-    public SettingsManager.EntityCategories getEntityCategoriesMap() {
-        return getContainer().entityCategories;
-    }
-
     public SettingsManager.BlockCategories getBlockCategoriesMap() {
         return getContainer().blockCategories;
+    }
+
+    public SettingsManager.EntityCategories getEntityCategoriesMap() {
+        return getContainer().entityCategories;
     }
 
 }

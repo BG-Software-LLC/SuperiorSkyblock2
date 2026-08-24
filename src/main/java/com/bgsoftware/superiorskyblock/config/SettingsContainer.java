@@ -215,7 +215,6 @@ public class SettingsContainer {
     public final int islandChestsDefaultPage;
     public final int islandChestsDefaultSize;
     public final Map<String, List<String>> commandAliases;
-    public final KeySet valuableBlocks;
     public final GameMode islandPreviewsGameMode;
     public final int islandPreviewsMaxDistance;
     public final List<String> islandPreviewsBlockedCommands;
@@ -561,8 +560,6 @@ public class SettingsContainer {
             }
         }
         this.commandAliases = Collections.unmodifiableMap(commandAliases);
-        valuableBlocks = KeySets.unmodifiableKeySet(
-                KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks")));
         GameMode islandPreviewsGameMode;
         String islandPreviewsGameModeName = config.getString("island-previews.game-mode", "SPECTATOR").toUpperCase(Locale.ENGLISH);
         try {

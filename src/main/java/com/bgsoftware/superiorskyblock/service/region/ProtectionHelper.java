@@ -71,7 +71,7 @@ public class ProtectionHelper {
         }
 
         SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-        if (CommandsHelper.hasCommandAccess(bypassCommand, sender)) {
+        if (bypassCommand != null && CommandsHelper.hasCommandAccess(bypassCommand, sender)) {
             if (!isSpawnIsland) {
                 Message.ISLAND_PROTECTED_OPPED.send(sender, locale);
             } else {

@@ -186,13 +186,16 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
 
     private static KeyMap<List<EntityCategory>> convertEntityToCategoryInternal(Collection<EntityCategory> entityCategories) {
         KeyMap<List<EntityCategory>> categories = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+
         for (EntityCategory entityCategory : entityCategories) {
             for (Key key : entityCategory.getEntities()) {
                 categories.computeIfAbsent(key, k -> new LinkedList<>()).add(entityCategory);
             }
         }
-        if (categories.isEmpty())
+
+        if (categories.isEmpty()) {
             return KeyMaps.createEmptyMap();
+        }
 
         // Convert keyMap to unmodifiable.
         KeyMap<List<EntityCategory>> categoriesUnmodifiable = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
@@ -208,6 +211,7 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
     @Override
     public List<EntityCategory> getCategories(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
+
         return this.entityToCategory.getOrDefault(key, Collections.emptyList());
     }
 
@@ -215,13 +219,15 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
     @Nullable
     public EntityCategory getCategoryByName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null");
+
         return this.nameToCategory.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Nullable
     private static IslandPrivilege getOrRegisterPrivilege(@Nullable String name) {
-        if (name == null)
+        if (name == null) {
             return null;
+        }
 
         try {
             return IslandPrivilege.getByName(name);
@@ -233,8 +239,9 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
 
     @Nullable
     private static IslandFlag getOrRegisterFlag(@Nullable String name) {
-        if (name == null)
+        if (name == null) {
             return null;
+        }
 
         try {
             return IslandFlag.getByName(name);

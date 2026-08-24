@@ -90,11 +90,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        boolean shouldSaveFile = false;
-
-        if (convertData(cfg)) {
-            shouldSaveFile = true;
-        }
+        boolean shouldSaveFile = convertData(cfg);
 
         if (convertEntityCategories(plugin, cfg)) {
             shouldSaveFile = true;
@@ -243,28 +239,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public VoidTeleport getVoidTeleport() {
         return this.voidTeleport;
-    }
-
-    @Override
-    @Deprecated
-    public List<String> getInteractables() {
-        List<String> interactables = new LinkedList<>();
-
-        for (BlockCategory blockCategory : getBlockCategoriesMap().getCategories()) {
-            if (blockCategory.getInteractPrivilege() != null) {
-                for (Key key : blockCategory.getBlocks()) {
-                    interactables.add(key.toString());
-                }
-            }
-        }
-
-        return interactables.isEmpty() ? Collections.emptyList() : interactables;
-    }
-
-    @Override
-    @Deprecated
-    public Interactables getInteractablesMap() {
-        return this.interactables;
     }
 
     @Override
@@ -748,22 +722,47 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public Map<String, KeySet> getEntityCategories() {
-        Map<String, KeySet> categories = new HashMap<>();
-        for (EntityCategory entityCategory : getEntityCategoriesMap().getCategories()) {
-            categories.put(entityCategory.getName(), entityCategory.getEntities());
+    @Deprecated
+    public List<String> getInteractables() {
+        List<String> interactables = new LinkedList<>();
+
+        for (BlockCategory blockCategory : getBlockCategoriesMap().getCategories()) {
+            if (blockCategory.getInteractPrivilege() != null) {
+                for (Key key : blockCategory.getBlocks()) {
+                    interactables.add(key.toString());
+                }
+            }
         }
-        return categories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(categories);
+
+        return interactables.isEmpty() ? Collections.emptyList() : interactables;
     }
 
     @Override
-    public EntityCategories getEntityCategoriesMap() {
-        return this.global.getEntityCategoriesMap();
+    @Deprecated
+    public Interactables getInteractablesMap() {
+        return this.interactables;
+    }
+
+    @Override
+    @Deprecated
+    public Map<String, KeySet> getEntityCategories() {
+        Map<String, KeySet> categories = new HashMap<>();
+
+        for (EntityCategory entityCategory : getEntityCategoriesMap().getCategories()) {
+            categories.put(entityCategory.getName(), entityCategory.getEntities());
+        }
+
+        return categories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(categories);
     }
 
     @Override
     public BlockCategories getBlockCategoriesMap() {
         return this.global.getBlockCategoriesMap();
+    }
+
+    @Override
+    public EntityCategories getEntityCategoriesMap() {
+        return this.global.getEntityCategoriesMap();
     }
 
     public void updateValue(String path, Object value) throws IOException {
