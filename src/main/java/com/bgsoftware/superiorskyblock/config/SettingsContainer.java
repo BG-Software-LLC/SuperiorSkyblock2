@@ -240,8 +240,8 @@ public class SettingsContainer {
     public final boolean helpOnNoPermission;
     public final boolean helpOnInvalidCommand;
     public final boolean cacheSchematics;
-    public final SettingsManager.EntityCategories entityCategories;
     public final SettingsManager.BlockCategories blockCategories;
+    public final SettingsManager.EntityCategories entityCategories;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -620,8 +620,8 @@ public class SettingsContainer {
         helpOnInvalidCommand = config.getBoolean("help-on-invalid-command", true);
         helpOnNoPermission = config.getBoolean("help-on-no-permission", false);
         cacheSchematics = config.getBoolean("cache-schematics", true);
-        entityCategories = loadEntityCategories(plugin);
         blockCategories = loadBlockCategories(plugin);
+        entityCategories = loadEntityCategories(plugin);
     }
 
     private void loadDimensions(ConfigurationSection dimensionsSection) throws ManagerLoadException {
@@ -686,6 +686,7 @@ public class SettingsContainer {
 
     private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
         List<ClearAction> clearActions = new LinkedList<>();
+
         clearActionsNames.forEach(clearAction -> {
             try {
                 clearActions.add(ClearAction.getByName(clearAction));
@@ -693,54 +694,29 @@ public class SettingsContainer {
                 Log.warnFromFile("config.yml", "Invalid clear action ", clearAction + ", skipping...");
             }
         });
+
         return Collections.unmodifiableList(clearActions);
-    }
-
-    private SettingsManager.EntityCategories loadEntityCategories(SuperiorSkyblockPlugin plugin) {
-        File file = new File(plugin.getDataFolder(), "entity-categories.yml");
-
-        boolean removeInvalidEntityKeys = false;
-
-        if (!file.exists()) {
-            plugin.saveResource("entity-categories.yml", false);
-            removeInvalidEntityKeys = true;
-        }
-
-        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
-
-        EntityCategoriesSection.convertToSections(config, file);
-
-        if (removeInvalidEntityKeys) {
-            EntityCategoriesSection.removeInvalidEntityKeys(config, file);
-        }
-
-        try {
-            config.syncWithConfig(file, plugin.getResource("entity-categories.yml"), "custom-categories");
-        } catch (Exception error) {
-            Log.error(error, file, "An unexpected error occurred while loading file:");
-        }
-
-        return new EntityCategoriesSection(config);
     }
 
     private SettingsManager.BlockCategories loadBlockCategories(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "block-categories.yml");
 
-        boolean removeInvalidBlockKeys = false;
+        boolean removeInvalidBlocks = false;
 
         if (!file.exists()) {
             plugin.saveResource("block-categories.yml", false);
-            removeInvalidBlockKeys = true;
+            removeInvalidBlocks = true;
         }
 
         CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
-        if (removeInvalidBlockKeys) {
+        if (removeInvalidBlocks) {
             BlockCategoriesSection.removeInvalidBlocks(config, file);
         }
 
         try {
-            config.syncWithConfig(file, plugin.getResource("block-categories.yml"), "custom-categories");
+            config.syncWithConfig(file, plugin.getResource("block-categories.yml"),
+                    BlockCategoriesSection.IGNORED_SECTIONS);
         } catch (Exception error) {
             Log.error(error, file, "An unexpected error occurred while loading file:");
         }
@@ -748,15 +724,44 @@ public class SettingsContainer {
         return new BlockCategoriesSection(config);
     }
 
+    private SettingsManager.EntityCategories loadEntityCategories(SuperiorSkyblockPlugin plugin) {
+        File file = new File(plugin.getDataFolder(), "entity-categories.yml");
+
+        boolean removeInvalidEntities = false;
+
+        if (!file.exists()) {
+            plugin.saveResource("entity-categories.yml", false);
+            removeInvalidEntities = true;
+        }
+
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
+
+        EntityCategoriesSection.convertToSections(config, file);
+
+        if (removeInvalidEntities) {
+            EntityCategoriesSection.removeInvalidEntities(config, file);
+        }
+
+        try {
+            config.syncWithConfig(file, plugin.getResource("entity-categories.yml"),
+                    EntityCategoriesSection.IGNORED_SECTIONS);
+        } catch (Exception error) {
+            Log.error(error, file, "An unexpected error occurred while loading file:");
+        }
+
+        return new EntityCategoriesSection(config);
+    }
+
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "safe_blocks.yml");
 
-        if (!file.exists())
+        if (!file.exists()) {
             Resources.saveResource("safe_blocks.yml");
+        }
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
-        List<String> safeBlocks = cfg.getStringList("safe-blocks");
+        List<String> safeBlocks = config.getStringList("safe-blocks");
 
         if (safeBlocks.isEmpty()) {
             Log.warnFromFile(file.getName(), "There are no valid safe blocks! Generating default ones...");
@@ -767,8 +772,8 @@ public class SettingsContainer {
                     .collect(Collectors.toList()));
 
             try {
-                cfg.set("safe-blocks", safeBlocks);
-                cfg.save(file);
+                config.set("safe-blocks", safeBlocks);
+                config.save(file);
             } catch (IOException error) {
                 Log.errorFromFile(error, "config.yml", "An unexpected error occurred while saving safe blocks into file:");
             }

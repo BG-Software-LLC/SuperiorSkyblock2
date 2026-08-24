@@ -33,6 +33,10 @@ import java.util.Map;
 
 public class EntityCategoriesSection implements SettingsManager.EntityCategories {
 
+    public static final String[] IGNORED_SECTIONS = new String[]{"custom-categories",
+            "builtin-categories.TAMEABLE.actions", "builtin-categories.VEHICLE.actions",
+            "builtin-categories.MONSTER.actions", "builtin-categories.ANIMAL.actions"};
+
     private final Map<String, EntityCategory> nameToCategory;
     private final KeyMap<List<EntityCategory>> entityToCategory;
 
@@ -71,13 +75,12 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
             if (categoryName.equalsIgnoreCase("TAMEABLE") || categoryName.equalsIgnoreCase("VEHICLE")
                     || categoryName.equalsIgnoreCase("MONSTER") || categoryName.equalsIgnoreCase("ANIMAL")) {
                 config.set("builtin-categories." + categoryName, categorySection);
-                config.set(categoryName, null);
-                converted = true;
             } else {
                 config.set("custom-categories." + categoryName, categorySection);
-                config.set(categoryName, null);
-                converted = true;
             }
+
+            config.set(categoryName, null);
+            converted = true;
         }
 
         if (converted) {
@@ -89,7 +92,7 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
         }
     }
 
-    public static void removeInvalidEntityKeys(YamlConfiguration config, File file) {
+    public static void removeInvalidEntities(YamlConfiguration config, File file) {
         if (!config.isConfigurationSection("custom-categories")) {
             return;
         }

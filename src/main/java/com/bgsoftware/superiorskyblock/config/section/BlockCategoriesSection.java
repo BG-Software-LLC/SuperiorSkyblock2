@@ -32,6 +32,8 @@ import java.util.Map;
 
 public class BlockCategoriesSection implements SettingsManager.BlockCategories {
 
+    public static final String[] IGNORED_SECTIONS = new String[]{"custom-categories", "builtin-categories.ALL.actions"};
+
     private final Map<String, BlockCategory> nameToCategory;
     private final KeyMap<List<BlockCategory>> blockToCategory;
 
