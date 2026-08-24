@@ -188,16 +188,11 @@ public class ProtectionListener extends AbstractGameEventListener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
         List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap()
                 .getCategories(Keys.of(spawnType));
-
-        if (entityCategories.isEmpty()) {
-            return false;
-        }
+        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories,
+                EntityCategory::getSpawnPrivilege);
 
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories,
-                    EntityCategory::getSpawnPrivilege);
-
             interactionResult = this.protectionManager.get().handleCustomInteraction(superiorPlayer,
                     e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), islandPrivileges);
         }

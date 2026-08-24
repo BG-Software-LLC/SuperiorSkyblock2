@@ -34,7 +34,6 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -133,15 +132,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(Key.of(block));
-
-        if (blockCategories.isEmpty()) {
-            return InteractionResult.SUCCESS;
-        }
+        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories,
+                BlockCategory::getPlacePrivilege);
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
-            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories,
-                    BlockCategory::getPlacePrivilege);
 
             return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivileges, 0,
                     true, true);
@@ -160,15 +155,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(Key.of(block));
-
-        if (blockCategories.isEmpty()) {
-            return InteractionResult.SUCCESS;
-        }
+        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories,
+                BlockCategory::getBreakPrivilege);
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
-            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories,
-                    BlockCategory::getBreakPrivilege);
 
             return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivileges, 0,
                     true, true);
@@ -192,7 +183,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Key blockKey = Keys.of(block);
 
             boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem);
-
             int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
 
             List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(blockKey);
@@ -261,6 +251,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
+
             return handleInteractionInternal(superiorPlayer, blockLocation, IslandPrivileges.FERTILIZE,
                     0, true, true);
         }
@@ -273,8 +264,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         // We do not care about spawn island when spawn protection is disabled,
         // and therefore only island worlds are relevant.
-        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(entity.getWorld()))
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(entity.getWorld())) {
             return InteractionResult.SUCCESS;
+        }
 
         InteractionResult interactionResult;
         boolean closeInventory = false;
@@ -331,8 +323,10 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 Player player = superiorPlayer.asPlayer();
                 if (player != null && player.isOnline()) {
                     Inventory openInventory = player.getOpenInventory().getTopInventory();
-                    if (openInventory != null && (openInventory.getType() == InventoryType.MERCHANT || openInventory.getType() == InventoryType.CHEST))
+                    if (openInventory != null && (openInventory.getType() == InventoryType.MERCHANT
+                            || openInventory.getType() == InventoryType.CHEST)) {
                         player.closeInventory();
+                    }
                 }
             }, 1L);
         }
@@ -358,16 +352,16 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         List<EntityCategory> entityCategories = BukkitEntities.getCategories(entity);
+        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories,
+                EntityCategory::getDamagePrivilege);
 
-        if (entityCategories.isEmpty()) {
+        if (islandPrivileges.isEmpty()) {
             return InteractionResult.SUCCESS;
         }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
 
-            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories,
-                    EntityCategory::getDamagePrivilege);
             InteractionResult interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation,
                     islandPrivileges, 0, true, false);
 
