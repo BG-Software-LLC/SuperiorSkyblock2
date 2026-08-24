@@ -237,7 +237,6 @@ public enum Materials {
         HOE,
         SHELF,
         COPPER_GOLEM,
-        SHELF,
         GRASS_BLOCK,
         DIRT
 
