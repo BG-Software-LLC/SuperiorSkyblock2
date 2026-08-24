@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -64,6 +65,12 @@ public class ChunksListener extends AbstractGameEventListener {
     }
 
     private void onWorldUnload(GameEvent<GameEventArgs.WorldUnloadEvent> e) {
+        // Cached world references may point to the unloaded world, which cannot be accessed anymore.
+        // The world is only removed from the server after this event is handled, therefore we invalidate
+        // the cached references again on the next tick so they cannot be resolved to the unloaded world.
+        LazyWorldLocation.notifyWorldUnloaded();
+        BukkitExecutor.sync(LazyWorldLocation::notifyWorldUnloaded, 1L);
+
         // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(e.getArgs().world))
             return;
@@ -94,8 +101,6 @@ public class ChunksListener extends AbstractGameEventListener {
 
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
-
-        Arrays.stream(chunk.getEntities()).forEach(this.worldRecordService.get()::recordEntityDespawn);
     }
 
     private void handleChunkLoad(Chunk chunk, boolean isNewChunk) {
@@ -117,15 +122,15 @@ public class ChunksListener extends AbstractGameEventListener {
         World world = chunk.getWorld();
         Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
 
-        if (isNewChunk && dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-            Biome defaultWorldBiome = IslandUtils.getDefaultWorldBiome(dimension);
+        if (isNewChunk) {
+            Biome biome = island.getBiome(dimension);
             // We want to update the biome for new island chunks.
-            if (island.getBiome() != defaultWorldBiome) {
+            if (biome != IslandUtils.getDefaultWorldBiome(dimension)) {
                 List<Player> playersToUpdate;
                 try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
                     playersToUpdate = strategy.getPlayers(WorldInfo.of(world));
                 }
-                plugin.getNMSChunks().setBiome(Collections.singletonList(chunkPosition), island.getBiome(), playersToUpdate);
+                plugin.getNMSChunks().setBiome(Collections.singletonList(chunkPosition), biome, playersToUpdate);
             }
         }
 
@@ -150,23 +155,21 @@ public class ChunksListener extends AbstractGameEventListener {
         MutableBoolean recalculateEntities = new MutableBoolean(false);
 
         if (chunk.getX() == (islandCenter.getX() >> 4) && chunk.getZ() == (islandCenter.getZ() >> 4)) {
-            if (dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
-                Block chunkBlock = chunk.getBlock(0, 100, 0);
-                island.setBiome(world.getBiome(chunkBlock.getX(), chunkBlock.getZ()), false);
-            }
+            Block chunkBlock = chunk.getBlock(0, 100, 0);
+            island.setBiome(dimension, world.getBiome(chunkBlock.getX(), chunkBlock.getZ()), 0);
 
             if (entityLimitsEnabled)
                 recalculateEntities.set(true);
         }
 
         BukkitExecutor.sync(() -> {
-            if (chunk.isLoaded())
+            if (isChunkStillLoaded(chunk))
                 // Update holograms of stacked blocks in delay so the chunk is entirely loaded.
                 plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
         }, 10L);
 
         BukkitExecutor.sync(() -> {
-            if (!pendingLoadedChunksForIsland.remove(chunk) || !chunk.isLoaded())
+            if (!pendingLoadedChunksForIsland.remove(chunk) || !isChunkStillLoaded(chunk))
                 return;
 
             // If we cannot recalculate entities at this moment, we want to track entities normally.
@@ -191,6 +194,12 @@ public class ChunksListener extends AbstractGameEventListener {
         }, 2L);
 
         DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.write(cache -> cache.remove(chunkPosition));
+    }
+
+    private static boolean isChunkStillLoaded(Chunk chunk) {
+        // Chunk#isLoaded may still report chunks of unloaded worlds as loaded, while accessing them
+        // throws an exception as the chunk-system of their world is shut down.
+        return LazyWorldLocation.isWorldLoaded(chunk.getWorld()) && chunk.isLoaded();
     }
 
     private static boolean isOldHologram(ArmorStand armorStand) {

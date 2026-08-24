@@ -123,6 +123,10 @@ public enum Materials {
         return hasTag(material, Tag.SHELF);
     }
 
+    public static boolean isCopperGolemBlock(Material material) {
+        return hasTag(material, Tag.COPPER_GOLEM);
+    }
+
     public static boolean isGrassBlock(Material material) {
         return hasTag(material, Tag.GRASS_BLOCK);
     }
@@ -187,6 +191,12 @@ public enum Materials {
                 materialTags.add(Tag.HOE);
             if (materialName.contains("_SHELF"))
                 materialTags.add(Tag.SHELF);
+            // The full copper blocks a copper golem can be built from (any oxidation/waxing state),
+            // excluding cut/chiseled/grate/bulb/etc. copper variants that cannot form a golem.
+            String copperBase = materialName.startsWith("WAXED_") ? materialName.substring(6) : materialName;
+            if (copperBase.equals("COPPER_BLOCK") || copperBase.equals("EXPOSED_COPPER") ||
+                    copperBase.equals("WEATHERED_COPPER") || copperBase.equals("OXIDIZED_COPPER"))
+                materialTags.add(Tag.COPPER_GOLEM);
             if (ServerVersion.isLegacy() ? material == Material.GRASS : materialName.equals("GRASS_BLOCK"))
                 materialTags.add(Tag.GRASS_BLOCK);
             if (materialName.contains("DIRT"))
@@ -225,6 +235,8 @@ public enum Materials {
         BED,
         HARNESS,
         HOE,
+        SHELF,
+        COPPER_GOLEM,
         SHELF,
         GRASS_BLOCK,
         DIRT

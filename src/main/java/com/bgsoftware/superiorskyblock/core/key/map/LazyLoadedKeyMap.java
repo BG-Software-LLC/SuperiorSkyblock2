@@ -11,7 +11,9 @@ import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -118,6 +120,20 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
     @Override
     public V getOrDefault(Object key, V defaultValue) {
         return runOnMap(m -> m.getOrDefault(key, defaultValue), defaultValue);
+    }
+
+    @Override
+    public V merge(Key key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        Objects.requireNonNull(remappingFunction);
+        Objects.requireNonNull(value);
+        V oldValue = getRaw(key, null);
+        V newValue = (oldValue == null) ? value : remappingFunction.apply(oldValue, value);
+        if (newValue == null) {
+            remove(key);
+        } else {
+            put(key, newValue);
+        }
+        return newValue;
     }
 
     @Override

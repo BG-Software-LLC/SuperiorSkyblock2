@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("WeakerAccess")
 public class SettingsManagerImpl extends Manager implements SettingsManager {
@@ -55,7 +56,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     private static final String[] IGNORED_SECTIONS = new String[]{
             "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "worlds.dimensions",
             "island-previews.locations", "default-values.block-limits", "default-values.entity-limits",
-            "default-values.role-limits", "stacked-blocks.limits", "default-values.generator", "message-delays"
+            "default-values.role-limits", "stacked-blocks.limits", "default-values.generator", "message-delays", "default-placeholders"
     };
 
     private final GlobalSection global = new GlobalSection();
@@ -87,9 +88,12 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         }
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-        convertData(cfg);
 
-        boolean shouldSaveFile = convertInteractables(plugin, cfg);
+        boolean shouldSaveFile = false;
+
+        if (convertData(cfg)) {
+            shouldSaveFile = true;
+        }
 
         if (convertEntityCategories(plugin, cfg)) {
             shouldSaveFile = true;
@@ -101,14 +105,16 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             shouldSaveFile = true;
         }
 
+        if (shouldSaveFile) {
+            try {
+                cfg.save(file);
+            } catch (Exception error) {
+                Log.error(error, file, "An unexpected error occurred while loading config file:");
+            }
+        }
+
         try {
             cfg.syncWithConfig(file, plugin.getResource("config.yml"), IGNORED_SECTIONS);
-
-            // If any of the convert methods removed something from the config, we have to save it manually,
-            // because CommentedConfiguration#syncWithConfig() does not detect unnecessary options.
-            if (shouldSaveFile) {
-                cfg.save(file);
-            }
         } catch (Exception error) {
             Log.error(error, file, "An unexpected error occurred while loading config file:");
         }
@@ -313,16 +319,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public boolean isTransferConfirm() {
         return this.global.isTransferConfirm();
-    }
-
-    @Override
-    public String getSpawnersProvider() {
-        return this.global.getSpawnersProvider();
-    }
-
-    @Override
-    public String getStackedBlocksProvider() {
-        return this.global.getStackedBlocksProvider();
     }
 
     @Override
@@ -555,6 +551,21 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public boolean isObsidianToLava() {
         return this.global.isObsidianToLava();
+    }
+
+    @Override
+    public String getSpawnersProvider() {
+        return this.global.getSpawnersProvider();
+    }
+
+    @Override
+    public String getStackedBlocksProvider() {
+        return this.global.getStackedBlocksProvider();
+    }
+
+    @Override
+    public String getPricesProvider() {
+        return this.global.getPricesProvider();
     }
 
     @Override
@@ -794,7 +805,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.interactables.setContainer(container);
     }
 
-    private void convertData(YamlConfiguration cfg) {
+    private boolean convertData(YamlConfiguration cfg) {
+        AtomicBoolean converted = new AtomicBoolean(false);
+
         if (cfg.getConfigurationSection("worlds.dimensions") == null) {
             cfg.set("worlds.dimensions.normal", cfg.getConfigurationSection("worlds.normal"));
             cfg.set("worlds.dimensions.normal.environment", "NORMAL");
@@ -929,8 +942,63 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         if (cfg.isBoolean("worlds.end.dragon-fight")) {
             cfg.set("worlds.end.dragon-fight.enabled", cfg.getBoolean("worlds.end.dragon-fight"));
         }
-        if (!cfg.isConfigurationSection("default-values.island-effects"))
+        if (cfg.get("default-values.island-effects") == null) {
             cfg.createSection("default-values.island-effects");
+        }
+        convertListToSection(cfg, "default-values.block-limits", true, converted);
+        convertListToSection(cfg, "default-values.entity-limits", true, converted);
+        convertListToSection(cfg, "default-values.island-effects", true, converted);
+        convertListToSection(cfg, "default-values.role-limits", true, converted);
+        convertListToSection(cfg, "stacked-blocks.limits", true, converted);
+        convertListToSection(cfg, "default-placeholders", false, converted);
+        if (cfg.isConfigurationSection("worlds.dimensions")) {
+            boolean hasDimensionalGeneratorRates = false;
+
+            for (String dimension : cfg.getConfigurationSection("worlds.dimensions").getKeys(false)) {
+                if (cfg.contains("default-values.generator." + dimension)) {
+                    convertListToSection(cfg, "default-values.generator." + dimension, true, converted);
+                    hasDimensionalGeneratorRates = true;
+                }
+            }
+
+            if (!hasDimensionalGeneratorRates) {
+                Object generator = cfg.get("default-values.generator");
+                String defaultDimension = cfg.getString("worlds.default-world");
+                cfg.set("default-values.generator." + defaultDimension, generator);
+                convertListToSection(cfg, "default-values.generator." + defaultDimension, true, converted);
+            }
+        }
+
+        return converted.get();
+    }
+
+    private void convertListToSection(YamlConfiguration cfg, String path, boolean integers, AtomicBoolean converted) {
+        if (cfg.isList(path)) {
+            List<String> list = cfg.getStringList(path);
+
+            cfg.createSection(path);
+
+            for (String line : list) {
+                String[] sections = line.split(":");
+
+                String key;
+                String value;
+                if (sections.length == 2) {
+                    key = sections[0];
+                    value = sections[1];
+                } else if (sections.length == 3) {
+                    key = sections[0] + ":" + sections[1];
+                    value = sections[2];
+                } else {
+                    Log.warnFromFile("config.yml", "Cannot parse value '", line, "', skipping...");
+                    continue;
+                }
+
+                cfg.set(path + "." + key, integers ? Integer.parseInt(value) : value);
+            }
+
+            converted.set(true);
+        }
     }
 
     private boolean convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {

@@ -17,13 +17,11 @@ import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonI
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
+import java.util.List;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
@@ -231,19 +229,15 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        // Dummy button
-    }
-
-    @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         Key rawKey = pagedObject.getBlockKey();
         Pair<Key, ItemStack> customKeyItem = plugin.getBlockValues().convertCustomKeyItem(rawKey);
 
         BigDecimal amount = new BigDecimal(pagedObject.getAmount());
 
-        ItemMeta currentMeta = buttonItem.getItemMeta();
-        ItemBuilder itemBuilder;
+        String displayName = itemBuilder.getDisplayName();
+        List<String> lore = itemBuilder.getLore();
+
         String materialName;
 
         ItemStack customItem = customKeyItem.getValue();
@@ -279,8 +273,8 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
 
         return itemBuilder
-                .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")
-                .withLore(currentMeta.hasLore() ? currentMeta.getLore() : Collections.emptyList())
+                .withName(displayName)
+                .withLore(lore)
                 .withAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue())
                 .replaceAll("{0}", Formatters.CAPITALIZED_FORMATTER.format(materialName))
                 .replaceAll("{1}", amount + "")
@@ -295,8 +289,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
 
         @Override
         public PagedMenuTemplateButton<MenuCounts.View, MenuCounts.BlockCount> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), CountsPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, CountsPagedObjectButton.class,
                     CountsPagedObjectButton::new);
         }
 

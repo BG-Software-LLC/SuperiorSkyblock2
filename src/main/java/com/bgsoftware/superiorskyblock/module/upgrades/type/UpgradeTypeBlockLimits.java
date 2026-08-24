@@ -83,9 +83,6 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
                 return;
 
             PlayerHand playerHand = BukkitItems.getHand(e);
-            if (playerHand != PlayerHand.MAIN_HAND)
-                return;
-
             ItemStack handItem = BukkitItems.getHandItem(e.getPlayer(), playerHand);
             if (handItem == null)
                 return;

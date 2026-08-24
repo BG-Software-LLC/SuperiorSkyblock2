@@ -1,0 +1,381 @@
+//<generate-if:DIALOGS_SUPPORT>
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
+
+import com.bgsoftware.common.reflection.ClassInfo;
+import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButtonAction;
+import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogMenuType;
+import com.bgsoftware.superiorskyblock.api.menu.layout.DialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPool;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyItem;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyText;
+import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.external.ui.UIProvider_Default;
+import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
+import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
+import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ClientboundClearDialogPacket;
+import net.minecraft.server.dialog.ActionButton;
+import net.minecraft.server.dialog.CommonButtonData;
+import net.minecraft.server.dialog.CommonDialogData;
+import net.minecraft.server.dialog.ConfirmationDialog;
+import net.minecraft.server.dialog.Dialog;
+import net.minecraft.server.dialog.DialogAction;
+import net.minecraft.server.dialog.MultiActionDialog;
+import net.minecraft.server.dialog.NoticeDialog;
+import net.minecraft.server.dialog.action.Action;
+import net.minecraft.server.dialog.action.StaticAction;
+import net.minecraft.server.dialog.body.DialogBody;
+import net.minecraft.server.dialog.body.ItemBody;
+import net.minecraft.server.dialog.body.PlainMessage;
+import org.bukkit.NamespacedKey;
+import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
+import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiPredicate;
+
+public class NMSDialogsImpl implements NMSDialogs {
+
+    private static final ReflectField<Tag> PAPER_PLAYER_CUSTOM_CLICK_EVENT_PAYLOAD = new ReflectField<>(
+            new ClassInfo("io.papermc.paper.event.player.PaperPlayerCustomClickEvent", ClassInfo.PackageType.UNKNOWN),
+            Tag.class, "payload");
+    private static final ReflectMethod<NamespacedKey> SPIGOT_PLAYER_CUSTOM_CLICK_EVENT_GET_ID = new ReflectMethod<>(
+            new ClassInfo("org.bukkit.event.player.PlayerCustomClickEvent", ClassInfo.PackageType.UNKNOWN),
+            "getId", new ClassInfo[0]);
+    private static final ReflectMethod<JsonElement> SPIGOT_PLAYER_CUSTOM_CLICK_EVENT_GET_DATA = new ReflectMethod<>(
+            new ClassInfo("org.bukkit.event.player.PlayerCustomClickEvent", ClassInfo.PackageType.UNKNOWN),
+            "getData", new ClassInfo[0]);
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final ${IDENTIFIER_CLASS} DIALOG_CLICK_CALLBACK_KEY =
+            ${IDENTIFIER_CLASS}.fromNamespaceAndPath("superiorskyblock", "dialog_click_callback");
+
+    private static final LazyReference<TitleParser> TITLE_PARSER = new LazyReference<>() {
+        @Override
+        protected TitleParser create() {
+            return plugin.getProviders().getUIProvider() instanceof UIProvider_Default ?
+                    new VanillaTitleParser() :  new MiniMessageTitleParser();
+        }
+    };
+
+    @Override
+    public PlayerCustomClickEventFunctions<?> createCustomClickEventFunctions() {
+        return PlayerCustomClickEventFunctionsImpl.INSTANCE;
+    }
+
+    @Override
+    public <V extends MenuView<V, ?>> DialogWrapper<V> createDialog(V menuView) {
+        DialogWrapper<V> dialog = new DialogWrapper<>(menuView);
+
+        RegularDialogMenuLayoutImpl<V> menuLayout = (RegularDialogMenuLayoutImpl<V>) menuView.getMenu().getLayout();
+
+        List<ActionButton> buttons = new LinkedList<>();
+        int slot = 0;
+        for (MenuTemplateButton<?> templateButton : menuLayout.getButtons()) {
+            DialogButton dialogButton = templateButton.getButtonDialog();
+            if (dialogButton != null) {
+                CommonButtonData buttonData = new CommonButtonData(Component.literal(dialogButton.getLabel()), dialogButton.getWidth());
+                Optional<Action> action = buildButtonAction(dialog, templateButton, slot);
+                buttons.add(new ActionButton(buttonData, action));
+            }
+            ++slot;
+        }
+
+        CommonDialogData dialogData = new CommonDialogData(
+                TITLE_PARSER.get().parse(menuLayout.getTitle(menuView)),
+                Optional.empty(), // Not implementing external titles for now (shown in dialogs of type list)
+                menuLayout.isCloseWithEscapeAllowed(),
+                false, // Pause is not relevant in multiplayer
+                DialogAction.CLOSE,
+                buildBodies(menuLayout, menuView),
+                Collections.emptyList()
+        );
+
+        Dialog backedDialog = buildDialog(menuLayout.getDialogType(), dialogData, buttons);
+
+        dialog.setHandle(backedDialog);
+
+        return dialog;
+    }
+
+    @Override
+    public void openDialog(SuperiorPlayer superiorPlayer, DialogWrapper<?> dialog) {
+        superiorPlayer.runIfOnline(player -> {
+            fireDialogOpenEvent(superiorPlayer, dialog);
+            dialog.onOpenDialog();
+            ((CraftPlayer) player).getHandle().openDialog(Holder.direct((Dialog) dialog.getHandle()));
+        });
+    }
+
+    @Override
+    public void closeDialog(SuperiorPlayer superiorPlayer, DialogWrapper<?> dialog) {
+        fireDialogCloseEvent(superiorPlayer, dialog);
+        superiorPlayer.runIfOnline(player -> {
+            ((CraftPlayer) player).getHandle().connection.send(ClientboundClearDialogPacket.INSTANCE);
+        });
+    }
+
+    private Optional<Action> buildButtonAction(DialogWrapper<?> dialog, MenuTemplateButton<?> templateButton, int slot) {
+        DialogButtonAction action = templateButton.getButtonDialog().getAction();
+        if (action == null)
+            return Optional.empty();
+
+        switch (action.getType()) {
+            case OPEN_URL:
+                try {
+                    return Optional.of(new StaticAction(new ClickEvent.OpenUrl(new URI(action.getActionData()))));
+                } catch (URISyntaxException error) {
+                    return Optional.empty();
+                }
+            case SUGGEST_COMMAND:
+                return Optional.of(new StaticAction(new ClickEvent.SuggestCommand(action.getActionData())));
+            case RUN_COMMAND:
+                // fallthrough, we handle commands with MenuCommands
+            case CUSTOM:
+                CompoundTag tag = new CompoundTag();
+                tag.putInt("dialogId", dialog.getId());
+                tag.putInt("clickedSlot", slot);
+                return Optional.of(new StaticAction(new ClickEvent.Custom(DIALOG_CLICK_CALLBACK_KEY, Optional.of(tag))));
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    private <V extends MenuView<V, ?>> List<DialogBody> buildBodies(DialogMenuLayout<V> menuLayout, V menuView) {
+        SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
+        Player player = inventoryViewer.asPlayer();
+
+        List<DialogBody> bodies = new LinkedList<>();
+        for (DialogBodyElement bodyElement : menuLayout.getBodyElements()) {
+            if (bodyElement instanceof DialogBodyText) {
+                bodies.add(getPlainMessage((DialogBodyText) bodyElement, player));
+            } else if (bodyElement instanceof DialogBodyItem) {
+                bodies.add(getItemBody((DialogBodyItem) bodyElement, inventoryViewer, player));
+            } else {
+                throw new IllegalStateException("bodyElement: " + bodyElement);
+            }
+        }
+        return bodies;
+    }
+
+    private PlainMessage getPlainMessage(DialogBodyText dialogBodyText, Player player) {
+        return new PlainMessage(TITLE_PARSER.get().parse(dialogBodyText.getText(player)), dialogBodyText.getWidth());
+    }
+
+    private ItemBody getItemBody(DialogBodyItem dialogBodyItem, SuperiorPlayer superiorPlayer, Player player) {
+        org.bukkit.inventory.ItemStack itemStack = dialogBodyItem.getItem().build(superiorPlayer);
+        Optional<PlainMessage> description = Optional.ofNullable(dialogBodyItem.getDescription())
+                .map(descElement -> getPlainMessage((DialogBodyText) descElement, player));
+        return new ItemBody(NMSUtilsVersioned.getItemBodyItemParameter(CraftItemStack.asNMSCopy(itemStack)),
+                description, dialogBodyItem.isShowDecorations(), dialogBodyItem.isShowTooltip(),
+                dialogBodyItem.getWidth(), dialogBodyItem.getHeight());
+    }
+
+    private Dialog buildDialog(DialogMenuType menuType, CommonDialogData dialogData, List<ActionButton> buttons) {
+        switch (menuType) {
+            case CONFIRMATION:
+                if (buttons.size() >= 2)
+                    return new ConfirmationDialog(dialogData, buttons.get(0), buttons.get(1));
+                break;
+            case NOTICE:
+                if (!buttons.isEmpty())
+                    return new NoticeDialog(dialogData, buttons.get(0));
+                break;
+            default:
+                break;
+        }
+        return new MultiActionDialog(dialogData, buttons, Optional.empty(), 1);
+    }
+
+    private void fireDialogOpenEvent(SuperiorPlayer superiorPlayer, DialogWrapper<?> dialog) {
+        GameEventArgs.DialogOpenEvent dialogOpenEvent = new GameEventArgs.DialogOpenEvent();
+        dialogOpenEvent.superiorPlayer = superiorPlayer;
+        dialogOpenEvent.dialog = dialog;
+        GameEvent<GameEventArgs.DialogOpenEvent> gameEvent = new GameEvent<>(GameEventType.DIALOG_OPEN_EVENT, dialogOpenEvent);
+        plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.NORMAL);
+    }
+
+    private void fireDialogCloseEvent(SuperiorPlayer superiorPlayer, DialogWrapper<?> dialog) {
+        GameEventArgs.DialogCloseEvent dialogCloseEvent = new GameEventArgs.DialogCloseEvent();
+        dialogCloseEvent.superiorPlayer = superiorPlayer;
+        dialogCloseEvent.dialog = dialog;
+        GameEvent<GameEventArgs.DialogCloseEvent> gameEvent = new GameEvent<>(GameEventType.DIALOG_CLOSE_EVENT, dialogCloseEvent);
+        plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.NORMAL);
+    }
+
+    private static class PlayerCustomClickEventFunctionsImpl implements PlayerCustomClickEventFunctions {
+
+        private static final PlayerCustomClickEventFunctionsImpl INSTANCE = new PlayerCustomClickEventFunctionsImpl();
+
+        private static final Class eventClass = findEventClassInternal();
+        private static final BiPredicate<Event, DialogEventData> getEventDataFunction = eventClass.getName().startsWith("io") ?
+                PlayerCustomClickEventFunctionsImpl::getPaperDialogEventData :
+                PlayerCustomClickEventFunctionsImpl::getSpigotDialogEventData;
+
+        @Override
+        public Class getEventClass() {
+            return eventClass;
+        }
+
+        @Override
+        public GameEvent execute(GameEventType eventType, GameEventPriority priority, Event event) {
+            int dialogId;
+            int clickedSlot;
+            try (DialogEventData eventData = DialogEventData.POOL.obtain()) {
+                if (!getEventDataFunction.test(event, eventData)) {
+                    return null;
+                }
+
+                dialogId = eventData.dialogId;
+                clickedSlot = eventData.clickedSlot;
+            }
+
+            DialogWrapper<?> dialog = DialogWrapper.getById(dialogId);
+            if (dialog == null)
+                return null;
+
+            GameEventArgs.DialogClickEvent dialogClickEvent = new GameEventArgs.DialogClickEvent();
+            dialogClickEvent.superiorPlayer = dialog.getMenuView().getInventoryViewer();
+            dialogClickEvent.dialog = dialog;
+            dialogClickEvent.clickedSlot = clickedSlot;
+            return eventType.createEvent(dialogClickEvent);
+        }
+
+        private static Class findEventClassInternal() {
+            try {
+                return Class.forName("org.bukkit.event.player.PlayerCustomClickEvent");
+            } catch (ClassNotFoundException error) {
+                try {
+                    return Class.forName("io.papermc.paper.event.player.PlayerCustomClickEvent");
+                } catch (ClassNotFoundException error2) {
+                    throw new IllegalStateException("Could not find PlayerCustomClickEvent");
+                }
+            }
+        }
+
+        private static boolean getSpigotDialogEventData(Event event, DialogEventData eventData) {
+            NamespacedKey identifier = SPIGOT_PLAYER_CUSTOM_CLICK_EVENT_GET_ID.invoke(event);
+            if (identifier.getNamespace().equals(DIALOG_CLICK_CALLBACK_KEY.getNamespace()) &&
+                    identifier.getKey().equals(DIALOG_CLICK_CALLBACK_KEY.getPath())) {
+                JsonElement payloadElement = SPIGOT_PLAYER_CUSTOM_CLICK_EVENT_GET_DATA.invoke(event);
+                if (payloadElement != null && payloadElement.isJsonObject()) {
+                    JsonObject payloadObj = payloadElement.getAsJsonObject();
+                    JsonElement dialogId = payloadObj.get("dialogId");
+                    JsonElement clickedSlot = payloadObj.get("clickedSlot");
+                    if (dialogId != null && clickedSlot != null && dialogId.isJsonPrimitive() && clickedSlot.isJsonPrimitive()) {
+                        eventData.dialogId = dialogId.getAsInt();
+                        eventData.clickedSlot = clickedSlot.getAsInt();
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static boolean getPaperDialogEventData(Event event, DialogEventData eventData) {
+            io.papermc.paper.event.player.PaperPlayerCustomClickEvent customClickEvent =
+                    (io.papermc.paper.event.player.PaperPlayerCustomClickEvent) event;
+            if (customClickEvent.getIdentifier().namespace().equals(DIALOG_CLICK_CALLBACK_KEY.getNamespace()) &&
+                    customClickEvent.getIdentifier().value().equals(DIALOG_CLICK_CALLBACK_KEY.getPath())) {
+                Tag payload = PAPER_PLAYER_CUSTOM_CLICK_EVENT_PAYLOAD.get(event);
+                if (payload instanceof CompoundTag) {
+                    Integer dialogId = ((CompoundTag) payload).getInt("dialogId").orElse(null);
+                    Integer clickedSlot = ((CompoundTag) payload).getInt("clickedSlot").orElse(null);
+                    if (dialogId != null && clickedSlot != null) {
+                        eventData.dialogId = dialogId;
+                        eventData.clickedSlot = clickedSlot;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+    }
+
+    private static class DialogEventData implements ObjectsPool.Releasable, AutoCloseable {
+
+        private static final ObjectsPool<DialogEventData> POOL = new ObjectsPool<>(DialogEventData::new);
+
+        private int dialogId;
+        private int clickedSlot;
+
+        @Override
+        public void release() {
+            POOL.release(this);
+        }
+
+        @Override
+        public void close() {
+            release();
+        }
+    }
+
+    private interface TitleParser {
+
+        Component parse(String title);
+
+    }
+
+    private static class VanillaTitleParser implements TitleParser {
+
+        @Override
+        public Component parse(String title) {
+            return Component.literal(title);
+        }
+    }
+
+    private static class MiniMessageTitleParser implements TitleParser {
+
+        private static final net.kyori.adventure.text.minimessage.MiniMessage MINI_MESSAGE =
+                net.kyori.adventure.text.minimessage.MiniMessage.builder().tags(
+                        net.kyori.adventure.text.minimessage.tag.standard.StandardTags.defaults()).build();
+        private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer LEGACY_COMPONENT_SERIALIZER =
+                net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection();
+
+        @Override
+        public Component parse(String title) {
+            return io.papermc.paper.adventure.PaperAdventure.asVanilla(deserialize(title));
+        }
+
+        private static net.kyori.adventure.text.Component deserialize(String text) {
+            try {
+                return MINI_MESSAGE.deserialize(text);
+            } catch (net.kyori.adventure.text.minimessage.ParsingException exception) {
+                return LEGACY_COMPONENT_SERIALIZER.deserialize(text);
+            }
+        }
+
+    }
+
+}

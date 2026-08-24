@@ -38,12 +38,12 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20
             TrimMaterial material = materialRegistry.get(NamespacedKey.minecraft(trimMaterial));
             TrimPattern pattern = patternRegistry.get(NamespacedKey.minecraft(trimPattern));
 
-            if (material == null)
-                throw new IllegalArgumentException("Couldn't convert " + trimMaterial.toUpperCase(Locale.ENGLISH) +
-                        " into trim material, skipping...");
-            if (pattern == null)
-                throw new IllegalArgumentException("Couldn't convert " + trimPattern.toUpperCase(Locale.ENGLISH) +
-                        " into trim pattern, skipping...");
+            if (material == null) {
+                throw new IllegalArgumentException("Couldn't convert '" + trimMaterial + "' into a trim material");
+            }
+            if (pattern == null) {
+                throw new IllegalArgumentException("Couldn't convert '" + trimPattern + "' into a trim pattern");
+            }
 
             ArmorTrim armorTrim = new ArmorTrim(material, pattern);
             armorMeta.setTrim(armorTrim);
@@ -78,16 +78,21 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20
     @Override
     public Biome getBiome(String biomeName) {
         NamespacedKey key = NamespacedKey.fromString(biomeName.toLowerCase(Locale.ENGLISH));
-        if (key == null) {
-            return null;
+        if (key != null) {
+            Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
+            if (registry != null) {
+                Biome biome = registry.get(key);
+                if (biome != null) {
+                    return biome;
+                }
+            }
         }
 
-        Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
-        if (registry == null) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
             return null;
         }
-
-        return registry.get(key);
     }
 
 }

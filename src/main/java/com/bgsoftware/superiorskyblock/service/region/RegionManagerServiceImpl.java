@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
@@ -19,7 +20,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
+import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -87,7 +88,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final EntityType PARROT_TYPE = EnumHelper.getEnum(EntityType.class, "PARROT");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
-    private static EnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
+    private static UnparsedEnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -101,13 +102,18 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private static void onSettingsUpdate() {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-        WORLD_PERMISSIONS_CACHE = new EnumerateSet<>(IslandPrivilege.values());
-        plugin.getSettings().getWorldPermissions().forEach(islandPrivilegeName -> {
-            try {
-                WORLD_PERMISSIONS_CACHE.add(IslandPrivilege.getByName(islandPrivilegeName));
-            } catch (Throwable ignored) {
+        WORLD_PERMISSIONS_CACHE = new UnparsedEnumerateSet<IslandPrivilege>(IslandPrivilege.values()) {
+            @Override
+            protected IslandPrivilege parseName(String name) {
+                return IslandPrivilege.getByName(name);
             }
-        });
+
+            @Override
+            protected String getName(IslandPrivilege islandPrivilege) {
+                return islandPrivilege.getName();
+            }
+        };
+        plugin.getSettings().getWorldPermissions().forEach(WORLD_PERMISSIONS_CACHE::addName);
     }
 
     @Override
@@ -654,7 +660,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             }
         }
 
-        if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
+        if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ() ||
+                superiorPlayer.asPlayer().getFallDistance() > 0) {
             // Handle moving while in teleport warmup.
             BukkitTask teleportTask = superiorPlayer.getTeleportTask();
             if (teleportTask != null) {
@@ -695,14 +702,15 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
             superiorPlayer.setPlayerStatus(PlayerStatus.VOID_TELEPORT);
 
-            superiorPlayer.teleport(fromIsland, result -> {
-                if (!result) {
-                    Message.TELEPORTED_FAILED.send(superiorPlayer);
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), result2 -> {
+            superiorPlayer.teleportWithResult(fromIsland, result -> {
+                if (result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
+                    forgetVoidTeleportPlayerStatus(superiorPlayer);
+                } else {
+                    superiorPlayer.teleportWithResult(plugin.getGrid().getSpawnIsland(), unused -> {
                         forgetVoidTeleportPlayerStatus(superiorPlayer);
                     });
-                } else {
-                    forgetVoidTeleportPlayerStatus(superiorPlayer);
+                    if (result != PlayerTeleportAlgorithm.TeleportResult.CUSTOM)
+                        Message.TELEPORTED_FAILED.send(superiorPlayer);
                 }
             });
 

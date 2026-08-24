@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -40,6 +41,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +59,11 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private static final Material OPEN_EYEBLOSSOM = EnumHelper.getEnum(Material.class, "OPEN_EYEBLOSSOM");
     @Nullable
     private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
+    @Nullable
+    private static final Material COPPER_CHEST = EnumHelper.getEnum(Material.class, "COPPER_CHEST");
+
+    private static final BlockFace[] COPPER_GOLEM_FACES = {
+            BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
 
     @WorldRecordFlags
     private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
@@ -408,18 +415,61 @@ public class BlockChangesListener extends AbstractGameEventListener {
             } else if (spawnReason == CreatureSpawnEvent.SpawnReason.BUILD_WITHER) {
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.SOUL_SAND, entityLocation, 4, 0);
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.WITHER_SKELETON_SKULL, entityLocation, 3, REGULAR_RECORD_FLAGS);
-            } else if (spawnReason == BUILD_COPPERGOLEM) {
-                Block copperOrChestBlock = entityLocation.getBlock().getRelative(BlockFace.DOWN);
-                Key copperBlock = Keys.of(copperOrChestBlock);
-                this.worldRecordService.get().recordBlockBreak(copperBlock, entityLocation, 1, 0);
-                this.worldRecordService.get().recordBlockBreak(ConstantKeys.CARVED_PUMPKIN, entityLocation, 1, 0);
-                BukkitExecutor.sync(() -> {
-                    Key chestBlock = Keys.of(copperOrChestBlock);
-                    this.worldRecordService.get().recordBlockPlace(chestBlock, entityLocation, 1, null, REGULAR_RECORD_FLAGS);
-                }, 1L);
+            } else if (COPPER_CHEST != null && spawnReason == BUILD_COPPERGOLEM) {
+                handleCopperGolemStructure(entityLocation);
             }
         }
 
+    }
+
+    private void handleCopperGolemStructure(Location entityLocation) {
+        this.worldRecordService.get().recordBlockBreak(ConstantKeys.CARVED_PUMPKIN, entityLocation, 1, 0);
+
+        // A copper golem can be built in any orientation, so the copper block it consumes (and
+        // its pre-transform key) can be any of the golem's 6 face neighbors. Capture all copper
+        // neighbors now, then one tick later record the one that actually turned into a copper
+        // chest.
+        Block golemBlock = entityLocation.getBlock();
+        EnumMap<BlockFace, Key> copperNeighbors = new EnumMap<>(BlockFace.class);
+        for (BlockFace face : COPPER_GOLEM_FACES) {
+            Key blockKey = Keys.of(golemBlock.getRelative(face));
+            if (blockKey instanceof MaterialKey && Materials.isCopperGolemBlock(((MaterialKey) blockKey).getMaterial()))
+                copperNeighbors.put(face, blockKey);
+        }
+
+        if (copperNeighbors.isEmpty()) {
+            // This should never occur as the copper block should not have turned into a chest in this time.
+            // Log and abort.
+            new IllegalStateException("Could not find a valid Copper Block for the copper golem structure").printStackTrace();
+            return;
+        }
+
+        BukkitExecutor.sync(() -> {
+            int foundBlocks = 0;
+
+            for (BlockFace face : COPPER_GOLEM_FACES) {
+                Key oldBlockKey = copperNeighbors.get(face);
+                if (oldBlockKey != null) {
+                    Block neighbor = golemBlock.getRelative(face);
+                    Key newBlockKey = Keys.of(neighbor);
+                    if (newBlockKey instanceof MaterialKey &&
+                            ((MaterialKey) newBlockKey).getMaterial() == COPPER_CHEST && !newBlockKey.equals(oldBlockKey)) {
+                        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                            Location copperLocation = neighbor.getLocation(wrapper.getHandle());
+                            this.worldRecordService.get().recordBlockBreak(oldBlockKey, copperLocation, 1, 0);
+                            this.worldRecordService.get().recordBlockPlace(newBlockKey, copperLocation, 1, null, REGULAR_RECORD_FLAGS);
+                            ++foundBlocks;
+                        }
+                    }
+                }
+            }
+
+            if (foundBlocks != 1) {
+                // This should never occur as only one copper block should have turned into a copper chest.
+                // Log and abort
+                new IllegalStateException("Could not find a valid Copper Chest for the copper golem structure").printStackTrace();
+            }
+        }, 1L);
     }
 
     private void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {

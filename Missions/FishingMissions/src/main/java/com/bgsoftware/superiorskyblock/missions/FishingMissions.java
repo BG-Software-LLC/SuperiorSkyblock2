@@ -125,6 +125,7 @@ public final class FishingMissions extends BuiltinMission<KeyDataTracker> implem
                 }
                 if (typeKey != null) {
                     typeKey = getMissionItemKey(typeKey);
+                    if (typeKey == null) continue;
                     int amount = section.getInt(uuid + "." + key + ".amount");
                     fishingTracker.load(typeKey, amount);
                 }

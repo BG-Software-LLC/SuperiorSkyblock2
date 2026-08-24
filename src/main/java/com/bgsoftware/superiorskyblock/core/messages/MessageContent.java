@@ -4,7 +4,9 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 
 import java.math.BigDecimal;
@@ -16,6 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MessageContent {
+
+    private static final Object[] EMPTY_ARGS = new Object[0];
 
     public static final MessageContent EMPTY = new MessageContent(Collections.emptyList()) {
         @Override
@@ -34,6 +38,7 @@ public class MessageContent {
     private static final Pattern DEFAULT_PLACEHOLDER_PATTERN = Pattern.compile("\\{(\\d+)}");
 
     private final List<IPart> contentParts = new LinkedList<>();
+    private final boolean legacyColorCodes;
 
     public static List<MessageContent> parse(List<String> contents) {
         List<MessageContent> messageContentsList = new LinkedList<>();
@@ -47,6 +52,7 @@ public class MessageContent {
 
         List<IPart> parts = new LinkedList<>();
         int lastPartIdx = 0;
+        boolean legacyColorCodes = false;
 
         while (matcher.find()) {
             StringBuilder previousPart = new StringBuilder(content.substring(lastPartIdx, matcher.start()));
@@ -60,29 +66,58 @@ public class MessageContent {
                 previousPart.append(matcher.group());
             }
 
-            if (previousPart.length() > 0)
-                parts.add(new StaticPart(previousPart.toString()));
-            if (argumentPart != null)
+            if (previousPart.length() > 0) {
+                String previous = previousPart.toString();
+
+                if (previous.indexOf(ChatColor.COLOR_CHAR) >= 0) {
+                    legacyColorCodes = true;
+                }
+
+                parts.add(new StaticPart(previous));
+            }
+
+            if (argumentPart != null) {
                 parts.add(argumentPart);
+            }
 
             lastPartIdx = matcher.end();
         }
 
-        if (lastPartIdx < content.length())
-            parts.add(new StaticPart(content.substring(lastPartIdx)));
+        if (lastPartIdx < content.length()) {
+            String remaining = content.substring(lastPartIdx);
 
-        return new MessageContent(parts);
+            if (remaining.indexOf(ChatColor.COLOR_CHAR) >= 0) {
+                legacyColorCodes = true;
+            }
+
+            parts.add(new StaticPart(remaining));
+        }
+
+        return new MessageContent(parts, legacyColorCodes);
     }
 
     private MessageContent(List<IPart> contentParts) {
+        this(contentParts, false);
+    }
+
+    private MessageContent(List<IPart> contentParts, boolean legacyColorCodes) {
         this.contentParts.addAll(contentParts);
+        this.legacyColorCodes = legacyColorCodes;
+    }
+
+    public Optional<String> getContent(@Nullable OfflinePlayer offlinePlayer) {
+        return getContent(offlinePlayer, EMPTY_ARGS);
     }
 
     public Optional<String> getContent(@Nullable OfflinePlayer offlinePlayer, Object... arguments) {
         StringBuilder content = new StringBuilder();
         for (IPart part : contentParts) {
             if (part instanceof StaticPart) {
-                content.append(((StaticPart) part).content);
+                String partContent = ((StaticPart) part).content;
+                if (((StaticPart) part).parsePlaceholders) {
+                    partContent = placeholdersService.get().parsePlaceholders(offlinePlayer, partContent);
+                }
+                content.append(partContent);
             } else {
                 int argumentIndex = ((ArgumentPart) part).argumentIndex;
                 if (argumentIndex >= 0 && argumentIndex < arguments.length) {
@@ -96,7 +131,11 @@ public class MessageContent {
         if (content.length() == 0)
             return Optional.empty();
 
-        return Optional.of(placeholdersService.get().parsePlaceholders(offlinePlayer, content.toString()));
+        return Optional.of(content.toString());
+    }
+
+    public boolean hasLegacyColorCodes() {
+        return legacyColorCodes;
     }
 
     public static String getArgumentString(Object argument) {
@@ -112,9 +151,31 @@ public class MessageContent {
     private static class StaticPart implements IPart {
 
         private final String content;
+        private final boolean parsePlaceholders;
 
         StaticPart(String content) {
             this.content = content;
+            this.parsePlaceholders = checkForPlaceholders(content);
+        }
+
+        private static boolean checkForPlaceholders(String value) {
+            if (Text.isBlank(value))
+                return false;
+
+            int openBracket = value.indexOf('{');
+            if (openBracket >= 0) {
+                // Open bracket was found, let's find close bracket
+                int closeBracket = value.indexOf('}', openBracket);
+                if (closeBracket >= 0)
+                    return true;
+            }
+
+            // Look for two %
+            int firstPercentage = value.indexOf('%');
+            if (firstPercentage < 0)
+                return false;
+
+            return value.indexOf('%', firstPercentage) >= 0;
         }
 
     }

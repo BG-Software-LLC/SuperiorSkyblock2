@@ -47,4 +47,14 @@ public class DelegateIslandChest implements IslandChest {
         return this.handle.getInventory();
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
 }

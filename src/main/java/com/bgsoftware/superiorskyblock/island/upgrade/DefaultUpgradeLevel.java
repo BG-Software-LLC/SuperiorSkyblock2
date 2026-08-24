@@ -16,7 +16,7 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
     private static final DefaultUpgradeLevel INSTANCE = new DefaultUpgradeLevel();
 
     private DefaultUpgradeLevel() {
-        super(-1, EmptyUpgradeCost.getInstance(), Collections.emptyList(), "", Collections.emptySet(),
+        super(-1, Collections.singletonList(EmptyUpgradeCost.getInstance()), Collections.emptyList(), "", Collections.emptySet(),
                 Value.syncedSupplied(() -> OptionalDouble.of(plugin.getSettings().getDefaultValues().getCropGrowth())),
                 Value.syncedSupplied(() -> OptionalDouble.of(plugin.getSettings().getDefaultValues().getSpawnerRates())),
                 Value.syncedSupplied(() -> OptionalDouble.of(plugin.getSettings().getDefaultValues().getMobDrops())),

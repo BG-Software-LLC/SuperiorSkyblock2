@@ -30,7 +30,7 @@ BANK_WITHDRAW_CUSTOM: '&e&lБанк | &7Введите сумму, котору�
 BANK_WITHDRAW_COMPLETED: 'Снятие завершено'
 BANNED_FROM_ISLAND: '&c&lОшибка | &7Вы забанены на этом острове.'
 BLOCK_COUNT_CHECK: '&e&lОстров | &7На этом острове x{0} {1}.'
-BLOCK_COUNTS_CHECK: |
+BLOCK_COUNTS_CHECK: |-
   &e&lОстров | &7На этом острове следующие блоки:
   &7{0}
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lОстров | &7На этом острове нет отслеживаемых блоков.'
@@ -52,10 +52,10 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lОшибка | &7Вы можете из�
 CHANGED_BANK_LIMIT: '&e&lУлучшения | &7Успешно обновлен лимит банка для острова {0}.'
 CHANGED_BANK_LIMIT_ALL: '&e&lУлучшения | &7Успешно обновлен лимит банка для всех островов.'
 CHANGED_BANK_LIMIT_NAME: '&e&lУлучшения | &7Успешно обновлен лимит банка для {0}.'
-CHANGED_BIOME: '&e&lОстров | &7Успешно изменен биом на {0}. Вам может понадобиться переподключиться к серверу, чтобы увидеть изменения.'
-CHANGED_BIOME_ALL: '&e&lОстров | &7Успешно изменен биом на {0} для всех островов.'
-CHANGED_BIOME_NAME: '&e&lОстров | &7Успешно изменен биом на {0} для острова {1}.'
-CHANGED_BIOME_OTHER: '&e&lОстров | &7Успешно изменен биом на {0} для острова {1}.'
+CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lБлоки | &7Успешно изменено количество блоков на {0} до {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lУлучшения | &7Успешно обновлен лимит {0} блоков для острова {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lУлучшения | &7Успешно обновлен лимит {0} блоков для всех островов.'
@@ -268,6 +268,7 @@ COMMAND_DESCRIPTION_INVITE: 'Пригласить игрока на ваш ос�
 COMMAND_DESCRIPTION_KICK: 'Выгнать игрока с вашего острова.'
 COMMAND_DESCRIPTION_LANG: 'Изменить личный язык.'
 COMMAND_DESCRIPTION_LEAVE: 'Покинуть свой остров.'
+COMMAND_DESCRIPTION_LOCAL_CHAT: 'Toggle local chat mode.'
 COMMAND_DESCRIPTION_MEMBERS: 'Открыть меню участников.'
 COMMAND_DESCRIPTION_MISSION: 'Выполнить миссию.'
 COMMAND_DESCRIPTION_MISSIONS: 'Открыть меню миссий.'
@@ -364,8 +365,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lОстров | &7Успешно отправлен 
 GOT_BANNED: '&e&lОстров | &7Вы были ЗАБАНЕНЫ на острове {0}.'
 GOT_DEMOTED: '&e&lОстров | &7Вы были понижены до {0} на вашем острове.'
 GOT_EXPELLED: '&e&lОстров | &7&oВы были выгнаны с острова {0}.'
-GOT_INVITE: '&e&lОстров | &7{0} пригласил вас на свой остров.'
-GOT_INVITE_TOOLTIP: '&7Нажмите на сообщение, чтобы принять приглашение.'
+GOT_INVITE:
+  0:
+    text: '&e&lОстров | &7{0} пригласил вас на свой остров.'
+    tooltip: '&7Нажмите на сообщение, чтобы принять приглашение.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lОстров | &7Вы были выгнаны с вашего острова {0}.'
 GOT_PROMOTED: '&e&lОстров | &7Вы были повышены до {0} на вашем острове.'
 GOT_REVOKED: '&e&lОстров | &7{0} отменил ваше приглашение на его остров.'
@@ -388,7 +392,7 @@ INVALID_ISLAND: '&c&lОшибка | &7У вас нет острова.'
 INVALID_ISLAND_LOCATION: '&c&lОшибка | &7В вашем местоположении нет острова.'
 INVALID_ISLAND_OTHER: '&c&lОшибка | &7У {0} нет острова.'
 INVALID_ISLAND_OTHER_NAME: '&c&lОшибка | &7Нет острова с именем {0}.'
-INVALID_ISLAND_PERMISSION: |
+INVALID_ISLAND_PERMISSION: |-
   &c&lОшибка | &7Не удалось найти разрешение острова {0}.
   &c&lОшибка | &7Разрешения острова: {1}
 INVALID_LEVEL: '&c&lОшибка | &7Недопустимый уровень {0}.'
@@ -403,22 +407,22 @@ INVALID_MULTIPLIER: '&c&lОшибка | &7Недопустимый множит�
 INVALID_PAGE: '&c&lОшибка | &7Недопустимая страница {0}.'
 INVALID_PERCENTAGE: '&c&lОшибка | &7Процент должен быть от 0 до 100.'
 INVALID_PLAYER: '&c&lОшибка | &7Не удается найти игрока с именем {0}.'
-INVALID_RATE: |
+INVALID_RATE: |-
   &c&lОшибка | &7Не удалось найти рейтинг с именем {0}.
   &c&lОшибка | &7Рейтинги острова: {1}
 INVALID_ROWS: '&c&lОшибка | &7Недопустимое количество строк: {0}.'
-INVALID_ROLE: |
+INVALID_ROLE: |-
   &c&lОшибка | &7Не удалось найти роль острова {0}.
   &c&lОшибка | &7Роли острова: {1}
 INVALID_SCHEMATIC: '&c&lОшибка | &7Не удалось найти схему с именем {0}.'
-INVALID_SETTINGS: |
+INVALID_SETTINGS: |-
   &c&lОшибка | &7Не удалось найти настройки острова {0}.
   &c&lОшибка | &7Настройки острова: {1}
 INVALID_SIZE: '&c&lОшибка | &7Недопустимый размер {0}.'
 INVALID_SLOT: '&c&lОшибка | &7Недопустимый слот {0}.'
 INVALID_TITLE: '&c&lОшибка | &7Недопустимый введенный титул.'
 INVALID_TOGGLE_MODE: '&c&lОшибка | &7Не удается переключить {0}.'
-INVALID_UPGRADE: |
+INVALID_UPGRADE: |-
   &c&lОшибка | &7Не удалось найти улучшение с названием {0}.
   &c&lОшибка | &7Улучшения: {1}
 INVALID_VISIT_LOCATION: '&c&lОшибка | &7У этого острова нет местоположения для посетителей.'
@@ -449,33 +453,33 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Список команд [{0}/{1}]:
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Используйте /is help {0} для следующей страницы.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lОстров | &7Лимит банка: {0}'
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lОстров | &7Лимиты блоков:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lОстров | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lОстров | &7Лимит кооперации: {0}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lОстров | &7Множитель урожая: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lОстров | &7Множитель дропов: {0}'
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |-
   &e&lОстров | &7Эффекты острова:
   {0}
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lОстров | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lОстров | &7Лимиты сущностей:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lОстров | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lОстров | &7Ставки генераторов ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lОстров | &7  {0}: {1}% ({2})'
-ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |-
   &e&lОстров | &7Лимиты ролей:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lОстров | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lОстров | &7Размер границ: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lОстров | &7Множитель спаунеров: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lОстров | &7Лимит команды: {0}'
-ISLAND_INFO_ADMIN_UPGRADES: |
+ISLAND_INFO_ADMIN_UPGRADES: |-
   &e&lОстров | &7Улучшения:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lОстров | &7  {0}: {1}'
@@ -504,7 +508,7 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
-ISLAND_INFO_ROLES: |
+ISLAND_INFO_ROLES: |-
   &e&lОстров | &7{0}ы:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lОстров | &7Количество посетителей: {0} ({1} unique visitors)'
@@ -518,7 +522,7 @@ ISLAND_PREVIEW_CANCEL: '&e&lПредпросмотр | &7Вы отменили �
 ISLAND_PREVIEW_CONFIRM_TEXT: 'ПОДТВЕРДИТЬ'
 ISLAND_PREVIEW_CANCEL_TEXT: 'ОТМЕНА'
 ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&lПредпросмотр | &7Вы начали режим предпросмотра для схемы {0}.
   &e&lПредпросмотр | &7Введите &a&lПОДТВЕРДИТЬ &7для создания нового острова или &c&lОТМЕНА &7для отмены режима предпросмотра.
   &e&lПредпросмотр | &7Вы не можете покидать территорию острова, иначе режим предпросмотра будет отменён автоматически.
@@ -558,6 +562,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lОстров | &7Вы покинули свой остров.'
 LEFT_ISLAND_COOP: '&e&lОстров | &7Вы больше не являетесь соучастником острова {0}.'
 LEFT_ISLAND_COOP_NAME: '&e&lОстров | &7Вы больше не являетесь соучастником острова {0}.'
+LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'
 LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
@@ -572,7 +577,7 @@ MISSION_STATUS_COMPLETE_ALL: '&e&lМиссия | &7Изменен статус �
 MISSION_STATUS_RESET: '&e&lМиссия | &7Сброшен статус миссии {0} для {1}.'
 MISSION_STATUS_RESET_ALL: '&e&lМиссия | &7Сброшен статус всех миссий для {0}.'
 MODULE_ALREADY_INITIALIZED: '&e&lМодуль | &7Этот модуль уже загружен.'
-MODULE_INFO: |
+MODULE_INFO: |-
   &e&lМодуль | &7{0} от {1}
   &e&lМодуль | &7&m--------------------
   &e&lМодуль | &7{2}
@@ -696,7 +701,7 @@ SCHEMATIC_LEFT_SELECT: '&e&lСхемы | &7Выбрана позиция #2 ({0}
 SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lОшибка | &7Вы не выбрали две позиции.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lСхемы | &7Обработка вашего запроса...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&lСхемы | &7Вы выбрали две позиции. Выполните /is admin schematic <name>, чтобы создать новую схему.
   &e&lСхемы | &7Убедитесь, что вы находитесь на месте телепортации при выполнении команды.
 SCHEMATIC_RIGHT_SELECT: '&e&lСхемы | &7Выбрана позиция #1 ({0})'
@@ -719,6 +724,7 @@ SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
 SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lСпавн | &7Успешно телепортирован {0} на спавн.'
 SPAWN_SET_SUCCESS: '&e&lСпавн | &7Успешно обновлено место спавна на {0}.'
+SPY_LOCAL_CHAT_FORMAT: '&7[Spy] &6[{0}] {1}&f: &7{2}'
 SPY_TEAM_CHAT_FORMAT: '&7[Шпион] &e[{0}] {1}&f: &7{2}'
 SYNC_UPGRADES: '&e&lУлучшения | &7Успешно синхронизированы все значения улучшений для острова {0}.'
 SYNC_UPGRADES_ALL: '&e&lУлучшения | &7Успешно синхронизированы все значения улучшений для всех островов.'
@@ -739,6 +745,8 @@ TOGGLED_FLY_OFF: '&e&lПолет | &7Режим полета на острове
 TOGGLED_FLY_ON: '&e&lПолет | &7Режим полета на острове включен &aON&7.'
 TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
 TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
+TOGGLED_LOCAL_CHAT_OFF: '&e&lChat | &7Toggling local chat &cOFF&7.'
+TOGGLED_LOCAL_CHAT_ON: '&e&lChat | &7Toggling local chat &aON&7.'
 TOGGLED_SCHEMATIC_OFF: '&e&lСхемы | &7Режим схем отключен &cOFF&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lСхемы | &7Режим схем включен &aON&7.
@@ -773,7 +781,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lОшибка | &7Вы можете улучшит�
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lОшибка | &7Вы не можете использовать эту команду на других островах.'
 WARP_ALREADY_EXIST: '&c&lОшибка | &7Варп с таким именем уже существует.'
-WARP_CATEGORY_ICON_NEW_LORE: |
+WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lВарпы | &7Введите новую лор (введите "-cancel" для отмены):
   &e&lВарпы | &7Вы можете разделять строки, используя "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lВарпы | &7Введите имя (введите "-cancel" для отмены):'
@@ -787,7 +795,7 @@ WARP_CATEGORY_SLOT_SUCCESS: '&e&lВарпы | &7Успешно изменен с
 WARP_CATEGORY_RENAME: '&e&lВарпы | &7Введите новое имя (введите "-cancel" для отмены):'
 WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lОшибка | &7Это имя уже занято другой категорией.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lВарпы | &7Успешно переименована категория в {0}.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&lВарпы | &7Введите новую лор (введите "-cancel" для отмены):
   &e&lВарпы | &7Вы можете разделять строки, используя "\n".
 WARP_ICON_NEW_NAME: '&e&lВарпы | &7Введите имя (введите "-cancel" для отмены):'
@@ -809,4 +817,5 @@ WITHDRAW_ERROR: '&c&lОшибка | &7{0}.'
 WITHDRAWN_MONEY: '&e&lБанк | &7Вы сняли ${0} из банка острова {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lБанк | &7Вы сняли ${0} из банка острова {1}!'
 WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
+WORLD_NOT_GENERATED: '&e&lWorlds | &7The {0} world is not generated yet!'
 WORLD_NOT_UNLOCKED: '&e&lМиры | &7Мир {0} еще не разблокирован!'

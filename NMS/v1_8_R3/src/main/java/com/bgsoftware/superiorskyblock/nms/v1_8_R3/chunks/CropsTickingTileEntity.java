@@ -66,7 +66,7 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
 
         chunkPositions.forEach(chunkPosition -> {
             long chunkKey = chunkPosition.asPair();
-            CropsTickingTileEntity cropsTickingTileEntity = tickingChunks.get(chunkKey);
+            CropsTickingTileEntity cropsTickingTileEntity = tickingChunks.get(chunkPosition.getWorldName(), chunkKey);
             if (cropsTickingTileEntity != null)
                 cropsTickingTileEntityConsumer.accept(cropsTickingTileEntity);
         });

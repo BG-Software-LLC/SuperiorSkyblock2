@@ -2,18 +2,23 @@ package com.bgsoftware.superiorskyblock.nms.v1_17.world;
 
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventFlags;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ServerTickList;
 import net.minecraft.world.level.TickNextTickData;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlockStates;
 
 import java.lang.reflect.Modifier;
@@ -29,6 +34,8 @@ public class BlockServerTickListTracker {
             new ReflectField<Consumer<TickNextTickData<Block>>>(
                     new ClassInfo("com.destroystokyo.paper.server.ticklist.PaperTickList", ClassInfo.PackageType.UNKNOWN),
                     Consumer.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
+    private static final ReflectMethod<CraftBlockState> BLOCK_STATE_CREATE = new ReflectMethod<>(
+            CraftBlockStates.class, "getBlockState", World.class, BlockPos.class, BlockState.class, BlockEntity.class);
 
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -50,14 +57,16 @@ public class BlockServerTickListTracker {
         BlockState blockState = serverLevel.getBlockState(nextTickData.pos);
         if (blockState.is(nextTickData.getType())) {
             BlockState oldState = serverLevel.getBlockState(nextTickData.pos);
+            // The block entity must be captured before the tick, as it might be removed by it.
+            BlockEntity oldBlockEntity = oldState.hasBlockEntity() ? serverLevel.getBlockEntity(nextTickData.pos) : null;
             try {
                 // Only capture blocks related events
                 plugin.getGameEventsDispatcher().startCaptureEvents(GameEventFlags.BLOCK_EVENT | GameEventFlags.MAYBE_BLOCK_EVENT);
                 blockState.tick(serverLevel, nextTickData.pos, serverLevel.random);
             } finally {
                 List<GameEvent<?>> capturedEvents = plugin.getGameEventsDispatcher().stopCaptureEvents();
-                // Remove BlockPhysicsEvent which we don't listen to
-                capturedEvents.removeIf(gameEvent -> gameEvent.getType() == GameEventType.BLOCK_PHYSICS_EVENT);
+                // Remove events that do not record a block change, so they never suppress the BlockUpdateShapeEvent
+                capturedEvents.removeIf(GameEvent::doesNotRecordBlockChange);
                 // We don't want to fire the BlockUpdateShapeEvent if another event was fired in the tick method.
                 // This is to prevent blocks from being considered updated twice.
                 if (!capturedEvents.isEmpty())
@@ -65,10 +74,15 @@ public class BlockServerTickListTracker {
             }
             BlockState newState = serverLevel.getBlockState(nextTickData.pos);
             if (oldState.getBlock() != newState.getBlock()) {
+                // We cannot create a snapshot of the old state without its block entity.
+                if (oldState.hasBlockEntity() && oldBlockEntity == null)
+                    return;
+
                 // Block was changed, let's call an update
                 GameEventArgs.BlockUpdateShapeEvent blockUpdateShapeEvent = new GameEventArgs.BlockUpdateShapeEvent();
                 blockUpdateShapeEvent.block = CraftBlock.at(serverLevel, nextTickData.pos);
-                blockUpdateShapeEvent.oldState = CraftBlockStates.getBlockState(nextTickData.pos, oldState, null);
+                blockUpdateShapeEvent.oldState = BLOCK_STATE_CREATE.invoke(null, blockUpdateShapeEvent.block.getWorld(),
+                        nextTickData.pos, oldState, oldBlockEntity);
                 GameEvent<GameEventArgs.BlockUpdateShapeEvent> gameEvent = GameEventType.BLOCK_UPDATE_SHAPE_EVENT.createEvent(blockUpdateShapeEvent);
                 plugin.getGameEventsDispatcher().onGameEvent(gameEvent, GameEventPriority.MONITOR);
             }

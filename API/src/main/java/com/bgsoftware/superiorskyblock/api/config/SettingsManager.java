@@ -260,20 +260,6 @@ public interface SettingsManager {
     boolean isTransferConfirm();
 
     /**
-     * The spawners-provider to use.
-     * If set to AUTO, the plugin will automatically detect an available spawners provider and use it.
-     * Config-path: spawners-provider
-     */
-    String getSpawnersProvider();
-
-    /**
-     * The stacked-blocks provider to use.
-     * If set to AUTO, the plugin will automatically detect an available stacked-blocks provider and use it.
-     * Config-path: stacked-blocks-provider
-     */
-    String getStackedBlocksProvider();
-
-    /**
      * Whether inventory of island members should be cleared when their island is disbanded or not.
      * Return true if clear-on-disband contains both ENDER_CHEST and INVENTORY.
      * This method will be deleted in the future!
@@ -567,6 +553,27 @@ public interface SettingsManager {
      * Config-path: obsidian-to-lava
      */
     boolean isObsidianToLava();
+
+    /**
+     * The spawners provider to use.
+     * If set to AUTO, the plugin will automatically detect an available spawners provider and use it.
+     * Config-path: spawners-provider
+     */
+    String getSpawnersProvider();
+
+    /**
+     * The stacked-blocks provider to use.
+     * If set to AUTO, the plugin will automatically detect an available stacked-blocks provider and use it.
+     * Config-path: stacked-blocks-provider
+     */
+    String getStackedBlocksProvider();
+
+    /**
+     * The prices provider to use.
+     * If set to AUTO, the plugin will automatically detect an available prices provider and use it.
+     * Config-path: prices-provider
+     */
+    String getPricesProvider();
 
     /**
      * The sync-worth status of the plugin.

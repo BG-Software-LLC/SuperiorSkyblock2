@@ -23,4 +23,14 @@ public class DelegateIslandCalculationAlgorithm implements IslandCalculationAlgo
         return this.handle.calculateIsland(island);
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
 }

@@ -12,6 +12,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -104,6 +105,10 @@ public interface NMSAlgorithms {
 
     default BukkitEventsListener.GameEventCreator getGenericGameCreator() {
         throw new UnsupportedOperationException("Not supported in this version");
+    }
+
+    default boolean isSoftExplosion(EntityExplodeEvent e) {
+        return false;
     }
 
     interface EnumBridge<T> {

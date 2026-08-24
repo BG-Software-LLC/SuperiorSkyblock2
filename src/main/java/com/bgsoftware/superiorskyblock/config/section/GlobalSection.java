@@ -131,14 +131,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().transferConfirm;
     }
 
-    public String getSpawnersProvider() {
-        return getContainer().spawnersProvider;
-    }
-
-    public String getStackedBlocksProvider() {
-        return getContainer().stackedBlocksProvider;
-    }
-
     public boolean isTeleportOnCreate() {
         return getContainer().teleportOnCreate;
     }
@@ -301,6 +293,18 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public boolean isObsidianToLava() {
         return getContainer().obsidianToLava;
+    }
+
+    public String getSpawnersProvider() {
+        return getContainer().spawnersProvider;
+    }
+
+    public String getStackedBlocksProvider() {
+        return getContainer().stackedBlocksProvider;
+    }
+
+    public String getPricesProvider() {
+        return getContainer().pricesProvider;
     }
 
     public BlockValuesManager.SyncWorthStatus getSyncWorth() {

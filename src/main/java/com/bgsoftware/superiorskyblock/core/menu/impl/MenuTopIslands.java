@@ -9,17 +9,20 @@ import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
+import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.ChangeSortingTypeButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.SwitchTopIslandsSortingTypeButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsSelfIslandButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import org.bukkit.configuration.ConfigurationSection;
@@ -35,14 +38,27 @@ import java.util.concurrent.CompletableFuture;
 public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuTopIslands.Args, Island> {
 
     private final boolean sortGlowWhenSelected;
+    private final String selectedSortingType;
+    private final String unselectedSortingType;
 
-    private MenuTopIslands(MenuParseResult<View> parseResult, boolean sortGlowWhenSelected) {
+    private MenuTopIslands(MenuParseResult<View> parseResult, boolean sortGlowWhenSelected,
+                           String selectedSortingType, String unselectedSortingType) {
         super(MenuIdentifiers.MENU_TOP_ISLANDS, parseResult, false);
         this.sortGlowWhenSelected = sortGlowWhenSelected;
+        this.selectedSortingType = selectedSortingType;
+        this.unselectedSortingType = unselectedSortingType;
     }
 
     public boolean isSortGlowWhenSelected() {
         return sortGlowWhenSelected;
+    }
+
+    public String getSelectedSortingType() {
+        return selectedSortingType;
+    }
+
+    public String getUnselectedSortingType() {
+        return unselectedSortingType;
     }
 
     @Override
@@ -76,40 +92,64 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
         if (menuParseResult == null)
             return null;
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
         boolean sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
+        String sort = cfg.getString("sort-islands", null);
+        String selectedSortingType = cfg.getString("messages.selected-sorting-type");
+        String unselectedSortingType = cfg.getString("messages.unselected-sorting-type");
 
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "worth-sort", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "worth-sort", menuSlotsMap),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_WORTH));
 
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "level-sort", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "level-sort", menuSlotsMap),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_LEVEL));
 
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "rating-sort", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "bank-sort", menuSlotsMap),
+                new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_BANK));
+
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "rating-sort", menuSlotsMap),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_RATING));
 
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "players-sort", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "players-sort", menuSlotsMap),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_PLAYERS));
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
                 ConfigurationSection itemSection = cfg.getConfigurationSection("items." + itemSectionName);
 
-                if (!itemSection.isString("sorting-type"))
-                    continue;
+                if (sort != null && sort.equals(itemSectionName)) {
+                    SwitchTopIslandsSortingTypeButton.Builder button = new SwitchTopIslandsSortingTypeButton.Builder();
 
-                SortingType sortingType = SortingType.getByName(itemSection.getString("sorting-type"));
+                    for (String sortSectionName : itemSection.getKeys(false)) {
+                        ConfigurationSection sortSection = cfg.getConfigurationSection("items." + itemSectionName + "." + sortSectionName);
 
-                if (sortingType == null) {
-                    Log.warnFromFile("top-islands.yml", "The sorting type is invalid for the item ", itemSectionName);
-                    continue;
+                        SortingType sortingType = SortingType.getByName(sortSectionName);
+
+                        if (sortingType == null) {
+                            Log.warnFromFile("top-islands.yml", "The sorting type is invalid for the item ", itemSectionName);
+                            continue;
+                        }
+
+                        String displayName = sortSection.getString("display-name", sortingType.getName());
+
+                        button.addItem(sortingType, displayName, MenuParserUtils.getItemStack("menus/top-islands.yml", sortSection));
+                    }
+
+                    patternBuilder.mapButtons(menuSlotsMap.getSlots(itemSectionName), button);
+                } else if (itemSection.isString("sorting-type")) {
+                    SortingType sortingType = SortingType.getByName(itemSection.getString("sorting-type"));
+
+                    if (sortingType == null) {
+                        Log.warnFromFile("top-islands.yml", "The sorting type is invalid for the item ", itemSectionName);
+                        continue;
+                    }
+
+                    patternBuilder.mapButtons(menuSlotsMap.getSlots(itemSectionName),
+                            new ChangeSortingTypeButton.Builder().setSortingType(sortingType));
                 }
-
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName),
-                        new ChangeSortingTypeButton.Builder().setSortingType(sortingType));
             }
         }
 
@@ -122,35 +162,47 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
                 if (itemsSection == null)
                     continue;
 
+                TemplateItem islandItem = MenuParserUtils.getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("island"));
+                if (islandItem == null)
+                    Log.warnFromFile("top-islands.yml", "The island item is missing for the char '", slotsChar, "'");
+
+                TemplateItem noIslandItem = MenuParserUtils.getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("no-island"));
+                if (noIslandItem == null)
+                    Log.warnFromFile("top-islands.yml", "The no-island item is missing for the char '", slotsChar, "'");
+
                 TopIslandsPagedObjectButton.Builder slotsBuilder = new TopIslandsPagedObjectButton.Builder();
-                slotsBuilder.setIslandItem(MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("island")));
-                slotsBuilder.setNoIslandItem(MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("no-island")));
-                slotsBuilder.setIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
-                slotsBuilder.setNoIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
+                if (islandItem != null)
+                    slotsBuilder.setIslandItem(islandItem);
+                if (noIslandItem != null)
+                    slotsBuilder.setNoIslandItem(noIslandItem);
+                slotsBuilder.setIslandSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
+                slotsBuilder.setNoIslandSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
                 slotsBuilder.setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"));
                 slotsBuilder.setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island"));
 
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(slotsChar), slotsBuilder);
+                patternBuilder.mapButtons(menuSlotsMap.getSlots(slotsChar), slotsBuilder);
 
                 if (!configuredSelfPlayerButton) {
                     configuredSelfPlayerButton = true;
 
                     TopIslandsSelfIslandButton.Builder selfIslandBuilder = new TopIslandsSelfIslandButton.Builder();
-                    selfIslandBuilder.setIslandItem(MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("island")));
-                    selfIslandBuilder.setNoIslandItem(MenuParserImpl.getInstance().getItemStack("menus/top-islands.yml", itemsSection.getConfigurationSection("no-island")));
-                    selfIslandBuilder.setIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
-                    selfIslandBuilder.setNoIslandSound(MenuParserImpl.getInstance().getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
+                    if (islandItem != null)
+                        selfIslandBuilder.setIslandItem(islandItem.copy());
+                    if (noIslandItem != null)
+                        selfIslandBuilder.setNoIslandItem(noIslandItem.copy());
+                    selfIslandBuilder.setIslandSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
+                    selfIslandBuilder.setNoIslandSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
                     selfIslandBuilder.setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"));
                     selfIslandBuilder.setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island"));
 
-                    patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "player-island", menuPatternSlots),
+                    patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "player-island", menuSlotsMap),
                             selfIslandBuilder);
                 }
             }
         }
 
 
-        return new MenuTopIslands(menuParseResult, sortGlowWhenSelected);
+        return new MenuTopIslands(menuParseResult, sortGlowWhenSelected, selectedSortingType, unselectedSortingType);
     }
 
     public static class Args implements ViewArgs {

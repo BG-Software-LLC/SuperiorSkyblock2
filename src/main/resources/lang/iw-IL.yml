@@ -31,7 +31,7 @@ BANK_WITHDRAW_CUSTOM: '&e&lBank | &7Type the amount you want to withdraw:'
 BANK_WITHDRAW_COMPLETED: 'Withdraw Completed'
 BANNED_FROM_ISLAND: '&c&lהאיגש | &7יאהמ קחרומ התא.'
 BLOCK_COUNT_CHECK: '&e&lIsland | &7This island has x{0} {1}.'
-BLOCK_COUNTS_CHECK: |
+BLOCK_COUNTS_CHECK: |-
   &e&lIsland | &7This island has the following blocks:
   &7{0}
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
@@ -54,11 +54,10 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lהאיגש | &7םינקחשל ךלשמ �
 CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
 CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
 CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
-CHANGED_BIOME: '&e&lיא | &7תרשל שדחמ רבחתהל שי ,םייונישה תא תוארל תנמ לע .{0}
-  ל החלצהב הנוש יאה לש םויבה.'
-CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
-CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'
-CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''s island.'
+CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Successfully changed the block amount at {0} to {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
@@ -279,6 +278,7 @@ COMMAND_DESCRIPTION_INVITE: ךלש יאה לא ןקחש ןימזהל.
 COMMAND_DESCRIPTION_KICK: יאהמ ןקחש ףיעהל.
 COMMAND_DESCRIPTION_LANG: ךלש הפשה תא ףילחהל.
 COMMAND_DESCRIPTION_LEAVE: יאה תא בוזעל.
+COMMAND_DESCRIPTION_LOCAL_CHAT: 'Toggle local chat mode.'
 COMMAND_DESCRIPTION_MEMBERS: םינקחשה טירפת תא חותפל.
 COMMAND_DESCRIPTION_MISSION: המישמ םילשהל.
 COMMAND_DESCRIPTION_MISSIONS: תומישמה טירפת תא חותפל.
@@ -379,8 +379,11 @@ GLOBAL_TITLE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members 
 GOT_BANNED: '&e&lיא | &7רמוע לש יאה ןמ תקחרוה.'
 GOT_DEMOTED: '&e&lיא | &7ךלש יאב {0} תגרדל הגרדב תדרי.'
 GOT_EXPELLED: '&e&lיא | &7{0} ידי לע יאה ןמ תשרוג.'
-GOT_INVITE: '&e&lיא | &7ולש יאה לא ךתוא ןימזה {0}.'
-GOT_INVITE_TOOLTIP: '&7הנמזהה תא רשאל תנמ לע העדוהה לע ץחל.'
+GOT_INVITE:
+  0:
+    text: '&e&lיא | &7ולש יאה לא ךתוא ןימזה {0}.'
+    tooltip: '&7הנמזהה תא רשאל תנמ לע העדוהה לע ץחל.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lיא | &7{0} ידי לע ךלש יאה ןמ תפעוה.'
 GOT_PROMOTED: '&e&lיא | &7ךלש יאב {0} תגרדל הגרדב תלעוה.'
 GOT_REVOKED: '&e&lיא | &7ולש יאל ךלש הנמזהה תא לטיב {0}.'
@@ -404,7 +407,7 @@ INVALID_ISLAND: '&c&lהאיגש | &7יא ךל ןיא.'
 INVALID_ISLAND_LOCATION: '&c&lהאיגש | &7ךלש םוקימב יא ןיא.'
 INVALID_ISLAND_OTHER: '&c&lהאיגש | &7יא ןיא {0} ל.'
 INVALID_ISLAND_OTHER_NAME: '&c&lהאיגש | &7{0} םשה םע יא ןיא.'
-INVALID_ISLAND_PERMISSION: |
+INVALID_ISLAND_PERMISSION: |-
   &c&lהאיגש | &7{0} האשרהה תא אוצמל היה ןתינ אל.
   &c&lהאיגש | &7{1} :יאה תואשרה
 INVALID_LEVEL: '&c&lהאיגש | &7{0} תיקוח אל המר.'
@@ -419,22 +422,22 @@ INVALID_MULTIPLIER: '&c&lהאיגש | &7{0} יקוח אל סונוב.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
 INVALID_PERCENTAGE: '&c&lהאיגש | &7100 ל 0 ןיב תויהל בייח זוחא.'
 INVALID_PLAYER: '&c&lהאיגש | &7{0} םשה םע ןקחש אוצמל ןתינ אל.'
-INVALID_RATE: |
+INVALID_RATE: |-
   &c&lהאיגש | &7{0} םשה םע גוריד אוצמל ןתינ אל.
   &c&lהאיגש | &7{0} :םיגוריד
 INVALID_ROWS: '&c&lError | &7Invalid amount of rows: {0}'
-INVALID_ROLE: |
+INVALID_ROLE: |-
   &c&lהאיגש | &7{0} הגרדה תא אוצמל היה ןתינ אל.
   &c&lהאיגש | &7{1} :תוגרד
 INVALID_SCHEMATIC: '&c&lהאיגש | &7{0} םשה םע הנבמ אוצמל היה ןתינ אל.'
-INVALID_SETTINGS: |
+INVALID_SETTINGS: |-
   &c&lהאיגש | &7{0} םשה םע תורדגה אוצמל ןתינ אל.
   &c&lהאיגש | &7{1} :תורדגה
 INVALID_SIZE: '&c&lהאיגש | &7{0} יקוח אל לדוג.'
 INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
 INVALID_TITLE: '&c&lError | &7Invalid title entered.'
 INVALID_TOGGLE_MODE: '&c&lהאיגש | &7{0} בצמ ףילחהל ןתינ אל.'
-INVALID_UPGRADE: |
+INVALID_UPGRADE: |-
   &c&lהאיגש | &7{0} םשה םע גורדש אוצמל היה ןתינ אל.
   &c&lהאיגש | &7{1} :םיגורדש
 INVALID_VISIT_LOCATION: '&c&lהאיגש | &7םירקבמ םוקמ ןיא הזה יאל.'
@@ -467,33 +470,33 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7תודוקפ תמישר [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7אבה דומעל רבעמל /is help {0} ץרה.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIsland | &7Bank Limit: {0}'
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lיא | &7םיקולב תלבגה:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lיא | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsland | &7Coop Limit: {0}'
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |-
   &e&lIsland | &7Island Effects:
   {0}
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lIsland | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lIsland | &7Entities Limits:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lיא | &7הלידג סונוב: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lיא | &7םיבוממ םיטירפ סונוב: {0}'
-ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lיא | &7רוטארנג ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lיא | &7  {0}: {1}% ({2})'
-ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |-
   &e&lIsland | &7Role Limits:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lיא | &7לובגה לדוג: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lיא | &7םירנואפס סונוב: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lיא | &7הצובק תלבגה: {0}'
-ISLAND_INFO_ADMIN_UPGRADES: |
+ISLAND_INFO_ADMIN_UPGRADES: |-
   &e&lיא | &7םיגורדש:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lיא | &7  {0}: {1}'
@@ -522,7 +525,7 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
-ISLAND_INFO_ROLES: |
+ISLAND_INFO_ROLES: |-
   &e&lיא | &7{0}s:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lIsland | &7Visitors Count: {0} ({1} unique visitors)'
@@ -536,7 +539,7 @@ ISLAND_PREVIEW_CANCEL: '&e&lPreview | &7You cancelled the preview mode.'
 ISLAND_PREVIEW_CONFIRM_TEXT: 'CONFIRM'
 ISLAND_PREVIEW_CANCEL_TEXT: 'CANCEL'
 ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&lPreview | &7You started the preview mode for the schematic {0}.
   &e&lPreview | &7Type &a&lCONFIRM &7to create a new island, or &c&lCANCEL &7to cancel the preview mode.
   &e&lPreview | &7You cannot leave the area of the island, otherwise the preview mode will be cancelled automatically.
@@ -578,6 +581,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lיא | &7ךלש יאה תא תבזע.'
 LEFT_ISLAND_COOP: '&e&lיא | &7{0} לש יאה לש הלועפ ףתשמ אל התא.'
 LEFT_ISLAND_COOP_NAME: '&e&lיא | &7רמוע יאה לש הלועפ ףתשמ אל התא.'
+LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'
 LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
@@ -594,7 +598,7 @@ MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Changed the status of all the miss
 MISSION_STATUS_RESET: '&e&lתומישמ | &7{1} ןקחשל הלחתוא {0} המישמה לש סוטטסה.'
 MISSION_STATUS_RESET_ALL: '&e&lMission | &7Reset the status of all the missions for {0}.'
 MODULE_ALREADY_INITIALIZED: '&e&lModule | &7This module is already loaded.'
-MODULE_INFO: |
+MODULE_INFO: |-
   &e&lModule | &7{0} by {1}
   &e&lModule | &7&m--------------------
   &e&lModule | &7{2}
@@ -718,7 +722,7 @@ SCHEMATIC_LEFT_SELECT: '&e&lםינבמ רצוי | &7היינש הדוקנ תנמ
 SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lהאיגש | &7תודוקנ ינש תרחב אל.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lםינבמ רצוי | &7ךתשקב תא דבעמ...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&lםינבמ רצוי | &7שדח הנבמ רוציל תנמ לע Run /is admin schematic <name> ץרה .תודוקנ יתש תרחב.
   &e&lםינבמ רצוי | &7הדוקפה תא ץירמ התא רשאכ רגתשהל םירומא וילא רוזאב דמוע התאש בל םיש.
 SCHEMATIC_RIGHT_SELECT: '&e&lםינבמ רצוי | &7הנושאר הדוקנ תנמיס ({0})'
@@ -741,6 +745,7 @@ SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
 SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
+SPY_LOCAL_CHAT_FORMAT: '&7[Spy] &6[{0}] {1}&f: &7{2}'
 SPY_TEAM_CHAT_FORMAT: '&7[יומס] &e[{0}] {1}&f: &7{2}'
 SYNC_UPGRADES: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}''s island.'
 SYNC_UPGRADES_ALL: '&e&lUpgrades | &7Successfully synced all upgrade values of all the islands.'
@@ -761,6 +766,8 @@ TOGGLED_FLY_OFF: '&e&lהפועת | &7תיטמוטואה הפועתה בצמ תא
 TOGGLED_FLY_ON: '&e&lהפועת | &7תיטמוטואה הפועתה בצמ תא &aתקלדה&7.'
 TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
 TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
+TOGGLED_LOCAL_CHAT_OFF: '&e&lChat | &7Toggling local chat &cOFF&7.'
+TOGGLED_LOCAL_CHAT_ON: '&e&lChat | &7Toggling local chat &aON&7.'
 TOGGLED_SCHEMATIC_OFF: '&e&lםינבמ רצוי | &7םינבמה תריצי בצמ תא &cתיביכ&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lםינבמ רצוי | &7םינבמה תריצי בצמ תא &aתקלדה&7.
@@ -795,7 +802,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lהאיגש | &7םירחא םייאב וזה הדוקפב שמתשהל לוכי אל התא.'
 WARP_ALREADY_EXIST: '&c&lהאיגש | &7הזה םשה םע םוקימ םייק רבכ.'
-WARP_CATEGORY_ICON_NEW_LORE: |
+WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
   &e&lWarps | &7You can separate lines by using "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
@@ -809,7 +816,7 @@ WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s 
 WARP_CATEGORY_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
 WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another category.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the category to {0}.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
   &e&lWarps | &7You can separate lines by using "\n".
 WARP_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
@@ -831,4 +838,5 @@ WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lקנב | &7{1} לש יאה לש קנבהמ ${0} תכשמ!'
 WITHDRAWN_MONEY_NAME: '&e&lקנב | &7{1} יאה לש קנבהמ ${0} תכשמ!'
 WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
+WORLD_NOT_GENERATED: '&e&lWorlds | &7The {0} world is not generated yet!'
 WORLD_NOT_UNLOCKED: '&e&lתומלוע | &7הזה יאב חותפ אל ןיידע {0} םלועה.'

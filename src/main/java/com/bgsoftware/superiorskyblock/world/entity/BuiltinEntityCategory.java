@@ -5,6 +5,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
@@ -41,7 +42,8 @@ public enum BuiltinEntityCategory {
             return Monster.class.isAssignableFrom(entityClass) ||
                     Slime.class.isAssignableFrom(entityClass) || Flying.class.isAssignableFrom(entityClass) ||
                     entityClass == HOGLIN_CLASS || entityClass == SKELETON_HORSE_CLASS ||
-                    entityClass == ZOMBIE_HORSE_CLASS || entityClass == ZOMBIE_NAUTILUS_CLASS;
+                    entityClass == ZOMBIE_HORSE_CLASS || entityClass == ZOMBIE_NAUTILUS_CLASS ||
+                    entityClass == SHULKER_CLASS;
         }
     },
     ANIMAL {
@@ -60,14 +62,24 @@ public enum BuiltinEntityCategory {
     private static final Class<?> ZOMBIE_HORSE_CLASS = getEntityTypeClass("org.bukkit.entity.ZombieHorse");
     @Nullable
     private static final Class<?> ZOMBIE_NAUTILUS_CLASS = getEntityTypeClass("org.bukkit.entity.ZombieNautilus");
+    @Nullable
+    private static final Class<?> SHULKER_CLASS = getEntityTypeClass("org.bukkit.entity.Shulker");
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final KeySet entities = getEntitiesInternal();
+    // Computed lazily rather than in the constructor: enum constants are initialized before the
+    // static Class<?> fields below (HOGLIN_CLASS, SHULKER_CLASS, ...), so computing this eagerly
+    // would read those fields while they are still null and drop every special-cased entity.
+    private final LazyReference<KeySet> entities = new LazyReference<KeySet>() {
+        @Override
+        protected KeySet create() {
+            return getEntitiesInternal();
+        }
+    };
     private WeakReference<EntityCategory> entityCategoryReference;
 
     public KeySet getEntities() {
-        return entities;
+        return entities.get();
     }
 
     @NotNull

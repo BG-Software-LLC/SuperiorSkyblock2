@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -30,12 +31,14 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.cache.PlayerCacheImpl;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -98,10 +101,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private boolean blocksStackerEnabled = plugin.getSettings().isDefaultStackedBlocks();
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
-    private boolean teamChatEnabled = false;
     private boolean toggledPanel;
     private boolean islandFly;
     private boolean adminSpyEnabled = false;
+    private ChatState chatState = ChatStates.GLOBAL;
 
     private SBlockPosition schematicPos1 = null;
     private SBlockPosition schematicPos2 = null;
@@ -110,7 +113,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private long lastTimeStatus;
 
     private BukkitTask teleportTask = null;
-    private EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
+    private final EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
 
     public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -452,53 +455,84 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location) {
-        teleport(location, null);
+        teleportWithResult(location, null);
     }
 
     @Override
     public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
+        if(teleportResult == null) {
+            teleportWithResult(location, null);
+        } else {
+            teleportWithResult(location, result ->
+                    teleportResult.accept(result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS));
+        }
+    }
+
+    @Override
+    public void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         Player player = asPlayer();
         if (player != null) {
-            playerTeleportAlgorithm.teleport(player, location).whenComplete((result, error) -> {
-                if (teleportResult != null)
-                    teleportResult.accept(error == null && result);
+            playerTeleportAlgorithm.teleportWithResult(player, location).whenComplete((result, error) -> {
+                if (teleportResult != null) {
+                    teleportResult.accept(error != null ? PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR : result);
+                }
             });
         } else if (teleportResult != null) {
-            teleportResult.accept(false);
+            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
         }
     }
 
     @Override
     public void teleport(Island island) {
-        this.teleport(island, (Consumer<Boolean>) null);
+        this.teleportWithResult(island, null);
     }
 
     @Override
     public void teleport(Island island, Dimension dimension) {
-        this.teleport(island, dimension, null);
+        this.teleportWithResult(island, dimension, null);
     }
 
     @Override
     public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
-        this.teleport(island, plugin.getSettings().getWorlds().getDefaultWorldDimension(), teleportResult);
+        if(teleportResult == null) {
+            teleportWithResult(island, null);
+        } else {
+            teleportWithResult(island, result ->
+                    teleportResult.accept(result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS));
+        }
+    }
+
+    @Override
+    public void teleportWithResult(Island island, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
+        this.teleportWithResult(island, plugin.getSettings().getWorlds().getDefaultWorldDimension(), teleportResult);
     }
 
     @Override
     public void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult) {
+        if(teleportResult == null) {
+            teleportWithResult(island, dimension, null);
+        } else {
+            teleportWithResult(island, dimension, result ->
+                    teleportResult.accept(result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS));
+        }
+    }
+
+    @Override
+    public void teleportWithResult(Island island, Dimension dimension,
+                                   @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         Player player = asPlayer();
         if (player != null) {
             setPlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
-            playerTeleportAlgorithm.teleport(player, island, dimension).whenComplete((result, error) -> {
-                boolean successful = error == null && result;
-
+            playerTeleportAlgorithm.teleportWithResult(player, island, dimension).whenComplete((result, error) -> {
                 player.setFallDistance(0f);
                 removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
 
-                if (teleportResult != null)
-                    teleportResult.accept(successful);
+                if (teleportResult != null) {
+                    teleportResult.accept(error != null ? PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR : result);
+                }
             });
         } else if (teleportResult != null) {
-            teleportResult.accept(false);
+            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
         }
     }
 
@@ -704,6 +738,17 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public ChatState getChatState() {
+        return this.chatState;
+    }
+
+    @Override
+    public void setChatState(ChatState chatState) {
+        Log.debug(Debug.SET_CHAT_STATE, getName(), chatState);
+        this.chatState = chatState;
+    }
+
+    @Override
     public boolean hasSchematicModeEnabled() {
         return schematicModeEnabled;
     }
@@ -720,19 +765,29 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public boolean hasTeamChatEnabled() {
-        return teamChatEnabled;
+        return getChatState() == ChatStates.TEAM_CHAT;
     }
 
     @Override
+    @Deprecated
     public void toggleTeamChat() {
-        setTeamChat(!teamChatEnabled);
+        if (getChatState() == ChatStates.TEAM_CHAT) {
+            setChatState(ChatStates.GLOBAL);
+        } else {
+            setChatState(ChatStates.TEAM_CHAT);
+        }
     }
 
     @Override
+    @Deprecated
     public void setTeamChat(boolean enabled) {
-        Log.debug(Debug.SET_TEAM_CHAT, getName(), enabled);
-        teamChatEnabled = enabled;
+        if (enabled) {
+            setChatState(ChatStates.TEAM_CHAT);
+        } else {
+            setChatState(ChatStates.GLOBAL);
+        }
     }
 
     @Override
@@ -817,6 +872,12 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void setAdminSpy(boolean enabled) {
         Log.debug(Debug.SET_ADMIN_SPY, getName(), enabled);
         adminSpyEnabled = enabled;
+
+        if (enabled) {
+            IslandChat.addSpy(this);
+        } else {
+            IslandChat.removeSpy(this);
+        }
     }
 
     @Override
@@ -983,10 +1044,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.blocksStackerEnabled |= otherPlayer.hasBlocksStackerEnabled();
         this.schematicModeEnabled |= otherPlayer.hasSchematicModeEnabled();
         this.bypassModeEnabled |= otherPlayer.hasBypassModeEnabled();
-        this.teamChatEnabled |= otherPlayer.hasTeamChatEnabled();
         this.toggledPanel |= otherPlayer.hasToggledPanel();
         this.islandFly |= otherPlayer.hasToggledPanel();
         this.adminSpyEnabled |= otherPlayer.hasAdminSpyEnabled();
+        this.chatState = otherPlayer.getChatState();
         this.disbands = otherPlayer.getDisbands();
         this.borderColor = otherPlayer.getBorderColor();
         this.lastTimeStatus = otherPlayer.getLastTimeStatus();
