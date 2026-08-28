@@ -1,0 +1,24 @@
+group 'Hooks:MythicMobs'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://mvn.lumine.io/repository/maven-public/' }
+}
+
+dependencies {
+    compileOnly 'io.lumine:Mythic-Dist:5.13.0'
+    compileOnly 'org.spigotmc:v1_8_R3-Taco:latest'
+    compileOnly project(":API")
+    compileOnly project(":")
+}
+
+if (project.hasProperty('hook.compile_mythicmobs') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_mythicmobs").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
