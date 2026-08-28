@@ -30,6 +30,7 @@ class-depends:
   - SilkSpawners
   - SkinsRestorer
   - SlimeWorldManager
+  - SmartSpawner
   - SuperVanish
   - UltimateStacker
   - VanishNoPacket
