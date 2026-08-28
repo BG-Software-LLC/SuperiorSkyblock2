@@ -74,6 +74,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -872,7 +874,8 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         BukkitExecutor.async(() -> {
             try {
-                countDownLatch.await();
+                if(!countDownLatch.await(2, TimeUnit.MINUTES))
+                    throw new TimeoutException();
             } catch (Throwable error) {
                 Log.error(error, "An error occurred while waiting for islands to calculate");
             }

@@ -258,7 +258,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("players_count", (island, superiorPlayer) ->
                             island.getAllPlayersInside().size() + "")
                     .put("players_list", (island, superiorPlayer) ->
-                            Formatters.COMMA_FORMATTER.format(island.getAllPlayersInside().stream().map(SuperiorPlayer::getName)))
+                            Formatters.COMMA_FORMATTER.format(island.getAllPlayersInside().stream()
+                                    .sorted(SortingComparators.PLAYER_NAMES_COMPARATOR)
+                                    .map(SuperiorPlayer::getName)))
                     .put("radius", (island, superiorPlayer) ->
                             island.getIslandSize() + "")
                     .put("rating", (island, superiorPlayer) ->
@@ -659,7 +661,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 }
 
                 if ((matcher = MEMBER_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                    return handlePlayersIndexPlaceholder(island.getIslandMembers(false), matcher.group(1));
+                    List<SuperiorPlayer> islandMembers = new LinkedList<>(island.getIslandMembers(false));
+                    islandMembers.sort(SortingComparators.PLAYER_NAMES_COMPARATOR);
+                    return handlePlayersIndexPlaceholder(islandMembers, matcher.group(1));
                 }
 
                 if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
@@ -667,7 +671,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 }
 
                 if ((matcher = PLAYER_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                    return handlePlayersIndexPlaceholder(island.getAllPlayersInside(), matcher.group(1));
+                    List<SuperiorPlayer> insidePlayers = new LinkedList<>(island.getAllPlayersInside());
+                    insidePlayers.sort(SortingComparators.PLAYER_NAMES_COMPARATOR);
+                    return handlePlayersIndexPlaceholder(insidePlayers, matcher.group(1));
                 }
 
                 if ((matcher = ROLE_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {

@@ -508,7 +508,10 @@ public class SIsland implements Island {
         }
 
         return this.members.readAndGet(members -> members.asListView(
-                id -> playerRolesFilter.contains(plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(id).getPlayerRole().getId()),
+                id -> {
+                    SuperiorPlayer superiorPlayer = plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(id);
+                    return superiorPlayer != null && playerRolesFilter.contains(superiorPlayer.getPlayerRole().getId());
+                },
                 ids -> {
                     if (includeOwner.get())
                         ids.add(owner.getId());
@@ -4535,6 +4538,8 @@ public class SIsland implements Island {
             // In case of an error, we get out of the recalculate state.
             this.beingRecalculated = false;
             plugin.getGrid().stopCalcTask();
+            if(callback != null)
+                callback.run();
             throw error;
         }
     }

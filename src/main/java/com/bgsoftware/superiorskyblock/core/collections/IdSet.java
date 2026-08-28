@@ -107,7 +107,7 @@ public abstract class IdSet<V extends Identified> {
     }
 
     public List<V> asListView(@Nullable IntPredicate predicate, @Nullable Consumer<IntSetView> beforeCreateCallback) {
-        if (size() == 0)
+        if (size() == 0 && beforeCreateCallback == null)
             return Collections.emptyList();
 
         IdSet<V> copy = newInstanceInternal();

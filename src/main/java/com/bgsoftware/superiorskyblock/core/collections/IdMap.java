@@ -182,6 +182,16 @@ public abstract class IdMap<K extends Identified, V> {
             public V setValue(V v) {
                 return this.handle.setValue(v);
             }
+
+            @Override
+            public boolean equals(Object o) {
+                return o == this || this.handle.equals(o);
+            }
+
+            @Override
+            public int hashCode() {
+                return this.handle.hashCode();
+            }
         }
 
     }
@@ -384,7 +394,11 @@ public abstract class IdMap<K extends Identified, V> {
 
             @Override
             public boolean contains(Object o) {
-                return MapViewImpl.this.containsKey(o);
+                if (!(o instanceof Map.Entry))
+                    return false;
+                Object key = ((Map.Entry) o).getKey();
+                Object value = ((Map.Entry) o).getValue();
+                return MapViewImpl.this.get(key) == value;
             }
 
             @NotNull
