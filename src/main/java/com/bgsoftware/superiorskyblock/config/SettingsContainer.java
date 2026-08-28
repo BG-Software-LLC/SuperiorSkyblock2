@@ -401,7 +401,7 @@ public class SettingsContainer {
         if (config.isConfigurationSection("default-placeholders")) {
             for (String placeholderName : config.getConfigurationSection("default-placeholders").getKeys(false)) {
                 String placeholder = placeholderName.replace("superior_", "").toLowerCase(Locale.ENGLISH);
-                String replacement = config.getString("default-placeholders." + placeholder);
+                String replacement = config.getString("default-placeholders." + placeholderName);
                 defaultPlaceholders.put(placeholder, replacement);
             }
         }
