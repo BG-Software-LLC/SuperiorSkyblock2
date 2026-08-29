@@ -210,7 +210,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                     .setBonusLevel(bonusLevel);
         }
 
-        createIsland(builder, biome, offset, spawnOffset);
+        createIsland(builder, biome, offset, spawnOffset, null, null);
     }
 
     @Override
@@ -218,11 +218,17 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(builderParam, "builder parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkArgument(builderParam instanceof IslandBuilderImpl, "Cannot create islands out of a custom builder.");
-        createIsland(builderParam, biome, offset, null);
+        createIsland(builderParam, biome, offset, null, null, null);
     }
 
     @Override
     public void createIsland(Island.Builder builderParam, Biome biome, boolean offset, @Nullable BlockOffset spawnOffset) {
+        createIsland(builderParam, biome, offset, spawnOffset, null, null);
+    }
+
+    @Override
+    public void createIsland(Island.Builder builderParam, Biome biome, boolean offset,
+                             @Nullable BlockOffset spawnOffset, @Nullable Float spawnYaw, @Nullable Float spawnPitch) {
         Preconditions.checkNotNull(builderParam, "builder parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         Preconditions.checkArgument(builderParam instanceof IslandBuilderImpl, "Cannot create islands out of a custom builder.");
@@ -237,9 +243,9 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         try {
             if (!Bukkit.isPrimaryThread()) {
-                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset));
+                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset, spawnYaw, spawnPitch));
             } else {
-                createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset);
+                createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset, spawnYaw, spawnPitch);
             }
         } catch (Throwable error) {
             Log.entering("ENTER", builder.owner.getName(), builder.islandType, biome, offset);
@@ -250,7 +256,8 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     private void createIslandInternalAsync(IslandBuilderImpl builder, Biome biome, boolean offset,
-                                           Schematic schematic, @Nullable BlockOffset spawnOffset) {
+                                           Schematic schematic, @Nullable BlockOffset spawnOffset,
+                                           @Nullable Float spawnYaw, @Nullable Float spawnPitch) {
         assert builder.owner != null;
 
         Log.debug(Debug.CREATE_ISLAND, builder.owner.getName(), builder.bonusWorth, builder.bonusLevel,
@@ -276,7 +283,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                 Log.debugResult(Debug.CREATE_ISLAND, "Creation Callback", "Successfully created island");
 
                 try {
-                    createIslandInternalOnSuccessCallback(builder, biome, offset, spawnOffset,
+                    createIslandInternalOnSuccessCallback(builder, biome, offset, spawnOffset, spawnYaw, spawnPitch,
                             schematic, updateGameMode, startTime, islandCreationResult);
                     return;
                 } catch (Throwable runtimeError) {
@@ -299,8 +306,8 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     private void createIslandInternalOnSuccessCallback(IslandBuilderImpl builder, Biome biome, boolean offset,
-                                                       @Nullable BlockOffset spawnOffset, Schematic schematic,
-                                                       boolean updateGameMode, long startTime,
+                                                       @Nullable BlockOffset spawnOffset, @Nullable Float spawnYaw, @Nullable Float spawnPitch,
+                                                       Schematic schematic, boolean updateGameMode, long startTime,
                                                        IslandCreationAlgorithm.IslandCreationResult islandCreationResult) {
         switch (islandCreationResult.getStatus()) {
             case NAME_OCCUPIED:
@@ -354,6 +361,11 @@ public class GridManagerImpl extends Manager implements GridManager {
         Location homeLocation = schematic.adjustRotation(islandLocation);
         if (spawnOffset != null)
             homeLocation = spawnOffset.applyToLocation(homeLocation);
+
+        if (spawnYaw != null)
+            homeLocation.setYaw(spawnYaw);
+        if (spawnPitch != null)
+            homeLocation.setPitch(spawnPitch);
 
         island.setIslandHome(defaultDimension, SWorldPosition.of(homeLocation));
 

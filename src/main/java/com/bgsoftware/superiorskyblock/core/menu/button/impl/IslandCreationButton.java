@@ -71,6 +71,10 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         private BigDecimal bonusLevel;
         private boolean isOffset;
         private BlockOffset spawnOffset = null;
+        @Nullable
+        private Float spawnYaw = null;
+        @Nullable
+        private Float spawnPitch = null;
 
         public Builder(Schematic schematic) {
             this.schematic = schematic;
@@ -128,6 +132,14 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.spawnOffset = spawnOffset;
         }
 
+        public void setSpawnYaw(Float spawnYaw) {
+            this.spawnYaw = spawnYaw;
+        }
+
+        public void setSpawnPitch(Float spawnPitch) {
+            this.spawnPitch = spawnPitch;
+        }
+
         @Override
         public MenuTemplateButton<MenuIslandCreation.View> build() {
             GameSound accessSound = clickSound;
@@ -137,7 +149,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.commands = null;
             try {
                 return new Template(this, accessSound, accessCommands, noAccessItem, noAccessCommands, biome,
-                        bonusWorth, bonusLevel, isOffset, spawnOffset, schematic);
+                        bonusWorth, bonusLevel, isOffset, spawnOffset, spawnYaw, spawnPitch, schematic);
             } finally {
                 this.clickSound = accessSound;
                 this.commands = accessCommands;
@@ -161,6 +173,10 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
         private final Schematic schematic;
         @Nullable
         private final BlockOffset spawnOffset;
+        @Nullable
+        private final Float spawnYaw;
+        @Nullable
+        private final Float spawnPitch;
 
         private final MenuIslandCreationConfig creationConfig;
 
@@ -168,7 +184,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
                  @Nullable GameSound accessSound, @Nullable List<String> accessCommands,
                  @Nullable Either<TemplateItem, DialogButton> lackPermissionItem, @Nullable List<String> lackPermissionCommands,
                  @Nullable Biome biome, @Nullable BigDecimal bonusWorth, @Nullable BigDecimal bonusLevel, boolean isOffset,
-                 @Nullable BlockOffset spawnOffset, Schematic schematic) {
+                 @Nullable BlockOffset spawnOffset, @Nullable Float spawnYaw, @Nullable Float spawnPitch, Schematic schematic) {
             super(builder, IslandCreationButton.class, IslandCreationButton::new);
             this.accessSound = accessSound;
             this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
@@ -179,6 +195,8 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             this.bonusLevel = bonusLevel == null ? BigDecimal.ZERO : bonusLevel;
             this.isOffset = isOffset;
             this.spawnOffset = spawnOffset;
+            this.spawnYaw = spawnYaw;
+            this.spawnPitch = spawnPitch;
             this.schematic = Objects.requireNonNull(schematic, "schematic cannot be null");
             this.creationConfig = new MenuConfig.IslandCreation(this);
         }
@@ -221,10 +239,21 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
             return spawnOffset;
         }
 
+        @Nullable
+        public Float getSpawnYaw() {
+            return spawnYaw;
+        }
+
+        @Nullable
+        public Float getSpawnPitch() {
+            return spawnPitch;
+        }
+
         public MenuIslandCreationConfig getCreationConfig() {
             return creationConfig;
         }
 
     }
+
 
 }

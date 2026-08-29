@@ -119,6 +119,23 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 if (itemSection.isString("spawn-offset"))
                     buttonBuilder.setSpawnOffset(Serializers.OFFSET_SPACED_SERIALIZER.deserialize(itemSection.getString("spawn-offset")));
 
+                if (itemSection.contains("rotation")) {
+                    String rotationStr = itemSection.getString("rotation");
+                    if (rotationStr != null) {
+                        String[] parts = rotationStr.split(",");
+                        if (parts.length >= 1) {
+                            try {
+                                buttonBuilder.setSpawnYaw(Float.parseFloat(parts[0].trim()));
+                            } catch (NumberFormatException ignored) {}
+                        }
+                        if (parts.length >= 2) {
+                            try {
+                                buttonBuilder.setSpawnPitch(Float.parseFloat(parts[1].trim()));
+                            } catch (NumberFormatException ignored) {}
+                        }
+                    }
+                }
+
                 buttonBuilder.setAccessItem(MenuParserUtils.getItemStack("menus/island-creation.yml",
                         itemSection.getConfigurationSection("access")));
                 buttonBuilder.setNoAccessItem(MenuParserUtils.getItemStack("menus/island-creation.yml",
