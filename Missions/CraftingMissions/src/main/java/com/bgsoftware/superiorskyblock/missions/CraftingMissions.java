@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.missions;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
+import com.bgsoftware.superiorskyblock.missions.common.FoliaUtil;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -191,11 +192,16 @@ public final class CraftingMissions extends BuiltinMission<CraftingMissions.Craf
         if (e.getRawSlot() == requiredSlot && itemsToCraft.containsKey(resultItem) &&
                 this.plugin.getMissions().canCompleteNoProgress(superiorPlayer, this)) {
             int amountOfResult = countItems(e.getWhoClicked(), resultItem);
-            Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            Runnable craftTask = () -> {
                 int afterTickAmountOfResult = countItems(e.getWhoClicked(), resultItem);
                 resultItem.setAmount(afterTickAmountOfResult - amountOfResult);
                 trackItem(superiorPlayer, resultItem);
-            }, 1L);
+            };
+            if (FoliaUtil.isFolia()) {
+                FoliaUtil.runGlobalDelayed(this.plugin, craftTask, 1L);
+            } else {
+                Bukkit.getScheduler().runTaskLater(this.plugin, craftTask, 1L);
+            }
         }
 
     }
@@ -208,10 +214,17 @@ public final class CraftingMissions extends BuiltinMission<CraftingMissions.Craf
 
         blocksTracker.trackItem(itemStack);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this.plugin, () -> superiorPlayer.runIfOnline(player -> {
-            if (canComplete(superiorPlayer))
-                this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
-        }), 2L);
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runAsyncDelayed(this.plugin, () -> superiorPlayer.runIfOnline(player -> {
+                if (canComplete(superiorPlayer))
+                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+            }), 100L);
+        } else {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(this.plugin, () -> superiorPlayer.runIfOnline(player -> {
+                if (canComplete(superiorPlayer))
+                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+            }), 2L);
+        }
     }
 
     private static int countItems(HumanEntity humanEntity, ItemStack itemStack) {

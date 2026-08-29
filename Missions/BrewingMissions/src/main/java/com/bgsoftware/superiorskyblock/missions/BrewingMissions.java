@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.missions;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
+import com.bgsoftware.superiorskyblock.missions.common.FoliaUtil;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.CustomRequirements;
 import org.bukkit.Bukkit;
@@ -221,14 +222,19 @@ public final class BrewingMissions extends BuiltinMission<BrewingMissions.Brewin
             }
         }
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Runnable brewTask = () -> {
             for (int i = 0; i < 3; ++i) {
                 ItemStack resultItem = e.getContents().getItem(i);
                 if (resultItem != null && !resultItem.isSimilar(originalResultItems[i]) && isMissionBrewing(resultItem)) {
                     trackedBrewItems.computeIfAbsent(e.getBlock().getLocation(), block -> new boolean[3])[i] = true;
                 }
             }
-        }, 1L);
+        };
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runGlobalDelayed(plugin, brewTask, 1L);
+        } else {
+            Bukkit.getScheduler().runTaskLater(plugin, brewTask, 1L);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -283,10 +289,17 @@ public final class BrewingMissions extends BuiltinMission<BrewingMissions.Brewin
                 }
             }
 
-            this.plugin.getServer().getScheduler().runTaskLaterAsynchronously(this.plugin, () -> superiorPlayer.runIfOnline(unused -> {
-                if (canComplete(superiorPlayer))
-                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
-            }), 2L);
+            if (FoliaUtil.isFolia()) {
+                FoliaUtil.runAsyncDelayed(this.plugin, () -> superiorPlayer.runIfOnline(unused -> {
+                    if (canComplete(superiorPlayer))
+                        this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+                }), 100L);
+            } else {
+                this.plugin.getServer().getScheduler().runTaskLaterAsynchronously(this.plugin, () -> superiorPlayer.runIfOnline(unused -> {
+                    if (canComplete(superiorPlayer))
+                        this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+                }), 2L);
+            }
         } finally {
             if (!brewItems[0] && !brewItems[1] && !brewItems[2])
                 this.trackedBrewItems.remove(block.getLocation());

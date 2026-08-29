@@ -2,13 +2,13 @@ package com.bgsoftware.superiorskyblock.core.threads;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.FoliaUtil;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -20,7 +20,8 @@ public class BukkitExecutor {
     private static SuperiorSkyblockPlugin plugin;
     private static State state = State.RUNNING;
 
-    private static final AtomicLong ACTIVE_TASKS_COUNT = new AtomicLong(0);
+    private static final java.util.concurrent.atomic.AtomicLong ACTIVE_TASKS_COUNT =
+            new java.util.concurrent.atomic.AtomicLong(0);
 
     private BukkitExecutor() {
 
@@ -35,6 +36,15 @@ public class BukkitExecutor {
         if (ensureNotShudown())
             return null;
 
+        if (FoliaUtil.isFolia()) {
+            if (state == State.PREPARE_SHUTDOWN) {
+                runnable.run();
+                return null;
+            }
+            FoliaUtil.runGlobalSync(plugin, runnable);
+            return null;
+        }
+
         if (state != State.PREPARE_SHUTDOWN && !Bukkit.isPrimaryThread()) {
             return sync(runnable);
         } else {
@@ -47,6 +57,15 @@ public class BukkitExecutor {
     public static BukkitTask ensureAsync(Runnable runnable) {
         if (ensureNotShudown())
             return null;
+
+        if (FoliaUtil.isFolia()) {
+            if (state == State.PREPARE_SHUTDOWN) {
+                runnable.run();
+                return null;
+            }
+            FoliaUtil.runAsync(plugin, runnable);
+            return null;
+        }
 
         if (state != State.PREPARE_SHUTDOWN && Bukkit.isPrimaryThread()) {
             return async(runnable);
@@ -67,9 +86,18 @@ public class BukkitExecutor {
         if (state == State.PREPARE_SHUTDOWN) {
             runnable.run();
             return null;
-        } else {
-            return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
         }
+
+        if (FoliaUtil.isFolia()) {
+            if (delay <= 0) {
+                FoliaUtil.runGlobalSync(plugin, runnable);
+            } else {
+                FoliaUtil.runGlobalDelayed(plugin, runnable, delay);
+            }
+            return null;
+        }
+
+        return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
     }
 
     public static BukkitTask async(Runnable runnable) {
@@ -79,9 +107,14 @@ public class BukkitExecutor {
         if (state == State.PREPARE_SHUTDOWN) {
             runnable.run();
             return null;
-        } else {
-            return Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
         }
+
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runAsync(plugin, runnable);
+            return null;
+        }
+
+        return Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
     }
 
     public static BukkitTask async(Runnable runnable, long delay) {
@@ -91,23 +124,36 @@ public class BukkitExecutor {
         if (state == State.PREPARE_SHUTDOWN) {
             runnable.run();
             return null;
-        } else {
-            return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
         }
+
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runAsyncDelayed(plugin, runnable, delay * 50L);
+            return null;
+        }
+
+        return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
     }
 
     public static void asyncTimer(Runnable runnable, long delay) {
         if (ensureNotShudown())
             return;
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, delay);
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runAsyncTimer(plugin, t -> runnable.run(), delay * 50L, delay * 50L);
+        } else {
+            Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, delay);
+        }
     }
 
     public static void timer(Runnable runnable, long delay) {
         if (ensureNotShudown())
             return;
 
-        Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, delay);
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runGlobalTimer(plugin, t -> runnable.run(), delay, delay);
+        } else {
+            Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, delay);
+        }
     }
 
     public static NestedTask<Void> createTask() {
@@ -138,7 +184,12 @@ public class BukkitExecutor {
         }
 
         state = State.SHUTDOWN;
-        Bukkit.getScheduler().cancelTasks(plugin);
+
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.cancelAllTasks(plugin);
+        } else {
+            Bukkit.getScheduler().cancelTasks(plugin);
+        }
     }
 
     private static boolean ensureNotShudown() {

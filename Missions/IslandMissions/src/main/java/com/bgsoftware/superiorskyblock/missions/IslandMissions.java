@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
+import com.bgsoftware.superiorskyblock.missions.common.FoliaUtil;
 import com.bgsoftware.superiorskyblock.missions.island.DynamicRegisteredListener;
 import com.bgsoftware.superiorskyblock.missions.island.EventsHelper;
 import com.bgsoftware.superiorskyblock.missions.island.timings.ITimings;
@@ -157,10 +158,15 @@ public final class IslandMissions extends BuiltinMission<Boolean> implements Lis
         if (success) {
             SuperiorPlayer rewardedPlayer = isTarget ? targetPlayer : superiorPlayer;
             if (rewardedPlayer != null) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                Runnable rewardTask = () -> {
                     insertData(rewardedPlayer, true);
                     this.plugin.getMissions().rewardMission(this, rewardedPlayer, true);
-                }, 5L);
+                };
+                if (FoliaUtil.isFolia()) {
+                    FoliaUtil.runGlobalDelayed(plugin, rewardTask, 5L);
+                } else {
+                    Bukkit.getScheduler().runTaskLater(plugin, rewardTask, 5L);
+                }
             }
         }
     }
