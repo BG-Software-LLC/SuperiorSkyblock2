@@ -2,15 +2,14 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
+import com.bgsoftware.superiorskyblock.module.upgrades.UpgradesModule;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.TickingBlockList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -54,14 +53,16 @@ public abstract class CropsTickingMethod {
 
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
-        plugin.getSettings().getCropsToGrow().forEach(cropName -> {
-            Key key = Keys.ofMaterialAndData(cropName);
-            if (key instanceof MaterialKey materialKey) {
-                Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());
-                if (block != null && block.defaultBlockState().isRandomlyTicking())
-                    CROPS_TO_GROW_CACHE.add(block);
-            }
-        });
+        PluginModule pluginModule = plugin.getModules().getModule("upgrades");
+        if (pluginModule instanceof UpgradesModule upgradesModule) {
+            upgradesModule.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
+                if (key instanceof MaterialKey materialKey) {
+                    Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());
+                    if (block != null && block.defaultBlockState().isRandomlyTicking())
+                        CROPS_TO_GROW_CACHE.add(block);
+                }
+            });
+        }
     }
 
     private static class PaperCropsTickingMethod extends CropsTickingMethod {

@@ -255,14 +255,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().valuesMenu;
     }
 
-    public List<String> getCropsToGrow() {
-        return getContainer().cropsToGrow;
-    }
-
-    public int getCropsInterval() {
-        return getContainer().cropsInterval;
-    }
-
     public boolean isOnlyBackButton() {
         return getContainer().onlyBackButton;
     }
@@ -349,10 +341,6 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public boolean isTabCompleteHideVanished() {
         return getContainer().tabCompleteHideVanished;
-    }
-
-    public boolean isDropsUpgradePlayersMultiply() {
-        return getContainer().dropsUpgradePlayersMultiply;
     }
 
     public Map<String, Long> getMessageDelays() {

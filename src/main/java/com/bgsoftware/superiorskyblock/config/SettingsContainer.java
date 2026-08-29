@@ -191,8 +191,6 @@ public class SettingsContainer {
     public final List<String> pvpWorlds;
     public final boolean stopLeaving;
     public final boolean valuesMenu;
-    public final List<String> cropsToGrow;
-    public final int cropsInterval;
     public final boolean onlyBackButton;
     public final boolean buildOutsideIsland;
     public final int defaultDisbandCount;
@@ -223,7 +221,6 @@ public class SettingsContainer {
     public final List<String> islandPreviewsBlockedCommands;
     public final Map<String, Location> islandPreviewsLocations;
     public final boolean tabCompleteHideVanished;
-    public final boolean dropsUpgradePlayersMultiply;
     public final Map<String, Long> messageDelays;
     public final boolean warpCategories;
     public final boolean physicsListener;
@@ -528,8 +525,6 @@ public class SettingsContainer {
         pvpWorlds = Collections.unmodifiableList(config.getStringList("pvp-worlds"));
         stopLeaving = config.getBoolean("stop-leaving", false);
         valuesMenu = config.getBoolean("values-menu", true);
-        cropsToGrow = Collections.unmodifiableList(config.getStringList("crops-to-grow"));
-        cropsInterval = config.getInt("crops-interval", 5);
         onlyBackButton = config.getBoolean("only-back-button", false);
         buildOutsideIsland = config.getBoolean("build-outside-island", false);
         defaultDisbandCount = config.getInt("default-disband-count", 5);
@@ -589,7 +584,6 @@ public class SettingsContainer {
         }
         this.islandPreviewsLocations = Collections.unmodifiableMap(islandPreviewsLocations);
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
-        dropsUpgradePlayersMultiply = config.getBoolean("drops-upgrade-players-multiply", false);
         Map<String, Long> messageDelays = new HashMap<>();
         if (config.isConfigurationSection("message-delays")) {
             for (String message : config.getConfigurationSection("message-delays").getKeys(false)) {

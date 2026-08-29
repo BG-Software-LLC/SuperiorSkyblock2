@@ -11,28 +11,10 @@ import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminSetGen
 import com.bgsoftware.superiorskyblock.module.generators.listeners.GeneratorsListener;
 import org.bukkit.event.Listener;
 
-import java.io.File;
-
 public class GeneratorsModule extends BuiltinModule<GeneratorsModule.Configuration> {
 
     public GeneratorsModule() {
         super("generators");
-    }
-
-    @Override
-    protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {
-        File oldConfigFile = new File(plugin.getDataFolder(), "config.yml");
-        if (!oldConfigFile.exists())
-            return false;
-
-        CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldConfigFile);
-        boolean updatedConfig = false;
-
-        if (oldConfig.contains("generators")) {
-            config.set("enabled", oldConfig.getBoolean("generators"));
-        }
-
-        return updatedConfig;
     }
 
     @Override

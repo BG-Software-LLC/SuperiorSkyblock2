@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,7 +48,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("WeakerAccess")
 public class SettingsManagerImpl extends Manager implements SettingsManager {
@@ -80,29 +81,45 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     public void loadData() throws ManagerLoadException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
-        if (!file.exists())
+        if (!file.exists()) {
             plugin.saveResource("config.yml", false);
+        }
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
-        if (convertData(cfg)) {
+        boolean forceSave = convertData(config);
+
+        if (convertInteractables(plugin, config)) {
+            forceSave = true;
+        }
+        if (convertEntityCategories(plugin, config)) {
+            forceSave = true;
+        }
+        if (convertBankModule(plugin, config)) {
+            forceSave = true;
+        }
+        if (convertGeneratorsModule(plugin, config)) {
+            forceSave = true;
+        }
+        if (convertUpgradesModule(plugin, config)) {
+            forceSave = true;
+        }
+
+        if (forceSave) {
             try {
-                cfg.save(file);
+                config.save(file);
             } catch (Exception error) {
-                Log.error(error, file, "An unexpected error occurred while loading config file:");
+                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving config file:");
             }
         }
 
-        convertInteractables(plugin, cfg);
-        convertEntityCategories(plugin, cfg);
-
         try {
-            cfg.syncWithConfig(file, plugin.getResource("config.yml"), IGNORED_SECTIONS);
+            config.syncWithConfig(file, plugin.getResource("config.yml"), IGNORED_SECTIONS);
         } catch (Exception error) {
             Log.error(error, file, "An unexpected error occurred while loading config file:");
         }
 
-        loadContainerFromConfig(cfg);
+        loadContainerFromConfig(config);
 
         PluginEventsFactory.callSettingsUpdateEvent();
     }
@@ -474,13 +491,20 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public List<String> getCropsToGrow() {
-        return this.global.getCropsToGrow();
+        List<String> list = new ArrayList<>();
+        for (Key key : BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops()) {
+            list.add(key.toString());
+        }
+
+        return Collections.unmodifiableList(list);
     }
 
     @Override
+    @Deprecated
     public int getCropsInterval() {
-        return this.global.getCropsInterval();
+        return BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval();
     }
 
     @Override
@@ -610,8 +634,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public boolean isDropsUpgradePlayersMultiply() {
-        return this.global.isDropsUpgradePlayersMultiply();
+        return BuiltinModules.UPGRADES.getConfiguration().isMobDropsOnlyPlayerKills();
     }
 
     @Override
@@ -750,8 +775,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         }
     }
 
-    private void loadContainerFromConfig(YamlConfiguration cfg) throws ManagerLoadException {
-        SettingsContainer container = new SettingsContainer(plugin, cfg);
+    private void loadContainerFromConfig(YamlConfiguration config) throws ManagerLoadException {
+        SettingsContainer container = new SettingsContainer(plugin, config);
         this.global.setContainer(container);
         this.database.setContainer(container);
         this.defaultValues.setContainer(container);
@@ -768,253 +793,416 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.islandPreviews.setContainer(container);
     }
 
-    private boolean convertData(YamlConfiguration cfg) {
-        AtomicBoolean converted = new AtomicBoolean(false);
+    private boolean convertData(YamlConfiguration config) {
+        // If we don't change the path but only the format of the existing one,
+        // we must force a save, because syncWithConfig() won't detect it.
+        boolean forceSave = false;
 
-        if (cfg.getConfigurationSection("worlds.dimensions") == null) {
-            cfg.set("worlds.dimensions.normal", cfg.getConfigurationSection("worlds.normal"));
-            cfg.set("worlds.dimensions.normal.environment", "NORMAL");
-            cfg.set("worlds.dimensions.normal.portals.NETHER", "nether");
-            cfg.set("worlds.dimensions.normal.portals.ENDER", "the_end");
-            cfg.set("worlds.normal", null);
-            cfg.set("worlds.dimensions.nether", cfg.getConfigurationSection("worlds.nether"));
-            cfg.set("worlds.dimensions.nether.environment", "NETHER");
-            cfg.set("worlds.dimensions.nether.portals.NETHER", "normal");
-            cfg.set("worlds.dimensions.nether.portals.ENDER", "the_end");
-            cfg.set("worlds.nether", null);
-            cfg.set("worlds.dimensions.the_end", cfg.getConfigurationSection("worlds.end"));
-            cfg.set("worlds.dimensions.the_end.environment", "THE_END");
-            cfg.set("worlds.dimensions.the_end.portals.NETHER", "nether");
-            cfg.set("worlds.dimensions.the_end.portals.ENDER", "normal");
-            cfg.set("worlds.end", null);
+        if (config.get("island-level-formula") != null) {
+            config.set("block-level-formula", config.getString("island-level-formula"));
+            config.set("island-level-formula", null);
         }
-        if (cfg.get("island-level-formula") != null) {
-            cfg.set("block-level-formula", cfg.getString("island-level-formula"));
-            cfg.set("island-level-formula", null);
+        if (config.get("protected-message-delay") instanceof Number) {
+            long delay = config.getLong("protected-message-delay") * 50;
+            config.set("message-delays.ISLAND_PROTECTED", delay);
+            config.set("message-delays.ISLAND_PROTECTED_OPPED", delay);
+            config.set("message-delays.SPAWN_PROTECTED", delay);
+            config.set("message-delays.SPAWN_PROTECTED_OPPED", delay);
+            config.set("protected-message-delay", null);
         }
-        if (cfg.get("protected-message-delay") instanceof Number) {
-            long delay = cfg.getLong("protected-message-delay") * 50;
-            cfg.set("message-delays.ISLAND_PROTECTED", delay);
-            cfg.set("message-delays.ISLAND_PROTECTED_OPPED", delay);
-            cfg.set("message-delays.SPAWN_PROTECTED", delay);
-            cfg.set("message-delays.SPAWN_PROTECTED_OPPED", delay);
-            cfg.set("protected-message-delay", null);
+        if (config.isConfigurationSection("preview-islands")) {
+            config.set("island-previews.locations", config.getConfigurationSection("preview-islands"));
+            config.set("preview-islands", null);
         }
-        if (cfg.isConfigurationSection("preview-islands")) {
-            cfg.set("island-previews.locations", cfg.getConfigurationSection("preview-islands"));
-            cfg.set("preview-islands", null);
-        }
-        if (cfg.isBoolean("disband-inventory-clear")) {
-            if (cfg.getBoolean("disband-inventory-clear")) {
-                cfg.set("clear-on-disband", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+        if (config.isBoolean("disband-inventory-clear")) {
+            if (config.getBoolean("disband-inventory-clear")) {
+                config.set("clear-on-disband", Arrays.asList("ENDER_CHEST", "INVENTORY"));
             } else {
-                cfg.set("clear-on-disband", Collections.emptyList());
+                config.set("clear-on-disband", Collections.emptyList());
             }
-            cfg.set("disband-inventory-clear", null);
+            config.set("disband-inventory-clear", null);
         }
-        if (cfg.isBoolean("clear-on-join")) {
-            if (cfg.getBoolean("disband-inventory-clear")) {
-                cfg.set("clear-on-join", Arrays.asList("ENDER_CHEST", "INVENTORY"));
+        if (config.isBoolean("clear-on-join")) {
+            if (config.getBoolean("disband-inventory-clear")) {
+                config.set("clear-on-join", Arrays.asList("ENDER_CHEST", "INVENTORY"));
             } else {
-                cfg.set("clear-on-join", Collections.emptyList());
+                config.set("clear-on-join", Collections.emptyList());
             }
         }
-        if (cfg.isInt("disband-count")) {
-            cfg.set("default-disband-count", cfg.getInt("disband-count") == 0 ? -1 : cfg.getInt("disband-count"));
-            cfg.set("disband-count", null);
+        if (config.isInt("disband-count")) {
+            config.set("default-disband-count", config.getInt("disband-count") == 0 ? -1 : config.getInt("disband-count"));
+            config.set("disband-count", null);
         }
-        if (cfg.isInt("default-hoppers-limit")) {
-            cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
-            cfg.set("default-hoppers-limit", null);
+        if (config.isInt("default-hoppers-limit")) {
+            config.set("default-limits", Collections.singletonList("HOPPER:" + config.getInt("default-hoppers-limit")));
+            config.set("default-hoppers-limit", null);
         }
-        if (cfg.isConfigurationSection("default-permissions")) {
-            cfg.set("island-roles.guest.name", "Guest");
-            cfg.set("island-roles.guest.permissions", cfg.getStringList("default-permissions.guest"));
-            cfg.set("island-roles.ladder.member.name", "Member");
-            cfg.set("island-roles.ladder.member.weight", 0);
-            cfg.set("island-roles.ladder.member.permissions", cfg.getStringList("default-permissions.member"));
-            cfg.set("island-roles.ladder.mod.name", "Moderator");
-            cfg.set("island-roles.ladder.mod.weight", 1);
-            cfg.set("island-roles.ladder.mod.permissions", cfg.getStringList("default-permissions.mod"));
-            cfg.set("island-roles.ladder.admin.name", "Admin");
-            cfg.set("island-roles.ladder.admin.weight", 2);
-            cfg.set("island-roles.ladder.admin.permissions", cfg.getStringList("default-permissions.admin"));
-            cfg.set("island-roles.ladder.leader.name", "Leader");
-            cfg.set("island-roles.ladder.leader.weight", 3);
-            cfg.set("island-roles.ladder.leader.permissions", cfg.getStringList("default-permissions.leader"));
+        if (config.isConfigurationSection("default-permissions")) {
+            config.set("island-roles.guest.name", "Guest");
+            config.set("island-roles.guest.permissions", config.getStringList("default-permissions.guest"));
+            config.set("island-roles.ladder.member.name", "Member");
+            config.set("island-roles.ladder.member.weight", 0);
+            config.set("island-roles.ladder.member.permissions", config.getStringList("default-permissions.member"));
+            config.set("island-roles.ladder.mod.name", "Moderator");
+            config.set("island-roles.ladder.mod.weight", 1);
+            config.set("island-roles.ladder.mod.permissions", config.getStringList("default-permissions.mod"));
+            config.set("island-roles.ladder.admin.name", "Admin");
+            config.set("island-roles.ladder.admin.weight", 2);
+            config.set("island-roles.ladder.admin.permissions", config.getStringList("default-permissions.admin"));
+            config.set("island-roles.ladder.leader.name", "Leader");
+            config.set("island-roles.ladder.leader.weight", 3);
+            config.set("island-roles.ladder.leader.permissions", config.getStringList("default-permissions.leader"));
         }
-        if (cfg.isString("spawn-location"))
-            cfg.set("spawn.location", cfg.getString("spawn-location"));
-        if (cfg.isBoolean("spawn-protection"))
-            cfg.set("spawn.protection", cfg.getBoolean("spawn-protection"));
-        if (cfg.getBoolean("spawn-pvp", false))
-            cfg.set("spawn.settings", Collections.singletonList("PVP"));
-        if (cfg.isString("island-world"))
-            cfg.set("worlds.normal-world", cfg.getString("island-world"));
-        if (cfg.isString("welcome-sign-line"))
-            cfg.set("visitors-sign.line", cfg.getString("welcome-sign-line"));
-        if (cfg.isConfigurationSection("island-roles.ladder")) {
-            for (String name : cfg.getConfigurationSection("island-roles.ladder").getKeys(false)) {
-                if (!cfg.isInt("island-roles.ladder." + name + ".id"))
-                    cfg.set("island-roles.ladder." + name + ".id", cfg.getInt("island-roles.ladder." + name + ".weight"));
+        if (config.isString("spawn-location"))
+            config.set("spawn.location", config.getString("spawn-location"));
+        if (config.isBoolean("spawn-protection"))
+            config.set("spawn.protection", config.getBoolean("spawn-protection"));
+        if (config.getBoolean("spawn-pvp", false))
+            config.set("spawn.settings", Collections.singletonList("PVP"));
+        if (config.isString("island-world"))
+            config.set("worlds.normal-world", config.getString("island-world"));
+        if (config.isString("welcome-sign-line"))
+            config.set("visitors-sign.line", config.getString("welcome-sign-line"));
+        if (config.isConfigurationSection("island-roles.ladder")) {
+            for (String name : config.getConfigurationSection("island-roles.ladder").getKeys(false)) {
+                if (!config.isInt("island-roles.ladder." + name + ".id"))
+                    config.set("island-roles.ladder." + name + ".id", config.getInt("island-roles.ladder." + name + ".weight"));
             }
         }
-        if (cfg.isInt("default-island-size"))
-            cfg.set("default-values.island-size", cfg.getInt("default-island-size"));
-        if (cfg.isList("default-limits"))
-            cfg.set("default-values.block-limits", cfg.getStringList("default-limits"));
-        if (cfg.isList("default-entity-limits"))
-            cfg.set("default-values.entity-limits", cfg.getStringList("default-entity-limits"));
-        if (cfg.isInt("default-warps-limit"))
-            cfg.set("default-values.warps-limit", cfg.getInt("default-warps-limit"));
-        if (cfg.isInt("default-team-limit"))
-            cfg.set("default-values.team-limit", cfg.getInt("default-team-limit"));
-        if (cfg.isInt("default-crop-growth"))
-            cfg.set("default-values.crop-growth", cfg.getInt("default-crop-growth"));
-        if (cfg.isInt("default-spawner-rates"))
-            cfg.set("default-values.spawner-rates", cfg.getInt("default-spawner-rates"));
-        if (cfg.isInt("default-mob-drops"))
-            cfg.set("default-values.mob-drops", cfg.getInt("default-mob-drops"));
-        if (cfg.isInt("default-island-height"))
-            cfg.set("islands-height", cfg.getInt("default-island-height"));
-        if (cfg.isConfigurationSection("starter-chest")) {
-            cfg.set("default-containers.enabled", cfg.getBoolean("starter-chest.enabled"));
-            cfg.set("default-containers.containers.chest", cfg.getConfigurationSection("starter-chest.contents"));
+        if (config.isInt("default-island-size"))
+            config.set("default-values.island-size", config.getInt("default-island-size"));
+        if (config.isList("default-limits"))
+            config.set("default-values.block-limits", config.getStringList("default-limits"));
+        if (config.isList("default-entity-limits"))
+            config.set("default-values.entity-limits", config.getStringList("default-entity-limits"));
+        if (config.isInt("default-warps-limit"))
+            config.set("default-values.warps-limit", config.getInt("default-warps-limit"));
+        if (config.isInt("default-team-limit"))
+            config.set("default-values.team-limit", config.getInt("default-team-limit"));
+        if (config.isInt("default-crop-growth"))
+            config.set("default-values.crop-growth", config.getInt("default-crop-growth"));
+        if (config.isInt("default-spawner-rates"))
+            config.set("default-values.spawner-rates", config.getInt("default-spawner-rates"));
+        if (config.isInt("default-mob-drops"))
+            config.set("default-values.mob-drops", config.getInt("default-mob-drops"));
+        if (config.isInt("default-island-height"))
+            config.set("islands-height", config.getInt("default-island-height"));
+        if (config.isConfigurationSection("starter-chest")) {
+            config.set("default-containers.enabled", config.getBoolean("starter-chest.enabled"));
+            config.set("default-containers.containers.chest", config.getConfigurationSection("starter-chest.contents"));
         }
-        if (cfg.isList("default-generator"))
-            cfg.set("default-values.generator", cfg.getStringList("default-generator"));
-        if (cfg.isBoolean("void-teleport")) {
-            boolean voidTeleport = cfg.getBoolean("void-teleport");
-            cfg.set("void-teleport.members", voidTeleport);
-            cfg.set("void-teleport.visitors", voidTeleport);
+        if (config.isList("default-generator"))
+            config.set("default-values.generator", config.getStringList("default-generator"));
+        if (config.isBoolean("void-teleport")) {
+            boolean voidTeleport = config.getBoolean("void-teleport");
+            config.set("void-teleport.members", voidTeleport);
+            config.set("void-teleport.visitors", voidTeleport);
         }
-        if (cfg.isBoolean("sync-worth"))
-            cfg.set("sync-worth", cfg.getBoolean("sync-worth") ? "BUY" : "NONE");
-        if (!cfg.isConfigurationSection("worlds.nether")) {
-            cfg.set("worlds.nether.enabled", cfg.getBoolean("worlds.nether-world"));
-            cfg.set("worlds.nether.unlock", cfg.getBoolean("worlds.nether-unlock"));
+        if (config.isBoolean("sync-worth"))
+            config.set("sync-worth", config.getBoolean("sync-worth") ? "BUY" : "NONE");
+        if (!config.isConfigurationSection("worlds.nether")) {
+            config.set("worlds.nether.enabled", config.getBoolean("worlds.nether-world"));
+            config.set("worlds.nether.unlock", config.getBoolean("worlds.nether-unlock"));
         }
-        if (!cfg.isConfigurationSection("worlds.end")) {
-            cfg.set("worlds.end.enabled", cfg.getBoolean("worlds.end-world"));
-            cfg.set("worlds.end.unlock", cfg.getBoolean("worlds.end-unlock"));
+        if (!config.isConfigurationSection("worlds.end")) {
+            config.set("worlds.end.enabled", config.getBoolean("worlds.end-world"));
+            config.set("worlds.end.unlock", config.getBoolean("worlds.end-unlock"));
         }
-        if (cfg.isString("worlds.normal-world")) {
-            cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
-            cfg.set("worlds.normal-world", null);
+        if (config.isString("worlds.normal-world")) {
+            config.set("worlds.world-name", config.getString("worlds.normal-world"));
+            config.set("worlds.normal-world", null);
         }
-        if (cfg.isBoolean("worlds.end.dragon-fight")) {
-            cfg.set("worlds.end.dragon-fight.enabled", cfg.getBoolean("worlds.end.dragon-fight"));
+        if (config.isBoolean("worlds.end.dragon-fight")) {
+            config.set("worlds.end.dragon-fight.enabled", config.getBoolean("worlds.end.dragon-fight"));
         }
-        if (cfg.get("default-values.island-effects") == null) {
-            cfg.createSection("default-values.island-effects");
+        if (config.getConfigurationSection("worlds.dimensions") == null) {
+            config.set("worlds.dimensions.normal", config.getConfigurationSection("worlds.normal"));
+            config.set("worlds.dimensions.normal.environment", "NORMAL");
+            config.set("worlds.dimensions.normal.portals.NETHER", "nether");
+            config.set("worlds.dimensions.normal.portals.ENDER", "the_end");
+            config.set("worlds.normal", null);
+            config.set("worlds.dimensions.nether", config.getConfigurationSection("worlds.nether"));
+            config.set("worlds.dimensions.nether.environment", "NETHER");
+            config.set("worlds.dimensions.nether.portals.NETHER", "normal");
+            config.set("worlds.dimensions.nether.portals.ENDER", "the_end");
+            config.set("worlds.nether", null);
+            config.set("worlds.dimensions.the_end", config.getConfigurationSection("worlds.end"));
+            config.set("worlds.dimensions.the_end.environment", "THE_END");
+            config.set("worlds.dimensions.the_end.portals.NETHER", "nether");
+            config.set("worlds.dimensions.the_end.portals.ENDER", "normal");
+            config.set("worlds.end", null);
         }
-        convertListToSection(cfg, "default-values.block-limits", true, converted);
-        convertListToSection(cfg, "default-values.entity-limits", true, converted);
-        convertListToSection(cfg, "default-values.island-effects", true, converted);
-        convertListToSection(cfg, "default-values.role-limits", true, converted);
-        convertListToSection(cfg, "stacked-blocks.limits", true, converted);
-        convertListToSection(cfg, "default-placeholders", false, converted);
-        if (cfg.isConfigurationSection("worlds.dimensions")) {
+        if (config.get("default-values.island-effects") == null) {
+            config.createSection("default-values.island-effects");
+        }
+        if (convertListToSection(config, "default-values.block-limits")) {
+            forceSave = true;
+        }
+        if (convertListToSection(config, "default-values.entity-limits")) {
+            forceSave = true;
+        }
+        if (convertListToSection(config, "default-values.island-effects")) {
+            forceSave = true;
+        }
+        if (convertListToSection(config, "default-values.role-limits")) {
+            forceSave = true;
+        }
+        if (convertListToSection(config, "stacked-blocks.limits")) {
+            forceSave = true;
+        }
+        if (convertListToSection(config, "default-placeholders")) {
+            forceSave = true;
+        }
+        if (config.isConfigurationSection("worlds.dimensions")) {
             boolean hasDimensionalGeneratorRates = false;
 
-            for (String dimension : cfg.getConfigurationSection("worlds.dimensions").getKeys(false)) {
-                if (cfg.contains("default-values.generator." + dimension)) {
-                    convertListToSection(cfg, "default-values.generator." + dimension, true, converted);
+            for (String dimension : config.getConfigurationSection("worlds.dimensions").getKeys(false)) {
+                if (config.contains("default-values.generator." + dimension)) {
+                    if (convertListToSection(config, "default-values.generator." + dimension)) {
+                        forceSave = true;
+                    }
                     hasDimensionalGeneratorRates = true;
                 }
             }
 
             if (!hasDimensionalGeneratorRates) {
-                Object generator = cfg.get("default-values.generator");
-                String defaultDimension = cfg.getString("worlds.default-world");
-                cfg.set("default-values.generator." + defaultDimension, generator);
-                convertListToSection(cfg, "default-values.generator." + defaultDimension, true, converted);
-            }
-        }
-
-        return converted.get();
-    }
-
-    private void convertListToSection(YamlConfiguration cfg, String path, boolean integers, AtomicBoolean converted) {
-        if (cfg.isList(path)) {
-            List<String> list = cfg.getStringList(path);
-
-            cfg.createSection(path);
-
-            for (String line : list) {
-                String[] sections = line.split(":");
-
-                String key;
-                String value;
-                if (sections.length == 2) {
-                    key = sections[0];
-                    value = sections[1];
-                } else if (sections.length == 3) {
-                    key = sections[0] + ":" + sections[1];
-                    value = sections[2];
-                } else {
-                    Log.warnFromFile("config.yml", "Cannot parse value '", line, "', skipping...");
-                    continue;
+                String defaultDimension = config.getString("worlds.default-world");
+                config.set("default-values.generator." + defaultDimension, config.get("default-values.generator"));
+                if (convertListToSection(config, "default-values.generator." + defaultDimension)) {
+                    forceSave = true;
                 }
-
-                cfg.set(path + "." + key, integers ? Integer.parseInt(value) : value);
             }
-
-            converted.set(true);
         }
+
+        return forceSave;
     }
 
-    private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
-        if (!cfg.isList("interactables"))
-            return;
+    private boolean convertListToSection(YamlConfiguration config, String path) {
+        if (!config.isList(path)) {
+            return false;
+        }
+
+        List<String> list = config.getStringList(path);
+        config.createSection(path);
+
+        for (String line : list) {
+            String[] sections = line.split(":");
+
+            String key;
+            String value;
+            if (sections.length == 2) {
+                key = sections[0];
+                value = sections[1];
+            } else if (sections.length == 3) {
+                key = sections[0] + ":" + sections[1];
+                value = sections[2];
+            } else {
+                Log.warnFromFile("config.yml", "The value '", line, "' has an incorrect amount of sections, skipping...");
+                continue;
+            }
+
+            try {
+                config.set(path + "." + key, Integer.parseInt(value));
+            } catch (NumberFormatException e) {
+                config.set(path + "." + key, value);
+            }
+        }
+
+        return true;
+    }
+
+    private boolean convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration mainConfig) {
+        if (!mainConfig.isList("interactables")) {
+            return false;
+        }
 
         File file = new File(plugin.getDataFolder(), "interactables.yml");
 
-        if (!file.exists())
+        if (!file.exists()) {
             plugin.saveResource("interactables.yml", false);
+        }
 
-        CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
+        CommentedConfiguration interactablesConfig = CommentedConfiguration.loadConfiguration(file);
 
-        commentedConfig.set("interactables", cfg.getStringList("interactables"));
+        interactablesConfig.set("interactables", mainConfig.getStringList("interactables"));
+        mainConfig.set("interactables", null);
 
         try {
-            commentedConfig.save(file);
-            cfg.set("interactables", null);
+            interactablesConfig.save(file);
         } catch (Exception error) {
             Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
         }
 
+        return true;
     }
 
-    private void convertEntityCategories(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
-        if (!cfg.isConfigurationSection("entity-categories"))
-            return;
+    private boolean convertEntityCategories(SuperiorSkyblockPlugin plugin, YamlConfiguration mainConfig) {
+        if (!mainConfig.isConfigurationSection("entity-categories")) {
+            return false;
+        }
 
         File file = new File(plugin.getDataFolder(), "entity-categories.yml");
 
-        if (!file.exists())
+        if (!file.exists()) {
             plugin.saveResource("entity-categories.yml", false);
+        }
 
-        CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
+        CommentedConfiguration entitiesConfig = CommentedConfiguration.loadConfiguration(file);
 
-        for (String categoryName : cfg.getConfigurationSection("entity-categories").getKeys(false)) {
-            List<String> entities = cfg.getStringList("entity-categories." + categoryName);
+        for (String categoryName : mainConfig.getConfigurationSection("entity-categories").getKeys(false)) {
+            List<String> entities = mainConfig.getStringList("entity-categories." + categoryName);
+
             if (!entities.isEmpty()) {
                 categoryName = categoryName.toUpperCase(Locale.ENGLISH);
-                commentedConfig.set(categoryName + ".entities", entities);
-                commentedConfig.set(categoryName + ".actions.SPAWN", categoryName + "_SPAWN");
-                commentedConfig.set(categoryName + ".actions.DAMAGE", categoryName + "_DAMAGE");
-                commentedConfig.set(categoryName + ".actions.SPAWNER_SPAWN", "SPAWNER_" + categoryName + "_SPAWN");
-                commentedConfig.set(categoryName + ".actions.NATURAL_SPAWN", "NATURAL_" + categoryName + "_SPAWN");
+                entitiesConfig.set(categoryName + ".entities", entities);
+                entitiesConfig.set(categoryName + ".actions.SPAWN", categoryName + "_SPAWN");
+                entitiesConfig.set(categoryName + ".actions.DAMAGE", categoryName + "_DAMAGE");
+                entitiesConfig.set(categoryName + ".actions.SPAWNER_SPAWN", "SPAWNER_" + categoryName + "_SPAWN");
+                entitiesConfig.set(categoryName + ".actions.NATURAL_SPAWN", "NATURAL_" + categoryName + "_SPAWN");
             }
         }
 
+        mainConfig.set("entity-categories", null);
+
         try {
-            commentedConfig.save(file);
-            cfg.set("entity-categories", null);
+            entitiesConfig.save(file);
         } catch (Exception error) {
             Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
         }
+
+        return true;
+    }
+
+    private boolean convertBankModule(SuperiorSkyblockPlugin plugin, YamlConfiguration mainConfig) {
+        File file = new File(plugin.getDataFolder(), "modules/bank/config.yml");
+
+        if (!file.exists()) {
+            plugin.saveResource("modules/bank/config.yml", false);
+        }
+
+        CommentedConfiguration bankConfig = CommentedConfiguration.loadConfiguration(file);
+
+        boolean forceSave = false;
+
+        // The value might have been entered as an integer, so we cannot use isDouble().
+        if (mainConfig.get("bank-worth-rate") != null) {
+            bankConfig.set("bank-worth-rate", mainConfig.getDouble("bank-worth-rate"));
+            mainConfig.set("bank-worth-rate", null);
+            forceSave = true;
+        }
+
+        // The value might have been entered as an integer, so we cannot use isDouble().
+        if (mainConfig.get("disband-refund") != null) {
+            bankConfig.set("disband-refund", mainConfig.getDouble("disband-refund"));
+            mainConfig.set("disband-refund", null);
+            forceSave = true;
+        }
+
+        if (mainConfig.isBoolean("bank-logs")) {
+            bankConfig.set("bank-logs", mainConfig.getBoolean("bank-logs"));
+            mainConfig.set("bank-logs", null);
+            forceSave = true;
+        }
+
+        if (mainConfig.isBoolean("cache-logs")) {
+            bankConfig.set("cache-logs", mainConfig.getBoolean("cache-logs"));
+            mainConfig.set("cache-logs", null);
+            forceSave = true;
+        }
+
+        if (mainConfig.isConfigurationSection("bank-interest")) {
+            bankConfig.set("bank-interest", mainConfig.getConfigurationSection("bank-interest"));
+            mainConfig.set("bank-interest", null);
+            forceSave = true;
+        }
+
+        if (forceSave) {
+            try {
+                bankConfig.save(file);
+            } catch (Exception error) {
+                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+            }
+        }
+
+        return forceSave;
+    }
+
+    private boolean convertGeneratorsModule(SuperiorSkyblockPlugin plugin, YamlConfiguration mainConfig) {
+        File file = new File(plugin.getDataFolder(), "modules/generators/config.yml");
+
+        if (!file.exists()) {
+            plugin.saveResource("modules/generators/config.yml", false);
+        }
+
+        CommentedConfiguration generatorsConfig = CommentedConfiguration.loadConfiguration(file);
+
+        boolean forceSave = false;
+
+        if (mainConfig.isBoolean("generators")) {
+            generatorsConfig.set("enabled", mainConfig.getBoolean("generators"));
+            mainConfig.set("generators", null);
+            forceSave = true;
+        }
+
+        if (forceSave) {
+            try {
+                generatorsConfig.save(file);
+            } catch (Exception error) {
+                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+            }
+        }
+
+        return forceSave;
+    }
+
+    private boolean convertUpgradesModule(SuperiorSkyblockPlugin plugin, YamlConfiguration mainConfig) {
+        File file = new File(plugin.getDataFolder(), "modules/upgrades/config.yml");
+
+        if (!file.exists()) {
+            plugin.saveResource("modules/upgrades/config.yml", false);
+        }
+
+        CommentedConfiguration upgradesConfig = CommentedConfiguration.loadConfiguration(file);
+
+        boolean forceSave = false;
+
+        if (!upgradesConfig.isConfigurationSection("crop-growth")) {
+            upgradesConfig.set("crop-growth.enabled", upgradesConfig.getBoolean("crop-growth"));
+            forceSave = true;
+        }
+
+        if (mainConfig.isList("crops-to-grow")) {
+            upgradesConfig.set("crop-growth.whitelisted-crops", mainConfig.getList("crops-to-grow"));
+            mainConfig.set("crops-to-grow", null);
+            forceSave = true;
+        }
+
+        if (mainConfig.isInt("crops-interval")) {
+            upgradesConfig.set("crop-growth.interval", mainConfig.getInt("crops-interval"));
+            mainConfig.set("crops-interval", null);
+            forceSave = true;
+        }
+
+        if (!upgradesConfig.isConfigurationSection("mob-drops")) {
+            upgradesConfig.set("mob-drops.enabled", upgradesConfig.getBoolean("mob-drops"));
+            forceSave = true;
+        }
+
+        if (mainConfig.isBoolean("drops-upgrade-players-multiply")) {
+            upgradesConfig.set("mob-drops.only-player-kills", mainConfig.getBoolean("drops-upgrade-players-multiply"));
+            mainConfig.set("drops-upgrade-players-multiply", null);
+            forceSave = true;
+        }
+
+        if (forceSave) {
+            try {
+                upgradesConfig.save(file);
+            } catch (Exception error) {
+                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+            }
+        }
+
+        return forceSave;
     }
 
 }

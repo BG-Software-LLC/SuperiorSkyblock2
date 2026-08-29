@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops.CropsTickingMethod;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops.CropsTickingTileEntity;
@@ -375,7 +376,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     @Override
     public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
-        if (plugin.getSettings().getCropsInterval() <= 0)
+        if (BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval() <= 0)
             return;
 
         if (stop) {

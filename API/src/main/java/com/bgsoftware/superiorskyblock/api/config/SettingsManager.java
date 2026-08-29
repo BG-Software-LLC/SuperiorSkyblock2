@@ -484,14 +484,18 @@ public interface SettingsManager {
 
     /**
      * List of crops that can get affected by the crops-growth multiplier.
-     * Config-path: crops-to-grow
+     *
+     * @deprecated Moved to the upgrades module configuration.
      */
+    @Deprecated
     List<String> getCropsToGrow();
 
     /**
      * Time between each iteration of the crops task.
-     * Config-path: crops-interval
+     *
+     * @deprecated Moved to the upgrades module configuration.
      */
+    @Deprecated
     int getCropsInterval();
 
     /**
@@ -656,8 +660,10 @@ public interface SettingsManager {
 
     /**
      * Whether drops multiplier should only affect entities that are killed by players or not.
-     * Config-path: drops-upgrade-players-multiply
+     *
+     * @deprecated Moved to the upgrades module configuration.
      */
+    @Deprecated
     boolean isDropsUpgradePlayersMultiply();
 
     /**
