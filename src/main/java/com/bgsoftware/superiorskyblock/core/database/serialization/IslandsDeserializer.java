@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.database.serialization;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -351,6 +352,33 @@ public class IslandsDeserializer {
 
             Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_block_limits");
             builder.setBlockLimit(block.get(), limit.get());
+        });
+    }
+
+    public static void deserializeEntityCategoryLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
+        databaseBridge.loadAllObjects("islands_entity_category_limits", entityCategoryLimitsRow -> {
+            DatabaseResult entityCategoryLimits = new DatabaseResult(entityCategoryLimitsRow);
+
+            Optional<UUID> uuid = entityCategoryLimits.getUUID("island");
+            if (!uuid.isPresent()) {
+                Log.warn("Cannot load entity category limits for null islands, skipping...");
+                return;
+            }
+
+            Optional<EntityCategory> entityCategory = entityCategoryLimits.getString("entity_category").map(plugin.getSettings().getEntityCategoriesMap()::getCategoryByName);
+            if (!entityCategory.isPresent()) {
+                Log.warn("Cannot load entity category limits for invalid entities on ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            Optional<Integer> limit = entityCategoryLimits.getInt("limit");
+            if (!limit.isPresent()) {
+                Log.warn("Cannot load entity category limits with invalid limits for ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_entity_limits");
+            builder.setEntityCategoryLimit(entityCategory.get(), limit.get());
         });
     }
 

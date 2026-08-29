@@ -111,7 +111,9 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
 
         // Add rest of built-in entity categories
         for (BuiltinEntityCategory builtinEntityCategory : BuiltinEntityCategory.values()) {
-            if (!entityCategories.containsKey(builtinEntityCategory.name())) {
+            String builtinKey = builtinEntityCategory.name().toLowerCase(Locale.ENGLISH);
+
+            if (!entityCategories.containsKey(builtinKey)) {
                 entityCategories.put(builtinEntityCategory.name(), new EntityCategoryImpl(builtinEntityCategory.name(),
                         builtinEntityCategory.getEntities(), null, null,
                         null, null, null));

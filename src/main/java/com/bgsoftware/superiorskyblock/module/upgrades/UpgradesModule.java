@@ -273,6 +273,12 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
                 plugin.getBlockValues().addCustomBlockKey(blockKey);
             }
         }
+        Map<String, Integer> entityCategoryLimits = new ArrayMap<>();
+        if (levelSection.isConfigurationSection("entity-category-limits")) {
+            for (String entityCategoryName : levelSection.getConfigurationSection("entity-category-limits").getKeys(false)) {
+                entityCategoryLimits.put(entityCategoryName.toLowerCase(Locale.ENGLISH), levelSection.getInt("entity-category-limits." + entityCategoryName));
+            }
+        }
         KeyMap<Integer> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
         if (levelSection.isConfigurationSection("entity-limits")) {
             for (String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
@@ -313,8 +319,8 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
         SUpgradeLevel upgradeLevel = new SUpgradeLevel(level, upgradeCosts, commands, permission, requirements,
                 cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize,
-                Value.syncedFixed(blockLimits), Value.syncedFixed(entityLimits), Value.syncedFixed(generatorRates),
-                Value.syncedFixed(islandEffects), bankLimit, Value.syncedFixed(rolesLimits));
+                Value.syncedFixed(blockLimits), Value.syncedFixed(entityCategoryLimits), Value.syncedFixed(entityLimits),
+                Value.syncedFixed(generatorRates), Value.syncedFixed(islandEffects), bankLimit, Value.syncedFixed(rolesLimits));
 
         upgrade.addUpgradeLevel(level, upgradeLevel);
     }

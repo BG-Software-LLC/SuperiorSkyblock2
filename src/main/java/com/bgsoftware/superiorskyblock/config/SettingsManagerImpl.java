@@ -53,7 +53,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private static final String[] IGNORED_SECTIONS = new String[]{
             "config.yml", "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "worlds.dimensions",
-            "island-previews.locations", "default-values.block-limits", "default-values.entity-limits",
+            "island-previews.locations", "default-values.block-limits", "default-values.entity-limits", "default-values.entity-category-limits",
             "default-values.role-limits", "stacked-blocks.limits", "default-values.generator", "message-delays", "default-placeholders"
     };
 

@@ -84,6 +84,7 @@ public class SettingsContainer {
     public final String islandCommand;
     public final int defaultIslandSize;
     public final KeyMap<Integer> defaultBlockLimits;
+    public final Map<String, Integer> defaultEntityCategoryLimits;
     public final KeyMap<Integer> defaultEntityLimits;
     public final EnumerateMap<Dimension, Map<Key, Integer>> defaultGenerator;
     public final int defaultWarpsLimit;
@@ -275,6 +276,16 @@ public class SettingsContainer {
             }
         }
         this.defaultBlockLimits = KeyMaps.unmodifiableKeyMap(defaultBlockLimits);
+        Map<String, Integer> defaultEntityCategoryLimits = new ArrayMap<>();
+        if (config.isConfigurationSection("default-values.entity-category-limits")) {
+            for (String entityCategoryName : config.getConfigurationSection("default-values.entity-category-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.entity-category-limits." + entityCategoryName);
+                if (limit >= 0) {
+                    defaultEntityCategoryLimits.put(entityCategoryName.toLowerCase(Locale.ENGLISH), limit);
+                }
+            }
+        }
+        this.defaultEntityCategoryLimits = Collections.unmodifiableMap(defaultEntityCategoryLimits);
         KeyMap<Integer> defaultEntityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
         if (config.isConfigurationSection("default-values.entity-limits")) {
             for (String entityName : config.getConfigurationSection("default-values.entity-limits").getKeys(false)) {
