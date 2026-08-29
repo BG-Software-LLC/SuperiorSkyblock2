@@ -3,15 +3,18 @@ package com.bgsoftware.superiorskyblock.island.privilege;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -22,10 +25,10 @@ public class IslandPrivileges {
     public static final IslandPrivilege ANIMAL_BREED = register("ANIMAL_BREED");
     public static final IslandPrivilege ANIMAL_SHEAR = register("ANIMAL_SHEAR");
     public static final IslandPrivilege BAN_MEMBER = register("BAN_MEMBER", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege BREAK = register("BREAK");
+    @Nullable
     public static final IslandPrivilege BRUSH = register("BRUSH", ServerVersion.isAtLeast(ServerVersion.v1_20));
-    public static final IslandPrivilege BUILD = register("BUILD");
     public static final IslandPrivilege CHANGE_NAME = register("CHANGE_NAME", IslandPrivilege.Type.COMMAND);
+    @Nullable
     public static final IslandPrivilege CHORUS_FRUIT = register("CHORUS_FRUIT", ServerVersion.isAtLeast(ServerVersion.v1_9));
     public static final IslandPrivilege CLOSE_BYPASS = register("CLOSE_BYPASS");
     public static final IslandPrivilege CLOSE_ISLAND = register("CLOSE_ISLAND", IslandPrivilege.Type.COMMAND);
@@ -55,7 +58,6 @@ public class IslandPrivileges {
     public static final IslandPrivilege OPEN_ISLAND = register("OPEN_ISLAND", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege PAYPAL_SHOW = register("PAYPAL_SHOW");
     public static final IslandPrivilege PICKUP_DROPS = register("PICKUP_DROPS");
-    @Nullable
     public static final IslandPrivilege PROMOTE_MEMBERS = register("PROMOTE_MEMBERS", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege RANKUP = register("RANKUP", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege RATINGS_SHOW = register("RATINGS_SHOW", IslandPrivilege.Type.COMMAND);
@@ -70,17 +72,15 @@ public class IslandPrivileges {
     public static final IslandPrivilege SET_ROLE = register("SET_ROLE", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege SET_SETTINGS = register("SET_SETTINGS", IslandPrivilege.Type.COMMAND);
     public static final IslandPrivilege SET_WARP = register("SET_WARP", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege SPAWNER_BREAK = register("SPAWNER_BREAK");
-    @Nullable
     public static final IslandPrivilege UNCOOP_MEMBER = register("UNCOOP_MEMBER", IslandPrivilege.Type.COMMAND);
-    public static final IslandPrivilege VALUABLE_BREAK = register("VALUABLE_BREAK");
     public static final IslandPrivilege VILLAGER_TRADING = register("VILLAGER_TRADING");
+    @Nullable
     public static final IslandPrivilege WIND_CHARGE = register("WIND_CHARGE", ServerVersion.isAtLeast(ServerVersion.v1_21));
     public static final IslandPrivilege WITHDRAW_MONEY = register("WITHDRAW_MONEY", IslandPrivilege.Type.COMMAND);
 
     // Privileges from configurations
     @Nullable
-    public static IslandPrivilege CONFIG_VAULT_INTERACT;
+    public static List<IslandPrivilege> VAULT_INTERACT_PRIVILEGES;
 
     private static String ALL_PRIVILEGE_NAMES;
     private static int KNOWN_PRIVILEGES_COUNT;
@@ -98,11 +98,16 @@ public class IslandPrivileges {
     }
 
     private static void onSettingsUpdate() {
-        CONFIG_VAULT_INTERACT = null;
-
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-        Key vaultKey = Keys.ofMaterialAndData("VAULT");
-        CONFIG_VAULT_INTERACT = plugin.getSettings().getInteractablesMap().getRequiredPrivilege(vaultKey);
+
+        List<IslandPrivilege> islandPrivileges = new ArrayList<>();
+        for (BlockCategory blockCategory : plugin.getSettings().getBlockCategoriesMap().getCategories(Keys.ofMaterialAndData("VAULT"))) {
+            if (blockCategory.getInteractPrivilege() != null) {
+                islandPrivileges.add(blockCategory.getInteractPrivilege());
+            }
+        }
+
+        VAULT_INTERACT_PRIVILEGES = Collections.unmodifiableList(islandPrivileges);
     }
 
     public static String getPrivilegesNames() {

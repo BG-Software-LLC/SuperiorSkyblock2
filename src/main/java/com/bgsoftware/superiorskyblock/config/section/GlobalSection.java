@@ -15,7 +15,6 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class GlobalSection extends SettingsContainerHolder {
 
@@ -81,10 +80,6 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public List<String> getSignWarp() {
         return getContainer().signWarp;
-    }
-
-    public SettingsManager.Interactables getInteractablesMap() {
-        return getContainer().interactables;
     }
 
     public Collection<Key> getSafeBlocks() {
@@ -343,10 +338,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().commandAliases;
     }
 
-    public Set<Key> getValuableBlocks() {
-        return getContainer().valuableBlocks;
-    }
-
     public boolean isTabCompleteHideVanished() {
         return getContainer().tabCompleteHideVanished;
     }
@@ -429,6 +420,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public boolean isCacheSchematics() {
         return getContainer().cacheSchematics;
+    }
+
+    public SettingsManager.BlockCategories getBlockCategoriesMap() {
+        return getContainer().blockCategories;
     }
 
     public SettingsManager.EntityCategories getEntityCategoriesMap() {

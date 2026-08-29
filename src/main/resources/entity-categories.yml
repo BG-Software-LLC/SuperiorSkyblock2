@@ -6,7 +6,7 @@
 ######################################################
 
 # Configure the categories of entities of the plugin.
-# The format of the file is as so:
+# The format for category is as so:
 # <CATEGORY_NAME>:
 #   entities:
 #     - <ENTITIES...>
@@ -21,112 +21,121 @@
 #     SPAWNER_SPAWN: <ISLAND_FLAG>
 #     # The island flag required so the entities can spawn vanilla
 #     NATURAL_SPAWN: <ISLAND_FLAG>
-# You can create as many custom categories as you want.
-# There are custom groups used for detecting animals, monsters and tameable entities.
-# These groups do not have `entities` and the entities are added automatically depending on your Minecraft version.
+# Important: Entities can belong to multiple categories at the same time. In that case, the
+# corresponding action may require a privilege or flag from each category.
 
-# Custom interact groups
-ALLAY:
-  entities:
-    - ALLAY
-  actions:
-    INTERACT: ALLAY_INTERACT
+# Built-in categories.
+# These categories are provided by the plugin and will always exist.
+# Unlike custom categories, they do not have a 'entities' list, as their entities are
+# populated automatically based on the server version.
+# You can use 'skipped-entities' to exclude specific entities from a built-in category.
+builtin-categories:
+  TAMEABLE:
+    skipped-entities: [ ]
+    actions:
+      DAMAGE: TAMED_ANIMAL_DAMAGE
 
-AXOLOTL:
-  entities:
-    - AXOLOTL
-  actions:
-    INTERACT: PICKUP_AXOLOTL
+  VEHICLE:
+    skipped-entities: [ ]
+    actions:
+      SPAWN: MINECART_PLACE
+      DAMAGE: MINECART_DAMAGE
 
-COPPER_GOLEM:
-  entities:
-    - COPPER_GOLEM
-  actions:
-    INTERACT: COPPER_GOLEM_INTERACT
+  ANIMAL:
+    skipped-entities: [ ]
+    actions:
+      SPAWN: ANIMAL_SPAWN
+      DAMAGE: ANIMAL_DAMAGE
+      SPAWNER_SPAWN: SPAWNER_ANIMALS_SPAWN
+      NATURAL_SPAWN: NATURAL_ANIMALS_SPAWN
 
-FISH:
-  entities:
-    - COD
-    - PUFFERFISH
-    - SALMON
-    - TADPOLE
-    - TROPICAL_FISH
-  actions:
-    INTERACT: PICKUP_FISH
+  MONSTER:
+    skipped-entities: [ ]
+    actions:
+      SPAWN: MONSTER_SPAWN
+      DAMAGE: MONSTER_DAMAGE
+      SPAWNER_SPAWN: SPAWNER_MONSTER_SPAWN
+      NATURAL_SPAWN: NATURAL_MONSTER_SPAWN
 
-HORSES:
-  entities:
-    - CAMEL
-    - CAMEL_HUSK
-    - DONKEY
-    - HORSE
-    - LLAMA
-    - MULE
-    - SKELETON_HORSE
-    - TRADER_LLAMA
-    - ZOMBIE_HORSE
-  actions:
-    INTERACT: HORSE_INTERACT
+# Custom categories.
+# These categories can be freely modified or removed. You can also create your own.
+custom-categories:
+  ALLAY:
+    entities:
+      - ALLAY
+    actions:
+      INTERACT: ALLAY_INTERACT
 
-NAUTILUS:
-  entities:
-    - NAUTILUS
-    - ZOMBIE_NAUTILUS
-  actions:
-    INTERACT: NAUTILUS_INTERACT
+  AXOLOTL:
+    entities:
+      - AXOLOTL
+    actions:
+      INTERACT: PICKUP_AXOLOTL
 
-VILLAGERS:
-  entities:
-    - VILLAGER
-  actions:
-    INTERACT: VILLAGER_TRADING
+  COPPER_GOLEM:
+    entities:
+      - COPPER_GOLEM
+    actions:
+      INTERACT: COPPER_GOLEM_INTERACT
 
-# Custom entities with custom functionalities
-ARMOR_STAND:
-  entities:
-    - ARMOR_STAND
-  actions:
-    SPAWN: BUILD
-    DAMAGE: BREAK
-    INTERACT: BUILD
+  FISH:
+    entities:
+      - COD
+      - PUFFERFISH
+      - SALMON
+      - TADPOLE
+      - TROPICAL_FISH
+    actions:
+      INTERACT: PICKUP_FISH
 
-ITEM_FRAME:
-  entities:
-    - GLOW_ITEM_FRAME
-    - ITEM_FRAME
-  actions:
-    SPAWN: ITEM_FRAME
-    DAMAGE: ITEM_FRAME
-    INTERACT: ITEM_FRAME
+  HORSES:
+    entities:
+      - CAMEL
+      - CAMEL_HUSK
+      - DONKEY
+      - HORSE
+      - LLAMA
+      - MULE
+      - SKELETON_HORSE
+      - TRADER_LLAMA
+      - ZOMBIE_HORSE
+    actions:
+      INTERACT: HORSE_INTERACT
 
-PAINTING:
-  entities:
-    - PAINTING
-  actions:
-    SPAWN: PAINTING
-    DAMAGE: PAINTING
-    INTERACT: PAINTING
+  NAUTILUS:
+    entities:
+      - NAUTILUS
+      - ZOMBIE_NAUTILUS
+    actions:
+      INTERACT: NAUTILUS_INTERACT
 
-# Custom built-in groups
-TAMEABLE:
-  actions:
-    DAMAGE: TAMED_ANIMAL_DAMAGE
+  VILLAGERS:
+    entities:
+      - VILLAGER
+    actions:
+      INTERACT: VILLAGER_TRADING
 
-VEHICLE:
-  actions:
-    SPAWN: MINECART_PLACE
-    DAMAGE: MINECART_DAMAGE
+  ARMOR_STAND:
+    entities:
+      - ARMOR_STAND
+    actions:
+      SPAWN: BUILD
+      DAMAGE: BREAK
+      INTERACT: BUILD
 
-ANIMAL:
-  actions:
-    SPAWN: ANIMAL_SPAWN
-    DAMAGE: ANIMAL_DAMAGE
-    SPAWNER_SPAWN: SPAWNER_ANIMALS_SPAWN
-    NATURAL_SPAWN: NATURAL_ANIMALS_SPAWN
+  ITEM_FRAME:
+    entities:
+      - GLOW_ITEM_FRAME
+      - ITEM_FRAME
+    actions:
+      SPAWN: ITEM_FRAME
+      DAMAGE: ITEM_FRAME
+      INTERACT: ITEM_FRAME
 
-MONSTER:
-  actions:
-    SPAWN: MONSTER_SPAWN
-    DAMAGE: MONSTER_DAMAGE
-    SPAWNER_SPAWN: SPAWNER_MONSTER_SPAWN
-    NATURAL_SPAWN: NATURAL_MONSTER_SPAWN
+  PAINTING:
+    entities:
+      - PAINTING
+    actions:
+      SPAWN: PAINTING
+      DAMAGE: PAINTING
+      INTERACT: PAINTING

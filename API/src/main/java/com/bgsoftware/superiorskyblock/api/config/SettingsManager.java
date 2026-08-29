@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.config;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
@@ -175,19 +176,6 @@ public interface SettingsManager {
      * Config path: void-teleport
      */
     VoidTeleport getVoidTeleport();
-
-    /**
-     * Get all the interactable blocks.
-     *
-     * @deprecated See {@link #getInteractablesMap}
-     */
-    @Deprecated
-    List<String> getInteractables();
-
-    /**
-     * Get all the interactable blocks and their interact privilege.
-     */
-    Interactables getInteractablesMap();
 
     /**
      * Get all the safe blocks.
@@ -788,11 +776,33 @@ public interface SettingsManager {
     boolean isCacheSchematics();
 
     /**
+     * Get all the interactable blocks.
+     *
+     * @deprecated See {@link #getInteractablesMap}
+     */
+    @Deprecated
+    List<String> getInteractables();
+
+    /**
+     * Get all the interactable blocks and their interact privilege.
+     *
+     * @deprecated See {@link #getBlockCategoriesMap()}
+     */
+    @Deprecated
+    Interactables getInteractablesMap();
+
+    /**
      * Custom entity categories to be used by the plugin.
-     * Config-path: entity-categories
+     *
+     * @deprecated See {@link #getBlockCategoriesMap()}
      */
     @Deprecated
     Map<String, KeySet> getEntityCategories();
+
+    /**
+     * Custom block categories to be used by the plugin.
+     */
+    BlockCategories getBlockCategoriesMap();
 
     /**
      * Custom entity categories to be used by the plugin.
@@ -1431,19 +1441,46 @@ public interface SettingsManager {
         /**
          * Get all the interactables from the interactables file.
          */
+        @Deprecated
         Set<Key> getInteractables();
 
         /**
          * Get all the interactables for a specific {@link IslandPrivilege}
          */
         @Nullable
+        @Deprecated
         Set<Key> getInteractables(IslandPrivilege islandPrivilege);
 
         /**
          * Get the required {@link IslandPrivilege} for a specific key.
          */
         @Nullable
+        @Deprecated
         IslandPrivilege getRequiredPrivilege(Key key);
+
+    }
+
+    interface BlockCategories {
+
+        /**
+         * Get all the categories from the block-categories file.
+         */
+        List<BlockCategory> getCategories();
+
+        /**
+         * Get the block categories for a specific block key.
+         *
+         * @param key The block's key.
+         */
+        List<BlockCategory> getCategories(Key key);
+
+        /**
+         * Get a block category by its name.
+         *
+         * @param name The name of the category.
+         */
+        @Nullable
+        BlockCategory getCategoryByName(String name);
 
     }
 
@@ -1457,12 +1494,12 @@ public interface SettingsManager {
         /**
          * Get the entity categories for a specific entity key.
          *
-         * @param key The entity's key
+         * @param key The entity's key.
          */
         List<EntityCategory> getCategories(Key key);
 
         /**
-         * Get an entity category by its name
+         * Get an entity category by its name.
          *
          * @param name The name of the category.
          */

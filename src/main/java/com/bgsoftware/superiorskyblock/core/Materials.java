@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core;
 
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,7 +46,7 @@ public enum Materials {
         try {
             return Material.valueOf(ServerVersion.isLegacy() ? bukkitType : name());
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Couldn't cast " + name() + " into a bukkit enum. Contact Ome_R!");
+            throw new IllegalArgumentException("Couldn't cast " + name() + " into a Bukkit enum. Contact Ome_R!");
         }
     }
 
@@ -62,10 +61,6 @@ public enum Materials {
     public static boolean hasTag(Material material, Tag tag) {
         EnumSet<Tag> materialsTag = MATERIAL_TAGS.get(material);
         return materialsTag != null && materialsTag.contains(tag);
-    }
-
-    public static boolean isSlab(Material material) {
-        return hasTag(material, Tag.SLAB);
     }
 
     public static boolean isWater(Material material) {
@@ -132,6 +127,14 @@ public enum Materials {
         return hasTag(material, Tag.COPPER_GOLEM);
     }
 
+    public static boolean isGrassBlock(Material material) {
+        return hasTag(material, Tag.GRASS_BLOCK);
+    }
+
+    public static boolean isDirt(Material material) {
+        return hasTag(material, Tag.DIRT);
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
@@ -142,10 +145,6 @@ public enum Materials {
 
     public static String patchOldMaterialName(String type) {
         return PATCHED_MATERIAL_NAMES.getOrDefault(type, type);
-    }
-
-    public static void init() {
-
     }
 
     private static EnumSet<Material> allOf(Predicate<Material> predicate) {
@@ -163,8 +162,6 @@ public enum Materials {
             String materialName = material.name();
             if (materialName.startsWith("LEGACY_"))
                 materialTags.add(Tag.LEGACY);
-            if (materialName.contains("SLAB"))
-                materialTags.add(Tag.SLAB);
             if (materialName.contains("WATER"))
                 materialTags.add(Tag.WATER);
             if (materialName.contains("RAIL"))
@@ -200,6 +197,10 @@ public enum Materials {
             if (copperBase.equals("COPPER_BLOCK") || copperBase.equals("EXPOSED_COPPER") ||
                     copperBase.equals("WEATHERED_COPPER") || copperBase.equals("OXIDIZED_COPPER"))
                 materialTags.add(Tag.COPPER_GOLEM);
+            if (ServerVersion.isLegacy() ? material == Material.GRASS : materialName.equals("GRASS_BLOCK"))
+                materialTags.add(Tag.GRASS_BLOCK);
+            if (materialName.contains("DIRT"))
+                materialTags.add(Tag.DIRT);
 
             if (!materialTags.isEmpty())
                 enumMap.put(material, materialTags);
@@ -220,7 +221,6 @@ public enum Materials {
 
     public enum Tag {
 
-        SLAB,
         WATER,
         LEGACY,
         RAIL,
@@ -236,7 +236,9 @@ public enum Materials {
         HARNESS,
         HOE,
         SHELF,
-        COPPER_GOLEM
+        COPPER_GOLEM,
+        GRASS_BLOCK,
+        DIRT
 
     }
 
