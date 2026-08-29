@@ -475,6 +475,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("JetsMinions"))
             registerHook("JetsMinionsHook");
 
+        if (canRegisterHook("mcMMO"))
+            registerHook("mcMMOHook");
+
         if (canRegisterHook("SkinsRestorer")) {
             String version = Bukkit.getPluginManager().getPlugin("SkinsRestorer").getDescription().getVersion();
             if (version.startsWith("14")) {
