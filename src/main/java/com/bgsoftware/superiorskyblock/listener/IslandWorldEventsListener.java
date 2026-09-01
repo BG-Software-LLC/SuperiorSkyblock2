@@ -3,11 +3,11 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -52,7 +52,7 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
 
         if ((plugin.getSettings().isDisableRedstoneOffline() && !island.isCurrentlyActive()) ||
                 (plugin.getSettings().getAFKIntegrations().isDisableRedstone() &&
-                        island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))) {
+                        ((SIsland) island).areAllOnlinePlayersInsideAFK())) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Log.debug(Debug.DISABLE_REDSTONE, island.getOwner().getName(), block.getLocation(wrapper.getHandle()));
             }
@@ -76,7 +76,7 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
             island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
         }
 
-        if (island == null || island.isSpawn() || !island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))
+        if (island == null || island.isSpawn() || !((SIsland) island).areAllOnlinePlayersInsideAFK())
             return;
 
         e.setCancelled();
