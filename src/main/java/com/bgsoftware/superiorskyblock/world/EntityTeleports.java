@@ -193,8 +193,15 @@ public class EntityTeleports {
             }
 
             BukkitExecutor.createTask().runAsync(v -> {
-                Location closestSafeSpot = null;
+                // Track the closest safe spot as primitive coordinates to avoid allocating a
+                // Location per scanned block; a single Location is built once after the loop.
+                boolean foundSafeSpot = false;
+                int closestX = 0, closestY = 0, closestZ = 0;
                 double closestSafeSpotDistance = 0;
+
+                double homeX = homeLocation.getX();
+                double homeY = homeLocation.getY();
+                double homeZ = homeLocation.getZ();
 
                 int worldBuildLimit = islandsWorld.getMaxHeight();
                 int worldMinLimit = plugin.getNMSWorld().getMinHeight(islandsWorld);
@@ -212,24 +219,30 @@ public class EntityTeleports {
                         // In some versions, the ChunkSnapshot#getHighestBlockYAt seems to return
                         // one block above the actual highest block. Therefore, the check is on the
                         // returned block and the block below it.
-                        Location safeSpot;
+                        int safeY;
                         if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
-                            safeSpot = new Location(islandsWorld, worldX, y, worldZ);
+                            safeY = y;
                         } else if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
-                            safeSpot = new Location(islandsWorld, worldX, y - 1, worldZ);
+                            safeY = y - 1;
                         } else {
                             continue;
                         }
 
-                        double distanceFromHome = safeSpot.distanceSquared(homeLocation);
-                        if (closestSafeSpot == null || distanceFromHome < closestSafeSpotDistance) {
+                        double dx = worldX - homeX;
+                        double dy = safeY - homeY;
+                        double dz = worldZ - homeZ;
+                        double distanceFromHome = dx * dx + dy * dy + dz * dz;
+                        if (!foundSafeSpot || distanceFromHome < closestSafeSpotDistance) {
+                            foundSafeSpot = true;
                             closestSafeSpotDistance = distanceFromHome;
-                            closestSafeSpot = safeSpot;
+                            closestX = worldX;
+                            closestY = safeY;
+                            closestZ = worldZ;
                         }
                     }
                 }
 
-                return closestSafeSpot;
+                return foundSafeSpot ? new Location(islandsWorld, closestX, closestY, closestZ) : null;
             }).runSync(location -> {
                 if (location != null) {
                     onResult.accept(location);
