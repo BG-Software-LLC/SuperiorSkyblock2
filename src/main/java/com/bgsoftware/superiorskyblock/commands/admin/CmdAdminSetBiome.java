@@ -96,7 +96,7 @@ public class CmdAdminSetBiome implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getBiomes(args[3]) : args.length == 5 ?
+        return args.length == 4 ? CommandTabCompletes.getBiomes(plugin, args[3]) : args.length == 5 ?
                 CommandTabCompletes.getDimensions(plugin, args[4]) : Collections.emptyList();
     }
 

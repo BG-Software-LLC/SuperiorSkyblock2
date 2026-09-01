@@ -439,7 +439,7 @@ public class CommandArguments {
     public static Schematic getSchematic(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
         Schematic schematic = plugin.getSchematics().getSchematic(argument);
 
-        if (schematic == null || argument.endsWith("_nether") || argument.endsWith("_normal") || argument.endsWith("_the_end")) {
+        if (schematic == null || !IslandUtils.isDefaultSchematic(schematic.getName())) {
             Message.INVALID_SCHEMATIC.send(sender, argument);
             return null;
         }

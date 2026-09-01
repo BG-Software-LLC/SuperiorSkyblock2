@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -358,6 +359,19 @@ public class IslandUtils {
 
     public static List<Biome> getDefaultWorldBiomes() {
         return new SequentialListBuilder<Biome>().build(DEFAULT_WORLD_BIOMES.values());
+    }
+
+    public static boolean isDefaultSchematic(String schematic) {
+        String schematicName = schematic.toLowerCase(Locale.ENGLISH);
+
+        for (Dimension dimension : Dimension.values()) {
+            String dimensionSuffix = "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
+            if (schematicName.endsWith(dimensionSuffix)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

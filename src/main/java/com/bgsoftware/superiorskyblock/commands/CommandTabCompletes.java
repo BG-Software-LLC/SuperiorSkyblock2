@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
@@ -40,8 +41,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class CommandTabCompletes {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private CommandTabCompletes() {
 
@@ -160,7 +159,7 @@ public class CommandTabCompletes {
     public static List<String> getSchematics(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
-                .filter(schematic -> isDefaultSchematic(schematic)
+                .filter(schematic -> IslandUtils.isDefaultSchematic(schematic)
                         && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .build(plugin.getSchematics().getSchematics());
     }
@@ -247,7 +246,7 @@ public class CommandTabCompletes {
                 argument.toLowerCase(Locale.ENGLISH));
     }
 
-    public static List<String> getBiomes(String argument) {
+    public static List<String> getBiomes(SuperiorSkyblockPlugin plugin, String argument) {
         NMSAlgorithms.EnumBridge<Biome> biomeEnumBridge = plugin.getNMSAlgorithms().getBiomeBridge();
         return filterByArgument(biomeEnumBridge.getValues(), biomeEnumBridge::getName, argument.toLowerCase(Locale.ENGLISH));
     }
@@ -336,18 +335,6 @@ public class CommandTabCompletes {
         return new SequentialListBuilder<String>()
                 .filter(name -> name.contains(lowerArgument))
                 .build(enums, enumElement -> enumElement.name().toLowerCase(Locale.ENGLISH));
-    }
-
-    private static boolean isDefaultSchematic(String schematic) {
-        String schematicName = schematic.toLowerCase(Locale.ENGLISH);
-
-        for (Dimension dimension : Dimension.values()) {
-            if (schematicName.endsWith(dimension.getName().toLowerCase(Locale.ENGLISH))) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
 }
