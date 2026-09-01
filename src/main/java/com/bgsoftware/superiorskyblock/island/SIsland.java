@@ -1290,6 +1290,14 @@ public class SIsland implements Island {
         return this.entireArea.expandAndIntercepts(worldPosition.getX(), worldPosition.getZ(), extraRadius);
     }
 
+    /**
+     * Allocation-free equivalent of {@code isInside(WorldPosition)} (X/Z area intercept only, no
+     * world check) used on the hot getIslandAt path to avoid allocating a WorldPosition per lookup.
+     */
+    public boolean intersectsArea(double x, double z) {
+        return this.entireArea.expandAndIntercepts(x, z, 0D);
+    }
+
     @Override
     public boolean isInside(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
