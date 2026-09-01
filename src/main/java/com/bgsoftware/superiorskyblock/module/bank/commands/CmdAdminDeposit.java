@@ -64,15 +64,24 @@ public class CmdAdminDeposit implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         BigDecimal amount = CommandArguments.getBigDecimalAmount(sender, args[3]);
 
-        if (amount == null)
+        if (amount == null) {
             return;
+        }
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            Message.INVALID_AMOUNT.send(sender, args[3]);
+            return;
+        }
 
         islands.forEach(island -> island.getIslandBank().depositAdminMoney(sender, amount));
 
-        if (targetPlayer == null)
-            Message.ADMIN_DEPOSIT_MONEY_NAME.send(sender, Formatters.NUMBER_FORMATTER.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");
-        else
+        if (islands.size() > 1) {
+            Message.ADMIN_DEPOSIT_MONEY_ALL.send(sender, Formatters.NUMBER_FORMATTER.format(amount));
+        } else if (targetPlayer == null) {
+            Message.ADMIN_DEPOSIT_MONEY_NAME.send(sender, Formatters.NUMBER_FORMATTER.format(amount), islands.get(0).getName());
+        } else {
             Message.ADMIN_DEPOSIT_MONEY.send(sender, Formatters.NUMBER_FORMATTER.format(amount), targetPlayer.getName());
+        }
     }
 
 }

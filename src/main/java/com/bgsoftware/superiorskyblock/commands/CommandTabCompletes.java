@@ -116,6 +116,17 @@ public class CommandTabCompletes {
         return Collections.unmodifiableList(tabArguments);
     }
 
+    public static List<String> getOnlinePlayersAndMultipleIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish,
+                                                          @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
+        List<String> tabArguments = new LinkedList<>(getOnlinePlayersAndIslands(plugin, argument, hideVanish, predicate));
+
+        if ("*".contains(argument)) {
+            tabArguments.add("*");
+        }
+
+        return Collections.unmodifiableList(tabArguments);
+    }
+
     public static List<String> getIslandWarps(Island island, String argument) {
         return filterByArgument(island.getIslandWarps().keySet(), argument.toLowerCase(Locale.ENGLISH));
     }
@@ -149,8 +160,8 @@ public class CommandTabCompletes {
     public static List<String> getSchematics(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
-                .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_normal") &&
-                        !schematic.endsWith("_the_end") && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .filter(schematic -> isDefaultSchematic(schematic)
+                        && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .build(plugin.getSchematics().getSchematics());
     }
 
@@ -325,6 +336,18 @@ public class CommandTabCompletes {
         return new SequentialListBuilder<String>()
                 .filter(name -> name.contains(lowerArgument))
                 .build(enums, enumElement -> enumElement.name().toLowerCase(Locale.ENGLISH));
+    }
+
+    private static boolean isDefaultSchematic(String schematic) {
+        String schematicName = schematic.toLowerCase(Locale.ENGLISH);
+
+        for (Dimension dimension : Dimension.values()) {
+            if (schematicName.endsWith(dimension.getName().toLowerCase(Locale.ENGLISH))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

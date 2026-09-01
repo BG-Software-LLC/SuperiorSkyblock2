@@ -71,6 +71,7 @@ public class CmdAdminKick implements IAdminPlayerCommand {
 
         IslandUtils.handleKickPlayer(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null,
                 sender.getName(), targetIsland, targetPlayer);
+        Message.KICKED_MEMBER.send(sender, targetPlayer.getName());
     }
 
     @Override

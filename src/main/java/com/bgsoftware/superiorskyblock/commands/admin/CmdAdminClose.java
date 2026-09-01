@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -56,22 +57,37 @@ public class CmdAdminClose implements IAdminIslandCommand {
 
     @Override
     public boolean supportMultipleIslands() {
-        return false;
+        return true;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        if (island.isLocked()) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+        List<Island> changedIslands = new ArrayList<>();
+
+        for (Island island : islands) {
+            if (!island.isLocked() && PluginEventsFactory.callIslandCloseEvent(island, sender)) {
+                changedIslands.add(island);
+                island.setLocked(true);
+            }
+        }
+
+        if (changedIslands.isEmpty()) {
             Message.ISLAND_ALREADY_CLOSED.send(sender);
-        } else if (PluginEventsFactory.callIslandCloseEvent(island, sender)) {
-            island.setLocked(true);
-            Message.ISLAND_CLOSED.send(sender);
+            return;
+        }
+
+        if (changedIslands.size() > 1) {
+            Message.CLOSED_ISLAND_ALL.send(sender);
+        } else if (targetPlayer == null) {
+            Message.CLOSED_ISLAND_NAME.send(sender, changedIslands.get(0).getName());
+        } else {
+            Message.CLOSED_ISLAND.send(sender, targetPlayer.getName());
         }
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersAndIslands(plugin, args[2], false,
+        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersAndMultipleIslands(plugin, args[2], false,
                 (superiorPlayer, island) -> !island.isLocked()) : Collections.emptyList();
     }
 
