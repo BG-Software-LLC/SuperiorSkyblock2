@@ -196,7 +196,9 @@ public class EntityTeleports {
                 // Track the closest safe spot as primitive coordinates to avoid allocating a
                 // Location per scanned block; a single Location is built once after the loop.
                 boolean foundSafeSpot = false;
-                int closestX = 0, closestY = 0, closestZ = 0;
+                int closestX = 0;
+                int closestY = 0;
+                int closestZ = 0;
                 double closestSafeSpotDistance = 0;
 
                 double homeX = homeLocation.getX();

@@ -796,6 +796,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         toIsland.setPlayerInside(superiorPlayer, true);
 
+        handleIslandEnterEffects(superiorPlayer, toIsland);
+
+        return MoveResult.SUCCESS;
+    }
+
+    private void handleIslandEnterEffects(SuperiorPlayer superiorPlayer, Island toIsland) {
         if (!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)) {
             Message.ENTER_PVP_ISLAND.send(superiorPlayer);
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
@@ -813,25 +819,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         Player player = superiorPlayer.asPlayer();
         if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
-            BukkitExecutor.sync(() -> {
-                // Update player time and player weather with a delay.
-                // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
-                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
-                    player.setPlayerTime(0, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
-                    player.setPlayerTime(6000, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
-                    player.setPlayerTime(14000, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
-                    player.setPlayerTime(18000, false);
-                }
-
-                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
-                    player.setPlayerWeather(WeatherType.CLEAR);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
-                    player.setPlayerWeather(WeatherType.DOWNFALL);
-                }
-            }, 1L);
+            BukkitExecutor.sync(() -> updatePlayerTimeAndWeather(player, toIsland), 1L);
         }
 
         if (superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()) {
@@ -844,8 +832,26 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             toIsland.applyEffects(superiorPlayer);
             plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland);
         }, 1L);
+    }
 
-        return MoveResult.SUCCESS;
+    private static void updatePlayerTimeAndWeather(Player player, Island toIsland) {
+        // Update player time and player weather with a delay.
+        // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
+        if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
+            player.setPlayerTime(0, false);
+        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
+            player.setPlayerTime(6000, false);
+        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
+            player.setPlayerTime(14000, false);
+        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
+            player.setPlayerTime(18000, false);
+        }
+
+        if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
+            player.setPlayerWeather(WeatherType.CLEAR);
+        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
+            player.setPlayerWeather(WeatherType.DOWNFALL);
+        }
     }
 
     private MoveResult handlePlayerLeaveIslandInternal(SuperiorPlayer superiorPlayer, Island fromIsland, Location from, @Nullable Location to, IslandLeaveEvent.LeaveCause leaveCause) {
