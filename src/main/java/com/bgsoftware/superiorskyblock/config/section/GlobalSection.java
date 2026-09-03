@@ -311,6 +311,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().pricesProvider;
     }
 
+    public String getVanishProvider() {
+        return getContainer().vanishProvider;
+    }
+
     public BlockValuesManager.SyncWorthStatus getSyncWorth() {
         return getContainer().syncWorth;
     }

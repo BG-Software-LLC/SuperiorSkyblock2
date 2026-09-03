@@ -206,6 +206,7 @@ public class SettingsContainer {
     public final String spawnersProvider;
     public final String stackedBlocksProvider;
     public final String pricesProvider;
+    public final String vanishProvider;
     public final BlockValuesManagerImpl.SyncWorthStatus syncWorth;
     public final boolean negativeWorth;
     public final boolean negativeLevel;
@@ -543,6 +544,7 @@ public class SettingsContainer {
         spawnersProvider = config.getString("spawners-provider", "AUTO");
         stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
         pricesProvider = config.getString("prices-provider", "AUTO");
+        vanishProvider = config.getString("vanish-provider", "AUTO");
         syncWorth = BlockValuesManagerImpl.SyncWorthStatus.of(config.getString("sync-worth", "NONE"));
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
