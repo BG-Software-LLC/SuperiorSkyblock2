@@ -15,6 +15,7 @@ ADMIN_ADD_PLAYER: '&e&lĐảo | &7Thêm thành công người chơi {0} vào đ�
 ADMIN_ADD_PLAYER_NAME: '&e&lĐảo | &7Thêm thành công người chơi {0} vào đảo {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&lNgân Hàng | &7Bạn đã gửi ${0} vào ngân hàng đảo của
   {1}.'
+ADMIN_DEPOSIT_MONEY_ALL: '&e&lBank | &7You deposited ${0} into the banks of all islands.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã gửi ${0} vào ngân hàng đảo tên
   {1}.'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Phát triển bởi Ome_R'
@@ -131,6 +132,9 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lNâng Cấp | &7Cập nhật thành công giới h
   của tất cả các đảo.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lNâng Cấp | &7Cập nhật thành công giới hạn khu vực
   của đảo {0}.'
+CLOSED_ISLAND: '&e&lIsland | &7Successfully closed {0}''s island to the public.'
+CLOSED_ISLAND_ALL: '&e&lIsland | &7Successfully closed all islands to the public.'
+CLOSED_ISLAND_NAME: '&e&lIsland | &7Successfully closed the island {0} to the public.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
@@ -139,6 +143,7 @@ COMMAND_ARGUMENT_AMOUNT: so-luong
 COMMAND_ARGUMENT_BIOME: quan-xa
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: lenh...
+COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER: 'online-filter'
 COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: hieu-ung-thuoc
@@ -403,12 +408,15 @@ GENERATOR_UPDATED: '&e&lĐảo | &7Cập nhật thành công số lượng máy 
 GENERATOR_UPDATED_NAME: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo {1}.'
 GENERATOR_UPDATED_ALL: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho tất cả các đảo.'
 GLOBAL_COMMAND_EXECUTED: '&e&lĐảo | &7Thành công thực hiện lệnh cho tất cả thành viên đảo của {0}!'
+GLOBAL_COMMAND_EXECUTED_ALL: '&e&lIsland | &7Successfully executed the command on all members of all islands!'
 GLOBAL_COMMAND_EXECUTED_NAME: '&e&lĐảo | &7Thành công thực hiện lệnh cho tất cả thành viên đảo {0}!'
 GLOBAL_MESSAGE_SENT: '&e&lĐảo | &7Gửi thành công tin nhắn đến thành viên
   đảo của {0}!'
+GLOBAL_MESSAGE_SENT_ALL: '&e&lIsland | &7Successfully sent the message to all members of all islands!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lĐảo | &7Gửi thành công tin nhắn đến thành
   viên của đảo {0}!'
 GLOBAL_TITLE_SENT: '&e&lĐảo | &7Gửi title cho thành viên đảo của {0} thành công!'
+GLOBAL_TITLE_SENT_ALL: '&e&lIsland | &7Successfully sent the title to all members of all islands!'
 GLOBAL_TITLE_SENT_NAME: '&e&lĐảo | &7Gửi title cho thành viên đảo {0} thành công!'
 GOT_BANNED: '&e&lĐảo | &7Bạn đã bị &cCẤM&7 khỏi đảo của {0}.'
 GOT_DEMOTED: '&e&lĐảo | &7Bạn đã bị hạ cấp xuống thành {0} trong đảo của bạn.'
@@ -426,6 +434,7 @@ HIT_ISLAND_MEMBER: '&c&lLỗi| &7Bạn không thể đánh thành viên đảo c
 HIT_PLAYER_IN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh người chơi trong đảo.'
 IGNORED_ISLAND: '&e&lĐảo | &7Đảo của {0} bây giờ không còn hiển thị trong
   danh sách đảo hàng đầu.'
+IGNORED_ISLAND_ALL: '&e&lIsland | &7Successfully ignored all islands from top islands.'
 IGNORED_ISLAND_NAME: '&e&lĐảo | &7Đảo {0} bây giờ không còn hiển thị trong
   danh sách đảo hàng đầu.'
 INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài phạm vi bảo
@@ -487,7 +496,9 @@ INVITE_TO_FULL_ISLAND: '&c&lLỗi | &7Bạn không thể mời thêm thành viê
   bạn.'
 ISLAND_ALREADY_CLOSED: '&c&lLỗi | &7Đảo đã được đóng cửa biên giới.'
 ISLAND_ALREADY_EXIST: '&c&lLỗi | &7Một hòn đảo với tên đó đã tồn tại.'
+ISLAND_ALREADY_IGNORED: '&c&lError | &7The island is already ignored from top islands.'
 ISLAND_ALREADY_OPENED: '&c&lLỗi | &7Đảo đã được mở cửa biên giới.'
+ISLAND_ALREADY_UNIGNORED: '&c&lError | &7The island is already un-ignored from top islands.'
 ISLAND_BANK_EMPTY: '&e&lNgân Hàng | &7Đảo ngân hàng trống rỗng.'
 ISLAND_BANK_SHOW: '&e&lNgân Hàng | &7Đảo bạn có ${0}.'
 ISLAND_BANK_SHOW_OTHER: '&e&lNgân Hàng | &7Đảo của {0} có ${1}.'
@@ -610,6 +621,7 @@ KICK_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã bị kick khỏi đảo bởi {1}.'
 KICK_ISLAND_LEADER: '&c&lLỗi | &7Bạn không thể đá người chủ đảo, thay vào đó sử dụng /is admin disband.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể kick người chơi có vai trò
   đảo thấp hơn bạn.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
 LACK_CHANGE_PERMISSION: '&c&Lỗi | &7Bạn phải có quyền này để thay đổi nó thành các
   vai trò khác.'
 LAST_ROLE_DEMOTE: '&c&lLỗi | &7Bạn không thể hạ cấp người chơi này nữa.'
@@ -711,6 +723,9 @@ NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lLỗi | &7Bạn không có đủ tiền để 
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lLỗi | &7Bạn không có đủ tiền để nâng cấp.'
 NOT_ENOUGH_MONEY_TO_WARP: '&c&lLỗi | &7Bạn không có đủ tiền để dùng các khu vực đảo.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oBạn quá mệt mỏi để tương tác với các menu, bạn không nghĩ vậy sao?'
+OPENED_ISLAND: '&e&lIsland | &7Successfully opened {0}''s island to the public.'
+OPENED_ISLAND_ALL: '&e&lIsland | &7Successfully opened all islands to the public.'
+OPENED_ISLAND_NAME: '&e&lIsland | &7Successfully opened the island {0} to the public.'
 PANEL_TOGGLE_OFF: |-
   &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo: &cTẮT&7.
   &e&lBảng điều khiển | &7Xài /is sẽ dịch chuyển bạn về đảo.'
@@ -762,6 +777,7 @@ RATE_ANNOUNCEMENT: '&e&lĐánh giá | &7{0} đã đánh giá đảo của bạn 
 RATE_CHANGE_OTHER: '&e&lĐánh giá | &7Bạn đã thay đổi đánh giá của đảo {0} thành {1}.'
 RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của bạn.'
 RATE_REMOVE_ALL: '&e&lĐánh giá | &7Thành công xóa bỏ tất cả đánh giá của đảo {0}.'
+RATE_REMOVE_ALL_ISLAND: '&e&lIsland | &7Successfully removed all ratings of the island {0}.'
 RATE_REMOVE_ALL_ISLANDS: '&e&lĐảo | &7Thành công xóa bỏ tất cả đánh giá của tất cả các đảo.'
 RATE_SUCCESS: '&e&lĐánh giá | &7Bạn đánh giả đảo này với {0} sao!'
 REACHED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
@@ -865,6 +881,7 @@ UNCOOP_LEFT_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã thoát khỏi trò chơi và 
   còn là một thành viên co-op.'
 UNIGNORED_ISLAND: '&e&lĐảo | &7Đảo của {0} bây giờ không được bỏ qua từ các
   đảo hàng đầu.'
+UNIGNORED_ISLAND_ALL: '&e&lIsland | &7Successfully un-ignored all islands from top islands.'
 UNIGNORED_ISLAND_NAME: '&e&lĐảo | &7Đảo {0} bây giờ không được bỏ qua từ các
   đảo hàng đầu.'
 UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lThế giới | &7Thế giới {0} hiện đã được mở khóa cho tất cả đảo!'

@@ -15,6 +15,7 @@
 ADMIN_ADD_PLAYER: '&e&lAda | &7Oyuncu {0} başarıyla {1}''in adasına eklendi.'
 ADMIN_ADD_PLAYER_NAME: '&e&lAda | &7Oyuncu {0} başarıyla {1} adasına eklendi.'
 ADMIN_DEPOSIT_MONEY: '&e&lBanka | &7{1}''in ada bankasına ${0} yatırdın.'
+ADMIN_DEPOSIT_MONEY_ALL: '&e&lBank | &7You deposited ${0} into the banks of all islands.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lBanka | &7{1} adasının bankasına ${0} yatırdın.'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Geliştiren: Ome_R'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Yönetici Komutları Listesi [{0}/{1}]:'
@@ -150,6 +151,9 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lYükseltmeler | &7Tüm adaların ışınlanma limi
   güncellendi.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lYükseltmeler | &7{0} adasının ışınlanma limiti başarıyla
   güncellendi.'
+CLOSED_ISLAND: '&e&lIsland | &7Successfully closed {0}''s island to the public.'
+CLOSED_ISLAND_ALL: '&e&lIsland | &7Successfully closed all islands to the public.'
+CLOSED_ISLAND_NAME: '&e&lIsland | &7Successfully closed the island {0} to the public.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
@@ -158,6 +162,7 @@ COMMAND_ARGUMENT_AMOUNT: miktar
 COMMAND_ARGUMENT_BIOME: biyom
 COMMAND_ARGUMENT_BORDER_COLOR: sınır-rengi
 COMMAND_ARGUMENT_COMMAND: komut...
+COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER: 'online-filter'
 COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: iksir-efekti
@@ -439,11 +444,14 @@ GENERATOR_UPDATED_NAME: '&e&lAda | &7{0}''ın jeneratör miktarı başarıyla {1
 GENERATOR_UPDATED_ALL: '&e&lAda | &7{0}''ın jeneratör miktarı tüm adalar için başarıyla
   güncellendi.'
 GLOBAL_COMMAND_EXECUTED: '&e&lAda | &7Komut {0}''ın ada üyelerinde başarıyla çalıştırıldı!'
+GLOBAL_COMMAND_EXECUTED_ALL: '&e&lIsland | &7Successfully executed the command on all members of all islands!'
 GLOBAL_COMMAND_EXECUTED_NAME: '&e&lAda | &7Komut {0} adasının üyelerinde başarıyla
   çalıştırıldı!'
 GLOBAL_MESSAGE_SENT: '&e&lAda | &7{0}''ın ada üyelerine mesaj başarıyla gönderildi!'
+GLOBAL_MESSAGE_SENT_ALL: '&e&lIsland | &7Successfully sent the message to all members of all islands!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lAda | &7{0} adasının üyelerine mesaj başarıyla gönderildi!'
 GLOBAL_TITLE_SENT: '&e&lAda | &7{0}''ın ada üyelerine başlık başarıyla gönderildi!'
+GLOBAL_TITLE_SENT_ALL: '&e&lIsland | &7Successfully sent the title to all members of all islands!'
 GLOBAL_TITLE_SENT_NAME: '&e&lAda | &7{0} adasının üyelerine başlık başarıyla gönderildi!'
 GOT_BANNED: '&e&lAda | &7{0}''ın adasından YASAKLANDIN.'
 GOT_DEMOTED: '&e&lAda | &7Adanda {0} olarak rütbe düşürüldün.'
@@ -460,6 +468,7 @@ GOT_UNBANNED: '&e&lAda | &7{0}''ın adasından YASAĞIN KALDIRILDI.'
 HIT_ISLAND_MEMBER: '&c&lHata | &7Ada üyelerine vuramazsın.'
 HIT_PLAYER_IN_ISLAND: '&c&lHata | &7Adaların içindeki oyunculara vuramazsın.'
 IGNORED_ISLAND: '&e&lAda | &7{0}''ın adası artık en iyi adalardan yoksayılıyor.'
+IGNORED_ISLAND_ALL: '&e&lIsland | &7Successfully ignored all islands from top islands.'
 IGNORED_ISLAND_NAME: '&e&lAda | &7{0} adası artık en iyi adalardan yoksayılıyor.'
 INTERACT_OUTSIDE_ISLAND: '&c&lHata | &7Koruma menzilinin dışında etkileşime geçemezsin.'
 INVALID_AMOUNT: '&c&lHata | &7Geçersiz miktar {0}.'
@@ -517,7 +526,9 @@ INVITE_BANNED_PLAYER: '&c&lHata | &7Bu oyuncu adadan yasaklandı ve davet edilem
 INVITE_TO_FULL_ISLAND: '&c&lHata | &7Adana daha fazla üye davet edemezsin.'
 ISLAND_ALREADY_CLOSED: '&c&lHata | &7Ada zaten halka kapalı.'
 ISLAND_ALREADY_EXIST: '&c&lHata | &7Bu adla bir ada zaten var.'
+ISLAND_ALREADY_IGNORED: '&c&lError | &7The island is already ignored from top islands.'
 ISLAND_ALREADY_OPENED: '&c&lHata | &7Ada zaten halka açık.'
+ISLAND_ALREADY_UNIGNORED: '&c&lError | &7The island is already un-ignored from top islands.'
 ISLAND_BANK_EMPTY: '&e&lBanka | &7Ada bankası boş.'
 ISLAND_BANK_SHOW: '&e&lBanka | &7Adanda ${0} var.'
 ISLAND_BANK_SHOW_OTHER: '&e&lBanka | &7{0}''ın adasında ${1} var.'
@@ -646,6 +657,7 @@ KICK_ISLAND_LEADER: '&c&lHata | &7Ada liderini atamazsın, bunun yerine /is admi
   kullan.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lHata | &7Sadece senden daha düşük ada rolüne sahip
   oyuncuları atabilirsin.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
 LACK_CHANGE_PERMISSION: '&c&lHata | &7Bu izni başka rollere değiştirebilmek için bu
   izne sahip olmalısın.'
 LAST_ROLE_DEMOTE: '&c&lHata | &7Bu oyuncuyu artık rütbe düşüremezsin.'
@@ -752,6 +764,9 @@ NOT_ENOUGH_MONEY_TO_WARP: '&c&lHata | &7Ada ışınlanmalarını kullanmak için
   paran yok.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oMenülerle etkileşime geçmek için çok mu yorgunsun,
   sence de öyle değil mi?'
+OPENED_ISLAND: '&e&lIsland | &7Successfully opened {0}''s island to the public.'
+OPENED_ISLAND_ALL: '&e&lIsland | &7Successfully opened all islands to the public.'
+OPENED_ISLAND_NAME: '&e&lIsland | &7Successfully opened the island {0} to the public.'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Ada paneli &cKAPALI&7.
   &e&lPanel | &7/is çalıştırmak seni adaya ışınlayacak.
@@ -806,6 +821,7 @@ RATE_ANNOUNCEMENT: '&e&lAda | &7{0} adanı 5 üzerinden {1} olarak değerlendird
 RATE_CHANGE_OTHER: '&e&lAda | &7{0}''ın değerlendirmesini {1} olarak değiştirdin.'
 RATE_OWN_ISLAND: '&c&lHata | &7Kendi adanı değerlendiremezsin.'
 RATE_REMOVE_ALL: '&e&lAda | &7{0}''ın tüm değerlendirmeleri başarıyla kaldırıldı.'
+RATE_REMOVE_ALL_ISLAND: '&e&lIsland | &7Successfully removed all ratings of the island {0}.'
 RATE_REMOVE_ALL_ISLANDS: '&e&lAda | &7Tüm adaların tüm değerlendirmeleri başarıyla
   kaldırıldı.'
 RATE_SUCCESS: '&e&lAda | &7Bu adayı {0} yıldızla değerlendirdin!'
@@ -904,6 +920,7 @@ UNCOOP_AUTO_ANNOUNCEMENT: '&e&lAda | &7Çevrimiçi ada üyesi yok ve bu yüzden 
   olarak co-op üyeliğinden çıkarıldın.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lAda | &7{0} oyundan ayrıldı ve artık co-op üyesi değil.'
 UNIGNORED_ISLAND: '&e&lAda | &7{0}''ın adası artık en iyi adalardan yoksayılmıyor.'
+UNIGNORED_ISLAND_ALL: '&e&lIsland | &7Successfully un-ignored all islands from top islands.'
 UNIGNORED_ISLAND_NAME: '&e&lAda | &7{0} adası artık en iyi adalardan yoksayılmıyor.'
 UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for all
   islands!'

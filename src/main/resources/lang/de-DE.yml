@@ -16,6 +16,7 @@ ADMIN_ADD_PLAYER: '&e&lInsel | &7Der Spieler {0} wurde erfolgreich zur Insel von
 ADMIN_ADD_PLAYER_NAME: '&e&lInsel | &7Der Spieler {0} wurde erfolgreich zur Insel
   {1} ​​hinzugefügt.'
 ADMIN_DEPOSIT_MONEY: '&e&lBank | &7Du hast $ {0} auf die Inselbank von {1} eingezahlt. '
+ADMIN_DEPOSIT_MONEY_ALL: '&e&lBank | &7You deposited ${0} into the banks of all islands.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lBank | &7Du hast {0} Citycoins auf die Bank der Insel
   {1} ​​eingezahlt. '
 ADMIN_HELP_FOOTER: '&e&lSkyblock &7Entwickelt von einem Entwickler'
@@ -157,6 +158,9 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lUpgrades | &7Das Warps-Limit aller Inseln wurde er
   aktualisiert.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lUpgrades | &7Das Warps-Limit von {0} wurde erfolgreich
   aktualisiert.'
+CLOSED_ISLAND: '&e&lIsland | &7Successfully closed {0}''s island to the public.'
+CLOSED_ISLAND_ALL: '&e&lIsland | &7Successfully closed all islands to the public.'
+CLOSED_ISLAND_NAME: '&e&lIsland | &7Successfully closed the island {0} to the public.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
@@ -165,6 +169,7 @@ COMMAND_ARGUMENT_AMOUNT: Betrag
 COMMAND_ARGUMENT_BIOME: biom
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: Befehl...
+COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER: 'online-filter'
 COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: Discord...
 COMMAND_ARGUMENT_EFFECT: Trank-Effekt
@@ -457,14 +462,17 @@ GENERATOR_UPDATED_ALL: '&e&lInsel | &7Die Generator Anzahl von {0} wurde erfolgr
   auf alle Inseln aktualisiert.'
 GLOBAL_COMMAND_EXECUTED: '&e&lInsel | &7Der Befehl wurde erfolgreich auf den Inselelementen
   von {0} ausgeführt!'
+GLOBAL_COMMAND_EXECUTED_ALL: '&e&lIsland | &7Successfully executed the command on all members of all islands!'
 GLOBAL_COMMAND_EXECUTED_NAME: '&e&lInsel | &7Der Befehl wurde erfolgreich auf den
   Inselmitgliedern von {0} ausgeführt!'
 GLOBAL_MESSAGE_SENT: '&e&lInsel | &7Die Nachricht wurde erfolgreich an die Inselmitglieder
   von {0} gesendet!'
+GLOBAL_MESSAGE_SENT_ALL: '&e&lIsland | &7Successfully sent the message to all members of all islands!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lInsel | &7Die Nachricht wurde erfolgreich an die Inselmitglieder
   von {0} gesendet!'
 GLOBAL_TITLE_SENT: '&e&lInsel | &7Der Titel wurde erfolgreich an die Inselmitglieder
   von {0} gesendet!'
+GLOBAL_TITLE_SENT_ALL: '&e&lIsland | &7Successfully sent the title to all members of all islands!'
 GLOBAL_TITLE_SENT_NAME: '&e&lInsel | &7Der Titel wurde erfolgreich an die Inselmitglieder
   von {0} gesendet!'
 GOT_BANNED: '&e&lInsel | &7Du wurdest von {0}´s Insel GEBANNT.'
@@ -484,6 +492,7 @@ HIT_PLAYER_IN_ISLAND: '&c&lError | &7Du kannst keine Spieler innerhalb von Insel
   treffen.'
 IGNORED_ISLAND: '&e&lInsel | Die Insel von &7{0} wird jetzt von den oberen Inseln
   ignoriert.'
+IGNORED_ISLAND_ALL: '&e&lIsland | &7Successfully ignored all islands from top islands.'
 IGNORED_ISLAND_NAME: '&e&lInsel | &7Die Insel {0} wird jetzt von den oberen Inseln
   ignoriert.'
 INTERACT_OUTSIDE_ISLAND: '&c&lError | &7Du kannst außerhalb der Border nicht interagieren.'
@@ -546,7 +555,9 @@ INVITE_TO_FULL_ISLAND: '&c&lError | &7Du kannst keine weiteren Mitglieder auf Ih
   Insel einladen.'
 ISLAND_ALREADY_CLOSED: '&c&lError | &7The island is already closed to the public.'
 ISLAND_ALREADY_EXIST: '&c&lError | &7Eine Insel mit diesem Namen existiert bereits.'
+ISLAND_ALREADY_IGNORED: '&c&lError | &7The island is already ignored from top islands.'
 ISLAND_ALREADY_OPENED: '&c&lError | &7The island is already opened to the public.'
+ISLAND_ALREADY_UNIGNORED: '&c&lError | &7The island is already un-ignored from top islands.'
 ISLAND_BANK_EMPTY: '&e&lBank | &7Inselbank ist leer.'
 ISLAND_BANK_SHOW: '&e&lBank | &7Deine Insel hat ${0}.'
 ISLAND_BANK_SHOW_OTHER: '&e&lBank | Die Insel von &7{0} hat ${1}.'
@@ -679,6 +690,7 @@ KICK_ISLAND_LEADER: '&c&lError | &7Du kannst den Besitzer der Insel nicht kicken
   verwende stattdessen /is admin disband.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7Du kannst nur Spieler mit einer niedrigeren
   Inselrolle als deiner kicken.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
 LACK_CHANGE_PERMISSION: '&c&lError | &7Du musst diese Berechtigung haben, um sie in
   andere Rollen zu ändern.'
 LAST_ROLE_DEMOTE: '&c&lError | &7Du kannst diesen Spieler nicht mehr zurückstufen.'
@@ -796,6 +808,9 @@ NOT_ENOUGH_MONEY_TO_WARP: '&c&lError | &7Du hast nicht genug Geld, um Island War
   zu benutzen.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oDu´ bist zu müde, um mit Menüs zu interagieren, findest
   du nicht auch?'
+OPENED_ISLAND: '&e&lIsland | &7Successfully opened {0}''s island to the public.'
+OPENED_ISLAND_ALL: '&e&lIsland | &7Successfully opened all islands to the public.'
+OPENED_ISLAND_NAME: '&e&lIsland | &7Successfully opened the island {0} to the public.'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Inselpanel umgeschaltet &cOFF&7.
   &e&lPanel | &7Das Ausführen von /is wird dich zur Insel teleportieren.
@@ -857,6 +872,7 @@ RATE_ANNOUNCEMENT: '&e&lInsel | &7{0} hat deine Insel mit {1} von 5 Punkten bewe
 RATE_CHANGE_OTHER: '&e&lInsel | &7Du hast die Bewertung von {0} in {1} geändert.'
 RATE_OWN_ISLAND: '&c&lError | &7Du kannst deine eigene Insel nicht bewerten.'
 RATE_REMOVE_ALL: '&e&lInsel | &7Alle Bewertungen von {0} wurden erfolgreich entfernt.'
+RATE_REMOVE_ALL_ISLAND: '&e&lIsland | &7Successfully removed all ratings of the island {0}.'
 RATE_REMOVE_ALL_ISLANDS: '&e&lInsel | &7Alle Bewertungen aller Inseln wurden erfolgreich
   entfernt.'
 RATE_SUCCESS: '&e&lInsel | &7Du hast diese Insel mit {0} Sternen bewertet!'
@@ -968,6 +984,7 @@ UNCOOP_LEFT_ANNOUNCEMENT: '&e&lInsel | &7{0} hat das Spiel verlassen und ist kei
   Koop-Mitglied mehr.'
 UNIGNORED_ISLAND: '&e&lInsel | Die Insel von &7{0} wird jetzt nicht mehr von den Top-Inseln
   ignoriert.'
+UNIGNORED_ISLAND_ALL: '&e&lIsland | &7Successfully un-ignored all islands from top islands.'
 UNIGNORED_ISLAND_NAME: '&e&lInsel | &7Die Insel {0} wird jetzt von den Top-Inseln
   nicht mehr ignoriert.'
 UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for all islands!'

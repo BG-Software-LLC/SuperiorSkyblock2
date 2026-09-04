@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class CmdAdminRemoveRatings implements IAdminIslandCommand {
+
     @Override
     public List<String> getAliases() {
         return Arrays.asList("removeratings", "rratings", "rr");
@@ -76,15 +77,17 @@ public class CmdAdminRemoveRatings implements IAdminIslandCommand {
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (!removingAllRatings)
+        if (!removingAllRatings) {
             Message.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
-        else if (islands.size() == 1)
-            Message.RATE_REMOVE_ALL.send(sender, islands.get(0).getName());
-        else
+        } else if (islandsChangedCount == 1) {
+            Message.RATE_REMOVE_ALL_ISLAND.send(sender, islands.get(0).getName());
+        } else {
             Message.RATE_REMOVE_ALL_ISLANDS.send(sender);
+        }
     }
 
 }
