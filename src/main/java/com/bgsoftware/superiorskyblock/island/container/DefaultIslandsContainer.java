@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -158,7 +159,16 @@ public class DefaultIslandsContainer implements IslandsContainer {
     public Island getIslandAt(Location location) {
         Island island = plugin.getProviders().hasCustomWorldsSupport() ?
                 customWorldsSupportIslandLookup(location) : nativeIslandLookup(location);
-        return island == null || !island.isInside(SWorldPosition.of(location)) ? null : island;
+        if (island == null)
+            return null;
+
+        // Fast path: verify the X/Z area intercept without allocating a WorldPosition per lookup.
+        // Semantics match isInside(WorldPosition) (area-only, no world check). Non-SIsland islands
+        // fall back to the original path to preserve behavior.
+        boolean inside = island instanceof SIsland ?
+                ((SIsland) island).intersectsArea(location.getX(), location.getZ()) :
+                island.isInside(SWorldPosition.of(location));
+        return inside ? island : null;
     }
 
     private Island customWorldsSupportIslandLookup(Location location) {
