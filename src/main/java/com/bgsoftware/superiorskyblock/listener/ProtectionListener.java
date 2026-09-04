@@ -70,6 +70,8 @@ public class ProtectionListener extends AbstractGameEventListener {
     private static final Material DECORATED_POT = EnumHelper.getEnum(Material.class, "DECORATED_POT");
     @Nullable
     private static final Material TARGET = EnumHelper.getEnum(Material.class, "TARGET");
+    @Nullable
+    private static final EntityType LEASH_KNOT = EnumHelper.getEnum(EntityType.class, "LEASH_KNOT");
 
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -243,12 +245,21 @@ public class ProtectionListener extends AbstractGameEventListener {
     }
 
     private boolean handleEntityInteract(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
-        if (e.getArgs().clickedEntity == null)
+        Entity entity = e.getArgs().clickedEntity;
+
+        if (entity == null) {
             return false;
+        }
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
-        InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(superiorPlayer,
-                e.getArgs().clickedEntity, e.getArgs().usedItem);
+
+        InteractionResult interactionResult;
+        if (entity.getType() == LEASH_KNOT) {
+            interactionResult = this.protectionManager.get().handleEntityLeash(superiorPlayer, entity);
+        } else {
+            interactionResult = this.protectionManager.get().handleEntityInteract(superiorPlayer, entity, e.getArgs().usedItem);
+        }
+
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
             return true;
