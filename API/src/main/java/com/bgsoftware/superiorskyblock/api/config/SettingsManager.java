@@ -572,6 +572,14 @@ public interface SettingsManager {
     String getPricesProvider();
 
     /**
+     * The vanish provider to use.
+     * If set to AUTO, the plugin will automatically detect an available vanish provider and use it.
+     * If set to METADATA, the Bukkit 'vanished' metadata value will be used.
+     * Config-path: vanish-provider
+     */
+    String getVanishProvider();
+
+    /**
      * The sync-worth status of the plugin.
      * Config-path: sync-worth
      */

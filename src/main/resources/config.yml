@@ -805,6 +805,11 @@ stacked-blocks-provider: 'AUTO'
 # Providers: Auto, CMI, EconomyShopGUI, Essentials, ExcellentShop, GUIShop, newtShop, NextGens, QuantumShop, ShopGUIPlus, zShop
 prices-provider: 'AUTO'
 
+# If you want a specific vanish provider to use, specify it here.
+# Metadata uses the Bukkit 'vanished' metadata value.
+# Providers: Auto, Metadata (or Default), VanishNoPacket, SuperVanish, PremiumVanish, Essentials, CMI
+vanish-provider: 'AUTO'
+
 # Should the worth values be synced with the prices provider?
 # You can set the following values: NONE (disabled), BUY (buy prices), SELL (sell prices)
 sync-worth: 'NONE'

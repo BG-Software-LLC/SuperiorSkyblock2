@@ -544,6 +544,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public String getVanishProvider() {
+        return this.global.getVanishProvider();
+    }
+
+    @Override
     public BlockValuesManager.SyncWorthStatus getSyncWorth() {
         return this.global.getSyncWorth();
     }
