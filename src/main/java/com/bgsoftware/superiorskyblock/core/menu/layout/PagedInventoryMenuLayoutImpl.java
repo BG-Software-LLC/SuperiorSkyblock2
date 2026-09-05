@@ -12,19 +12,21 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.CurrentPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.NextPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.PreviousPageButton;
-import com.bgsoftware.superiorskyblock.core.menu.layout.order.CustomPagedLayoutOrder;
-import com.bgsoftware.superiorskyblock.core.menu.layout.order.PagedLayoutOrder;
+import com.bgsoftware.superiorskyblock.core.menu.layout.custom.CustomPagedLayout;
+import com.bgsoftware.superiorskyblock.core.menu.layout.custom.PagedLayout;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class PagedInventoryMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> extends RegularInventoryMenuLayoutImpl<V> implements PagedInventoryMenuLayout<V> {
 
     @Nullable
-    private final PagedLayoutOrder<V> customLayoutOrder;
+    private final PagedLayout<V> customLayoutOrder;
     private final int objectsPerPageCount;
 
     private PagedInventoryMenuLayoutImpl(Builder<V, E> builder) {
@@ -33,13 +35,21 @@ public class PagedInventoryMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> e
         this.objectsPerPageCount = builder.layoutOrder == null ? countPagedButtons(buttons) : builder.layoutOrder.getObjectsPerPageCount();
         if (this.customLayoutOrder != null) {
             // Update button indexes with the custom layout order
-            PagedLayoutOrder.MenuButtonsIterator<V> buttonsIterator = this.customLayoutOrder.createIterator(this.buttons);
+            PagedLayout.MenuButtonsIterator<V> buttonsIterator = this.customLayoutOrder.createIterator(this.buttons);
             int buttonIndex = 0;
-            while (buttonsIterator.hasNext()) {
-                MenuTemplateButton<V> templateButton = buttonsIterator.next();
 
-                if (templateButton instanceof PagedMenuTemplateButton)
-                    ((PagedMenuTemplateButton<V, ?>) templateButton).setButtonIndex(buttonIndex++);
+            while (buttonsIterator.hasNext()) {
+                buttonsIterator.next();
+
+                for (int slot : buttonsIterator.getSlots()) {
+                    MenuTemplateButton<V> templateButton = this.buttons[slot];
+
+                    if (templateButton instanceof PagedMenuTemplateButton) {
+                        ((PagedMenuTemplateButton<V, ?>) templateButton).setButtonIndex(buttonIndex);
+                    }
+                }
+
+                buttonIndex++;
             }
         }
     }
@@ -57,32 +67,44 @@ public class PagedInventoryMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> e
         for (int slot = 0; slot < this.buttons.length; ++slot) {
             MenuViewButton<V> button = this.buttons[slot].createViewButton(menuView);
 
-            if (this.customLayoutOrder != null && button instanceof PagedMenuViewButton)
+            if (this.customLayoutOrder != null && button instanceof PagedMenuViewButton) {
                 continue;
+            }
 
-            populateInventoryWithButton(inventory, button, slot, menuView, pagedObjectSlot);
+            ItemStack buttonItem = createButtonItem(button, menuView, pagedObjectSlot);
+
+            if (buttonItem != null) {
+                inventory.setItem(slot, buttonItem);
+            }
         }
 
-        if (this.customLayoutOrder == null)
+        if (this.customLayoutOrder == null) {
             return;
+        }
 
-        PagedLayoutOrder.MenuButtonsIterator<V> buttonsIterator = this.customLayoutOrder.createIterator(this.buttons);
+        PagedLayout.MenuButtonsIterator<V> buttonsIterator = this.customLayoutOrder.createIterator(this.buttons);
+
         while (buttonsIterator.hasNext()) {
             MenuTemplateButton<V> templateButton = buttonsIterator.next();
 
-            if (!(templateButton instanceof PagedMenuTemplateButton))
+            if (!(templateButton instanceof PagedMenuTemplateButton)) {
                 continue;
+            }
 
             MenuViewButton<V> button = templateButton.createViewButton(menuView);
-            int slot = buttonsIterator.getSlot();
+            ItemStack buttonItem = createButtonItem(button, menuView, pagedObjectSlot);
 
-            populateInventoryWithButton(inventory, button, slot, menuView, pagedObjectSlot);
+            if (buttonItem == null) {
+                continue;
+            }
+
+            for (int slot : buttonsIterator.getSlots()) {
+                inventory.setItem(slot, buttonItem);
+            }
         }
-
     }
 
-    private void populateInventoryWithButton(Inventory inventory, MenuViewButton<V> button, int slot,
-                                             PagedMenuView<V, ?, E> menuView, MutableInt pagedObjectSlot) {
+    private ItemStack createButtonItem(MenuViewButton<V> button, PagedMenuView<V, ?, E> menuView, MutableInt pagedObjectSlot) {
         int currentPage = menuView.getCurrentPage();
         List<E> pagedObjects = menuView.getPagedObjects();
 
@@ -93,11 +115,10 @@ public class PagedInventoryMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> e
             pagedObjectSlot.set(pagedObjectSlot.get() + 1);
 
             if (objectIndex >= pagedObjects.size()) {
-                inventory.setItem(slot, ((PagedMenuTemplateButton<V, E>) pagedMenuButton.getTemplate()).getNullItem());
-                return;
-            } else {
-                pagedMenuButton.updateObject(pagedObjects.get(objectIndex));
+                return ((PagedMenuTemplateButton<V, E>) pagedMenuButton.getTemplate()).getNullItem();
             }
+
+            pagedMenuButton.updateObject(pagedObjects.get(objectIndex));
         }
 
         ItemStack buttonItem;
@@ -106,27 +127,28 @@ public class PagedInventoryMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> e
             buttonItem = button.createViewItem();
         } catch (Exception error) {
             Log.error(error, "An unexpected error occurred while setting up menu:");
-            return;
+            return null;
         }
 
-        if (buttonItem == null)
-            return;
+        if (buttonItem == null) {
+            return null;
+        }
 
         if (button instanceof PreviousPageButton) {
-            inventory.setItem(slot, new ItemBuilder(buttonItem)
+            return new ItemBuilder(buttonItem)
                     .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a"))
-                    .build(menuView.getInventoryViewer()));
+                    .build(menuView.getInventoryViewer());
         } else if (button instanceof NextPageButton) {
-            inventory.setItem(slot, new ItemBuilder(buttonItem)
+            return new ItemBuilder(buttonItem)
                     .replaceAll("{0}", (pagedObjects.size() > currentPage * this.objectsPerPageCount ? "&a" : "&c"))
-                    .build(menuView.getInventoryViewer()));
+                    .build(menuView.getInventoryViewer());
         } else if (button instanceof CurrentPageButton) {
-            inventory.setItem(slot, new ItemBuilder(buttonItem)
+            return new ItemBuilder(buttonItem)
                     .replaceAll("{0}", currentPage + "")
-                    .build(menuView.getInventoryViewer()));
-        } else {
-            inventory.setItem(slot, buttonItem);
+                    .build(menuView.getInventoryViewer());
         }
+
+        return buttonItem;
     }
 
     private static int countPagedButtons(MenuTemplateButton<?>[] buttons) {
@@ -138,7 +160,7 @@ public class PagedInventoryMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> e
             implements PagedInventoryMenuLayout.Builder<V, E> {
 
         @Nullable
-        private PagedLayoutOrder<V> layoutOrder;
+        private PagedLayout<V> layoutOrder;
 
         @Override
         public Builder<V, E> setPreviousPageSlots(List<Integer> slots) {
@@ -166,9 +188,45 @@ public class PagedInventoryMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> e
 
         @Override
         public Builder<V, E> setCustomLayoutOrder(List<Integer> slotsOrder) {
-            slotsOrder.removeIf(slot -> !(super.buttons[slot] instanceof PagedMenuTemplateButton));
-            if (!slotsOrder.isEmpty())
-                this.layoutOrder = new CustomPagedLayoutOrder<>(slotsOrder);
+            List<List<Integer>> validSlotsLayout = new ArrayList<>();
+
+            for (int slot : slotsOrder) {
+                if (slot >= 0 && slot < super.buttons.length &&
+                        super.buttons[slot] instanceof PagedMenuTemplateButton) {
+                    validSlotsLayout.add(Collections.singletonList(slot));
+                }
+            }
+
+            if (!validSlotsLayout.isEmpty()) {
+                this.layoutOrder = new CustomPagedLayout<>(validSlotsLayout);
+            }
+
+            return this;
+        }
+
+        @Override
+        public Builder<V, E> setCustomLayout(List<List<Integer>> slotsLayout) {
+            List<List<Integer>> validSlotsLayout = new ArrayList<>();
+
+            for (List<Integer> slots : slotsLayout) {
+                List<Integer> validSlots = new ArrayList<>();
+
+                for (int slot : slots) {
+                    if (slot >= 0 && slot < super.buttons.length &&
+                            super.buttons[slot] instanceof PagedMenuTemplateButton) {
+                        validSlots.add(slot);
+                    }
+                }
+
+                if (!validSlots.isEmpty()) {
+                    validSlotsLayout.add(validSlots);
+                }
+            }
+
+            if (!validSlotsLayout.isEmpty()) {
+                this.layoutOrder = new CustomPagedLayout<>(validSlotsLayout);
+            }
+
             return this;
         }
 

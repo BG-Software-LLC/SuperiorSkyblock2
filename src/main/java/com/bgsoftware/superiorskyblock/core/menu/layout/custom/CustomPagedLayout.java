@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.core.menu.layout.order;
+package com.bgsoftware.superiorskyblock.core.menu.layout.custom;
 
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -6,11 +6,11 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomPagedLayoutOrder<T extends MenuView<T, ?>> implements PagedLayoutOrder<T> {
+public class CustomPagedLayout<T extends MenuView<T, ?>> implements PagedLayout<T> {
 
-    private final List<Integer> slotsOrder;
+    private final List<List<Integer>> slotsOrder;
 
-    public CustomPagedLayoutOrder(List<Integer> slotsOrder) {
+    public CustomPagedLayout(List<List<Integer>> slotsOrder) {
         this.slotsOrder = new ArrayList<>(slotsOrder);
     }
 
@@ -28,30 +28,39 @@ public class CustomPagedLayoutOrder<T extends MenuView<T, ?>> implements PagedLa
 
         private final MenuTemplateButton<T>[] buttons;
         private int cursor = 0;
-        private int currentSlot;
+        private List<Integer> currentSlots;
 
         private IteratorImpl(MenuTemplateButton<T>[] buttons) {
             this.buttons = buttons;
         }
 
         @Override
-        public int getSlot() {
-            return this.currentSlot;
+        public List<Integer> getSlots() {
+            return this.currentSlots;
         }
 
         @Override
         public boolean hasNext() {
-            if (this.cursor >= slotsOrder.size())
+            if (this.cursor >= slotsOrder.size()) {
                 return false;
+            }
 
-            int slot = slotsOrder.get(this.cursor);
-            return slot >= 0 && slot < this.buttons.length;
+            List<Integer> slots = slotsOrder.get(this.cursor);
+
+            for (int slot : slots) {
+                if (slot < 0 || slot >= this.buttons.length) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         @Override
         public MenuTemplateButton<T> next() {
-            this.currentSlot = slotsOrder.get(this.cursor++);
-            return this.buttons[this.currentSlot];
+            this.currentSlots = slotsOrder.get(this.cursor++);
+
+            return this.buttons[this.currentSlots.get(0)];
         }
 
     }
