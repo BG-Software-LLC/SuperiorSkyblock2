@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.task;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.FoliaUtil;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,9 +12,17 @@ public class CalcTask extends BukkitRunnable {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static BukkitTask calcTask;
+    private static Object foliaCalcTask; // holds ScheduledTask as Object to avoid compile-time Folia dependency
 
     private CalcTask() {
-        calcTask = runTaskTimerAsynchronously(plugin, plugin.getSettings().getCalcInterval(), plugin.getSettings().getCalcInterval());
+        if (FoliaUtil.isFolia()) {
+            long intervalMs = plugin.getSettings().getCalcInterval() * 50L;
+            foliaCalcTask = FoliaUtil.runAsyncTimer(plugin, t -> run(), intervalMs, intervalMs);
+        } else {
+            calcTask = runTaskTimerAsynchronously(plugin,
+                    plugin.getSettings().getCalcInterval(),
+                    plugin.getSettings().getCalcInterval());
+        }
     }
 
     public static void startTask() {
@@ -23,9 +32,16 @@ public class CalcTask extends BukkitRunnable {
     }
 
     public static void cancelTask() {
-        if (calcTask != null) {
-            calcTask.cancel();
-            calcTask = null;
+        if (FoliaUtil.isFolia()) {
+            if (foliaCalcTask != null) {
+                FoliaUtil.cancelTask(foliaCalcTask);
+                foliaCalcTask = null;
+            }
+        } else {
+            if (calcTask != null) {
+                calcTask.cancel();
+                calcTask = null;
+            }
         }
     }
 

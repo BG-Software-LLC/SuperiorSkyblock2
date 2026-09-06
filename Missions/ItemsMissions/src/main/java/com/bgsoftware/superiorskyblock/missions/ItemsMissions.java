@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
+import com.bgsoftware.superiorskyblock.missions.common.FoliaUtil;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.KeyRequirements;
 import org.bukkit.Bukkit;
@@ -196,10 +197,17 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
         if (!this.plugin.getMissions().canCompleteNoProgress(superiorPlayer, this))
             return;
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(unused -> {
-            if (canComplete(superiorPlayer))
-                this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
-        }), 2L);
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runAsyncDelayed(plugin, () -> superiorPlayer.runIfOnline(unused -> {
+                if (canComplete(superiorPlayer))
+                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+            }), 100L);
+        } else {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(unused -> {
+                if (canComplete(superiorPlayer))
+                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+            }), 2L);
+        }
     }
 
     @Nullable

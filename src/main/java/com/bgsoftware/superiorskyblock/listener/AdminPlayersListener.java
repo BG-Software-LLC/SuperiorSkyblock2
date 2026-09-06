@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import com.bgsoftware.superiorskyblock.core.FoliaUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -32,16 +33,29 @@ public class AdminPlayersListener extends AbstractGameEventListener {
 
         // Notifies me when a server uses one of my plugins.
         if (player.getUniqueId().equals(DEVELOPER_UUID)) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> Message.CUSTOM.send(player,
-                    "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
-                            plugin.getDescription().getVersion() + buildName, true), 5L);
+            if (FoliaUtil.isFolia()) {
+                FoliaUtil.runGlobalDelayed(plugin, () -> Message.CUSTOM.send(player,
+                        "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
+                                plugin.getDescription().getVersion() + buildName, true), 5L);
+            } else {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> Message.CUSTOM.send(player,
+                        "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
+                                plugin.getDescription().getVersion() + buildName, true), 5L);
+            }
         }
 
         // Notifies operators about new updates
         if (player.isOp() && plugin.getUpdater().isOutdated()) {
-            Bukkit.getScheduler().runTaskLater(plugin, () ->
-                    player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "SuperiorSkyblock2" + ChatColor.GRAY +
-                            " A new version is available (v" + plugin.getUpdater().getLatestVersion() + ")!"), 20L);
+            if (FoliaUtil.isFolia()) {
+                FoliaUtil.runGlobalDelayed(plugin, () ->
+                        player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "SuperiorSkyblock2" +
+                                ChatColor.GRAY + " A new version is available (v" +
+                                plugin.getUpdater().getLatestVersion() + ")!"), 20L);
+            } else {
+                Bukkit.getScheduler().runTaskLater(plugin, () ->
+                        player.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "SuperiorSkyblock2" + ChatColor.GRAY +
+                                " A new version is available (v" + plugin.getUpdater().getLatestVersion() + ")!"), 20L);
+            }
         }
     }
 

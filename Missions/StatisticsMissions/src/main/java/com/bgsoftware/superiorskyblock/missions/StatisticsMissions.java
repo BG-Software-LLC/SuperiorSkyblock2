@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.missions;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
+import com.bgsoftware.superiorskyblock.missions.common.FoliaUtil;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.Requirements;
 import org.bukkit.Bukkit;
@@ -193,10 +194,17 @@ public final class StatisticsMissions extends BuiltinMission<Void> implements Li
         if (!isMissionStatistic(e.getStatistic()) || !this.plugin.getMissions().canCompleteNoProgress(superiorPlayer, this))
             return;
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(player -> {
-            if (canComplete(superiorPlayer))
-                this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
-        }), 2L);
+        if (FoliaUtil.isFolia()) {
+            FoliaUtil.runAsyncDelayed(plugin, () -> superiorPlayer.runIfOnline(player -> {
+                if (canComplete(superiorPlayer))
+                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+            }), 100L);
+        } else {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(player -> {
+                if (canComplete(superiorPlayer))
+                    this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
+            }), 2L);
+        }
     }
 
     private boolean isMissionStatistic(@Nullable Statistic statistic) {
