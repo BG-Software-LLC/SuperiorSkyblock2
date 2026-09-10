@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.nms.world.ChunkReader;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.World;
+import org.bukkit.Location;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +37,9 @@ public class WorldReader {
         if (this.finishCalled)
             throw new IllegalStateException("Cannot call WorldReader#prepareChunk after WorldReader#finish was called");
 
+        Location location = new Location(this.world, chunkPosition.getX() << 4, 0, chunkPosition.getZ() << 4);
         chunkReaderFutures.add(ChunksProvider.loadChunk(chunkPosition, this.chunkLoadReason, null)
-                .thenApply(chunk -> plugin.getNMSWorld().createChunkReader(chunk)));
+                .thenCompose(chunk -> BukkitExecutor.submit(location, () -> plugin.getNMSWorld().createChunkReader(chunk))));
     }
 
     @Nullable

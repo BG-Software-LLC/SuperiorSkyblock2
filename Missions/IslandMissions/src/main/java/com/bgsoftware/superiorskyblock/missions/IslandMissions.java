@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.missions;
 
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.api.events.IslandEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.MissionCompleteEvent;
@@ -157,7 +158,7 @@ public final class IslandMissions extends BuiltinMission<Boolean> implements Lis
         if (success) {
             SuperiorPlayer rewardedPlayer = isTarget ? targetPlayer : superiorPlayer;
             if (rewardedPlayer != null) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                BukkitExecutor.sync(rewardedPlayer.asPlayer(), () -> {
                     insertData(rewardedPlayer, true);
                     this.plugin.getMissions().rewardMission(this, rewardedPlayer, true);
                 }, 5L);

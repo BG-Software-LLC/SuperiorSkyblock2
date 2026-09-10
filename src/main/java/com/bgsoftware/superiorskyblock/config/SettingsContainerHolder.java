@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.config;
 
 public abstract class SettingsContainerHolder {
 
-    private SettingsContainer container;
+    private volatile SettingsContainer container;
 
     protected SettingsContainerHolder() {
 

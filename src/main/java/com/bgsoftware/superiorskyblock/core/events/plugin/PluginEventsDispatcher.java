@@ -23,7 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
-import java.util.EnumMap;
+import java.util.Map;
 import java.util.List;
 
 public class PluginEventsDispatcher extends EventsDispatcher<
@@ -62,7 +62,7 @@ public class PluginEventsDispatcher extends EventsDispatcher<
     public <Args extends PluginEventArgs> PluginEvent<Args> fireEvent(PluginEventType<Args> type, Args args) {
         PluginEvent<Args> event = type.createEvent(args);
 
-        EnumMap<PluginEventPriority, List<RegisteredListener>> gameEventCallbacks = callbacks.get(type);
+        Map<PluginEventPriority, List<RegisteredListener>> gameEventCallbacks = getRegisteredCallbacks(type);
         if (gameEventCallbacks != null) {
             gameEventCallbacks.forEach((priority, priorityCallbacks) -> {
                 for (RegisteredListener listener : priorityCallbacks) {

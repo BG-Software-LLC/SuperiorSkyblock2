@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -62,7 +63,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
 
         GameSoundImpl.playSound(player, button.pagedObject.getAccessSound());
 
-        button.pagedObject.getAccessCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+        button.pagedObject.getAccessCommands().forEach(command -> CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", clickedPlayer.getName())));
 
         Menus.MENU_ISLAND_PRIVILEGES.refreshViews();
@@ -80,7 +81,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
 
         GameSoundImpl.playSound(player, button.pagedObject.getNoAccessSound());
 
-        button.pagedObject.getNoAccessCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+        button.pagedObject.getNoAccessCommands().forEach(command -> CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", clickedPlayer.getName())));
     }
 

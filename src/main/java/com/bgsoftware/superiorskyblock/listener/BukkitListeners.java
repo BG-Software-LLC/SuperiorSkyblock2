@@ -4,6 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,36 +18,55 @@ public class BukkitListeners {
     private final SuperiorSkyblockPlugin plugin;
 
     private String listenerRegisterFailure = "";
+    private boolean foliaBridgeRegistered;
+    private List<AbstractGameEventListener> foliaGameListeners = Collections.emptyList();
 
     public BukkitListeners(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
     public void registerListeners() {
-        new AdminPlayersListener(this.plugin);
-        new ChunksListener(this.plugin);
-        new EntityTrackingListener(this.plugin);
-        new FeaturesListener(this.plugin);
-        new IslandFlagsListener(this.plugin);
-        new IslandWorldEventsListener(this.plugin);
-        new MenusListener(this.plugin);
-        new PlayersListener(this.plugin);
-        new PortalsListener(this.plugin);
-        new ProtectionListener(this.plugin);
-        new SignsListener(this.plugin);
-        new StackedBlocksListener(this.plugin);
-        new WorldDestructionListener(this.plugin);
+        if (plugin.getTaskScheduler().isFolia()) {
+            List<AbstractGameEventListener> replacements = new ArrayList<>();
+            plugin.getGameEventsDispatcher().replaceCallbacks(this.foliaGameListeners,
+                    () -> replacements.addAll(registerGameListeners()));
+            this.foliaGameListeners = replacements;
+            if (!this.foliaBridgeRegistered) {
+                safeEventsRegister(new BukkitEventsListener(this.plugin));
+                this.foliaBridgeRegistered = true;
+            }
+        } else {
+            registerGameListeners();
+            safeEventsRegister(new BukkitEventsListener(this.plugin));
+        }
+    }
+
+    private List<AbstractGameEventListener> registerGameListeners() {
+        List<AbstractGameEventListener> listeners = new ArrayList<>();
+        listeners.add(new AdminPlayersListener(this.plugin));
+        listeners.add(new ChunksListener(this.plugin));
+        listeners.add(new EntityTrackingListener(this.plugin));
+        listeners.add(new FeaturesListener(this.plugin));
+        listeners.add(new IslandFlagsListener(this.plugin));
+        listeners.add(new IslandWorldEventsListener(this.plugin));
+        listeners.add(new MenusListener(this.plugin));
+        listeners.add(new PlayersListener(this.plugin));
+        listeners.add(new PortalsListener(this.plugin));
+        listeners.add(new ProtectionListener(this.plugin));
+        listeners.add(new SignsListener(this.plugin));
+        listeners.add(new StackedBlocksListener(this.plugin));
+        listeners.add(new WorldDestructionListener(this.plugin));
 
         if (plugin.getSettings().isStopLeaving())
-            new IslandOutsideListener(this.plugin);
+            listeners.add(new IslandOutsideListener(this.plugin));
 
         if (plugin.getSettings().isAutoBlocksTracking())
-            new BlockChangesListener(this.plugin);
+            listeners.add(new BlockChangesListener(this.plugin));
 
         if (!plugin.getSettings().getIslandPreviews().getLocations().isEmpty())
-            new IslandPreviewListener(this.plugin);
+            listeners.add(new IslandPreviewListener(this.plugin));
 
-        safeEventsRegister(new BukkitEventsListener(this.plugin));
+        return listeners;
     }
 
     public void unregisterListeners() {

@@ -55,7 +55,10 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
-import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +79,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private final DatabaseBridge databaseBridge;
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm;
     @Nullable
-    private PersistentDataContainer persistentDataContainer; // Lazy loading
+    private volatile PersistentDataContainer persistentDataContainer; // Lazy loading
     private final LazyReference<PlayerCache> playerCache = new LazyReference<PlayerCache>() {
         @Override
         protected PlayerCache create() {
@@ -86,35 +89,35 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private final PlayerPermissionsStore permissionsStore;
 
     private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
-    private final List<UUID> pendingInvites = new LinkedList<>();
-    private final List<Island> coopIslands = new LinkedList<>();
+    private final List<UUID> pendingInvites = new CopyOnWriteArrayList<>();
+    private final List<Island> coopIslands = new CopyOnWriteArrayList<>();
 
     private final UUID uuid;
 
-    private Island playerIsland = null;
-    private String name;
-    private String textureValue;
-    private WeakReference<PlayerRole> playerRole;
-    private int playerRoleId;
-    private java.util.Locale userLocale;
+    private volatile Island playerIsland = null;
+    private volatile String name;
+    private volatile String textureValue;
+    private volatile WeakReference<PlayerRole> playerRole;
+    private volatile int playerRoleId;
+    private volatile java.util.Locale userLocale;
 
-    private boolean worldBorderEnabled;
-    private boolean blocksStackerEnabled = plugin.getSettings().isDefaultStackedBlocks();
-    private boolean schematicModeEnabled = false;
-    private boolean bypassModeEnabled = false;
-    private boolean toggledPanel;
-    private boolean islandFly;
-    private boolean adminSpyEnabled = false;
-    private ChatState chatState = ChatStates.GLOBAL;
+    private volatile boolean worldBorderEnabled;
+    private volatile boolean blocksStackerEnabled = plugin.getSettings().isDefaultStackedBlocks();
+    private volatile boolean schematicModeEnabled = false;
+    private volatile boolean bypassModeEnabled = false;
+    private volatile boolean toggledPanel;
+    private volatile boolean islandFly;
+    private volatile boolean adminSpyEnabled = false;
+    private volatile ChatState chatState = ChatStates.GLOBAL;
 
-    private SBlockPosition schematicPos1 = null;
-    private SBlockPosition schematicPos2 = null;
-    private int disbands;
-    private BorderColor borderColor;
-    private long lastTimeStatus;
+    private volatile SBlockPosition schematicPos1 = null;
+    private volatile SBlockPosition schematicPos2 = null;
+    private volatile int disbands;
+    private volatile BorderColor borderColor;
+    private volatile long lastTimeStatus;
 
-    private BukkitTask teleportTask = null;
-    private final EnumSet<PlayerStatus> playerStatuses = EnumSet.noneOf(PlayerStatus.class);
+    private volatile BukkitTask teleportTask = null;
+    private final Set<PlayerStatus> playerStatuses = ConcurrentHashMap.newKeySet();
 
     public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -282,8 +285,16 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void runIfOnline(Consumer<Player> toRun) {
         Player player = asPlayer();
-        if (player != null)
-            toRun.accept(player);
+        if (player != null) {
+            if (!BukkitExecutor.isFolia()) {
+                toRun.accept(player);
+                return;
+            }
+            BukkitExecutor.ensureMain(player, () -> {
+                if (asPlayer() == player && player.isOnline())
+                    toRun.accept(player);
+            });
+        }
     }
 
     @Override
@@ -472,15 +483,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         Player player = asPlayer();
-        if (player != null) {
-            playerTeleportAlgorithm.teleportWithResult(player, location).whenCompleteAsync((result, error) -> {
-                if (teleportResult != null) {
-                    teleportResult.accept(error != null ? PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR : result);
-                }
-            }, BukkitExecutor.SYNC_EXECUTOR);
-        } else if (teleportResult != null) {
-            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
-        }
+        Location destination = BukkitExecutor.isFolia() ? location.clone() : location;
+        runTeleport(player, () -> playerTeleportAlgorithm.teleportWithResult(player, destination), teleportResult, false);
     }
 
     @Override
@@ -522,19 +526,57 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void teleportWithResult(Island island, Dimension dimension,
                                    @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         Player player = asPlayer();
-        if (player != null) {
-            setPlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
-            playerTeleportAlgorithm.teleportWithResult(player, island, dimension).whenCompleteAsync((result, error) -> {
-                player.setFallDistance(0f);
-                removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
+        runTeleport(player, () -> playerTeleportAlgorithm.teleportWithResult(player, island, dimension), teleportResult, true);
+    }
 
-                if (teleportResult != null) {
-                    teleportResult.accept(error != null ? PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR : result);
-                }
-            }, BukkitExecutor.SYNC_EXECUTOR);
-        } else if (teleportResult != null) {
-            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
+    private void runTeleport(@Nullable Player player,
+                             Supplier<CompletableFuture<PlayerTeleportAlgorithm.TeleportResult>> teleport,
+                             @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> callback, boolean protectFall) {
+        Runnable retired = () -> {
+            if (protectFall)
+                removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
+            if (callback != null)
+                callback.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
+        };
+        if (player == null) {
+            retired.run();
+            return;
         }
+        Runnable start = () -> {
+            if (BukkitExecutor.isFolia() && (!player.isOnline() || asPlayer() != player)) {
+                retired.run();
+                return;
+            }
+            if (protectFall)
+                setPlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
+            CompletableFuture<PlayerTeleportAlgorithm.TeleportResult> result;
+            try {
+                result = teleport.get();
+            } catch (Throwable error) {
+                result = new CompletableFuture<>();
+                result.completeExceptionally(error);
+            }
+            result.whenComplete((value, error) -> {
+                Runnable finish = () -> {
+                    if (protectFall) {
+                        player.setFallDistance(0f);
+                        removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
+                    }
+                    if (callback != null)
+                        callback.accept(error == null ? value : PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR);
+                };
+                if (!BukkitExecutor.isFolia())
+                    BukkitExecutor.ensureMain(finish);
+                else if (BukkitExecutor.isOwned(player))
+                    finish.run();
+                else
+                    plugin.getTaskScheduler().entity(player, finish, retired, 1L, 0L);
+            });
+        };
+        if (!BukkitExecutor.isFolia() || BukkitExecutor.isOwned(player))
+            start.run();
+        else
+            plugin.getTaskScheduler().entity(player, start, retired, 1L, 0L);
     }
 
     @Override
@@ -719,7 +761,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void updateWorldBorder(@Nullable Island island) {
-        BukkitExecutor.ensureMain(() -> plugin.getNMSWorld().setWorldBorder(this, island));
+        if (BukkitExecutor.isFolia())
+            runIfOnline(player -> plugin.getNMSWorld().setWorldBorder(this, island));
+        else
+            BukkitExecutor.ensureMain(() -> plugin.getNMSWorld().setWorldBorder(this, island));
     }
 
     @Override
@@ -834,10 +879,12 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         if (islandFly && player != null && !player.hasPermission("superior.island.fly")) {
             islandFly = false;
-            if (player.getAllowFlight()) {
-                player.setFlying(false);
-                player.setAllowFlight(false);
-            }
+            runIfOnline(onlinePlayer -> {
+                if (onlinePlayer.getAllowFlight()) {
+                    onlinePlayer.setFlying(false);
+                    onlinePlayer.setAllowFlight(false);
+                }
+            });
         }
 
         return islandFly;
@@ -1075,7 +1122,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public PersistentDataContainer getPersistentDataContainer() {
+    public synchronized PersistentDataContainer getPersistentDataContainer() {
         if (persistentDataContainer == null)
             persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
         return persistentDataContainer;

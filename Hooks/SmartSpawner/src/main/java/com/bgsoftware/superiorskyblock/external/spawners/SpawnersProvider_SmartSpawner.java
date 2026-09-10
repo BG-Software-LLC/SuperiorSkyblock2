@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import github.nighter.smartspawner.api.SmartSpawnerAPI;
 import github.nighter.smartspawner.api.SmartSpawnerProvider;
@@ -122,7 +123,7 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
 
             // SmartSpawner calls SpawnerPlaceEvent before completing the spawner setup.
             // It initializes the CreatureSpawner and creates SpawnerData 2 ticks later.
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            BukkitExecutor.sync(location, () -> {
                 island.handleBlockPlace(location.getBlock(), e.getQuantity());
             }, 3L);
         }

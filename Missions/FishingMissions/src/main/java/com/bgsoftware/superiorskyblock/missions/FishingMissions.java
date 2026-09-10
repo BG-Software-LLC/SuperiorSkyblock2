@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.missions;
 
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
@@ -186,7 +187,7 @@ public final class FishingMissions extends BuiltinMission<KeyDataTracker> implem
 
         blocksTracker.track(itemKey, count);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(player -> {
+        BukkitExecutor.async(() -> superiorPlayer.runIfOnline(player -> {
             if (canComplete(superiorPlayer))
                 this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
         }), 2L);

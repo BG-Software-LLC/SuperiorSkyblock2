@@ -124,7 +124,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             stackedBlock.setBlockKey(blockKey);
             stackedBlock.setAmount(amount);
             // Must be called with delay in order to fix issue #632
-            BukkitExecutor.sync(stackedBlock::updateName, 2L);
+            BukkitExecutor.sync(stackedBlock.getLocation(), stackedBlock::updateName, 2L);
             StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
         } else {
             this.stackedBlocksContainer.removeStackedBlock(location);
@@ -322,7 +322,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
 
     private void updateStackedBlockKeys() {
         this.stackedBlocksContainer.forEach(stackedBlock ->
-                stackedBlock.setBlockKey(Keys.of(stackedBlock.getLocation().getBlock())));
+                BukkitExecutor.ensureMain(stackedBlock.getLocation(), () ->
+                        stackedBlock.setBlockKey(Keys.of(stackedBlock.getLocation().getBlock()))));
     }
 
     private void initializeDatabaseBridge() {

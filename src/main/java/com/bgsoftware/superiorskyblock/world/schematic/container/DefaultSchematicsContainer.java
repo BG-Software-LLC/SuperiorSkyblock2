@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -13,8 +14,8 @@ import java.util.Map;
 
 public class DefaultSchematicsContainer implements SchematicsContainer {
 
-    private final Map<String, Schematic> schematicMap = new LinkedHashMap<>();
-    private final List<SchematicParser> schematicParsers = new LinkedList<>();
+    private volatile Map<String, Schematic> schematicMap = Collections.emptyMap();
+    private volatile List<SchematicParser> schematicParsers = Collections.emptyList();
 
     @Nullable
     @Override
@@ -24,27 +25,44 @@ public class DefaultSchematicsContainer implements SchematicsContainer {
 
     @Override
     public void addSchematic(Schematic schematic) {
-        this.schematicMap.put(schematic.getName().toLowerCase(Locale.ENGLISH), schematic);
+        String schematicName = schematic.getName().toLowerCase(Locale.ENGLISH);
+        synchronized (this) {
+            Map<String, Schematic> schematics = new LinkedHashMap<>(this.schematicMap);
+            schematics.put(schematicName, schematic);
+            this.schematicMap = Collections.unmodifiableMap(schematics);
+        }
     }
 
     @Override
     public Map<String, Schematic> getSchematics() {
-        return Collections.unmodifiableMap(this.schematicMap);
+        return this.schematicMap;
     }
 
     @Override
-    public void addSchematicParser(SchematicParser schematicParser) {
-        this.schematicParsers.add(schematicParser);
+    public synchronized void addSchematicParser(SchematicParser schematicParser) {
+        List<SchematicParser> parsers = new LinkedList<>(this.schematicParsers);
+        parsers.add(schematicParser);
+        this.schematicParsers = Collections.unmodifiableList(parsers);
     }
 
     @Override
     public List<SchematicParser> getSchematicParsers() {
-        return Collections.unmodifiableList(this.schematicParsers);
+        return this.schematicParsers;
     }
 
     @Override
-    public void clearSchematics() {
-        this.schematicMap.clear();
+    public synchronized void clearSchematics() {
+        this.schematicMap = Collections.emptyMap();
+    }
+
+    @Override
+    public void replaceSchematics(Collection<Schematic> schematics) {
+        Map<String, Schematic> newSchematics = new LinkedHashMap<>();
+        for (Schematic schematic : schematics)
+            newSchematics.put(schematic.getName().toLowerCase(Locale.ENGLISH), schematic);
+        synchronized (this) {
+            this.schematicMap = Collections.unmodifiableMap(newSchematics);
+        }
     }
 
 }

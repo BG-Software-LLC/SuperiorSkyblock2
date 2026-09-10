@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface WorldsProvider {
 
@@ -17,6 +18,11 @@ public interface WorldsProvider {
      * Prepare all the island worlds on startup.
      */
     void prepareWorlds();
+
+    default CompletableFuture<Void> prepareWorldsAsync() {
+        prepareWorlds();
+        return CompletableFuture.completedFuture(null);
+    }
 
     /**
      * Get the world of an island by the dimension.

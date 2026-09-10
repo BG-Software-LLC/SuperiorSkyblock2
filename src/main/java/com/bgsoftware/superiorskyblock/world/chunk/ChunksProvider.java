@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.profiler.ProfileType;
 import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChunksProvider {
 
@@ -27,7 +29,9 @@ public class ChunksProvider {
 
     private static final Map<ChunkPosition, PendingChunkLoadRequest> pendingRequests = new ConcurrentHashMap<>();
 
-    private static boolean stopped = false;
+    private static final Set<FoliaChunkLoadRequest> foliaRequests = ConcurrentHashMap.newKeySet();
+
+    private static volatile boolean stopped = false;
 
     private ChunksProvider() {
 
@@ -44,10 +48,34 @@ public class ChunksProvider {
 
     private static CompletableFuture<Chunk> loadChunkInternal(ChunkPosition chunkPosition, ChunkLoadReason chunkLoadReason,
                                                      @Nullable Consumer<Chunk> onLoadConsumer) {
-        if (stopped)
-            return new CompletableFuture<>();
+        if (stopped) {
+            CompletableFuture<Chunk> future = new CompletableFuture<>();
+            future.completeExceptionally(new IllegalStateException("Chunk loading is stopping"));
+            return future;
+        }
 
         Log.debug(Debug.LOAD_CHUNK, chunkPosition, chunkLoadReason);
+
+        if (BukkitExecutor.isFolia()) {
+            Location location = new Location(chunkPosition.getWorld(), chunkPosition.getX() << 4, 0, chunkPosition.getZ() << 4);
+            FoliaChunkLoadRequest request = new FoliaChunkLoadRequest();
+            foliaRequests.add(request);
+            request.future.whenComplete((chunk, error) -> foliaRequests.remove(request));
+            if (stopped) {
+                request.fail(new IllegalStateException("Chunk loading is stopping"));
+                return request.future;
+            }
+            BukkitExecutor.submit(location, () -> plugin.getProviders().getChunksProvider()
+                    .loadChunk(location.getWorld(), location.getBlockX() >> 4, location.getBlockZ() >> 4))
+                    .thenCompose(future -> future).thenCompose(chunk -> BukkitExecutor.submit(location, () -> {
+                        request.complete(chunk, onLoadConsumer);
+                        return null;
+                    })).whenComplete((ignored, error) -> {
+                        if (error != null)
+                            request.fail(error);
+                    });
+            return request.future;
+        }
 
         Chunk loadedChunk = ChunkPosition.getLoadedChunk(chunkPosition).orElse(null);
 
@@ -87,12 +115,15 @@ public class ChunksProvider {
 
     public static void stop() {
         stopped = true;
+        foliaRequests.forEach(request -> request.fail(new IllegalStateException("Chunk loading is stopping")));
         if (chunksExecutor.isRunning())
             chunksExecutor.stop();
     }
 
     public static void start() {
-        chunksExecutor.start(plugin);
+        stopped = false;
+        if (!BukkitExecutor.isFolia())
+            chunksExecutor.start(plugin);
     }
 
     private static class ChunkLoadWorker implements IWorker {
@@ -146,6 +177,29 @@ public class ChunksProvider {
 
         pendingRequest.callbacks.forEach(chunkConsumer -> chunkConsumer.accept(chunk));
         pendingRequest.completableFuture.complete(chunk);
+    }
+
+    private static class FoliaChunkLoadRequest {
+
+        private final CompletableFuture<Chunk> future = new CompletableFuture<>();
+        private final AtomicBoolean started = new AtomicBoolean();
+
+        private void complete(Chunk chunk, Consumer<Chunk> callback) {
+            if (!this.started.compareAndSet(false, true))
+                return;
+            try {
+                if (callback != null)
+                    callback.accept(chunk);
+                this.future.complete(chunk);
+            } catch (Throwable error) {
+                this.future.completeExceptionally(error);
+            }
+        }
+
+        private void fail(Throwable error) {
+            if (this.started.compareAndSet(false, true))
+                this.future.completeExceptionally(error);
+        }
     }
 
     private static class PendingChunkLoadRequest {

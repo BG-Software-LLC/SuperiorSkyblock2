@@ -24,8 +24,16 @@ public class PlantsTrackingComponent {
     }
 
     public PlantsTrackingComponent(World world, TrackedPlantsData trackedPlantsData) {
-        this.worldMinHeight = WORLD_GET_MIN_HEIGHT.isValid() ? WORLD_GET_MIN_HEIGHT.invoke(world) : 0;
+        this(WORLD_GET_MIN_HEIGHT.isValid() ? WORLD_GET_MIN_HEIGHT.invoke(world) : 0, trackedPlantsData);
+    }
+
+    public PlantsTrackingComponent(int worldMinHeight, TrackedPlantsData trackedPlantsData) {
+        this.worldMinHeight = worldMinHeight;
         this.trackedPlantsData = trackedPlantsData;
+    }
+
+    public int getWorldMinHeight() {
+        return this.worldMinHeight;
     }
 
     public void track(int x, int y, int z, UUID placer) {
