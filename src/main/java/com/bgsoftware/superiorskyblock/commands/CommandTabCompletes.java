@@ -47,6 +47,20 @@ public class CommandTabCompletes {
 
     }
 
+    public static Island getIsland(SuperiorSkyblockPlugin plugin, String argument) {
+        Island island = plugin.getGrid().getIsland(argument);
+
+        if (island == null) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(argument);
+
+            if (superiorPlayer != null) {
+                island = superiorPlayer.getIsland();
+            }
+        }
+
+        return island;
+    }
+
     public static List<String> getPlayerIslandsExceptSender(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument, boolean hideVanish) {
         return getPlayerIslandsExceptSender(plugin, sender, argument, hideVanish, (onlinePlayer, onlineIsland) -> true);
     }

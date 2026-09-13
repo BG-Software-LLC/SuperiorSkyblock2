@@ -288,6 +288,16 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public Map<Dimension, Location> getVisitorHomesLocations() {
+        return this.handle.getVisitorHomesLocations();
+    }
+
+    @Override
+    public Map<Dimension, WorldPosition> getVisitorHomesPositions() {
+        return this.handle.getVisitorHomesPositions();
+    }
+
+    @Override
     public void setVisitorsLocation(@Nullable Location visitorsLocation) {
         this.handle.setVisitorsLocation(visitorsLocation);
     }
@@ -1747,6 +1757,11 @@ public class DelegateIsland implements Island {
     @Override
     public void renameWarp(IslandWarp islandWarp, String newName) {
         this.handle.renameWarp(islandWarp, newName);
+    }
+
+    @Override
+    public void relocateWarp(IslandWarp islandWarp, Location newLocation) {
+        this.handle.relocateWarp(islandWarp, newLocation);
     }
 
     @Nullable

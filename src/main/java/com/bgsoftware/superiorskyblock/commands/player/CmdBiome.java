@@ -1,20 +1,21 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.api.enums.DimensionSelectionMode;
+import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.impl.MenuDimensionSelection;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.World;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,10 +35,11 @@ public class CmdBiome implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        if (isMode(DimensionSelectionMode.ARGUMENT) || isMode(DimensionSelectionMode.AUTO))
-            return "biome [" + Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + "]";
-        else
+        if (Menus.MENU_BIOMES.isOnlyDefaultDimension()) {
             return "biome";
+        } else {
+            return "biome [" + Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + "]";
+        }
     }
 
     @Override
@@ -52,7 +54,7 @@ public class CmdBiome implements IPermissibleCommand {
 
     @Override
     public int getMaxArgs() {
-        return (isMode(DimensionSelectionMode.ARGUMENT) || isMode(DimensionSelectionMode.AUTO)) ? 2 : 1;
+        return Menus.MENU_BIOMES.isOnlyDefaultDimension() ? 1 : 2;
     }
 
     @Override
@@ -72,54 +74,53 @@ public class CmdBiome implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        Dimension dimension;
-
-        // There is no need to check if dimension selection mode is ARGUMENT or BOTH,
-        // because if it is not, length will never be 2
-        if (args.length == 2) {
-            dimension = CommandArguments.getDimension(superiorPlayer.asPlayer(), args[1]);
-        } else {
-            World world = superiorPlayer.asPlayer().getWorld();
-
-            if ((isMode(DimensionSelectionMode.LOCATION) || isMode(DimensionSelectionMode.AUTO)) &&
-                    plugin.getProviders().getWorldsProvider().isIslandsWorld(world)) {
-                dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+        if (args.length == 1) {
+            if (Menus.MENU_BIOMES.isOnlyDefaultDimension()) {
+                Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+                openBiomesMenu(plugin, superiorPlayer, island, dimension);
             } else {
-                dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+                plugin.getMenus().openDimensionSelection(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()),
+                        selectedDimension -> openBiomesMenu(plugin, superiorPlayer, island, selectedDimension)
+                );
             }
+        } else {
+            Dimension dimension = CommandArguments.getEnabledDimension(plugin, superiorPlayer.asPlayer(), args[1]);
+            openBiomesMenu(plugin, superiorPlayer, island, dimension);
         }
+    }
 
-        if (dimension == null)
-            return;
-
-        if (!plugin.getProviders().getWorldsProvider().isDimensionEnabled(dimension)) {
-            Message.WORLD_NOT_ENABLED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
-            return;
+    @Override
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        if (args.length == 2 && !Menus.MENU_BIOMES.isOnlyDefaultDimension()) {
+            return CommandTabCompletes.getDimensions(plugin, args[1]);
+        } else {
+            return Collections.emptyList();
         }
+    }
 
+    private void openBiomesMenu(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, Dimension dimension) {
         if (!island.isDimensionEnabled(dimension)) {
             Message.WORLD_NOT_UNLOCKED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
+            closeMenu(superiorPlayer);
             return;
         }
 
         if (!island.wasSchematicGenerated(dimension)) {
             Message.WORLD_NOT_GENERATED.send(superiorPlayer, Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
+            closeMenu(superiorPlayer);
             return;
         }
 
-        plugin.getMenus().openBiomes(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), superiorPlayer.getIsland(), dimension);
+        plugin.getMenus().openBiomes(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), island, dimension);
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if (args.length == 2 && (isMode(DimensionSelectionMode.ARGUMENT) || isMode(DimensionSelectionMode.AUTO)))
-            return CommandTabCompletes.getDimensions(plugin, args[1]);
-        else
-            return Collections.emptyList();
-    }
+    private void closeMenu(SuperiorPlayer superiorPlayer) {
+        MenuView<?, ?> menuView = superiorPlayer.getOpenedView();
 
-    private boolean isMode(DimensionSelectionMode dimensionSelectionMode) {
-        return Menus.MENU_BIOMES.getDimensionSelectionMode() == dimensionSelectionMode;
+        if (menuView != null && menuView.getMenu() instanceof MenuDimensionSelection) {
+            menuView.setPreviousMove(false);
+            BukkitExecutor.sync(menuView::closeView, 1L);
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -16,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 
@@ -30,7 +32,8 @@ public class WarpManageRenameButton extends AbstractMenuViewButton<MenuWarpManag
         Player player = context.getPlayer();
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
-        Message.WARP_RENAME.send(player);
+        String cancelText = Message.WARP_CATEGORY_MANAGE_CANCEL_TEXT.getMessage(superiorPlayer.getUserLocale());
+        Message.WARP_RENAME.send(player, cancelText);
 
         menuView.closeView();
 
@@ -38,15 +41,20 @@ public class WarpManageRenameButton extends AbstractMenuViewButton<MenuWarpManag
             IslandWarp islandWarp = menuView.getIslandWarp();
             Island island = islandWarp.getIsland();
 
-            if (!newName.equalsIgnoreCase("-cancel")) {
-                if (!IslandNames.isValidWarpName(superiorPlayer, island, newName, true))
+            String warpName = Formatters.STRIP_COLOR_FORMATTER.format(newName);
+
+            if (!warpName.equalsIgnoreCase(cancelText)) {
+                if (!IslandNames.isValidWarpName(superiorPlayer, island, warpName)) {
                     return true;
+                }
 
                 PluginEvent<PluginEventArgs.IslandRenameWarp> event = PluginEventsFactory.callIslandRenameWarpEvent(
-                        islandWarp.getIsland(), player, islandWarp, newName);
+                        islandWarp.getIsland(), player, islandWarp, warpName);
 
                 if (!event.isCancelled()) {
                     islandWarp.getIsland().renameWarp(islandWarp, event.getArgs().warpName);
+
+                    WarpsUtils.updateWarpSign(islandWarp);
 
                     Message.WARP_RENAME_SUCCESS.send(player, event.getArgs().warpName);
 

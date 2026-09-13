@@ -10,7 +10,7 @@ public enum ChunkLoadReason {
     FIND_SAFE_SPOT,
     API_REQUEST,
     BIOME_REQUEST,
-    WARP_SIGN_BREAK,
+    EDIT_SIGN,
     SET_BIOME,
     DELETE_CHUNK
 

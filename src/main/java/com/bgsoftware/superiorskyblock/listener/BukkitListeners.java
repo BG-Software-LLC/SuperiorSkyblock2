@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -31,18 +32,25 @@ public class BukkitListeners {
         new PlayersListener(this.plugin);
         new PortalsListener(this.plugin);
         new ProtectionListener(this.plugin);
-        new SignsListener(this.plugin);
         new StackedBlocksListener(this.plugin);
         new WorldDestructionListener(this.plugin);
 
-        if (plugin.getSettings().isStopLeaving())
+        if (plugin.getSettings().isStopLeaving()) {
             new IslandOutsideListener(this.plugin);
+        }
 
-        if (plugin.getSettings().isAutoBlocksTracking())
+        if (plugin.getSettings().isAutoBlocksTracking()) {
             new BlockChangesListener(this.plugin);
+        }
 
-        if (!plugin.getSettings().getIslandPreviews().getLocations().isEmpty())
+        if (!plugin.getSettings().getIslandPreviews().getLocations().isEmpty()) {
             new IslandPreviewListener(this.plugin);
+        }
+
+        if (BuiltinModules.VISIT.getConfiguration().isEnabled() || (BuiltinModules.WARPS.getConfiguration().isEnabled()
+                && BuiltinModules.WARPS.getConfiguration().isSignsEnabled())) {
+            new SignsListener(this.plugin);
+        }
 
         safeEventsRegister(new BukkitEventsListener(this.plugin));
     }

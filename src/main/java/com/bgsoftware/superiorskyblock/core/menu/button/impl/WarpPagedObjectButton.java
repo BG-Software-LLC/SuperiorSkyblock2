@@ -11,12 +11,14 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.MenuActions;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarps;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.inventory.ItemStack;
 
 public class WarpPagedObjectButton extends AbstractPagedMenuButton<MenuWarps.View, IslandWarp> {
@@ -26,27 +28,20 @@ public class WarpPagedObjectButton extends AbstractPagedMenuButton<MenuWarps.Vie
     }
 
     @Override
-    public void onButtonClick(ButtonClickContext<MenuWarps.View> context) {
-        SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(context.getPlayer());
-
-        if (menuView.hasManagePerms() && context.getClickType().isRightClick()) {
-            menuView.setPreviousMove(false);
-            plugin.getMenus().openWarpManage(clickedPlayer, MenuViewWrapper.fromView(menuView), pagedObject);
-        } else {
-            MenuActions.simulateWarpsClick(clickedPlayer, menuView.getWarpCategory().getIsland(), pagedObject);
-            BukkitExecutor.sync(() -> menuView.setPreviousMove(false), 1L);
-        }
-    }
-
-    @Override
     public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
+        if (pagedObject == null) {
+            return TemplateItem.AIR.build();
+        }
+
         SuperiorPlayer superiorPlayer = menuView.getInventoryViewer();
 
         ItemStack icon = pagedObject.getIcon(superiorPlayer);
         ItemBuilder newItemBuilder = icon == null ? itemBuilder : new ItemBuilder(icon);
 
-        if (menuView.hasManagePerms() && !Menus.MENU_WARPS.getEditLore().isEmpty())
+        if (BuiltinModules.WARPS.getConfiguration().isMenusWarpManageEnabled()
+                && menuView.hasManagePerms() && !Menus.MENU_WARPS.getEditLore().isEmpty()) {
             itemBuilder.appendLore(Menus.MENU_WARPS.getEditLore());
+        }
 
         try (ObjectsPools.Wrapper<LazyWorldLocation> wrapper = ObjectsPools.LAZY_LOCATION.obtain()) {
             return newItemBuilder.replaceAll("{0}", pagedObject.getName())
@@ -55,6 +50,20 @@ public class WarpPagedObjectButton extends AbstractPagedMenuButton<MenuWarps.Vie
                             ensureNotNull(Message.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
                             ensureNotNull(Message.ISLAND_WARP_PUBLIC.getMessage(superiorPlayer.getUserLocale())))
                     .build(superiorPlayer);
+        }
+    }
+
+    @Override
+    public void onButtonClick(ButtonClickContext<MenuWarps.View> context) {
+        SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(context.getPlayer());
+
+        if (BuiltinModules.WARPS.getConfiguration().isMenusWarpManageEnabled()
+                && menuView.hasManagePerms() && context.getClickType().isRightClick()) {
+            menuView.setPreviousMove(false);
+            plugin.getMenus().openWarpManage(clickedPlayer, MenuViewWrapper.fromView(menuView), pagedObject);
+        } else {
+            MenuActions.simulateWarpsClick(clickedPlayer, menuView.getWarpCategory().getIsland(), pagedObject);
+            BukkitExecutor.sync(() -> menuView.setPreviousMove(false), 1L);
         }
     }
 

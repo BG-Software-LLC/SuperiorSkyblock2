@@ -7,58 +7,51 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
-import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.ChangeSortingTypeButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.SwitchTopIslandsSortingTypeButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsPagedObjectButton;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.TopIslandsSelfIslandButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.*;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
-import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractSortedIslandsMenu;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuTopIslands.Args, Island> {
 
+    private final boolean visitorWarps;
     private final boolean sortGlowWhenSelected;
     private final String selectedSortingType;
     private final String unselectedSortingType;
 
-    private MenuTopIslands(MenuParseResult<View> parseResult, boolean sortGlowWhenSelected,
+    private MenuTopIslands(MenuParseResult<View> parseResult, boolean visitorWarps, boolean sortGlowWhenSelected,
                            String selectedSortingType, String unselectedSortingType) {
         super(MenuIdentifiers.MENU_TOP_ISLANDS, parseResult, false);
+        this.visitorWarps = visitorWarps;
         this.sortGlowWhenSelected = sortGlowWhenSelected;
         this.selectedSortingType = selectedSortingType;
         this.unselectedSortingType = unselectedSortingType;
     }
 
+    public boolean isVisitorWarps() {
+        return visitorWarps;
+    }
+
     public boolean isSortGlowWhenSelected() {
         return sortGlowWhenSelected;
-    }
-
-    public String getSelectedSortingType() {
-        return selectedSortingType;
-    }
-
-    public String getUnselectedSortingType() {
-        return unselectedSortingType;
     }
 
     @Override
@@ -70,7 +63,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
     @Override
     public CompletableFuture<View> refreshView(View view) {
         CompletableFuture<View> res = new CompletableFuture<>();
-        plugin.getGrid().sortIslands(view.sortingType, () -> super.refreshView(view).whenComplete((v, err) -> {
+        plugin.getGrid().sortIslands(view.getSortingType(), () -> super.refreshView(view).whenComplete((v, err) -> {
             if (err != null) {
                 res.completeExceptionally(err);
             } else {
@@ -81,7 +74,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
     }
 
     public void refreshViews(SortingType sortingType) {
-        refreshViews(view -> view.sortingType.equals(sortingType));
+        refreshViews(view -> view.getSortingType().equals(sortingType));
     }
 
     @Nullable
@@ -96,6 +89,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
+        boolean visitorWarps = cfg.getBoolean("visitor-warps", false);
         boolean sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
         String sort = cfg.getString("sort-islands", null);
         String selectedSortingType = cfg.getString("messages.selected-sorting-type");
@@ -121,7 +115,7 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
                 ConfigurationSection itemSection = cfg.getConfigurationSection("items." + itemSectionName);
 
                 if (sort != null && sort.equals(itemSectionName)) {
-                    SwitchTopIslandsSortingTypeButton.Builder button = new SwitchTopIslandsSortingTypeButton.Builder();
+                    SwitchIslandsSortingTypeButton.Builder<MenuTopIslands.View> button = new SwitchIslandsSortingTypeButton.Builder<>();
 
                     for (String sortSectionName : itemSection.getKeys(false)) {
                         ConfigurationSection sortSection = cfg.getConfigurationSection("items." + itemSectionName + "." + sortSectionName);
@@ -202,43 +196,27 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
         }
 
 
-        return new MenuTopIslands(menuParseResult, sortGlowWhenSelected, selectedSortingType, unselectedSortingType);
+        return new MenuTopIslands(menuParseResult, visitorWarps, sortGlowWhenSelected, selectedSortingType, unselectedSortingType);
     }
 
-    public static class Args implements ViewArgs {
-
-        private final SortingType sortingType;
+    public static class Args extends AbstractSortedIslandsMenu.Args {
 
         public Args(SortingType sortingType) {
-            this.sortingType = sortingType;
+            super(sortingType, Menus.MENU_TOP_ISLANDS.selectedSortingType, Menus.MENU_TOP_ISLANDS.unselectedSortingType);
         }
 
     }
 
-    public static class View extends AbstractPagedMenuView<View, Args, Island> {
-
-        private final Set<SortingType> alreadySorted = new HashSet<>();
-        private SortingType sortingType;
+    public static class View extends AbstractSortedIslandsMenu.View<View, Args> {
 
         View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
              Menu<View, Args> menu, Args args) {
-            super(inventoryViewer, previousMenuView, menu);
-            this.sortingType = args.sortingType;
-        }
-
-        public SortingType getSortingType() {
-            return sortingType;
-        }
-
-        public boolean setSortingType(SortingType sortingType) {
-            this.sortingType = sortingType;
-            this.updatePagedObjects();
-            return this.alreadySorted.add(sortingType);
+            super(inventoryViewer, previousMenuView, menu, args);
         }
 
         @Override
         protected List<Island> requestObjects() {
-            return plugin.getGrid().getIslands(sortingType);
+            return plugin.getGrid().getIslands(getSortingType());
         }
 
     }
@@ -246,8 +224,9 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/top-islands.yml");
 
-        if (!oldFile.exists())
-            return false;
+        if (!oldFile.exists()) {
+            return convertVisitorWarps(plugin, newMenu);
+        }
 
         //We want to reset the items of newMenu.
         ConfigurationSection itemsSection = newMenu.createSection("items");
@@ -326,6 +305,28 @@ public class MenuTopIslands extends AbstractPagedMenu<MenuTopIslands.View, MenuT
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
                 AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
+
+        return true;
+    }
+
+    private static boolean convertVisitorWarps(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+        if (newMenu.isBoolean("visitor-warps")) {
+            return false;
+        }
+
+        File oldFile = new File(plugin.getDataFolder(), "menus/global-warps.yml");
+
+        if (!oldFile.exists()) {
+            return false;
+        }
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(oldFile);
+
+        if (!cfg.isBoolean("visitor-warps")) {
+            return false;
+        }
+
+        newMenu.set("visitor-warps", cfg.getBoolean("visitor-warps"));
 
         return true;
     }

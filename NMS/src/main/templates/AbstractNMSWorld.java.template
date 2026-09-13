@@ -301,7 +301,7 @@ public abstract class AbstractNMSWorld implements NMSWorld {
     }
 
     @Override
-    public void placeSign(Island island, Location location) {
+    public void placeSign(Location location) {
         SignBlockEntity signBlockEntity = NMSUtils.getBlockEntityAt(location, SignBlockEntity.class);
         if (signBlockEntity == null)
             return;
@@ -315,7 +315,7 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
         Component[] newLines;
 
-        IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, strippedLines, false);
+        IslandSigns.Result result = IslandSigns.handleSignPlace(null, location, strippedLines);
         if (result.isCancelEvent()) {
             newLines = CraftSign.sanitizeLines(strippedLines);
         } else {

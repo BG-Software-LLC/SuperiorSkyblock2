@@ -50,11 +50,11 @@ public class MenuWarpIconEdit extends AbstractMenu<AbstractIconProviderMenu.View
         MenuLayout.Builder<AbstractIconProviderMenu.View<IslandWarp>> patternBuilder = menuParseResult.getLayoutBuilder();
 
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-type", menuSlotsMap),
-                new IconEditTypeButton.Builder<>(Message.WARP_ICON_NEW_TYPE));
+                new IconEditTypeButton.Builder<>(Message.WARP_ICON_NEW_TYPE, Message.WARP_MANAGE_CANCEL_TEXT));
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-rename", menuSlotsMap),
-                new IconRenameButton.Builder<>(Message.WARP_ICON_NEW_NAME));
+                new IconRenameButton.Builder<>(Message.WARP_ICON_NEW_NAME, Message.WARP_MANAGE_CANCEL_TEXT));
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-relore", menuSlotsMap),
-                new IconEditLoreButton.Builder<>(Message.WARP_ICON_NEW_LORE));
+                new IconEditLoreButton.Builder<>(Message.WARP_ICON_NEW_LORE, Message.WARP_MANAGE_CANCEL_TEXT));
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-confirm", menuSlotsMap),
                 new WarpIconEditConfirmButton.Builder());
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "icon-slots", menuSlotsMap),

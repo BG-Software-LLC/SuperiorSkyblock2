@@ -63,24 +63,12 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().islandTopOrder;
     }
 
-    public SortingType getGlobalWarpsOrder() {
-        return getContainer().globalWarpsOrder;
-    }
-
     public boolean isCoopMembers() {
         return getContainer().coopMembers;
     }
 
     public boolean isEditPlayerPermissions() {
         return getContainer().editPlayerPermissions;
-    }
-
-    public String getSignWarpLine() {
-        return getContainer().signWarpLine;
-    }
-
-    public List<String> getSignWarp() {
-        return getContainer().signWarp;
     }
 
     public SettingsManager.Interactables getInteractablesMap() {
@@ -223,16 +211,8 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().eventCommands;
     }
 
-    public long getWarpsWarmup() {
-        return getContainer().warpsWarmup;
-    }
-
     public long getHomeWarmup() {
         return getContainer().homeWarmup;
-    }
-
-    public long getVisitWarmup() {
-        return getContainer().visitWarmup;
     }
 
     public boolean isLiquidUpdate() {
@@ -359,24 +339,8 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().messageDelays;
     }
 
-    public boolean isWarpCategories() {
-        return getContainer().warpCategories;
-    }
-
-    public String getDefaultWarpCategoryName() {
-        return getContainer().defaultWarpCategoryName;
-    }
-
     public boolean isPhysicsListener() {
         return getContainer().physicsListener;
-    }
-
-    public double getChargeOnWarp() {
-        return getContainer().chargeOnWarp;
-    }
-
-    public boolean isPublicWarps() {
-        return getContainer().publicWarps;
     }
 
     public boolean isLockedIslands() {
@@ -401,10 +365,6 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public int getBossbarLimit() {
         return getContainer().bossBarLimit;
-    }
-
-    public boolean getDeleteUnsafeWarps() {
-        return getContainer().deleteUnsafeWarps;
     }
 
     public List<RespawnAction> getPlayerRespawn() {

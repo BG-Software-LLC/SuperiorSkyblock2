@@ -113,7 +113,10 @@ public interface SettingsManager {
     /**
      * The default global-warps sorting type.
      * Config path: global-warps-order
+     *
+     * @deprecated Moved to the warps module.
      */
+    @Deprecated
     String getGlobalWarpsOrder();
 
     /**
@@ -137,19 +140,28 @@ public interface SettingsManager {
     /**
      * The line that determines if a sign is created as an island warp.
      * Config path: sign-warp-line
+     *
+     * @deprecated Moved to the warps module.
      */
+    @Deprecated
     String getSignWarpLine();
 
     /**
      * The lines to be set for warp signs.
      * Config path: sign-warp
+     *
+     * @deprecated Moved to the warps module.
      */
+    @Deprecated
     List<String> getSignWarp();
 
     /**
      * All settings related to the visitors-sign.
      * Config path: visitors-sign
+     *
+     * @deprecated Moved to the visit module.
      */
+    @Deprecated
     VisitorsSign getVisitorsSign();
 
     /**
@@ -435,7 +447,10 @@ public interface SettingsManager {
      * Delay before teleporting to an island warp, in milliseconds.
      * If 0, no delay will be.
      * Config-path: warps-warmup
+     *
+     * @deprecated Moved to the warps module.
      */
+    @Deprecated
     long getWarpsWarmup();
 
     /**
@@ -449,7 +464,10 @@ public interface SettingsManager {
      * Delay before teleporting to another island, in milliseconds.
      * If 0, no delay will be.
      * Config-path: visit-warmup
+     *
+     * @deprecated Moved to the visit module.
      */
+    @Deprecated
     long getVisitWarmup();
 
     /**
@@ -678,14 +696,11 @@ public interface SettingsManager {
     /**
      * Whether the warp categories system is enabled or not.
      * Config-path: warp-categories
+     *
+     * @deprecated Moved to the warps module.
      */
+    @Deprecated
     boolean isWarpCategories();
-
-    /**
-     * The name of the default warp category.
-     * Config-path: default-warp-category-name
-     */
-    String getDefaultWarpCategoryName();
 
     /**
      * Whether the plugin should listen for the physics event or not.
@@ -697,13 +712,19 @@ public interface SettingsManager {
      * Amount of money to be charged from players when they use an island warp.
      * If set to 0, no money will be charged.
      * Config-path: charge-on-warp
+     *
+     * @deprecated Moved to the warps module.
      */
+    @Deprecated
     double getChargeOnWarp();
 
     /**
      * Whether island warps should be public by default or not.
      * Config-path: public-warps
+     *
+     * @deprecated Moved to the warps module.
      */
+    @Deprecated
     boolean isPublicWarps();
 
     /**
@@ -746,7 +767,10 @@ public interface SettingsManager {
     /**
      * Whether to delete unsafe warps when players try to teleport to them automatically.
      * Config-path: delete-unsafe-warps
+     *
+     * @deprecated Moved to the warps module.
      */
+    @Deprecated
     boolean getDeleteUnsafeWarps();
 
     /**
@@ -1068,31 +1092,46 @@ public interface SettingsManager {
         /**
          * Whether a visitors sign is required for others to visit islands.
          * Config-path: visitors-sign.required-for-visit
+         *
+         * @deprecated Moved to the visit module.
          */
+        @Deprecated
         boolean isRequiredForVisit();
 
         /**
          * The line that determines if the sign is used as a visitors home location.
          * Config-path: visitors-sign.line
+         *
+         * @deprecated Moved to the visit module.
          */
+        @Deprecated
         String getLine();
 
         /**
          * The line that is displayed when the visitors sign is active.
          * Config-path: visitors-sign.active
+         *
+         * @deprecated Moved to the visit module.
          */
+        @Deprecated
         String getActive();
 
         /**
          * The line that is displayed when the visitors sign is inactive.
          * Config-path: visitors-sign.inactive
+         *
+         * @deprecated Moved to the visit module.
          */
+        @Deprecated
         String getInactive();
 
         /**
          * The format in which the island description lines will be saved.
          * Config-path: visitors-sign.description-line-format
+         *
+         * @deprecated Moved to the visit module.
          */
+        @Deprecated
         String getDescriptionLineFormat();
 
     }

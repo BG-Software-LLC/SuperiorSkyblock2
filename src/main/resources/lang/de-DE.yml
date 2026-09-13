@@ -203,6 +203,7 @@ COMMAND_ARGUMENT_UPGRADE_NAME: Upgrade-Name
 COMMAND_ARGUMENT_VALUE: Wert
 COMMAND_ARGUMENT_WARP_NAME: Warp-Name
 COMMAND_ARGUMENT_WARP_CATEGORY: Warp-Kategorie
+COMMAND_ARGUMENT_WARP_PRIVATE: 'private'
 COMMAND_ARGUMENT_WORLD: Welt
 COMMAND_COOLDOWN_FORMAT: '&c&lError | &7Du darfst den Befehl nur in {0} verwenden.'
 COMMAND_DESCRIPTION_ACCEPT: Eine Einladung von einem Spieler annehmen.
@@ -405,8 +406,6 @@ DEBUG_MODE_ENABLED: '&e&lDebug | &7Debug-Modus &aON&7 umgeschaltet.'
 DEBUG_MODE_FILTER_ADD: '&e&lDebug | &7Toggled debug filter {0} &aON&7.'
 DEBUG_MODE_FILTER_CLEAR: '&e&lDebug | &7Toggled all debug filters &cOFF&7.'
 DEBUG_MODE_FILTER_REMOVE: '&e&lDebug | &7Toggled debug filter {0} &cOFF&7.'
-DELETE_WARP: '&e&lInsel | &7Du hast den Warp {0} gelöscht.'
-DELETE_WARP_SIGN_BROKE: '&7&oEs gab ein Zeichen für diesen Warp, er ist gebrochen...'
 DEMOTE_LEADER: '&c&lError | &7Du kannst keine Inselanführer degradieren.'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lFehler | &7Du kannst nur Spieler mit einer niedrigeren
   Inselrolle als deiner degradieren.'
@@ -534,9 +533,6 @@ INVALID_TOGGLE_MODE: '&c&lFehler | &7Kann {0} nicht umschalten.'
 INVALID_UPGRADE: |-
   &c&lFehler | &7Ein Upgrade namens {0} konnte nicht gefunden werden.
   &c&lFehler | &7Upgrades: {1}
-INVALID_VISIT_LOCATION: '&c&lFehler | &7Diese Insel hat keinen Besucherstandort.'
-INVALID_VISIT_LOCATION_BYPASS: '&7&oDu hast den Bypass-Modus, der dich auf die Insel
-  teleportiert...'
 INVALID_WARP: '&c&lError | &7Ungültiger Warp {0}.'
 INVALID_WORLD: '&c&lError | &7Ungültige Welt {0}.'
 INVITE_ANNOUNCEMENT: '&e&lInsel | &7{0} hat {1} auf die Insel eingeladen.'
@@ -892,8 +888,6 @@ SET_UPGRADE_LEVEL: '&e&lUpgrades | &7Die Ebene von {0} für die Insel von {1} wu
 SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lUpgrades | &7Die Ebene von {0} für {1} wurde erfolgreich
   aktualisiert.'
-SET_WARP: '&e&lInsel | &7Erzeugt erfolgreich einen neuen Warp am {0}.'
-SET_WARP_OUTSIDE: '&c&lError | &7Du kannst keine Warps außerhalb Ihrer Insel setzen.'
 SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
 SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
 SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
@@ -930,9 +924,6 @@ TITLE_SENT: '&e&lIsland | &7Der Titel wurde erfolgreich an {0} gesendet!'
 TELEPORTED_FAILED: '&e&lIsland | &7Anscheinend hat diese Insel keine sicheren Blöcke.
   Bitte wenden dich an einen Supporter.'
 TELEPORTED_SUCCESS: '&e&lIsland | &7Du wurdest auf deine Insel teleportiert.'
-TELEPORTED_TO_WARP: '&e&lInsel | &7Erfolgreich zu diesem Inselwarp teleportiert.'
-TELEPORTED_TO_WARP_ANNOUNCEMENT: '&e&lInsel | &7Der Spieler {0} hat sich zum Inselwarp
-  {1} teleportiert.'
 TOGGLED_BYPASS_OFF: '&e&lBypass | &7Umgehungsmodus &cOFF&7 umgeschaltet.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Umgehungsmodus &aON&7 umgeschaltet.'
 TOGGLED_FLY_OFF: '&e&lFly | &7Inselflug umgeschaltet &cOFF&7.'
@@ -973,55 +964,81 @@ UNIGNORED_ISLAND_NAME: '&e&lInsel | &7Die Insel {0} wird jetzt von den Top-Insel
 UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for all islands!'
 UNLOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now unlocked for the island {1}!'
 UNLOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now unlocked for {1}''s island!'
-UNSAFE_WARP: '&e&lInsel | &7&oAnscheinend ist dieser Warp unsicher. Bitte versuche
-  es mit einem anderen Warp.'
 UPDATED_PERMISSION: '&e&lInsel | &7Aktualisierte Berechtigungen für {0}.'
 UPDATED_SETTINGS: '&e&lInsel | &7Die Inseleinstellungen {0} aktualisiert.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7Du kannst erst in {0} erneut ein Upgrade durchführen.'
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lError | &7Du kannst diesen Befehl nicht auf anderen Inseln
   verwenden.'
+VISITOR_HOME_REMOVE: '&e&lIsland | &7Successfully removed your visitor home in the {0} dimension.'
+VISITOR_HOME_SET: '&e&lIsland | &7Successfully created a new visitor home in the {0} dimension.'
+VISITOR_HOME_SET_PREVIOUS_REMOVED: '&7&oYou already had a visitor home in that dimension, it was removed...'
+VISITOR_HOME_SET_OUTSIDE_DEFAULT_DIMENSION: '&c&lError | &7You cannot create a visitor home outside the default dimension.'
+VISITOR_HOME_SIGN_DEACTIVATED: '&7&oThe sign linked to this visitor home has been deactivated...'
+VISITOR_HOME_SIGN_EDIT: '&c&lError | &7You cannot edit this sign because it is linked to the visitor home.'
+VISITOR_HOME_TELEPORT_ANNOUNCEMENT: '&e&lIsland | &7The player {0} teleported to your visitor home in the {1} dimension.'
+VISITOR_HOME_TELEPORT_NOT_SET: '&c&lFehler | &7Diese Insel hat keinen Besucherstandort.'
+VISITOR_HOME_TELEPORT_NOT_SET_BYPASS: '&7&oDu hast den Bypass-Modus, der dich auf die Insel teleportiert...'
+VISITOR_HOME_TELEPORT_SUCCESS: '&e&lIsland | &7Successfully teleported to the visitor home of {0}''s island in the {1} dimension.'
+VISITOR_HOME_TELEPORT_SUCCESS_NAME: '&e&lIsland | &7Successfully teleported to the visitor home of the island {0} in the {1} dimension.'
+VISITOR_HOME_TELEPORT_UNSAFE: '&c&lError | &7You cannot teleport to that visitor home because the location is unsafe.'
+VISITOR_HOME_TELEPORT_UNSAFE_BYPASS: '&7&oYou have bypass mode, teleporting you to that visitor home anyway...'
 WARP_ALREADY_EXIST: '&c&lError | &7Es existiert bereits ein Warp mit diesem Namen.'
 WARP_CATEGORY_ALREADY_EXIST: '&c&lError | &7There is already a warp category with this name.'
 WARP_CATEGORY_ICON_NEW_LORE: |-
-  &e&lWarps | &7Gebe eine neue Beschreibung ein (Gebe "-cancel" ein, um abzubrechen):
+  &e&lWarps | &7Gebe eine neue Beschreibung ein (Gebe "{0}" ein, um abzubrechen):
   &e&lWarps | &7Du kannst Zeilen mit "\n" trennen.
-WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Gebe einen Namen ein (gebe "-cancel" ein,
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Gebe einen Namen ein (gebe "{0}" ein,
   um abzubrechen):'
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Gebe  eine neue Materialart ein (Gebe
-  "-cancel" ein, um abzubrechen):'
+  "{0}" ein, um abzubrechen):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Das Symbol der Kategorie wurde erfolgreich
   aktualisiert.'
-WARP_CATEGORY_INVALID_NAME: '&c&lError | &7Warp category names cannot be empty and must be one word.'
-WARP_CATEGORY_NAME_TOO_LONG: '&c&lError | &7Warp category names cannot be longer than 255 chars.'
-WARP_CATEGORY_SLOT: '&e&lWarps | &7Gebe einen neuen Slot ein (Gebe "-cancel" ein,
+WARP_CATEGORY_MANAGE_CANCEL_TEXT: '-cancel'
+WARP_CATEGORY_NAME_BLACKLISTED: '&c&lError | &7That warp category name is blacklisted.'
+WARP_CATEGORY_NAME_INVALID: '&c&lError | &7Warp category names cannot be empty and must be one word.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lError | &7Warp category names cannot be longer than {0} chars.'
+WARP_CATEGORY_NAME_TOO_SHORT: '&c&lError | &7Warp category names cannot be shorter than {0} chars.'
+WARP_CATEGORY_SLOT: '&e&lWarps | &7Gebe einen neuen Slot ein (Gebe "{0}" ein,
   um abzubrechen):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lFehler | &7Dieser Slot ist bereits von einer
   anderen Kategorie belegt.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Der Slot der Kategorie wurde erfolgreich
   in {0} geändert.'
 WARP_CATEGORY_RENAME: '&e&lWarps | &7Gebe einen neuen Namen ein (gebe zum Abbrechen
-  "-cancel" ein):'
+  "{0}" ein):'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Die Kategorie wurde erfolgreich in {0}
   umbenannt.'
+WARP_DELETE: '&e&lInsel | &7Du hast den Warp {0} gelöscht.'
 WARP_ICON_NEW_LORE: |-
-  &e&lWarps | &7Gebe eine neue Beschreibung ein (Gebe "-cancel" ein, um abzubrechen):
+  &e&lWarps | &7Gebe eine neue Beschreibung ein (Gebe "{0}" ein, um abzubrechen):
   &e&lWarps | &7Du kannst Zeilen mit "\n" trennen.
-WARP_ICON_NEW_NAME: '&e&lWarps | &7Gebe einen Namen ein (gebe "-cancel" ein, um abzubrechen):'
-WARP_ICON_NEW_TYPE: '&e&lWarps | &7Gebe eine neue Materialart ein (Gebe "-cancel"
+WARP_ICON_NEW_NAME: '&e&lWarps | &7Gebe einen Namen ein (gebe "{0}" ein, um abzubrechen):'
+WARP_ICON_NEW_TYPE: '&e&lWarps | &7Gebe eine neue Materialart ein (Gebe "{0}"
   ein, um abzubrechen):'
 WARP_ICON_UPDATED: '&e&lWarps | &7Das Warp-Icon wurde erfolgreich aktualisiert.'
-WARP_INVALID_NAME: '&c&lError | &7Warp names cannot be empty and must be one word.'
 WARP_LOCATION_UPDATE: '&e&lWarps | &7Der Standort des Warps wurde erfolgreich auf
   deinen Standort aktualisiert.'
-WARP_NAME_TOO_LONG: '&c&lError | &7Warp names cannot be longer than 255 chars.'
+WARP_MANAGE_CANCEL_TEXT: '-cancel'
+WARP_NAME_BLACKLISTED: '&c&lError | &7That warp name is blacklisted.'
+WARP_NAME_INVALID: '&c&lError | &7Warp names cannot be empty and must be one word.'
+WARP_NAME_TOO_LONG: '&c&lError | &7Warp names cannot be longer than {0} chars.'
+WARP_NAME_TOO_SHORT: '&c&lError | &7Warp names cannot be shorter than {0} chars.'
 WARP_PUBLIC_UPDATE: '&e&lWarps | &7Der Warp wurde erfolgreich für die Öffentlichkeit
   geöffnet.'
 WARP_PRIVATE_UPDATE: '&e&lWarps | &7Der Warp wurde erfolgreich für die Öffentlichkeit
   geschlossen.'
-WARP_RENAME: '&e&lWarps | &7Gebe einen neuen Namen ein (gebe zum Abbrechen "-cancel"
+WARP_RENAME: '&e&lWarps | &7Gebe einen neuen Namen ein (gebe zum Abbrechen "{0}"
   ein):'
 WARP_RENAME_SUCCESS: '&e&lWarps | &7Der Warp wurde erfolgreich in {0} umbenannt.'
+WARP_SET: '&e&lInsel | &7Erzeugt erfolgreich einen neuen Warp am {0}.'
+WARP_SET_OUTSIDE_ISLAND: '&c&lError | &7Du kannst keine Warps außerhalb Ihrer Insel setzen.'
+WARP_SIGN_DEACTIVATED: '&7&oThe sign linked to this warp has been deactivated...'
+WARP_SIGN_EDIT: '&c&lError | &7You cannot edit this sign because it is linked to the warp.'
+WARP_TELEPORT_ANNOUNCEMENT: '&e&lInsel | &7Der Spieler {0} hat sich zum Inselwarp {1} teleportiert.'
+WARP_TELEPORT_SUCCESS: '&e&lInsel | &7Erfolgreich zu diesem Inselwarp teleportiert.'
+WARP_TELEPORT_SUCCESS_NAME: '&e&lInsel | &7Erfolgreich zu diesem Inselwarp teleportiert.'
+WARP_TELEPORT_UNSAFE: '&e&lInsel | &7&oAnscheinend ist dieser Warp unsicher. Bitte versuche es mit einem anderen Warp.'
 WITHDRAW_ALL_MONEY: |-
   &e&lBank | &7Insel Bank hat nur {0} Dollar drin.
   &e&lBank | &7&oAlles Geld abheben..."

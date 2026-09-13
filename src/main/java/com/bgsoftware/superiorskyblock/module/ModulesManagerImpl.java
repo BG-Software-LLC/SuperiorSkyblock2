@@ -46,10 +46,12 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             //noinspection ResultOfMethodCallIgnored
             modulesFolder.mkdirs();
 
+        registerModule(BuiltinModules.BANK);
         registerModule(BuiltinModules.GENERATORS);
         registerModule(BuiltinModules.MISSIONS);
-        registerModule(BuiltinModules.BANK);
         registerModule(BuiltinModules.UPGRADES);
+        registerModule(BuiltinModules.VISIT);
+        registerModule(BuiltinModules.WARPS);
         registerExternalModules();
     }
 

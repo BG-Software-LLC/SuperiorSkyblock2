@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -103,11 +104,13 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
         @Override
         protected List<WarpCategory> requestObjects() {
             DynamicArray<WarpCategory> warpCategories = new DynamicArray<>();
-            island.getWarpCategories().values().forEach(warpCategory -> warpCategory.getWarps()
-                    .stream()
-                    .filter(islandWarp -> island.isMember(getInventoryViewer()) || !islandWarp.hasPrivateFlag())
-                    .findAny()
-                    .ifPresent(unused -> warpCategories.set(warpCategory.getSlot(), warpCategory)));
+
+            island.getWarpCategories().values().forEach(warpCategory -> {
+                if (WarpsUtils.hasAvailableWarps(warpCategory, inventoryViewer)) {
+                    warpCategories.set(warpCategory.getSlot(), warpCategory);
+                }
+            });
+
             return warpCategories.toList();
         }
 

@@ -27,7 +27,6 @@ public class PlayerCommandsMap extends CommandsMap {
         }
         registerCommand(new CmdCounts());
         registerCommand(new CmdCreate());
-        registerCommand(new CmdDelWarp());
         registerCommand(new CmdDemote());
         registerCommand(new CmdDisband());
         registerCommand(new CmdExpel());
@@ -53,7 +52,6 @@ public class PlayerCommandsMap extends CommandsMap {
         registerCommand(new CmdSetRole());
         registerCommand(new CmdSetTeleport());
         registerCommand(new CmdSettings());
-        registerCommand(new CmdSetWarp());
         registerCommand(new CmdShow());
         registerCommand(new CmdTeam());
         registerCommand(new CmdTeamChat());
@@ -65,10 +63,7 @@ public class PlayerCommandsMap extends CommandsMap {
             registerCommand(new CmdUncoop());
         registerCommand(new CmdValue());
         registerCommand(new CmdValues());
-        registerCommand(new CmdVisit());
         registerCommand(new CmdVisitors());
-        registerCommand(new CmdWarp());
-        registerCommand(new CmdWarps());
     }
 
 }

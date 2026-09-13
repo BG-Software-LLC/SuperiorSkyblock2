@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.warp.WarpIcons;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -114,10 +115,7 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
 
         @Override
         protected List<IslandWarp> requestObjects() {
-            boolean isMember = warpCategory.getIsland().isMember(getInventoryViewer());
-            return new SequentialListBuilder<IslandWarp>()
-                    .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
-                    .build(warpCategory.getWarps());
+            return WarpsUtils.getAvailableWarps(warpCategory, inventoryViewer);
         }
 
         public WarpCategory getWarpCategory() {

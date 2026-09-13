@@ -3,100 +3,144 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
-import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
-import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
+import com.bgsoftware.superiorskyblock.core.menu.Menus;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.SwitchIslandsSortingTypeButton;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.GlobalWarpsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
-import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
-import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
-import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
+import com.bgsoftware.superiorskyblock.core.menu.view.AbstractSortedIslandsMenu;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
-public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, EmptyViewArgs, Island> {
+public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, MenuGlobalWarps.Args, Island> {
 
-    private final boolean visitorWarps;
+    private final String selectedSortingType;
+    private final String unselectedSortingType;
 
-    private MenuGlobalWarps(MenuParseResult<View> parseResult, boolean visitorWarps) {
+    private MenuGlobalWarps(MenuParseResult<View> parseResult, String selectedSortingType, String unselectedSortingType) {
         super(MenuIdentifiers.MENU_GLOBAL_WARPS, parseResult, false);
-        this.visitorWarps = visitorWarps;
-    }
-
-    public boolean isVisitorWarps() {
-        return visitorWarps;
+        this.selectedSortingType = selectedSortingType;
+        this.unselectedSortingType = unselectedSortingType;
     }
 
     @Override
-    protected View createViewInternal(SuperiorPlayer superiorPlayer, EmptyViewArgs unused,
+    protected View createViewInternal(SuperiorPlayer superiorPlayer, Args args,
                                       @Nullable MenuView<?, ?> previousMenuView) {
-        return new View(superiorPlayer, previousMenuView, this);
+        return new View(superiorPlayer, previousMenuView, this, args);
+    }
+
+    @Override
+    public CompletableFuture<MenuGlobalWarps.View> refreshView(MenuGlobalWarps.View view) {
+        CompletableFuture<MenuGlobalWarps.View> res = new CompletableFuture<>();
+        plugin.getGrid().sortIslands(view.getSortingType(), () ->
+                super.refreshView(view).whenComplete((v, err) -> {
+                    if (err != null) {
+                        res.completeExceptionally(err);
+                    } else {
+                        res.complete(v);
+                    }
+                }));
+        return res;
+    }
+
+    public void refreshViews(SortingType sortingType) {
+        refreshViews(view -> view.getSortingType().equals(sortingType));
     }
 
     @Nullable
     public static MenuGlobalWarps createInstance() {
-        MenuParseResult<View> menuParseResult = MenuParserImpl.getInstance().loadMenu("global-warps.yml",
+        MenuParseResult<MenuGlobalWarps.View> menuParseResult = MenuParserImpl.getInstance().loadMenu("global-warps.yml",
                 MenuGlobalWarps::convertOldGUI, new GlobalWarpsPagedObjectButton.Builder());
 
-        if (menuParseResult == null)
+        if (menuParseResult == null) {
             return null;
+        }
 
         MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        PagedMenuLayout.Builder<View, Island> patternBuilder = (PagedMenuLayout.Builder<View, Island>) menuParseResult.getLayoutBuilder();
+        MenuLayout.Builder<MenuGlobalWarps.View> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        boolean visitorWarps = cfg.getBoolean("visitor-warps", false);
+        String sort = cfg.getString("sort-islands", null);
+        String selectedSortingType = cfg.getString("messages.selected-sorting-type");
+        String unselectedSortingType = cfg.getString("messages.unselected-sorting-type");
 
-        List<Integer> slots = new LinkedList<>();
+        if (sort != null && cfg.isConfigurationSection("items")) {
+            for (String itemSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
+                ConfigurationSection itemSection = cfg.getConfigurationSection("items." + itemSectionName);
 
-        if (cfg.isString("warps"))
-            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warps", menuSlotsMap));
-        if (cfg.isString("slots"))
-            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "slots", menuSlotsMap));
-        if (slots.isEmpty())
-            slots.add(-1);
+                if (sort.equals(itemSectionName)) {
+                    SwitchIslandsSortingTypeButton.Builder<MenuGlobalWarps.View> button = new SwitchIslandsSortingTypeButton.Builder<>();
 
-        patternBuilder.setPagedObjectSlots(slots, new GlobalWarpsPagedObjectButton.Builder());
+                    for (String sortSectionName : itemSection.getKeys(false)) {
+                        ConfigurationSection sortSection = cfg.getConfigurationSection("items." + itemSectionName + "." + sortSectionName);
 
-        return new MenuGlobalWarps(menuParseResult, visitorWarps);
+                        SortingType sortingType = SortingType.getByName(sortSectionName);
+
+                        if (sortingType == null) {
+                            Log.warnFromFile("global-warps.yml", "The sorting type is invalid for the item ", itemSectionName);
+                            continue;
+                        }
+
+                        String displayName = sortSection.getString("display-name", sortingType.getName());
+
+                        button.addItem(sortingType, displayName, MenuParserUtils.getItemStack("menus/global-warps.yml", sortSection));
+                    }
+
+                    patternBuilder.mapButtons(menuSlotsMap.getSlots(itemSectionName), button);
+                }
+            }
+        }
+
+        return new MenuGlobalWarps(menuParseResult, selectedSortingType, unselectedSortingType);
     }
 
-    public class View extends AbstractPagedMenuView<MenuGlobalWarps.View, EmptyViewArgs, Island> {
+    public static class Args extends AbstractSortedIslandsMenu.Args {
+
+        public Args(SortingType sortingType) {
+            super(sortingType, Menus.MENU_GLOBAL_WARPS.selectedSortingType, Menus.MENU_GLOBAL_WARPS.unselectedSortingType);
+        }
+
+    }
+
+    public static class View extends AbstractSortedIslandsMenu.View<View, Args> {
 
         View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
-             Menu<View, EmptyViewArgs> menu) {
-            super(inventoryViewer, previousMenuView, menu);
+             Menu<View, Args> menu, Args args) {
+            super(inventoryViewer, previousMenuView, menu, args);
         }
 
         @Override
         protected List<Island> requestObjects() {
             return new SequentialListBuilder<Island>()
-                    .sorted(SortingTypes.getGlobalWarpsSorting().getComparator())
                     .filter(ISLANDS_FILTER)
-                    .build(plugin.getGrid().getIslands());
+                    .build(plugin.getGrid().getIslands(getSortingType()));
         }
 
         private final Predicate<Island> ISLANDS_FILTER = island -> {
-            if (visitorWarps)
-                return island.getVisitorsPosition(null /* unused */) != null;
-            else if (island.equals(getInventoryViewer().getIsland()))
+            if (island.equals(getInventoryViewer().getIsland())) {
                 return !island.getIslandWarps().isEmpty();
-            else
+            } else {
                 return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
+            }
         };
 
     }
@@ -104,8 +148,9 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
-        if (!oldFile.exists())
-            return false;
+        if (!oldFile.exists()) {
+            return convertWarpsToSlots(newMenu);
+        }
 
         //We want to reset the items of newMenu.
         ConfigurationSection itemsSection = newMenu.createSection("items");
@@ -146,6 +191,16 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
                 AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
+    }
+
+    private static boolean convertWarpsToSlots(YamlConfiguration newMenu) {
+        if (newMenu.isString("warps")) {
+            newMenu.set("slots", newMenu.getString("warps"));
+            newMenu.set("warps", null);
+            return true;
+        }
+
+        return false;
     }
 
 }

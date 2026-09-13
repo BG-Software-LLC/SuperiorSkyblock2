@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -165,7 +166,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public String getGlobalWarpsOrder() {
-        return this.global.getGlobalWarpsOrder().getName();
+        return BuiltinModules.WARPS.getConfiguration().getMenusGlobalWarpsOrder();
     }
 
     @Override
@@ -184,16 +185,19 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public String getSignWarpLine() {
-        return this.global.getSignWarpLine();
+        return BuiltinModules.WARPS.getConfiguration().getSignsCreateLine();
     }
 
     @Override
+    @Deprecated
     public List<String> getSignWarp() {
-        return this.global.getSignWarp();
+        return BuiltinModules.WARPS.getConfiguration().getSignsActiveLines();
     }
 
     @Override
+    @Deprecated
     public VisitorsSign getVisitorsSign() {
         return this.visitorsSign;
     }
@@ -425,8 +429,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public long getWarpsWarmup() {
-        return this.global.getWarpsWarmup();
+        return BuiltinModules.WARPS.getConfiguration().getTeleportWarmup();
     }
 
     @Override
@@ -435,8 +440,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public long getVisitWarmup() {
-        return this.global.getVisitWarmup();
+        return BuiltinModules.VISIT.getConfiguration().getTeleportWarmup();
     }
 
     @Override
@@ -617,13 +623,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public boolean isWarpCategories() {
-        return this.global.isWarpCategories();
-    }
-
-    @Override
-    public String getDefaultWarpCategoryName() {
-        return this.global.getDefaultWarpCategoryName();
+        return BuiltinModules.WARPS.getConfiguration().isCategoriesEnabled();
     }
 
     @Override
@@ -633,12 +635,12 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public double getChargeOnWarp() {
-        return this.global.getChargeOnWarp();
+        return BuiltinModules.WARPS.getConfiguration().getChargeOnTeleport();
     }
 
     @Override
     public boolean isPublicWarps() {
-        return this.global.isPublicWarps();
+        return !BuiltinModules.WARPS.getConfiguration().isPrivateByDefault();
     }
 
     @Override
@@ -673,7 +675,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     @Override
     public boolean getDeleteUnsafeWarps() {
-        return this.global.getDeleteUnsafeWarps();
+        return BuiltinModules.WARPS.getConfiguration().isDeleteUnsafe();
     }
 
     @Override

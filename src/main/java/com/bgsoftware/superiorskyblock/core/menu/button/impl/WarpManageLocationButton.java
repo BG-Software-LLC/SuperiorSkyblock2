@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -18,9 +17,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.warp.SignWarp;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -41,28 +38,27 @@ public class WarpManageLocationButton extends AbstractMenuViewButton<MenuWarpMan
             Location playerLocation = player.getLocation(wrapper.getHandle());
 
             if (!islandWarp.getIsland().isInsideRange(playerLocation)) {
-                Message.SET_WARP_OUTSIDE.send(player);
+                Message.WARP_SET_OUTSIDE_ISLAND.send(player);
                 return;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeWarpLocation> event = PluginEventsFactory.callIslandChangeWarpLocationEvent(
                     islandWarp.getIsland(), player, islandWarp, playerLocation);
 
-            if (event.isCancelled())
+            if (event.isCancelled()) {
                 return;
-
-            Message.WARP_LOCATION_UPDATE.send(player);
+            }
 
             WorldPosition warpPosition = islandWarp.getPosition();
             WorldInfo warpWorld = plugin.getGrid().getIslandsWorldInfo(islandWarp.getIsland(), islandWarp.getPositionDimension());
 
             if (!isSameLocation(event.getArgs().location, warpWorld, warpPosition)) {
-                ChunksProvider.loadChunk(ChunkPosition.of(warpWorld, warpPosition), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
-                    SignWarp.trySignWarpBreak(islandWarp, player);
-                });
+                WarpsUtils.deactivateWarpSign(islandWarp, player);
             }
 
-            islandWarp.setLocation(event.getArgs().location);
+            islandWarp.getIsland().relocateWarp(islandWarp, event.getArgs().location);
+
+            Message.WARP_LOCATION_UPDATE.send(player);
 
             GameSoundImpl.playSound(player, Menus.MENU_WARP_MANAGE.getSuccessUpdateSound());
         }

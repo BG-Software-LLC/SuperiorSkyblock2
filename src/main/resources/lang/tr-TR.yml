@@ -196,6 +196,7 @@ COMMAND_ARGUMENT_UPGRADE_NAME: yükseltme-adı
 COMMAND_ARGUMENT_VALUE: değer
 COMMAND_ARGUMENT_WARP_NAME: ışınlanma-adı
 COMMAND_ARGUMENT_WARP_CATEGORY: ışınlanma-kategorisi
+COMMAND_ARGUMENT_WARP_PRIVATE: 'private'
 COMMAND_ARGUMENT_WORLD: dünya
 COMMAND_COOLDOWN_FORMAT: '&c&lHata | &7Komutu sadece {0} içinde kullanabilirsin.'
 COMMAND_DESCRIPTION_ACCEPT: Bir oyuncudan gelen daveti kabul et.
@@ -390,8 +391,6 @@ DEBUG_MODE_ENABLED: '&e&lHata Ayıklama | &7Hata ayıklama modu &aAÇIK&7.'
 DEBUG_MODE_FILTER_ADD: '&e&lHata Ayıklama | &7Hata ayıklama filtresi {0} &aAÇIK&7.'
 DEBUG_MODE_FILTER_CLEAR: '&e&lHata Ayıklama | &7Tüm hata ayıklama filtreleri &cKAPALI&7.'
 DEBUG_MODE_FILTER_REMOVE: '&e&lHata Ayıklama | &7Hata ayıklama filtresi {0} &cKAPALI&7.'
-DELETE_WARP: '&e&lAda | &7{0} ışınlanmasını sildin.'
-DELETE_WARP_SIGN_BROKE: '&7&oO ışınlanma için bir tabela vardı, kırıldı...'
 DEMOTE_LEADER: '&c&lHata | &7Ada liderlerini rütbe düşüremezsin.'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lHata | &7Sadece senden daha düşük ada rolüne
   sahip oyuncuları rütbe düşürebilirsin.'
@@ -508,8 +507,6 @@ INVALID_TOGGLE_MODE: '&c&lHata | &7{0} açılamaz/kapatılamaz.'
 INVALID_UPGRADE: |-
   &c&lHata | &7{0} adında bir yükseltme bulunamadı.
   &c&lHata | &7Yükseltmeler: {1}
-INVALID_VISIT_LOCATION: '&c&lHata | &7Bu adanın ziyaretçi konumu yok.'
-INVALID_VISIT_LOCATION_BYPASS: '&7&oBypass modundasın, adaya ışınlanıyorsun...'
 INVALID_WARP: '&c&lHata | &7Geçersiz ışınlanma {0}.'
 INVALID_WORLD: '&c&lHata | &7Geçersiz dünya {0}.'
 INVITE_ANNOUNCEMENT: '&e&lAda | &7{0}, {1}''i adaya davet etti.'
@@ -839,8 +836,6 @@ SET_UPGRADE_LEVEL: '&e&lYükseltmeler | &7{1}''in adası için {0} seviyesi baş
 SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lYükseltmeler | &7{1} adası için {0} seviyesi başarıyla
   güncellendi.'
-SET_WARP: '&e&lAda | &7{0} konumunda yeni bir ışınlanma noktası başarıyla oluşturuldu.'
-SET_WARP_OUTSIDE: '&c&lHata | &7Adanın dışında ışınlanma noktası ayarlayamazsın.'
 SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
 SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
 SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
@@ -870,8 +865,6 @@ TITLE_SENT: '&e&lAda | &7{0}''e başlık başarıyla gönderildi!'
 TELEPORTED_FAILED: '&e&lAda | &7Görünüşe göre bu adanın güvenli blokları yok. Lütfen
   bir yetkiliyle iletişime geç.'
 TELEPORTED_SUCCESS: '&e&lAda | &7Adana ışınlandın.'
-TELEPORTED_TO_WARP: '&e&lAda | &7Bu ada ışınlanmasına başarıyla ışınlandın.'
-TELEPORTED_TO_WARP_ANNOUNCEMENT: '&e&lAda | &7Oyuncu {0} {1} ada ışınlanmasına ışınlandı.'
 TOGGLED_BYPASS_OFF: '&e&lBypass | &7Bypass modu &cKAPALI&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Bypass modu &aAÇIK&7.'
 TOGGLED_FLY_OFF: '&e&lUçuş | &7Ada uçuşu &cKAPALI&7.'
@@ -910,51 +903,76 @@ UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for
 UNLOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now unlocked for
   the island {1}!'
 UNLOCK_WORLD_ANNOUNCEMENT: '&e&lDünyalar | &7{0} dünyan artık kilitli değil!'
-UNSAFE_WARP: '&e&lAda | &7&oBu ışınlanma güvensiz görünüyor. Lütfen başka bir ışınlanmayı
-  dene.'
 UPDATED_PERMISSION: '&e&lAda | &7{0} için izinler güncellendi.'
 UPDATED_SETTINGS: '&e&lAda | &7Ada ayarları {0} güncellendi.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lHata | &7Sadece {0} içinde tekrar yükseltme yapabilirsin.'
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lHata | &7Bu komutu başka adalarda kullanamazsın.'
+VISITOR_HOME_REMOVE: '&e&lIsland | &7Successfully removed your visitor home in the {0} dimension.'
+VISITOR_HOME_SET: '&e&lIsland | &7Successfully created a new visitor home in the {0} dimension.'
+VISITOR_HOME_SET_PREVIOUS_REMOVED: '&7&oYou already had a visitor home in that dimension, it was removed...'
+VISITOR_HOME_SET_OUTSIDE_DEFAULT_DIMENSION: '&c&lError | &7You cannot create a visitor home outside the default dimension.'
+VISITOR_HOME_SIGN_DEACTIVATED: '&7&oThe sign linked to this visitor home has been deactivated...'
+VISITOR_HOME_SIGN_EDIT: '&c&lError | &7You cannot edit this sign because it is linked to the visitor home.'
+VISITOR_HOME_TELEPORT_ANNOUNCEMENT: '&e&lIsland | &7The player {0} teleported to your visitor home in the {1} dimension.'
+VISITOR_HOME_TELEPORT_NOT_SET: '&c&lHata | &7Bu adanın ziyaretçi konumu yok.'
+VISITOR_HOME_TELEPORT_NOT_SET_BYPASS: '&7&oBypass modundasın, adaya ışınlanıyorsun...'
+VISITOR_HOME_TELEPORT_SUCCESS: '&e&lIsland | &7Successfully teleported to the visitor home of {0}''s island in the {1} dimension.'
+VISITOR_HOME_TELEPORT_SUCCESS_NAME: '&e&lIsland | &7Successfully teleported to the visitor home of the island {0} in the {1} dimension.'
+VISITOR_HOME_TELEPORT_UNSAFE: '&c&lError | &7You cannot teleport to that visitor home because the location is unsafe.'
+VISITOR_HOME_TELEPORT_UNSAFE_BYPASS: '&7&oYou have bypass mode, teleporting you to that visitor home anyway...'
 WARP_ALREADY_EXIST: '&c&lHata | &7Bu adla bir ışınlanma noktası zaten var.'
 WARP_CATEGORY_ALREADY_EXIST: '&c&lError | &7There is already a warp category with this name.'
 WARP_CATEGORY_ICON_NEW_LORE: |-
-  &e&lIşınlanmalar | &7Yeni bir açıklama gir (İptal etmek için "-cancel" yaz):
+  &e&lIşınlanmalar | &7Yeni bir açıklama gir (İptal etmek için "{0}" yaz):
   &e&lIşınlanmalar | &7Satırları "\n" kullanarak ayırabilirsin.
-WARP_CATEGORY_ICON_NEW_NAME: '&e&lIşınlanmalar | &7Bir ad gir (İptal etmek için "-cancel"
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lIşınlanmalar | &7Bir ad gir (İptal etmek için "{0}"
   yaz):'
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lIşınlanmalar | &7Yeni bir materyal türü gir (İptal
-  etmek için "-cancel" yaz):'
+  etmek için "{0}" yaz):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lIşınlanmalar | &7Kategorinin simgesi başarıyla güncellendi.'
-WARP_CATEGORY_INVALID_NAME: '&c&lError | &7Warp category names cannot be empty and must be one word.'
-WARP_CATEGORY_NAME_TOO_LONG: '&c&lHata | Işınlanma kategorisi adları 255 karakterden
-  uzun olamaz.'
-WARP_CATEGORY_SLOT: '&e&lIşınlanmalar | &7Yeni bir yuva gir (İptal etmek için "-cancel"
+WARP_CATEGORY_MANAGE_CANCEL_TEXT: '-cancel'
+WARP_CATEGORY_NAME_BLACKLISTED: '&c&lError | &7That warp category name is blacklisted.'
+WARP_CATEGORY_NAME_INVALID: '&c&lError | &7Warp category names cannot be empty and must be one word.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lHata | Işınlanma kategorisi adları {0} karakterden uzun olamaz.'
+WARP_CATEGORY_NAME_TOO_SHORT: '&c&lError | &7Warp category names cannot be shorter than {0} chars.'
+WARP_CATEGORY_SLOT: '&e&lIşınlanmalar | &7Yeni bir yuva gir (İptal etmek için "{0}"
   yaz):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lHata | &7Bu yuva zaten başka bir kategori tarafından
   alınmış.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lIşınlanmalar | &7Kategorinin yuvası başarıyla {0}
   olarak değiştirildi.'
-WARP_CATEGORY_RENAME: '&e&lIşınlanmalar | &7Yeni bir ad gir (İptal etmek için "-cancel"
+WARP_CATEGORY_RENAME: '&e&lIşınlanmalar | &7Yeni bir ad gir (İptal etmek için "{0}"
   yaz):'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lIşınlanmalar | &7Kategori adı başarıyla {0} olarak
   değiştirildi.'
+WARP_DELETE: '&e&lAda | &7{0} ışınlanmasını sildin.'
 WARP_ICON_NEW_LORE: |-
-  &e&lIşınlanmalar | &7Yeni bir açıklama gir (İptal etmek için "-cancel" yaz):
+  &e&lIşınlanmalar | &7Yeni bir açıklama gir (İptal etmek için "{0}" yaz):
   &e&lIşınlanmalar | &7Satırları "\n" kullanarak ayırabilirsin.
-WARP_ICON_NEW_NAME: '&e&lIşınlanmalar | &7Bir ad gir (İptal etmek için "-cancel" yaz):'
+WARP_ICON_NEW_NAME: '&e&lIşınlanmalar | &7Bir ad gir (İptal etmek için "{0}" yaz):'
 WARP_ICON_NEW_TYPE: '&e&lIşınlanmalar | &7Yeni bir materyal türü gir (İptal etmek
-  için "-cancel" yaz):'
+  için "{0}" yaz):'
 WARP_ICON_UPDATED: '&e&lIşınlanmalar | &7Işınlanmanın simgesi başarıyla güncellendi.'
-WARP_INVALID_NAME: '&c&lError | &7Warp names cannot be empty and must be one word.'
 WARP_LOCATION_UPDATE: '&e&lIşınlanmalar | &7Işınlanmanın konumu senin konumuna başarıyla
   güncellendi.'
-WARP_NAME_TOO_LONG: '&c&lHata | &7Işınlanma adları 255 karakterden uzun olamaz.'
+WARP_MANAGE_CANCEL_TEXT: '-cancel'
+WARP_NAME_BLACKLISTED: '&c&lError | &7That warp name is blacklisted.'
+WARP_NAME_INVALID: '&c&lError | &7Warp names cannot be empty and must be one word.'
+WARP_NAME_TOO_LONG: '&c&lHata | &7Işınlanma adları {0} karakterden uzun olamaz.'
+WARP_NAME_TOO_SHORT: '&c&lError | &7Warp names cannot be shorter than {0} chars.'
 WARP_PUBLIC_UPDATE: '&e&lIşınlanmalar | &7Işınlanma başarıyla halka açıldı.'
 WARP_PRIVATE_UPDATE: '&e&lIşınlanmalar | &7Işınlanma başarıyla halka kapatıldı.'
-WARP_RENAME: '&e&lIşınlanmalar | &7Yeni bir ad gir (İptal etmek için "-cancel" yaz):'
+WARP_RENAME: '&e&lIşınlanmalar | &7Yeni bir ad gir (İptal etmek için "{0}" yaz):'
 WARP_RENAME_SUCCESS: '&e&lIşınlanmalar | &7Işınlanma adı başarıyla {0} olarak değiştirildi.'
+WARP_SET: '&e&lAda | &7{0} konumunda yeni bir ışınlanma noktası başarıyla oluşturuldu.'
+WARP_SET_OUTSIDE_ISLAND: '&c&lHata | &7Adanın dışında ışınlanma noktası ayarlayamazsın.'
+WARP_SIGN_DEACTIVATED: '&7&oThe sign linked to this warp has been deactivated...'
+WARP_SIGN_EDIT: '&c&lError | &7You cannot edit this sign because it is linked to the warp.'
+WARP_TELEPORT_ANNOUNCEMENT: '&e&lAda | &7Oyuncu {0} {1} ada ışınlanmasına ışınlandı.'
+WARP_TELEPORT_SUCCESS: '&e&lAda | &7Bu ada ışınlanmasına başarıyla ışınlandın.'
+WARP_TELEPORT_SUCCESS_NAME: '&e&lAda | &7Bu ada ışınlanmasına başarıyla ışınlandın.'
+WARP_TELEPORT_UNSAFE: '&e&lAda | &7&oBu ışınlanma güvensiz görünüyor. Lütfen başka bir ışınlanmayı dene.'
 WITHDRAW_ALL_MONEY: |-
   &e&lBanka | &7Ada bankasında sadece {0} dolar var.
   &e&lBanka | &7&oTüm para çekiliyor...'

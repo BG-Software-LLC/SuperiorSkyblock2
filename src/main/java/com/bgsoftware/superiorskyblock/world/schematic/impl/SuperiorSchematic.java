@@ -287,11 +287,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
                     worldEditSession.finish(island);
 
-                    if (island.getOwner().isOnline()) {
-                        postPlaceTasks.forEach(schematicBlock -> {
-                            schematicBlock.doPostPlace(island);
-                        });
-                    }
+                    postPlaceTasks.forEach(SchematicBlock::doPostPlace);
 
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
 

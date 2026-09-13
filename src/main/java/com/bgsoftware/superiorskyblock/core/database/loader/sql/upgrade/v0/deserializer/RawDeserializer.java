@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
@@ -208,10 +209,10 @@ public class RawDeserializer implements IDeserializer {
                     continue;
 
                 if (!IslandNames.isWarpNameLengthValid(name))
-                    name = name.substring(0, IslandNames.getMaxWarpNameLength());
+                    name = name.substring(0, BuiltinModules.WARPS.getConfiguration().getNamesMaxLength());
 
                 if (!IslandNames.isWarpNameLengthValid(category))
-                    category = category.substring(0, IslandNames.getMaxWarpNameLength());
+                    category = category.substring(0, BuiltinModules.WARPS.getConfiguration().getNamesMaxLength());
 
                 warpAttributes.add(new IslandWarpAttributes()
                         .setValue(IslandWarpAttributes.Field.NAME, name)

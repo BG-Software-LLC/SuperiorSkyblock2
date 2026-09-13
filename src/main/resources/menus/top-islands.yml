@@ -28,6 +28,9 @@ messages:
   selected-sorting-type: '&8 - &a{0}'
   unselected-sorting-type: '&8 - &7{0}'
 
+# When enabled, instead of showing warps upon right click, the visitor warp locations will be shown.
+visitor-warps: false
+
 items:
   '#':
     island:
@@ -48,15 +51,15 @@ items:
         - '{4}:&f  - &7{}'
         - '&7'
         - '&7&o(( &f&oLeft-Click &7&oto view their items. ))'
-        - '&7&o(( &f&oRight-Click &7&oto teleport to island warp. ))'
+        - '&7&o(( &f&oRight-Click &7&oto view their warps. ))'
     no-island:
       type: SKULL_ITEM
       data: 3
       name: '&cInvalid Island'
   '%':
-    WORTH:
-      display-name: 'Worth'
-      type: DIAMOND
+    BANK:
+      display-name: 'Bank'
+      type: EMERALD
       name: '&6Switch Sorting Type'
       lore:
         - '&7Switch top islands sorting type.'
@@ -66,15 +69,6 @@ items:
     LEVEL:
       display-name: 'Level'
       type: GOLD_INGOT
-      name: '&6Switch Sorting Type'
-      lore:
-        - '&7Switch top islands sorting type.'
-        - '&7Sorting Type: &e{1}&7.'
-        - ''
-        - '{0}'
-    RATING:
-      display-name: 'Rating'
-      type: NETHER_STAR
       name: '&6Switch Sorting Type'
       lore:
         - '&7Switch top islands sorting type.'
@@ -91,9 +85,18 @@ items:
         - '&7Sorting Type: &e{1}&7.'
         - ''
         - '{0}'
-    BANK:
-      display-name: 'Bank'
-      type: EMERALD
+    RATING:
+      display-name: 'Rating'
+      type: NETHER_STAR
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    WORTH:
+      display-name: 'Worth'
+      type: DIAMOND
       name: '&6Switch Sorting Type'
       lore:
         - '&7Switch top islands sorting type.'

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
@@ -9,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
@@ -16,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
 
@@ -30,7 +33,8 @@ public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuW
         Player player = context.getPlayer();
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
-        Message.WARP_CATEGORY_RENAME.send(player);
+        String cancelText = Message.WARP_CATEGORY_MANAGE_CANCEL_TEXT.getMessage(superiorPlayer.getUserLocale());
+        Message.WARP_CATEGORY_RENAME.send(player, cancelText);
 
         menuView.closeView();
 
@@ -38,21 +42,28 @@ public class WarpCategoryManageRenameButton extends AbstractMenuViewButton<MenuW
             WarpCategory warpCategory = menuView.getWarpCategory();
             Island island = warpCategory.getIsland();
 
-            if (warpCategory.getIsland().getWarpCategory(warpCategory.getName()) != null &&
-                    !newName.equalsIgnoreCase("-cancel")) {
-                if (!IslandNames.isValidWarpCategoryName(superiorPlayer, newName))
-                    return true;
+            String categoryName = Formatters.STRIP_COLOR_FORMATTER.format(newName);
 
-                if (island.getWarpCategory(newName) != null) {
+            if (warpCategory.getIsland().getWarpCategory(warpCategory.getName()) != null &&
+                    !categoryName.equalsIgnoreCase(cancelText)) {
+                if (!IslandNames.isValidWarpCategoryName(superiorPlayer, categoryName)) {
+                    return true;
+                }
+
+                if (island.getWarpCategory(categoryName) != null) {
                     Message.WARP_CATEGORY_ALREADY_EXIST.send(superiorPlayer);
                     return true;
                 }
 
                 PluginEvent<PluginEventArgs.IslandRenameWarpCategory> event = PluginEventsFactory.callIslandRenameWarpCategoryEvent(
-                        warpCategory.getIsland(), plugin.getPlayers().getSuperiorPlayer(player), warpCategory, newName);
+                        warpCategory.getIsland(), plugin.getPlayers().getSuperiorPlayer(player), warpCategory, categoryName);
 
                 if (!event.isCancelled()) {
                     warpCategory.getIsland().renameCategory(warpCategory, event.getArgs().categoryName);
+
+                    for (IslandWarp islandWarp : warpCategory.getWarps()) {
+                        WarpsUtils.updateWarpSign(islandWarp);
+                    }
 
                     Message.WARP_CATEGORY_RENAME_SUCCESS.send(player, event.getArgs().categoryName);
 

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands.admin;
+package com.bgsoftware.superiorskyblock.module.warps.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -16,20 +16,20 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
+public class CmdAdminSetWarpsLimit implements IAdminIslandCommand {
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("addwarpslimit");
+        return Collections.singletonList("setwarpslimit");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.addwarpslimit";
+        return "superior.admin.setwarpslimit";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin addwarpslimit <" +
+        return "admin setwarpslimit <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
@@ -38,7 +38,7 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Message.COMMAND_DESCRIPTION_ADMIN_ADD_WARPS_LIMIT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT.getMessage(locale);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        if (limit <= 0) {
+        if (limit < 0) {
             Message.INVALID_AMOUNT.send(sender);
             return;
         }
@@ -78,8 +78,7 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            PluginEvent<PluginEventArgs.IslandChangeWarpsLimit> event = PluginEventsFactory.callIslandChangeWarpsLimitEvent(
-                    island, sender, island.getWarpsLimit() + limit);
+            PluginEvent<PluginEventArgs.IslandChangeWarpsLimit> event = PluginEventsFactory.callIslandChangeWarpsLimitEvent(island, sender, limit);
             if (!event.isCancelled()) {
                 island.setWarpsLimit(event.getArgs().warpsLimit);
                 ++islandsChangedCount;

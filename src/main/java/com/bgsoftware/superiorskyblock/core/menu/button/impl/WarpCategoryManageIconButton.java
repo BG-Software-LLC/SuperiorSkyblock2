@@ -60,20 +60,22 @@ public class WarpCategoryManageIconButton extends AbstractMenuViewButton<MenuWar
 
         Player player = context.getPlayer();
 
-        Message.WARP_CATEGORY_SLOT.send(player);
+        String cancelText = Message.WARP_CATEGORY_MANAGE_CANCEL_TEXT.getMessage(inventoryViewer.getUserLocale());
+        Message.WARP_CATEGORY_SLOT.send(player, cancelText);
 
         menuView.closeView();
 
         PlayerChat.listen(player, message -> {
-            if (!message.equalsIgnoreCase("-cancel")) {
+            if (!message.equalsIgnoreCase(cancelText)) {
                 int rowsSize = Menus.MENU_WARP_CATEGORIES.getRowsSize();
 
                 int slot;
 
                 try {
                     slot = Integer.parseInt(message);
-                    if (slot < 0 || slot >= rowsSize * 9)
+                    if (slot < 0 || slot >= rowsSize * 9) {
                         throw new IllegalArgumentException();
+                    }
                 } catch (IllegalArgumentException ex) {
                     Message.INVALID_SLOT.send(player, message);
                     return true;

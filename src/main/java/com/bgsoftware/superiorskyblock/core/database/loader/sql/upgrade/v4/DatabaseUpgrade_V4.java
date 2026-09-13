@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 
 import java.sql.ResultSet;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
                     // with the name "Default" - we force change it here.
                     newName = "Default";
                 } else if (!IslandNames.isWarpNameLengthValid(name)) {
-                    newName = name.substring(0, IslandNames.getMaxWarpNameLength());
+                    newName = name.substring(0, BuiltinModules.WARPS.getConfiguration().getNamesMaxLength());
                 } else if (name.contains(" ")) {
                     newName = name.replace(" ", "_");
                 } else if (name.length() != Formatters.STRIP_COLOR_FORMATTER.format(name).length()) {

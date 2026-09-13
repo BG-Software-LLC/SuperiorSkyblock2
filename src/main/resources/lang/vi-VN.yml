@@ -177,6 +177,7 @@ COMMAND_ARGUMENT_UPGRADE_NAME: ten-nang-cap
 COMMAND_ARGUMENT_VALUE: gia-tri
 COMMAND_ARGUMENT_WARP_NAME: ten-khu-vuc
 COMMAND_ARGUMENT_WARP_CATEGORY: danh-sach-khu-vuc
+COMMAND_ARGUMENT_WARP_PRIVATE: 'private'
 COMMAND_ARGUMENT_WORLD: the-gioi
 COMMAND_COOLDOWN_FORMAT: '&c&lLỗi | &7Bạn chỉ có thể sử dụng lệnh trong {0}.'
 COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
@@ -359,8 +360,6 @@ DEBUG_MODE_ENABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &aB
 DEBUG_MODE_FILTER_ADD: '&e&lGỡ lỗi | &7Đã bật bộ lọc gỡ lỗi {0} &aBẬT&7.'
 DEBUG_MODE_FILTER_CLEAR: '&e&lGỡ lỗi | &7Đã xóa tất cả bộ lọc gỡ lỗi &cTẮT&7.'
 DEBUG_MODE_FILTER_REMOVE: '&e&lGỡ lỗi | &7Đã tắt bộ lọc gỡ lỗi {0} &cTẮT&7.'
-DELETE_WARP: '&e&lĐảo | &7Bạn đã xóa khu vực {0}.'
-DELETE_WARP_SIGN_BROKE: '&7&oChỗ đó từng có một bảng khu vực, nhưng nó đã bị hỏng...'
 DEMOTE_LEADER: '&c&lLỗi | &7Bạn không thể hạ cấp lãnh đạo đảo.'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể hạ cấp người chơi có
   vai trò đảo thấp hơn của bạn.'
@@ -476,8 +475,6 @@ INVALID_TOGGLE_MODE: '&c&lLỗi | &7Không thể chuyển đổi {0}.'
 INVALID_UPGRADE: |-
   &c&lLỗi | &7Không thể tìm thấy bản nâng cấp được gọi là {0}.
   &c&lLỗi | &7Nâng cấp: {1}
-INVALID_VISIT_LOCATION: '&c&lLỗi | &7Hòn đảo này không có vị trí du khách.'
-INVALID_VISIT_LOCATION_BYPASS: '&7&oBạn có chế độ bypass, dịch chuyển bạn đến đảo...'
 INVALID_WARP: '&c&lLỗi | &7Khu vực không hợp lệ {0}.'
 INVALID_WORLD: '&c&lLỗi | &7Thế giới không hợp lệ {0}.'
 INVITE_ANNOUNCEMENT: '&e&lĐảo | &7{0} mời {1} vào đảo.'
@@ -794,8 +791,6 @@ SET_UPGRADE_LEVEL: '&e&lNâng Cấp | &7Nâng cấp thành công cấp độ c�
   {1}.'
 SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lNâng Cấp | &7Thay đổi thành công cấp độ {0} cho đảo {1}.'
-SET_WARP: '&e&lĐảo | &7Tạo thành công một khu vực mới tại {0}.'
-SET_WARP_OUTSIDE: '&c&lLỗi | &7Bạn không thể đặt khu vực bên ngoài hòn đảo của bạn.'
 SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
 SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
 SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
@@ -826,9 +821,6 @@ TITLE_SENT: '&e&lĐảo | &7Thành công gửi người chơi {0} title!'
 TELEPORTED_FAILED: '&e&lĐảo | &7Có vẻ như hòn đảo này không có vị trí nào an toàn.
   Xin vui lòng liên lạc với ban quản trị.'
 TELEPORTED_SUCCESS: '&e&lĐảo | &7Bạn đã được dịch chuyển đến hòn đảo của bạn.'
-TELEPORTED_TO_WARP: '&e&lĐảo | &7Dịch chuyển thành công đến khu vực của hòn đảo
-  này.'
-TELEPORTED_TO_WARP_ANNOUNCEMENT: '&e&lĐảo | &7Người chơi {0} đã dịch chuyển đến khu vực đảo {1}.'
 TOGGLED_BYPASS_OFF: '&e&lBypass | &7Chuyển đổi chế độ bypass: &cTẮT&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Chuyển đổi chế độ bypass: &aBẬT&7.'
 TOGGLED_FLY_OFF: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &cTẮT&7.'
@@ -870,41 +862,67 @@ UNIGNORED_ISLAND_NAME: '&e&lĐảo | &7Đảo {0} bây giờ không được b�
 UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lThế giới | &7Thế giới {0} hiện đã được mở khóa cho tất cả đảo!'
 UNLOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lThế giới | &7Thế giới {0} hiện đã được mở khóa cho đảo {1}!'
 UNLOCK_WORLD_ANNOUNCEMENT: '&e&lThế giới | &7Thế giới {0} hiện đã được mở khóa cho hòn đảo của {1}!'
-UNSAFE_WARP: '&e&lĐảo | &7&oCó vẻ như khu vực này không an toàn. Vui lòng thử
-  lại với khu vực khác.'
 UPDATED_PERMISSION: '&e&lĐảo | &7Đã cập nhật quyền cho {0}.'
 UPDATED_SETTINGS: '&e&lĐảo | &7Thay đổi thành công điều chỉnh của đảo {0}.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lLỗi | &77Bạn có thể nâng cấp lại trong {0}.'
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
+VISITOR_HOME_REMOVE: '&e&lIsland | &7Successfully removed your visitor home in the {0} dimension.'
+VISITOR_HOME_SET: '&e&lIsland | &7Successfully created a new visitor home in the {0} dimension.'
+VISITOR_HOME_SET_PREVIOUS_REMOVED: '&7&oYou already had a visitor home in that dimension, it was removed...'
+VISITOR_HOME_SET_OUTSIDE_DEFAULT_DIMENSION: '&c&lError | &7You cannot create a visitor home outside the default dimension.'
+VISITOR_HOME_SIGN_DEACTIVATED: '&7&oThe sign linked to this visitor home has been deactivated...'
+VISITOR_HOME_SIGN_EDIT: '&c&lError | &7You cannot edit this sign because it is linked to the visitor home.'
+VISITOR_HOME_TELEPORT_ANNOUNCEMENT: '&e&lIsland | &7The player {0} teleported to your visitor home in the {1} dimension.'
+VISITOR_HOME_TELEPORT_NOT_SET: '&c&lLỗi | &7Hòn đảo này không có vị trí du khách.'
+VISITOR_HOME_TELEPORT_NOT_SET_BYPASS: '&7&oBạn có chế độ bypass, dịch chuyển bạn đến đảo...'
+VISITOR_HOME_TELEPORT_SUCCESS: '&e&lIsland | &7Successfully teleported to the visitor home of {0}''s island in the {1} dimension.'
+VISITOR_HOME_TELEPORT_SUCCESS_NAME: '&e&lIsland | &7Successfully teleported to the visitor home of the island {0} in the {1} dimension.'
+VISITOR_HOME_TELEPORT_UNSAFE: '&c&lError | &7You cannot teleport to that visitor home because the location is unsafe.'
+VISITOR_HOME_TELEPORT_UNSAFE_BYPASS: '&7&oYou have bypass mode, teleporting you to that visitor home anyway...'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
 WARP_CATEGORY_ALREADY_EXIST: '&c&lError | &7There is already a warp category with this name.'
 WARP_CATEGORY_ICON_NEW_LORE: |-
-  &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
+  &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "{0}" để hủy):
   &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
-WARP_CATEGORY_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
-WARP_CATEGORY_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "-cancel" để hủy):'
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "{0}" để hủy):'
+WARP_CATEGORY_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "{0}" để hủy):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lKhu Vực | &7Cập nhật thành công biểu tượng danh mục.'
-WARP_CATEGORY_INVALID_NAME: '&c&lError | &7Warp category names cannot be empty and must be one word.'
-WARP_CATEGORY_NAME_TOO_LONG: '&c&lLỗi | &7Tên danh mục khu vực không thể dài hơn 255 kí tự.'
-WARP_CATEGORY_SLOT: '&e&lKhu Vực | &7Vui lòng nhập vị trí mới (Nhập "-cancel" để hủy):'
+WARP_CATEGORY_MANAGE_CANCEL_TEXT: '-cancel'
+WARP_CATEGORY_NAME_BLACKLISTED: '&c&lError | &7That warp category name is blacklisted.'
+WARP_CATEGORY_NAME_INVALID: '&c&lError | &7Warp category names cannot be empty and must be one word.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lLỗi | &7Tên danh mục khu vực không thể dài hơn {0} kí tự.'
+WARP_CATEGORY_NAME_TOO_SHORT: '&c&lError | &7Warp category names cannot be shorter than {0} chars.'
+WARP_CATEGORY_SLOT: '&e&lKhu Vực | &7Vui lòng nhập vị trí mới (Nhập "{0}" để hủy):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lLỗi | &7Vị trí đã được dùng bởi một danh mục khu vực khác.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lKhu Vực | &7Thành công thay đổi danh mục tới vị trí {0}.'
-WARP_CATEGORY_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
+WARP_CATEGORY_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "{0}" để hủy):'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lKhu Vực | &7Thành công đổi tên danh mục thành {0}.'
+WARP_DELETE: '&e&lĐảo | &7Bạn đã xóa khu vực {0}.'
 WARP_ICON_NEW_LORE: |-
-  &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
+  &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "{0}" để hủy):
   &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
-WARP_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
-WARP_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "-cancel" để hủy):'
+WARP_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "{0}" để hủy):'
+WARP_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "{0}" để hủy):'
 WARP_ICON_UPDATED: '&e&lKhu Vực | &7Cập nhật thành công biểu tượng danh mục.'
-WARP_INVALID_NAME: '&c&lError | &7Warp names cannot be empty and must be one word.'
 WARP_LOCATION_UPDATE: '&e&lKhu Vực | &7Đã cập nhật thành công vị trí của khu vực vào vị trí của bạn.'
-WARP_NAME_TOO_LONG: '&c&lLỗi | &7Tên khu vực không thể dài hơn 255 kí tự.'
+WARP_MANAGE_CANCEL_TEXT: '-cancel'
+WARP_NAME_BLACKLISTED: '&c&lError | &7That warp name is blacklisted.'
+WARP_NAME_INVALID: '&c&lError | &7Warp names cannot be empty and must be one word.'
+WARP_NAME_TOO_LONG: '&c&lLỗi | &7Tên khu vực không thể dài hơn {0} kí tự.'
+WARP_NAME_TOO_SHORT: '&c&lError | &7Warp names cannot be shorter than {0} chars.'
 WARP_PUBLIC_UPDATE: '&e&lKhu Vực | &7Thành công mở khu vực cho công chúng.'
 WARP_PRIVATE_UPDATE: '&e&lKhu Vực | &7Thành công đóng khu vực đối với công chúng.'
-WARP_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
+WARP_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "{0}" để hủy):'
 WARP_RENAME_SUCCESS: '&e&lKhu Vực | &7Thành công đổi tên danh mục thành {0}.'
+WARP_SET: '&e&lĐảo | &7Tạo thành công một khu vực mới tại {0}.'
+WARP_SET_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể đặt khu vực bên ngoài hòn đảo của bạn.'
+WARP_SIGN_DEACTIVATED: '&7&oThe sign linked to this warp has been deactivated...'
+WARP_SIGN_EDIT: '&c&lError | &7You cannot edit this sign because it is linked to the warp.'
+WARP_TELEPORT_ANNOUNCEMENT: '&e&lĐảo | &7Người chơi {0} đã dịch chuyển đến khu vực đảo {1}.'
+WARP_TELEPORT_SUCCESS: '&e&lĐảo | &7Dịch chuyển thành công đến khu vực của hòn đảo này.'
+WARP_TELEPORT_SUCCESS_NAME: '&e&lĐảo | &7Dịch chuyển thành công đến khu vực của hòn đảo này.'
+WARP_TELEPORT_UNSAFE: '&e&lĐảo | &7&oCó vẻ như khu vực này không an toàn. Vui lòng thử lại với khu vực khác.'
 WITHDRAW_ALL_MONEY: |-
   &e&lNgân Hàng | &7Đảo ngân hàng chỉ có {0}$ bên trong.
   &e&lNgân Hàng | &7&oRút toàn bộ tiền..."

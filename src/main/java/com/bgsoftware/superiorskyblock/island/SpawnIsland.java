@@ -153,7 +153,6 @@ public class SpawnIsland implements Island {
 
     private Biome biome = Biome.PLAINS;
 
-
     public SpawnIsland() throws ManagerLoadException {
         String spawnLocation = plugin.getSettings().getSpawn().getLocation();
         Location centerLocation = Serializers.LOCATION_SPACED_CENTERED_SERIALIZER.deserialize(spawnLocation);
@@ -397,7 +396,6 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
     public Map<Dimension, WorldPosition> getIslandHomes() {
         return Collections.singletonMap(
                 plugin.getSettings().getWorlds().getDefaultWorldDimension(),
@@ -427,6 +425,16 @@ public class SpawnIsland implements Island {
     @Override
     public WorldPosition getVisitorsPosition(Dimension unused) {
         return getIslandHomePosition(null /*unused*/);
+    }
+
+    @Override
+    public Map<Dimension, Location> getVisitorHomesLocations() {
+        return getIslandHomesAsDimensions();
+    }
+
+    @Override
+    public Map<Dimension, WorldPosition> getVisitorHomesPositions() {
+        return getIslandHomes();
     }
 
     @Override
@@ -492,7 +500,7 @@ public class SpawnIsland implements Island {
     @Override
     @Deprecated
     public List<Chunk> getAllChunks(Dimension unused) {
-        return getAllChunks((Dimension) null /*unused*/, 0);
+        return getAllChunks(null /*unused*/, 0);
     }
 
     @Override
@@ -534,7 +542,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getLoadedChunks(Dimension unused) {
-        return getLoadedChunks((Dimension) null /*unused*/, 0);
+        return getLoadedChunks(null /*unused*/, 0);
     }
 
     @Override
@@ -564,18 +572,18 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused) {
-        return getAllChunksAsync((Dimension) null /*unused*/, 0);
+        return getAllChunksAsync(null /*unused*/, 0);
     }
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused, @IslandChunkFlags int flags) {
-        return getAllChunksAsync((Dimension) null /*unused*/, flags, null);
+        return getAllChunksAsync(null /*unused*/, flags, null);
     }
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(Dimension unused,
                                                             @Nullable Consumer<Chunk> onChunkLoad) {
-        return getAllChunksAsync((Dimension) null /*unused*/, 0, onChunkLoad);
+        return getAllChunksAsync(null /*unused*/, 0, onChunkLoad);
     }
 
     @Override
@@ -1898,6 +1906,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public void renameWarp(IslandWarp islandWarp, String newName) {
+        // Do nothing.
+    }
+
+    @Override
+    public void relocateWarp(IslandWarp islandWarp, Location newLocation) {
         // Do nothing.
     }
 

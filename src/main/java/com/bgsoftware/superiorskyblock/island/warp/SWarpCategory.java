@@ -22,7 +22,6 @@ public class SWarpCategory implements WarpCategory {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-
     private final List<IslandWarp> islandWarps = new LinkedList<>();
     private final UUID islandUUID;
     private Island cachedIsland;

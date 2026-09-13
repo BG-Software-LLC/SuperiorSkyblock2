@@ -1,0 +1,51 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lSelect a dimension...'
+previous-menu: true
+
+pattern:
+  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
+  - '# @ # # ^ # # $ #'
+  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
+
+items:
+  '@':
+    dimension: NORMAL
+    type: GRASS
+    name: '&aNormal Dimension'
+    lore:
+      - '&7Select a dimension to continue.'
+  '^':
+    dimension: NETHER
+    type: NETHERRACK
+    name: '&cNether Dimension'
+    lore:
+      - '&7Select a dimension to continue.'
+  '$':
+    dimension: THE_END
+    type: ENDER_STONE
+    name: '&eThe End Dimension'
+    lore:
+      - '&7Select a dimension to continue.'
+  '~':
+    type: BLACK_STAINED_GLASS_PANE
+    name: '&f'
+
+sounds:
+  '@':
+    type: ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '^':
+    type: ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '$':
+    type: ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

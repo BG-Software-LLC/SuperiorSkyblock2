@@ -5,18 +5,15 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
-import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -85,14 +82,11 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
         if (args.length != 4) {
             dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
         } else {
-            dimension = CommandArguments.getDimension(sender, args[3]);
-            if (dimension == null)
-                return;
-        }
+            dimension = CommandArguments.getEnabledDimension(plugin, sender, args[3]);
 
-        if (plugin.getGrid().getIslandsWorldInfo(island, dimension) == null) {
-            Message.WORLD_NOT_ENABLED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
-            return;
+            if (dimension == null) {
+                return;
+            }
         }
 
         if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands.player;
+package com.bgsoftware.superiorskyblock.module.warps.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.island.warp.SignWarp;
+import com.bgsoftware.superiorskyblock.module.warps.utils.WarpsUtils;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -69,16 +69,18 @@ public class CmdDelWarp implements IPermissibleCommand {
         Player player = superiorPlayer.asPlayer();
         IslandWarp islandWarp = CommandArguments.getWarp(player, island, args, 1);
 
-        if (islandWarp == null)
+        if (islandWarp == null) {
             return;
+        }
 
-        if (!PluginEventsFactory.callIslandDeleteWarpEvent(island, superiorPlayer, islandWarp))
+        if (!PluginEventsFactory.callIslandDeleteWarpEvent(island, superiorPlayer, islandWarp)) {
             return;
+        }
 
         island.deleteWarp(islandWarp.getName());
-        Message.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
+        Message.WARP_DELETE.send(superiorPlayer, islandWarp.getName());
 
-        SignWarp.trySignWarpBreak(islandWarp, player);
+        WarpsUtils.deactivateWarpSign(islandWarp, player);
     }
 
     @Override
