@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 public class ObjectsPools {
 
     public static final ObjectsPool<Wrapper<Location>> LOCATION = createNewPool(() -> new Location(null, 0D, 0D, 0D));
+    public static final ObjectsPool<MutableWorldPosition> WORLD_POSITION = createWorldPositionPool();
     public static final ObjectsPool<Wrapper<LazyWorldLocation>> LAZY_LOCATION = createNewPool(() -> new LazyWorldLocation(null, 0D, 0D, 0D));
     public static final ObjectsPool<Wrapper<DBColumn>> DB_COLUMN = createNewPool(() -> new DBColumn("", null));
     public static final ObjectsPool<Batch<DBColumn>> DB_COLUMN_BATCH = new ObjectsPool<>(() -> new Batch<>(DB_COLUMN));
@@ -28,6 +29,17 @@ public class ObjectsPools {
                         obj -> onWrapperRelease(obj, wrapperReference.getValue())));
 
         wrapperReference.setValue(pool);
+
+        return pool;
+    }
+
+    private static ObjectsPool<MutableWorldPosition> createWorldPositionPool() {
+        MutableObject<ObjectsPool<MutableWorldPosition>> poolReference = new MutableObject<>(null);
+
+        ObjectsPool<MutableWorldPosition> pool = new ObjectsPool<>(
+                () -> new MutableWorldPosition(obj -> onWrapperRelease(obj, poolReference.getValue())));
+
+        poolReference.setValue(pool);
 
         return pool;
     }

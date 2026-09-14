@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class DelegateIsland implements Island {
 
@@ -108,6 +109,16 @@ public class DelegateIsland implements Island {
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
         return this.handle.getAllPlayersInside();
+    }
+
+    @Override
+    public boolean anyPlayerInsideMatches(Predicate<SuperiorPlayer> predicate) {
+        return this.handle.anyPlayerInsideMatches(predicate);
+    }
+
+    @Override
+    public int countPlayersInside(Predicate<SuperiorPlayer> predicate) {
+        return this.handle.countPlayersInside(predicate);
     }
 
     @Override
