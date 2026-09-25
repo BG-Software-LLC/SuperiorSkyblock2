@@ -95,15 +95,16 @@ public class NMSUtilsVersioned {
             ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
     private static final ReflectField<SimpleRegionStorage> ENTITY_STORAGE_REGION_STORAGE = new ReflectField<>(
             EntityStorage.class, SimpleRegionStorage.class, Modifier.PRIVATE | Modifier.FINAL, 1);
-    private static final ReflectMethod<org.bukkit.inventory.ItemStack> AS_CRAFT_MIRROR =
-            new ReflectMethod<>(CraftItemStack.class, org.bukkit.inventory.ItemStack.class, "asCraftMirror", ItemStack.class);
+    private static final ReflectMethod<org.bukkit.inventory.ItemStack> CRAFT_ITEM_STACK_AS_CRAFT_MIRROR = new ReflectMethod<>(
+                    CraftItemStack.class, org.bukkit.inventory.ItemStack.class, "asCraftMirror", ItemStack.class);
 
     public static final PalettedContainerFactory DEFAULT_PALETTED_CONTAINER_FACTORY = PalettedContainerFactory.create(
             MinecraftServer.getServer().registryAccess());
 
     public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
-        if (AS_CRAFT_MIRROR.isValid()) {
-            return AS_CRAFT_MIRROR.invoke(null, itemStack);
+        // Spigot still uses the CraftItemStack#asCraftMirror(ItemStack).
+        if (CRAFT_ITEM_STACK_AS_CRAFT_MIRROR.isValid()) {
+            return CRAFT_ITEM_STACK_AS_CRAFT_MIRROR.invoke(null, itemStack);
         }
 
         return CraftItemStack.asBukkitMirror(itemStack);
