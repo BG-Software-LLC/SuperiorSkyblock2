@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
@@ -936,25 +937,23 @@ public class BukkitEventsListener implements Listener {
 
     private static class EntityBreakByEntityEventFunction implements GameEventCreator<GameEventArgs.HangingBreakEvent, Event> {
 
+        private static final ReflectMethod<Enum<?>> GET_CAUSE_METHOD = new ReflectMethod<>(
+                new ClassInfo("io.papermc.paper.event.entity.EntityBreakEvent", ClassInfo.PackageType.UNKNOWN),
+                "getCause", new ClassInfo[0]);
+        private static final ReflectMethod<Entity> GET_REMOVER_METHOD = new ReflectMethod<>(
+                new ClassInfo("io.papermc.paper.event.entity.EntityBreakEvent", ClassInfo.PackageType.UNKNOWN),
+                "getRemover", new ClassInfo[0]);
+
         @Override
         public GameEvent<GameEventArgs.HangingBreakEvent> execute(GameEventType<GameEventArgs.HangingBreakEvent> eventType, GameEventPriority priority, Event e) {
-            try {
-                org.bukkit.event.entity.EntityEvent entityEvent = (org.bukkit.event.entity.EntityEvent) e;
+            org.bukkit.event.entity.EntityEvent entityEvent = (org.bukkit.event.entity.EntityEvent) e;
 
-                GameEventArgs.HangingBreakEvent hangingBreakEvent = new GameEventArgs.HangingBreakEvent();
+            GameEventArgs.HangingBreakEvent hangingBreakEvent = new GameEventArgs.HangingBreakEvent();
 
-                hangingBreakEvent.entity = entityEvent.getEntity();
-
-                Object cause = e.getClass().getMethod("getCause").invoke(e);
-                hangingBreakEvent.removeCause = HangingBreakEvent.RemoveCause.valueOf(((Enum<?>) cause).name());
-
-                Object remover = e.getClass().getMethod("getRemover").invoke(e);
-                hangingBreakEvent.remover = (Entity) remover;
-
-                return eventType.createEvent(hangingBreakEvent);
-            } catch (ReflectiveOperationException | IllegalArgumentException ex) {
-                return null;
-            }
+            hangingBreakEvent.entity = entityEvent.getEntity();
+            hangingBreakEvent.removeCause = HangingBreakEvent.RemoveCause.valueOf(GET_CAUSE_METHOD.invoke(e).name());
+            hangingBreakEvent.remover = GET_REMOVER_METHOD.invoke(e);
+            return eventType.createEvent(hangingBreakEvent);
         }
     }
 
