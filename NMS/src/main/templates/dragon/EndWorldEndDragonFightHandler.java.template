@@ -5,8 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.cache.IslandCacheKey;
 import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEndDragonFight;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.dimension.end.${END_DRAGON_FIGHT_CLASS};
 
 import java.util.LinkedList;
 import java.util.List;

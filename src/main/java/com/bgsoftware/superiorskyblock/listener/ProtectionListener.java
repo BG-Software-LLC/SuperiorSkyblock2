@@ -72,6 +72,8 @@ public class ProtectionListener extends AbstractGameEventListener {
     private static final Material TARGET = EnumHelper.getEnum(Material.class, "TARGET");
     @Nullable
     private static final EntityType LEASH_KNOT = EnumHelper.getEnum(EntityType.class, "LEASH_KNOT");
+    @Nullable
+    private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
 
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -99,7 +101,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (handleBedPlace(e)) return;
         if (handleSignColorChange(e)) return;
         if (handleBrushUse(e)) return;
-        if (handleMinecartPlace(e)) return;
+        if (handleEntityPlace(e)) return;
         if (handleEntityInteract(e)) return;
         handleBlockInteract(e, e.getArgs().player, e.getArgs().action, e.getArgs().clickedBlock, e.getArgs().usedHand, e.getArgs().usedItem);
     }
@@ -204,7 +206,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         return false;
     }
 
-    private boolean handleMinecartPlace(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
+    private boolean handleEntityPlace(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
         Action action = e.getArgs().action;
         ItemStack usedItem = e.getArgs().usedItem;
 
@@ -215,7 +217,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         Material clickedBlockType = e.getArgs().clickedBlock.getType();
 
         EntityType spawnType = Materials.isMinecart(handItemType) && Materials.isRail(clickedBlockType) ? EntityType.MINECART :
-                Materials.isBoat(handItemType) ? EntityType.BOAT : null;
+                Materials.isBoat(handItemType) ? EntityType.BOAT : Materials.isCushion(handItemType) ? CUSHION_TYPE : null;
         if (spawnType == null)
             return false;
 
@@ -374,9 +376,9 @@ public class ProtectionListener extends AbstractGameEventListener {
     }
 
     private void onHangingBreak(GameEvent<GameEventArgs.HangingBreakEvent> e) {
-        BukkitEntities.getPlayerSource(e.getArgs().remover).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(removerPlayer -> {
-            InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(removerPlayer, e.getArgs().entity, null);
-            if (ProtectionHelper.shouldPreventInteraction(interactionResult, removerPlayer, true))
+        BukkitEntities.getPlayerSource(e.getArgs().remover).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(superiorPlayer -> {
+            InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(e.getArgs().remover, e.getArgs().entity);
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                 e.setCancelled();
         });
     }
@@ -386,9 +388,27 @@ public class ProtectionListener extends AbstractGameEventListener {
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
-        InteractionResult interactionResult = this.protectionManager.get().handleEntityInteract(superiorPlayer, e.getArgs().entity, null);
-        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
-            e.setCancelled();
+
+        Entity entity = e.getArgs().entity;
+
+        List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+
+        if (entityCategories.isEmpty())
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location clickedBlockLocation = entity.getLocation(wrapper.getHandle());
+
+            for (EntityCategory entityCategory : entityCategories) {
+                if (entityCategory.getSpawnPrivilege() != null) {
+                    InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(
+                            superiorPlayer, clickedBlockLocation, entityCategory.getSpawnPrivilege());
+                    if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+                        e.setCancelled();
+                }
+            }
+        }
+
     }
 
     private void onEntityTarget(GameEvent<GameEventArgs.EntityTargetEvent> e) {

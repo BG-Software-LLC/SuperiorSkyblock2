@@ -29,9 +29,7 @@ import net.minecraft.world.level.dimension.end.${END_DRAGON_FIGHT_CLASS};
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Modifier;
@@ -212,13 +210,13 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
     }
 
     private static ReflectField<${END_DRAGON_FIGHT_CLASS}> initializeDragonBattleField() {
-        ReflectField<${END_DRAGON_FIGHT_CLASS}> dragonBattleField = new ReflectField<${END_DRAGON_FIGHT_CLASS}>(
+        ReflectField<${END_DRAGON_FIGHT_CLASS}> dragonBattleField = new ReflectField<>(
                 EnderDragon.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE | Modifier.FINAL, 1);
 
         if(dragonBattleField.isValid()) {
             dragonBattleField = dragonBattleField.removeFinal();
         } else {
-            dragonBattleField = new ReflectField<${END_DRAGON_FIGHT_CLASS}>(
+            dragonBattleField = new ReflectField<>(
                     EnderDragon.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE, 1);
         }
 

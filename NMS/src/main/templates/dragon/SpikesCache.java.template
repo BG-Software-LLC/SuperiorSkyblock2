@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon;
 
-
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.DragonUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;

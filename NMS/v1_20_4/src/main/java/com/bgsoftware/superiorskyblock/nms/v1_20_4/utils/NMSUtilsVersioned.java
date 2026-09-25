@@ -33,6 +33,7 @@ import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -62,6 +63,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBiome;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -87,6 +89,18 @@ public class NMSUtilsVersioned {
             ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
     private static final ReflectField<IOWorker> ENTITY_STORAGE_WORKER = new ReflectField<>(
             EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+    public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
+    }
+
+    public static int getLevelChunkX(LevelChunk levelChunk) {
+        return levelChunk.getPos().x;
+    }
+
+    public static int getLevelChunkZ(LevelChunk levelChunk) {
+        return levelChunk.getPos().z;
+    }
 
     public static CompoundTag readChunk(ChunkMap chunkMap, ChunkPos chunkPos) {
         return chunkMap.read(chunkPos).join().orElse(null);

@@ -61,6 +61,7 @@ import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -193,6 +194,18 @@ public class BukkitEventsListener implements Listener {
         try {
             Class.forName("org.bukkit.event.block.SpongeAbsorbEvent");
             createEventListener(GameEventType.SPONGE_ABSORB_EVENT, org.bukkit.event.block.SpongeAbsorbEvent.class, new SpongeAbsorbEventFunction());
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        try {
+            Class entityBreakByEntityEventClass = Class.forName("io.papermc.paper.event.entity.EntityBreakByEntityEvent");
+            createEventListener(GameEventType.HANGING_BREAK_EVENT, entityBreakByEntityEventClass, new EntityBreakByEntityEventFunction());
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        try {
+            Class.forName("org.bukkit.event.entity.EntityPlaceEvent");
+            createEventListener(GameEventType.ENTITY_PLACE_EVENT, org.bukkit.event.entity.EntityPlaceEvent.class, new EntityPlaceEventFunction());
         } catch (ClassNotFoundException ignored) {
         }
 
@@ -904,6 +917,41 @@ public class BukkitEventsListener implements Listener {
             spongeAbsorbEvent.block = e.getBlock();
             spongeAbsorbEvent.blocks = e.getBlocks();
             return eventType.createEvent(spongeAbsorbEvent);
+        }
+    }
+
+    private static class EntityBreakByEntityEventFunction implements GameEventCreator<GameEventArgs.HangingBreakEvent, Event> {
+
+        @Override
+        public GameEvent<GameEventArgs.HangingBreakEvent> execute(GameEventType<GameEventArgs.HangingBreakEvent> eventType, GameEventPriority priority, Event e) {
+            try {
+                org.bukkit.event.entity.EntityEvent entityEvent = (org.bukkit.event.entity.EntityEvent) e;
+
+                GameEventArgs.HangingBreakEvent hangingBreakEvent = new GameEventArgs.HangingBreakEvent();
+
+                hangingBreakEvent.entity = entityEvent.getEntity();
+
+                Object cause = e.getClass().getMethod("getCause").invoke(e);
+                hangingBreakEvent.removeCause = HangingBreakEvent.RemoveCause.valueOf(((Enum<?>) cause).name());
+
+                Object remover = e.getClass().getMethod("getRemover").invoke(e);
+                hangingBreakEvent.remover = (Entity) remover;
+
+                return eventType.createEvent(hangingBreakEvent);
+            } catch (ReflectiveOperationException | IllegalArgumentException ex) {
+                return null;
+            }
+        }
+    }
+
+    private static class EntityPlaceEventFunction implements GameEventCreator<GameEventArgs.EntityPlaceEvent, org.bukkit.event.entity.EntityPlaceEvent> {
+
+        @Override
+        public GameEvent<GameEventArgs.EntityPlaceEvent> execute(GameEventType<GameEventArgs.EntityPlaceEvent> eventType, GameEventPriority priority, org.bukkit.event.entity.EntityPlaceEvent e) {
+            GameEventArgs.EntityPlaceEvent entityPlaceEvent = new GameEventArgs.EntityPlaceEvent();
+            entityPlaceEvent.entity = e.getEntity();
+            entityPlaceEvent.player = e.getPlayer();
+            return eventType.createEvent(entityPlaceEvent);
         }
     }
 

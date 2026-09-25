@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersione
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.TickingBlockList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -72,8 +71,8 @@ public abstract class CropsTickingMethod {
             LevelChunkSection[] sections = levelChunk.getSections();
 
             int minSection = NMSUtilsVersioned.getMinSection(serverLevel);
-            int chunkOffsetX = levelChunk.locX << 4;
-            int chunkOffsetZ = levelChunk.locZ << 4;
+            int chunkOffsetX = NMSUtilsVersioned.getLevelChunkX(levelChunk) << 4;
+            int chunkOffsetZ = NMSUtilsVersioned.getLevelChunkZ(levelChunk) << 4;
 
             ${SERVER_LEVEL_RANDOM_TYPE} simpleRandom = SERVER_LEVEL_SIMPLE_RANDOM.get(serverLevel);
 
@@ -101,7 +100,7 @@ public abstract class CropsTickingMethod {
                         continue;
                     }
 
-                    int location = (int) tickList.getRaw(index) & 0xFFFF;
+                    int location = tickList.getRaw(index) & 0xFFFF;
                     BlockState blockState = states.get(location);
                     if (!CROPS_TO_GROW_CACHE.contains(blockState.getBlock()))
                         continue;
@@ -128,8 +127,8 @@ public abstract class CropsTickingMethod {
             LevelChunkSection[] sections = levelChunk.getSections();
             ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
 
-            int chunkOffsetX = levelChunk.locX << 4;
-            int chunkOffsetZ = levelChunk.locZ << 4;
+            int chunkOffsetX = NMSUtilsVersioned.getLevelChunkX(levelChunk) << 4;
+            int chunkOffsetZ = NMSUtilsVersioned.getLevelChunkZ(levelChunk) << 4;
 
             for (int sectionIndex = 0; sectionIndex < sections.length; ++sectionIndex) {
                 LevelChunkSection levelChunkSection = sections[sectionIndex];

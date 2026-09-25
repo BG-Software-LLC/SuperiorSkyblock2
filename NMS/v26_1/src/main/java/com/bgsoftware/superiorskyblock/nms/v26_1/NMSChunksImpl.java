@@ -229,7 +229,8 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v26_1.Abs
         return new NMSUtils.ChunkCallback(ChunkLoadReason.BLOCKS_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
-                ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(), levelChunk.locX, levelChunk.locZ, false);
+                ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(),
+                        NMSUtilsVersioned.getLevelChunkX(levelChunk), NMSUtilsVersioned.getLevelChunkZ(levelChunk), false);
                 allCalculatedChunks.add(calculateChunk(chunkPosition, levelChunk.level, levelChunk.getSections()));
 
                 latchCountDown();
@@ -300,7 +301,8 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v26_1.Abs
         return new NMSUtils.ChunkCallback(ChunkLoadReason.ENTITIES_RECALCULATE, true) {
             @Override
             public void onLoadedChunk(LevelChunk levelChunk) {
-                ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(), levelChunk.locX, levelChunk.locZ, false);
+                ChunkPosition chunkPosition = ChunkPosition.of(levelChunk.level.getWorld(),
+                        NMSUtilsVersioned.getLevelChunkX(levelChunk), NMSUtilsVersioned.getLevelChunkZ(levelChunk), false);
                 allCalculatedChunks.add(calculatedChunk(chunkPosition, levelChunk));
 
                 latchCountDown();
