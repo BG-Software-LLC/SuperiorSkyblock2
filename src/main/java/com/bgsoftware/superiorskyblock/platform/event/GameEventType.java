@@ -35,7 +35,6 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityExplodeEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityInteractEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityMoveEvent;
-import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityPlaceEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityPortalEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityRideEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntitySpawnEvent;
@@ -119,7 +118,6 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<EntityInteractEvent> ENTITY_INTERACT_EVENT = register(EntityInteractEvent.class, GameEventFlags.ENTITY_EVENT | GameEventFlags.MAYBE_BLOCK_EVENT);
     public static final GameEventType<EntityMoveEvent> ENTITY_MOVE_EVENT = register(EntityMoveEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<EntityPortalEvent> ENTITY_PORTAL_EVENT = register(EntityPortalEvent.class, GameEventFlags.ENTITY_EVENT);
-    public static final GameEventType<EntityPlaceEvent> ENTITY_PLACE_EVENT = register(EntityPlaceEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<EntityRideEvent> ENTITY_RIDE_EVENT = register(EntityRideEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<EntitySpawnEvent> ENTITY_SPAWN_EVENT = register(EntitySpawnEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<EntityTargetEvent> ENTITY_TARGET_EVENT = register(EntityTargetEvent.class, GameEventFlags.ENTITY_EVENT);

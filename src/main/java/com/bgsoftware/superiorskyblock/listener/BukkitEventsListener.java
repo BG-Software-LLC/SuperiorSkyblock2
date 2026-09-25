@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
@@ -22,6 +23,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -54,6 +56,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -108,6 +111,8 @@ public class BukkitEventsListener implements Listener {
             ProjectileHitEvent.class, "getHitEntity");
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
+    @Nullable
+    private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -165,6 +170,9 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.PROJECTILE_HIT_EVENT, ProjectileHitEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PROJECTILE_LAUNCH_EVENT, ProjectileLaunchEvent.class, this::createGameEvent);
 
+        if (CUSHION_TYPE != null)
+            createEventListener(GameEventType.ENTITY_SPAWN_EVENT, EntitySpawnEvent.class, this::createCushionGameEvent);
+
         // Inventory Events
         createEventListener(GameEventType.INVENTORY_CLICK_EVENT, InventoryClickEvent.class, this::createGameEvent);
         createEventListener(GameEventType.INVENTORY_CLOSE_EVENT, InventoryCloseEvent.class, this::createGameEvent);
@@ -200,12 +208,6 @@ public class BukkitEventsListener implements Listener {
         try {
             Class entityBreakByEntityEventClass = Class.forName("io.papermc.paper.event.entity.EntityBreakByEntityEvent");
             createEventListener(GameEventType.HANGING_BREAK_EVENT, entityBreakByEntityEventClass, new EntityBreakByEntityEventFunction());
-        } catch (ClassNotFoundException ignored) {
-        }
-
-        try {
-            Class.forName("org.bukkit.event.entity.EntityPlaceEvent");
-            createEventListener(GameEventType.ENTITY_PLACE_EVENT, org.bukkit.event.entity.EntityPlaceEvent.class, new EntityPlaceEventFunction());
         } catch (ClassNotFoundException ignored) {
         }
 
@@ -654,6 +656,18 @@ public class BukkitEventsListener implements Listener {
         return eventType.createEvent(entityDeathEvent);
     }
 
+    private GameEvent<GameEventArgs.EntitySpawnEvent> createCushionGameEvent(GameEventType<GameEventArgs.EntitySpawnEvent> eventType, GameEventPriority priority, EntitySpawnEvent e) {
+        // We only listen to Cushion in EntitySpawnEvent, as this is the only event that is both called in Spigot and Paper.
+        // In Paper, the event "EntityPlaceEvent" should technically be used, but listening to it conflicts with HangingPlaceEvent and others.
+        if (e.getEntityType() != CUSHION_TYPE)
+            return null;
+
+        GameEventArgs.EntitySpawnEvent entitySpawnEvent = new GameEventArgs.EntitySpawnEvent();
+        entitySpawnEvent.entity = e.getEntity();
+        entitySpawnEvent.spawnReason = CreatureSpawnEvent.SpawnReason.NATURAL;
+        return eventType.createEvent(entitySpawnEvent);
+    }
+
     /*
      * INVENTORY EVENTS
      */
@@ -941,17 +955,6 @@ public class BukkitEventsListener implements Listener {
             } catch (ReflectiveOperationException | IllegalArgumentException ex) {
                 return null;
             }
-        }
-    }
-
-    private static class EntityPlaceEventFunction implements GameEventCreator<GameEventArgs.EntityPlaceEvent, org.bukkit.event.entity.EntityPlaceEvent> {
-
-        @Override
-        public GameEvent<GameEventArgs.EntityPlaceEvent> execute(GameEventType<GameEventArgs.EntityPlaceEvent> eventType, GameEventPriority priority, org.bukkit.event.entity.EntityPlaceEvent e) {
-            GameEventArgs.EntityPlaceEvent entityPlaceEvent = new GameEventArgs.EntityPlaceEvent();
-            entityPlaceEvent.entity = e.getEntity();
-            entityPlaceEvent.player = e.getPlayer();
-            return eventType.createEvent(entityPlaceEvent);
         }
     }
 

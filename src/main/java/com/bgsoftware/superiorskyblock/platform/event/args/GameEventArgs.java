@@ -82,12 +82,6 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
-    public static class EntityPlaceEvent extends EntityEvent {
-
-        public Player player;
-
-    }
-
     public static class EntityMoveEvent extends EntityEvent {
 
         public Location from;
