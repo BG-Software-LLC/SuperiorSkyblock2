@@ -70,6 +70,10 @@ public class AbstractEntityHologram extends ArmorStand implements Hologram {
         // Prevent stand being equipped
     }
 
+    public void setSlot(EquipmentSlot equipmentSlot, ItemStack itemStack, boolean silence) {
+        // Prevent stand being equipped
+    }
+
     @Override
     public void tick() {
         // Disable normal ticking for this entity.
@@ -108,6 +112,10 @@ public class AbstractEntityHologram extends ArmorStand implements Hologram {
      * on chunk unload, we prefer to override isInvulnerable().
      */
     public boolean isInvulnerableTo(ServerLevel serverLevel, DamageSource damageSource) {
+        return true;
+    }
+
+    public boolean isInvulnerableTo(DamageSource damageSource) {
         return true;
     }
 
