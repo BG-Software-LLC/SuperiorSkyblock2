@@ -41,7 +41,9 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -53,6 +55,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ProtectionListener extends AbstractGameEventListener {
+
+    private static final boolean PROJECTILE_HIT_EVENT_IS_CANCELLABLE =
+            Cancellable.class.isAssignableFrom(ProjectileHitEvent.class);
 
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
@@ -74,6 +79,8 @@ public class ProtectionListener extends AbstractGameEventListener {
     private static final EntityType LEASH_KNOT = EnumHelper.getEnum(EntityType.class, "LEASH_KNOT");
     @Nullable
     private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
+    @Nullable
+    private static final Material SULFUR_SPIKE = EnumHelper.getEnum(Material.class, "SULFUR_SPIKE");
 
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -624,33 +631,44 @@ public class ProtectionListener extends AbstractGameEventListener {
                 } else {
                     hitBlock = e.getArgs().hitBlock;
                     Material hitBlockType = hitBlock == null ? null : hitBlock.getType();
-                    if (hitBlockType != CHORUS_FLOWER && hitBlockType != DECORATED_POT && hitBlockType != TARGET)
-                        return;
+                    EntityType entityType = entity.getType();
 
-                    IslandPrivilege requiredPrivilege = plugin.getSettings().getInteractablesMap()
-                            .getRequiredPrivilege(ConstantKeys.TARGET);
+                    if (hitBlockType == TARGET) {
+                        islandPrivilege = plugin.getSettings().getInteractablesMap()
+                                .getRequiredPrivilege(ConstantKeys.TARGET);
+                    } else if (hitBlockType == CHORUS_FLOWER || hitBlockType == DECORATED_POT || (entityType == TRIDENT
+                            && (hitBlockType == POINTED_DRIPSTONE || hitBlockType == SULFUR_SPIKE))) {
+                        islandPrivilege = IslandPrivileges.BREAK;
+                    } else {
+                        islandPrivilege = null;
+                    }
+
+                    if (islandPrivilege == null) {
+                        return;
+                    }
 
                     location = hitBlock.getLocation(wrapper.getHandle());
-                    islandPrivilege = hitBlockType == TARGET ? requiredPrivilege : IslandPrivileges.BREAK;
-
-                    if (islandPrivilege == null)
-                        return;
 
                     interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer, location, islandPrivilege);
                 }
             }
 
             if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooterPlayer, true)) {
-                entity.remove();
-                if (hitBlock != null) {
-                    ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
-                    hitBlock.setType(Material.AIR);
-                    BukkitExecutor.sync(() -> {
-                        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                            cachedBlock.setBlock(hitBlock.getLocation(wrapper.getHandle()));
-                        }
-                        cachedBlock.release();
-                    }, 1L);
+                if (PROJECTILE_HIT_EVENT_IS_CANCELLABLE) {
+                    e.setCancelled();
+                } else {
+                    // Support for 1.8 and 1.12, where this event was not Cancellable.
+                    entity.remove();
+                    if (hitBlock != null) {
+                        ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
+                        hitBlock.setType(Material.AIR);
+                        BukkitExecutor.sync(() -> {
+                            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                                cachedBlock.setBlock(hitBlock.getLocation(wrapper.getHandle()));
+                            }
+                            cachedBlock.release();
+                        }, 1L);
+                    }
                 }
             }
         });
@@ -668,7 +686,7 @@ public class ProtectionListener extends AbstractGameEventListener {
                 Block block = blocksIterator.next();
                 Material blockType = block.getType();
 
-                IslandPrivilege islandPrivilege = blockType == CHORUS_FLOWER || blockType == POINTED_DRIPSTONE ?
+                IslandPrivilege islandPrivilege = blockType == CHORUS_FLOWER || blockType == DECORATED_POT ?
                         IslandPrivileges.BREAK : plugin.getSettings().getInteractablesMap().getRequiredPrivilege(Keys.of(block));
 
                 if (islandPrivilege == null)
