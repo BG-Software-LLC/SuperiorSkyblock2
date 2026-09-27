@@ -86,6 +86,10 @@ public enum Materials {
         return hasTag(material, Tag.BOAT);
     }
 
+    public static boolean isChestBoat(Material material) {
+        return hasTag(material, Tag.CHEST_BOAT);
+    }
+
     public static boolean isLava(Material material) {
         return hasTag(material, Tag.LAVA);
     }
@@ -170,6 +174,8 @@ public enum Materials {
                 materialTags.add(Tag.CHEST);
             if (materialName.contains("BOAT") || materialName.contains("_RAFT"))
                 materialTags.add(Tag.BOAT);
+            if (materialName.contains("CHEST_BOAT") || materialName.contains("CHEST_RAFT"))
+                materialTags.add(Tag.CHEST_BOAT);
             if (materialName.contains("LAVA"))
                 materialTags.add(Tag.LAVA);
             if (materialName.contains("SIGN"))
@@ -223,6 +229,7 @@ public enum Materials {
         MINECART,
         CHEST,
         BOAT,
+        CHEST_BOAT,
         LAVA,
         SIGN,
         DYE,

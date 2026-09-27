@@ -696,6 +696,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isCountEntitiesAsBlocks() {
+        return this.global.isCountEntitiesAsBlocks();
+    }
+
+    @Override
     public boolean getChatSigningSupport() {
         return this.global.getChatSigningSupport();
     }

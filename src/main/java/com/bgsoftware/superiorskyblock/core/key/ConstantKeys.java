@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 
 import java.util.Optional;
 
@@ -31,7 +30,6 @@ public class ConstantKeys {
     public static final Key END_PORTAL_FRAME_WITH_EYE = Keys.of(Materials.END_PORTAL_FRAME.toBukkitType(), (short) 7);
     public static final Key FURNACE = Keys.of(Material.FURNACE);
     public static final Key HOPPER = Keys.of(Material.HOPPER);
-    @Nullable
     public static final Key IRON_BLOCK = Keys.of(Material.IRON_BLOCK);
     public static final Key LAVA = Keys.of(Material.LAVA);
     public static final Key MOB_SPAWNER = Keys.of(Materials.SPAWNER.toBukkitType());
@@ -49,21 +47,16 @@ public class ConstantKeys {
     public static final Key WET_SPONGE = Keys.of(EnumHelper.getEnum(Material.class, "WET_SPONGE", "SPONGE"));
     public static final Key WITHER_SKELETON_SKULL = initializeWitherSkeletonSkullKey();
 
-    public static final Key ENTITY_MINECART_COMMAND = Keys.of(EntityType.MINECART_COMMAND);
-    public static final Key ENTITY_MINECART_CHEST = Keys.of(EntityType.MINECART_CHEST);
-    public static final Key ENTITY_MINECART_FURNACE = Keys.of(EntityType.MINECART_FURNACE);
-    public static final Key ENTITY_MINECART_TNT = Keys.of(EntityType.MINECART_TNT);
-    public static final Key ENTITY_MINECART_HOPPER = Keys.of(EntityType.MINECART_HOPPER);
-    public static final Key ENTITY_MINECART_MOB_SPAWNER = Keys.of(EntityType.MINECART_MOB_SPAWNER);
-
     private ConstantKeys() {
 
     }
 
     private static Key initializeWitherSkeletonSkullKey() {
         Material newSkullMaterial = EnumHelper.getEnum(Material.class, "WITHER_SKELETON_SKULL");
-        if (newSkullMaterial != null)
+
+        if (newSkullMaterial != null) {
             return Keys.of(newSkullMaterial);
+        }
 
         return Keys.of(Material.SKULL_ITEM, (byte) 1);
     }

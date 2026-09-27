@@ -415,6 +415,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().blockCountsSaveThreshold;
     }
 
+    public boolean isCountEntitiesAsBlocks() {
+        return getContainer().countEntitiesAsBlocks;
+    }
+
     public boolean getChatSigningSupport() {
         return getContainer().chatSigningSupport;
     }

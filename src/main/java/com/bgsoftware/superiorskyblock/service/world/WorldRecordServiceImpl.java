@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.key.EntityBlockMapper;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -29,7 +30,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Minecart;
 
 import java.util.EnumMap;
 
@@ -308,10 +308,13 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         if (recordResult != RecordResult.SUCCESS)
             return recordResult;
 
-        if (entity instanceof Minecart) {
-            Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                recordBlockBreak(blockKey, entity.getLocation(wrapper.getHandle()), 1, REGULAR_RECORD_FLAGS);
+        if (plugin.getSettings().isCountEntitiesAsBlocks() && BukkitEntities.canHaveBlock(entity)) {
+            Key blockKey = EntityBlockMapper.getBlockFromEntity(Keys.of(entity));
+
+            if (blockKey != null) {
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    recordBlockBreak(blockKey, entity.getLocation(wrapper.getHandle()), 1, REGULAR_RECORD_FLAGS);
+                }
             }
         }
 
