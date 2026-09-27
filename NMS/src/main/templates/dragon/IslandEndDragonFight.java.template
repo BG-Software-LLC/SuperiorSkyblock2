@@ -66,6 +66,8 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
     private final Vec3 islandBlockVectored;
     private final ServerLevel serverLevel;
     private final IslandEntityEnderDragon entityEnderDragon;
+    private final Runnable tickTask;
+    private final Runnable resetSpikeCrystalsTask;
 
     private byte currentTick = 0;
 
@@ -81,6 +83,17 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
         this.islandBlockPos = islandBlockPos;
         this.islandBlockVectored = Vec3.atBottomCenterOf(islandBlockPos);
         this.serverLevel = serverLevel;
+
+        // Must be initialized before spawning the dragon, as it resets the spike crystals.
+        SpikesCache.IslandSpikes islandSpikes = SpikesCache.createIslandSpikes(serverLevel, islandBlockPos);
+        if (islandSpikes == null) {
+            this.tickTask = super::tick;
+            this.resetSpikeCrystalsTask = super::resetSpikeCrystals;
+        } else {
+            this.tickTask = () -> islandSpikes.runWith(super::tick);
+            this.resetSpikeCrystalsTask = () -> islandSpikes.runWith(super::resetSpikeCrystals);
+        }
+
         this.entityEnderDragon = islandEntityEnderDragon == null ? spawnEnderDragon() : islandEntityEnderDragon;
 
         SCAN_FOR_LEGACY_PORTALS.set(this, false);
@@ -94,7 +107,7 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
     public void tick() {
         // doServerTick
 
-        DragonUtils.runWithPodiumPosition(this.islandBlockPos, super::tick);
+        DragonUtils.runWithPodiumPosition(this.islandBlockPos, this.tickTask);
 
         DragonPhaseInstance currentPhase = this.entityEnderDragon.getPhaseManager().getCurrentPhase();
         if (currentPhase instanceof DragonLandingPhase && !this.islandBlockVectored.equals(currentPhase.getFlyTargetLocation())) {
@@ -158,7 +171,7 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
 
     @Override
     public void resetSpikeCrystals() {
-        DragonUtils.runWithPodiumPosition(this.islandBlockPos, super::resetSpikeCrystals);
+        DragonUtils.runWithPodiumPosition(this.islandBlockPos, this.resetSpikeCrystalsTask);
     }
 
     public void removeBattlePlayers() {
