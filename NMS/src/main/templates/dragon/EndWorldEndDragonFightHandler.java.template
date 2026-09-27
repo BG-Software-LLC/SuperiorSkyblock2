@@ -26,8 +26,11 @@ public class EndWorldEndDragonFightHandler {
 
     public void addDragonFight(IslandCache islandCache, IslandEndDragonFight endDragonFight) {
         IslandEndDragonFight oldDragonFight = islandCache.store(CACHE_KEY, endDragonFight);
-        if (oldDragonFight != null)
+        if (oldDragonFight != null && oldDragonFight != endDragonFight) {
             this.worldDragonFightsList.remove(oldDragonFight);
+            // The old fight is no longer ticked, so its boss bar would stay visible to its players forever.
+            oldDragonFight.removeBattlePlayers();
+        }
         this.worldDragonFightsList.add(endDragonFight);
     }
 
