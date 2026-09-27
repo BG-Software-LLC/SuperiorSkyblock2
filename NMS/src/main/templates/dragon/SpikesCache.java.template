@@ -39,6 +39,8 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     @Nullable
     private static LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>> vanillaSpikesCache;
 
+    private static boolean hideSpikes = false;
+
     private final LoadingCache<BlockPos, List<${SPIKE_FEATURE_CLASS}.EndSpike>> cachedSpikes = CacheBuilder.newBuilder()
             .expireAfterWrite(5L, TimeUnit.MINUTES).build(new InternalCacheLoader());
 
@@ -80,6 +82,21 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
         return null;
     }
 
+    public static void runWithoutSpikes(@Nullable IslandSpikes islandSpikes, Runnable runnable) {
+        if (islandSpikes != null) {
+            islandSpikes.runWith(Collections.emptyList(), runnable);
+            return;
+        }
+
+        boolean previousHideSpikes = hideSpikes;
+        hideSpikes = true;
+        try {
+            runnable.run();
+        } finally {
+            hideSpikes = previousHideSpikes;
+        }
+    }
+
     public static List<${SPIKE_FEATURE_CLASS}.EndSpike> computeSpikes(long worldSeed, BlockPos blockPos) {
         List<Integer> list = IntStream.range(0, 10).boxed().collect(Collectors.toList());
 
@@ -103,6 +120,9 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     @Override
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> get(@NotNull Long worldSeed) throws ExecutionException {
+        if (hideSpikes)
+            return Collections.emptyList();
+
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.get(DragonUtils.getCurrentPodiumPosition());
@@ -114,6 +134,9 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     @Override
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> getUnchecked(@NotNull Long worldSeed) {
+        if (hideSpikes)
+            return Collections.emptyList();
+
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.getUnchecked(DragonUtils.getCurrentPodiumPosition());
@@ -159,6 +182,9 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> get(@NotNull Long worldSeed,
                                     @NotNull Callable<? extends List<${SPIKE_FEATURE_CLASS}.EndSpike>> loader) throws ExecutionException {
+        if (hideSpikes)
+            return Collections.emptyList();
+
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.get(DragonUtils.getCurrentPodiumPosition(), loader);
@@ -242,11 +268,17 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
         }
 
         public void runWith(Runnable runnable) {
-            vanillaSpikesCache.put(this.key, this.islandSpikes);
+            runWith(this.islandSpikes, runnable);
+        }
+
+        private void runWith(List<${SPIKE_FEATURE_CLASS}.EndSpike> spikes, Runnable runnable) {
+            // Calls may be nested, so we restore the previous spikes instead of the vanilla ones.
+            List<${SPIKE_FEATURE_CLASS}.EndSpike> previousSpikes = vanillaSpikesCache.asMap().get(this.key);
+            vanillaSpikesCache.put(this.key, spikes);
             try {
                 runnable.run();
             } finally {
-                vanillaSpikesCache.put(this.key, this.vanillaSpikes);
+                vanillaSpikesCache.put(this.key, previousSpikes == null ? this.vanillaSpikes : previousSpikes);
             }
         }
 

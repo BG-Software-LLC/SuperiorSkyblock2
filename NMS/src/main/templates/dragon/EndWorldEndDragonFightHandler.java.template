@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.cache.IslandCacheKey;
 import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEndDragonFight;
+import net.minecraft.core.BlockPos;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +34,23 @@ public class EndWorldEndDragonFightHandler {
     @Nullable
     public IslandEndDragonFight getDragonFight(IslandCache islandCache) {
         return islandCache.get(CACHE_KEY);
+    }
+
+    @Nullable
+    public IslandEndDragonFight getDragonFightAt(BlockPos blockPos) {
+        int chunkX = blockPos.getX() >> 4;
+        int chunkZ = blockPos.getZ() >> 4;
+
+        for (IslandEndDragonFight endDragonFight : this.worldDragonFightsList) {
+            if (endDragonFight.getIsland().isInside(chunkX, chunkZ))
+                return endDragonFight;
+        }
+
+        return null;
+    }
+
+    public List<IslandEndDragonFight> getDragonFights() {
+        return Collections.unmodifiableList(this.worldDragonFightsList);
     }
 
     @Nullable

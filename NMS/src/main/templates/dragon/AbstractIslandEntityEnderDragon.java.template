@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon;
 
 import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
@@ -62,6 +63,16 @@ public class AbstractIslandEntityEnderDragon extends EnderDragon {
         super(${ENTITY_TYPE_VALUES_CLASS}.ENDER_DRAGON, level);
         this.serverLevel = (ServerLevel) level;
         this.dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(level.getWorld());
+    }
+
+    @Nullable
+    public BlockPos getIslandBlockPos() {
+        return this.islandBlockPos;
+    }
+
+    public void setIslandBlockPos(BlockPos islandBlockPos) {
+        this.islandBlockPos = islandBlockPos;
+        NMSUtilsVersioned.setFightOrigin(this, islandBlockPos);
     }
 
     @Override

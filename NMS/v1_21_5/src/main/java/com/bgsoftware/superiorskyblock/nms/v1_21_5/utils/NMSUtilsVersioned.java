@@ -32,6 +32,7 @@ import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
@@ -327,6 +328,10 @@ public class NMSUtilsVersioned {
 
     public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
         enderDragon.setFightOrigin(fightOrigin);
+    }
+
+    public static void removeDragonTicket(ServerLevel serverLevel) {
+        serverLevel.getChunkSource().removeTicketWithRadius(TicketType.DRAGON, new ChunkPos(0, 0), 9);
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {

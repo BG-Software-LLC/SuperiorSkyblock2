@@ -27,7 +27,9 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.item.ItemStack;
@@ -307,6 +309,10 @@ public class NMSUtilsVersioned {
 
     public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
         // Fight origin does not exist in this version; DragonUtils handles the podium position instead.
+    }
+
+    public static void removeDragonTicket(ServerLevel serverLevel) {
+        serverLevel.getChunkSource().removeRegionTicket(TicketType.DRAGON, new ChunkPos(0, 0), 9, Unit.INSTANCE);
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {
