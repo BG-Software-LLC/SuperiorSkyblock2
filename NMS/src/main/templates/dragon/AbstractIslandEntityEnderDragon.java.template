@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon;
 
 import com.bgsoftware.common.annotations.NotNull;
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -15,13 +16,29 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
+import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.feature.${SPIKE_FEATURE_CLASS};
+import net.minecraft.world.level.pathfinder.Node;
 import org.bukkit.Location;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftEnderDragon;
+
+import java.lang.reflect.Modifier;
+import java.util.List;
 
 public class AbstractIslandEntityEnderDragon extends EnderDragon {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final ReflectField<Node[]> NODES = new ReflectField<>(
+            EnderDragon.class, Node[].class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+    // Vanilla node heights are calculated for the vanilla end island, where the podium is at y=64.
+    // We translate these heights to be relative to the island instead.
+    private static final int VANILLA_PODIUM_Y = 64;
+    private static final int VANILLA_MIN_NODE_Y = 73;
 
     @NotNull
     public static EnderDragon fromEntityTypes(EntityType<? extends EnderDragon> entityTypes, Level level) {
@@ -32,10 +49,13 @@ public class AbstractIslandEntityEnderDragon extends EnderDragon {
     protected final ServerLevel serverLevel;
     protected final Dimension dimension;
     protected BlockPos islandBlockPos;
+    // The origin the path nodes are currently centered around.
+    private BlockPos nodesOrigin = BlockPos.ZERO;
 
     protected AbstractIslandEntityEnderDragon(Level level, BlockPos islandBlockPos) {
         this(level);
         this.islandBlockPos = islandBlockPos;
+        NMSUtilsVersioned.setFightOrigin(this, islandBlockPos);
     }
 
     protected AbstractIslandEntityEnderDragon(Level level) {
@@ -47,6 +67,32 @@ public class AbstractIslandEntityEnderDragon extends EnderDragon {
     @Override
     public void aiStep() {
         DragonUtils.runWithPodiumPosition(this.islandBlockPos, super::aiStep);
+    }
+
+    @Override
+    public int findClosestNode() {
+        Node[] nodes = NODES.get(this);
+        if (nodes == null)
+            return super.findClosestNode();
+
+        // Vanilla generates the path nodes around (0, 0), as there is only one dragon fight in the world.
+        // We generate them using vanilla logic, and then move them to be around the island.
+        if (nodes[0] == null)
+            super.findClosestNode();
+
+        if (this.islandBlockPos != null && !this.nodesOrigin.equals(this.islandBlockPos))
+            offsetNodes(nodes);
+
+        return super.findClosestNode(getX(), getY(), getZ());
+    }
+
+    @Override
+    public int findClosestNode(double x, double y, double z) {
+        // The takeoff and landing approach phases look for nodes relative to (0, 0).
+        if (this.islandBlockPos != null && isLookingForRelativeNode())
+            return super.findClosestNode(x + this.islandBlockPos.getX(), y, z + this.islandBlockPos.getZ());
+
+        return super.findClosestNode(x, y, z);
     }
 
     @Override
@@ -75,10 +121,57 @@ public class AbstractIslandEntityEnderDragon extends EnderDragon {
         }
 
         this.islandBlockPos = new BlockPos(middleBlock.getBlockX(), middleBlock.getBlockY(), middleBlock.getBlockZ());
+        NMSUtilsVersioned.setFightOrigin(this, this.islandBlockPos);
 
         IslandEndDragonFight dragonBattle = new IslandEndDragonFight(island, this.serverLevel,
                 this.islandBlockPos, (IslandEntityEnderDragon) this);
         dragonFight.HANDLER.addDragonFight(island.getCache(), dragonBattle);
+    }
+
+    private void offsetNodes(Node[] nodes) {
+        int offsetX = this.islandBlockPos.getX() - this.nodesOrigin.getX();
+        int offsetZ = this.islandBlockPos.getZ() - this.nodesOrigin.getZ();
+        int islandY = this.islandBlockPos.getY();
+
+        List<${SPIKE_FEATURE_CLASS}.EndSpike> spikes = SpikesCache.computeSpikes(this.serverLevel.getSeed(), this.islandBlockPos);
+
+        for (int i = 0; i < nodes.length; ++i) {
+            Node node = nodes[i];
+            int nodeX = node.x + offsetX;
+            int nodeZ = node.z + offsetZ;
+
+            // Vanilla nodes are generated above the end island and the end spikes. Islands are usually surrounded
+            // by void, so we treat the island as the ground around it, and the end spikes as if they exist.
+            int groundY = Math.max(islandY, getSpikeGroundY(spikes, nodeX, nodeZ, islandY));
+            groundY = Math.max(groundY, this.serverLevel.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                    new BlockPos(nodeX, 0, nodeZ)).getY());
+
+            // Same height logic as vanilla, with the minimum height being relative to the island.
+            int heightOffset = i >= 12 && i < 20 ? 15 : 5;
+            int nodeY = Math.max(islandY + VANILLA_MIN_NODE_Y - VANILLA_PODIUM_Y, groundY + heightOffset);
+            nodes[i] = new Node(nodeX, nodeY, nodeZ);
+        }
+
+        this.nodesOrigin = this.islandBlockPos;
+    }
+
+    private static int getSpikeGroundY(List<${SPIKE_FEATURE_CLASS}.EndSpike> spikes, int x, int z, int islandY) {
+        for (${SPIKE_FEATURE_CLASS}.EndSpike spike : spikes) {
+            int deltaX = x - spike.getCenterX();
+            int deltaZ = z - spike.getCenterZ();
+            // Same check vanilla uses when placing the spike blocks.
+            if (deltaX * deltaX + deltaZ * deltaZ <= spike.getRadius() * spike.getRadius() + 1) {
+                // The top of vanilla spikes is at their height, relative to the vanilla podium.
+                return islandY + spike.getHeight() + 1 - VANILLA_PODIUM_Y;
+            }
+        }
+
+        return Integer.MIN_VALUE;
+    }
+
+    private boolean isLookingForRelativeNode() {
+        EnderDragonPhase<? extends DragonPhaseInstance> phase = getPhaseManager().getCurrentPhase().getPhase();
+        return phase == EnderDragonPhase.TAKEOFF || phase == EnderDragonPhase.LANDING_APPROACH;
     }
 
 }

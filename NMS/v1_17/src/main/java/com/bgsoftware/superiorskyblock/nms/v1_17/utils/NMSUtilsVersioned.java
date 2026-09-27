@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_17.utils.TickingBlockList;
 import com.google.common.base.Suppliers;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -25,6 +26,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -280,6 +282,10 @@ public class NMSUtilsVersioned {
 
     public static EndDragonFight getEndDragonFight(ServerLevel serverLevel) {
         return serverLevel.dragonFight();
+    }
+
+    public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
+        // Fight origin does not exist in this version; DragonUtils handles the podium position instead.
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {

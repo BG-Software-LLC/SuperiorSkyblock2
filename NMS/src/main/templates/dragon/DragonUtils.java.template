@@ -8,6 +8,9 @@ import java.lang.reflect.Modifier;
 
 public class DragonUtils {
 
+    // Only valid in versions where the field is public (before 1.20). Newer versions calculate the podium
+    // location using the fight origin of the dragon, which is set in AbstractIslandEntityEnderDragon.
+    // Do not make this field valid for newer versions, otherwise the island offset will be applied twice.
     private static final ReflectField<BlockPos> END_PODIUM_LOCATION = new ReflectField<BlockPos>(
             EndPodiumFeature.class, BlockPos.class,
             Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL, 1)

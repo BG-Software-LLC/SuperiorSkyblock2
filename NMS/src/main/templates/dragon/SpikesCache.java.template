@@ -80,7 +80,7 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
         return null;
     }
 
-    private static List<${SPIKE_FEATURE_CLASS}.EndSpike> computeSpikes(long worldSeed, BlockPos blockPos) {
+    public static List<${SPIKE_FEATURE_CLASS}.EndSpike> computeSpikes(long worldSeed, BlockPos blockPos) {
         List<Integer> list = IntStream.range(0, 10).boxed().collect(Collectors.toList());
 
         Collections.shuffle(list, new Random(worldSeed));

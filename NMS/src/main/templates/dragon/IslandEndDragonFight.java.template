@@ -52,6 +52,9 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
     private static final ReflectField<Vec3> LANDING_TARGET_POSITION = new ReflectField<>(
             DragonLandingPhase.class, Vec3.class, Modifier.PRIVATE, 1);
 
+    // Vanilla spawns the dragon at y=128, which is 64 blocks above the vanilla podium (y=64).
+    private static final int DRAGON_SPAWN_HEIGHT_ABOVE_ISLAND = 64;
+
     private static final BlockPattern EXIT_PORTAL_PATTERN = BlockPatternBuilder.start()
             .aisle("       ", "       ", "       ", "   #   ", "       ", "       ", "       ")
             .aisle("       ", "       ", "       ", "   #   ", "       ", "       ", "       ")
@@ -210,7 +213,9 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
         IslandEntityEnderDragon entityEnderDragon = new IslandEntityEnderDragon(this.serverLevel, this.islandBlockPos);
 
         entityEnderDragon.getPhaseManager().setPhase(EnderDragonPhase.HOLDING_PATTERN);
-        NMSUtilsVersioned.moveEntity(entityEnderDragon, this.islandBlockPos.getX(), 128, this.islandBlockPos.getZ(),
+        int spawnY = Math.min(this.islandBlockPos.getY() + DRAGON_SPAWN_HEIGHT_ABOVE_ISLAND,
+                NMSUtilsVersioned.getMaxBuildHeight(this.serverLevel) - 1);
+        NMSUtilsVersioned.moveEntity(entityEnderDragon, this.islandBlockPos.getX(), spawnY, this.islandBlockPos.getZ(),
                 this.serverLevel.getRandom().nextFloat() * 360.0F, 0.0F);
 
         NMSUtilsVersioned.addEntity(this.serverLevel, entityEnderDragon, CreatureSpawnEvent.SpawnReason.NATURAL);
