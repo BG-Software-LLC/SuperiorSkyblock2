@@ -574,6 +574,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public List<String> getDangerousCommands() {
+        return this.global.getDangerousCommands();
+    }
+
+    @Override
     public List<String> getDisabledHooks() {
         return this.global.getDisabledHooks();
     }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.events.plugin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.CommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.CmdAdmin;
 import com.bgsoftware.superiorskyblock.commands.player.CmdHelp;
@@ -47,6 +48,7 @@ public class PluginEventsDispatcher extends EventsDispatcher<
         WorldsProvider_Default.registerListeners(this);
         IslandPrivileges.registerListeners(this);
         Dimensions.registerListeners(this);
+        CommandsManagerImpl.registerListeners(this);
     }
 
     public void registerCallback(PluginEventType<?> type, Runnable callback) {
