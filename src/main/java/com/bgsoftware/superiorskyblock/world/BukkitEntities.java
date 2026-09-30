@@ -140,8 +140,16 @@ public class BukkitEntities {
         return entity instanceof Minecart || (CHEST_BOAT_CLASS != null && CHEST_BOAT_CLASS.isInstance(entity));
     }
 
+    public static boolean canHaveBlock(EntityType entityType) {
+        Class<?> entityClass = entityType.getEntityClass();
+
+        return (entityClass != null && (Minecart.class.isAssignableFrom(entityClass) ||
+                        (CHEST_BOAT_CLASS != null && CHEST_BOAT_CLASS.isAssignableFrom(entityClass))));
+    }
+
     public static boolean canHaveLimit(EntityType entityType) {
         Class<?> entityClass = entityType.getEntityClass();
+
         return (entityClass != null && (LivingEntity.class.isAssignableFrom(entityClass) || entityType == CUSHION_TYPE ||
                 Hanging.class.isAssignableFrom(entityClass) || Vehicle.class.isAssignableFrom(entityClass)));
     }

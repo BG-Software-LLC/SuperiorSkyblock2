@@ -367,7 +367,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private void onEntityWithBlockPlace(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
         Entity entity = e.getArgs().entity;
 
-        if (!BukkitEntities.canHaveBlock(entity)) {
+        if (!BukkitEntities.canHaveBlock(entity.getType())) {
             return;
         }
 

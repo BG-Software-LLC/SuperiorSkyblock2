@@ -159,11 +159,11 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
             // Calculate entities with block counts
             if (plugin.getSettings().isCountEntitiesAsBlocks()) {
-                EntityBlockMapper.getTrackerMappings().forEach(pair -> {
-                    int count = island.getEntitiesTracker().getEntityCount(pair.getKey());
+                EntityBlockMapper.getTrackerMappings().forEach(entry -> {
+                    int count = island.getEntitiesTracker().getEntityCount(entry.getKey());
 
                     if (count > 0) {
-                        blockCounts.addCounts(pair.getValue(), count);
+                        blockCounts.addCounts(entry.getValue(), count);
                     }
                 });
             }

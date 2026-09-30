@@ -30,7 +30,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.entity.${ABSTRACT_MINECART_SUBPACKAGE}.AbstractMinecart;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
@@ -45,7 +44,6 @@ import org.bukkit.command.defaults.BukkitCommand;
 import ${CRAFTBUKKIT_PACKAGE}.CraftServer;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftFallingBlock;
-import ${CRAFTBUKKIT_PACKAGE}.entity.CraftMinecart;
 import ${CRAFTBUKKIT_PACKAGE}.util.CraftMagicNumbers;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
@@ -182,13 +180,6 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
     @Override
     public Key getBlockKey(int combinedId) {
         Block block = Block.stateById(combinedId).getBlock();
-        return KeyBlocksCache.getBlockKey(block);
-    }
-
-    @Override
-    public Key getMinecartBlock(org.bukkit.entity.Minecart bukkitMinecart) {
-        AbstractMinecart minecart = ((CraftMinecart) bukkitMinecart).getHandle();
-        Block block = minecart.getDisplayBlockState().getBlock();
         return KeyBlocksCache.getBlockKey(block);
     }
 

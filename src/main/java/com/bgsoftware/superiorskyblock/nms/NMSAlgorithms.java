@@ -56,8 +56,6 @@ public interface NMSAlgorithms {
 
     Key getBlockKey(int combinedId);
 
-    Key getMinecartBlock(Minecart minecart);
-
     Key getFallingBlockType(FallingBlock fallingBlock);
 
     void setCustomModel(ItemMeta itemMeta, int customModel);

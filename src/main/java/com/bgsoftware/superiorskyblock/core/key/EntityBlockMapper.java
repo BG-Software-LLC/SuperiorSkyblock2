@@ -3,56 +3,34 @@ package com.bgsoftware.superiorskyblock.core.key;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class EntityBlockMapper {
 
     private static final KeyMap<Key> ITEM_TO_BLOCK = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
     private static final KeyMap<Key> ENTITY_TO_BLOCK = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
-    private static final List<Pair<Key, Key>> TRACKER_TO_BLOCK = new LinkedList<>();
 
     static {
-        // Minecarts
-        register(getMaterialKey("CHEST_MINECART", "STORAGE_MINECART"), Keys.of(EntityType.MINECART_CHEST), ConstantKeys.CHEST);
-        register(getMaterialKey("COMMAND_BLOCK_MINECART", "COMMAND_MINECART"), Keys.of(EntityType.MINECART_COMMAND), ConstantKeys.COMMAND_BLOCK);
-        register(getMaterialKey("FURNACE_MINECART", "POWERED_MINECART"), Keys.of(EntityType.MINECART_FURNACE), ConstantKeys.FURNACE);
-        register(getMaterialKey("HOPPER_MINECART"), Keys.of(EntityType.MINECART_HOPPER), ConstantKeys.HOPPER);
-        register(null, Keys.of(EntityType.MINECART_MOB_SPAWNER), ConstantKeys.MOB_SPAWNER);
-        register(getMaterialKey("TNT_MINECART", "EXPLOSIVE_MINECART"), Keys.of(EntityType.MINECART_TNT), ConstantKeys.TNT);
-
-        // Boats
-        register(getMaterialKey("ACACIA_CHEST_BOAT"), getEntityTypeKey("ACACIA_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("BAMBOO_CHEST_RAFT"), getEntityTypeKey("BAMBOO_CHEST_RAFT"), ConstantKeys.CHEST);
-        register(getMaterialKey("BIRCH_CHEST_BOAT"), getEntityTypeKey("BIRCH_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("CHERRY_CHEST_BOAT"), getEntityTypeKey("CHERRY_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("DARK_OAK_CHEST_BOAT"), getEntityTypeKey("DARK_OAK_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("JUNGLE_CHEST_BOAT"), getEntityTypeKey("JUNGLE_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("MANGROVE_CHEST_BOAT"), getEntityTypeKey("MANGROVE_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("OAK_CHEST_BOAT"), getEntityTypeKey("OAK_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("PALE_OAK_CHEST_BOAT"), getEntityTypeKey("PALE_OAK_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("POPLAR_CHEST_BOAT"), getEntityTypeKey("POPLAR_CHEST_BOAT"), ConstantKeys.CHEST);
-        register(getMaterialKey("SPRUCE_CHEST_BOAT"), getEntityTypeKey("SPRUCE_CHEST_BOAT"), ConstantKeys.CHEST);
-    }
-
-    private static void register(@Nullable Key itemKey, @Nullable Key entityKey, @Nullable Key blockKey) {
-        if (entityKey == null || blockKey == null) {
-            return;
-        }
-
-        if (itemKey != null) {
-            ITEM_TO_BLOCK.put(itemKey, blockKey);
-        }
-
-        ENTITY_TO_BLOCK.put(entityKey, blockKey);
-        TRACKER_TO_BLOCK.add(new Pair<>(entityKey, blockKey));
+        registerMinecart(ConstantKeys.CHEST, EntityType.MINECART_CHEST, "CHEST_MINECART", "STORAGE_MINECART");
+        registerMinecart(ConstantKeys.COMMAND_BLOCK, EntityType.MINECART_COMMAND, "COMMAND_BLOCK_MINECART", "COMMAND_MINECART");
+        registerMinecart(ConstantKeys.FURNACE, EntityType.MINECART_FURNACE, "FURNACE_MINECART", "POWERED_MINECART");
+        registerMinecart(ConstantKeys.HOPPER, EntityType.MINECART_HOPPER, "HOPPER_MINECART");
+        registerMinecart(ConstantKeys.MOB_SPAWNER, EntityType.MINECART_MOB_SPAWNER);
+        registerMinecart(ConstantKeys.TNT, EntityType.MINECART_TNT, "TNT_MINECART", "EXPLOSIVE_MINECART");
+        registerChestBoats(
+                new String[]{"ACACIA_CHEST_BOAT", "BAMBOO_CHEST_RAFT", "BIRCH_CHEST_BOAT", "CHERRY_CHEST_BOAT",
+                        "DARK_OAK_CHEST_BOAT", "JUNGLE_CHEST_BOAT", "MANGROVE_CHEST_BOAT", "OAK_CHEST_BOAT",
+                        "PALE_OAK_CHEST_BOAT", "SPRUCE_CHEST_BOAT", "CHEST_BOAT"},
+                new String[]{"ACACIA_CHEST_BOAT", "BAMBOO_CHEST_RAFT", "BIRCH_CHEST_BOAT", "CHERRY_CHEST_BOAT",
+                        "DARK_OAK_CHEST_BOAT", "JUNGLE_CHEST_BOAT", "MANGROVE_CHEST_BOAT", "OAK_CHEST_BOAT",
+                        "PALE_OAK_CHEST_BOAT", "SPRUCE_CHEST_BOAT"}
+        );
     }
 
     @Nullable
@@ -65,8 +43,39 @@ public class EntityBlockMapper {
         return ENTITY_TO_BLOCK.get(entityKey);
     }
 
-    public static List<Pair<Key, Key>> getTrackerMappings() {
-        return Collections.unmodifiableList(TRACKER_TO_BLOCK);
+    public static Set<Map.Entry<Key, Key>> getTrackerMappings() {
+        return ENTITY_TO_BLOCK.entrySet();
+    }
+
+    private static void registerMinecart(Key blockKey, EntityType entityType, String... materialNames) {
+        Key entityTypeKey = Keys.of(entityType);
+        ENTITY_TO_BLOCK.put(entityTypeKey, blockKey);
+
+        for (String materialName : materialNames) {
+            Key materialKey = getMaterialKey(materialName);
+
+            if (materialKey != null) {
+                ITEM_TO_BLOCK.put(materialKey, blockKey);
+            }
+        }
+    }
+
+    private static void registerChestBoats(String[] entityTypeNames, String[] materialNames) {
+        for (String entityTypeName : entityTypeNames) {
+            Key entityTypeKey = getEntityTypeKey(entityTypeName);
+
+            if (entityTypeKey != null) {
+                ENTITY_TO_BLOCK.put(entityTypeKey, ConstantKeys.CHEST);
+            }
+        }
+
+        for (String materialName : materialNames) {
+            Key materialKey = getMaterialKey(materialName);
+
+            if (materialKey != null) {
+                ITEM_TO_BLOCK.put(materialKey, ConstantKeys.CHEST);
+            }
+        }
     }
 
     @Nullable
