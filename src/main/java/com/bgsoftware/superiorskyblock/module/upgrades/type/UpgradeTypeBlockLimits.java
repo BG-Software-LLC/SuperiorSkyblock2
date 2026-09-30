@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -155,14 +156,15 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-        private void onMinecartPlaceByDispenser(BlockDispenseEvent e) {
+        private void onVehiclePlaceByDispenser(BlockDispenseEvent e) {
             if (!plugin.getSettings().isCountEntitiesAsBlocks()) {
                 return;
             }
 
             Material dispenseItemType = e.getItem().getType();
 
-            if (!Materials.isMinecart(dispenseItemType) || e.getBlock().getType() != Material.DISPENSER) {
+            if ((!Materials.isMinecart(dispenseItemType) && !Materials.isChestBoat(dispenseItemType))
+                    || e.getBlock().getType() != Material.DISPENSER) {
                 return;
             }
 
@@ -182,7 +184,22 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
                 }
             }
 
-            if (targetBlock == null || !Materials.isRail(targetBlock.getType())) {
+            if (targetBlock == null) {
+                return;
+            }
+
+            Material targetBlockType = targetBlock.getType();
+
+            if (Materials.isMinecart(dispenseItemType)) {
+                if (!Materials.isRail(targetBlockType)) {
+                    return;
+                }
+            } else if (Materials.isChestBoat(dispenseItemType)) {
+                if (!Materials.isWater(targetBlockType) && !(targetBlockType == Material.AIR
+                        && Materials.isWater(targetBlock.getRelative(BlockFace.DOWN).getType()))) {
+                    return;
+                }
+            } else {
                 return;
             }
 
