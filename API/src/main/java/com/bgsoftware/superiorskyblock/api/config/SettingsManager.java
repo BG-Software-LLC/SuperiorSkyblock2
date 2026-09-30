@@ -610,6 +610,13 @@ public interface SettingsManager {
     List<String> getDisabledCommands();
 
     /**
+     * List of admin commands that are considered dangerous.
+     * When executed by players, these commands must be approved by the console before being executed.
+     * Config-path: dangerous-commands
+     */
+    List<String> getDangerousCommands();
+
+    /**
      * List of plugins that their hooks should not be enabled.
      * Config-path: disabled-hooks
      */

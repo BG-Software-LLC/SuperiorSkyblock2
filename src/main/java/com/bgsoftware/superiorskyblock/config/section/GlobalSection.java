@@ -335,6 +335,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().disabledCommands;
     }
 
+    public List<String> getDangerousCommands() {
+        return getContainer().dangerousCommands;
+    }
+
     public List<String> getDisabledHooks() {
         return getContainer().disabledHooks;
     }
