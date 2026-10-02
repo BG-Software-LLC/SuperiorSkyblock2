@@ -76,6 +76,8 @@ public interface GridManager extends IDatabaseBridgeHolder {
     void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel,
                       Biome biome, String islandName, boolean offset, @Nullable BlockOffset spawnOffset);
 
+
+
     /**
      * Create a new island.
      *
@@ -94,6 +96,22 @@ public interface GridManager extends IDatabaseBridgeHolder {
      * @param spawnOffset The offset to teleport the player to from the center of the schematic
      */
     void createIsland(Island.Builder builder, Biome biome, boolean offset, @Nullable BlockOffset spawnOffset);
+
+    /**
+     * Create a new island.
+     *
+     * @param builder     The builder for the island.
+     * @param biome       A starting biome for the island.
+     * @param offset      Should the island have an offset for its values? If disabled, the bonus will be given.
+     * @param spawnOffset The offset to teleport the player to from the center of the schematic
+     * @param spawnYaw    The yaw to face the player when teleported
+     * @param spawnPitch  The pitch to face the player when teleported
+     */
+    default void createIsland(Island.Builder builder, Biome biome, boolean offset, @Nullable BlockOffset spawnOffset,
+                              @Nullable Float spawnYaw, @Nullable Float spawnPitch) {
+        createIsland(builder, biome, offset, spawnOffset);
+    }
+
 
     /**
      * Set the creation algorithm of islands.
