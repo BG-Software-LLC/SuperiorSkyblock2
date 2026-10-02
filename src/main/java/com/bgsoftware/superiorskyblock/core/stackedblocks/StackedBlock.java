@@ -8,10 +8,8 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.formatting.impl.KeyNameFormatter;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -100,8 +98,7 @@ public class StackedBlock {
 
         hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
                 .replace("{0}", String.valueOf(amount))
-                .replace("{1}", KeyNameFormatter.getInstance().getTranslatedName(blockKey, PlayerLocales.getDefaultLocale())
-                        .orElseGet(() -> Formatters.CAPITALIZED_FORMATTER.format(blockKey.getGlobalKey())))
+                .replace("{1}", Formatters.CAPITALIZED_FORMATTER.format(blockKey.getGlobalKey()))
                 .replace("{2}", Formatters.NUMBER_FORMATTER.format(amount))
         );
     }

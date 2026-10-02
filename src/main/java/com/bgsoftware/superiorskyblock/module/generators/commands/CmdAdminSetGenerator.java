@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -127,11 +128,11 @@ public class CmdAdminSetGenerator implements IAdminIslandCommand {
             return;
 
         if (islands.size() != 1)
-            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
+            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.KEY_NAME_FORMATTER.format(material, PlayerLocales.getPlayerLocale(sender)));
         else if (targetPlayer == null)
-            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());
+            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.KEY_NAME_FORMATTER.format(material, PlayerLocales.getPlayerLocale(sender)), islands.get(0).getName());
         else
-            Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
+            Message.GENERATOR_UPDATED.send(sender, Formatters.KEY_NAME_FORMATTER.format(material, PlayerLocales.getPlayerLocale(sender)), targetPlayer.getName());
     }
 
     @Override

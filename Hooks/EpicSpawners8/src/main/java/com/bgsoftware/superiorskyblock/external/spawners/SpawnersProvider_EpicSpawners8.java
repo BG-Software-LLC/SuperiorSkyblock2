@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.craftaro.epicspawners.api.EpicSpawnersApi;
 import com.craftaro.epicspawners.api.events.SpawnerBreakEvent;
 import com.craftaro.epicspawners.api.events.SpawnerChangeEvent;
@@ -89,7 +90,7 @@ public class SpawnersProvider_EpicSpawners8 implements SpawnersProvider {
 
             if (island.hasReachedBlockLimit(spawnerKey, increaseAmount)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(spawnerKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(spawnerKey, PlayerLocales.getPlayerLocale(e.getPlayer())));
             } else {
                 island.handleBlockPlace(spawnerKey, increaseAmount);
             }
@@ -110,7 +111,7 @@ public class SpawnersProvider_EpicSpawners8 implements SpawnersProvider {
                 island.handleBlockBreak(blockKey, -increaseAmount);
             } else if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getPlayerLocale(e.getPlayer())));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }

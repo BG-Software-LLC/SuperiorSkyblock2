@@ -98,6 +98,8 @@ public class CmdAdminShow implements IAdminIslandCommand {
     private static void doShowIslandInfo(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island) {
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Locale locale = superiorPlayer != null ? superiorPlayer.getUserLocale() : PlayerLocales.getDefaultLocale();
+        // Names of blocks and entities are not translated for the console.
+        Locale namesLocale = superiorPlayer != null ? locale : null;
         boolean isUpgradesModuleEnabled = BuiltinModules.UPGRADES.isEnabled();
         long lastTime = island.getLastTimeUpdate();
 
@@ -182,14 +184,14 @@ public class CmdAdminShow implements IAdminIslandCommand {
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
                 collectIslandData(superiorPlayer, locale, island::getEntitiesLimitsAsKeys, island::getCustomEntitiesLimits,
                         Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE,
-                        key -> Formatters.KEY_NAME_FORMATTER.format(key, locale));
+                        key -> Formatters.KEY_NAME_FORMATTER.format(key, namesLocale));
             }
 
             // Island block limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
                 collectIslandData(superiorPlayer, locale, island::getBlocksLimits, island::getCustomBlocksLimits,
                         Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS, Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE,
-                        key -> Formatters.KEY_NAME_FORMATTER.format(key, locale));
+                        key -> Formatters.KEY_NAME_FORMATTER.format(key, namesLocale));
             }
         }
 
@@ -205,7 +207,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
                         Key key = Keys.ofMaterialAndData(entry.getKey());
                         lineDataMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
-                                Formatters.KEY_NAME_FORMATTER.format(key, locale),
+                                Formatters.KEY_NAME_FORMATTER.format(key, namesLocale),
                                 Formatters.NUMBER_FORMATTER.format(IslandUtils.getGeneratorPercentageDecimal(island, key, dimension)),
                                 island.getGeneratorAmount(key, dimension))
                         );

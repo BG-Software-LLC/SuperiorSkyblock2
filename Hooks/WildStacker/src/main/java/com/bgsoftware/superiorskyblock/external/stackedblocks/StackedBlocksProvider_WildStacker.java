@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
@@ -121,7 +122,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getPlayerLocale(e.getPlayer())));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }
@@ -187,7 +188,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getPlayerLocale(e.getPlayer())));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
 import github.nighter.smartspawner.api.SmartSpawnerAPI;
 import github.nighter.smartspawner.api.SmartSpawnerProvider;
@@ -95,7 +96,7 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
 
             if (island.hasReachedBlockLimit(newEntity, spawnerData.getStackSize())) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(newEntity.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(newEntity, PlayerLocales.getPlayerLocale(e.getPlayer())));
                 return;
             }
 
@@ -116,7 +117,7 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
 
             if (island.hasReachedBlockLimit(key, e.getQuantity())) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(key.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(key, PlayerLocales.getPlayerLocale(e.getPlayer())));
                 return;
             }
 
@@ -173,7 +174,7 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
 
             if (island.hasReachedBlockLimit(key, amount)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(key.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(key, PlayerLocales.getPlayerLocale(e.getPlayer())));
                 return;
             }
 

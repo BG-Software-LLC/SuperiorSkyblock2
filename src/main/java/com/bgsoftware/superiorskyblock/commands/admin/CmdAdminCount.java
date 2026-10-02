@@ -95,7 +95,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
                 for (Map.Entry<Key, BigInteger> entry : island.getBlockCountsAsBigInteger().entrySet()) {
                     materialsBuilder.append(", ").append(Message.BLOCK_COUNTS_CHECK_MATERIAL
                             .getMessage(locale, Formatters.NUMBER_FORMATTER.format(entry.getValue()),
-                                    Formatters.KEY_NAME_FORMATTER.format(entry.getKey(), locale)));
+                                    Formatters.KEY_NAME_FORMATTER.format(entry.getKey(), PlayerLocales.getPlayerLocale(sender))));
                 }
             }
 
@@ -113,7 +113,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
             Key materialKey = Keys.ofMaterialAndData(materialName);
             BigInteger blockCount = island.getBlockCountAsBigInteger(materialKey);
 
-            String displayName = KeyNameFormatter.getInstance().getTranslatedName(materialKey, PlayerLocales.getLocale(sender))
+            String displayName = KeyNameFormatter.getInstance().getTranslatedName(materialKey, PlayerLocales.getPlayerLocale(sender))
                     .orElseGet(() -> Formatters.CAPITALIZED_FORMATTER.format(blockCount.compareTo(BigInteger.ONE) > 0 ?
                             materialName + "s" : materialName));
 

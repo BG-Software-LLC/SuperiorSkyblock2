@@ -74,7 +74,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getLocale(e.getPlayer())));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getPlayerLocale(e.getPlayer())));
             }
         }
 
@@ -109,7 +109,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(wrapper.getHandle()), minecraftKey)) {
                     Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(
-                            minecraftKey.getValue(), PlayerLocales.getLocale(e.getPlayer())));
+                            minecraftKey.getValue(), PlayerLocales.getPlayerLocale(e.getPlayer())));
                     return true;
                 }
             }
@@ -145,7 +145,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             try {
                 island.handleBlockBreak(oldSpawnerKey, 1, 0);
                 if (island.hasReachedBlockLimit(newSpawnerKey)) {
-                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(newSpawnerKey, PlayerLocales.getLocale(e.getPlayer())));
+                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(newSpawnerKey, PlayerLocales.getPlayerLocale(e.getPlayer())));
                     return true;
                 }
             } finally {
@@ -241,7 +241,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getLocale(e.getPlayer())));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getPlayerLocale(e.getPlayer())));
             }
         }
 

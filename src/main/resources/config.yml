@@ -777,8 +777,15 @@ default-language: 'en-US'
 # When enabled, the plugin will download the translations of blocks and entities for every language file
 # you have, and use them when displaying names of blocks and entities in messages (limits, values, etc).
 # The files are downloaded from Mojang's servers into the lang/minecraft folder.
+# Existing files are never downloaded again. Languages that do not exist in minecraft
+# are not attempted again until the server restarts.
 # You can also put the files there manually (e.g fr_fr.json), and override names by adding
 # entries in the format of "superiorskyblock.<KEY>": "<name>" (e.g "superiorskyblock.SPAWNER:ZOMBIE").
+# The format of spawner names can be changed using "superiorskyblock.format.spawner": "{0} ({1})",
+# where {0} is the spawner name and {1} is the entity name.
+# English (en_us) cannot be downloaded, as it is not provided by Mojang; names will be shown in English
+# by default. If you want to override English names, create an en_us.json file manually with your overrides.
+# Names shown to the console and in holograms are always in English.
 # This feature is not supported in 1.12 and below.
 download-minecraft-languages: false
 

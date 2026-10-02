@@ -123,7 +123,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (hasReachedLimit) {
                 e.setCancelled(true);
                 if (spawningPlayer != null && spawningPlayer.isOnline()) {
-                    Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getLocale(spawningPlayer)));
+                    Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getPlayerLocale(spawningPlayer)));
                     List<ItemStack> itemsToGiveBack = spawningPlayerData.itemStacks;
                     try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                         Location location = spawningPlayer.getLocation(wrapper.getHandle());
@@ -156,7 +156,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
             if (hasReachedLimit) {
                 e.setCancelled(true);
-                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getLocale(e.getPlayer())));
+                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getPlayerLocale(e.getPlayer())));
             }
         }
 
@@ -223,7 +223,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (hasReachedLimit) {
                 entity.remove();
                 if (vehicleOwner != null && vehicleOwner.isOnline()) {
-                    Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getLocale(vehicleOwner)));
+                    Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getPlayerLocale(vehicleOwner)));
                 }
             }
         }
@@ -300,7 +300,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
             if (hasReachedLimit) {
                 entity.remove();
-                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getLocale(e.getPlayer())));
+                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getPlayerLocale(e.getPlayer())));
             }
         }
 

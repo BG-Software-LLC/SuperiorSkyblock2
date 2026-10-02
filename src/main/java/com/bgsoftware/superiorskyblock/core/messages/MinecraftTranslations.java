@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MinecraftTranslations {
 
@@ -41,7 +44,13 @@ public class MinecraftTranslations {
     // en_us is not part of the assets index, it is bundled inside the client jar.
     private static final String ENGLISH_LANGUAGE = "en_us";
 
+    private static final int CONNECT_TIMEOUT = 10000;
+    private static final int READ_TIMEOUT = 30000;
+
     private static final Gson GSON = new Gson();
+    private static final AtomicBoolean downloading = new AtomicBoolean(false);
+    // Languages that do not exist in minecraft, so they are not downloaded again until the server restarts.
+    private static final Set<String> unavailableLanguages = ConcurrentHashMap.newKeySet();
 
     private static SuperiorSkyblockPlugin plugin;
 
@@ -70,8 +79,18 @@ public class MinecraftTranslations {
                     missingLanguages.add(languageName);
             }
 
-            if (!missingLanguages.isEmpty())
-                BukkitExecutor.async(() -> downloadLanguages(missingLanguages));
+            // Languages that were not found since the server started are not downloaded again.
+            missingLanguages.removeAll(unavailableLanguages);
+
+            if (!missingLanguages.isEmpty() && downloading.compareAndSet(false, true)) {
+                BukkitExecutor.async(() -> {
+                    try {
+                        downloadLanguages(missingLanguages);
+                    } finally {
+                        downloading.set(false);
+                    }
+                });
+            }
         }
     }
 
@@ -133,15 +152,20 @@ public class MinecraftTranslations {
                 JsonObject asset = assetsIndex.getAsJsonObject("minecraft/lang/" + language + ".json");
                 if (asset == null) {
                     Log.warn("Minecraft language ", language, " does not exist, skipping...");
+                    unavailableLanguages.add(language);
                     continue;
                 }
 
                 String hash = asset.get("hash").getAsString();
-                try (InputStream inputStream = new URL(RESOURCES_URL + hash.substring(0, 2) + "/" + hash).openStream()) {
+                HttpsURLConnection connection = openConnection(RESOURCES_URL + hash.substring(0, 2) + "/" + hash);
+                try (InputStream inputStream = connection.getInputStream()) {
                     java.nio.file.Files.copy(inputStream, getLanguageFile(language).toPath(), StandardCopyOption.REPLACE_EXISTING);
                     downloadedAny = true;
+                } finally {
+                    connection.disconnect();
                 }
             }
+
 
             if (downloadedAny) {
                 loadTranslations();
@@ -182,11 +206,20 @@ public class MinecraftTranslations {
     }
 
     private static JsonObject readJson(String url) throws IOException {
-        HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
-        connection.setRequestMethod("GET");
+        HttpsURLConnection connection = openConnection(url);
         try (Reader reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)) {
             return GSON.fromJson(reader, JsonObject.class);
+        } finally {
+            connection.disconnect();
         }
+    }
+
+    private static HttpsURLConnection openConnection(String url) throws IOException {
+        HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(CONNECT_TIMEOUT);
+        connection.setReadTimeout(READ_TIMEOUT);
+        return connection;
     }
 
     private static boolean isLoadedKey(String key) {

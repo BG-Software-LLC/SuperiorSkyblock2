@@ -94,11 +94,11 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
             return;
 
         if (islandsChangedCount > 1)
-            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getLocale(sender)));
+            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getPlayerLocale(sender)));
         else if (targetPlayer == null)
-            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getLocale(sender)), islands.get(0).getName());
+            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getPlayerLocale(sender)), islands.get(0).getName());
         else
-            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getLocale(sender)), targetPlayer.getName());
+            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getPlayerLocale(sender)), targetPlayer.getName());
     }
 
     @Override

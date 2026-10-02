@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.player;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.google.common.base.Preconditions;
 import org.bukkit.command.CommandSender;
@@ -28,6 +29,15 @@ public class PlayerLocales {
 
     public static Locale getLocale(CommandSender sender) {
         return sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender).getUserLocale() : defaultLocale;
+    }
+
+    /**
+     * Get the locale of a player, or null if the sender is not a player.
+     * Used for formatting texts that should not be translated for non-players (console, shared holograms, etc).
+     */
+    @Nullable
+    public static Locale getPlayerLocale(@Nullable CommandSender sender) {
+        return sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender).getUserLocale() : null;
     }
 
     public static java.util.Locale getLocale(String str) throws IllegalArgumentException {

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.craftaro.ultimatestacker.api.UltimateStackerApi;
 import com.craftaro.ultimatestacker.api.events.spawner.SpawnerBreakEvent;
 import com.craftaro.ultimatestacker.api.events.spawner.SpawnerPlaceEvent;
@@ -58,7 +59,7 @@ public class SpawnersProvider_UltimateStacker3 implements SpawnersProviderItemMe
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getPlayerLocale(e.getPlayer())));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }

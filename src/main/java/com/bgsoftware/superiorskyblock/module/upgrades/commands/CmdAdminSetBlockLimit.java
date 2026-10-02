@@ -93,11 +93,11 @@ public class CmdAdminSetBlockLimit implements IAdminIslandCommand {
             return;
 
         if (islandsChangedCount > 1)
-            Message.CHANGED_BLOCK_LIMIT_ALL.send(sender, Formatters.KEY_NAME_FORMATTER.format(key, PlayerLocales.getLocale(sender)));
+            Message.CHANGED_BLOCK_LIMIT_ALL.send(sender, Formatters.KEY_NAME_FORMATTER.format(key, PlayerLocales.getPlayerLocale(sender)));
         else if (targetPlayer == null)
-            Message.CHANGED_BLOCK_LIMIT_NAME.send(sender, Formatters.KEY_NAME_FORMATTER.format(key, PlayerLocales.getLocale(sender)), islands.get(0).getName());
+            Message.CHANGED_BLOCK_LIMIT_NAME.send(sender, Formatters.KEY_NAME_FORMATTER.format(key, PlayerLocales.getPlayerLocale(sender)), islands.get(0).getName());
         else
-            Message.CHANGED_BLOCK_LIMIT.send(sender, Formatters.KEY_NAME_FORMATTER.format(key, PlayerLocales.getLocale(sender)), targetPlayer.getName());
+            Message.CHANGED_BLOCK_LIMIT.send(sender, Formatters.KEY_NAME_FORMATTER.format(key, PlayerLocales.getPlayerLocale(sender)), targetPlayer.getName());
     }
 
     @Override
