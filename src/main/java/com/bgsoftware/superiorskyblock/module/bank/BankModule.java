@@ -13,43 +13,14 @@ import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBalance;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBank;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdDeposit;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdWithdraw;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 
-import java.io.File;
 import java.math.BigDecimal;
 
 public class BankModule extends BuiltinModule<BankModule.Configuration> {
 
     public BankModule() {
         super("bank");
-    }
-
-    @Override
-    protected boolean onConfigCreate(SuperiorSkyblockPlugin plugin, CommentedConfiguration config, boolean firstTime) {
-        File oldConfigFile = new File(plugin.getDataFolder(), "config.yml");
-        if (!oldConfigFile.exists())
-            return false;
-
-        CommentedConfiguration oldConfig = CommentedConfiguration.loadConfiguration(oldConfigFile);
-        boolean updatedConfig = false;
-
-        if (syncValues("bank-worth-rate", config, oldConfig))
-            updatedConfig = true;
-
-        if (syncValues("disband-refund", config, oldConfig))
-            updatedConfig = true;
-
-        if (syncValues("bank-logs", config, oldConfig))
-            updatedConfig = true;
-
-        if (syncValues("cache-logs", config, oldConfig))
-            updatedConfig = true;
-
-        if (syncValues("bank-interest", config, oldConfig))
-            updatedConfig = true;
-
-        return updatedConfig;
     }
 
     @Override
@@ -86,15 +57,6 @@ public class BankModule extends BuiltinModule<BankModule.Configuration> {
     @Override
     protected Configuration createConfigFile(CommentedConfiguration config) {
         return new Configuration(config);
-    }
-
-    private static boolean syncValues(String section, YamlConfiguration newConfig, YamlConfiguration oldConfig) {
-        if (oldConfig.contains(section)) {
-            newConfig.set(section, oldConfig.get(section));
-            return true;
-        }
-
-        return false;
     }
 
     public static class Configuration implements IModuleConfiguration {
