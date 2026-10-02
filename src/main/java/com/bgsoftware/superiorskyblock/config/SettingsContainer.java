@@ -210,6 +210,7 @@ public class SettingsContainer {
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
     public final List<String> disabledCommands;
+    public final List<String> dangerousCommands;
     public final List<String> disabledHooks;
     public final boolean schematicNameArgument;
     public final String islandChestTitle;
@@ -548,6 +549,8 @@ public class SettingsContainer {
         disabledEvents = Collections.unmodifiableList(config.getStringList("disabled-events")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         disabledCommands = Collections.unmodifiableList(config.getStringList("disabled-commands")
+                .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
+        dangerousCommands = Collections.unmodifiableList(config.getStringList("dangerous-commands")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         disabledHooks = Collections.unmodifiableList(config.getStringList("disabled-hooks")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
