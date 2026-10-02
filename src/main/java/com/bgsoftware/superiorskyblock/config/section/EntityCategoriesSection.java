@@ -114,7 +114,7 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
             String builtinKey = builtinEntityCategory.name().toLowerCase(Locale.ENGLISH);
 
             if (!entityCategories.containsKey(builtinKey)) {
-                entityCategories.put(builtinEntityCategory.name(), new EntityCategoryImpl(builtinEntityCategory.name(),
+                entityCategories.put(builtinKey, new EntityCategoryImpl(builtinEntityCategory.name(),
                         builtinEntityCategory.getEntities(), null, null,
                         null, null, null));
             }

@@ -573,7 +573,11 @@ public class IslandBuilderImpl implements Island.Builder {
 
         Map<EntityCategory, Integer> entityCategoryLimits = new HashMap<>();
         for (Map.Entry<String, IntValue> entry : this.entityCategoryLimits.entrySet()) {
-            entityCategoryLimits.put(plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entry.getKey()), entry.getValue().get());
+            EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entry.getKey());
+
+            if (entityCategory != null) {
+                entityCategoryLimits.put(entityCategory, entry.getValue().get());
+            }
         }
 
         return Collections.unmodifiableMap(entityCategoryLimits);
@@ -641,7 +645,11 @@ public class IslandBuilderImpl implements Island.Builder {
         Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = this.roleLimits.entryIterator();
         while (iterator.hasNext()) {
             Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
-            roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), entry.getValue().get());
+            PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+            if (playerRole != null) {
+                roleLimits.put(playerRole, entry.getValue().get());
+            }
         }
 
         return Collections.unmodifiableMap(roleLimits);

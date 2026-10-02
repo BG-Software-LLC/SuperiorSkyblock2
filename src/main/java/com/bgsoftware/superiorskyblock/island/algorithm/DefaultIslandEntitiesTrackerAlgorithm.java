@@ -26,9 +26,7 @@ import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +40,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final KeyMap<Integer> entityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
-    private final Map<String, Integer> entityCategoryCounts = new ConcurrentHashMap<>();
+    private final Map<EntityCategory, Integer> entityCategoryCounts = new ConcurrentHashMap<>();
 
     private final Island island;
 
@@ -79,9 +77,8 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
         this.entityCounts.put(key, currentAmount + amount);
 
         for (EntityCategory entityCategory : plugin.getSettings().getEntityCategoriesMap().getCategories(key)) {
-            String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
-            currentAmount = this.entityCategoryCounts.getOrDefault(entityCategoryName, 0);
-            this.entityCategoryCounts.put(entityCategoryName, currentAmount + amount);
+            currentAmount = this.entityCategoryCounts.getOrDefault(entityCategory, 0);
+            this.entityCategoryCounts.put(entityCategory, currentAmount + amount);
         }
 
         Log.debugResult(Debug.ENTITY_SPAWN, "Return", "Success");
@@ -121,14 +118,13 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
         }
 
         for (EntityCategory entityCategory : plugin.getSettings().getEntityCategoriesMap().getCategories(key)) {
-            String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
-            currentAmount = this.entityCategoryCounts.getOrDefault(entityCategoryName, -1);
+            currentAmount = this.entityCategoryCounts.getOrDefault(entityCategory, -1);
 
             if (currentAmount != -1) {
                 if (currentAmount > amount) {
-                    this.entityCategoryCounts.put(entityCategoryName, currentAmount - amount);
+                    this.entityCategoryCounts.put(entityCategory, currentAmount - amount);
                 } else {
-                    this.entityCategoryCounts.remove(entityCategoryName);
+                    this.entityCategoryCounts.remove(entityCategory);
                 }
             }
         }
@@ -150,26 +146,12 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
     @Override
     public int getEntityCategoryCount(EntityCategory entityCategory) {
-        String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
-        return this.entityCategoryCounts.getOrDefault(entityCategoryName, 0);
+        return this.entityCategoryCounts.getOrDefault(entityCategory, 0);
     }
 
     @Override
     public Map<EntityCategory, Integer> getEntityCategoryCounts() {
-        if (this.entityCategoryCounts.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        Map<EntityCategory, Integer> entityCategoryCounts = new HashMap<>();
-        for (Map.Entry<String, Integer> entry : this.entityCategoryCounts.entrySet()) {
-            EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entry.getKey());
-
-            if (entityCategory != null) {
-                entityCategoryCounts.put(entityCategory, entry.getValue());
-            }
-        }
-
-        return Collections.unmodifiableMap(entityCategoryCounts);
+        return Collections.unmodifiableMap(this.entityCategoryCounts);
     }
 
     @Override
@@ -226,9 +208,8 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                             this.entityCounts.put(entity, count.get());
 
                             for (EntityCategory entityCategory : plugin.getSettings().getEntityCategoriesMap().getCategories(entity)) {
-                                String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
-                                int currentAmount = this.entityCategoryCounts.getOrDefault(entityCategoryName, 0);
-                                this.entityCategoryCounts.put(entityCategoryName, currentAmount + count.get());
+                                int currentAmount = this.entityCategoryCounts.getOrDefault(entityCategory, 0);
+                                this.entityCategoryCounts.put(entityCategory, currentAmount + count.get());
                             }
                         });
                     }
@@ -290,9 +271,8 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
         for (Map.Entry<Key, Integer> entry : this.entityCounts.entrySet()) {
             for (EntityCategory entityCategory : plugin.getSettings().getEntityCategoriesMap().getCategories(entry.getKey())) {
-                String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
-                int currentAmount = this.entityCategoryCounts.getOrDefault(entityCategoryName, 0);
-                this.entityCategoryCounts.put(entityCategoryName, currentAmount + entry.getValue());
+                int currentAmount = this.entityCategoryCounts.getOrDefault(entityCategory, 0);
+                this.entityCategoryCounts.put(entityCategory, currentAmount + entry.getValue());
             }
         }
     }

@@ -3348,18 +3348,18 @@ public class SIsland implements Island {
     public void setEntityCategoryLimit(EntityCategory entityCategory, int limit) {
         Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
 
-        int finalLimit = Math.max(0, limit);
+        int finalLimit = Math.max(-1, limit);
 
         Log.debug(Debug.SET_ENTITY_CATEGORY_LIMIT, owner.getName(), entityCategory.getName(), finalLimit);
 
         String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
-        IntValue oldLimit = this.entityCategoryLimits.put(entityCategoryName, IntValue.fixed(limit));
+        IntValue oldLimit = this.entityCategoryLimits.put(entityCategoryName, IntValue.fixed(finalLimit));
 
-        if (limit == IntValue.getNonSynced(oldLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (finalLimit == IntValue.getNonSynced(oldLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
-        IslandsDatabaseBridge.saveEntityCategoryLimit(this, entityCategory, limit);
+        IslandsDatabaseBridge.saveEntityCategoryLimit(this, entityCategory, finalLimit);
     }
 
     @Override
@@ -5110,13 +5110,6 @@ public class SIsland implements Island {
                 this.blockLimits.put(block, IntValue.syncedFixed(defaultValue));
         });
 
-        this.entityCategoryLimits.forEach((entityCategory, limit) -> {
-            Integer defaultValue = plugin.getSettings().getDefaultValues().getEntityCategoryLimits().get(entityCategory);
-            if (defaultValue != null && (int) limit.get() == defaultValue) {
-                this.entityCategoryLimits.put(entityCategory, IntValue.syncedFixed(defaultValue));
-            }
-        });
-
         this.entityLimits.forEach((entity, limit) -> {
             Integer defaultValue = plugin.getSettings().getDefaultValues().getEntityLimits().get(entity);
             if (defaultValue != null && (int) limit.get() == defaultValue)
@@ -5221,6 +5214,8 @@ public class SIsland implements Island {
         });
 
         clearSyncedMapEntries(blockLimits, overrideCustom);
+
+        clearSyncedMapEntries(entityCategoryLimits, overrideCustom);
 
         clearSyncedMapEntries(entityLimits, overrideCustom);
 

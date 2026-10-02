@@ -377,7 +377,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_entity_limits");
+            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_entity_category_limits");
             builder.setEntityCategoryLimit(entityCategory.get(), limit.get());
         });
     }

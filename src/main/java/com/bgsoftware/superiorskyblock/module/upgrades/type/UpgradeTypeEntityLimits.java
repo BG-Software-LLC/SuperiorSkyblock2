@@ -180,7 +180,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            boolean hasReachedLimit = hasReachedLimit(island, e.getPlayer(), Keys.of(entityType));
+            boolean hasReachedLimit = hasReachedLimit(island, e.getPlayer(), Keys.of(entity));
 
             if (hasReachedLimit) {
                 e.setCancelled(true);

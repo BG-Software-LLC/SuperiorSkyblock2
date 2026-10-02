@@ -857,6 +857,8 @@ public class IslandsDatabaseBridge {
                 databaseBridge.deleteObject("islands_chests", islandFilter);
             if (!island.getPotionEffects().isEmpty())
                 databaseBridge.deleteObject("islands_effects", islandFilter);
+            if (!island.getEntityCategoryLimits().isEmpty())
+                databaseBridge.deleteObject("islands_entity_category_limits", islandFilter);
             if (!island.getEntitiesLimitsAsKeys().isEmpty())
                 databaseBridge.deleteObject("islands_entity_limits", islandFilter);
             if (!island.getAllSettings().isEmpty())
