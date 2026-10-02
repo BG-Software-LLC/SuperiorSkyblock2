@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.core.logging;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.module.logging.ModuleLoggerFileHandler;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -61,6 +60,10 @@ public class Log {
 
     public static void errorFromFile(String fileName, Object first, Object... parts) {
         logInternalWithFile(Level.SEVERE, fileName, first, parts);
+    }
+
+    public static void errorFromFile(Throwable error, File file, Object first, Object... parts) {
+        errorFromFile(error, file.getName(), first, parts);
     }
 
     public static void errorFromFile(Throwable error, String fileName, Object first, Object... parts) {

@@ -109,14 +109,14 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             try {
                 config.save(file);
             } catch (Exception error) {
-                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving config file:");
+                Log.errorFromFile(error, file, "An unexpected error occurred while saving config file:");
             }
         }
 
         try {
             config.syncWithConfig(file, plugin.getResource("config.yml"), IGNORED_SECTIONS);
         } catch (Exception error) {
-            Log.error(error, file, "An unexpected error occurred while loading config file:");
+            Log.errorFromFile(error, file, "An unexpected error occurred while loading config file:");
         }
 
         loadContainerFromConfig(config);
@@ -1079,7 +1079,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         try {
             interactablesConfig.save(file);
         } catch (Exception error) {
-            Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+            Log.errorFromFile(error, file, "An unexpected error occurred while saving file:");
         }
 
         return true;
@@ -1116,7 +1116,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         try {
             entitiesConfig.save(file);
         } catch (Exception error) {
-            Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+            Log.errorFromFile(error, file, "An unexpected error occurred while saving file:");
         }
 
         return true;
@@ -1169,7 +1169,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             try {
                 bankConfig.save(file);
             } catch (Exception error) {
-                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+                Log.errorFromFile(error, file, "An unexpected error occurred while saving file:");
             }
         }
 
@@ -1197,7 +1197,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             try {
                 generatorsConfig.save(file);
             } catch (Exception error) {
-                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+                Log.errorFromFile(error, file, "An unexpected error occurred while saving file:");
             }
         }
 
@@ -1247,7 +1247,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             try {
                 upgradesConfig.save(file);
             } catch (Exception error) {
-                Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+                Log.errorFromFile(error, file, "An unexpected error occurred while saving file:");
             }
         }
 
