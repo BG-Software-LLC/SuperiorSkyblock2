@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEntityLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveEntityLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEntityLimit;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
@@ -122,7 +123,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (hasReachedLimit) {
                 e.setCancelled(true);
                 if (spawningPlayer != null && spawningPlayer.isOnline()) {
-                    Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+                    Message.REACHED_ENTITY_LIMIT.send(spawningPlayer, Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getLocale(spawningPlayer)));
                     List<ItemStack> itemsToGiveBack = spawningPlayerData.itemStacks;
                     try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                         Location location = spawningPlayer.getLocation(wrapper.getHandle());
@@ -155,7 +156,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
             if (hasReachedLimit) {
                 e.setCancelled(true);
-                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getLocale(e.getPlayer())));
             }
         }
 
@@ -222,7 +223,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (hasReachedLimit) {
                 entity.remove();
                 if (vehicleOwner != null && vehicleOwner.isOnline()) {
-                    Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+                    Message.REACHED_ENTITY_LIMIT.send(vehicleOwner, Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getLocale(vehicleOwner)));
                 }
             }
         }
@@ -299,7 +300,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
             if (hasReachedLimit) {
                 entity.remove();
-                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(Keys.of(entityType), PlayerLocales.getLocale(e.getPlayer())));
             }
         }
 

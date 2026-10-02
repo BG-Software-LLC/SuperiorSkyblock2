@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.KeyNameFormatter;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -94,7 +95,7 @@ public class CmdAdminCount implements IAdminIslandCommand {
                 for (Map.Entry<Key, BigInteger> entry : island.getBlockCountsAsBigInteger().entrySet()) {
                     materialsBuilder.append(", ").append(Message.BLOCK_COUNTS_CHECK_MATERIAL
                             .getMessage(locale, Formatters.NUMBER_FORMATTER.format(entry.getValue()),
-                                    Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().toString())));
+                                    Formatters.KEY_NAME_FORMATTER.format(entry.getKey(), locale)));
                 }
             }
 
@@ -109,13 +110,14 @@ public class CmdAdminCount implements IAdminIslandCommand {
             if (material == null)
                 return;
 
-            BigInteger blockCount = island.getBlockCountAsBigInteger(Keys.ofMaterialAndData(materialName));
+            Key materialKey = Keys.ofMaterialAndData(materialName);
+            BigInteger blockCount = island.getBlockCountAsBigInteger(materialKey);
 
-            if (blockCount.compareTo(BigInteger.ONE) > 0)
-                materialName = materialName + "s";
+            String displayName = KeyNameFormatter.getInstance().getTranslatedName(materialKey, PlayerLocales.getLocale(sender))
+                    .orElseGet(() -> Formatters.CAPITALIZED_FORMATTER.format(blockCount.compareTo(BigInteger.ONE) > 0 ?
+                            materialName + "s" : materialName));
 
-            Message.BLOCK_COUNT_CHECK.send(sender, Formatters.NUMBER_FORMATTER.format(blockCount),
-                    Formatters.CAPITALIZED_FORMATTER.format(materialName));
+            Message.BLOCK_COUNT_CHECK.send(sender, Formatters.NUMBER_FORMATTER.format(blockCount), displayName);
         }
     }
 

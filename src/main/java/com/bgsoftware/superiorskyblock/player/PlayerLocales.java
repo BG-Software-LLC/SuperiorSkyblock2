@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -59,6 +60,10 @@ public class PlayerLocales {
 
     public static void setDefaultLocale(Locale defaultLocale) {
         PlayerLocales.defaultLocale = defaultLocale;
+    }
+
+    public static Set<Locale> getLocales() {
+        return Collections.unmodifiableSet(locales);
     }
 
     public static boolean isValidLocale(java.util.Locale locale) {

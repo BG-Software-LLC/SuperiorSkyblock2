@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.formatting;
 
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.BlockPositionFormatter;
@@ -12,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.impl.ColorFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.CommaFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.FancyNumberFormatter;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.KeyNameFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.LocaleFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.LocationFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
@@ -36,6 +38,7 @@ public class Formatters {
     public static final IFormatter<Stream<String>> COMMA_FORMATTER = CommaFormatter.getInstance();
     public static final IFormatter<Date> DATE_FORMATTER = DateFormatter.getInstance();
     public static final IBiFormatter<Number, Locale> FANCY_NUMBER_FORMATTER = FancyNumberFormatter.getInstance();
+    public static final IBiFormatter<Key, Locale> KEY_NAME_FORMATTER = KeyNameFormatter.getInstance();
     public static final IFormatter<Locale> LOCALE_FORMATTER = LocaleFormatter.getInstance();
     public static final IFormatter<Location> LOCATION_FORMATTER = LocationFormatter.getInstance();
     public static final IFormatter<Number> NUMBER_FORMATTER = NumberFormatter.getInstance();

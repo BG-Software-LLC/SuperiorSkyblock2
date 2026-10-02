@@ -27,7 +27,6 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRa
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -182,13 +181,15 @@ public class CmdAdminShow implements IAdminIslandCommand {
             // Island entity limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
                 collectIslandData(superiorPlayer, locale, island::getEntitiesLimitsAsKeys, island::getCustomEntitiesLimits,
-                        Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE);
+                        Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE,
+                        key -> Formatters.KEY_NAME_FORMATTER.format(key, locale));
             }
 
             // Island block limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
                 collectIslandData(superiorPlayer, locale, island::getBlocksLimits, island::getCustomBlocksLimits,
-                        Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS, Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE);
+                        Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS, Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE,
+                        key -> Formatters.KEY_NAME_FORMATTER.format(key, locale));
             }
         }
 
@@ -204,7 +205,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
                         Key key = Keys.ofMaterialAndData(entry.getKey());
                         lineDataMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
-                                Formatters.CAPITALIZED_FORMATTER.format(entry.getKey()),
+                                Formatters.KEY_NAME_FORMATTER.format(key, locale),
                                 Formatters.NUMBER_FORMATTER.format(IslandUtils.getGeneratorPercentageDecimal(island, key, dimension)),
                                 island.getGeneratorAmount(key, dimension))
                         );
@@ -225,7 +226,8 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
         if (isUpgradesModuleEnabled && BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
             collectIslandData(superiorPlayer, locale, island::getPotionEffects, island::getCustomPotionEffects,
-                    Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS, Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE, PotionEffectType::getName);
+                    Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS, Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE,
+                    effectType -> Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()));
         }
 
         collectIslandData(superiorPlayer, locale, island::getRoleLimits, island::getCustomRoleLimits,
@@ -280,7 +282,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
         islandData.forEach((key, value) -> {
             StringBuilder lineDataMessage = new StringBuilder();
-            lineDataMessage.append(Formatters.CAPITALIZED_FORMATTER.format(formatter == null ? key.toString() : formatter.apply(key)));
+            lineDataMessage.append(formatter == null ? Formatters.CAPITALIZED_FORMATTER.format(key.toString()) : formatter.apply(key));
             if (!islandCustomData.containsKey(key))
                 lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
             Text.appendWithLine(islandDataMessage, dataLineMessage.getMessage(locale, lineDataMessage.toString(), value));

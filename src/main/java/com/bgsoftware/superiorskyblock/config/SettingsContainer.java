@@ -197,6 +197,7 @@ public class SettingsContainer {
     public final boolean buildOutsideIsland;
     public final int defaultDisbandCount;
     public final String defaultLanguage;
+    public final boolean downloadMinecraftLanguages;
     public final boolean defaultWorldBorder;
     public final boolean defaultBlocksStacker;
     public final boolean defaultToggledPanel;
@@ -536,6 +537,7 @@ public class SettingsContainer {
         buildOutsideIsland = config.getBoolean("build-outside-island", false);
         defaultDisbandCount = config.getInt("default-disband-count", 5);
         defaultLanguage = config.getString("default-language", "en-US");
+        downloadMinecraftLanguages = config.getBoolean("download-minecraft-languages", false);
         defaultWorldBorder = config.getBoolean("default-world-border", true);
         defaultBlocksStacker = config.getBoolean("default-blocks-stacker", true);
         defaultToggledPanel = config.getBoolean("default-toggled-panel", false);

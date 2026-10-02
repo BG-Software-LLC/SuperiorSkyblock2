@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddBlockLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveBlockLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetBlockLimit;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -73,7 +74,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getLocale(e.getPlayer())));
             }
         }
 
@@ -107,8 +108,8 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(wrapper.getHandle()), minecraftKey)) {
-                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(
-                            minecraftKey.getValue().getGlobalKey()));
+                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(
+                            minecraftKey.getValue(), PlayerLocales.getLocale(e.getPlayer())));
                     return true;
                 }
             }
@@ -144,7 +145,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             try {
                 island.handleBlockBreak(oldSpawnerKey, 1, 0);
                 if (island.hasReachedBlockLimit(newSpawnerKey)) {
-                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(newSpawnerKey.toString()));
+                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(newSpawnerKey, PlayerLocales.getLocale(e.getPlayer())));
                     return true;
                 }
             } finally {
@@ -240,7 +241,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.KEY_NAME_FORMATTER.format(blockKey, PlayerLocales.getLocale(e.getPlayer())));
             }
         }
 

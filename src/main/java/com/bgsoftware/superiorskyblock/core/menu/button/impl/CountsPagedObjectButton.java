@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.KeyNameFormatter;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
@@ -273,11 +274,14 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
 
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
 
+        Optional<String> translatedName = KeyNameFormatter.getInstance().getTranslatedName(rawKey, inventoryViewer.getUserLocale());
+        String keyName = translatedName.isPresent() ? translatedName.get() : Formatters.CAPITALIZED_FORMATTER.format(materialName);
+
         return itemBuilder
                 .withName(displayName)
                 .withLore(lore)
                 .withAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue())
-                .replaceAll("{0}", Formatters.CAPITALIZED_FORMATTER.format(materialName))
+                .replaceAll("{0}", keyName)
                 .replaceAll("{1}", amount + "")
                 .replaceAll("{2}", Formatters.NUMBER_FORMATTER.format(worthValue.multiply(amount)))
                 .replaceAll("{3}", Formatters.NUMBER_FORMATTER.format(levelValue.multiply(amount)))

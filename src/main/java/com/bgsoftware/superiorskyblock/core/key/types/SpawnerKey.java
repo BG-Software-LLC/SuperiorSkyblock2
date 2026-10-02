@@ -52,6 +52,11 @@ public class SpawnerKey extends MaterialKey {
         return this.isGlobalType ? "" : getSubKeyInternal();
     }
 
+    @Nullable
+    public Key getSpawnerTypeKey() {
+        return this.spawnerTypeKey;
+    }
+
     @Override
     protected MaterialKey createAPIKeyForCacheInternal() {
         return new SpawnerKey(this.spawnerTypeKey, true);

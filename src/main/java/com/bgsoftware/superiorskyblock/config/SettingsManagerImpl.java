@@ -499,6 +499,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    public boolean isDownloadMinecraftLanguages() {
+        return this.global.isDownloadMinecraftLanguages();
+    }
+
+    @Override
     public boolean isDefaultWorldBorder() {
         return this.global.isDefaultWorldBorder();
     }

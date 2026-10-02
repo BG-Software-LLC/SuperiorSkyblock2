@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -93,11 +94,11 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
             return;
 
         if (islandsChangedCount > 1)
-            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()));
+            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getLocale(sender)));
         else if (targetPlayer == null)
-            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), islands.get(0).getName());
+            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getLocale(sender)), islands.get(0).getName());
         else
-            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), targetPlayer.getName());
+            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.KEY_NAME_FORMATTER.format(entityKey, PlayerLocales.getLocale(sender)), targetPlayer.getName());
     }
 
     @Override

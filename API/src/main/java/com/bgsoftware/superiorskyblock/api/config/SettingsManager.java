@@ -515,6 +515,13 @@ public interface SettingsManager {
     String getDefaultLanguage();
 
     /**
+     * Whether vanilla minecraft language files should be downloaded automatically for every language file.
+     * These are used to translate block and entity names in messages.
+     * Config-path: download-minecraft-languages
+     */
+    boolean isDownloadMinecraftLanguages();
+
+    /**
      * Whether new players should have world-borders enabled by default or not.
      * Config-path: default-world-border
      */

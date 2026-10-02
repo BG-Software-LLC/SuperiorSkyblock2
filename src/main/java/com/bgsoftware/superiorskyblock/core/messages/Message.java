@@ -920,6 +920,8 @@ public enum Message {
             countMessages = false;
         }
 
+        MinecraftTranslations.reload(plugin);
+
         Log.info(" - Found " + messagesAmount + " messages in the language files.");
         Log.info("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }

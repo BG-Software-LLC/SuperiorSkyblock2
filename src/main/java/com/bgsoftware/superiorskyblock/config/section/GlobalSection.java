@@ -275,6 +275,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().defaultLanguage;
     }
 
+    public boolean isDownloadMinecraftLanguages() {
+        return getContainer().downloadMinecraftLanguages;
+    }
+
     public boolean isDefaultWorldBorder() {
         return getContainer().defaultWorldBorder;
     }

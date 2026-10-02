@@ -773,6 +773,15 @@ default-disband-count: 5
 # This should be the same as your language file's name.
 default-language: 'en-US'
 
+# Should vanilla minecraft language files be downloaded automatically?
+# When enabled, the plugin will download the translations of blocks and entities for every language file
+# you have, and use them when displaying names of blocks and entities in messages (limits, values, etc).
+# The files are downloaded from Mojang's servers into the lang/minecraft folder.
+# You can also put the files there manually (e.g fr_fr.json), and override names by adding
+# entries in the format of "superiorskyblock.<KEY>": "<name>" (e.g "superiorskyblock.SPAWNER:ZOMBIE").
+# This feature is not supported in 1.12 and below.
+download-minecraft-languages: false
+
 # Should world borders be enabled by default for new players?
 default-world-border: true
 
