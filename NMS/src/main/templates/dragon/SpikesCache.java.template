@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon;
 
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.DragonUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -10,9 +11,11 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.feature.${SPIKE_FEATURE_CLASS};
 
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +31,16 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
 
     private static final SpikesCache INSTANCE = new SpikesCache();
 
+    private static final boolean SPIKE_FEATURE_IS_RECORD = ${SPIKE_FEATURE_CLASS}.class.isRecord();
+
+    private static final ReflectField<LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>>> SPIKE_CACHE = new ReflectField<>(
+            ${SPIKE_FEATURE_CLASS}.class, LoadingCache.class, Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, 1);
+
+    @Nullable
+    private static LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>> vanillaSpikesCache;
+
+    private static boolean hideSpikes = false;
+
     private final LoadingCache<BlockPos, List<${SPIKE_FEATURE_CLASS}.EndSpike>> cachedSpikes = CacheBuilder.newBuilder()
             .expireAfterWrite(5L, TimeUnit.MINUTES).build(new InternalCacheLoader());
 
@@ -41,9 +54,75 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
 
     }
 
+    public static void install() {
+        if (!SPIKE_FEATURE_IS_RECORD) {
+            SPIKE_CACHE.removeFinal().set(null, INSTANCE);
+            return;
+        }
+
+        // Static final fields of records cannot be modified, so instead we keep a reference to the vanilla
+        // cache and override its entries while island dragon fights are running.
+        vanillaSpikesCache = SPIKE_CACHE.get(null);
+    }
+
+    @Nullable
+    public static IslandSpikes createIslandSpikes(ServerLevel serverLevel, BlockPos podiumPosition) {
+        if (vanillaSpikesCache == null)
+            return null;
+
+        List<${SPIKE_FEATURE_CLASS}.EndSpike> vanillaSpikes = ${SPIKE_FEATURE_CLASS}.getSpikesForLevel(serverLevel);
+
+        for (Map.Entry<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>> entry : vanillaSpikesCache.asMap().entrySet()) {
+            if (entry.getValue() == vanillaSpikes) {
+                long key = entry.getKey();
+                return new IslandSpikes(key, vanillaSpikes, computeSpikes(key, podiumPosition));
+            }
+        }
+
+        return null;
+    }
+
+    public static void runWithoutSpikes(@Nullable IslandSpikes islandSpikes, Runnable runnable) {
+        if (islandSpikes != null) {
+            islandSpikes.runWith(Collections.emptyList(), runnable);
+            return;
+        }
+
+        boolean previousHideSpikes = hideSpikes;
+        hideSpikes = true;
+        try {
+            runnable.run();
+        } finally {
+            hideSpikes = previousHideSpikes;
+        }
+    }
+
+    public static List<${SPIKE_FEATURE_CLASS}.EndSpike> computeSpikes(long worldSeed, BlockPos blockPos) {
+        List<Integer> list = IntStream.range(0, 10).boxed().collect(Collectors.toList());
+
+        Collections.shuffle(list, new Random(worldSeed));
+        List<${SPIKE_FEATURE_CLASS}.EndSpike> spikesList = Lists.newArrayList();
+
+        for (int i = 0; i < 10; ++i) {
+            int spikeX = Mth.floor(42.0D * Math.cos(2.0D * (-3.141592653589793D + 0.3141592653589793D * (double) i)));
+            int spikeZ = Mth.floor(42.0D * Math.sin(2.0D * (-3.141592653589793D + 0.3141592653589793D * (double) i)));
+            int l = list.get(i);
+            int radius = 2 + l / 3;
+            int height = 76 + l * 3;
+            boolean guarded = l == 1 || l == 2;
+
+            spikesList.add(new ${SPIKE_FEATURE_CLASS}.EndSpike(spikeX + blockPos.getX(), spikeZ + blockPos.getZ(), radius, height, guarded));
+        }
+
+        return spikesList;
+    }
+
     @Override
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> get(@NotNull Long worldSeed) throws ExecutionException {
+        if (hideSpikes)
+            return Collections.emptyList();
+
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.get(DragonUtils.getCurrentPodiumPosition());
@@ -55,6 +134,9 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     @Override
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> getUnchecked(@NotNull Long worldSeed) {
+        if (hideSpikes)
+            return Collections.emptyList();
+
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.getUnchecked(DragonUtils.getCurrentPodiumPosition());
@@ -100,6 +182,9 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> get(@NotNull Long worldSeed,
                                     @NotNull Callable<? extends List<${SPIKE_FEATURE_CLASS}.EndSpike>> loader) throws ExecutionException {
+        if (hideSpikes)
+            return Collections.emptyList();
+
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.get(DragonUtils.getCurrentPodiumPosition(), loader);
@@ -165,23 +250,36 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
         @Override
         public @NotNull
         List<${SPIKE_FEATURE_CLASS}.EndSpike> load(@NotNull BlockPos blockPos) {
-            List<Integer> list = IntStream.range(0, 10).boxed().collect(Collectors.toList());
+            return computeSpikes(worldSeed, blockPos);
+        }
 
-            Collections.shuffle(list, new Random(worldSeed));
-            List<${SPIKE_FEATURE_CLASS}.EndSpike> spikesList = Lists.newArrayList();
+    }
 
-            for (int i = 0; i < 10; ++i) {
-                int spikeX = Mth.floor(42.0D * Math.cos(2.0D * (-3.141592653589793D + 0.3141592653589793D * (double) i)));
-                int spikeZ = Mth.floor(42.0D * Math.sin(2.0D * (-3.141592653589793D + 0.3141592653589793D * (double) i)));
-                int l = list.get(i);
-                int radius = 2 + l / 3;
-                int height = 76 + l * 3;
-                boolean guarded = l == 1 || l == 2;
+    public static class IslandSpikes {
 
-                spikesList.add(new ${SPIKE_FEATURE_CLASS}.EndSpike(spikeX + blockPos.getX(), spikeZ + blockPos.getZ(), radius, height, guarded));
+        private final long key;
+        private final List<${SPIKE_FEATURE_CLASS}.EndSpike> vanillaSpikes;
+        private final List<${SPIKE_FEATURE_CLASS}.EndSpike> islandSpikes;
+
+        private IslandSpikes(long key, List<${SPIKE_FEATURE_CLASS}.EndSpike> vanillaSpikes, List<${SPIKE_FEATURE_CLASS}.EndSpike> islandSpikes) {
+            this.key = key;
+            this.vanillaSpikes = vanillaSpikes;
+            this.islandSpikes = islandSpikes;
+        }
+
+        public void runWith(Runnable runnable) {
+            runWith(this.islandSpikes, runnable);
+        }
+
+        private void runWith(List<${SPIKE_FEATURE_CLASS}.EndSpike> spikes, Runnable runnable) {
+            // Calls may be nested, so we restore the previous spikes instead of the vanilla ones.
+            List<${SPIKE_FEATURE_CLASS}.EndSpike> previousSpikes = vanillaSpikesCache.asMap().get(this.key);
+            vanillaSpikesCache.put(this.key, spikes);
+            try {
+                runnable.run();
+            } finally {
+                vanillaSpikesCache.put(this.key, previousSpikes == null ? this.vanillaSpikes : previousSpikes);
             }
-
-            return spikesList;
         }
 
     }

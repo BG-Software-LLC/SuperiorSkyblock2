@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -80,6 +81,13 @@ public class CmdAdmin implements ISuperiorCommand {
 
             SuperiorCommand command = plugin.getCommands().getAdminCommand(executedSubCommand);
             if (command != null) {
+                // The console approves pending requests of dangerous commands by executing the sub command without arguments.
+                if (sender instanceof ConsoleCommandSender && args.length == 2 &&
+                        plugin.getCommands().hasPendingDangerousRequests(command)) {
+                    plugin.getCommands().approveDangerousRequests(sender, command);
+                    return;
+                }
+
                 if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
                     Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
                     return;
@@ -102,7 +110,12 @@ public class CmdAdmin implements ISuperiorCommand {
                     return;
                 }
 
-                command.execute(plugin, sender, args);
+                if (sender instanceof Player && plugin.getCommands().isDangerousCommand(command)) {
+                    plugin.getCommands().submitDangerousRequest((Player) sender, command, args);
+                } else {
+                    command.execute(plugin, sender, args);
+                }
+
                 return;
             }
 

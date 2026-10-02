@@ -119,6 +119,9 @@ public class NMSChunksImpl implements NMSChunks {
                 PacketPlayOutLightUpdate lightUpdatePacket = new PacketPlayOutLightUpdate(chunkCoords, lightEngineThreaded, true);
 
                 playersToUpdate.forEach(player -> {
+                    if (!player.isOnline() || player.getWorld() != chunk.world.getWorld())
+                        return;
+
                     PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
                     playerConnection.sendPacket(unloadChunkPacket);
                     playerConnection.sendPacket(lightUpdatePacket);

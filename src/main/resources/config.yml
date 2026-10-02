@@ -779,6 +779,13 @@ disabled-events: [ ]
 # You can add a label or an alias of a command to disable it.
 disabled-commands: [ ]
 
+# A list of admin sub-commands that are considered dangerous.
+# When a player executes one of them, the command is not executed until the console approves it
+# by executing the same admin sub-command without arguments (e.g. "is admin purge").
+# Requests expire after 1 minute, or when the player leaves the server.
+# You can add a label or an alias of an admin command.
+dangerous-commands: [ ]
+
 # List of plugins that their hooks should not be enabled.
 # Simply add the plugin's name in order to prevent it from enabling.
 disabled-hooks: [ ]
