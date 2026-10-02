@@ -23,34 +23,45 @@ public class IslandPlayerDetector implements PlayerDetector {
 
     private final Island island;
     private final PlayerDetector original;
-    private final Supplier<IslandPrivilege> requiredPrivilege;
+    private final Supplier<List<IslandPrivilege>> requiredPrivileges;
 
     public static IslandPlayerDetector trialVaultPlayerDetector(Island island, PlayerDetector original) {
-        return new IslandPlayerDetector(island, original, () -> IslandPrivileges.CONFIG_VAULT_INTERACT);
+        return new IslandPlayerDetector(island, original, () -> IslandPrivileges.VAULT_INTERACT_PRIVILEGES);
     }
 
     public static IslandPlayerDetector trialSpawnerPlayerDetector(Island island, PlayerDetector original) {
-        return new IslandPlayerDetector(island, original, () -> BuiltinEntityCategory.MONSTER.getEntityCategory().getDamagePrivilege());
+        return new IslandPlayerDetector(island, original, () ->
+                List.of(BuiltinEntityCategory.MONSTER.getEntityCategory().getDamagePrivilege()));
     }
 
-    private IslandPlayerDetector(Island island, PlayerDetector original, Supplier<IslandPrivilege> requiredPrivilege) {
+    private IslandPlayerDetector(Island island, PlayerDetector original, Supplier<List<IslandPrivilege>> requiredPrivileges) {
         this.island = island;
         this.original = original;
-        this.requiredPrivilege = requiredPrivilege;
+        this.requiredPrivileges = requiredPrivileges;
     }
 
     @Override
     public List<UUID> detect(ServerLevel serverLevel, EntitySelector entitySelector, BlockPos blockPos, double maxDistance, boolean requireLineOfSight) {
         List<UUID> players = this.original.detect(serverLevel, entitySelector, blockPos, maxDistance, requireLineOfSight);
-        IslandPrivilege requiredPrivilege = this.requiredPrivilege.get();
-        if (requiredPrivilege != null && !players.isEmpty()) {
+        List<IslandPrivilege> privileges = this.requiredPrivileges.get();
+
+        if (!privileges.isEmpty() && !players.isEmpty()) {
             players = new LinkedList<>(players);
+
             players.removeIf(uuid -> {
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
-                return !island.hasPermission(superiorPlayer, requiredPrivilege);
+
+                for (IslandPrivilege privilege : privileges) {
+                    if (privilege != null && !island.hasPermission(superiorPlayer, privilege)) {
+                        return true;
+                    }
+                }
+                return false;
             });
+
             players = Collections.unmodifiableList(players);
         }
+
         return players;
     }
 
