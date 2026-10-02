@@ -9,12 +9,16 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankLogsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BankLogsSortButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.SwitchBankLogsSortingTypeButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
@@ -30,6 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,14 +42,30 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
 
-    private MenuBankLogs(MenuParseResult<View> parseResult) {
+    private final BankLogsSortButton.SortType defaultSortingType;
+    private final String selectedSortingType;
+    private final String unselectedSortingType;
+
+    private MenuBankLogs(MenuParseResult<View> parseResult, BankLogsSortButton.SortType defaultSortingType,
+                         String selectedSortingType, String unselectedSortingType) {
         super(MenuIdentifiers.MENU_BANK_LOGS, parseResult, false);
+        this.defaultSortingType = defaultSortingType;
+        this.selectedSortingType = selectedSortingType;
+        this.unselectedSortingType = unselectedSortingType;
+    }
+
+    public String getSelectedSortingType() {
+        return this.selectedSortingType;
+    }
+
+    public String getUnselectedSortingType() {
+        return this.unselectedSortingType;
     }
 
     @Override
     protected View createViewInternal(SuperiorPlayer superiorPlayer, IslandViewArgs args,
                                       @Nullable MenuView<?, ?> previousMenuView) {
-        return new View(superiorPlayer, previousMenuView, this, args);
+        return new View(superiorPlayer, previousMenuView, this, args, this.defaultSortingType);
     }
 
     public void refreshViews(Island island) {
@@ -68,7 +89,50 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
         patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "money-sort", menuSlotsMap),
                 new BankLogsSortButton.Builder().setSortType(BankLogsSortButton.SortType.MONEY));
 
-        return new MenuBankLogs(menuParseResult);
+        BankLogsSortButton.SortType defaultSortingType = null;
+        String sort = cfg.getString("sort-logs");
+        List<Integer> sortSlots = MenuParserImpl.getInstance().parseButtonSlots(cfg, "sort-logs", menuSlotsMap);
+
+        if (sort != null && !sortSlots.isEmpty()) {
+            ConfigurationSection itemSection = cfg.getConfigurationSection("items." + sort);
+
+            if (itemSection == null) {
+                Log.warnFromFile("bank-logs.yml", "The sorting item is missing for the item ", sort);
+            } else {
+                SwitchBankLogsSortingTypeButton.Builder button = new SwitchBankLogsSortingTypeButton.Builder();
+
+                for (String sortSectionName : itemSection.getKeys(false)) {
+                    ConfigurationSection sortSection = itemSection.getConfigurationSection(sortSectionName);
+                    BankLogsSortButton.SortType sortingType;
+
+                    try {
+                        sortingType = BankLogsSortButton.SortType.valueOf(sortSectionName.toUpperCase(Locale.ENGLISH));
+                    } catch (IllegalArgumentException error) {
+                        Log.warnFromFile("bank-logs.yml", "The sorting type is invalid for the item ", sort, ": ", sortSectionName);
+                        continue;
+                    }
+
+                    TemplateItem templateItem = MenuParserUtils.getItemStack("menus/bank-logs.yml", sortSection);
+
+                    if (templateItem == null) {
+                        Log.warnFromFile("bank-logs.yml", "The sorting item is missing for the sorting type ", sortSectionName);
+                        continue;
+                    }
+
+                    button.addItem(sortingType, sortSection.getString("display-name", sortingType.name()), templateItem);
+
+                    if (defaultSortingType == null)
+                        defaultSortingType = sortingType;
+                }
+
+                if (defaultSortingType != null)
+                    patternBuilder.mapButtons(sortSlots, button);
+            }
+        }
+
+        return new MenuBankLogs(menuParseResult, defaultSortingType,
+                cfg.getString("messages.selected-sorting-type", "&8 - &a{0}"),
+                cfg.getString("messages.unselected-sorting-type", "&8 - &7{0}"));
     }
 
     public static class View extends AbstractPagedMenuView<View, IslandViewArgs, BankTransaction> implements IIslandMenuView, IPlayerMenuView {
@@ -76,12 +140,15 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
         private final Island island;
 
         private Comparator<BankTransaction> sorting;
+        private BankLogsSortButton.SortType sortingType;
         private UUID filteredPlayer;
 
         View(SuperiorPlayer inventoryViewer, @Nullable MenuView<?, ?> previousMenuView,
-             Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
+             Menu<View, IslandViewArgs> menu, IslandViewArgs args, BankLogsSortButton.SortType sortingType) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
+            if (sortingType != null)
+                setSortingType(sortingType);
         }
 
         @Override
@@ -97,6 +164,17 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
 
         public void setSorting(Comparator<BankTransaction> sorting) {
             this.sorting = sorting;
+            this.sortingType = null;
+        }
+
+        @Nullable
+        public BankLogsSortButton.SortType getSortingType() {
+            return this.sortingType;
+        }
+
+        public void setSortingType(BankLogsSortButton.SortType sortingType) {
+            this.sorting = sortingType.getComparator();
+            this.sortingType = sortingType;
         }
 
         public void setFilteredPlayer(UUID filteredPlayer) {

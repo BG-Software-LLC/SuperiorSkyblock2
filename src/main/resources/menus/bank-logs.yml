@@ -13,7 +13,7 @@ pattern:
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
-  - '$ $ $ ! $ - $ $ $'
+  - '$ $ $ $ ! $ $ $ $'
   - '# # % # * # ^ # #'
 
 slots: '@'
@@ -21,8 +21,11 @@ previous-page: '%'
 current-page: '*'
 next-page: '^'
 
-time-sort: '!'
-money-sort: '-'
+sort-logs: '!'
+
+messages:
+  selected-sorting-type: '&8 - &a{0}'
+  unselected-sorting-type: '&8 - &7{0}'
 
 items:
   '@':
@@ -51,11 +54,30 @@ items:
     data: 15
     name: '&f'
   '!':
-    type: WATCH
-    name: '&6Sort by creation time'
-  '-':
-    type: EMERALD
-    name: '&6Sort by money'
+    TIME:
+      display-name: 'Creation time'
+      type: WATCH
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch transaction logs sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+        - ''
+        - '&7Left-click for the previous sorting type.'
+        - '&7Right-click for the next sorting type.'
+    MONEY:
+      display-name: 'Money'
+      type: EMERALD
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch transaction logs sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+        - ''
+        - '&7Left-click for the previous sorting type.'
+        - '&7Right-click for the next sorting type.'
 
 sounds:
   '@':

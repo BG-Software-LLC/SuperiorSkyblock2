@@ -24,30 +24,24 @@ public class BankLogsSortButton extends AbstractMenuViewButton<MenuBankLogs.View
 
     @Override
     public void onButtonClick(ButtonClickContext<MenuBankLogs.View> context) {
-        getTemplate().sortType.onButtonClick(menuView);
+        menuView.setSortingType(getTemplate().sortType);
         menuView.refreshView();
     }
 
     public enum SortType {
 
-        TIME {
-            @Override
-            void onButtonClick(MenuBankLogs.View menuView) {
-                menuView.setSorting(Comparator.comparingLong(BankTransaction::getTime));
-            }
-        },
-        MONEY {
-            @Override
-            void onButtonClick(MenuBankLogs.View menuView) {
-                menuView.setSorting((o1, o2) -> o2.getAmount().compareTo(o1.getAmount()));
-            }
-        };
+        TIME(Comparator.comparingLong(BankTransaction::getTime)),
+        MONEY((o1, o2) -> o2.getAmount().compareTo(o1.getAmount()));
 
-        SortType() {
+        private final Comparator<BankTransaction> comparator;
 
+        SortType(Comparator<BankTransaction> comparator) {
+            this.comparator = comparator;
         }
 
-        abstract void onButtonClick(MenuBankLogs.View menuView);
+        public Comparator<BankTransaction> getComparator() {
+            return this.comparator;
+        }
 
     }
 
