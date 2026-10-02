@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island.builder;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -24,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
+import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
@@ -54,6 +56,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -99,6 +102,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
     public final EnumerateMap<Dimension, KeyMap<IntValue>> cobbleGeneratorValues = new EnumerateMap<>(Dimension.values());
     public final List<SIsland.UniqueVisitor> uniqueVisitors = new LinkedList<>();
+    public final Map<String, IntValue> entityCategoryLimits = new ArrayMap<>();
     public final KeyMap<IntValue> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
@@ -552,6 +556,34 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Island.Builder setEntityCategoryLimit(EntityCategory entityCategory, int limit) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+
+        String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
+        this.entityCategoryLimits.put(entityCategoryName, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+
+        return this;
+    }
+
+    @Override
+    public Map<EntityCategory, Integer> getEntityCategoryLimits() {
+        if (this.entityCategoryLimits.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<EntityCategory, Integer> entityCategoryLimits = new HashMap<>();
+        for (Map.Entry<String, IntValue> entry : this.entityCategoryLimits.entrySet()) {
+            EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entry.getKey());
+
+            if (entityCategory != null) {
+                entityCategoryLimits.put(entityCategory, entry.getValue().get());
+            }
+        }
+
+        return Collections.unmodifiableMap(entityCategoryLimits);
+    }
+
+    @Override
     public Island.Builder setEntityLimit(Key entity, int limit) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
         this.entityLimits.put(entity, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
@@ -613,7 +645,11 @@ public class IslandBuilderImpl implements Island.Builder {
         Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = this.roleLimits.entryIterator();
         while (iterator.hasNext()) {
             Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
-            roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), entry.getValue().get());
+            PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+            if (playerRole != null) {
+                roleLimits.put(playerRole, entry.getValue().get());
+            }
         }
 
         return Collections.unmodifiableMap(roleLimits);

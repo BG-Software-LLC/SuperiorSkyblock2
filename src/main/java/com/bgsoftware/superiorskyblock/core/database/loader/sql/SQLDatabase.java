@@ -125,6 +125,12 @@ public class SQLDatabase {
                 new Column("level", "INTEGER")
         );
 
+        DBSession.createTable("islands_entity_category_limits",
+                new Column("island", "UUID"),
+                new Column("entity_category", "UNIQUE_TEXT"),
+                new Column("`limit`", "INTEGER")
+        );
+
         DBSession.createTable("islands_entity_limits",
                 new Column("island", "UUID"),
                 new Column("entity", "UNIQUE_TEXT"),
