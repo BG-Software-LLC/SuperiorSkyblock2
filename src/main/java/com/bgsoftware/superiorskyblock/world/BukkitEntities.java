@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
@@ -20,6 +21,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -38,6 +40,9 @@ import java.util.Optional;
 
 public class BukkitEntities {
 
+    @Nullable
+    private static final Class<?> CHEST_BOAT_CLASS = new ClassInfo("org.bukkit.entity.ChestBoat",
+            ClassInfo.PackageType.UNKNOWN).findClass();
     @Nullable
     private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
     @Nullable
@@ -131,8 +136,20 @@ public class BukkitEntities {
         return Keys.of(entity.getType());
     }
 
+    public static boolean canHaveBlock(Entity entity) {
+        return entity instanceof Minecart || (CHEST_BOAT_CLASS != null && CHEST_BOAT_CLASS.isInstance(entity));
+    }
+
+    public static boolean canHaveBlock(EntityType entityType) {
+        Class<?> entityClass = entityType.getEntityClass();
+
+        return (entityClass != null && (Minecart.class.isAssignableFrom(entityClass) ||
+                        (CHEST_BOAT_CLASS != null && CHEST_BOAT_CLASS.isAssignableFrom(entityClass))));
+    }
+
     public static boolean canHaveLimit(EntityType entityType) {
         Class<?> entityClass = entityType.getEntityClass();
+
         return (entityClass != null && (LivingEntity.class.isAssignableFrom(entityClass) || entityType == CUSHION_TYPE ||
                 Hanging.class.isAssignableFrom(entityClass) || Vehicle.class.isAssignableFrom(entityClass)));
     }

@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.key.EntityBlockMapper;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
@@ -23,6 +24,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,10 +32,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.Action;
@@ -244,22 +244,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
-    private void onMinecartPlace(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
-        Entity vehicle = e.getArgs().entity;
-
-        if (!(vehicle instanceof Minecart))
-            return;
-
-        Key minecartBlockKey = getMinecartBlockKey(vehicle.getType());
-        if (minecartBlockKey != null) {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                this.worldRecordService.get().recordBlockPlace(minecartBlockKey,
-                        vehicle.getLocation(wrapper.getHandle()),
-                        1, null, REGULAR_RECORD_FLAGS);
-            }
-        }
-    }
-
     private void onSpawnerChange(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
         Action action = e.getArgs().action;
         Block clickedBlock = e.getArgs().clickedBlock;
@@ -372,9 +356,29 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
             return;
 
-        onMinecartPlace(e);
+        if (plugin.getSettings().isCountEntitiesAsBlocks()) {
+            onEntityWithBlockPlace(e);
+        }
+
         onDragonEggDrop(e);
         onGolemStructure(e);
+    }
+
+    private void onEntityWithBlockPlace(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
+        Entity entity = e.getArgs().entity;
+
+        if (!BukkitEntities.canHaveBlock(entity.getType())) {
+            return;
+        }
+
+        Key blockKey = EntityBlockMapper.getBlockFromEntity(Keys.of(entity));
+
+        if (blockKey != null) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                this.worldRecordService.get().recordBlockPlace(blockKey, entity.getLocation(wrapper.getHandle()),
+                        1, null, REGULAR_RECORD_FLAGS);
+            }
+        }
     }
 
     private void onDragonEggDrop(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
@@ -645,26 +649,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         if (CLOSED_EYEBLOSSOM != null || OPEN_EYEBLOSSOM != null)
             registerCallback(GameEventType.GENERIC_GAME_EVENT, GameEventPriority.MONITOR, this::onGenericGame);
-    }
-
-    @Nullable
-    private static Key getMinecartBlockKey(EntityType minecartType) {
-        switch (minecartType) {
-            case MINECART_HOPPER:
-                return ConstantKeys.HOPPER;
-            case MINECART_COMMAND:
-                return ConstantKeys.COMMAND_BLOCK;
-            case MINECART_TNT:
-                return ConstantKeys.TNT;
-            case MINECART_FURNACE:
-                return ConstantKeys.FURNACE;
-            case MINECART_CHEST:
-                return ConstantKeys.CHEST;
-            case MINECART_MOB_SPAWNER:
-                return ConstantKeys.MOB_SPAWNER;
-        }
-
-        return null;
     }
 
     private static Key getBlockKeyFromBucketMaterial(Material material) {

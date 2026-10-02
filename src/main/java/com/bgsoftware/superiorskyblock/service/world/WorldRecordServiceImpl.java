@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.key.EntityBlockMapper;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -29,7 +30,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Minecart;
 
 import java.util.EnumMap;
 
@@ -277,19 +277,21 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     }
 
     private RecordResult recordEntitySpawnInternal(EntityType entityType, Location location) {
-        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class) ||
-                !BukkitEntities.canHaveLimit(entityType))
-            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        RecordResult recordResult = canEntityBeTracked(entityType);
+
+        if (recordResult != RecordResult.SUCCESS) {
+            return recordResult;
+        }
 
         Island island = plugin.getGrid().getIslandAt(location);
 
-        if (island == null)
+        if (island == null) {
             return RecordResult.NOT_IN_ISLAND;
+        }
 
         island.getEntitiesTracker().trackEntity(Keys.of(entityType), 1);
         // TODO: elsewhere
         IslandsDatabaseBridge.saveEntityCounts(island);
-
 
         return RecordResult.SUCCESS;
     }
@@ -298,24 +300,30 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     public RecordResult recordEntityDespawn(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null");
 
-        if (BukkitEntities.canBypassEntityLimit(entity))
+        if (BukkitEntities.canBypassEntityLimit(entity)) {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
 
         RecordResult recordResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             recordResult = recordEntityDespawnInternal(entity.getType(), entity.getLocation(wrapper.getHandle()));
         }
-        if (recordResult != RecordResult.SUCCESS)
-            return recordResult;
 
-        if (entity instanceof Minecart) {
-            Key blockKey = plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity);
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                recordBlockBreak(blockKey, entity.getLocation(wrapper.getHandle()), 1, REGULAR_RECORD_FLAGS);
+        if (recordResult != RecordResult.SUCCESS) {
+            return recordResult;
+        }
+
+        if (plugin.getSettings().isCountEntitiesAsBlocks() && BukkitEntities.canHaveBlock(entity)) {
+            Key blockKey = EntityBlockMapper.getBlockFromEntity(Keys.of(entity));
+
+            if (blockKey != null) {
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    recordBlockBreak(blockKey, entity.getLocation(wrapper.getHandle()), 1, REGULAR_RECORD_FLAGS);
+                }
             }
         }
 
-        return RecordResult.SUCCESS;
+        return recordResult;
     }
 
     @Override
@@ -328,18 +336,34 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     }
 
     private RecordResult recordEntityDespawnInternal(EntityType entityType, Location location) {
-        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class) ||
-                !BukkitEntities.canHaveLimit(entityType))
-            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        RecordResult recordResult = canEntityBeTracked(entityType);
+
+        if (recordResult != RecordResult.SUCCESS) {
+            return recordResult;
+        }
 
         Island island = plugin.getGrid().getIslandAt(location);
 
-        if (island == null)
+        if (island == null) {
             return RecordResult.NOT_IN_ISLAND;
+        }
 
         island.getEntitiesTracker().untrackEntity(Keys.of(entityType), 1);
         // TODO: not here
         IslandsDatabaseBridge.saveEntityCounts(island);
+
+        return RecordResult.SUCCESS;
+    }
+
+    private RecordResult canEntityBeTracked(EntityType entityType) {
+        boolean canHaveLimit = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)
+                && BukkitEntities.canHaveLimit(entityType);
+        boolean canHaveBlock = plugin.getSettings().isCountEntitiesAsBlocks()
+                && BukkitEntities.canHaveBlock(entityType);
+
+        if (!canHaveLimit && !canHaveBlock) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
 
         return RecordResult.SUCCESS;
     }
