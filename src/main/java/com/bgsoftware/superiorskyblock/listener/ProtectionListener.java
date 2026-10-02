@@ -617,7 +617,7 @@ public class ProtectionListener extends AbstractGameEventListener {
                     hitBlock = null;
                     location = hitEntity.getLocation(wrapper.getHandle());
 
-                    List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+                    List<EntityCategory> entityCategories = BukkitEntities.getCategories(hitEntity);
                     interactionResult = InteractionResult.SUCCESS;
 
                     for (EntityCategory entityCategory : entityCategories) {

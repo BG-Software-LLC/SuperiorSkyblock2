@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -155,7 +156,7 @@ public class BukkitEntities {
         return false;
     }
 
-    public static boolean isTameable(Entity entity) {
+    public static boolean isTamed(Entity entity) {
         return entity instanceof Tameable && ((Tameable) entity).isTamed();
     }
 
@@ -168,12 +169,18 @@ public class BukkitEntities {
     }
 
     public static List<EntityCategory> getCategories(Entity entity) {
-        List<EntityCategory> categories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
-        if (isTameable(entity)) {
-            categories = new LinkedList<>(categories);
-            categories.add(BuiltinEntityCategory.TAMEABLE.getEntityCategory());
-        }
-        return categories;
+        SettingsManager.EntityCategories categorySettings = plugin.getSettings().getEntityCategoriesMap();
+        List<EntityCategory> categories = categorySettings.getCategories(Keys.of(entity));
+        if (!isTamed(entity))
+            return categories;
+
+        EntityCategory tamedCategory = categorySettings.getCategoryByName(BuiltinEntityCategory.TAMED.name());
+        if (tamedCategory == null)
+            return categories;
+
+        List<EntityCategory> applicableCategories = new LinkedList<>(categories);
+        applicableCategories.add(tamedCategory);
+        return applicableCategories;
     }
 
 }
