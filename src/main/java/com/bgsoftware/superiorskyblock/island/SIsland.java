@@ -1884,7 +1884,7 @@ public class SIsland implements Island {
     @Override
     public void updateBorder() {
         Log.debug(Debug.UPDATE_BORDER, owner.getName());
-        getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this));
+        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this)));
     }
 
     @Override

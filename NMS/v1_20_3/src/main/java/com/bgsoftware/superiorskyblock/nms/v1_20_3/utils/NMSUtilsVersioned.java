@@ -14,6 +14,7 @@ import com.google.common.base.Suppliers;
 import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -30,8 +31,11 @@ import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -303,6 +307,14 @@ public class NMSUtilsVersioned {
 
     public static EndDragonFight getEndDragonFight(ServerLevel serverLevel) {
         return serverLevel.getDragonFight();
+    }
+
+    public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
+        enderDragon.setFightOrigin(fightOrigin);
+    }
+
+    public static void removeDragonTicket(ServerLevel serverLevel) {
+        serverLevel.getChunkSource().removeRegionTicket(TicketType.DRAGON, new ChunkPos(0, 0), 9, Unit.INSTANCE);
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {

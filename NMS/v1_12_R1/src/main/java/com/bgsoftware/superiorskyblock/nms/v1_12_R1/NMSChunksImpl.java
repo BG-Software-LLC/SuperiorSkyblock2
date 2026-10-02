@@ -87,6 +87,9 @@ public class NMSChunksImpl implements NMSChunks {
                 PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
 
                 playersToUpdate.forEach(player -> {
+                    if (!player.isOnline() || player.getWorld() != chunk.world.getWorld())
+                        return;
+
                     PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
                     playerConnection.sendPacket(unloadChunkPacket);
                     playerConnection.sendPacket(mapChunkPacket);
