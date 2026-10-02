@@ -16,12 +16,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SIslandChest implements IslandChest {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static String title = plugin.getSettings().getIslandChests().getChestTitle();
 
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
     private final Island island;
     private final int index;
-    private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(this, 9, title);
+    private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(this, 9,
+            plugin.getSettings().getIslandChests().getChestTitle());
     private int contentsUpdateCounter = 0;
 
     public SIslandChest(Island island, int index) {
@@ -31,7 +31,8 @@ public class SIslandChest implements IslandChest {
 
     public static SIslandChest createChest(Island island, int index, ItemStack[] contents) {
         SIslandChest islandChest = new SIslandChest(island, index);
-        islandChest.inventory = plugin.getProviders().getUIProvider().createInventory(islandChest, contents.length, title);
+        islandChest.inventory = plugin.getProviders().getUIProvider().createInventory(islandChest, contents.length,
+                plugin.getSettings().getIslandChests().getChestTitle());
         islandChest.inventory.setContents(contents);
         return islandChest;
     }
@@ -58,7 +59,8 @@ public class SIslandChest implements IslandChest {
                 updateFlag.set(true);
                 ItemStack[] oldContents = inventory.getContents();
                 Inventory oldInventory = inventory;
-                inventory = plugin.getProviders().getUIProvider().createInventory(this, 9 * rows, title);
+                inventory = plugin.getProviders().getUIProvider().createInventory(this, 9 * rows,
+                        plugin.getSettings().getIslandChests().getChestTitle());
                 inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
                 inventory.getViewers().forEach(humanEntity -> {
                     if (humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))
@@ -97,17 +99,6 @@ public class SIslandChest implements IslandChest {
         } else {
             IslandsDatabaseBridge.markIslandChestsToBeSaved(island, this);
         }
-    }
-
-    public static boolean updateTitleIfNeeded() {
-        String newTitle = plugin.getSettings().getIslandChests().getChestTitle();
-
-        if (!title.equals(newTitle)) {
-            title = newTitle;
-            return true;
-        }
-
-        return false;
     }
 
 }

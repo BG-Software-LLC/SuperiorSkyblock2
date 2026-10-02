@@ -125,7 +125,9 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -4573,12 +4575,24 @@ public class SIsland implements Island {
     }
 
     private void recreateChests() {
-        if (!SIslandChest.updateTitleIfNeeded()) {
+        IslandChest[] islandChests = this.islandChests.get();
+
+        if (islandChests.length == 0 || islandChests[0].getInventory().getTitle().equals(
+                plugin.getSettings().getIslandChests().getChestTitle())) {
             return;
         }
 
-        IslandChest[] islandChests = this.islandChests.get();
         IslandChest[] newIslandChests = new IslandChest[islandChests.length];
+
+        for (IslandChest islandChest : islandChests) {
+            Inventory inventory = islandChest.getInventory();
+
+            for (HumanEntity humanEntity : inventory.getViewers()) {
+                if (humanEntity.getOpenInventory().getTopInventory().equals(inventory)) {
+                    humanEntity.closeInventory();;
+                }
+            }
+        }
 
         for (int index = 0; index < islandChests.length; index++) {
             IslandChest newIslandChest = SIslandChest.createChest(this, index, islandChests[index].getContents());
