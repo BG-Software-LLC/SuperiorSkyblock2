@@ -45,12 +45,17 @@ public class Keys {
         return EntityTypeKey.of(entityType);
     }
 
-    public static Key ofEntityType(String customType) {
+    public static Key ofEntityType(String key) {
+        String[] sections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
+        return Keys.ofEntityType(sections[0], sections.length >= 2 ? sections[1] : null);
+    }
+
+    private static Key ofEntityType(String entityTypeName, @Nullable String data) {
         try {
-            return EntityTypeKey.of(EntityType.valueOf(customType.toUpperCase(Locale.ENGLISH)));
-        } catch (IllegalArgumentException error) {
-            String[] keySections = KEY_SPLITTER_PATTERN.split(customType.toUpperCase(Locale.ENGLISH));
-            return of(keySections[0], keySections.length >= 2 ? keySections[1] : null, KeyIndicator.ENTITY_TYPE);
+            EntityType entityType = EntityType.valueOf(entityTypeName.toUpperCase(Locale.ENGLISH));
+            return Keys.of(entityType);
+        } catch (Exception error) {
+            return Keys.of(entityTypeName, data, KeyIndicator.ENTITY_TYPE);
         }
     }
 
@@ -133,25 +138,27 @@ public class Keys {
         return type == Materials.SPAWNER.toBukkitType() ? SpawnerKey.GLOBAL_KEY : MaterialKey.of(type);
     }
 
-    public static Key ofMaterialAndData(String material, @Nullable String data) {
-        try {
-            Material blockType = Material.valueOf(material);
-            if (Text.isBlank(data)) {
-                return Keys.of(blockType);
-            }
-            if (blockType == Materials.SPAWNER.toBukkitType()) {
-                return ofSpawner(data);
-            }
-            short blockData = Short.parseShort(data);
-            return Keys.of(blockType, blockData);
-        } catch (Exception error) {
-            return Keys.of(material, data, KeyIndicator.MATERIAL);
-        }
+    public static Key ofMaterialAndData(String key) {
+        String[] sections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
+        return Keys.ofMaterialAndData(sections[0], sections.length >= 2 ? sections[1] : null);
     }
 
-    public static Key ofMaterialAndData(String key) {
-        String[] keySections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
-        return ofMaterialAndData(keySections[0], keySections.length >= 2 ? keySections[1] : null);
+    private static Key ofMaterialAndData(String materialName, @Nullable String data) {
+        try {
+            Material material = Material.valueOf(materialName);
+
+            if (Text.isBlank(data)) {
+                return Keys.of(material);
+            }
+
+            if (material == Materials.SPAWNER.toBukkitType()) {
+                return Keys.ofSpawner(data);
+            }
+
+            return Keys.of(material, Short.parseShort(data));
+        } catch (Exception error) {
+            return Keys.of(materialName, data, KeyIndicator.MATERIAL);
+        }
     }
 
     /* Spawner keys */
@@ -179,8 +186,8 @@ public class Keys {
     }
 
     public static Key ofCustom(String key) {
-        String[] sections = KEY_SPLITTER_PATTERN.split(key);
-        return of(sections[0], sections.length > 2 ? sections[1] : null, KeyIndicator.CUSTOM);
+        String[] sections = KEY_SPLITTER_PATTERN.split(key, 2);
+        return of(sections[0], sections.length >= 2 ? sections[1] : null, KeyIndicator.CUSTOM);
     }
 
     public static <T extends Key> Key of(Class<T> baseKeyClass, LazyReference<T> keyLoader) {
