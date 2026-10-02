@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -82,8 +83,12 @@ public class CmdAdminAddRoleLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            int currentLimit = island.getRoleLimit(playerRole);
+            int newLimit = currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE ? limit : currentLimit + limit;
+
             PluginEvent<PluginEventArgs.IslandChangeRoleLimit> event = PluginEventsFactory.callIslandChangeRoleLimitEvent(
-                    island, sender, playerRole, island.getRoleLimit(playerRole) + limit);
+                    island, sender, playerRole, newLimit);
+
             if (!event.isCancelled()) {
                 island.setRoleLimit(playerRole, event.getArgs().roleLimit);
                 ++islandsChangedCount;

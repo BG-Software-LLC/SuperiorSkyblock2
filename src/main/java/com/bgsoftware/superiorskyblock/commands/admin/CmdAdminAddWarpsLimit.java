@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -74,8 +75,12 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            int currentLimit = island.getWarpsLimit();
+            int newLimit = currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE ? limit : currentLimit + limit;
+
             PluginEvent<PluginEventArgs.IslandChangeWarpsLimit> event = PluginEventsFactory.callIslandChangeWarpsLimitEvent(
-                    island, sender, island.getWarpsLimit() + limit);
+                    island, sender, newLimit);
+
             if (!event.isCancelled()) {
                 island.setWarpsLimit(event.getArgs().warpsLimit);
                 ++islandsChangedCount;

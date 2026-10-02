@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -72,8 +73,12 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            BigDecimal currentLimit = island.getBankLimit();
+            BigDecimal newLimit = currentLimit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) <= 0 ? limit : currentLimit.add(limit);
+
             PluginEvent<PluginEventArgs.IslandChangeBankLimit> event = PluginEventsFactory.callIslandChangeBankLimitEvent(
-                    island, sender, island.getBankLimit().add(limit));
+                    island, sender, newLimit);
+
             if (!event.isCancelled()) {
                 island.setBankLimit(event.getArgs().bankLimit);
                 ++islandsChangedCount;

@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -81,8 +82,12 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            int currentLimit = island.getEntityLimit(entityKey);
+            int newLimit = currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE ? limit : currentLimit + limit;
+
             PluginEvent<PluginEventArgs.IslandChangeEntityLimit> event = PluginEventsFactory.callIslandChangeEntityLimitEvent(
-                    island, sender, entityKey, island.getEntityLimit(entityKey) + limit);
+                    island, sender, entityKey, newLimit);
+
             if (!event.isCancelled()) {
                 island.setEntityLimit(entityKey, event.getArgs().entityLimit);
                 ++islandsChangedCount;

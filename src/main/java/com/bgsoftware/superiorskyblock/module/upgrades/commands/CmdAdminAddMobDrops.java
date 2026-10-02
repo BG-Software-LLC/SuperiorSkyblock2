@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -74,8 +75,12 @@ public class CmdAdminAddMobDrops implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            double currentMultiplier = island.getMobDropsMultiplier();
+            double newMultiplier = currentMultiplier <= IslandUpgradeConstants.NO_LIMIT_VALUE ? multiplier : currentMultiplier + multiplier;
+
             PluginEvent<PluginEventArgs.IslandChangeMobDrops> event = PluginEventsFactory.callIslandChangeMobDropsEvent(
-                    island, sender, island.getMobDropsMultiplier() + multiplier);
+                    island, sender, newMultiplier);
+
             if (!event.isCancelled()) {
                 island.setMobDropsMultiplier(event.getArgs().mobDrops);
                 ++islandsChangedCount;
