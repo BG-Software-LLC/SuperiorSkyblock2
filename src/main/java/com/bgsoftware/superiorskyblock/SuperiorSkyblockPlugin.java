@@ -12,13 +12,14 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
+import com.bgsoftware.superiorskyblock.api.platform.TaskScheduler;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
-import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PluginLoadingStage;
 import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
@@ -41,6 +42,8 @@ import com.bgsoftware.superiorskyblock.core.stats.StatsClient;
 import com.bgsoftware.superiorskyblock.core.task.CalcTask;
 import com.bgsoftware.superiorskyblock.core.task.ShutdownTask;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitTaskScheduler;
+import com.bgsoftware.superiorskyblock.core.threads.SerialTaskQueue;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
 import com.bgsoftware.superiorskyblock.external.ProvidersManagerImpl;
@@ -88,13 +91,17 @@ import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
@@ -117,6 +124,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private final CommandsManagerImpl commandsHandler = new CommandsManagerImpl(this, new PlayerCommandsMap(this), new AdminCommandsMap(this));
     private final ModulesManagerImpl modulesHandler = new ModulesManagerImpl(this, new DefaultModulesContainer(this));
     private final ServicesHandler servicesHandler = new ServicesHandler(this);
+    private final SerialTaskQueue<SuperiorSkyblockPlugin> reloadQueue = new SerialTaskQueue<>();
     private final SettingsManagerImpl settingsHandler = new SettingsManagerImpl(this);
 
     /* Global handlers */
@@ -140,7 +148,19 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private NMSTags nmsTags;
     private NMSWorld nmsWorld;
 
-    private PluginLoadingStage loadingStage = PluginLoadingStage.START;
+    private volatile PluginLoadingStage loadingStage = PluginLoadingStage.START;
+    private volatile boolean shuttingDown;
+
+    private TaskScheduler taskScheduler = new BukkitTaskScheduler(this);
+
+    @Override
+    public TaskScheduler getTaskScheduler() {
+        return taskScheduler;
+    }
+
+    public boolean isReady() {
+        return !shuttingDown && loadingStage == PluginLoadingStage.ENABLED;
+    }
 
     public static SuperiorSkyblockPlugin getPlugin() {
         return plugin;
@@ -149,6 +169,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     @Override
     public void onLoad() {
         plugin = this;
+        initializeTaskScheduler();
+        BukkitExecutor.init(this);
         pluginEventsDispatcher.registerDefaultListeners();
 
         DependenciesManager.inject(this);
@@ -230,6 +252,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             loadingStage = PluginLoadingStage.SETTINGS_INITIALIZED;
 
+            providersHandler.initializeWorldsProvider();
+
             modulesHandler.loadData();
 
             loadingStage = PluginLoadingStage.MODULES_INITIALIZED;
@@ -247,27 +271,76 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.BEFORE_WORLD_CREATION, false);
 
-            try {
+            if (taskScheduler.isFolia()) {
+                providersHandler.getWorldsProvider().prepareWorldsAsync().whenComplete((ignored, error) -> {
+                    if (!isEnabled() || shuttingDown)
+                        return;
+                    BukkitExecutor.ensureMain(() -> {
+                        if (!isEnabled() || shuttingDown)
+                            return;
+                        if (error != null) {
+                            Log.error(error, "An error occurred while preparing worlds:");
+                            Bukkit.shutdown();
+                        } else {
+                            completeEnable();
+                        }
+                    });
+                });
+            } else {
                 providersHandler.getWorldsProvider().prepareWorlds();
-            } catch (RuntimeException ex) {
-                ManagerLoadException handlerError = new ManagerLoadException(ex, ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-                Log.error(handlerError, "An error occurred while preparing worlds:");
-                Bukkit.shutdown();
-                return;
+                completeEnable();
             }
+        } catch (Throwable error) {
+            Log.error(error, "An unexpected error occurred while enabling the plugin:");
+            Bukkit.shutdown();
+        }
+    }
 
+    private void completeEnable() {
+        try {
             loadingStage = PluginLoadingStage.WORLDS_PREPARED;
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, false);
 
-            try {
-                reloadPlugin(PluginReloadReason.STARTUP);
-            } catch (ManagerLoadException error) {
-                Log.error(error, "An unexpected error occurred while starting up the plugin:");
-                ManagerLoadException.handle(error);
-                return;
+            if (taskScheduler.isFolia()) {
+                reloadPluginAsync(PluginReloadReason.STARTUP).whenComplete((ignored, error) -> {
+                    if (!isEnabled() || shuttingDown)
+                        return;
+                    BukkitExecutor.ensureMain(() -> {
+                        if (!isEnabled() || shuttingDown)
+                            return;
+                        if (error != null) {
+                            Throwable cause = error;
+                            while (cause instanceof CompletionException && cause.getCause() != null)
+                                cause = cause.getCause();
+                            Log.error(cause, "An unexpected error occurred while starting up the plugin:");
+                            if (cause instanceof ManagerLoadException)
+                                ManagerLoadException.handle((ManagerLoadException) cause);
+                            else
+                                Bukkit.shutdown();
+                        } else {
+                            finishEnable();
+                        }
+                    });
+                });
+            } else {
+                try {
+                    reloadPlugin(PluginReloadReason.STARTUP);
+                } catch (ManagerLoadException error) {
+                    Log.error(error, "An unexpected error occurred while starting up the plugin:");
+                    ManagerLoadException.handle(error);
+                    return;
+                }
+                finishEnable();
             }
+        } catch (Throwable error) {
+            Log.error(error, "An unexpected error occurred while enabling the plugin:");
+            Bukkit.shutdown();
+        }
+    }
 
+    private void finishEnable() {
+        try {
             loadingStage = PluginLoadingStage.MANAGERS_INITIALIZED;
 
             ChunksProvider.start();
@@ -293,12 +366,14 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             }
 
             BukkitExecutor.sync(() -> {
-                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    for (Player player : Bukkit.getOnlinePlayers()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    BukkitExecutor.ensureMain(player, () -> {
+                        if (!player.isOnline())
+                            return;
                         SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                         superiorPlayer.updateLastTimeStatus();
 
-                        Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                        Island island = gridHandler.getIslandAt(player.getLocation());
                         Island playerIsland = superiorPlayer.getIsland();
 
                         if (superiorPlayer.hasIslandFlyEnabled()) {
@@ -315,7 +390,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
                         if (island != null)
                             island.setPlayerInside(superiorPlayer, true);
-                    }
+                    });
                 }
             }, 1L);
 
@@ -332,6 +407,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     @Override
     public void onDisable() {
+        shuttingDown = true;
         try {
             if (loadingStage.isAtLeast(PluginLoadingStage.START_ENABLE))
                 BukkitExecutor.prepareShutdown();
@@ -358,6 +434,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             // This check should prevent it.
             if (Bukkit.isPrimaryThread()) {
                 Bukkit.getOnlinePlayers().forEach(player -> {
+                    if (!taskScheduler.isOwned(player))
+                        return;
                     SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                     player.closeInventory();
                     superiorPlayer.updateWorldBorder(null);
@@ -395,7 +473,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        return WorldGenerator.getWorldGenerator(settingsHandler.getWorlds().getDefaultWorldDimension());
+        Dimension dimension = !taskScheduler.isFolia() || id == null || id.isEmpty() ?
+                settingsHandler.getWorlds().getDefaultWorldDimension() : Dimension.getByName(id);
+        return WorldGenerator.getWorldGenerator(dimension);
     }
 
     public Updater getUpdater() {
@@ -406,9 +486,51 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         return super.getClassLoader();
     }
 
+    private void initializeTaskScheduler() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+        } catch (ClassNotFoundException ignored) {
+            return;
+        }
+        try {
+            taskScheduler = (TaskScheduler) Class.forName(
+                    "com.bgsoftware.superiorskyblock.external.scheduler.FoliaTaskScheduler")
+                    .getConstructor(Plugin.class).newInstance(this);
+        } catch (ReflectiveOperationException error) {
+            throw new IllegalStateException("Failed to initialize Folia scheduler", error);
+        }
+    }
+
+    private NMSConfiguration createNMSConfiguration() throws NMSLoadException {
+        NMSConfiguration configuration = NMSConfiguration.forPlugin(this);
+        if (!taskScheduler.isFolia())
+            return configuration;
+        return new NMSConfiguration() {
+            @Override
+            public String getNMSResourcePathForVersion(String version) {
+                return configuration.getNMSResourcePathForVersion(version + "_folia");
+            }
+
+            @Override
+            public String getPackagePathForNMSHandler(String version, String handler) {
+                return configuration.getPackagePathForNMSHandler(version + "_folia", handler);
+            }
+
+            @Override
+            public File getCacheFolder() {
+                return new File(configuration.getCacheFolder(), "folia");
+            }
+
+            @Override
+            public InputStream getResource(String path) {
+                return configuration.getResource(path);
+            }
+        };
+    }
+
     private boolean loadNMSAdapter() {
         try {
-            INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(this, NMSConfiguration.forPlugin(this));
+            INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(this, createNMSConfiguration());
 
             this.nmsAlgorithms = nmsLoader.loadNMSHandler(NMSAlgorithms.class);
             this.nmsChunks = nmsLoader.loadNMSHandler(NMSChunks.class);
@@ -449,7 +571,35 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     public void reloadPlugin(PluginReloadReason reloadReason) throws ManagerLoadException {
-        if (reloadReason == PluginReloadReason.COMMAND) {
+        prepareReload(reloadReason);
+        if (reloadReason == PluginReloadReason.STARTUP)
+            schematicsHandler.loadData();
+        else
+            schematicsHandler.loadSchematics();
+        completeReload(reloadReason);
+    }
+
+    public CompletableFuture<Void> reloadPluginAsync(PluginReloadReason reloadReason) {
+        return reloadQueue.submit(this, () -> BukkitExecutor.submit(() -> {
+            try {
+                prepareReload(reloadReason);
+                return reloadReason == PluginReloadReason.STARTUP ? schematicsHandler.loadDataAsync() :
+                        schematicsHandler.loadSchematicsAsync();
+            } catch (ManagerLoadException error) {
+                throw new CompletionException(error);
+            }
+        }).thenCompose(future -> future).thenCompose(ignored -> BukkitExecutor.submit(() -> {
+            try {
+                completeReload(reloadReason);
+            } catch (ManagerLoadException error) {
+                throw new CompletionException(error);
+            }
+            return null;
+        })));
+    }
+
+    private void prepareReload(PluginReloadReason reloadReason) throws ManagerLoadException {
+        if (reloadReason == PluginReloadReason.COMMAND && !taskScheduler.isFolia()) {
             bukkitListeners.unregisterListeners();
         }
 
@@ -483,13 +633,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         if (reloadReason == PluginReloadReason.STARTUP) {
             playersHandler.loadData();
             gridHandler.loadData();
-            schematicsHandler.loadData();
         } else {
             BukkitExecutor.sync(gridHandler::updateSpawn, 1L);
             gridHandler.syncUpgrades();
-            schematicsHandler.loadSchematics();
         }
+    }
 
+    private void completeReload(PluginReloadReason reloadReason) throws ManagerLoadException {
         menusHandler.loadData();
         missionsHandler.loadData();
 
@@ -503,13 +653,15 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         modulesHandler.runModuleLifecycle(ModuleLoadTime.AFTER_MODULE_DATA_LOAD, reloadReason == PluginReloadReason.COMMAND);
 
         BukkitExecutor.sync(() -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                BukkitExecutor.ensureMain(player, () -> {
+                    if (!player.isOnline())
+                        return;
                     SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                    Island island = gridHandler.getIslandAt(player.getLocation(wrapper.getHandle()));
+                    Island island = gridHandler.getIslandAt(player.getLocation());
                     superiorPlayer.updateWorldBorder(island);
                     if (island != null) island.applyEffects(superiorPlayer);
-                }
+                });
             }
         });
 

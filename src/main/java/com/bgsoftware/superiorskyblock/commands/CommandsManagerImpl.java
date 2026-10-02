@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.io.loader.FilesLookupFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
@@ -33,7 +34,6 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,15 +41,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("UnstableApiUsage")
 public class CommandsManagerImpl extends Manager implements CommandsManager {
 
-    private static Set<String> DANGEROUS_COMMANDS_CACHE;
+    private static volatile Set<String> DANGEROUS_COMMANDS_CACHE = Collections.emptySet();
 
-    private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
-    private final Map<String, Cache<UUID, DangerousCommandRequest>> dangerousCommandsRequests = new HashMap<>();
+    private final Map<UUID, Map<String, Long>> commandsCooldown = new ConcurrentHashMap<>();
+    private final Map<String, Cache<UUID, DangerousCommandRequest>> dangerousCommandsRequests = new ConcurrentHashMap<>();
 
     private final CommandsMap playerCommandsMap;
     private final CommandsMap adminCommandsMap;
@@ -156,6 +158,16 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         return adminCommandsMap.getCommand(commandLabel);
     }
 
+    public static CompletableFuture<Boolean> dispatchCommand(CommandSender sender, String command) {
+        if (!BukkitExecutor.isFolia())
+            return CompletableFuture.completedFuture(Bukkit.dispatchCommand(sender, command));
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            return BukkitExecutor.submit(player, () -> player.isOnline() && Bukkit.dispatchCommand(player, command));
+        }
+        return BukkitExecutor.submit(() -> Bukkit.dispatchCommand(sender, command));
+    }
+
     @Override
     public void dispatchSubCommand(CommandSender sender, String subCommand) {
         dispatchSubCommand(sender, subCommand, null);
@@ -165,7 +177,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
     public void dispatchSubCommand(CommandSender sender, String subCommand, @Nullable String args) {
         // We first check that the sub command is enabled.
         if (getCommand(subCommand) == null) {
-            Bukkit.dispatchCommand(sender, this.label + " " + subCommand + (args == null ? "" : " " + args));
+            dispatchCommand(sender, this.label + " " + subCommand + (args == null ? "" : " " + args));
             return;
         }
 
@@ -209,7 +221,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 .expireAfterWrite(1, TimeUnit.MINUTES)
                 .build()
         ).put(player.getUniqueId(), new DangerousCommandRequest(player.getUniqueId(), player.getName(),
-                executedCommand, args, System.currentTimeMillis()));
+                executedCommand, args.clone(), System.currentTimeMillis()));
 
         Message.DANGEROUS_COMMAND_REQUEST_SENT.send(player, executedCommand);
         Message.DANGEROUS_COMMAND_REQUEST_CONSOLE.send(Bukkit.getConsoleSender(), player.getName(),
@@ -234,9 +246,10 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
         List<DangerousCommandRequest> requestsToExecute = new LinkedList<>(requests.asMap().values());
         // We clear the requests before executing them, so they cannot be executed twice.
-        requests.invalidateAll();
+        requestsToExecute.removeIf(request -> !requests.asMap().remove(request.playerUUID, request));
 
         requestsToExecute.sort(Comparator.comparingLong(request -> request.creationTime));
+        CompletableFuture<Void> requestsCompletion = CompletableFuture.completedFuture(null);
 
         for (DangerousCommandRequest request : requestsToExecute) {
             Player player = Bukkit.getPlayer(request.playerUUID);
@@ -246,18 +259,44 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 continue;
             }
 
-            if (!CommandsHelper.hasCommandAccess(command, player)) {
-                Message.DANGEROUS_COMMAND_NO_ACCESS.send(sender, request.playerName, request.executedCommand);
-                continue;
-            }
+            Runnable executeRequest = () -> {
+                if (!player.isOnline() || Bukkit.getPlayer(request.playerUUID) != player) {
+                    Message.DANGEROUS_COMMAND_PLAYER_OFFLINE.send(sender, request.playerName, request.executedCommand);
+                    return;
+                }
 
-            Message.DANGEROUS_COMMAND_APPROVED.send(player, request.executedCommand);
+                if (!CommandsHelper.hasCommandAccess(command, player)) {
+                    Message.DANGEROUS_COMMAND_NO_ACCESS.send(sender, request.playerName, request.executedCommand);
+                    return;
+                }
 
-            try {
-                command.execute(plugin, player, request.args);
-            } catch (Throwable error) {
-                Log.error(error, "An unexpected error occurred while executing approved command ",
-                        request.executedCommand, " of ", request.playerName, ":");
+                Message.DANGEROUS_COMMAND_APPROVED.send(player, request.executedCommand);
+
+                try {
+                    command.execute(plugin, player, request.args);
+                } catch (Throwable error) {
+                    Log.error(error, "An unexpected error occurred while executing approved command ",
+                            request.executedCommand, " of ", request.playerName, ":");
+                }
+            };
+            if (BukkitExecutor.isFolia()) {
+                requestsCompletion = requestsCompletion.thenCompose(ignored ->
+                        BukkitExecutor.<Void>submit(player, () -> {
+                            executeRequest.run();
+                            return null;
+                        })).handle((ignored, error) -> {
+                    if (error != null) {
+                        if (!player.isOnline() || Bukkit.getPlayer(request.playerUUID) != player) {
+                            Message.DANGEROUS_COMMAND_PLAYER_OFFLINE.send(sender, request.playerName, request.executedCommand);
+                        } else {
+                            Log.error(error, "An unexpected error occurred while scheduling approved command ",
+                                    request.executedCommand, " of ", request.playerName, ":");
+                        }
+                    }
+                    return null;
+                });
+            } else {
+                executeRequest.run();
             }
         }
     }
@@ -265,9 +304,8 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
     @Override
     public void cancelDangerousRequests(UUID playerUUID) {
         for (Cache<UUID, DangerousCommandRequest> requests : dangerousCommandsRequests.values()) {
-            DangerousCommandRequest request = requests.getIfPresent(playerUUID);
+            DangerousCommandRequest request = requests.asMap().remove(playerUUID);
             if (request != null) {
-                requests.invalidate(playerUUID);
                 Message.DANGEROUS_COMMAND_PLAYER_QUIT.send(Bukkit.getConsoleSender(), request.playerName, request.executedCommand);
             }
         }
@@ -287,13 +325,14 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
     }
 
     private static void onSettingsUpdate() {
-        DANGEROUS_COMMANDS_CACHE = new HashSet<>();
+        Set<String> dangerousCommands = new HashSet<>();
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         plugin.getSettings().getDangerousCommands().forEach(commandLabel -> {
             SuperiorCommand superiorCommand = plugin.getCommands().getAdminCommand(commandLabel);
             if (superiorCommand != null)
-                DANGEROUS_COMMANDS_CACHE.add(getCommandLabel(superiorCommand));
+                dangerousCommands.add(getCommandLabel(superiorCommand));
         });
+        DANGEROUS_COMMANDS_CACHE = Collections.unmodifiableSet(dangerousCommands);
     }
 
     private static String getCommandLabel(SuperiorCommand command) {
@@ -369,6 +408,17 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
         @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
+            if (plugin.getTaskScheduler().isFolia()) {
+                if (!plugin.isReady()) {
+                    sender.sendMessage("SuperiorSkyblock is still starting. Please try again in a moment.");
+                    return false;
+                }
+                if (sender instanceof Player && !plugin.getTaskScheduler().isOwned((Player) sender)) {
+                    String[] arguments = args.clone();
+                    plugin.getTaskScheduler().entity((Player) sender, () -> execute(sender, label, arguments), null, 0L, 0L);
+                    return false;
+                }
+            }
             java.util.Locale locale = PlayerLocales.getLocale(sender);
 
             String executedSubCommand;
@@ -425,7 +475,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                                     }
                                 }
 
-                                commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
+                                commandsCooldown.computeIfAbsent(uuid, u -> new ConcurrentHashMap<>()).put(commandLabel,
                                         timeNow + commandCooldown.getKey());
                             }
                         }
@@ -466,6 +516,8 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
         @Override
         public List<String> tabComplete(CommandSender sender, String label, String[] args) {
+            if (plugin.getTaskScheduler().isFolia() && !plugin.isReady())
+                return Collections.emptyList();
             if (args.length > 0) {
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
                 if (command != null) {

@@ -2,6 +2,11 @@ package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.player.inventory.FoliaInventoryReturns;
+import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksInteractionServiceImpl;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
@@ -27,11 +32,15 @@ public class StackedBlocksDepositMenu implements InventoryHolder {
 
     private final Inventory inventory;
     private final Location stackedBlock;
+    private final Key blockKey;
+    private final Material blockType;
 
     public StackedBlocksDepositMenu(Location stackedBlock) {
         this.inventory = plugin.getProviders().getUIProvider().createInventory(
                 this, 36, plugin.getSettings().getStackedBlocks().getDepositMenu().getTitle());
-        this.stackedBlock = stackedBlock;
+        this.stackedBlock = stackedBlock.clone();
+        this.blockKey = BukkitExecutor.isFolia() ? Keys.of(stackedBlock.getBlock()) : null;
+        this.blockType = BukkitExecutor.isFolia() ? stackedBlock.getBlock().getType() : null;
     }
 
     @Override
@@ -60,13 +69,28 @@ public class StackedBlocksDepositMenu implements InventoryHolder {
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getWhoClicked());
-        InteractionResult interactionResult = stackedBlocksInteractionService.get().checkStackedBlockInteraction(
-                superiorPlayer, stackedBlock.getBlock(), itemToDeposit);
+        InteractionResult interactionResult = BukkitExecutor.isFolia() ?
+                StackedBlocksInteractionServiceImpl.checkStackedBlockInteraction(plugin, superiorPlayer, blockKey,
+                        blockType, stackedBlock.getWorld().getName(), itemToDeposit, null) :
+                stackedBlocksInteractionService.get().checkStackedBlockInteraction(superiorPlayer, stackedBlock.getBlock(), itemToDeposit);
         if (interactionResult != InteractionResult.SUCCESS)
             e.setCancelled(true);
     }
 
     public void onClose(InventoryCloseEvent e) {
+        if (BukkitExecutor.isFolia()) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+            boolean permission = superiorPlayer.hasPermission("superior.island.stacker.*") ||
+                    superiorPlayer.hasPermission("superior.island.stacker." + blockType);
+            ItemStack[] contents = e.getInventory().getContents();
+            for (int slot = 0; slot < contents.length; slot++)
+                contents[slot] = contents[slot] == null ? null : contents[slot].clone();
+            FoliaInventoryReturns.Reservation reservation = FoliaInventoryReturns.reserve(superiorPlayer, contents);
+            e.getInventory().clear();
+            ((StackedBlocksInteractionServiceImpl) stackedBlocksInteractionService.get())
+                    .depositReservedItems(superiorPlayer, stackedBlock, blockKey, contents, permission, reservation);
+            return;
+        }
         int depositAmount = 0;
         ItemStack blockItem = null;
 

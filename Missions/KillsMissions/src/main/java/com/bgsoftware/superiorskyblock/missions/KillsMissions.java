@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.missions;
 
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
@@ -62,7 +63,7 @@ public final class KillsMissions extends BuiltinMission<KeyDataTracker> implemen
     protected void registerListeners() {
         registerListener(this);
 
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+        BukkitExecutor.sync(() -> {
             if (plugin.getServer().getPluginManager().isPluginEnabled("WildStacker")) {
                 this.getEntityCount = WildStackerAPI::getEntityAmount;
             } else {
@@ -195,7 +196,7 @@ public final class KillsMissions extends BuiltinMission<KeyDataTracker> implemen
 
         killsTracker.track(Key.of(e.getEntity()), this.getEntityCount.apply(e.getEntity()));
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this.plugin, () -> superiorPlayer.runIfOnline(player -> {
+        BukkitExecutor.async(() -> superiorPlayer.runIfOnline(player -> {
             if (canComplete(superiorPlayer))
                 this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
         }), 2L);

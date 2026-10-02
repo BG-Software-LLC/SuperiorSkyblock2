@@ -52,7 +52,7 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
             targetIsland.disbandIsland();
         }
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        BukkitExecutor.sync(menuView.getInventoryViewer().asPlayer(), menuView::closeView, 1L);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<IslandMenuView> {

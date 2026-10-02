@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
@@ -100,7 +101,7 @@ public class MenuCommandsImpl implements MenuCommands {
         else
             command = placeholdersService.get().parsePlaceholders(player, command);
 
-        Bukkit.dispatchCommand(
+        CommandsManagerImpl.dispatchCommand(
                 sender instanceof Player || command.startsWith("PLAYER:") ? player : Bukkit.getConsoleSender(),
                 command.replace("PLAYER:", "").replace("%player%", player.getName()));
     }

@@ -35,7 +35,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -139,7 +139,7 @@ public class ChunksListener extends AbstractGameEventListener {
         IslandCache islandCache = island.getCache();
 
         Set<Chunk> pendingLoadedChunksForIsland = islandCache.computeIfAbsent(IslandCacheKeys.PENDING_LOADED_CHUNKS,
-                k -> new LinkedHashSet<>());
+                k -> ConcurrentHashMap.newKeySet());
         pendingLoadedChunksForIsland.add(chunk);
 
         boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
@@ -162,13 +162,13 @@ public class ChunksListener extends AbstractGameEventListener {
                 recalculateEntities.set(true);
         }
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(new Location(chunk.getWorld(), chunk.getX() << 4, 0, chunk.getZ() << 4), () -> {
             if (isChunkStillLoaded(chunk))
                 // Update holograms of stacked blocks in delay so the chunk is entirely loaded.
                 plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
         }, 10L);
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(new Location(chunk.getWorld(), chunk.getX() << 4, 0, chunk.getZ() << 4), () -> {
             if (!pendingLoadedChunksForIsland.remove(chunk) || !isChunkStillLoaded(chunk))
                 return;
 

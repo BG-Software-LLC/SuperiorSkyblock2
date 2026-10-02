@@ -337,7 +337,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
     private void onCopperGolemCancel(Location copperChestLocation) {
         Block copperChestBlock = copperChestLocation.getBlock();
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(copperChestBlock.getLocation(), () -> {
             if (copperChestBlock.getType() == COPPER_CHEST) {
                 copperChestBlock.setType(COPPER_BLOCK);
             }

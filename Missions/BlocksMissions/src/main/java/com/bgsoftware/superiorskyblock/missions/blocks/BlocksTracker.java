@@ -45,22 +45,40 @@ public class BlocksTracker {
     }
 
     public void loadTrackedBlocks(TrackingType trackingType, String worldName, ConfigurationSection section) {
-        if (this.rawData == null)
-            this.rawData = new EnumMap<>(TrackingType.class);
-
-        this.rawData.computeIfAbsent(trackingType, t -> new HashMap<>()).put(worldName, new TrackedBlocksData(section));
-    }
-
-    public void save(ConfigurationSection section) {
-        if (!this.saved) {
-            saveInternal(section, TrackingType.PLACED_BLOCKS);
-            saveInternal(section, TrackingType.BROKEN_BLOCKS);
-            this.saved = true;
+        TrackedBlocksData data = new TrackedBlocksData(section);
+        synchronized (this.trackingComponentMap) {
+            if (this.rawData == null)
+                this.rawData = new EnumMap<>(TrackingType.class);
+            this.rawData.computeIfAbsent(trackingType, type -> new HashMap<>()).put(worldName, data);
         }
     }
 
-    private void saveInternal(ConfigurationSection section, TrackingType trackingType) {
-        Map<String, BlocksTrackingComponent> trackingComponentMap = this.trackingComponentMap.get(trackingType);
+    public void save(ConfigurationSection section) {
+        EnumMap<TrackingType, Map<String, BlocksTrackingComponent>> components = new EnumMap<>(TrackingType.class);
+        EnumMap<TrackingType, Map<String, TrackedBlocksData>> raw = new EnumMap<>(TrackingType.class);
+        synchronized (this.trackingComponentMap) {
+            if (this.saved)
+                return;
+            this.saved = true;
+            this.trackingComponentMap.forEach((type, data) -> components.put(type, new HashMap<>(data)));
+            if (this.rawData != null)
+                this.rawData.forEach((type, data) -> raw.put(type, new HashMap<>(data)));
+        }
+        try {
+            saveInternal(section, TrackingType.PLACED_BLOCKS, components, raw);
+            saveInternal(section, TrackingType.BROKEN_BLOCKS, components, raw);
+        } catch (RuntimeException | Error error) {
+            synchronized (this.trackingComponentMap) {
+                this.saved = false;
+            }
+            throw error;
+        }
+    }
+
+    private void saveInternal(ConfigurationSection section, TrackingType trackingType,
+                              Map<TrackingType, Map<String, BlocksTrackingComponent>> components,
+                              Map<TrackingType, Map<String, TrackedBlocksData>> raw) {
+        Map<String, BlocksTrackingComponent> trackingComponentMap = components.get(trackingType);
 
         if (trackingComponentMap == null)
             return;
@@ -74,8 +92,8 @@ public class BlocksTracker {
             });
         });
 
-        if (this.rawData != null) {
-            Map<String, TrackedBlocksData> rawData = this.rawData.get(trackingType);
+        if (!raw.isEmpty()) {
+            Map<String, TrackedBlocksData> rawData = raw.get(trackingType);
             if (rawData != null) {
                 rawData.forEach((worldName, trackedBlocksData) -> {
                     trackedBlocksData.getBlocks().forEach((chunkKey, blocksBitSet) -> {
@@ -90,38 +108,43 @@ public class BlocksTracker {
     }
 
     private BlocksTrackingComponent getComponent(TrackingType trackingType, World world) {
-        BlocksTrackingComponent trackingComponent = loadRawData(trackingType, world);
-        return trackingComponent != null ? trackingComponent :
-                trackingComponentMap.computeIfAbsent(trackingType, t -> new HashMap<>())
-                        .computeIfAbsent(world.getName(), uuid -> new BlocksTrackingComponent(world));
+        return getComponent(trackingType, world, true);
+    }
+
+    private BlocksTrackingComponent getComponent(TrackingType trackingType, World world, boolean create) {
+        String worldName = world.getName();
+        synchronized (this.trackingComponentMap) {
+            Map<String, TrackedBlocksData> raw = this.rawData == null ? null : this.rawData.get(trackingType);
+            if (raw == null || !raw.containsKey(worldName)) {
+                Map<String, BlocksTrackingComponent> components = this.trackingComponentMap.get(trackingType);
+                BlocksTrackingComponent existing = components == null ? null : components.get(worldName);
+                if (existing != null || !create)
+                    return existing;
+            }
+        }
+        BlocksTrackingComponent candidate = new BlocksTrackingComponent(world);
+        synchronized (this.trackingComponentMap) {
+            BlocksTrackingComponent loaded = loadRawData(trackingType, worldName, candidate);
+            if (loaded != null)
+                return loaded;
+            Map<String, BlocksTrackingComponent> components =
+                    this.trackingComponentMap.computeIfAbsent(trackingType, type -> new HashMap<>());
+            return create ? components.computeIfAbsent(worldName, name -> candidate) : components.get(worldName);
+        }
     }
 
     private <R> R ifComponentExists(TrackingType trackingType, World world, R def, Function<BlocksTrackingComponent, R> function) {
-        String worldName = world.getName();
-
-        BlocksTrackingComponent trackingComponent = loadRawData(trackingType, world);
-        if (trackingComponent != null)
-            return function.apply(trackingComponent);
-
-        Map<String, BlocksTrackingComponent> trackingTypeComponents = trackingComponentMap.get(trackingType);
-        if (trackingTypeComponents != null) {
-            trackingComponent = trackingTypeComponents.get(worldName);
-            if (trackingComponent != null)
-                return function.apply(trackingComponent);
-        }
-
-        return def;
+        BlocksTrackingComponent component = getComponent(trackingType, world, false);
+        return component == null ? def : function.apply(component);
     }
 
-    private BlocksTrackingComponent loadRawData(TrackingType trackingType, World world) {
-        String worldName = world.getName();
-
+    private BlocksTrackingComponent loadRawData(TrackingType trackingType, String worldName,
+                                                BlocksTrackingComponent trackingComponent) {
         if (this.rawData != null) {
             Map<String, TrackedBlocksData> rawData = this.rawData.get(trackingType);
             if (rawData != null) {
                 TrackedBlocksData trackedBlocksData = rawData.remove(worldName);
                 if (trackedBlocksData != null) {
-                    BlocksTrackingComponent trackingComponent = new BlocksTrackingComponent(world);
                     trackingComponent.loadBlocks(trackedBlocksData);
                     this.trackingComponentMap.computeIfAbsent(trackingType, i -> new HashMap<>())
                             .put(worldName, trackingComponent);

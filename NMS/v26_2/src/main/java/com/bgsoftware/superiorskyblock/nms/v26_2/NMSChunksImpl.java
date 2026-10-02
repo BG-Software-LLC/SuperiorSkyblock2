@@ -43,6 +43,7 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.block.CraftBiome;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -85,8 +86,9 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v26_2.Abs
 
                 levelChunk.markUnsaved();
 
-                BukkitExecutor.ensureMain(() -> {
-                    ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
+                ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
+                BukkitExecutor.ensureMain(new Location(serverLevel.getWorld(),
+                        levelChunk.getPos().getMinBlockX(), 0, levelChunk.getPos().getMinBlockZ()), () -> {
                     if (playersToUpdate.isEmpty() || serverLevel.getChunkSource().getChunkNow(
                             levelChunk.getPos().getMinBlockX() >> 4, levelChunk.getPos().getMinBlockZ() >> 4) != levelChunk)
                         return;
