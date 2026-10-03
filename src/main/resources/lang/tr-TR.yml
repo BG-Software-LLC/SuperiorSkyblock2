@@ -217,6 +217,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Çakıl taşı jeneratörü için bir m
   yüzdesini ekle.
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: Başka bir oyuncunun adası için mob düşürme
   çarpanını artır.
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: Başka bir oyuncunun ada boyutunu genişlet.
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: Başka bir oyuncunun adası için spawner
   oranları çarpanını artır.
@@ -261,6 +262,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Bir adadan blok limitini kaldır.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Bir oyuncu tarafından verilen tüm değerlendirmeleri
   kaldır.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Bir ada için bir dünyayı sıfırla.

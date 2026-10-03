@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminSetWarpsLimit implements IAdminIslandCommand {
+
     @Override
     public List<String> getAliases() {
         return Collections.singletonList("setwarpslimit");
@@ -65,35 +66,34 @@ public class CmdAdminSetWarpsLimit implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[3]);
 
-        if (!arguments.isSucceed())
-            return;
-
-        int limit = arguments.getNumber();
-
-        if (limit < 0) {
-            Message.INVALID_AMOUNT.send(sender);
+        if (!arguments.isSucceed()) {
             return;
         }
+
+        int limit = arguments.getNumber();
 
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            PluginEvent<PluginEventArgs.IslandChangeWarpsLimit> event = PluginEventsFactory.callIslandChangeWarpsLimitEvent(island, sender, limit);
+            PluginEvent<PluginEventArgs.IslandChangeWarpsLimit> event = PluginEventsFactory.callIslandChangeWarpsLimitEvent(
+                    island, sender, limit);
             if (!event.isCancelled()) {
                 island.setWarpsLimit(event.getArgs().warpsLimit);
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_WARPS_LIMIT_ALL.send(sender);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_WARPS_LIMIT_NAME.send(sender, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_WARPS_LIMIT.send(sender, targetPlayer.getName());
+        }
     }
 
 }

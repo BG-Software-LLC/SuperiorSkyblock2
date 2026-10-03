@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,8 +45,6 @@ public class IslandsDeserializer {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Gson GSON = new GsonBuilder().create();
-    private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
-    private static final int SYNCED_VALUE = -2;
 
     private IslandsDeserializer() {
 
@@ -729,14 +728,14 @@ public class IslandsDeserializer {
 
             Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_settings");
 
-            builder.setIslandSize(islandSettings.getInt("size").orElse(SYNCED_VALUE));
-            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(SYNCED_VALUE));
-            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(SYNCED_VALUE));
-            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse((double) SYNCED_VALUE));
-            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse((double) SYNCED_VALUE));
-            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse((double) SYNCED_VALUE));
-            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(SYNCED_VALUE));
-            builder.setBankLimit(islandSettings.getBigDecimal("bank_limit").orElse(SYNCED_BANK_LIMIT_VALUE));
+            builder.setIslandSize(islandSettings.getInt("size").orElse(IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse((double) IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse((double) IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse((double) IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setBankLimit(islandSettings.getBigDecimal("bank_limit").orElse(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
         });
     }
 

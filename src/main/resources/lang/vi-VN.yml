@@ -192,6 +192,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: 'Thêm hiệu ứng đảo của người 
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: 'Tăng giới hạn vật thể của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: 'Thêm phần trăm vật liệu cho máy tạo đá cuội.'
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: 'Tăng hệ số vật phẩm của quái rớt ra của người chơi khác.'
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: 'Mở rộng đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: 'Tăng hệ số tỷ lệ lồng sinh sản của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: 'Tăng giới hạn thành viên đảo của người chơi khác.'
@@ -232,6 +233,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Xóa giới hạn khối khỏi m
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
   một người chơi.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Tái tạo lại thế giới cho một hòn đảo.'

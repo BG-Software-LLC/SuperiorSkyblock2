@@ -170,6 +170,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: Aggiungi un effetto isola per l'isola di u
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: Aumenta il limite di entità per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Aggiungi la percentuale di un materiale per il generatore di ciottoli.
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: Aumenta il moltiplicatore dei mob drops per l'isola di un altro giocatore.
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: Espandi la dimensione dell'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: Aumenta il moltiplicatore dei tassi di generazione per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: Aumenta il limite di membri per l'isola di un altro giocatore.
@@ -208,6 +209,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Rimuovi il limite di un blocco da 
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Rimuovi tutte le valutazioni fornite da un giocatore.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Ripristina il mondo su un''isole.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.

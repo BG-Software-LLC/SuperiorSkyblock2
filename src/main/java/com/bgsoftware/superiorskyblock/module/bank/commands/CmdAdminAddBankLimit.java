@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -64,31 +65,43 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        BigDecimal limit = CommandArguments.getBigDecimalAmount(sender, args[3]);
+        BigDecimal limit = CommandArguments.getAdditionalBankLimit(sender, args[3]);
 
-        if (limit == null)
+        if (limit == null) {
             return;
+        }
 
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            BigDecimal currentLimit = island.getBankLimit();
+            if (currentLimit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) <= 0
+                    || currentLimit.add(limit).compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
             PluginEvent<PluginEventArgs.IslandChangeBankLimit> event = PluginEventsFactory.callIslandChangeBankLimitEvent(
-                    island, sender, island.getBankLimit().add(limit));
+                    island, sender, currentLimit.add(limit));
             if (!event.isCancelled()) {
                 island.setBankLimit(event.getArgs().bankLimit);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            Message.INVALID_LIMIT.send(sender, limit);
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_BANK_LIMIT_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_BANK_LIMIT_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_BANK_LIMIT_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_BANK_LIMIT.send(sender, targetPlayer.getName());
+        }
     }
 
 }

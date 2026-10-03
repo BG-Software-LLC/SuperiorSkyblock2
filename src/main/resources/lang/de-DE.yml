@@ -224,6 +224,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Prozentsatz eines Materials für den Ko
   hinzufügen.
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: Erhöhe den Mob-Drop-Multiplikator für die
   Insel eines anderen Spielers.
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: Erweitere die Inselgröße eines anderen Spielers.
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: Erhöht den Spawner-Raten-Multiplikator
   für die Insel eines anderen Spielers.
@@ -270,6 +271,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: Alle Konfigurationen und Aufgaben des Plugins 
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Entferne ein Blocklimit von einer Insel.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Alle Bewertungen eines Spielers entfernen.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Setze eine Welt für eine Insel zurück.

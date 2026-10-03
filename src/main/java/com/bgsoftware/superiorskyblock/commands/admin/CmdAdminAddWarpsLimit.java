@@ -11,12 +11,14 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
 public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
+
     @Override
     public List<String> getAliases() {
         return Collections.singletonList("addwarpslimit");
@@ -63,38 +65,44 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[3]);
+        NumberArgument<Integer> arguments = CommandArguments.getAdditionalLimit(sender, args[3]);
 
-        if (!arguments.isSucceed())
-            return;
-
-        int limit = arguments.getNumber();
-
-        if (limit <= 0) {
-            Message.INVALID_AMOUNT.send(sender);
+        if (!arguments.isSucceed()) {
             return;
         }
 
+        int limit = arguments.getNumber();
+
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            int currentLimit = island.getWarpsLimit();
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE || currentLimit + limit < 0) {
+                continue;
+            }
+
             PluginEvent<PluginEventArgs.IslandChangeWarpsLimit> event = PluginEventsFactory.callIslandChangeWarpsLimitEvent(
-                    island, sender, island.getWarpsLimit() + limit);
+                    island, sender, currentLimit + limit);
             if (!event.isCancelled()) {
                 island.setWarpsLimit(event.getArgs().warpsLimit);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            Message.INVALID_LIMIT.send(sender, limit);
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_WARPS_LIMIT_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_WARPS_LIMIT_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_WARPS_LIMIT_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_WARPS_LIMIT.send(sender, targetPlayer.getName());
+        }
     }
 
 }
