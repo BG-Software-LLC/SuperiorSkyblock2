@@ -10,13 +10,11 @@ import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEndDragon
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEntityEnderDragon;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.SpikesCache;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
-import com.google.common.cache.LoadingCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.level.dimension.end.${END_DRAGON_FIGHT_CLASS};
-import net.minecraft.world.level.levelgen.feature.${SPIKE_FEATURE_CLASS};
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -26,7 +24,6 @@ import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Modifier;
-import java.util.List;
 
 public class NMSDragonFightImpl implements NMSDragonFight {
 
@@ -36,10 +33,6 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
     private static final ReflectField<${END_DRAGON_FIGHT_CLASS}> WORLD_DRAGON_BATTLE = new ReflectField<>(
             ServerLevel.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE, 1);
-
-    private static final ReflectField<LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>>> SPIKE_CACHE = new ReflectField<LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>>>(
-            ${SPIKE_FEATURE_CLASS}.class, LoadingCache.class, Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, 1)
-            .removeFinal();
 
     private static boolean firstWorldPreparation = true;
 
@@ -54,7 +47,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
         if (firstWorldPreparation) {
             firstWorldPreparation = false;
-            SPIKE_CACHE.set(null, SpikesCache.getInstance());
+            SpikesCache.install();
         }
     }
 
