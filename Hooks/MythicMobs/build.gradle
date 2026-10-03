@@ -6,8 +6,12 @@ java {
     }
 }
 
+repositories {
+    maven { url 'https://mvn.lumine.io/repository/maven-public/' }
+}
+
 dependencies {
-    compileOnly 'io.lumine:MythicMobs:5.0.1'
+    compileOnly 'io.lumine:Mythic-Dist:5.11.0'
     compileOnly 'org.spigotmc:v1_8_R3-Taco:latest'
     compileOnly project(":API")
     compileOnly project(":")

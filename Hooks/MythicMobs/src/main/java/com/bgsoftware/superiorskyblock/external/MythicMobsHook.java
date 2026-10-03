@@ -15,6 +15,7 @@ import org.bukkit.entity.EntityType;
 
 import java.util.Locale;
 
+@SuppressWarnings("unused")
 public class MythicMobsHook {
 
     private static final String MYTHIC_MOBS_PREFIX = "MYTHIC_MOBS";
@@ -22,11 +23,7 @@ public class MythicMobsHook {
 
     private static boolean registered = false;
 
-    private static SuperiorSkyblockPlugin plugin;
-
     public static void register(SuperiorSkyblockPlugin plugin) {
-        MythicMobsHook.plugin = plugin;
-
         if (!registered) {
             registered = true;
             plugin.getKeys().registerCustomEntityTypeKeyParser(new MythicMobsKeyParser(), collectCustomKeys());
