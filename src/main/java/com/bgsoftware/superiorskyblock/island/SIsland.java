@@ -2192,14 +2192,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, Arrays.toString(ignoredMembers));
 
-        forEachIslandMember(ignoredMembers, false, islandMember -> {
-            String playerMessage = message;
-
-            if (!Text.isBlank(playerMessage))
-                playerMessage = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerMessage);
-
-            Message.CUSTOM.send(islandMember, playerMessage, false);
-        });
+        forEachIslandMember(ignoredMembers, false,
+                islandMember -> Message.CUSTOM.send(islandMember, message, false));
     }
 
     @Override
