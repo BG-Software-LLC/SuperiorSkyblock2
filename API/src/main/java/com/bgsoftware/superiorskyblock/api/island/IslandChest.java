@@ -38,4 +38,9 @@ public interface IslandChest extends InventoryHolder {
      */
     void openChest(SuperiorPlayer superiorPlayer);
 
+    /**
+     * Get the inventory title of the chest.
+     */
+    String getTitle();
+
 }

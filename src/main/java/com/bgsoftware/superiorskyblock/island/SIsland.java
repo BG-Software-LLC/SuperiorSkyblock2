@@ -4577,7 +4577,8 @@ public class SIsland implements Island {
     private void recreateChests() {
         IslandChest[] islandChests = this.islandChests.get();
 
-        if (islandChests.length == 0 || islandChests[0].getInventory().getTitle().equals(
+        // If the first page has the correct title, the others should have it too.
+        if (islandChests.length == 0 || islandChests[0].getTitle().equals(
                 plugin.getSettings().getIslandChests().getChestTitle())) {
             return;
         }
@@ -4588,9 +4589,7 @@ public class SIsland implements Island {
             Inventory inventory = islandChest.getInventory();
 
             for (HumanEntity humanEntity : inventory.getViewers()) {
-                if (humanEntity.getOpenInventory().getTopInventory().equals(inventory)) {
-                    humanEntity.closeInventory();;
-                }
+                humanEntity.closeInventory();
             }
         }
 

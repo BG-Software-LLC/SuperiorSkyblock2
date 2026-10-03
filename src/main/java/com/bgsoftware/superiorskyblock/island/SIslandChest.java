@@ -20,8 +20,8 @@ public class SIslandChest implements IslandChest {
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
     private final Island island;
     private final int index;
-    private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(this, 9,
-            plugin.getSettings().getIslandChests().getChestTitle());
+    private final String title = plugin.getSettings().getIslandChests().getChestTitle();
+    private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(this, 9, title);
     private int contentsUpdateCounter = 0;
 
     public SIslandChest(Island island, int index) {
@@ -59,8 +59,7 @@ public class SIslandChest implements IslandChest {
                 updateFlag.set(true);
                 ItemStack[] oldContents = inventory.getContents();
                 Inventory oldInventory = inventory;
-                inventory = plugin.getProviders().getUIProvider().createInventory(this, 9 * rows,
-                        plugin.getSettings().getIslandChests().getChestTitle());
+                inventory = plugin.getProviders().getUIProvider().createInventory(this, 9 * rows, title);
                 inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
                 inventory.getViewers().forEach(humanEntity -> {
                     if (humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))
@@ -81,6 +80,11 @@ public class SIslandChest implements IslandChest {
     public void openChest(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         superiorPlayer.runIfOnline(player -> player.openInventory(getInventory()));
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
     }
 
     @Override
