@@ -564,7 +564,7 @@ JOINED_ISLAND_AS_COOP_NAME: '&e&lSziget | &7Mostantól a(z) {0} sziget coop tagj
 KICK_ANNOUNCEMENT: '&e&lSziget | &7{0} játékost {1} kirúgta a szigetről.'
 KICK_ISLAND_LEADER: '&c&lHiba | &7A sziget vezetőjét nem rúghatod ki. Használd inkább az /is admin disband parancsot.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lHiba | &7Csak nálad alacsonyabb rangú játékosokat rúghatsz ki.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lHiba | &7Ehhez a módosításhoz rendelkezned kell ezzel a jogosultsággal.'
 LAST_ROLE_DEMOTE: '&c&lHiba | &7Ezt a játékost már nem lehet alacsonyabb rangra lefokozni.'
 LAST_ROLE_PROMOTE: '&c&lHiba | &7Ezt a játékost már nem lehet magasabb rangra előléptetni.'

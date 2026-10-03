@@ -565,7 +565,7 @@ JOINED_ISLAND_AS_COOP_NAME: '&e&lIle | &7Vous êtes désormais un coopérateur d
 KICK_ANNOUNCEMENT: '&e&lIle | &7{0} a été éjecté de l''île par {1}.'
 KICK_ISLAND_LEADER: '&c&lErreur | &7Vous ne pouvez pas éjecter le propriétaire d''une île, utilisez ''/isadmin disband'' à la place.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lErreur | &7Vous ne pouvez éjécter que les membres ayant un rôle d''île inférieur au votre.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lErreur | &7Vous devez avoir cette permission afin de pouvoir la modifier pour les autres rôles.'
 LAST_ROLE_DEMOTE: '&c&lErreur | &7Vous ne pouvez plus rétrograder ce joueur.'
 LAST_ROLE_PROMOTE: '&c&lErreur | &7Vous ne pouvez plus promouvoir ce joueur.'

@@ -563,7 +563,7 @@ JOINED_ISLAND_AS_COOP_NAME: '&e&lОстров | &7Вы теперь являет
 KICK_ANNOUNCEMENT: '&e&lОстров | &7{0} был исключен из острова {1}.'
 KICK_ISLAND_LEADER: '&c&lОшибка | &7Вы не можете исключить лидера острова, используйте /is admin disband вместо этого.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lОшибка | &7Вы можете исключить только игроков с ролью ниже вашей.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lОшибка | &7У вас нет разрешения на изменение этой роли.'
 LAST_ROLE_DEMOTE: '&c&lОшибка | &7Вы больше не можете понижать эту роль игрока.'
 LAST_ROLE_PROMOTE: '&c&lОшибка | &7Вы больше не можете повышать эту роль игрока.'

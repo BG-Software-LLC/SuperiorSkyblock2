@@ -657,7 +657,7 @@ KICK_ISLAND_LEADER: '&c&lHata | &7Ada liderini atamazsın, bunun yerine /is admi
   kullan.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lHata | &7Sadece senden daha düşük ada rolüne sahip
   oyuncuları atabilirsin.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lHata | &7Bu izni başka rollere değiştirebilmek için bu
   izne sahip olmalısın.'
 LAST_ROLE_DEMOTE: '&c&lHata | &7Bu oyuncuyu artık rütbe düşüremezsin.'

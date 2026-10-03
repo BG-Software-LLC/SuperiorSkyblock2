@@ -690,7 +690,7 @@ KICK_ISLAND_LEADER: '&c&lError | &7Du kannst den Besitzer der Insel nicht kicken
   verwende stattdessen /is admin disband.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7Du kannst nur Spieler mit einer niedrigeren
   Inselrolle als deiner kicken.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lError | &7Du musst diese Berechtigung haben, um sie in
   andere Rollen zu ändern.'
 LAST_ROLE_DEMOTE: '&c&lError | &7Du kannst diesen Spieler nicht mehr zurückstufen.'

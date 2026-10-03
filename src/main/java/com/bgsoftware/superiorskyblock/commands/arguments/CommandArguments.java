@@ -276,7 +276,7 @@ public class CommandArguments {
         try {
             amount = new BigDecimal(argument);
         } catch (NumberFormatException ex) {
-            Message.INVALID_AMOUNT.send(sender);
+            Message.INVALID_AMOUNT.send(sender, argument);
         }
 
         return amount;

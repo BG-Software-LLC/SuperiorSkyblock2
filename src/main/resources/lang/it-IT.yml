@@ -570,7 +570,7 @@ JOINED_ISLAND_AS_COOP_NAME: '&e&lIsola | &7Ora sei un membro coop dell''isola {0
 KICK_ANNOUNCEMENT: '&e&lIsola | &7{0} è stato cacciato dall''isola da {1}.'
 KICK_ISLAND_LEADER: '&c&lErrore | &7Non puoi cacciare il capo dell''isola, per farlo usa /is admin disband'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi cacciare solo giocatori con un ruolo insulare inferiore al tuo.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lErrore | &7È necessario disporre di questa autorizzazione per cambiarla in altri ruoli.'
 LAST_ROLE_DEMOTE: '&c&lErrore | &7Non puoi più degradare questo giocatore.'
 LAST_ROLE_PROMOTE: '&c&lErrore | &7Non puoi più promuovere questo giocatore.'

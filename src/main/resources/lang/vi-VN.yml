@@ -621,7 +621,7 @@ KICK_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã bị kick khỏi đảo bởi {1}.'
 KICK_ISLAND_LEADER: '&c&lLỗi | &7Bạn không thể đá người chủ đảo, thay vào đó sử dụng /is admin disband.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể kick người chơi có vai trò
   đảo thấp hơn bạn.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&Lỗi | &7Bạn phải có quyền này để thay đổi nó thành các
   vai trò khác.'
 LAST_ROLE_DEMOTE: '&c&lLỗi | &7Bạn không thể hạ cấp người chơi này nữa.'

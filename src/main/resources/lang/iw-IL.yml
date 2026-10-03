@@ -581,7 +581,7 @@ KICK_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע יאהמ ףעוה {0}.'
 KICK_ISLAND_LEADER: '&c&lError | &7You cannot kick the leader of the island, use /is admin disband instead.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7ךלשמ הכומנ רתוי הגרד ילעב קר םינקחש ףיעהל
   לוכי התא.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lהאיגש | &7תורחא תוגרדל התוא תונשל תנמ לע האשרהה תא ךל
   היהיש בייח התא.'
 LAST_ROLE_DEMOTE: '&c&lהאיגש | &7הזה ןקחשה תא הגרדב דירוהל דוע לוכי אל התא.'

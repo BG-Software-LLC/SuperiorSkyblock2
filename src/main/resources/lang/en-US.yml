@@ -563,7 +563,7 @@ JOINED_ISLAND_AS_COOP_NAME: '&e&lIsland | &7You are now a co-op member of the is
 KICK_ANNOUNCEMENT: '&e&lIsland | &7{0} was kicked from the island by {1}.'
 KICK_ISLAND_LEADER: '&c&lError | &7You cannot kick the leader of the island, use /is admin disband instead.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only kick players with a lower island role than yours.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lError | &7You must have this permission in order to change it to other roles.'
 LAST_ROLE_DEMOTE: '&c&lError | &7You cannot demote this player anymore.'
 LAST_ROLE_PROMOTE: '&c&lError | &7You cannot promote this player anymore.'

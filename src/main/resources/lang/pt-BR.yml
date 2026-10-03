@@ -563,7 +563,7 @@ JOINED_ISLAND_AS_COOP_NAME: '&e&lIlha | &7Agora você é um membro cooperativo d
 KICK_ANNOUNCEMENT: '&e&lIlha | &7{0} foi expulso da ilha por {1}.'
 KICK_ISLAND_LEADER: '&c&lErro | &7Você não pode expulsar o líder da ilha, use /is admin disband em vez disso.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lErro | &7Você só pode expulsar jogadores com uma função de ilha inferior à sua.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lErro | &7Você deve ter esta permissão para alterá-la para outras funções.'
 LAST_ROLE_DEMOTE: '&c&lErro | &7Você não pode mais rebaixar este jogador.'
 LAST_ROLE_PROMOTE: '&c&lErro | &7Você não pode mais promover este jogador.'

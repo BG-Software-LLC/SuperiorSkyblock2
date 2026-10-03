@@ -563,7 +563,7 @@ JOINED_ISLAND_AS_COOP_NAME: '&e&l岛屿 | &7你现在是岛屿 {0} 的合作成�
 KICK_ANNOUNCEMENT: '&e&l岛屿 | &7{0} 被玩家 {1} 从岛屿中踢出.'
 KICK_ISLAND_LEADER: '&c&l错误 | &7你不能踢出岛屿的领袖, 若要如此请输入命令 /is admin disband instead.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能踢出角色职位低于你的玩家.'
-KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from his island.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&l错误 | &7你必须拥有更改其他成员职位的权限.'
 LAST_ROLE_DEMOTE: '&c&l错误 | &7你不能再对该玩家降职了.'
 LAST_ROLE_PROMOTE: '&c&l错误 | &7你不能再对该玩家升职了.'
