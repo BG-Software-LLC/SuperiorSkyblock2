@@ -65,7 +65,7 @@ public class CmdAdminAddMobDrops implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Double> arguments = CommandArguments.getMultiplier(sender, args[3]);
+        NumberArgument<Double> arguments = CommandArguments.getAdditionalMultiplier(sender, args[3]);
 
         if (!arguments.isSucceed())
             return;

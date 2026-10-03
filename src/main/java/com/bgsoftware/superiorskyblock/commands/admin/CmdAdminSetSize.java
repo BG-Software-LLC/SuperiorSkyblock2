@@ -71,6 +71,11 @@ public class CmdAdminSetSize implements IAdminIslandCommand {
 
         int size = arguments.getNumber();
 
+        if (size < 1) {
+            Message.INVALID_SIZE.send(sender, size);
+            return;
+        }
+
         if (size > plugin.getSettings().getMaxIslandSize()) {
             Message.SIZE_BIGGER_MAX.send(sender);
             return;

@@ -65,37 +65,44 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[3]);
+        NumberArgument<Integer> arguments = CommandArguments.getAdditionalLimit(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int limit = arguments.getNumber();
 
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             int currentLimit = island.getWarpsLimit();
-            int newLimit = currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE ? limit : currentLimit + limit;
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                continue;
+            }
 
             PluginEvent<PluginEventArgs.IslandChangeWarpsLimit> event = PluginEventsFactory.callIslandChangeWarpsLimitEvent(
-                    island, sender, newLimit);
-
+                    island, sender, currentLimit + limit);
             if (!event.isCancelled()) {
                 island.setWarpsLimit(event.getArgs().warpsLimit);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            Message.INVALID_LIMIT.send(sender, limit);
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_WARPS_LIMIT_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_WARPS_LIMIT_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_WARPS_LIMIT_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_WARPS_LIMIT.send(sender, targetPlayer.getName());
+        }
     }
 
 }

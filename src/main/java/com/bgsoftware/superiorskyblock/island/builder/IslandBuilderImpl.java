@@ -448,7 +448,7 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setBlockLimit(Key block, int limit) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        this.blockLimits.put(block, limit < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+        this.blockLimits.put(block, limit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
         return this;
     }
 
@@ -512,7 +512,7 @@ public class IslandBuilderImpl implements Island.Builder {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension dimension cannot be null.");
         this.cobbleGeneratorValues.computeIfAbsent(dimension, e -> KeyMaps.createArrayMap(KeyIndicator.MATERIAL))
-                .put(block, rate < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(rate) : IntValue.fixed(rate));
+                .put(block, rate <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(rate) : IntValue.fixed(Math.max(1, rate)));
         return this;
     }
 
@@ -552,7 +552,7 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setEntityLimit(Key entity, int limit) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
-        this.entityLimits.put(entity, limit < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+        this.entityLimits.put(entity, limit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
         return this;
     }
 
@@ -564,7 +564,7 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setIslandEffect(PotionEffectType potionEffectType, int level) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
-        this.islandEffects.put(potionEffectType, level < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(level) : IntValue.fixed(level));
+        this.islandEffects.put(potionEffectType, level <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(level) : IntValue.fixed(Math.max(1, level)));
         return this;
     }
 
@@ -598,7 +598,7 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setRoleLimit(PlayerRole playerRole, int limit) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        this.roleLimits.put(playerRole.getId(), limit < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+        this.roleLimits.put(playerRole.getId(), limit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
         return this;
     }
 
@@ -647,7 +647,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setIslandSize(int islandSize) {
-        this.islandSize = islandSize < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(islandSize) : IntValue.fixed(islandSize);
+        this.islandSize = islandSize <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(islandSize) : IntValue.fixed(Math.max(1, islandSize));
         return this;
     }
 
@@ -658,7 +658,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setTeamLimit(int teamLimit) {
-        this.teamLimit = teamLimit < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(teamLimit) : IntValue.fixed(teamLimit);
+        this.teamLimit = teamLimit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(teamLimit) : IntValue.fixed(teamLimit);
         return this;
     }
 
@@ -669,7 +669,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setWarpsLimit(int warpsLimit) {
-        this.warpsLimit = warpsLimit < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(warpsLimit) : IntValue.fixed(warpsLimit);
+        this.warpsLimit = warpsLimit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(warpsLimit) : IntValue.fixed(warpsLimit);
         return this;
     }
 
@@ -680,7 +680,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setCropGrowth(double cropGrowth) {
-        this.cropGrowth = cropGrowth < IslandUpgradeConstants.NO_LIMIT_VALUE ? DoubleValue.syncedFixed(cropGrowth) : DoubleValue.fixed(cropGrowth);
+        this.cropGrowth = cropGrowth <= IslandUpgradeConstants.SYNCED_VALUE ? DoubleValue.syncedFixed(cropGrowth) : DoubleValue.fixed(Math.max(1, cropGrowth));
         return this;
     }
 
@@ -691,7 +691,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setSpawnerRates(double spawnerRates) {
-        this.spawnerRates = spawnerRates < IslandUpgradeConstants.NO_LIMIT_VALUE ? DoubleValue.syncedFixed(spawnerRates) : DoubleValue.fixed(spawnerRates);
+        this.spawnerRates = spawnerRates <= IslandUpgradeConstants.SYNCED_VALUE ? DoubleValue.syncedFixed(spawnerRates) : DoubleValue.fixed(Math.max(1, spawnerRates));
         return this;
     }
 
@@ -702,7 +702,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setMobDrops(double mobDrops) {
-        this.mobDrops = mobDrops < IslandUpgradeConstants.NO_LIMIT_VALUE ? DoubleValue.syncedFixed(mobDrops) : DoubleValue.fixed(mobDrops);
+        this.mobDrops = mobDrops <= IslandUpgradeConstants.SYNCED_VALUE ? DoubleValue.syncedFixed(mobDrops) : DoubleValue.fixed(Math.max(1, mobDrops));
         return this;
     }
 
@@ -713,7 +713,7 @@ public class IslandBuilderImpl implements Island.Builder {
 
     @Override
     public Island.Builder setCoopLimit(int coopLimit) {
-        this.coopLimit = coopLimit < IslandUpgradeConstants.NO_LIMIT_VALUE ? IntValue.syncedFixed(coopLimit) : IntValue.fixed(coopLimit);
+        this.coopLimit = coopLimit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(coopLimit) : IntValue.fixed(coopLimit);
         return this;
     }
 

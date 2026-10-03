@@ -291,7 +291,7 @@ permissions:
           superior.admin.removeratings:
             description: Remove all ratings given by a player.
           superior.admin.removerolelimit:
-            description: Set a role limit for an island.
+            description: Remove a role limit for an island.
           superior.admin.resetpermissions:
             description: Reset all island permissions for a specific island.
           superior.admin.resetsettings:

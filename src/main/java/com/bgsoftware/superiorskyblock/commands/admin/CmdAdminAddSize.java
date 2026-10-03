@@ -77,6 +77,7 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
             return;
         }
 
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
@@ -89,6 +90,10 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
             if (!event.isCancelled()) {
                 island.setIslandSize(event.getArgs().borderSize);
                 ++islandsChangedCount;
+
+                if (changedIsland == null) {
+                    changedIsland = island;
+                }
             }
         }
 

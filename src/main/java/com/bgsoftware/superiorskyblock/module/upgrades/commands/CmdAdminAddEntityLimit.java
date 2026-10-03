@@ -70,39 +70,46 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Key entityKey = Keys.ofEntityType(args[3]);
+        Key key = Keys.ofEntityType(args[3]);
 
-        NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[4]);
+        NumberArgument<Integer> arguments = CommandArguments.getAdditionalLimit(sender, args[4]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int limit = arguments.getNumber();
 
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            int currentLimit = island.getEntityLimit(entityKey);
-            int newLimit = currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE ? limit : currentLimit + limit;
+            int currentLimit = island.getEntityLimit(key);
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                continue;
+            }
 
             PluginEvent<PluginEventArgs.IslandChangeEntityLimit> event = PluginEventsFactory.callIslandChangeEntityLimitEvent(
-                    island, sender, entityKey, newLimit);
-
+                    island, sender, key, currentLimit + limit);
             if (!event.isCancelled()) {
-                island.setEntityLimit(entityKey, event.getArgs().entityLimit);
+                island.setEntityLimit(key, event.getArgs().entityLimit);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            Message.INVALID_LIMIT.send(sender, limit);
             return;
+        }
 
-        if (islandsChangedCount > 1)
-            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()));
-        else if (targetPlayer == null)
-            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), islands.get(0).getName());
-        else
-            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), targetPlayer.getName());
+        if (islandsChangedCount > 1) {
+            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));
+        } else if (targetPlayer == null) {
+            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), changedIsland.getName());
+        } else {
+            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), targetPlayer.getName());
+        }
     }
 
     @Override

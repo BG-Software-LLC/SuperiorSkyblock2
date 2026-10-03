@@ -811,7 +811,7 @@ public class SIsland implements Island {
 
     @Override
     public void setCoopLimit(int coopLimit) {
-        int finalCoopLimit = Math.max(-1, coopLimit);
+        int finalCoopLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, coopLimit);
 
         Log.debug(Debug.SET_COOP_LIMIT, owner.getName(), finalCoopLimit);
 
@@ -3230,7 +3230,7 @@ public class SIsland implements Island {
     public void setBlockLimit(Key key, int limit) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        int finalBlockLimit = Math.max(-1, limit);
+        int finalBlockLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, limit);
 
         Log.debug(Debug.SET_BLOCK_LIMIT, owner.getName(), key, finalBlockLimit);
 
@@ -3334,7 +3334,7 @@ public class SIsland implements Island {
     public void setEntityLimit(Key key, int limit) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        int finalLimit = Math.max(-1, limit);
+        int finalLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, limit);
 
         Log.debug(Debug.SET_ENTITY_LIMIT, owner.getName(), key, finalLimit);
 
@@ -3405,7 +3405,7 @@ public class SIsland implements Island {
 
     @Override
     public void setTeamLimit(int teamLimit) {
-        int finalTeamLimit = Math.max(-1, teamLimit);
+        int finalTeamLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, teamLimit);
 
         Log.debug(Debug.SET_TEAM_LIMIT, owner.getName(), finalTeamLimit);
 
@@ -3430,7 +3430,7 @@ public class SIsland implements Island {
 
     @Override
     public void setWarpsLimit(int warpsLimit) {
-        int finalWarpsLimit = Math.max(-1, warpsLimit);
+        int finalWarpsLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, warpsLimit);
 
         Log.debug(Debug.SET_WARPS_LIMIT, owner.getName(), finalWarpsLimit);
 
@@ -3578,7 +3578,7 @@ public class SIsland implements Island {
     public void setRoleLimit(PlayerRole playerRole, int limit) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
 
-        int finalRoleLimit = Math.max(-1, limit);
+        int finalRoleLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, limit);
 
         Log.debug(Debug.SET_ROLE_LIMIT, owner.getName(), playerRole.getName(), finalRoleLimit);
 
