@@ -154,6 +154,10 @@ public class GridManagerImpl extends Manager implements GridManager {
         getIslands().forEach(Island::updateUpgrades);
     }
 
+    public void syncChests() {
+        getIslands().forEach(Island::updateChests);
+    }
+
     public UUID getServerUUID() {
         return serverUUID;
     }

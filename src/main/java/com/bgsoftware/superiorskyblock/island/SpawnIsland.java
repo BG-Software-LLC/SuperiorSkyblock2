@@ -2109,6 +2109,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void updateChests() {
+        // Do nothing.
+    }
+
+    @Override
     public int getCoopLimitRaw() {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }

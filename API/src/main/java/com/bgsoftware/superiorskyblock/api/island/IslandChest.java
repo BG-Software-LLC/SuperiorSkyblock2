@@ -38,4 +38,10 @@ public interface IslandChest extends InventoryHolder {
      */
     void openChest(SuperiorPlayer superiorPlayer);
 
+    /**
+     * Update the title of the inventory of the chest.
+     * This will set the title retrieved from the config.
+     */
+    void updateTitle();
+
 }
