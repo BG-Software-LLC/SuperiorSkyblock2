@@ -513,7 +513,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
             registerHook("ItemsAdderHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("MythicMobs"))
+        if (canRegisterHook("MythicMobs"))
             registerHook("MythicMobsHook");
 
         if (canRegisterHook("Plan"))
