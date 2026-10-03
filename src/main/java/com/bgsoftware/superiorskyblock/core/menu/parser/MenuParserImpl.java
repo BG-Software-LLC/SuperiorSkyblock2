@@ -26,6 +26,7 @@ import org.bukkit.event.inventory.InventoryType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -101,8 +102,28 @@ public class MenuParserImpl implements MenuParser {
             inventoryMenuLayoutBuilder.setNextPageSlots(parseButtonSlots(cfg, "next-page", menuSlotsMap));
             inventoryMenuLayoutBuilder.setPagedObjectSlots(parseButtonSlots(cfg, "slots", menuSlotsMap), pagedButtonBuilder);
 
-            if (cfg.isList("custom-order"))
+            if (cfg.isList("custom-layout")) {
+                List<?> customLayout = cfg.getList("custom-layout");
+                List<List<Integer>> slotsLayout = new ArrayList<>();
+
+                for (Object element : customLayout) {
+                    if (element instanceof List<?>) {
+                        List<Integer> slots = new ArrayList<>();
+
+                        for (Object slot : (List<?>) element) {
+                            slots.add(((Number) slot).intValue());
+                        }
+
+                        slotsLayout.add(slots);
+                    }
+                }
+
+                if (!slotsLayout.isEmpty()) {
+                    inventoryMenuLayoutBuilder.setCustomLayout(slotsLayout);
+                }
+            } else if (cfg.isList("custom-order")) {
                 inventoryMenuLayoutBuilder.setCustomLayoutOrder(cfg.getIntegerList("custom-order"));
+            }
         }
 
         return new MenuParseResult<>(menuLayoutBuilder, openingSound, previousMoveAllowed, skipOneItem, menuSlotsMap, cfg);

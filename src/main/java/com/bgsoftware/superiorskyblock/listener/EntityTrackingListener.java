@@ -27,8 +27,9 @@ public class EntityTrackingListener extends AbstractGameEventListener {
         Entity entity = e.getArgs().entity;
 
         // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld())) {
             return;
+        }
 
         this.worldRecordService.get().recordEntitySpawn(entity);
     }
@@ -37,10 +38,11 @@ public class EntityTrackingListener extends AbstractGameEventListener {
         Entity entity = e.getArgs().entity;
 
         // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld())) {
             return;
+        }
 
-        worldRecordService.get().recordEntityDespawn(entity);
+        this.worldRecordService.get().recordEntityDespawn(entity);
     }
 
     /* INTERNAL */

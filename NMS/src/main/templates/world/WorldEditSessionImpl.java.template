@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.SetBlockContext;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world.WorldEditSessionDataImpl;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
@@ -192,9 +193,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
             levelChunk.getSections()[i] = chunkData.chunkSections[i];
         }
 
-        chunkData.heightmaps.forEach(((type, heightmap) -> {
-            levelChunk.setHeightmap(type, heightmap.getRawData());
-        }));
+        chunkData.heightmaps.forEach(((type, heightmap) ->
+            levelChunk.setHeightmap(type, heightmap.getRawData())));
 
         if (plugin.getSettings().isLightsUpdate()) {
             if (isStarLightInterface) {
@@ -285,12 +285,6 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     public ChunkData createChunkData(LevelChunkSection[] chunkSections, Map<Heightmap.Types, Heightmap> heightmaps, List<BlockPos> lights) {
         return new ChunkData(chunkSections, heightmaps, lights);
-    }
-
-    private boolean isValidPosition(BlockPos blockPos) {
-        return blockPos.getX() >= -30000000 && blockPos.getZ() >= -30000000 &&
-                blockPos.getX() < 30000000 && blockPos.getZ() < 30000000 &&
-                !this.levelHeightAccessor.isOutsideBuildHeight(blockPos.getY());
     }
 
     private static LevelHeightAccessor createLevelHeightAccessor(int minY, int height) {

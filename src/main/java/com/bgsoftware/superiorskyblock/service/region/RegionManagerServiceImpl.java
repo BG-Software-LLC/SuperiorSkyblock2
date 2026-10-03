@@ -196,9 +196,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Material blockType = block.getType();
             Material usedItemType = usedItem == null ? null : usedItem.getType();
 
-            EntityType spawnType = usedItem == null ? EntityType.UNKNOWN :
-                    Materials.isMinecart(usedItemType) && Materials.isRail(blockType) ? EntityType.MINECART :
-                    Materials.isBoat(blockType) ? EntityType.BOAT : BukkitItems.getEntityType(usedItem);
+            EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
 
             if (spawnType != EntityType.UNKNOWN) {
                 List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(spawnType));
