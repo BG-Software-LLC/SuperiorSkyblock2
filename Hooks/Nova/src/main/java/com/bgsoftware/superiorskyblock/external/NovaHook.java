@@ -72,7 +72,7 @@ public class NovaHook {
 
         if (!registered) {
             registered = true;
-            plugin.getBlockValues().registerKeyParser(new NovaKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
+            plugin.getKeys().registerCustomMaterialKeyParser(new NovaKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
         }
     }
 

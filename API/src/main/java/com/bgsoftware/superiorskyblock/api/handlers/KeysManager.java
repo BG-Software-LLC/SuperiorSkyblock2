@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
@@ -16,6 +17,22 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public interface KeysManager {
+
+    /**
+     * Register custom key parser for materials.
+     *
+     * @param customKeyParser The custom key parser.
+     * @param keys            The keys of all the materials that this parser should check.
+     */
+    void registerCustomMaterialKeyParser(CustomKeyParser customKeyParser, Key... keys);
+
+    /**
+     * Register custom key parser for entity types.
+     *
+     * @param customKeyParser The custom key parser.
+     * @param keys            The keys of all the entityTypes that this parser should check.
+     */
+    void registerCustomEntityTypeKeyParser(CustomKeyParser customKeyParser, Key... keys);
 
     /**
      * Get the key of an entity type.
