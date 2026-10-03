@@ -75,15 +75,22 @@ public class CmdAdminSetGenerator implements IAdminIslandCommand {
         Key material = Keys.ofMaterialAndData(args[3]);
         boolean percentage = args[4].endsWith("%");
 
-        if (percentage)
+        if (percentage) {
             args[4] = args[4].substring(0, args[4].length() - 1);
+        }
 
         NumberArgument<Integer> arguments = CommandArguments.getAmount(sender, args[4]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int amount = arguments.getNumber();
+
+        if (!percentage && amount < 1) {
+            Message.INVALID_AMOUNT.send(sender);
+            return;
+        }
 
         if (percentage && (amount < 0 || amount > 100)) {
             Message.INVALID_PERCENTAGE.send(sender);
@@ -93,8 +100,9 @@ public class CmdAdminSetGenerator implements IAdminIslandCommand {
         Dimension dimension = args.length == 5 ? plugin.getSettings().getWorlds().getDefaultWorldDimension() :
                 CommandArguments.getDimension(sender, args[5]);
 
-        if (dimension == null)
+        if (dimension == null) {
             return;
+        }
 
         int islandsChangedCount = 0;
 
@@ -105,33 +113,29 @@ public class CmdAdminSetGenerator implements IAdminIslandCommand {
                     continue;
                 }
             } else {
-                if (amount <= 0) {
-                    if (!PluginEventsFactory.callIslandRemoveGeneratorRateEvent(island, sender, material, dimension))
-                        continue;
+                PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event = PluginEventsFactory.callIslandChangeGeneratorRateEvent(
+                        island, sender, material, dimension, amount);
 
-                    island.removeGeneratorAmount(material, dimension);
-                } else {
-                    PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event = PluginEventsFactory.callIslandChangeGeneratorRateEvent(
-                            island, sender, material, dimension, amount);
-
-                    if (event.isCancelled())
-                        continue;
-
-                    island.setGeneratorAmount(material, event.getArgs().generatorRate, dimension);
+                if (event.isCancelled()) {
+                    continue;
                 }
+
+                island.setGeneratorAmount(material, event.getArgs().generatorRate, dimension);
             }
             ++islandsChangedCount;
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islands.size() != 1)
+        if (islands.size() != 1) {
             Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());
-        else
+        } else {
             Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
+        }
     }
 
     @Override

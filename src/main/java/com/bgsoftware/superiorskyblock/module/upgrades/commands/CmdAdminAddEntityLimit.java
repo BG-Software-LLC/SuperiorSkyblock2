@@ -85,7 +85,7 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
 
         for (Island island : islands) {
             int currentLimit = island.getEntityLimit(key);
-            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE || currentLimit + limit < 0) {
                 continue;
             }
 

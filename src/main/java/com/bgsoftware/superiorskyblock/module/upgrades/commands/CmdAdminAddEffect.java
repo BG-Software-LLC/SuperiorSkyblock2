@@ -70,44 +70,53 @@ public class CmdAdminAddEffect implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         PotionEffectType effectType = CommandArguments.getPotionEffect(sender, args[3]);
 
-        if (effectType == null)
+        if (effectType == null) {
             return;
+        }
 
         NumberArgument<Integer> arguments = CommandArguments.getLevel(sender, args[4]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int level = arguments.getNumber();
 
+        if (level == 0) {
+            Message.INVALID_LEVEL.send(sender, level);
+            return;
+        }
+
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            int newLevel = island.getPotionEffectLevel(effectType) + level;
-            if (newLevel <= 0) {
-                if (PluginEventsFactory.callIslandRemoveEffectEvent(island, sender, effectType)) {
-                    ++islandsChangedCount;
-                    island.removePotionEffect(effectType);
-                }
-            } else {
-                PluginEvent<PluginEventArgs.IslandChangeEffectLevel> event = PluginEventsFactory.callIslandChangeEffectLevelEvent(
-                        island, sender, effectType, newLevel);
-                if (!event.isCancelled()) {
-                    island.setPotionEffect(effectType, event.getArgs().effectLevel);
-                    ++islandsChangedCount;
-                }
+            int currentLevel = island.getPotionEffectLevel(effectType);
+            if (currentLevel + level < 1) {
+                continue;
+            }
+
+            PluginEvent<PluginEventArgs.IslandChangeEffectLevel> event = PluginEventsFactory.callIslandChangeEffectLevelEvent(
+                    island, sender, effectType, currentLevel + level);
+            if (!event.isCancelled()) {
+                island.setPotionEffect(effectType, event.getArgs().effectLevel);
+                changedIsland = island;
+                ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            Message.INVALID_LEVEL.send(sender, level);
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_ISLAND_EFFECT_LEVEL_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()));
-        else if (targetPlayer == null)
-            Message.CHANGED_ISLAND_EFFECT_LEVEL_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()), islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_ISLAND_EFFECT_LEVEL_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()), changedIsland.getName());
+        } else {
             Message.CHANGED_ISLAND_EFFECT_LEVEL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()), targetPlayer.getName());
+        }
     }
 
     @Override

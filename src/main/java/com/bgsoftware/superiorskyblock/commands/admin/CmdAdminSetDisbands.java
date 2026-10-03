@@ -57,7 +57,7 @@ public class CmdAdminSetDisbands implements IAdminPlayerCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, List<SuperiorPlayer> targetPlayers, String[] args) {
-        NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[3]);
+        NumberArgument<Integer> arguments = CommandArguments.getAmount(sender, args[3]);
 
         if (!arguments.isSucceed())
             return;

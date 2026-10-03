@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -67,35 +66,42 @@ public class CmdAdminAddMobDrops implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Double> arguments = CommandArguments.getAdditionalMultiplier(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         double multiplier = arguments.getNumber();
 
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             double currentMultiplier = island.getMobDropsMultiplier();
-            double newMultiplier = currentMultiplier <= IslandUpgradeConstants.NO_LIMIT_VALUE ? multiplier : currentMultiplier + multiplier;
+            if (currentMultiplier + multiplier < 1) {
+                continue;
+            }
 
             PluginEvent<PluginEventArgs.IslandChangeMobDrops> event = PluginEventsFactory.callIslandChangeMobDropsEvent(
-                    island, sender, newMultiplier);
-
+                    island, sender, currentMultiplier + multiplier);
             if (!event.isCancelled()) {
                 island.setMobDropsMultiplier(event.getArgs().mobDrops);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            Message.INVALID_MULTIPLIER.send(sender, multiplier);
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_MOB_DROPS_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_MOB_DROPS_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_MOB_DROPS_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_MOB_DROPS.send(sender, targetPlayer.getName());
+        }
     }
 
 }

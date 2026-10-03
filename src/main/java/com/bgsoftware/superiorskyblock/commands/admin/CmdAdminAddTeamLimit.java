@@ -78,7 +78,7 @@ public class CmdAdminAddTeamLimit implements IAdminIslandCommand {
 
         for (Island island : islands) {
             int currentLimit = island.getTeamLimit();
-            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE || currentLimit + limit < 0) {
                 continue;
             }
 

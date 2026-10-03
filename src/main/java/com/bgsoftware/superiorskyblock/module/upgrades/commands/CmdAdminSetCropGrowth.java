@@ -66,8 +66,9 @@ public class CmdAdminSetCropGrowth implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Double> arguments = CommandArguments.getMultiplier(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         double multiplier = arguments.getNumber();
 
@@ -82,15 +83,17 @@ public class CmdAdminSetCropGrowth implements IAdminIslandCommand {
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_CROP_GROWTH_ALL.send(sender);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_CROP_GROWTH_NAME.send(sender, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_CROP_GROWTH.send(sender, targetPlayer.getName());
+        }
     }
 
 }

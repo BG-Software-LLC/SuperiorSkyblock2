@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -67,35 +66,42 @@ public class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Double> arguments = CommandArguments.getAdditionalMultiplier(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         double multiplier = arguments.getNumber();
 
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             double currentMultiplier = island.getSpawnerRatesMultiplier();
-            double newMultiplier = currentMultiplier <= IslandUpgradeConstants.NO_LIMIT_VALUE ? multiplier : currentMultiplier + multiplier;
+            if (currentMultiplier + multiplier < 1) {
+                continue;
+            }
 
             PluginEvent<PluginEventArgs.IslandChangeSpawnerRates> event = PluginEventsFactory.callIslandChangeSpawnerRatesEvent(
-                    island, sender, newMultiplier);
-
+                    island, sender, currentMultiplier + multiplier);
             if (!event.isCancelled()) {
                 island.setSpawnerRatesMultiplier(event.getArgs().spawnerRates);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            Message.INVALID_MULTIPLIER.send(sender, multiplier);
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_SPAWNER_RATES_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_SPAWNER_RATES_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_SPAWNER_RATES.send(sender, targetPlayer.getName());
+        }
     }
 
 }

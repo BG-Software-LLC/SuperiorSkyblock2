@@ -268,41 +268,25 @@ public class CommandArguments {
     }
 
     public static NumberArgument<Integer> getLimit(CommandSender sender, String argument) {
-        int limit = -1;
-        boolean status = true;
+        NumberArgument<Integer> limit = getInt(sender, argument, Message.INVALID_LIMIT);
 
-        try {
-            limit = Integer.parseInt(argument);
-        } catch (IllegalArgumentException ex) {
+        if (limit.isSucceed() && limit.getNumber() < IslandUpgradeConstants.NO_LIMIT_VALUE) {
             Message.INVALID_LIMIT.send(sender, argument);
-            status = false;
+            return new NumberArgument<>(limit.getNumber(), false);
         }
 
-        if (limit < IslandUpgradeConstants.NO_LIMIT_VALUE) {
-            Message.INVALID_LIMIT.send(sender, argument);
-            status = false;
-        }
-
-        return new NumberArgument<>(limit, status);
+        return limit;
     }
 
     public static NumberArgument<Integer> getAdditionalLimit(CommandSender sender, String argument) {
-        int limit = 1;
-        boolean status = true;
+        NumberArgument<Integer> limit = getInt(sender, argument, Message.INVALID_LIMIT);
 
-        try {
-            limit = Integer.parseInt(argument);
-        } catch (IllegalArgumentException ex) {
+        if (limit.isSucceed() && limit.getNumber() == 0) {
             Message.INVALID_LIMIT.send(sender, argument);
-            status = false;
+            return new NumberArgument<>(limit.getNumber(), false);
         }
 
-        if (limit <= 0) {
-            Message.INVALID_LIMIT.send(sender, argument);
-            status = false;
-        }
-
-        return new NumberArgument<>(limit, status);
+        return limit;
     }
 
     public static BigDecimal getBankLimit(CommandSender sender, String argument) {
@@ -333,7 +317,7 @@ public class CommandArguments {
             return null;
         }
 
-        if (limit.compareTo(BigDecimal.ZERO) <= 0) {
+        if (limit.compareTo(BigDecimal.ZERO) == 0) {
             Message.INVALID_LIMIT.send(sender, argument);
             return null;
         }
@@ -358,45 +342,25 @@ public class CommandArguments {
     }
 
     public static NumberArgument<Double> getMultiplier(CommandSender sender, String argument) {
-        double multiplier = 1;
-        boolean status = true;
+        NumberArgument<Double> multiplier = getRoundedDouble(sender, argument, Message.INVALID_MULTIPLIER);
 
-        try {
-            multiplier = Double.parseDouble(argument);
-            // Makes sure the multiplier is rounded.
-            multiplier = Math.round(multiplier * 100) / 100D;
-        } catch (IllegalArgumentException ex) {
+        if (multiplier.isSucceed() && multiplier.getNumber() < 1) {
             Message.INVALID_MULTIPLIER.send(sender, argument);
-            status = false;
+            return new NumberArgument<>(multiplier.getNumber(), false);
         }
 
-        if (multiplier < 1) {
-            Message.INVALID_MULTIPLIER.send(sender, argument);
-            status = false;
-        }
-
-        return new NumberArgument<>(multiplier, status);
+        return multiplier;
     }
 
     public static NumberArgument<Double> getAdditionalMultiplier(CommandSender sender, String argument) {
-        double multiplier = 0.01;
-        boolean status = true;
+        NumberArgument<Double> multiplier = getRoundedDouble(sender, argument, Message.INVALID_MULTIPLIER);
 
-        try {
-            multiplier = Double.parseDouble(argument);
-            // Makes sure the multiplier is rounded.
-            multiplier = Math.round(multiplier * 100) / 100D;
-        } catch (IllegalArgumentException ex) {
+        if (multiplier.isSucceed() && multiplier.getNumber() == 0) {
             Message.INVALID_MULTIPLIER.send(sender, argument);
-            status = false;
+            return new NumberArgument<>(multiplier.getNumber(), false);
         }
 
-        if (multiplier < 0.01) {
-            Message.INVALID_MULTIPLIER.send(sender, argument);
-            status = false;
-        }
-
-        return new NumberArgument<>(multiplier, status);
+        return multiplier;
     }
 
     public static PotionEffectType getPotionEffect(CommandSender sender, String argument) {
@@ -425,22 +389,25 @@ public class CommandArguments {
     }
 
     public static NumberArgument<Integer> getSize(CommandSender sender, String argument) {
-        int size = 1;
-        boolean status = true;
+        NumberArgument<Integer> size = getInt(sender, argument, Message.INVALID_SIZE);
 
-        try {
-            size = Integer.parseInt(argument);
-        } catch (IllegalArgumentException ex) {
+        if (size.isSucceed() && size.getNumber() < 1) {
             Message.INVALID_SIZE.send(sender, argument);
-            status = false;
+            return new NumberArgument<>(size.getNumber(), false);
         }
 
-        if (size < 1) {
+        return size;
+    }
+
+    public static NumberArgument<Integer> getAdditionalSize(CommandSender sender, String argument) {
+        NumberArgument<Integer> size = getInt(sender, argument, Message.INVALID_SIZE);
+
+        if (size.isSucceed() && size.getNumber() == 0) {
             Message.INVALID_SIZE.send(sender, argument);
-            status = false;
+            return new NumberArgument<>(size.getNumber(), false);
         }
 
-        return new NumberArgument<>(size, status);
+        return size;
     }
 
     public static IslandWarp getWarp(CommandSender sender, Island island, String[] args, int start) {
@@ -621,6 +588,21 @@ public class CommandArguments {
         }
 
         return new NumberArgument<>(i, status);
+    }
+
+    private static NumberArgument<Double> getRoundedDouble(CommandSender sender, String argument, Message locale) {
+        double d = 0;
+        boolean status = true;
+
+        try {
+            d = Double.parseDouble(argument);
+            d = Math.round(d * 100) / 100D;
+        } catch (IllegalArgumentException ex) {
+            locale.send(sender, argument);
+            status = false;
+        }
+
+        return new NumberArgument<>(d, status);
     }
 
 }

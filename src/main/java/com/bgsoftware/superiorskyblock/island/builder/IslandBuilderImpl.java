@@ -512,7 +512,7 @@ public class IslandBuilderImpl implements Island.Builder {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension dimension cannot be null.");
         this.cobbleGeneratorValues.computeIfAbsent(dimension, e -> KeyMaps.createArrayMap(KeyIndicator.MATERIAL))
-                .put(block, rate <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(rate) : IntValue.fixed(Math.max(1, rate)));
+                .put(block, rate <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(rate) : IntValue.fixed(Math.max(0, rate)));
         return this;
     }
 
@@ -564,7 +564,7 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setIslandEffect(PotionEffectType potionEffectType, int level) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
-        this.islandEffects.put(potionEffectType, level <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(level) : IntValue.fixed(Math.max(1, level)));
+        this.islandEffects.put(potionEffectType, level <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(level) : IntValue.fixed(Math.max(0, level)));
         return this;
     }
 

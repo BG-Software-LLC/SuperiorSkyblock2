@@ -70,6 +70,7 @@ public class CmdAdminAddRoleLimit implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         PlayerRole playerRole = CommandArguments.getPlayerRoleForLimit(sender, args[3]);
+
         if (playerRole == null) {
             return;
         }
@@ -87,7 +88,7 @@ public class CmdAdminAddRoleLimit implements IAdminIslandCommand {
 
         for (Island island : islands) {
             int currentLimit = island.getRoleLimit(playerRole);
-            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE || currentLimit + limit < 0) {
                 continue;
             }
 

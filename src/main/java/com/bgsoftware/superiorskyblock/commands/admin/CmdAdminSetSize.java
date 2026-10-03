@@ -66,15 +66,11 @@ public class CmdAdminSetSize implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Integer> arguments = CommandArguments.getSize(sender, args[3]);
 
-        if (!arguments.isSucceed())
-            return;
-
-        int size = arguments.getNumber();
-
-        if (size < 1) {
-            Message.INVALID_SIZE.send(sender, size);
+        if (!arguments.isSucceed()) {
             return;
         }
+
+        int size = arguments.getNumber();
 
         if (size > plugin.getSettings().getMaxIslandSize()) {
             Message.SIZE_BIGGER_MAX.send(sender);
@@ -84,25 +80,29 @@ public class CmdAdminSetSize implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            PluginEvent<PluginEventArgs.IslandChangeBorderSize> event = PluginEventsFactory.callIslandChangeBorderSizeEvent(island, sender, size);
+            PluginEvent<PluginEventArgs.IslandChangeBorderSize> event = PluginEventsFactory.callIslandChangeBorderSizeEvent(
+                    island, sender, size);
             if (!event.isCancelled()) {
                 island.setIslandSize(event.getArgs().borderSize);
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_ISLAND_SIZE_ALL.send(sender);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_ISLAND_SIZE_NAME.send(sender, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
+        }
 
-        if (plugin.getSettings().isBuildOutsideIsland())
+        if (plugin.getSettings().isBuildOutsideIsland()) {
             Message.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
+        }
     }
 
 }

@@ -65,7 +65,7 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        BigDecimal limit = CommandArguments.getBankLimit(sender, args[3]);
+        BigDecimal limit = CommandArguments.getAdditionalBankLimit(sender, args[3]);
 
         if (limit == null) {
             return;
@@ -76,7 +76,8 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
 
         for (Island island : islands) {
             BigDecimal currentLimit = island.getBankLimit();
-            if (currentLimit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) <= 0) {
+            if (currentLimit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) <= 0
+                    || currentLimit.add(limit).compareTo(BigDecimal.ZERO) <= 0) {
                 continue;
             }
 
