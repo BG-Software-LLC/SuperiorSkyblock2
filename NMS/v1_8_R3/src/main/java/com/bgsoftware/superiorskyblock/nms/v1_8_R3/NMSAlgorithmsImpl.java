@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
+import com.bgsoftware.common.reflection.ClassInfo;
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -14,6 +16,7 @@ import net.minecraft.server.v1_8_R3.EntityFallingBlock;
 import net.minecraft.server.v1_8_R3.EntityMinecartAbstract;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.IInventory;
 import net.minecraft.server.v1_8_R3.Item;
 import net.minecraft.server.v1_8_R3.MinecraftKey;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
@@ -28,12 +31,14 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFallingSand;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftMinecart;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryCustom;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -45,12 +50,28 @@ import java.util.Optional;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
+    private static final ReflectField<String> TITLE_FIELD = new ReflectField<>(
+            new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
+                    ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title");
+
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
     private final SuperiorSkyblockPlugin plugin;
 
     public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @Override
+    public void setTitle(Inventory inventory, String title) {
+        if (inventory instanceof CraftInventoryCustom) {
+            CraftInventoryCustom craftInventoryCustom = (CraftInventoryCustom) inventory;
+            IInventory iInventory = craftInventoryCustom.getInventory();
+
+            if (TITLE_FIELD.isValid()) {
+                TITLE_FIELD.set(iInventory, title);
+            }
+        }
     }
 
     @Override

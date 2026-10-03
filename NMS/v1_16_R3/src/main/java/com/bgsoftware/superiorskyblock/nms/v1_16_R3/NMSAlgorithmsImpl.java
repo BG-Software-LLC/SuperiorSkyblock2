@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
+import com.bgsoftware.common.reflection.ClassInfo;
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -44,6 +46,7 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftFallingBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecart;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryCustom;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
@@ -51,6 +54,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -67,6 +71,10 @@ import java.util.function.BiFunction;
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final ReflectField<String> TITLE_FIELD = new ReflectField<>(
+            new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
+                    ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title");
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
@@ -88,6 +96,18 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
             return Bukkit.getUnsafe().processClass(plugin.getDescription(), path, classBytes);
         }
     };
+
+    @Override
+    public void setTitle(Inventory inventory, String title) {
+        if (inventory instanceof CraftInventoryCustom) {
+            CraftInventoryCustom craftInventoryCustom = (CraftInventoryCustom) inventory;
+            IInventory iInventory = craftInventoryCustom.getInventory();
+
+            if (TITLE_FIELD.isValid()) {
+                TITLE_FIELD.set(iInventory, title);
+            }
+        }
+    }
 
     @Override
     public void registerCommand(BukkitCommand command) {

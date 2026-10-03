@@ -20,7 +20,7 @@ public class SIslandChest implements IslandChest {
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
     private final Island island;
     private final int index;
-    private final String title = plugin.getSettings().getIslandChests().getChestTitle();
+    private String title = plugin.getSettings().getIslandChests().getChestTitle();
     private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(this, 9, title);
     private int contentsUpdateCounter = 0;
 
@@ -83,8 +83,15 @@ public class SIslandChest implements IslandChest {
     }
 
     @Override
-    public String getTitle() {
-        return title;
+    public void updateTitle() {
+        String defaultTitle = plugin.getSettings().getIslandChests().getChestTitle();
+
+        if (this.title.equals(defaultTitle)) {
+            return;
+        }
+
+        plugin.getNMSAlgorithms().setTitle(this.inventory, defaultTitle);
+        this.title = defaultTitle;
     }
 
     @Override
