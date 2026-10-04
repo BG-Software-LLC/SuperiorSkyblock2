@@ -115,7 +115,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
                     continue;
                 }
             } else {
-                int currentAmount = island.getGeneratorAmount(material, dimension) + amount;
+                int currentAmount = island.getGeneratorAmount(material, dimension);
                 if (currentAmount + amount < 1) {
                     continue;
                 }

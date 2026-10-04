@@ -1212,16 +1212,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     int getIslandSize();
 
     /**
+     * Get the island radius of the island that was set with a command.
+     */
+    int getIslandSizeRaw();
+
+    /**
      * Set the radius of the island.
      *
      * @param islandSize The radius for the island.
      */
     void setIslandSize(int islandSize);
-
-    /**
-     * Get the island radius of the island that was set with a command.
-     */
-    int getIslandSizeRaw();
 
     /**
      * Get the discord that is associated with the island.
@@ -1456,16 +1456,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     BigDecimal getBankLimit();
 
     /**
+     * Get the limit of the bank that was set using a command.
+     */
+    BigDecimal getBankLimitRaw();
+
+    /**
      * Set a new limit for the bank.
      *
      * @param bankLimit The limit to set. Use -1 to remove the limit.
      */
     void setBankLimit(BigDecimal bankLimit);
-
-    /**
-     * Get the limit of the bank that was set using a command.
-     */
-    BigDecimal getBankLimitRaw();
 
     /**
      * Give the bank interest to this island.
@@ -2059,6 +2059,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     double getCropGrowthMultiplier();
 
     /**
+     * Get the crop-growth multiplier for the island that was set using a command.
+     */
+    double getCropGrowthRaw();
+
+    /**
      * Set the crop-growth multiplier for the island.
      *
      * @param cropGrowth The multiplier to set.
@@ -2066,14 +2071,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setCropGrowthMultiplier(double cropGrowth);
 
     /**
-     * Get the crop-growth multiplier for the island that was set using a command.
-     */
-    double getCropGrowthRaw();
-
-    /**
      * Get the spawner-rates multiplier for the island.
      */
     double getSpawnerRatesMultiplier();
+
+    /**
+     * Get the spawner-rates multiplier for the island that was set using a command.
+     */
+    double getSpawnerRatesRaw();
 
     /**
      * Set the spawner-rates multiplier for the island.
@@ -2083,14 +2088,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setSpawnerRatesMultiplier(double spawnerRates);
 
     /**
-     * Get the spawner-rates multiplier for the island that was set using a command.
-     */
-    double getSpawnerRatesRaw();
-
-    /**
      * Get the mob-drops multiplier for the island.
      */
     double getMobDropsMultiplier();
+
+    /**
+     * Get the mob-drops multiplier for the island that was set using a command.
+     */
+    double getMobDropsRaw();
 
     /**
      * Set the mob-drops multiplier for the island.
@@ -2098,11 +2103,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param mobDrops The multiplier to set.
      */
     void setMobDropsMultiplier(double mobDrops);
-
-    /**
-     * Get the mob-drops multiplier for the island that was set using a command.
-     */
-    double getMobDropsRaw();
 
     /**
      * Get the block limit of a block.
@@ -2267,6 +2267,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     int getTeamLimit();
 
     /**
+     * Get the team limit of the island that was set with a command.
+     */
+    int getTeamLimitRaw();
+
+    /**
      * Set the team limit of the island.
      *
      * @param teamLimit The team limit to set.
@@ -2274,14 +2279,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setTeamLimit(int teamLimit);
 
     /**
-     * Get the team limit of the island that was set with a command.
-     */
-    int getTeamLimitRaw();
-
-    /**
      * Get the warps limit of the island.
      */
     int getWarpsLimit();
+
+    /**
+     * Get the warps limit of the island that was set using a command.
+     */
+    int getWarpsLimitRaw();
 
     /**
      * Set the warps limit for the island.
@@ -2291,16 +2296,10 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setWarpsLimit(int warpsLimit);
 
     /**
-     * Get the warps limit of the island that was set using a command.
-     */
-    int getWarpsLimitRaw();
-
-    /**
      * Add a potion effect to the island.
      *
      * @param type  The potion effect to add.
      * @param level The level of the potion effect.
-     *              If the level is 0 or below, then the effect will be removed.
      */
     void setPotionEffect(PotionEffectType type, int level);
 
@@ -2328,7 +2327,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get a list of all custom active island effects with their levels.
      */
     Map<PotionEffectType, Integer> getCustomPotionEffects();
-
 
     /**
      * Give all the island effects to a player.
