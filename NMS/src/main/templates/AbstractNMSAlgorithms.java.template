@@ -71,9 +71,13 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
     private static final Multimap<Attribute, AttributeModifier> EMPTY_ATTRIBUTES_MAP =
             MultimapBuilder.hashKeys().hashSetValues().build();
 
+    private static final ReflectField<Object> ADVENTURE_TITLE_FIELD =
+            new ReflectField<>(new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
+            ClassInfo.PackageType.CRAFTBUKKIT), Object.class, "adventure$title");
+
     private static final ReflectField<String> TITLE_FIELD = new ReflectField<>(
-                new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
-                ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title");
+            new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
+            ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title");
 
     private static final EnumBridge<Biome> BIOME_ENUM_BRIDGE = new EnumBridge<>() {
         @Override
@@ -116,6 +120,11 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
 
             if (TITLE_FIELD.isValid()) {
                 TITLE_FIELD.removeFinal().set(container, title);
+            }
+
+            if (ADVENTURE_TITLE_FIELD.isValid()) {
+                net.kyori.adventure.text.Component component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(title);
+                ADVENTURE_TITLE_FIELD.removeFinal().set(container, component);
             }
         }
     }
