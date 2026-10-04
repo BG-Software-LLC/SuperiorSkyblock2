@@ -67,29 +67,30 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
         Dimension dimension = args.length == 3 ? plugin.getSettings().getWorlds().getDefaultWorldDimension() :
                 CommandArguments.getDimension(sender, args[3]);
 
-        if (dimension == null)
+        if (dimension == null) {
             return;
+        }
 
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (!PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension))
-                continue;
-
-            ++islandsChangedCount;
-
-            island.clearGeneratorAmounts(dimension);
+            if (PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension)){
+                island.clearGeneratorAmounts(dimension);
+                ++islandsChangedCount;
+            }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islands.size() != 1)
+        if (islandsChangedCount > 1) {
             Message.GENERATOR_CLEARED_ALL.send(sender);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.GENERATOR_CLEARED_NAME.send(sender, islands.get(0).getName());
-        else
+        } else {
             Message.GENERATOR_CLEARED.send(sender, targetPlayer.getName());
+        }
     }
 
     @Override

@@ -65,8 +65,10 @@ public class CmdAdminRemoveRoleLimit implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         PlayerRole playerRole = CommandArguments.getPlayerRoleForLimit(sender, args[3]);
-        if (playerRole == null)
+
+        if (playerRole == null) {
             return;
+        }
 
         int islandsChangedCount = 0;
 
@@ -77,15 +79,17 @@ public class CmdAdminRemoveRoleLimit implements IAdminIslandCommand {
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_ROLE_LIMIT_ALL.send(sender, playerRole);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_ROLE_LIMIT_NAME.send(sender, playerRole, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_ROLE_LIMIT.send(sender, playerRole, targetPlayer.getName());
+        }
     }
 
     @Override

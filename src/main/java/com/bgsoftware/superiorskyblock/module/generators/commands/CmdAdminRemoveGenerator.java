@@ -89,7 +89,7 @@ public class CmdAdminRemoveGenerator implements IAdminIslandCommand {
             return;
         }
 
-        if (islands.size() != 1) {
+        if (islandsChangedCount > 1) {
             Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
         } else if (targetPlayer == null) {
             Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());

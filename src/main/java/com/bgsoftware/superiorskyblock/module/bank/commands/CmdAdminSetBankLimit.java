@@ -66,8 +66,9 @@ public class CmdAdminSetBankLimit implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         BigDecimal limit = CommandArguments.getBankLimit(sender, args[3]);
 
-        if (limit == null)
+        if (limit == null) {
             return;
+        }
 
         int islandsChangedCount = 0;
 
@@ -79,15 +80,17 @@ public class CmdAdminSetBankLimit implements IAdminIslandCommand {
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_BANK_LIMIT_ALL.send(sender);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_BANK_LIMIT_NAME.send(sender, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_BANK_LIMIT.send(sender, targetPlayer.getName());
+        }
     }
 
 }
