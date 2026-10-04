@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
@@ -110,8 +111,8 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
             }
         }
 
-        superiorPlayer.teleport(island, dimension, result -> {
-            if (!result) {
+        superiorPlayer.teleportWithResult(island, dimension, result -> {
+            if (result != PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
                 superiorPlayer.teleport(island.getIslandHome(dimension));
             }
         });

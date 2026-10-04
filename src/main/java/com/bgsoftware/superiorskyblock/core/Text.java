@@ -12,4 +12,11 @@ public class Text {
         return string == null || string.isEmpty();
     }
 
+    public static StringBuilder appendWithLine(StringBuilder stringBuilder, Object value) {
+        if (stringBuilder.length() != 0)
+            stringBuilder.append("\n");
+
+        return stringBuilder.append(value);
+    }
+
 }

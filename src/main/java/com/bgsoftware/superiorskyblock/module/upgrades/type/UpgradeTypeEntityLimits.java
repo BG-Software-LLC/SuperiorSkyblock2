@@ -70,6 +70,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
         listeners.add(new EntityLimitsListener());
 
         checkEntityBreedListener().ifPresent(listeners::add);
+        checkEntityPlaceListener().ifPresent(listeners::add);
 
         return listeners;
     }
@@ -83,6 +84,15 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
         try {
             Class.forName("org.bukkit.event.entity.EntityBreedEvent");
             return Optional.of(new EntityLimitsBreedListener());
+        } catch (ClassNotFoundException error) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<Listener> checkEntityPlaceListener() {
+        try {
+            Class.forName("org.bukkit.event.entity.EntityPlaceEvent");
+            return Optional.of(new EntityLimitsPlaceListener());
         } catch (ClassNotFoundException error) {
             return Optional.empty();
         }
@@ -257,6 +267,40 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             }
 
             return null;
+        }
+
+    }
+
+    private class EntityLimitsPlaceListener implements Listener {
+
+        @Nullable
+        private final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onEntityPlace(org.bukkit.event.entity.EntityPlaceEvent e) {
+            Entity entity = e.getEntity();
+            EntityType entityType = entity.getType();
+
+            if (entityType != CUSHION_TYPE || BukkitEntities.canBypassEntityLimit(entity)
+                    || !BukkitEntities.canHaveLimit(entityType)) {
+                return;
+            }
+
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+            }
+
+            if (island == null) {
+                return;
+            }
+
+            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+
+            if (hasReachedLimit) {
+                entity.remove();
+                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+            }
         }
 
     }

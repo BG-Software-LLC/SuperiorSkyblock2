@@ -1,13 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
@@ -15,10 +13,8 @@ import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 public class RateIslandButton extends AbstractMenuViewButton<IslandMenuView> {
@@ -33,7 +29,7 @@ public class RateIslandButton extends AbstractMenuViewButton<IslandMenuView> {
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<IslandMenuView> context) {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Island island = menuView.getIsland();
         Rating rating = getTemplate().rating;
@@ -69,7 +65,7 @@ public class RateIslandButton extends AbstractMenuViewButton<IslandMenuView> {
 
         @Override
         public MenuTemplateButton<IslandMenuView> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, rating);
+            return new Template(this, rating);
         }
 
     }
@@ -78,10 +74,8 @@ public class RateIslandButton extends AbstractMenuViewButton<IslandMenuView> {
 
         private final Rating rating;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Rating rating) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    RateIslandButton.class, RateIslandButton::new);
+        Template(AbstractBuilder<IslandMenuView> builder, Rating rating) {
+            super(builder, RateIslandButton.class, RateIslandButton::new);
             this.rating = Objects.requireNonNull(rating, "rating cannot be null");
         }
 

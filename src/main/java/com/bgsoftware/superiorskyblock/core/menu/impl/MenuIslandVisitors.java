@@ -7,11 +7,11 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.OpenUniqueVisitorsButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.VisitorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
@@ -51,11 +51,11 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
-        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "unique-visitors", menuPatternSlots),
+        patternBuilder.mapButtons(MenuParserImpl.getInstance().parseButtonSlots(cfg, "unique-visitors", menuSlotsMap),
                 new OpenUniqueVisitorsButton.Builder());
 
         return new MenuIslandVisitors(menuParseResult);
@@ -77,13 +77,16 @@ public class MenuIslandVisitors extends AbstractPagedMenu<MenuIslandVisitors.Vie
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", String.valueOf(island.getIslandVisitors(false).size()));
+        protected List<SuperiorPlayer> requestObjects() {
+            return island.getIslandVisitors(false);
         }
 
         @Override
-        protected List<SuperiorPlayer> requestObjects() {
-            return island.getIslandVisitors(false);
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = String.valueOf(island.getIslandVisitors(false).size());
         }
 
     }

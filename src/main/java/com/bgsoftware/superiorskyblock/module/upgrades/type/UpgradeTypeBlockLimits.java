@@ -117,6 +117,9 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
         }
 
         private boolean onSpawnerChangeInternal(PlayerInteractEvent e, Material clickedBlockType, ItemStack handItem) {
+            if (!plugin.getProviders().shouldListenToSpawnerChangesUsingEggs())
+                return false;
+
             if (clickedBlockType != Materials.SPAWNER.toBukkitType())
                 return false;
 

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
@@ -63,13 +64,12 @@ public class CmdDeposit implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
-        BigDecimal moneyInBank = plugin.getProviders().getBankEconomyProvider().getBalance(superiorPlayer);
         BigDecimal amount = BigDecimal.valueOf(-1);
 
         if (args[1].equalsIgnoreCase("all") || args[1].equals("*")) {
-            amount = moneyInBank;
+            amount = plugin.getProviders().getBankEconomyProvider().getBalance(superiorPlayer);
         } else try {
-            amount = BigDecimal.valueOf(Double.parseDouble(args[1]));
+            amount = new BigDecimal(args[1]);
         } catch (IllegalArgumentException ignored) {
         }
 
@@ -79,7 +79,8 @@ public class CmdDeposit implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
+        return args.length != 2 ? Collections.emptyList() :
+                CommandTabCompletes.getCustomComplete(args[1], "*");
     }
 
 }

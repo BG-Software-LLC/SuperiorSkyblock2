@@ -40,7 +40,7 @@ public class ServicesHandler {
         registerService(new HologramsServiceImpl(plugin));
         registerService(new DragonBattleServiceImpl(plugin));
         registerService(new BossBarsServiceImpl(plugin));
-        registerService(new MessagesServiceImpl());
+        registerService(new MessagesServiceImpl(plugin));
         registerService(new PortalsManagerServiceImpl(plugin));
         registerService(new RegionManagerServiceImpl(plugin));
         registerService(new StackedBlocksInteractionServiceImpl(plugin));

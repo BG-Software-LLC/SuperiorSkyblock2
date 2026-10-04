@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
@@ -289,16 +290,16 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             // teleport player to destination location.
             if (schematic == null || island.wasSchematicGenerated(destination)) {
                 if (superiorPlayer != null) {
-                    superiorPlayer.teleport(island, destination, result -> {
+                    superiorPlayer.teleportWithResult(island, destination, unused -> {
                         generatingSchematicsIslands.remove(island.getUniqueId());
                     });
                 } else {
-                    EntityTeleports.findIslandSafeLocation(island, destination).whenComplete((safeSpot, error) -> {
+                    EntityTeleports.findIslandSafeLocation(island, destination).whenCompleteAsync((safeSpot, error) -> {
                         generatingSchematicsIslands.remove(island.getUniqueId());
 
                         if (error == null && safeSpot != null)
                             EntityTeleports.teleport(entity, safeSpot);
-                    });
+                    }, BukkitExecutor.SYNC_EXECUTOR);
                 }
                 return EntityPortalResult.SUCCEED;
             }

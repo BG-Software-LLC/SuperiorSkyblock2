@@ -80,16 +80,15 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                     });
         } else {
             IslandUtils.getAllChunksAsync(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS,
-                    ChunkLoadReason.BLOCKS_RECALCULATE, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
-                CompletableFuture<List<CalculatedChunk.Blocks>> calculateCompletable = new CompletableFuture<>();
-                completableFuture.whenComplete((chunk, ex) -> {
-                    try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
-                        plugin.getNMSChunks().calculateChunks(Collections.singletonList(chunkPosition), CACHED_CALCULATED_CHUNKS)
-                                .whenComplete((pair, ex2) -> calculateCompletable.complete(pair));
-                    }
-                });
-                chunksToLoad.add(calculateCompletable);
-            });
+                    ChunkLoadReason.BLOCKS_RECALCULATE, plugin.getProviders()::takeSnapshots).forEach(completableFuture ->
+                    chunksToLoad.add(completableFuture.thenCompose(chunk -> {
+                        try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
+                            // calculateChunks removes cached chunks from the given list, therefore it must be mutable.
+                            List<ChunkPosition> chunkPositions = new LinkedList<>();
+                            chunkPositions.add(chunkPosition);
+                            return plugin.getNMSChunks().calculateChunks(chunkPositions, CACHED_CALCULATED_CHUNKS);
+                        }
+                    })));
         }
 
         BlockCountsTracker blockCounts = new BlockCountsTracker();

@@ -26,10 +26,25 @@ subprojects {
 
             templates.each { File templateFile ->
                 def relativePath = templatesDir.toPath().relativize(templateFile.toPath()).toString()
+
+                def templateText = templateFile.text
+
+                // Templates starting with a `//<generate-if:KEY>` directive are only
+                // generated for versions that set KEY=true in their properties file.
+                if (templateText.startsWith('//<generate-if:')) {
+                    def newlineIndex = templateText.indexOf('\n')
+                    def directiveLine = (newlineIndex == -1 ? templateText : templateText.substring(0, newlineIndex)).trim()
+                    def requiredProperty = directiveLine.substring('//<generate-if:'.length(), directiveLine.length() - 1)
+                    if (!Boolean.parseBoolean(props.getProperty(requiredProperty))) {
+                        println "Skipped ${relativePath} (${requiredProperty} is not enabled)"
+                        return
+                    }
+                    templateText = newlineIndex == -1 ? '' : templateText.substring(newlineIndex + 1)
+                }
+
                 def outputFile = new File(generatedSrcDir, relativePath.replace('.template', ''))
                 outputFile.parentFile.mkdirs()
 
-                def templateText = templateFile.text
                 props.each { k, v ->
                     templateText = templateText.replace("\${${k}}", v)
                 }

@@ -55,7 +55,7 @@ public class CmdBalance implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        IslandArgument arguments = args.length == 1 ? CommandArguments.getIslandWhereStanding(plugin, sender) :
+        IslandArgument arguments = args.length == 1 ? CommandArguments.getIslandWhereStandingOrSenderIsland(plugin, sender) :
                 CommandArguments.getIsland(plugin, sender, args[1]);
 
         Island island = arguments.getIsland();

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
@@ -10,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
-import com.bgsoftware.superiorskyblock.core.menu.layout.RegularMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.EmptyViewArgs;
 import org.bukkit.ChatColor;
@@ -40,7 +40,7 @@ public class MenuBlank extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
             sound = Sound.ANVIL_LAND;
         }
 
-        RegularMenuLayoutImpl.Builder<BaseMenuView> patternBuilder = RegularMenuLayoutImpl.newBuilder();
+        InventoryMenuLayout.Builder<BaseMenuView> patternBuilder = InventoryMenuLayout.newBuilder();
 
         patternBuilder.setTitle("" + ChatColor.RED + ChatColor.BOLD + "ERROR");
         patternBuilder.setRowsCount(3);

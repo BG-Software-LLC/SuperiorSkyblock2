@@ -256,20 +256,6 @@ public interface SettingsManager {
     boolean isTransferConfirm();
 
     /**
-     * The spawners-provider to use.
-     * If set to AUTO, the plugin will automatically detect an available spawners provider and use it.
-     * Config-path: spawners-provider
-     */
-    String getSpawnersProvider();
-
-    /**
-     * The stacked-blocks provider to use.
-     * If set to AUTO, the plugin will automatically detect an available stacked-blocks provider and use it.
-     * Config-path: stacked-blocks-provider
-     */
-    String getStackedBlocksProvider();
-
-    /**
      * Whether inventory of island members should be cleared when their island is disbanded or not.
      * Return true if clear-on-disband contains both ENDER_CHEST and INVENTORY.
      * This method will be deleted in the future!
@@ -565,6 +551,35 @@ public interface SettingsManager {
     boolean isObsidianToLava();
 
     /**
+     * The spawners provider to use.
+     * If set to AUTO, the plugin will automatically detect an available spawners provider and use it.
+     * Config-path: spawners-provider
+     */
+    String getSpawnersProvider();
+
+    /**
+     * The stacked-blocks provider to use.
+     * If set to AUTO, the plugin will automatically detect an available stacked-blocks provider and use it.
+     * Config-path: stacked-blocks-provider
+     */
+    String getStackedBlocksProvider();
+
+    /**
+     * The prices provider to use.
+     * If set to AUTO, the plugin will automatically detect an available prices provider and use it.
+     * Config-path: prices-provider
+     */
+    String getPricesProvider();
+
+    /**
+     * The vanish provider to use.
+     * If set to AUTO, the plugin will automatically detect an available vanish provider and use it.
+     * If set to METADATA, the Bukkit 'vanished' metadata value will be used.
+     * Config-path: vanish-provider
+     */
+    String getVanishProvider();
+
+    /**
      * The sync-worth status of the plugin.
      * Config-path: sync-worth
      */
@@ -593,6 +608,13 @@ public interface SettingsManager {
      * Config-path: disabled-commands
      */
     List<String> getDisabledCommands();
+
+    /**
+     * List of admin commands that are considered dangerous.
+     * When executed by players, these commands must be approved by the console before being executed.
+     * Config-path: dangerous-commands
+     */
+    List<String> getDangerousCommands();
 
     /**
      * List of plugins that their hooks should not be enabled.

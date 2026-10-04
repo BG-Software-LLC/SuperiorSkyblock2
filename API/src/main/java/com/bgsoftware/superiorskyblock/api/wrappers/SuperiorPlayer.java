@@ -13,7 +13,9 @@ import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -25,6 +27,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -236,6 +239,14 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void teleport(Location location, @Nullable Consumer<Boolean> teleportResult);
 
     /**
+     * Teleport the player to a location.
+     *
+     * @param location       The location to teleport the player to.
+     * @param teleportResult The result of the teleportation process.
+     */
+    void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult);
+
+    /**
      * Teleport the player to an island.
      *
      * @param island The island to teleport the player to.
@@ -262,10 +273,27 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Teleport the player to an island.
      *
      * @param island         The island to teleport the player to.
+     * @param teleportResult Consumer that will be ran when task is finished.
+     */
+    void teleportWithResult(Island island, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult);
+
+    /**
+     * Teleport the player to an island.
+     *
+     * @param island         The island to teleport the player to.
      * @param dimension      The dimension to teleport the player to.
      * @param teleportResult Consumer that will be ran when task is finished.
      */
     void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult);
+
+    /**
+     * Teleport the player to an island.
+     *
+     * @param island         The island to teleport the player to.
+     * @param dimension      The dimension to teleport the player to.
+     * @param teleportResult Consumer that will be ran when task is finished.
+     */
+    void teleportWithResult(Island island, Dimension dimension, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult);
 
     /**
      * Check whether or not the player is inside their island.
@@ -358,6 +386,17 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Get all islands that the player is coop of.
      */
     List<Island> getCoopIslands();
+
+    /**
+     * Get the ChatState of the player;
+     */
+    ChatState getChatState();
+
+
+    /**
+     * Set the ChatState of the player.
+     */
+    void setChatState(ChatState chatState);
 
     /**
      * Get the role of the player.
@@ -462,19 +501,25 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
 
     /**
      * Check whether the team chat is enabled for the player.
+     * @deprecated See {@link #getChatState()}
      */
+    @Deprecated
     boolean hasTeamChatEnabled();
 
     /**
      * Toggle the team chat for the player.
+     * @deprecated See {@link #setChatState(ChatState)}
      */
+    @Deprecated
     void toggleTeamChat();
 
     /**
-     * Set whether the schematic mode is enabled for the player.
+     * Set whether the team chat is enabled for the player.
      *
-     * @param enabled true to enable schematic mode.
+     * @param enabled true to enable team chat;
+     * @deprecated See {@link #setChatState(ChatState)}
      */
+    @Deprecated
     void setTeamChat(boolean enabled);
 
     /**

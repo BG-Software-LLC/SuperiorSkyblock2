@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
 import com.bgsoftware.superiorskyblock.core.database.sql.ResultSetMapBridge;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
@@ -638,8 +639,8 @@ public class DatabaseConverter {
                 .setValue(IslandAttributes.Field.CENTER, (String) resultSet.get("center"))
                 .setValue(IslandAttributes.Field.CREATION_TIME, resultSet.get("creationTime", currentTime / 1000))
                 .setValue(IslandAttributes.Field.ISLAND_TYPE, resultSet.get("schemName", ""))
-                .setValue(IslandAttributes.Field.DISCORD, resultSet.get("discord", "None"))
-                .setValue(IslandAttributes.Field.PAYPAL, resultSet.get("paypal", "None"))
+                .setValue(IslandAttributes.Field.DISCORD, resultSet.get("discord", IslandUtils.DEFAULT_NONE_VALUE))
+                .setValue(IslandAttributes.Field.PAYPAL, resultSet.get("paypal", IslandUtils.DEFAULT_NONE_VALUE))
                 .setValue(IslandAttributes.Field.WORTH_BONUS, resultSet.get("bonusWorth", ""))
                 .setValue(IslandAttributes.Field.LEVELS_BONUS, resultSet.get("bonusLevel", ""))
                 .setValue(IslandAttributes.Field.LOCKED, resultSet.get("locked", false))

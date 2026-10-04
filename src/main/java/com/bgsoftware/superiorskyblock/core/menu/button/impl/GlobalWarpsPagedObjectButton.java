@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonI
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Locale;
@@ -25,7 +25,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuGlobalWarps.View> context) {
         if (Menus.MENU_GLOBAL_WARPS.isVisitorWarps()) {
             menuView.setPreviousMove(false);
             plugin.getCommands().dispatchSubCommand(menuView.getInventoryViewer().asPlayer(),
@@ -37,7 +37,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         String ownerName = pagedObject.getOwner().getName();
         String islandName = pagedObject.getName().isEmpty() ? ownerName : pagedObject.getName();
 
@@ -51,7 +51,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
         else
             description = EMPTY_STRING_ARRAY;
 
-        return new ItemBuilder(buttonItem)
+        return itemBuilder
                 .asSkullOf(pagedObject.getOwner())
                 .replaceAll("{0}", ownerName)
                 .replaceLoreWithLines("{1}", description)
@@ -71,8 +71,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
 
         @Override
         public PagedMenuTemplateButton<MenuGlobalWarps.View, Island> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), GlobalWarpsPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, GlobalWarpsPagedObjectButton.class,
                     GlobalWarpsPagedObjectButton::new);
         }
 

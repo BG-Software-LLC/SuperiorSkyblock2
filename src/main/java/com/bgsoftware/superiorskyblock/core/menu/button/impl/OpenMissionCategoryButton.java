@@ -1,19 +1,15 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.List;
 import java.util.Objects;
 
 public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuView> {
@@ -28,7 +24,7 @@ public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuVi
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<BaseMenuView> context) {
         if (getTemplate().requireIsland && !menuView.getInventoryViewer().hasIsland()) {
             Message.INVALID_ISLAND.send(menuView.getInventoryViewer());
             return;
@@ -49,7 +45,7 @@ public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuVi
 
         @Override
         public MenuTemplateButton<BaseMenuView> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, missionCategory);
+            return new Template(this, missionCategory);
         }
 
     }
@@ -59,10 +55,8 @@ public class OpenMissionCategoryButton extends AbstractMenuViewButton<BaseMenuVi
         private final MissionCategory missionCategory;
         private final boolean requireIsland;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, MissionCategory missionCategory) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    OpenMissionCategoryButton.class, OpenMissionCategoryButton::new);
+        Template(AbstractBuilder<BaseMenuView> builder, MissionCategory missionCategory) {
+            super(builder, OpenMissionCategoryButton.class, OpenMissionCategoryButton::new);
             this.missionCategory = Objects.requireNonNull(missionCategory, "missionCategory cannot be null");
             this.requireIsland = !plugin.getMissions().isPlayerMissionCategory(missionCategory);
         }

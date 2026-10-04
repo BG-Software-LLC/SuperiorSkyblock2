@@ -13,9 +13,9 @@ import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class WarpManageRenameButton extends AbstractMenuViewButton<MenuWarpManage.View> {
 
@@ -24,8 +24,8 @@ public class WarpManageRenameButton extends AbstractMenuViewButton<MenuWarpManag
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        Player player = (Player) clickEvent.getWhoClicked();
+    public void onButtonClick(ButtonClickContext<MenuWarpManage.View> context) {
+        Player player = context.getPlayer();
 
         Message.WARP_RENAME.send(player);
 
@@ -69,8 +69,8 @@ public class WarpManageRenameButton extends AbstractMenuViewButton<MenuWarpManag
 
         @Override
         public MenuTemplateButton<MenuWarpManage.View> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, WarpManageRenameButton.class, WarpManageRenameButton::new);
+            return new MenuTemplateButtonImpl<>(this, WarpManageRenameButton.class,
+                    WarpManageRenameButton::new);
         }
 
     }

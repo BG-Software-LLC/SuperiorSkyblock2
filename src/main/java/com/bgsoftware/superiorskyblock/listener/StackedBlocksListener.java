@@ -3,16 +3,19 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -25,7 +28,6 @@ import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -282,7 +284,9 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     }
 
     private void onGolemCreate(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
-        List<BlockOffset> entityTemplateOffsets = ENTITY_TEMPLATE_OFFSETS.get(e.getArgs().spawnReason);
+        CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
+
+        List<BlockOffset> entityTemplateOffsets = ENTITY_TEMPLATE_OFFSETS.get(spawnReason);
         if (entityTemplateOffsets == null)
             return;
 
@@ -291,6 +295,8 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
             return;
+
+        boolean copperGolem = BUILD_COPPERGOLEM != null && spawnReason == BUILD_COPPERGOLEM;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
@@ -301,18 +307,36 @@ public class StackedBlocksListener extends AbstractGameEventListener {
             }
 
             for (BlockOffset blockOffset : entityTemplateOffsets) {
-                if (plugin.getStackedBlocks().getStackedBlockAmount(blockOffset.applyToLocation(entityLocation)) > 1) {
-                    e.setCancelled();
-                    if (e.getArgs().spawnReason == BUILD_COPPERGOLEM)
-                        onCopperGolemCancel(entityLocation);
-                    return;
-                }
+                Location offsetLocation = blockOffset.applyToLocation(entityLocation);
+
+                if (plugin.getStackedBlocks().getStackedBlockAmount(offsetLocation) <= 1)
+                    continue;
+
+                // A copper golem can be built in any orientation, so we check all 6 neighbors, but it
+                // only consumes a single copper block. Skipping non-copper stacked neighbors prevents
+                // an unrelated stacked block from cancelling a legitimately built golem.
+                if (copperGolem && !isCopperGolemBlock(offsetLocation))
+                    continue;
+
+                e.setCancelled();
+
+                if (copperGolem)
+                    onCopperGolemCancel(offsetLocation);
+
+                return;
             }
         }
     }
 
-    private void onCopperGolemCancel(Location entityLocation) {
-        Block copperChestBlock = entityLocation.getBlock().getRelative(BlockFace.DOWN);
+    private boolean isCopperGolemBlock(Location location) {
+        // We rely on the stored stacked-block key (not the live block type) because the copper block
+        // may have already been converted into a copper chest by the time the golem spawns.
+        Key blockKey = plugin.getStackedBlocks().getStackedBlockKey(location);
+        return blockKey instanceof MaterialKey && Materials.isCopperGolemBlock(((MaterialKey) blockKey).getMaterial());
+    }
+
+    private void onCopperGolemCancel(Location copperChestLocation) {
+        Block copperChestBlock = copperChestLocation.getBlock();
         BukkitExecutor.sync(() -> {
             if (copperChestBlock.getType() == COPPER_CHEST) {
                 copperChestBlock.setType(COPPER_BLOCK);
@@ -395,8 +419,16 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         offsetsMap.put(CreatureSpawnEvent.SpawnReason.BUILD_WITHER, blockOffsets);
 
         if (BUILD_COPPERGOLEM != null) {
+            // A copper golem spawns where the carved pumpkin was placed, and the copper block it was
+            // built from turns into a copper chest. The build works in any orientation (pumpkin on top,
+            // on a side, or underneath), so the copper block can be any of the golem's 6 face neighbors.
             blockOffsets = new LinkedList<>();
             blockOffsets.add(SBlockOffset.fromOffsets(0, -1, 0));
+            blockOffsets.add(SBlockOffset.fromOffsets(0, 1, 0));
+            blockOffsets.add(SBlockOffset.fromOffsets(1, 0, 0));
+            blockOffsets.add(SBlockOffset.fromOffsets(-1, 0, 0));
+            blockOffsets.add(SBlockOffset.fromOffsets(0, 0, 1));
+            blockOffsets.add(SBlockOffset.fromOffsets(0, 0, -1));
             offsetsMap.put(BUILD_COPPERGOLEM, blockOffsets);
         }
 

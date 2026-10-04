@@ -21,13 +21,28 @@ public class DelegatePlayerTeleportAlgorithm implements PlayerTeleportAlgorithm 
     }
 
     @Override
+    public CompletableFuture<TeleportResult> teleportWithResult(Player player, Location location) {
+        return this.handle.teleportWithResult(player, location);
+    }
+
+    @Override
     public CompletableFuture<Boolean> teleport(Player player, Island island) {
         return this.handle.teleport(player, island);
     }
 
     @Override
+    public CompletableFuture<TeleportResult> teleportWithResult(Player player, Island island) {
+        return this.handle.teleportWithResult(player, island);
+    }
+
+    @Override
     public CompletableFuture<Boolean> teleport(Player player, Island island, Dimension dimension) {
         return this.handle.teleport(player, island, dimension);
+    }
+
+    @Override
+    public CompletableFuture<TeleportResult> teleportWithResult(Player player, Island island, Dimension dimension) {
+        return this.handle.teleportWithResult(player, island, dimension);
     }
 
     @Override

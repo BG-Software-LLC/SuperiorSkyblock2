@@ -17,16 +17,12 @@ public class IslandMenuView extends AbstractMenuView<IslandMenuView, IslandViewA
                           Menu<IslandMenuView, IslandViewArgs> menu, IslandViewArgs args) {
         super(inventoryViewer, previousMenuView, menu);
         this.island = args.getIsland();
+        this.cachedTitleArgs = new Object[]{this.island.getName()};
     }
 
     @Override
     public Island getIsland() {
         return island;
-    }
-
-    @Override
-    public String replaceTitle(String title) {
-        return title.replace("{}", this.island.getName());
     }
 
 }

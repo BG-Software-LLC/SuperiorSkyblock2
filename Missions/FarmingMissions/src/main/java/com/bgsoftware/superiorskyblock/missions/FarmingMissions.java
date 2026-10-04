@@ -140,6 +140,7 @@ public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implem
 
                 for (String key : grownPlants.getConfigurationSection(uuid).getKeys(false)) {
                     Key typeKey = getMissionPlantKey(Key.ofMaterialAndData(key));
+                    if (typeKey == null) continue;
                     farmingTracker.load(typeKey, grownPlants.getInt(uuid + "." + key));
                 }
             }

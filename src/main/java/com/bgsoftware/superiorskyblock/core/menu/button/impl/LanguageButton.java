@@ -1,20 +1,16 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.BaseMenuView;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -30,7 +26,7 @@ public class LanguageButton extends AbstractMenuViewButton<BaseMenuView> {
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<BaseMenuView> context) {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
 
         Locale language = getTemplate().language;
@@ -56,7 +52,7 @@ public class LanguageButton extends AbstractMenuViewButton<BaseMenuView> {
 
         @Override
         public MenuTemplateButton<BaseMenuView> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, language);
+            return new Template(this, language);
         }
 
     }
@@ -65,10 +61,8 @@ public class LanguageButton extends AbstractMenuViewButton<BaseMenuView> {
 
         private final Locale language;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Locale language) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    LanguageButton.class, LanguageButton::new);
+        Template(AbstractBuilder<BaseMenuView> builder, Locale language) {
+            super(builder, LanguageButton.class, LanguageButton::new);
             this.language = Objects.requireNonNull(language, "language cannot be null");
         }
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
@@ -10,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
@@ -55,6 +57,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -62,6 +65,7 @@ import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -108,6 +112,8 @@ public class BukkitEventsListener implements Listener {
             ProjectileHitEvent.class, "getHitEntity");
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
+    @Nullable
+    private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -165,6 +171,9 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.PROJECTILE_HIT_EVENT, ProjectileHitEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PROJECTILE_LAUNCH_EVENT, ProjectileLaunchEvent.class, this::createGameEvent);
 
+        if (CUSHION_TYPE != null)
+            createEventListener(GameEventType.ENTITY_SPAWN_EVENT, EntitySpawnEvent.class, this::createCushionGameEvent);
+
         // Inventory Events
         createEventListener(GameEventType.INVENTORY_CLICK_EVENT, InventoryClickEvent.class, this::createGameEvent);
         createEventListener(GameEventType.INVENTORY_CLOSE_EVENT, InventoryCloseEvent.class, this::createGameEvent);
@@ -194,6 +203,12 @@ public class BukkitEventsListener implements Listener {
         try {
             Class.forName("org.bukkit.event.block.SpongeAbsorbEvent");
             createEventListener(GameEventType.SPONGE_ABSORB_EVENT, org.bukkit.event.block.SpongeAbsorbEvent.class, new SpongeAbsorbEventFunction());
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        try {
+            Class entityBreakByEntityEventClass = Class.forName("io.papermc.paper.event.entity.EntityBreakByEntityEvent");
+            createEventListener(GameEventType.HANGING_BREAK_EVENT, entityBreakByEntityEventClass, new EntityBreakByEntityEventFunction());
         } catch (ClassNotFoundException ignored) {
         }
 
@@ -241,6 +256,15 @@ public class BukkitEventsListener implements Listener {
             createEventListener(GameEventType.GENERIC_GAME_EVENT, genericGameEventClass, plugin.getNMSAlgorithms().getGenericGameCreator());
         } catch (Exception ignored) {
         }
+
+        plugin.getNMSDialogs().ifPresent(nmsDialogs -> {
+            try {
+                NMSDialogs.PlayerCustomClickEventFunctions clickEventFunctions = nmsDialogs.createCustomClickEventFunctions();
+                createEventListener(GameEventType.DIALOG_CLICK_EVENT, clickEventFunctions.getEventClass(), clickEventFunctions);
+            } catch (Exception ignored) {
+            }
+        });
+
     }
 
     /*
@@ -633,6 +657,18 @@ public class BukkitEventsListener implements Listener {
         return eventType.createEvent(entityDeathEvent);
     }
 
+    private GameEvent<GameEventArgs.EntitySpawnEvent> createCushionGameEvent(GameEventType<GameEventArgs.EntitySpawnEvent> eventType, GameEventPriority priority, EntitySpawnEvent e) {
+        // We only listen to Cushion in EntitySpawnEvent, as this is the only event that is both called in Spigot and Paper.
+        // In Paper, the event "EntityPlaceEvent" should technically be used, but listening to it conflicts with HangingPlaceEvent and others.
+        if (e.getEntityType() != CUSHION_TYPE)
+            return null;
+
+        GameEventArgs.EntitySpawnEvent entitySpawnEvent = new GameEventArgs.EntitySpawnEvent();
+        entitySpawnEvent.entity = e.getEntity();
+        entitySpawnEvent.spawnReason = CreatureSpawnEvent.SpawnReason.NATURAL;
+        return eventType.createEvent(entitySpawnEvent);
+    }
+
     /*
      * INVENTORY EVENTS
      */
@@ -896,6 +932,28 @@ public class BukkitEventsListener implements Listener {
             spongeAbsorbEvent.block = e.getBlock();
             spongeAbsorbEvent.blocks = e.getBlocks();
             return eventType.createEvent(spongeAbsorbEvent);
+        }
+    }
+
+    private static class EntityBreakByEntityEventFunction implements GameEventCreator<GameEventArgs.HangingBreakEvent, Event> {
+
+        private static final ReflectMethod<Enum<?>> GET_CAUSE_METHOD = new ReflectMethod<>(
+                new ClassInfo("io.papermc.paper.event.entity.EntityBreakByEntityEvent", ClassInfo.PackageType.UNKNOWN),
+                "getCause", new ClassInfo[0]);
+        private static final ReflectMethod<Entity> GET_REMOVER_METHOD = new ReflectMethod<>(
+                new ClassInfo("io.papermc.paper.event.entity.EntityBreakByEntityEvent", ClassInfo.PackageType.UNKNOWN),
+                "getRemover", new ClassInfo[0]);
+
+        @Override
+        public GameEvent<GameEventArgs.HangingBreakEvent> execute(GameEventType<GameEventArgs.HangingBreakEvent> eventType, GameEventPriority priority, Event e) {
+            org.bukkit.event.entity.EntityEvent entityEvent = (org.bukkit.event.entity.EntityEvent) e;
+
+            GameEventArgs.HangingBreakEvent hangingBreakEvent = new GameEventArgs.HangingBreakEvent();
+
+            hangingBreakEvent.entity = entityEvent.getEntity();
+            hangingBreakEvent.removeCause = HangingBreakEvent.RemoveCause.valueOf(GET_CAUSE_METHOD.invoke(e).name());
+            hangingBreakEvent.remover = GET_REMOVER_METHOD.invoke(e);
+            return eventType.createEvent(hangingBreakEvent);
         }
     }
 

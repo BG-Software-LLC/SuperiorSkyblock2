@@ -9,9 +9,9 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractIconProviderMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class WarpIconEditConfirmButton extends AbstractMenuViewButton<AbstractIconProviderMenu.View<IslandWarp>> {
 
@@ -21,7 +21,7 @@ public class WarpIconEditConfirmButton extends AbstractMenuViewButton<AbstractIc
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<AbstractIconProviderMenu.View<IslandWarp>> context) {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
 
         IslandWarp islandWarp = menuView.getIconProvider();
@@ -32,7 +32,7 @@ public class WarpIconEditConfirmButton extends AbstractMenuViewButton<AbstractIc
         if (event.isCancelled())
             return;
 
-        clickEvent.getWhoClicked().closeInventory();
+        context.getPlayer().closeInventory();
 
         Message.WARP_ICON_UPDATED.send(inventoryViewer);
 
@@ -43,8 +43,8 @@ public class WarpIconEditConfirmButton extends AbstractMenuViewButton<AbstractIc
 
         @Override
         public MenuTemplateButton<AbstractIconProviderMenu.View<IslandWarp>> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, WarpIconEditConfirmButton.class, WarpIconEditConfirmButton::new);
+            return new MenuTemplateButtonImpl<>(this, WarpIconEditConfirmButton.class,
+                    WarpIconEditConfirmButton::new);
         }
 
     }

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -154,11 +155,11 @@ public class IslandSigns {
             String line = warpLines[i];
             if (!line.isEmpty()) {
                 String formattedLine = plugin.getSettings().getVisitorsSign().getDescriptionLineFormat().replace("{0}", line);
-                descriptionBuilder.append("\n").append(ChatColor.RESET).append(formattedLine);
+                Text.appendWithLine(descriptionBuilder, ChatColor.RESET).append(formattedLine);
             }
         }
 
-        String description = descriptionBuilder.length() < 1 ? "" : descriptionBuilder.substring(1);
+        String description = descriptionBuilder.toString();
 
         warpLines[0] = plugin.getSettings().getVisitorsSign().getActive();
 

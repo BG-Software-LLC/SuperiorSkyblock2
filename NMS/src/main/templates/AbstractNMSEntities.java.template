@@ -1,16 +1,13 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import org.bukkit.Material;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftAnimals;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftEntity;
-import ${CRAFTBUKKIT_PACKAGE}.entity.CraftMinecartFurnace;
 import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Steerable;
-import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 

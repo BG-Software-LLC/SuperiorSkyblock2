@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.event.Cancellable;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,19 +26,19 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
     private final UpgradeLevel upgradeLevel;
     private final List<String> commands;
     private final Cause cause;
-    @Nullable
-    private UpgradeCost upgradeCost;
+    private List<UpgradeCost> upgradeCosts;
     private boolean cancelled = false;
 
     /**
      * The constructor for the event.
      *
-     * @param superiorPlayer The player who upgraded the island. Can be null if ran by the console.
+     * @param superiorPlayer The player who upgraded the island. 
+     *                       Can be null if ran by the console.
      * @param island         The island that was upgraded.
      * @param upgradeName    The name of the upgrade.
      * @param commands       The commands that will be ran upon upgrade.
      * @param upgradeCost    The cost of the upgrade
-     * @deprecated See {@link #IslandUpgradeEvent(SuperiorPlayer, Island, Upgrade, UpgradeLevel, List, Cause, UpgradeCost)}
+     * @deprecated See {@link #IslandUpgradeEvent(SuperiorPlayer, Island, Upgrade, UpgradeLevel, List, Cause, List)}
      */
     @Deprecated
     public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, String upgradeName,
@@ -50,7 +51,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
         this.upgradeLevel = Preconditions.checkNotNull(island.getUpgradeLevel(upgrade), "upgradeLevel cannot be null");
         this.commands = new LinkedList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
         this.cause = Cause.UNKONWN;
-        this.upgradeCost = upgradeCost;
+        this.upgradeCosts = upgradeCost == null ? Collections.emptyList() : Collections.singletonList(upgradeCost);
     }
 
     /**
@@ -64,6 +65,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * @param commands       The commands that will be running upon upgrade.
      * @param upgradeCost    The cost of the upgrade.
      *                       If null, there was no cost for the upgrade (For example, setupgrade command).
+     * @deprecated See {@link #IslandUpgradeEvent(SuperiorPlayer, Island, Upgrade, UpgradeLevel, List, Cause, List)}
      */
     @Deprecated
     public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Upgrade upgrade,
@@ -80,10 +82,12 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * @param upgrade        The upgrade.
      * @param upgradeLevel   The level that will be upgraded into.
      * @param commands       The commands that will be running upon upgrade.
+     * @param cause          The cause of the upgrade.
      * @param upgradeCost    The cost of the upgrade.
      *                       If null, there was no cost for the upgrade (For example, setupgrade command).
-     * @param cause          The cause of the upgrade.
+     * @deprecated See {@link #IslandUpgradeEvent(SuperiorPlayer, Island, Upgrade, UpgradeLevel, List, Cause, List)}
      */
+    @Deprecated
     public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Upgrade upgrade,
                               UpgradeLevel upgradeLevel, List<String> commands, Cause cause,
                               @Nullable UpgradeCost upgradeCost) {
@@ -93,7 +97,31 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
         this.upgradeLevel = Preconditions.checkNotNull(upgradeLevel, "upgradeLevel cannot be null");
         this.commands = new LinkedList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
         this.cause = Preconditions.checkNotNull(cause, "cause cannot be null");
-        this.upgradeCost = upgradeCost;
+        this.upgradeCosts = upgradeCost == null ? Collections.emptyList() : Collections.singletonList(upgradeCost);
+    }
+
+    /**
+     * The constructor for the event.
+     *
+     * @param superiorPlayer The player who upgraded the island.
+     *                       Can be null if ran by the console.
+     * @param island         The island that was upgraded.
+     * @param upgrade        The upgrade.
+     * @param upgradeLevel   The level that will be upgraded into.
+     * @param commands       The commands that will be running upon upgrade.
+     * @param cause          The cause of the upgrade.
+     * @param upgradeCosts   The costs of the upgrade.
+     */
+    public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Upgrade upgrade,
+                              UpgradeLevel upgradeLevel, List<String> commands, Cause cause,
+                              @Nullable List<UpgradeCost> upgradeCosts) {
+        super(island);
+        this.superiorPlayer = superiorPlayer;
+        this.upgrade = Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
+        this.upgradeLevel = Preconditions.checkNotNull(upgradeLevel, "upgradeLevel cannot be null");
+        this.commands = new LinkedList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
+        this.cause = Preconditions.checkNotNull(cause, "cause cannot be null");
+        this.upgradeCosts = upgradeCosts == null || upgradeCosts.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(new LinkedList<>(upgradeCosts));
     }
 
     /**
@@ -142,59 +170,64 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
 
     /**
      * Get the upgrade cost that is used.
+     * 
+     * @deprecated See {@link #getUpgradeCosts()}
      */
     @Nullable
+    @Deprecated
     public UpgradeCost getUpgradeCost() {
-        return upgradeCost;
+        return upgradeCosts.isEmpty() ? null : upgradeCosts.get(0);
+    }
+
+    /**
+     * Get the upgrade costs that are used.
+     */
+    @Nullable
+    public List<UpgradeCost> getUpgradeCosts() {
+        return upgradeCosts;
     }
 
     /**
      * Set a new upgrade cost to be used.
      *
      * @param upgradeCost The new upgrade cost.
+     * @deprecated See {@link #setUpgradeCosts(List)}
      */
+    @Deprecated
     public void setUpgradeCost(@Nullable UpgradeCost upgradeCost) {
-        this.upgradeCost = upgradeCost;
+        this.upgradeCosts = upgradeCost == null ? Collections.emptyList() : Collections.singletonList(upgradeCost);
     }
 
     /**
-     * Get the amount that will be withdrawn.
-     *
-     * @deprecated See getCost()
+     * Set a new upgrade costs to be used.
+     * 
+     * @param upgradeCosts The new upgrade costs.
      */
-    @Deprecated
-    public double getAmountToWithdraw() {
-        return getCost().doubleValue();
-    }
-
-    /**
-     * Set the amount that will be withdrawn.
-     *
-     * @deprecated See setCost(BigDecimal)
-     */
-    @Deprecated
-    public void setAmountToWithdraw(double amountToWithdraw) {
-        setCost(BigDecimal.valueOf(amountToWithdraw));
+    public void setUpgradeCosts(@Nullable List<UpgradeCost> upgradeCosts) {
+        this.upgradeCosts = upgradeCosts == null || upgradeCosts.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(new LinkedList<>(upgradeCosts));
     }
 
     /**
      * Get the amount that will be withdrawn.
      */
+    @Deprecated
     public BigDecimal getCost() {
-        return upgradeCost == null ? BigDecimal.ZERO : upgradeCost.getCost();
+        return upgradeCosts.isEmpty() ? BigDecimal.ZERO : upgradeCosts.get(0).getCost();
     }
 
     /**
      * Set the amount that will be withdrawn.
      *
      * @param cost The new amount to be withdrawn.
-     * @throws IllegalStateException If the upgradeCost is null. Use {@link #setUpgradeCost(UpgradeCost)} instead.
+     * @throws IllegalStateException If upgradeCosts is empty or contains more than one cost. Use {@link #setUpgradeCosts(List)} instead.
      */
+    @Deprecated
     public void setCost(BigDecimal cost) throws IllegalStateException {
-        if (this.upgradeCost == null)
-            throw new IllegalStateException("Cannot set raw cost when upgradeCost is null.");
+        if (this.upgradeCosts.size() != 1) {
+            throw new IllegalStateException("Cannot set raw cost when upgradeCosts is empty or contains more than one cost.");
+        }
 
-        setUpgradeCost(this.upgradeCost.clone(cost));
+        setUpgradeCost(this.upgradeCosts.get(0).clone(cost));
     }
 
     @Override

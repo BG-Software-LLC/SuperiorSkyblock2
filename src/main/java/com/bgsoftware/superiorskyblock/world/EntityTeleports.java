@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -61,7 +62,7 @@ public class EntityTeleports {
         teleport(entity, location, null);
     }
 
-    public static void teleport(Entity entity, Location location, @Nullable Consumer<Boolean> teleportResult) {
+    public static void teleport(Entity entity, Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         Island island = plugin.getGrid().getIslandAt(location);
 
         if (island != null) {
@@ -73,8 +74,8 @@ public class EntityTeleports {
     }
 
     public static void teleportUntilSuccess(Entity entity, Location location, long cooldown, @Nullable Runnable onFinish) {
-        teleport(entity, location, succeed -> {
-            if (!succeed) {
+        teleport(entity, location, result -> {
+            if (result != PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
                 if (cooldown > 0) {
                     BukkitExecutor.sync(() -> teleportUntilSuccess(entity, location, cooldown, onFinish), cooldown);
                 } else {
@@ -202,23 +203,23 @@ public class EntityTeleports {
                     for (int z = 0; z < 16; z++) {
                         int y = chunkSnapshot.getHighestBlockYAt(x, z);
 
-                        if (y - 1 <= worldMinLimit || y + 1 >= worldBuildLimit)
+                        // ChunkSnapshot#getHighestBlockYAt returns the highest block in 1.18+, and the
+                        // block above it in older versions. Therefore, we check both possible standing spots.
+                        int safeY;
+                        if (y > worldMinLimit && y + 2 < worldBuildLimit &&
+                                WorldBlocks.isSafeStandingSpot(chunkSnapshot, x, y + 1, z)) {
+                            safeY = y + 1;
+                        } else if (y - 1 > worldMinLimit && y + 1 < worldBuildLimit &&
+                                WorldBlocks.isSafeStandingSpot(chunkSnapshot, x, y, z)) {
+                            safeY = y;
+                        } else {
                             continue;
+                        }
 
                         int worldX = chunkSnapshot.getX() * 16 + x;
                         int worldZ = chunkSnapshot.getZ() * 16 + z;
 
-                        // In some versions, the ChunkSnapshot#getHighestBlockYAt seems to return
-                        // one block above the actual highest block. Therefore, the check is on the
-                        // returned block and the block below it.
-                        Location safeSpot;
-                        if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
-                            safeSpot = new Location(islandsWorld, worldX, y, worldZ);
-                        } else if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
-                            safeSpot = new Location(islandsWorld, worldX, y - 1, worldZ);
-                        } else {
-                            continue;
-                        }
+                        Location safeSpot = new Location(islandsWorld, worldX, safeY, worldZ);
 
                         double distanceFromHome = safeSpot.distanceSquared(homeLocation);
                         if (closestSafeSpot == null || distanceFromHome < closestSafeSpotDistance) {
@@ -240,9 +241,15 @@ public class EntityTeleports {
         });
     }
 
-    private static void teleportEntity(Entity entity, Location location, @Nullable Consumer<Boolean> teleportResult) {
+    private static void teleportEntity(Entity entity, Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         entity.eject();
-        plugin.getProviders().getAsyncProvider().teleport(entity, location, teleportResult);
+        if(teleportResult == null) {
+            plugin.getProviders().getAsyncProvider().teleport(entity, location, null);
+        } else {
+            plugin.getProviders().getAsyncProvider().teleport(entity, location, res -> {
+                teleportResult.accept(res ? PlayerTeleportAlgorithm.TeleportResult.SUCCESS : PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
+            });
+        }
     }
 
     private static Location adjustLocationToHome(Island island, Block block, float yaw, float pitch) {

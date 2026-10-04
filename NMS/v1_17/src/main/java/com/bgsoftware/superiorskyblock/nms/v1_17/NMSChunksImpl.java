@@ -83,6 +83,9 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
                         levelChunk.level.getLightEngine(), null, null, true);
 
                 playersToUpdate.forEach(player -> {
+                    if (!player.isOnline() || player.getWorld() != levelChunk.getLevel().getWorld())
+                        return;
+
                     ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
                     serverPlayer.connection.send(lightUpdatePacket);
                     serverPlayer.connection.send(levelChunkPacket);

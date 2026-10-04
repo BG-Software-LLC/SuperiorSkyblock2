@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -8,12 +10,11 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.UpgradeButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
@@ -53,7 +54,7 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<IslandMenuView> patternBuilder = menuParseResult.getLayoutBuilder();
 
@@ -66,7 +67,7 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
                     continue;
                 }
 
-                List<Integer> slots = MenuParserImpl.getInstance().parseButtonSlots(upgradeSection, "item", menuPatternSlots);
+                List<Integer> slots = MenuParserImpl.getInstance().parseButtonSlots(upgradeSection, "item", menuSlotsMap);
                 upgrade.setSlots(slots);
 
                 patternBuilder.mapButtons(slots, new UpgradeButton.Builder(upgrade));
@@ -90,22 +91,22 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
                     SUpgradeLevel upgradeLevel = (SUpgradeLevel) upgrade.getUpgradeLevel(level);
 
                     if (upgradeLevel != null) {
-                        TemplateItem hasNextLevel = MenuParserImpl.getInstance().getItemStack("menus/upgrades.yml",
+                        TemplateItem hasNextLevel = MenuParserUtils.getItemStack("menus/upgrades.yml",
                                 upgradeSection.getConfigurationSection(level + ".has-next-level"));
                         if (hasNextLevel == null) {
                             Log.warnFromFile("upgrades.yml", "The upgrade ", upgrade.getName(),
                                     " (level ", level, ") is missing has-next-level item.");
                         }
 
-                        TemplateItem noNextLevel = MenuParserImpl.getInstance().getItemStack("menus/upgrades.yml",
+                        TemplateItem noNextLevel = MenuParserUtils.getItemStack("menus/upgrades.yml",
                                 upgradeSection.getConfigurationSection(level + ".no-next-level"));
                         if (noNextLevel == null) {
                             Log.warnFromFile("upgrades.yml", "&cThe upgrade ", upgrade.getName(),
                                     " (level ", level, ") is missing no-next-level item.");
                         }
 
-                        GameSound hasNextLevelSound = MenuParserImpl.getInstance().getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound"));
-                        GameSound noNextLevelSound = MenuParserImpl.getInstance().getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound"));
+                        GameSound hasNextLevelSound = MenuParserUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound"));
+                        GameSound noNextLevelSound = MenuParserUtils.getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound"));
                         List<String> hasNextLevelCommands = upgradeSection.getStringList(level + ".has-next-level.commands");
                         List<String> noNextLevelCommands = upgradeSection.getStringList(level + ".no-next-level.commands");
                         upgradeLevel.setItemData(hasNextLevel, noNextLevel, hasNextLevelSound, noNextLevelSound, hasNextLevelCommands, noNextLevelCommands);

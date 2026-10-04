@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Bukkit;
@@ -238,8 +239,8 @@ public class DataManager extends Manager {
                     .setName(databaseResult.getString("name").orElse(""))
                     .setSchematicName(databaseResult.getString("island_type").orElse(null))
                     .setCreationTime(databaseResult.getLong("creation_time").orElse(System.currentTimeMillis() / 1000L))
-                    .setDiscord(databaseResult.getString("discord").orElse("None"))
-                    .setPaypal(databaseResult.getString("paypal").orElse("None"))
+                    .setDiscord(databaseResult.getString("discord").orElse(IslandUtils.DEFAULT_NONE_VALUE))
+                    .setPaypal(databaseResult.getString("paypal").orElse(IslandUtils.DEFAULT_NONE_VALUE))
                     .setBonusWorth(databaseResult.getBigDecimal("worth_bonus").orElse(BigDecimal.ZERO))
                     .setBonusLevel(databaseResult.getBigDecimal("levels_bonus").orElse(BigDecimal.ZERO))
                     .setLocked(databaseResult.getBoolean("locked").orElse(false))

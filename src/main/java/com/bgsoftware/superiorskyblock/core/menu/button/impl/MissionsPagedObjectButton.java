@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
@@ -8,17 +9,14 @@ import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Optional;
 
 public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissionsCategory.View, MissionReference> {
@@ -33,7 +31,7 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuMissionsCategory.View> context) {
         Mission<?> mission = pagedObject.getMission();
 
         if (mission == null)
@@ -66,7 +64,7 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
         else
             gameSound = getTemplate().notCompletedSound;
 
-        GameSoundImpl.playSound(clickEvent.getWhoClicked(), gameSound);
+        GameSoundImpl.playSound(context.getPlayer(), gameSound);
 
         if (!canComplete)
             return;
@@ -78,18 +76,17 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
+        SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Mission<?> mission = pagedObject.getMission();
 
         if (mission == null)
-            return buttonItem;
+            return itemBuilder.build(inventoryViewer);
 
         Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
 
         if (!missionDataOptional.isPresent())
-            return buttonItem;
-
-        SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
+            return itemBuilder.build(inventoryViewer);
 
         MissionData missionData = missionDataOptional.get();
         IMissionsHolder missionsHolder = mission.getIslandMission() ? inventoryViewer.getIsland() : inventoryViewer;
@@ -101,18 +98,18 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
         int progressValue = mission.getProgressValue(inventoryViewer);
         int amountCompleted = missionsHolder.getAmountMissionCompleted(mission);
 
-        ItemBuilder itemBuilder;
+        ItemBuilder newItemBuilder;
 
         if (!missionsHolder.canCompleteMissionAgain(mission))
-            itemBuilder = missionData.getCompleted();
+            newItemBuilder = missionData.getCompleted();
         else if (missionData.hasLocked() && !plugin.getMissions().hasAllRequirements(mission, inventoryViewer))
-            itemBuilder = missionData.getLocked();
+            newItemBuilder = missionData.getLocked();
         else if (plugin.getMissions().canComplete(inventoryViewer, mission))
-            itemBuilder = missionData.getCanComplete();
+            newItemBuilder = missionData.getCanComplete();
         else
-            itemBuilder = missionData.getNotCompleted();
+            newItemBuilder = missionData.getNotCompleted();
 
-        ItemStack itemStack = itemBuilder
+        ItemStack itemStack = newItemBuilder
                 .replaceAll("{0}", percentage + "")
                 .replaceAll("{1}", progressValue + "")
                 .replaceAll("{2}", amountCompleted + "")
@@ -155,8 +152,13 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
 
         @Override
         public PagedMenuTemplateButton<MenuMissionsCategory.View, MissionReference> build() {
-            return new Template(buttonItem, commands, requiredPermission, lackPermissionSound, nullItem,
-                    getButtonIndex(), clickSound, notCompletedSound, canCompleteSound, lockedSound);
+            GameSound completedSound = clickSound;
+            this.clickSound = null;
+            try {
+                return new Template(this, completedSound, notCompletedSound, canCompleteSound, lockedSound);
+            } finally {
+                this.clickSound = completedSound;
+            }
         }
 
     }
@@ -168,11 +170,9 @@ public class MissionsPagedObjectButton extends AbstractPagedMenuButton<MenuMissi
         private final GameSound canCompleteSound;
         private final GameSound lockedSound;
 
-        Template(TemplateItem buttonItem, List<String> commands, String requiredPermission,
-                 GameSound lackPermissionSound, TemplateItem nullItem, int buttonIndex,
+        Template(AbstractBuilder<MenuMissionsCategory.View, MissionReference> builder,
                  GameSound completedSound, GameSound notCompletedSound, GameSound canCompleteSound, GameSound lockedSound) {
-            super(buttonItem, null, commands, requiredPermission, lackPermissionSound, nullItem, buttonIndex,
-                    MissionsPagedObjectButton.class, MissionsPagedObjectButton::new);
+            super(builder, MissionsPagedObjectButton.class, MissionsPagedObjectButton::new);
             this.completedSound = completedSound;
             this.notCompletedSound = notCompletedSound;
             this.canCompleteSound = canCompleteSound;

@@ -156,6 +156,7 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
                 if (countsSection != null) {
                     for (String key : countsSection.getKeys(false)) {
                         Key typeKey = getMissionBlockKey(Key.ofMaterialAndData(key));
+                        if (typeKey == null) continue;
                         blocksCounter.load(typeKey, countsSection.getInt(key));
                     }
                 }
@@ -164,6 +165,7 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
                 if (countsSection != null) {
                     for (String key : countsSection.getKeys(false)) {
                         Key typeKey = getMissionBlockKey(Key.ofMaterialAndData(key));
+                        if (typeKey == null) continue;
                         blocksCounter.load(typeKey, section.getInt(uuid + "." + key));
                     }
                 }

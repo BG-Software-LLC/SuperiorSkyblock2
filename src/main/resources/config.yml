@@ -464,12 +464,11 @@ coop-damage: true
 island-top-include-leader: true
 
 # Set default placeholders that will be returned if the island is null.
-# Please use the <placeholder>:<default> format.
 # You can find a list of placeholders here: https://bg-software.com/superiorskyblock/#placeholders
 default-placeholders:
-  - 'superior_island_leader:N/A'
-  - 'superior_island_level:0'
-  - 'superior_island_worth:0'
+  'superior_island_leader': 'N/A'
+  'superior_island_level': '0'
+  'superior_island_worth': '0'
 
 # Should a confirm gui be displayed when /is ban is executed.
 ban-confirm: true
@@ -485,14 +484,6 @@ leave-confirm: true
 
 # Should a confirm gui be displayed when /is transfer is executed.
 transfer-confirm: true
-
-# If you want a specific spawners provider to use, specify it here.
-# Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
-spawners-provider: 'AUTO'
-
-# If you want a specific stacked-blocks provider to use, specify it here.
-# Providers: Auto, WildStacker, RoseStacker
-stacked-blocks-provider: 'AUTO'
 
 # All settings related to island names.
 island-names:
@@ -802,10 +793,26 @@ default-border-color: BLUE
 # Should obsidian get turned into a lava bucket when clicking it with a bucket in hand?
 obsidian-to-lava: false
 
-# Should the worth values be synced with other prices providers?
+# If you want a specific spawners provider to use, specify it here.
+# Providers: Auto, AdvancedSpawners, EpicSpawners, MergedSpawner, PvpingSpawners, RoseStacker, SilkSpawners, UltimateStacker, WildStacker
+spawners-provider: 'AUTO'
+
+# If you want a specific stacked-blocks provider to use, specify it here.
+# Providers: Auto, RoseStacker, WildStacker
+stacked-blocks-provider: 'AUTO'
+
+# If you want a specific prices provider to use, specify it here.
+# Providers: Auto, CMI, EconomyShopGUI, Essentials, ExcellentShop, GUIShop, newtShop, NextGens, QuantumShop, ShopGUIPlus, zShop
+prices-provider: 'AUTO'
+
+# If you want a specific vanish provider to use, specify it here.
+# Metadata uses the Bukkit 'vanished' metadata value.
+# Providers: Auto, Metadata (or Default), VanishNoPacket, SuperVanish, PremiumVanish, Essentials, CMI
+vanish-provider: 'AUTO'
+
+# Should the worth values be synced with the prices provider?
 # You can set the following values: NONE (disabled), BUY (buy prices), SELL (sell prices)
-# Supported Providers: ShopGUIPlus
-sync-worth: NONE
+sync-worth: 'NONE'
 
 # Can the worth value of the island be negative?
 negative-worth: true
@@ -820,6 +827,13 @@ disabled-events: [ ]
 # A list of commands that should be disabled within the plugin.
 # You can add a label or an alias of a command to disable it.
 disabled-commands: [ ]
+
+# A list of admin sub-commands that are considered dangerous.
+# When a player executes one of them, the command is not executed until the console approves it
+# by executing the same admin sub-command without arguments (e.g. "is admin purge").
+# Requests expire after 1 minute, or when the player leaves the server.
+# You can add a label or an alias of an admin command.
+dangerous-commands: [ ]
 
 # List of plugins that their hooks should not be enabled.
 # Simply add the plugin's name in order to prevent it from enabling.

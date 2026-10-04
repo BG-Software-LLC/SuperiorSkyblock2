@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.World;
 
 import java.math.BigDecimal;
 import java.util.UUID;

@@ -21,7 +21,7 @@ public interface NMSPlayers {
 
     void sendActionBar(Player player, String message);
 
-    BossBar createBossBar(Player player, String message, BossBar.Color color, double ticksToRun);
+    BossBar createBossBar(Player player, String message, BossBar.Color color, BossBar.Style style, double ticksToRun);
 
     void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut);
 

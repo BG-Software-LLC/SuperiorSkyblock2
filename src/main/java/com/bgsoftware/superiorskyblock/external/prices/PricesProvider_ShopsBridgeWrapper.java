@@ -69,9 +69,9 @@ public class PricesProvider_ShopsBridgeWrapper implements PricesProvider {
 
         switch (plugin.getSettings().getSyncWorth()) {
             case BUY:
-                return this.shopsBridge.getBuyPrice(itemStack);
+                return this.shopsBridge.getBuyPrice(itemStack).getPrice();
             case SELL:
-                return this.shopsBridge.getSellPrice(itemStack);
+                return this.shopsBridge.getSellPrice(itemStack).getPrice();
             default:
                 return BigDecimal.ZERO;
         }

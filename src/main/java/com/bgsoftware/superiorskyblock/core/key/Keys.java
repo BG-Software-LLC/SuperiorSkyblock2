@@ -150,7 +150,7 @@ public class Keys {
     }
 
     public static Key ofMaterialAndData(String key) {
-        String[] keySections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH));
+        String[] keySections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
         return ofMaterialAndData(keySections[0], keySections.length >= 2 ? keySections[1] : null);
     }
 

@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandPrivilegePagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
@@ -129,14 +130,14 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         List<String> noAccessCommands = null;
 
         if (islandPrivilegeSection != null) {
-            enabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
+            enabledIslandPrivilegeItem = MenuParserUtils.getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("permission-enabled"));
-            disabledIslandPrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
+            disabledIslandPrivilegeItem = MenuParserUtils.getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("permission-disabled"));
-            rolePrivilegeItem = MenuParserImpl.getInstance().getItemStack("menus/permissions.yml",
+            rolePrivilegeItem = MenuParserUtils.getItemStack("menus/permissions.yml",
                     islandPrivilegeSection.getConfigurationSection("role-permission"));
-            accessSound = MenuParserImpl.getInstance().getSound(islandPrivilegeSection.getConfigurationSection("has-access.sound"));
-            noAccessSound = MenuParserImpl.getInstance().getSound(islandPrivilegeSection.getConfigurationSection("no-access.sound"));
+            accessSound = MenuParserUtils.getSound(islandPrivilegeSection.getConfigurationSection("has-access.sound"));
+            noAccessSound = MenuParserUtils.getSound(islandPrivilegeSection.getConfigurationSection("no-access.sound"));
             accessCommands = islandPrivilegeSection.getStringList("has-access.commands");
             noAccessCommands = islandPrivilegeSection.getStringList("no-access.commands");
         }

@@ -4,17 +4,18 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandChestPagedObjectButton;
-import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
@@ -49,13 +50,13 @@ public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, Isl
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
-        PagedMenuLayoutImpl.Builder<View, IslandChest> patternBuilder = (PagedMenuLayoutImpl.Builder<View, IslandChest>) menuParseResult.getLayoutBuilder();
+        PagedMenuLayout.Builder<View, IslandChest> patternBuilder = (PagedMenuLayout.Builder<View, IslandChest>) menuParseResult.getLayoutBuilder();
 
         if (cfg.isString("slots")) {
             for (char slotChar : cfg.getString("slots", "").toCharArray()) {
-                List<Integer> slots = menuPatternSlots.getSlots(slotChar);
+                List<Integer> slots = menuSlotsMap.getSlots(slotChar);
 
                 ConfigurationSection validPageSection = cfg.getConfigurationSection("items." + slotChar + ".valid-page");
                 ConfigurationSection invalidPageSection = cfg.getConfigurationSection("items." + slotChar + ".invalid-page");
@@ -71,8 +72,8 @@ public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, Isl
                 }
 
                 IslandChestPagedObjectButton.Builder buttonBuilder = new IslandChestPagedObjectButton.Builder();
-                buttonBuilder.setButtonItem(MenuParserImpl.getInstance().getItemStack("menus/island-chest.yml", validPageSection));
-                buttonBuilder.setNullItem(MenuParserImpl.getInstance().getItemStack("menus/island-chest.yml", invalidPageSection));
+                buttonBuilder.setButtonItem(MenuParserUtils.getItemStack("menus/island-chest.yml", validPageSection));
+                buttonBuilder.setNullItem(MenuParserUtils.getItemStack("menus/island-chest.yml", invalidPageSection));
 
                 patternBuilder.mapButtons(slots, buttonBuilder);
             }

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
@@ -8,6 +9,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class SortingType implements Comparator<Island>, Enumerable {
 
@@ -21,11 +24,14 @@ public class SortingType implements Comparator<Island>, Enumerable {
     };
 
     private final String name;
+    @Nullable
+    private final Function<Island, Number> valueFunction;
     private final Comparator<Island> comparator;
     private final int ordinal;
 
-    private SortingType(String name, Comparator<Island> comparator, boolean handleEqualsIslands) {
+    private SortingType(String name, @Nullable Function<Island, Number> valueFunction, Comparator<Island> comparator, boolean handleEqualsIslands) {
         this.name = name;
+        this.valueFunction = valueFunction;
         this.comparator = !handleEqualsIslands ? comparator : (o1, o2) -> {
             int compare = comparator.compare(o1, o2);
             return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
@@ -61,9 +67,6 @@ public class SortingType implements Comparator<Island>, Enumerable {
      * @param comparator The comparator for sorting the islands.
      */
     public static void register(String name, Comparator<Island> comparator) {
-        Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        Preconditions.checkNotNull(comparator, "comparator parameter cannot be null.");
-
         register(name, comparator, true);
     }
 
@@ -76,11 +79,35 @@ public class SortingType implements Comparator<Island>, Enumerable {
      *                            If that's false, you should handle it on your own.
      */
     public static void register(String name, Comparator<Island> comparator, boolean handleEqualsIslands) {
+        register(name, null, comparator, handleEqualsIslands);
+    }
+
+    /**
+     * Register a new sorting type.
+     *
+     * @param name          The name for the sorting type.
+     * @param valueFunction The value function for sorting type.
+     * @param comparator    The comparator for sorting the islands.
+     */
+    public static void register(String name, @Nullable Function<Island, Number> valueFunction, Comparator<Island> comparator) {
+        register(name, valueFunction, comparator, true);
+    }
+
+    /**
+     * Register a new sorting type.
+     *
+     * @param name                The name for the sorting type.
+     * @param valueFunction       The value function for sorting type.
+     * @param comparator          The comparator for sorting the islands.
+     * @param handleEqualsIslands Should the plugin handle equals islands?
+     *                            If that's false, you should handle it on your own.
+     */
+    public static void register(String name, @Nullable Function<Island, Number> valueFunction, Comparator<Island> comparator, boolean handleEqualsIslands) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkNotNull(comparator, "comparator parameter cannot be null.");
         Preconditions.checkState(!sortingTypes.containsKey(name), "SortingType with the name " + name + " already exists.");
 
-        SortingType sortingType = new SortingType(name, comparator, handleEqualsIslands);
+        SortingType sortingType = new SortingType(name, valueFunction, comparator, handleEqualsIslands);
         sortingTypes.put(name, sortingType);
         SuperiorSkyblockAPI.getGrid().registerSortingType(sortingType);
     }
@@ -97,6 +124,13 @@ public class SortingType implements Comparator<Island>, Enumerable {
      */
     public Comparator<Island> getComparator() {
         return comparator;
+    }
+
+    /**
+     * Get the value of the sorting type for specific island.
+     */
+    public Optional<Number> getValue(Island island) {
+        return valueFunction == null ? Optional.empty() : Optional.ofNullable(valueFunction.apply(island));
     }
 
     @Override

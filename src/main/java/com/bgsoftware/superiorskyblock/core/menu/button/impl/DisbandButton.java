@@ -1,13 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
@@ -16,11 +14,9 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.List;
 
 public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
 
@@ -34,7 +30,7 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<IslandMenuView> context) {
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
         Island targetIsland = menuView.getIsland();
 
@@ -70,7 +66,7 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
 
         @Override
         public MenuTemplateButton<IslandMenuView> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, disbandIsland);
+            return new Template(this, disbandIsland);
         }
 
     }
@@ -79,10 +75,8 @@ public class DisbandButton extends AbstractMenuViewButton<IslandMenuView> {
 
         private final boolean disbandIsland;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, boolean disbandIsland) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    DisbandButton.class, DisbandButton::new);
+        Template(AbstractBuilder<IslandMenuView> builder, boolean disbandIsland) {
+            super(builder, DisbandButton.class, DisbandButton::new);
             this.disbandIsland = disbandIsland;
         }
 

@@ -23,6 +23,9 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockUpdateShapeEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ChunkLoadEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ChunkUnloadEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.DialogClickEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.DialogCloseEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.DialogOpenEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityBlockFormEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityChangeBlockEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityCollisionEvent;
@@ -129,6 +132,11 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<InventoryCloseEvent> INVENTORY_CLOSE_EVENT = register(InventoryCloseEvent.class, GameEventFlags.INVENTORY_EVENT | GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<InventoryOpenEvent> INVENTORY_OPEN_EVENT = register(InventoryOpenEvent.class, GameEventFlags.INVENTORY_EVENT | GameEventFlags.PLAYER_EVENT);
 
+    // Dialog Events
+    public static final GameEventType<DialogClickEvent> DIALOG_CLICK_EVENT = register(GameEventFlags.INVENTORY_EVENT | GameEventFlags.PLAYER_EVENT);
+    public static final GameEventType<DialogCloseEvent> DIALOG_CLOSE_EVENT = register(GameEventFlags.INVENTORY_EVENT | GameEventFlags.PLAYER_EVENT);
+    public static final GameEventType<DialogOpenEvent> DIALOG_OPEN_EVENT = register(GameEventFlags.INVENTORY_EVENT | GameEventFlags.PLAYER_EVENT);
+
     // Player Events
     public static final GameEventType<PlayerChangedWorldEvent> PLAYER_CHANGED_WORLD_EVENT = register(PlayerChangedWorldEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerChatEvent> PLAYER_CHAT_EVENT = register(PlayerChatEvent.class, GameEventFlags.PLAYER_EVENT);
@@ -166,6 +174,10 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     }
 
     private static <Args extends IEventArgs> GameEventType<Args> register(Class<Args> eventArgsType, @GameEventFlags int flags) {
+        return register(flags);
+    }
+
+    private static <Args extends IEventArgs> GameEventType<Args> register(@GameEventFlags int flags) {
         GameEventType<Args> eventType = new GameEventType<>(flags);
         ALL_TYPES.add(eventType);
         return eventType;

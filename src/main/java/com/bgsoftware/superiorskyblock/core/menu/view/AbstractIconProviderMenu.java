@@ -46,7 +46,7 @@ public class AbstractIconProviderMenu {
         public abstract Island getIsland();
 
         @Override
-        public abstract String replaceTitle(String title);
+        public abstract void updateTitleArgs();
 
     }
 

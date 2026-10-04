@@ -276,48 +276,46 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             }));
         });
 
-        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
+        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenCompleteAsync((v, error) -> {
             if (failed.get())
                 return;
 
             Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
 
-            BukkitExecutor.ensureMain(() -> {
-                try {
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
-                    worldEditSession.finish(island);
+            try {
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
+                worldEditSession.finish(island);
 
-                    if (island.getOwner().isOnline()) {
-                        postPlaceTasks.forEach(schematicBlock -> {
-                            schematicBlock.doPostPlace(island);
-                        });
-                    }
-
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
-
-                    island.handleBlocksPlace(cachedCounts);
-
-                    PluginEventsFactory.callIslandSchematicPasteEvent(island, null, name, location);
-
-                    Profiler.end(profiler);
-
-                    synchronized (this) {
-                        try {
-                            Location min = this.data.offset.applyToLocation(location);
-                            prepareCallback(affectedChunks, min);
-                            callback.run();
-                        } finally {
-                            finishCallback();
-                        }
-                    }
-                } catch (Throwable error2) {
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Finishing Placement", error2);
-                    Profiler.end(profiler);
-                    if (onFailure != null)
-                        onFailure.accept(error2);
+                if (island.getOwner().isOnline()) {
+                    postPlaceTasks.forEach(schematicBlock -> {
+                        schematicBlock.doPostPlace(island);
+                    });
                 }
-            });
-        });
+
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
+
+                island.handleBlocksPlace(cachedCounts);
+
+                PluginEventsFactory.callIslandSchematicPasteEvent(island, null, name, location);
+
+                Profiler.end(profiler);
+
+                synchronized (this) {
+                    try {
+                        Location min = this.data.offset.applyToLocation(location);
+                        prepareCallback(affectedChunks, min);
+                        callback.run();
+                    } finally {
+                        finishCallback();
+                    }
+                }
+            } catch (Throwable error2) {
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Finishing Placement", error2);
+                Profiler.end(profiler);
+                if (onFailure != null)
+                    onFailure.accept(error2);
+            }
+        }, BukkitExecutor.SYNC_EXECUTOR);
     }
 
     private void pasteSchematicAsyncInternal(Island island, Location location, long profiler, Runnable callback, Consumer<Throwable> onFailure) {
