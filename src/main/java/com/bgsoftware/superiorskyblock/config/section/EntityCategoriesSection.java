@@ -53,7 +53,7 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
     public static void removeInvalidEntityKeys(YamlConfiguration cfg, File file) {
         boolean removed = false;
         for (String categoryName : cfg.getKeys(false)) {
-            if (EnumHelper.getEnum(BuiltinEntityCategory.class, categoryName) == null) {
+            if (EnumHelper.getEnum(BuiltinEntityCategory.class, categoryName.toUpperCase(Locale.ENGLISH)) == null) {
                 List<String> entities = cfg.getStringList(categoryName + ".entities");
                 Iterator<String> iterator = entities.iterator();
                 while (iterator.hasNext()) {
@@ -86,7 +86,7 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
         for (String categoryName : cfg.getKeys(false)) {
             String key = categoryName.toLowerCase(Locale.ENGLISH);
 
-            if (entityCategories.containsKey(categoryName)) {
+            if (entityCategories.containsKey(key)) {
                 Log.warnFromFile("entity-categories.yml", "Duplicate entity category ", categoryName, " - skipping...");
                 continue;
             }
@@ -111,8 +111,9 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
 
         // Add rest of built-in entity categories
         for (BuiltinEntityCategory builtinEntityCategory : BuiltinEntityCategory.values()) {
-            if (!entityCategories.containsKey(builtinEntityCategory.name())) {
-                entityCategories.put(builtinEntityCategory.name(), new EntityCategoryImpl(builtinEntityCategory.name(),
+            String key = builtinEntityCategory.name().toLowerCase(Locale.ENGLISH);
+            if (!entityCategories.containsKey(key)) {
+                entityCategories.put(key, new EntityCategoryImpl(builtinEntityCategory.name(),
                         builtinEntityCategory.getEntities(), null, null,
                         null, null, null));
             }
@@ -124,6 +125,11 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
     private static KeyMap<List<EntityCategory>> convertEntityToCategoryInternal(Collection<EntityCategory> entityCategories) {
         KeyMap<List<EntityCategory>> categories = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
         for (EntityCategory entityCategory : entityCategories) {
+            BuiltinEntityCategory builtinCategory = EnumHelper.getEnum(BuiltinEntityCategory.class,
+                    entityCategory.getName().toUpperCase(Locale.ENGLISH));
+            if (builtinCategory != null && builtinCategory.requiresEntityState())
+                continue;
+
             for (Key key : entityCategory.getEntities()) {
                 categories.computeIfAbsent(key, k -> new LinkedList<>()).add(entityCategory);
             }
