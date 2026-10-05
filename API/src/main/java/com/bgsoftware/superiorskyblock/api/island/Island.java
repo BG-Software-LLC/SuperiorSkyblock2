@@ -2807,6 +2807,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setChestRows(int index, int rows);
 
     /**
+     * Update the chests from default values of config.
+     */
+    void updateChests();
+
+    /**
      * Create a new builder for a {@link Island} object.
      */
     static Builder newBuilder() {

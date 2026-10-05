@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -46,11 +47,13 @@ import ${CRAFTBUKKIT_PACKAGE}.CraftServer;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftFallingBlock;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftMinecart;
+import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftInventoryCustom;
 import ${CRAFTBUKKIT_PACKAGE}.util.CraftMagicNumbers;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.world.GenericGameEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -67,6 +70,14 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
 
     private static final Multimap<Attribute, AttributeModifier> EMPTY_ATTRIBUTES_MAP =
             MultimapBuilder.hashKeys().hashSetValues().build();
+
+    private static final ReflectField<Object> ADVENTURE_TITLE_FIELD =
+            new ReflectField<>(new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
+            ClassInfo.PackageType.CRAFTBUKKIT), Object.class, "adventure$title");
+
+    private static final ReflectField<String> TITLE_FIELD = new ReflectField<>(
+            new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
+            ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title");
 
     private static final EnumBridge<Biome> BIOME_ENUM_BRIDGE = new EnumBridge<>() {
         @Override
@@ -101,6 +112,22 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
             return Bukkit.getUnsafe().processClass(plugin.getDescription(), path, classBytes);
         }
     };
+
+    @Override
+    public void setTitle(Inventory inventory, String title) {
+        if (inventory instanceof CraftInventoryCustom craftInventoryCustom) {
+            Container container = craftInventoryCustom.getInventory();
+
+            if (TITLE_FIELD.isValid()) {
+                TITLE_FIELD.removeFinal().set(container, title);
+            }
+
+            if (ADVENTURE_TITLE_FIELD.isValid()) {
+                net.kyori.adventure.text.Component component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(title);
+                ADVENTURE_TITLE_FIELD.removeFinal().set(container, component);
+            }
+        }
+    }
 
     @Override
     public void registerCommand(BukkitCommand command) {
