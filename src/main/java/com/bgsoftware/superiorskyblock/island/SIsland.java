@@ -391,7 +391,8 @@ public class SIsland implements Island {
             loadIslandWarp(warpRecord.name, worldInfo, warpRecord.worldPosition, warpCategory, warpRecord.isPrivate, warpRecord.icon);
         });
 
-        updateIslandAreas();
+        updateEntireArea();
+        this.protectedArea.update(this.center, getIslandSize());
 
         // We want to save all the limits to the custom block keys
         plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
@@ -895,6 +896,13 @@ public class SIsland implements Island {
     @Override
     public BlockPosition getCenterPosition() {
         return center;
+    }
+
+    @Override
+    public void updateEntireArea() {
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        this.entireArea.update(this.center, islandDistance);
     }
 
     @Override
@@ -3078,7 +3086,6 @@ public class SIsland implements Island {
 
     @Override
     public void updateUpgrades() {
-        updateIslandAreas();
         clearUpgrades(false);
         // We want to sync the default upgrade first, then the actual upgrades
         syncUpgrade(DefaultUpgradeLevel.getInstance(), false);
@@ -4985,13 +4992,6 @@ public class SIsland implements Island {
         });
     }
 
-    private void updateIslandAreas() {
-        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
-                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
-        this.entireArea.update(this.center, islandDistance);
-        this.protectedArea.update(this.center, getIslandSize());
-    }
-
     private void updateOldUpgradeValues() {
         this.blockLimits.forEach((block, limit) -> {
             Integer defaultValue = plugin.getSettings().getDefaultValues().getBlockLimits().get(block);
@@ -5048,6 +5048,8 @@ public class SIsland implements Island {
     private void clearUpgrades(boolean overrideCustom) {
         if (overrideCustom || this.islandSize.get().isSynced()) {
             setIslandSizeInternal(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+        } else {
+            this.protectedArea.update(this.center, getIslandSize());
         }
 
         warpsLimit.set(warpsLimit -> {
