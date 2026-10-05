@@ -391,10 +391,7 @@ public class SIsland implements Island {
             loadIslandWarp(warpRecord.name, worldInfo, warpRecord.worldPosition, warpCategory, warpRecord.isPrivate, warpRecord.icon);
         });
 
-        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
-                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
-        this.entireArea.update(this.center, islandDistance);
-        this.protectedArea.update(this.center, getIslandSize());
+        updateIslandAreas();
 
         // We want to save all the limits to the custom block keys
         plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
@@ -3081,6 +3078,7 @@ public class SIsland implements Island {
 
     @Override
     public void updateUpgrades() {
+        updateIslandAreas();
         clearUpgrades(false);
         // We want to sync the default upgrade first, then the actual upgrades
         syncUpgrade(DefaultUpgradeLevel.getInstance(), false);
@@ -4985,6 +4983,13 @@ public class SIsland implements Island {
                 }
             }
         });
+    }
+
+    private void updateIslandAreas() {
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        this.entireArea.update(this.center, islandDistance);
+        this.protectedArea.update(this.center, getIslandSize());
     }
 
     private void updateOldUpgradeValues() {
