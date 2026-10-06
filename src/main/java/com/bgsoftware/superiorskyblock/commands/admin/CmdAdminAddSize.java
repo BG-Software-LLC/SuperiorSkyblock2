@@ -77,12 +77,18 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
             return;
         }
 
+        boolean biggerThanMax = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             int currentSize = island.getIslandSize();
-            if (currentSize + size < 1 || currentSize + size > plugin.getSettings().getMaxIslandSize()) {
+            if (currentSize + size < 1) {
+                continue;
+            }
+
+            if (currentSize + size > plugin.getSettings().getMaxIslandSize()) {
+                biggerThanMax = true;
                 continue;
             }
 
@@ -96,7 +102,12 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            Message.INVALID_SIZE.send(sender, size);
+            if (biggerThanMax) {
+                Message.SIZE_BIGGER_MAX.send(sender);
+            } else {
+                Message.INVALID_SIZE.send(sender, size);
+            }
+
             return;
         }
 

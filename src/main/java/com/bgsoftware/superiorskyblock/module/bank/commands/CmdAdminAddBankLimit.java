@@ -77,7 +77,7 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
         for (Island island : islands) {
             BigDecimal currentLimit = island.getBankLimit();
             if (currentLimit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) <= 0
-                    || currentLimit.add(limit).compareTo(BigDecimal.ZERO) <= 0) {
+                    || currentLimit.add(limit).compareTo(BigDecimal.ZERO) < 0) {
                 continue;
             }
 

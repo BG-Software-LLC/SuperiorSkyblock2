@@ -2324,6 +2324,10 @@ public class SIsland implements Island {
             IslandsDatabaseBridge.saveLastTimeUpdate(this);
     }
 
+    /*
+     *  Bank related methods
+     */
+
     @Override
     public IslandBank getIslandBank() {
         return islandBank;
@@ -2334,45 +2338,32 @@ public class SIsland implements Island {
         return this.bankLimit.readAndGet(Value::get);
     }
 
-    /*
-     *  Bank related methods
-     */
+    @Override
+    public BigDecimal getBankLimitRaw() {
+        return this.bankLimit.readAndGet(bankLimit ->
+                bankLimit.getNonSynced(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
+    }
 
     @Override
     public void setBankLimit(BigDecimal bankLimit) {
         Preconditions.checkNotNull(bankLimit, "bankLimit parameter cannot be null.");
 
-        Log.debug(Debug.SET_BANK_LIMIT, owner.getName(), bankLimit);
+        BigDecimal finalBankLimit = bankLimit.max(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE);
 
-        if (Objects.equals(bankLimit, getBankLimitRaw()))
+        Log.debug(Debug.SET_BANK_LIMIT, owner.getName(), finalBankLimit);
+
+        Value<BigDecimal> oldBankLimit = this.bankLimit.set(Value.fixed(finalBankLimit));
+
+        if (!oldBankLimit.isSynced() &&
+                finalBankLimit.compareTo(Value.getNonSynced(oldBankLimit, IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE)) == 0) {
             return;
-
-        if (bankLimit.compareTo(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE) <= 0) {
-            this.bankLimit.set(Value.syncedFixed(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
-
-            getUpgrades().forEach((upgradeName, level) -> {
-                Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
-                if (upgrade != null) {
-                    UpgradeLevel upgradeLevel = upgrade.getUpgradeLevel(level);
-                    if (upgradeLevel.getBankLimit().compareTo(getBankLimit()) > 0) {
-                        this.bankLimit.set(Value.syncedFixed(upgradeLevel.getBankLimit()));
-                    }
-                }
-            });
-        } else {
-            this.bankLimit.set(Value.fixed(bankLimit));
         }
 
-        // Trying to give interest again if the last one failed.
-        if (hasGiveInterestFailed())
+        if (hasGiveInterestFailed()) {
             giveInterest(false);
+        }
 
         IslandsDatabaseBridge.saveBankLimit(this);
-    }
-
-    @Override
-    public BigDecimal getBankLimitRaw() {
-        return this.bankLimit.readAndGet(bankLimit -> bankLimit.getNonSynced(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
     }
 
     @Override
@@ -3126,7 +3117,8 @@ public class SIsland implements Island {
 
         DoubleValue oldCropGrowth = this.cropGrowth.set(DoubleValue.fixed(finalCropGrowth));
 
-        if (finalCropGrowth == DoubleValue.getNonSynced(oldCropGrowth, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (!oldCropGrowth.isSynced() &&
+                finalCropGrowth == DoubleValue.getNonSynced(oldCropGrowth, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
@@ -3152,7 +3144,8 @@ public class SIsland implements Island {
 
         DoubleValue oldSpawnerRates = this.spawnerRates.set(DoubleValue.fixed(finalSpawnerRates));
 
-        if (finalSpawnerRates == DoubleValue.getNonSynced(oldSpawnerRates, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (!oldSpawnerRates.isSynced() &&
+                finalSpawnerRates == DoubleValue.getNonSynced(oldSpawnerRates, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
@@ -3177,7 +3170,8 @@ public class SIsland implements Island {
 
         DoubleValue oldMobDrops = this.mobDrops.set(DoubleValue.fixed(finalMobDrops));
 
-        if (finalMobDrops == DoubleValue.getNonSynced(oldMobDrops, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (!oldMobDrops.isSynced() &&
+                finalMobDrops == DoubleValue.getNonSynced(oldMobDrops, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
@@ -3263,7 +3257,8 @@ public class SIsland implements Island {
 
         IntValue oldBlockLimit = this.blockLimits.put(key, IntValue.fixed(finalBlockLimit));
 
-        if (finalBlockLimit == IntValue.getNonSynced(oldBlockLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (oldBlockLimit != null && !oldBlockLimit.isSynced() &&
+                finalBlockLimit == IntValue.getNonSynced(oldBlockLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
@@ -3398,7 +3393,8 @@ public class SIsland implements Island {
 
         IntValue oldEntityLimit = this.entityLimits.put(key, IntValue.fixed(finalLimit));
 
-        if (finalLimit == IntValue.getNonSynced(oldEntityLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (oldEntityLimit != null && !oldEntityLimit.isSynced() &&
+                finalLimit == IntValue.getNonSynced(oldEntityLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
@@ -3485,7 +3481,8 @@ public class SIsland implements Island {
 
         IntValue oldTeamLimit = this.teamLimit.set(IntValue.fixed(finalTeamLimit));
 
-        if (finalTeamLimit == IntValue.getNonSynced(oldTeamLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (!oldTeamLimit.isSynced() &&
+                finalTeamLimit == IntValue.getNonSynced(oldTeamLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
@@ -3510,7 +3507,8 @@ public class SIsland implements Island {
 
         IntValue oldWarpsLimit = this.warpsLimit.set(IntValue.fixed(finalWarpsLimit));
 
-        if (finalWarpsLimit == IntValue.getNonSynced(oldWarpsLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (!oldWarpsLimit.isSynced() &&
+                finalWarpsLimit == IntValue.getNonSynced(oldWarpsLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
@@ -3521,20 +3519,21 @@ public class SIsland implements Island {
     public void setPotionEffect(PotionEffectType potionEffectType, int effectLevel) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
 
-        int finalLevel = Math.max(1, effectLevel);
+        int finalEffectLevel = Math.max(1, effectLevel);
 
-        Log.debug(Debug.SET_ISLAND_EFFECT, owner.getName(), potionEffectType.getName(), finalLevel);
+        Log.debug(Debug.SET_ISLAND_EFFECT, owner.getName(), potionEffectType.getName(), finalEffectLevel);
 
-        IntValue oldPotionLevel = this.islandEffects.put(potionEffectType, IntValue.fixed(finalLevel));
+        IntValue oldEffectLevel = this.islandEffects.put(potionEffectType, IntValue.fixed(finalEffectLevel));
 
-        if (finalLevel == IntValue.getNonSynced(oldPotionLevel, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (oldEffectLevel != null && !oldEffectLevel.isSynced() &&
+                finalEffectLevel == IntValue.getNonSynced(oldEffectLevel, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
         registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             assert player != null;
-            if (oldPotionLevel != null && oldPotionLevel.get() > effectLevel) {
+            if (oldEffectLevel != null && oldEffectLevel.get() > effectLevel) {
                 player.removePotionEffect(potionEffectType);
             }
 
@@ -3542,7 +3541,7 @@ public class SIsland implements Island {
             player.addPotionEffect(potionEffect, true);
         })));
 
-        IslandsDatabaseBridge.saveIslandEffect(this, potionEffectType, finalLevel);
+        IslandsDatabaseBridge.saveIslandEffect(this, potionEffectType, finalEffectLevel);
     }
 
     @Override
@@ -3671,7 +3670,8 @@ public class SIsland implements Island {
         IntValue oldRoleLimit = this.roleLimits.writeAndGet(roleLimits ->
                 roleLimits.put(playerRole.getId(), IntValue.fixed(finalRoleLimit)));
 
-        if (finalRoleLimit == IntValue.getNonSynced(oldRoleLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (oldRoleLimit != null && !oldRoleLimit.isSynced() &&
+                finalRoleLimit == IntValue.getNonSynced(oldRoleLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
@@ -4388,20 +4388,21 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        int finalAmount = Math.max(1, amount);
+        int finalGeneratorAmount = Math.max(1, amount);
 
-        Log.debug(Debug.SET_GENERATOR_RATE, owner.getName(), key, finalAmount, dimension);
+        Log.debug(Debug.SET_GENERATOR_RATE, owner.getName(), key, finalGeneratorAmount, dimension);
 
         KeyMap<IntValue> dimensionGeneratorAmount = this.cobbleGeneratorValues.writeAndGet(values ->
                 values.computeIfAbsent(dimension, e -> KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL)));
 
-        IntValue oldGeneratorAmount = dimensionGeneratorAmount.put(key, IntValue.fixed(finalAmount));
+        IntValue oldGeneratorAmount = dimensionGeneratorAmount.put(key, IntValue.fixed(finalGeneratorAmount));
 
-        if (finalAmount == IntValue.getNonSynced(oldGeneratorAmount, IslandUpgradeConstants.SYNCED_VALUE)) {
+        if (oldGeneratorAmount != null && !oldGeneratorAmount.isSynced() &&
+                finalGeneratorAmount == IntValue.getNonSynced(oldGeneratorAmount, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
-        IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, finalAmount);
+        IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, finalGeneratorAmount);
     }
 
     @Override
