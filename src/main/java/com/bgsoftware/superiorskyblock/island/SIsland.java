@@ -3251,7 +3251,7 @@ public class SIsland implements Island {
     public void setBlockLimit(Key key, int blockLimit) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        int finalBlockLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, blockLimit);
+        int finalBlockLimit = Math.max(0, blockLimit);
 
         Log.debug(Debug.SET_BLOCK_LIMIT, owner.getName(), key, finalBlockLimit);
 
@@ -3284,7 +3284,12 @@ public class SIsland implements Island {
             this.blockLimits.put(key, IntValue.fixed(IslandUpgradeConstants.NO_LIMIT_VALUE));
         } else {
             IslandsDatabaseBridge.removeBlockLimit(this, key);
-            this.blockLimits.remove(key);
+
+            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
+            syncBlockLimit(defaultUpgradeLevel, key);
+
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncBlockLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
         }
     }
 
@@ -3387,7 +3392,7 @@ public class SIsland implements Island {
     public void setEntityLimit(Key key, int entityLimit) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        int finalLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, entityLimit);
+        int finalLimit = Math.max(0, entityLimit);
 
         Log.debug(Debug.SET_ENTITY_LIMIT, owner.getName(), key, finalLimit);
 
@@ -3419,7 +3424,12 @@ public class SIsland implements Island {
             this.entityLimits.put(key, IntValue.fixed(IslandUpgradeConstants.NO_LIMIT_VALUE));
         } else {
             IslandsDatabaseBridge.removeEntityLimit(this, key);
-            this.entityLimits.remove(key);
+
+            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
+            syncEntityLimit(defaultUpgradeLevel, key);
+
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncEntityLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
         }
     }
 
@@ -3569,7 +3579,12 @@ public class SIsland implements Island {
             this.islandEffects.put(potionEffectType, IntValue.fixed(0));
         } else {
             IslandsDatabaseBridge.removeIslandEffect(this, potionEffectType);
-            this.islandEffects.remove(potionEffectType);
+
+            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
+            syncEffectLevel(defaultUpgradeLevel, potionEffectType);
+
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncEffectLevel((SUpgradeLevel) getUpgradeLevel(upgrade), potionEffectType));
         }
     }
 
@@ -3663,7 +3678,7 @@ public class SIsland implements Island {
     public void setRoleLimit(PlayerRole playerRole, int roleLimit) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
 
-        int finalRoleLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, roleLimit);
+        int finalRoleLimit = Math.max(0, roleLimit);
 
         Log.debug(Debug.SET_ROLE_LIMIT, owner.getName(), playerRole.getName(), finalRoleLimit);
 
@@ -3698,8 +3713,12 @@ public class SIsland implements Island {
                     roleLimits.put(playerRole.getId(), IntValue.fixed(IslandUpgradeConstants.NO_LIMIT_VALUE)));
         } else {
             IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
-            this.roleLimits.write(roleLimits ->
-                    roleLimits.remove(playerRole.getId()));
+
+            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
+            syncRoleLimit(defaultUpgradeLevel, playerRole);
+
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncRoleLimit((SUpgradeLevel) getUpgradeLevel(upgrade), playerRole));
         }
     }
 
@@ -4431,7 +4450,12 @@ public class SIsland implements Island {
             dimensionGeneratorAmounts.put(key, IntValue.fixed(0));
         } else {
             IslandsDatabaseBridge.removeGeneratorRate(this, dimension, key);
-            dimensionGeneratorAmounts.remove(key);
+
+            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
+            syncGeneratorAmount(defaultUpgradeLevel, key, dimension);
+
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncGeneratorAmount((SUpgradeLevel) getUpgradeLevel(upgrade), key, dimension));
         }
     }
 
@@ -5467,6 +5491,82 @@ public class SIsland implements Island {
 
         if (editedIslandEffects) {
             applyEffects();
+        }
+    }
+
+    private void syncBlockLimit(SUpgradeLevel upgradeLevel, Key key) {
+        IntValue blockLimit = upgradeLevel.getBlockLimitsUpgradeValue().get(key);
+
+        if (blockLimit != null) {
+            if (blockLimit.get() < 0) {
+                this.blockLimits.remove(key);
+            } else {
+                this.blockLimits.put(key, blockLimit);
+            }
+        }
+    }
+
+    private void syncEntityLimit(SUpgradeLevel upgradeLevel, Key key) {
+        IntValue entityLimit = upgradeLevel.getEntityLimitsUpgradeValue().get(key);
+
+        if (entityLimit != null) {
+            if (entityLimit.get() < 0) {
+                this.entityLimits.remove(key);
+            } else {
+                this.entityLimits.put(key, entityLimit);
+            }
+        }
+    }
+
+    private void syncRoleLimit(SUpgradeLevel upgradeLevel, PlayerRole playerRole) {
+        IntValue roleLimit = upgradeLevel.getRoleLimitsUpgradeValue().get(playerRole);
+
+        if (roleLimit != null) {
+            if (roleLimit.get() < 0) {
+                this.roleLimits.write(roleLimits -> roleLimits.remove(playerRole.getId()));
+            } else {
+                this.roleLimits.write(roleLimits -> roleLimits.put(playerRole.getId(), roleLimit));
+            }
+        }
+    }
+
+    private void syncEffectLevel(SUpgradeLevel upgradeLevel, PotionEffectType potionEffectType) {
+        IntValue effectLevel = upgradeLevel.getPotionEffectsUpgradeValue().get(potionEffectType);
+
+        if (effectLevel != null) {
+            if (effectLevel.get() < 0) {
+                this.islandEffects.remove(potionEffectType);
+            } else {
+                this.islandEffects.put(potionEffectType, effectLevel);
+            }
+        }
+    }
+
+    private void syncGeneratorAmount(SUpgradeLevel upgradeLevel, Key key, Dimension dimension) {
+        Map<Key, IntValue> upgradeGeneratorValues = upgradeLevel.getGeneratorUpgradeValue().get(dimension);
+
+        if (upgradeGeneratorValues == null) {
+            return;
+        }
+
+        IntValue generatorAmount = upgradeGeneratorValues.get(key);
+
+        if (generatorAmount != null) {
+            this.cobbleGeneratorValues.write(cobbleGeneratorValues -> {
+                KeyMap<IntValue> customGeneratorValues = cobbleGeneratorValues.get(dimension);
+
+                if (generatorAmount.get() < 0) {
+                    if (customGeneratorValues != null) {
+                        customGeneratorValues.remove(key);
+                    }
+                } else {
+                    if (customGeneratorValues == null) {
+                        customGeneratorValues = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+                    }
+
+                    customGeneratorValues.put(key, generatorAmount);
+                }
+            });
         }
     }
 
