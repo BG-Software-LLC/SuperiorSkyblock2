@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external.worlds;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
@@ -81,7 +82,7 @@ public class WorldsProvider_Default implements WorldsProvider {
     }
 
     @Override
-    public Location getNextLocation(BlockPosition previousPosition, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
+    public synchronized Location getNextLocation(BlockPosition previousPosition, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
         Preconditions.checkNotNull(previousPosition, "previousPosition parameter cannot be null.");
 
         BlockFace islandFace = getIslandFace(previousPosition);
@@ -125,7 +126,7 @@ public class WorldsProvider_Default implements WorldsProvider {
     }
 
     @Override
-    public void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID) {
+    public synchronized void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID) {
         Preconditions.checkNotNull(islandLocation, "islandLocation parameter cannot be null.");
         servedPositions.remove(SBlockPosition.of(islandLocation));
     }
@@ -186,18 +187,23 @@ public class WorldsProvider_Default implements WorldsProvider {
                 .generator(WorldGenerator.getWorldGenerator(dimension))
                 .createWorld();
 
-        world.setDifficulty(difficulty);
-        islandWorlds.put(dimension, world);
-        islandWorldsToDimensions.put(world.getUID(), dimension);
-
-        notifyWorldLoadListeners(world, dimension);
+        registerWorld(world, difficulty, dimension);
 
         if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv modify set generator " + plugin.getName() + " " + worldName);
+            CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
+            CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(), "mv modify set generator " + plugin.getName() + " " + worldName);
         }
 
         return world;
+    }
+
+    protected void registerWorld(World world, Difficulty difficulty, Dimension dimension) {
+        world.setDifficulty(difficulty);
+        this.islandWorlds.put(dimension, world);
+        this.islandWorldsToDimensions.put(world.getUID(), dimension);
+        if (dimension == this.plugin.getSettings().getWorlds().getDefaultWorldDimension())
+            this.islandsWorld = world;
+        notifyWorldLoadListeners(world, dimension);
     }
 
     private static BlockPosition nextPosition(BlockPosition previousPosition, int islandsHeight, int offsetX, int offsetZ) {

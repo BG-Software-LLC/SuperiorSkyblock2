@@ -58,6 +58,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,6 +77,16 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     public void loadData() throws ManagerLoadException {
+        prepareData();
+        loadSchematics();
+    }
+
+    public CompletableFuture<Void> loadDataAsync() {
+        prepareData();
+        return loadSchematicsAsync();
+    }
+
+    private void prepareData() {
         File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
 
         if (!schematicsFolder.exists()) {
@@ -91,19 +103,34 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         }
 
         loadDefaultSchematicParsers();
-        loadSchematics();
     }
 
     public void loadSchematics() throws ManagerLoadException {
         this.schematicsContainer.clearSchematics();
+        for (Schematic schematic : readSchematics())
+            this.schematicsContainer.addSchematic(schematic);
+    }
 
+    public CompletableFuture<Void> loadSchematicsAsync() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return readSchematics();
+            } catch (ManagerLoadException error) {
+                throw new CompletionException(error);
+            }
+        }).thenCompose(schematics -> BukkitExecutor.submit(() -> {
+            this.schematicsContainer.replaceSchematics(schematics);
+            return null;
+        }));
+    }
+
+    private List<Schematic> readSchematics() throws ManagerLoadException {
+        List<Schematic> loadedSchematics = Collections.synchronizedList(new LinkedList<>());
         File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
         List<File> schematicFilesList = Files.listFolderFiles(schematicsFolder, false);
 
         if (!schematicFilesList.isEmpty()) {
             int schematicFilesCount = schematicFilesList.size();
-            List<Schematic> loadedSchematics = Collections.synchronizedList(new LinkedList<>());
-
             CountDownLatch latch = new CountDownLatch(schematicFilesCount);
 
             int threadCount = Math.min(schematicFilesCount, Runtime.getRuntime().availableProcessors() * 2);
@@ -140,9 +167,6 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
                 Log.info("Successfully loaded " + loadedSchematics.size() + " schematics.");
 
-                for (Schematic schematic : loadedSchematics) {
-                    this.schematicsContainer.addSchematic(schematic);
-                }
             } catch (InterruptedException e) {
                 Log.error("Schematic loading thread was interrupted.");
                 loadService.shutdownNow();
@@ -150,13 +174,14 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             }
         }
 
-        if (this.schematicsContainer.getSchematics().isEmpty()) {
+        if (loadedSchematics.isEmpty()) {
             throw new ManagerLoadException("&cThere were no valid schematics.",
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
         // Force garbage collection to release file handles on Windows
         System.gc();
+        return loadedSchematics;
     }
 
     public void cacheSchematics() {

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.bank;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
@@ -36,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 public class SIslandBank implements IslandBank {
@@ -45,6 +47,8 @@ public class SIslandBank implements IslandBank {
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
+    private final BankReservations reservations = new BankReservations(balance);
+    private final AtomicInteger transactionPosition = new AtomicInteger(-1);
     private final Island island;
     private final Supplier<Boolean> isGiveInterestFailed;
     private final IBankLogs bankLogs;
@@ -74,6 +78,18 @@ public class SIslandBank implements IslandBank {
     public BankTransaction depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
+        boolean reserved = amount.signum() > 0 && reservations.reserveDeposit(amount, island.getBankLimit());
+        try {
+            return depositMoneyInternal(superiorPlayer, amount, reserved);
+        } finally {
+            if (reserved)
+                reservations.releaseDeposit(amount);
+        }
+    }
+
+    private BankTransaction depositMoneyInternal(SuperiorPlayer superiorPlayer, BigDecimal amount, boolean reserved) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
         Log.debug(Debug.DEPOSIT_MONEY, island.getOwner().getName(), superiorPlayer.getName(), amount);
 
@@ -93,7 +109,7 @@ public class SIslandBank implements IslandBank {
                 failureReason = event.getArgs().failureReason;
             } else if (playerBalance.compareTo(amount) < 0) {
                 failureReason = "Not enough money";
-            } else if (!canDepositMoney(amount)) {
+            } else if (!reserved) {
                 failureReason = "Exceed bank limit";
             } else {
                 EconomyProvider.EconomyResult result = plugin.getProviders()
@@ -103,7 +119,7 @@ public class SIslandBank implements IslandBank {
             }
         }
 
-        int position = this.bankLogs.getLastTransactionPosition() + 1;
+        int position = nextTransactionPosition();
 
         if (Text.isBlank(failureReason)) {
             Log.debugResult(Debug.DEPOSIT_MONEY, "Return Success", amount);
@@ -140,7 +156,7 @@ public class SIslandBank implements IslandBank {
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
-        int position = this.bankLogs.getLastTransactionPosition() + 1;
+        int position = nextTransactionPosition();
 
         BankAction bankAction;
         if (event.isCancelled()) {
@@ -180,17 +196,28 @@ public class SIslandBank implements IslandBank {
     public BankTransaction withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount, @Nullable List<String> commandsToExecute) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
+        BigDecimal reserved = reservations.reserveWithdrawal(amount.max(BigDecimal.ZERO));
+        try {
+            return withdrawMoneyInternal(superiorPlayer, amount, commandsToExecute, reserved);
+        } finally {
+            reservations.releaseWithdrawal(reserved);
+        }
+    }
+
+    private BankTransaction withdrawMoneyInternal(SuperiorPlayer superiorPlayer, BigDecimal amount,
+                                                 @Nullable List<String> commandsToExecute, BigDecimal withdrawAmount) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
         Log.debug(Debug.WITHDRAW_MONEY, island.getOwner().getName(), superiorPlayer.getName(), amount, commandsToExecute);
 
-        BigDecimal withdrawAmount = balance.get().min(amount);
 
         BankTransaction bankTransaction;
         String failureReason;
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.WITHDRAW_MONEY)) {
             failureReason = "No permission";
-        } else if (this.balance.get().compareTo(BigDecimal.ZERO) <= 0) {
+        } else if (withdrawAmount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Bank is empty";
         } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Invalid amount";
@@ -206,14 +233,14 @@ public class SIslandBank implements IslandBank {
             } else {
                 String currentBalance = balance.get().toString();
                 failureReason = "";
-                commandsToExecute.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
+                commandsToExecute.forEach(command -> CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(), command
                         .replace("{0}", superiorPlayer.getName())
                         .replace("{1}", currentBalance)
                 ));
             }
         }
 
-        int position = this.bankLogs.getLastTransactionPosition() + 1;
+        int position = nextTransactionPosition();
 
         if (Text.isBlank(failureReason)) {
             Log.debugResult(Debug.WITHDRAW_MONEY, "Return Success", amount);
@@ -247,7 +274,7 @@ public class SIslandBank implements IslandBank {
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
-        int position = this.bankLogs.getLastTransactionPosition() + 1;
+        int position = nextTransactionPosition();
 
         PluginEvent<PluginEventArgs.IslandBankWithdraw> event = PluginEventsFactory.callIslandBankWithdrawEvent(
                 island, commandSender, amount);
@@ -293,6 +320,7 @@ public class SIslandBank implements IslandBank {
 
     @Override
     public void loadTransaction(BankTransaction bankTransaction) {
+        transactionPosition.accumulateAndGet(bankTransaction.getPosition(), Math::max);
         addTransaction(bankTransaction, false);
     }
 
@@ -306,6 +334,14 @@ public class SIslandBank implements IslandBank {
 
         if (save) {
             IslandsDatabaseBridge.saveBankTransaction(island, bankTransaction);
+        }
+    }
+
+    private int nextTransactionPosition() {
+        synchronized (transactionPosition) {
+            if (transactionPosition.get() < 0)
+                transactionPosition.set(bankLogs.getLastTransactionPosition());
+            return transactionPosition.incrementAndGet();
         }
     }
 

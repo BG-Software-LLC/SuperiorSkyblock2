@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -44,6 +45,31 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkState(superiorPlayer.isOnline(), "Cannot create view for offline player: " + superiorPlayer.getName());
         Preconditions.checkNotNull(args, "args parameter cannot be null.");
+        Player player = superiorPlayer.asPlayer();
+        if (BukkitExecutor.isFolia() && !BukkitExecutor.isOwned(player)) {
+            CompletableFuture<V> result = new CompletableFuture<>();
+            if (player == null) {
+                result.cancel(false);
+                return result;
+            }
+            plugin.getTaskScheduler().entity(player, () -> {
+                try {
+                    if (superiorPlayer.asPlayer() != player || !player.isOnline()) {
+                        result.cancel(false);
+                        return;
+                    }
+                    createView(superiorPlayer, args, previousMenu).whenComplete((view, error) -> {
+                        if (error == null)
+                            result.complete(view);
+                        else
+                            result.completeExceptionally(error);
+                    });
+                } catch (Throwable error) {
+                    result.completeExceptionally(error);
+                }
+            }, () -> result.cancel(false), 1L, 0L);
+            return result;
+        }
         V view = createViewInternal(superiorPlayer, args, previousMenu);
         addView(view);
         return refreshView(view);
@@ -71,6 +97,35 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
     protected abstract V createViewInternal(SuperiorPlayer superiorPlayer, A args, @Nullable MenuView<?, ?> previousMenu);
 
     public CompletableFuture<V> refreshView(V view) {
+        if (BukkitExecutor.isFolia()) {
+            CompletableFuture<V> result = new CompletableFuture<>();
+            Player player = view.getInventoryViewer().asPlayer();
+            if (player == null) {
+                result.cancel(false);
+                return result;
+            }
+            Runnable refresh = () -> {
+                try {
+                    if (view.getInventoryViewer().asPlayer() != player || !player.isOnline()) {
+                        result.cancel(false);
+                        return;
+                    }
+                    view.updateTitleArgs();
+                    if (this.isInventoryMenu)
+                        view.setInventory(((InventoryMenuLayout<V>) this.menuLayout).buildInventory(view));
+                    else
+                        view.setDialog(((RegularDialogMenuLayoutImpl<V>) this.menuLayout).buildDialog(view));
+                    result.complete(view);
+                } catch (Throwable error) {
+                    result.completeExceptionally(error);
+                }
+            };
+            if (BukkitExecutor.isOwned(player))
+                refresh.run();
+            else
+                plugin.getTaskScheduler().entity(player, refresh, () -> result.cancel(false), 1L, 0L);
+            return result;
+        }
         view.updateTitleArgs();
 
         if (this.isInventoryMenu) {
@@ -86,7 +141,7 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
             if (error != null) {
                 result.completeExceptionally(error);
             } else {
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.sync(view.getInventoryViewer().asPlayer(), () -> {
                     view.setInventory(inventory);
                     result.complete(view);
                 });
@@ -101,7 +156,7 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
             if (error != null) {
                 result.completeExceptionally(error);
             } else {
-                BukkitExecutor.sync(() -> {
+                BukkitExecutor.sync(view.getInventoryViewer().asPlayer(), () -> {
                     view.setDialog(dialog);
                     result.complete(view);
                 });

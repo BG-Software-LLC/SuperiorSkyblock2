@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.missions;
 
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
@@ -322,7 +323,7 @@ public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implem
 
         farmingTracker.track(plantKey, 1);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> playerTracked.runIfOnline(player -> {
+        BukkitExecutor.async(() -> playerTracked.runIfOnline(player -> {
             if (canComplete(playerTracked))
                 this.plugin.getMissions().rewardMission(this, playerTracked, true);
         }), 2L);

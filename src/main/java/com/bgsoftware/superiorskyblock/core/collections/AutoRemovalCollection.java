@@ -3,11 +3,13 @@ package com.bgsoftware.superiorskyblock.core.collections;
 import com.bgsoftware.common.annotations.NotNull;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalCause;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -32,51 +34,79 @@ public class AutoRemovalCollection<E> implements Collection<E> {
         this.elementsLifeTime = CacheBuilder.newBuilder()
                 .expireAfterWrite(removalDelay, timeUnit)
                 .removalListener(removalNotification -> {
-                    elements.remove(removalNotification.getKey());
+                    if (removalNotification.getCause() == RemovalCause.EXPIRED) {
+                        synchronized (AutoRemovalCollection.this) {
+                            elements.removeIf(element -> Objects.equals(element, removalNotification.getKey()));
+                        }
+                    }
                 })
                 .build();
     }
 
     @Override
-    public int size() {
+    public synchronized int size() {
         refreshLifeTime();
         return elements.size();
     }
 
     @Override
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return size() <= 0;
     }
 
     @Override
-    public boolean contains(Object o) {
+    public synchronized boolean contains(Object o) {
         refreshLifeTime(o);
         return elements.contains(o);
     }
 
     @NotNull
     @Override
-    public Iterator<E> iterator() {
+    public synchronized Iterator<E> iterator() {
         refreshLifeTime();
-        return elements.iterator();
+        Iterator<E> iterator = new ArrayList<>(elements).iterator();
+        return new Iterator<E>() {
+            private E current;
+            private boolean removable;
+
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public E next() {
+                current = iterator.next();
+                removable = true;
+                return current;
+            }
+
+            @Override
+            public void remove() {
+                if (!removable)
+                    throw new IllegalStateException();
+                AutoRemovalCollection.this.remove(current);
+                removable = false;
+            }
+        };
     }
 
     @NotNull
     @Override
-    public Object[] toArray() {
+    public synchronized Object[] toArray() {
         refreshLifeTime();
         return elements.toArray();
     }
 
     @NotNull
     @Override
-    public <T> T[] toArray(@NotNull T[] a) {
+    public synchronized <T> T[] toArray(@NotNull T[] a) {
         refreshLifeTime();
         return elements.toArray(a);
     }
 
     @Override
-    public boolean add(E e) {
+    public synchronized boolean add(E e) {
         refreshLifeTime(e);
         boolean result = elements.add(e);
         if (result)
@@ -85,19 +115,21 @@ public class AutoRemovalCollection<E> implements Collection<E> {
     }
 
     @Override
-    public boolean remove(Object o) {
-        this.elementsLifeTime.invalidate(o);
-        return elements.remove(o);
+    public synchronized boolean remove(Object o) {
+        boolean removed = elements.remove(o);
+        if (!elements.contains(o))
+            this.elementsLifeTime.invalidate(o);
+        return removed;
     }
 
     @Override
-    public boolean containsAll(@NotNull Collection<?> c) {
+    public synchronized boolean containsAll(@NotNull Collection<?> c) {
         c.forEach(this::refreshLifeTime);
         return elements.containsAll(c);
     }
 
     @Override
-    public boolean addAll(@NotNull Collection<? extends E> c) {
+    public synchronized boolean addAll(@NotNull Collection<? extends E> c) {
         boolean result = false;
         for (E element : c)
             result |= add(element);
@@ -105,32 +137,36 @@ public class AutoRemovalCollection<E> implements Collection<E> {
     }
 
     @Override
-    public boolean retainAll(@NotNull Collection<?> c) {
-        return elements.retainAll(c);
+    public synchronized boolean retainAll(@NotNull Collection<?> c) {
+        refreshLifeTime();
+        Collection<E> removed = new ArrayList<>(elements);
+        removed.removeAll(c);
+        boolean changed = elements.retainAll(c);
+        this.elementsLifeTime.invalidateAll(removed);
+        return changed;
     }
 
     @Override
-    public boolean removeAll(@NotNull Collection<?> c) {
-        this.elementsLifeTime.invalidateAll((Iterable<E>) c.iterator());
-        return elements.removeAll(c);
+    public synchronized boolean removeAll(@NotNull Collection<?> c) {
+        Collection<?> removed = new ArrayList<>(c);
+        boolean changed = elements.removeAll(removed);
+        this.elementsLifeTime.invalidateAll(removed);
+        return changed;
     }
 
     @Override
-    public void clear() {
+    public synchronized void clear() {
         elements.clear();
         this.elementsLifeTime.invalidateAll();
     }
 
     private void refreshLifeTime(Object o) {
-        try {
-            this.elementsLifeTime.get((E) o, () -> null);
-        } catch (Throwable ignored) {
-
-        }
+        this.elementsLifeTime.getIfPresent(o);
+        refreshLifeTime();
     }
 
     private void refreshLifeTime() {
-        this.elementsLifeTime.size();
+        this.elementsLifeTime.cleanUp();
     }
 
 }

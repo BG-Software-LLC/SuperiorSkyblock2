@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.player.chat;
 
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class PlayerChat {
 
-    private static final Map<UUID, PlayerChat> playerChatListeners = new ArrayMap<>();
+    private static final Map<UUID, PlayerChat> playerChatListeners = new ConcurrentHashMap<>();
     private final Function<String, Boolean> chatConsumer;
 
     private PlayerChat(Function<String, Boolean> chatConsumer) {

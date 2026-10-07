@@ -31,7 +31,7 @@ public abstract class CropsTickingMethod {
     private static final CropsTickingMethod INSTANCE = SERVER_LEVEL_SIMPLE_RANDOM.isValid() ?
             new PaperCropsTickingMethod() : new SpigotCropsTickingMethod();
 
-    private static Set<Block> CROPS_TO_GROW_CACHE;
+    private static volatile Set<Block> CROPS_TO_GROW_CACHE = java.util.Collections.emptySet();
 
     static {
         plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CropsTickingMethod::onSettingsUpdate);
@@ -52,15 +52,16 @@ public abstract class CropsTickingMethod {
     protected abstract void doTick(LevelChunk levelChunk, int tickSpeed);
 
     private static void onSettingsUpdate() {
-        CROPS_TO_GROW_CACHE = new HashSet<>();
+        Set<Block> cropsToGrow = new HashSet<>();
         plugin.getSettings().getCropsToGrow().forEach(cropName -> {
             Key key = Keys.ofMaterialAndData(cropName);
             if (key instanceof MaterialKey materialKey) {
                 Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());
                 if (block != null && block.defaultBlockState().isRandomlyTicking())
-                    CROPS_TO_GROW_CACHE.add(block);
+                    cropsToGrow.add(block);
             }
         });
+        CROPS_TO_GROW_CACHE = cropsToGrow;
     }
 
     private static class PaperCropsTickingMethod extends CropsTickingMethod {

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.missions;
 
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -268,7 +270,7 @@ public final class EnchantingMissions extends BuiltinMission<RawDataTracker> imp
 
         enchantsTracker.track(requirement.key, 1);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this.plugin, () -> superiorPlayer.runIfOnline(_player -> {
+        BukkitExecutor.async(() -> superiorPlayer.runIfOnline(_player -> {
             if (canComplete(superiorPlayer))
                 this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
         }), 2L);
@@ -309,7 +311,7 @@ public final class EnchantingMissions extends BuiltinMission<RawDataTracker> imp
 
     private class PrepareAnvilListener implements Listener {
 
-        private final Map<UUID, RequiredEnchantment> addingEnchantments = new HashMap<>();
+        private final Map<UUID, RequiredEnchantment> addingEnchantments = new ConcurrentHashMap<>();
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onItemAnvil(org.bukkit.event.inventory.PrepareAnvilEvent e) {

@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -21,5 +22,10 @@ public interface SchematicsContainer {
     List<SchematicParser> getSchematicParsers();
 
     void clearSchematics();
+
+    default void replaceSchematics(Collection<Schematic> schematics) {
+        clearSchematics();
+        schematics.forEach(this::addSchematic);
+    }
 
 }

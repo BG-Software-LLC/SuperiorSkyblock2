@@ -14,7 +14,7 @@ public class ChunkBitSet {
 
     }
 
-    public void set(int index) {
+    public synchronized void set(int index) {
         BitSet bitSet = getBitSetForBlock(index, true);
         if (bitSet == null)
             throw new IllegalStateException();
@@ -22,7 +22,7 @@ public class ChunkBitSet {
         bitSet.set(blockIdx);
     }
 
-    public boolean clear(int index) {
+    public synchronized boolean clear(int index) {
         BitSet bitSet = getBitSetForBlock(index, false);
         if (bitSet == null)
             return false;
@@ -32,7 +32,7 @@ public class ChunkBitSet {
         return old;
     }
 
-    public boolean get(int index) {
+    public synchronized boolean get(int index) {
         BitSet bitSet = getBitSetForBlock(index, false);
         if (bitSet == null)
             return false;
@@ -41,14 +41,25 @@ public class ChunkBitSet {
     }
 
     public void forEach(IntConsumer consumer) {
-        for (int i = 0; i < this.bitSets.length; ++i) {
-            BitSet bitSet = this.bitSets[i];
+        BitSet[] snapshot = copy().bitSets;
+        for (int i = 0; i < snapshot.length; ++i) {
+            BitSet bitSet = snapshot[i];
             if (bitSet != null) {
                 for (int j = bitSet.nextSetBit(0); j != -1; j = bitSet.nextSetBit(j + 1)) {
                     consumer.accept(((i << 4) << 8) | j);
                 }
             }
         }
+    }
+
+    public synchronized ChunkBitSet copy() {
+        ChunkBitSet snapshot = new ChunkBitSet();
+        snapshot.bitSets = new BitSet[this.bitSets.length];
+        for (int i = 0; i < this.bitSets.length; ++i) {
+            if (this.bitSets[i] != null)
+                snapshot.bitSets[i] = (BitSet) this.bitSets[i].clone();
+        }
+        return snapshot;
     }
 
     private void ensureCapacity(int capacity) {

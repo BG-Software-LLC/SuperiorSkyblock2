@@ -5,9 +5,9 @@ import com.google.common.base.Preconditions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public class PlayerLocales {
@@ -18,8 +18,8 @@ public class PlayerLocales {
             "^(ar|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_](Arab|Hebr|Thaa|Nkoo|Tfng))(?!.*[-_](Latn|Cyrl)($|-|_))($|-|_)");
     private static final Pattern LOCALE_PATTERN = Pattern.compile("^[a-zA-Z]{2}[_|-][a-zA-Z]{2}$");
 
-    private static final Set<Locale> locales = new HashSet<>();
-    private static java.util.Locale defaultLocale = null;
+    private static final Set<Locale> locales = ConcurrentHashMap.newKeySet();
+    private static volatile java.util.Locale defaultLocale = null;
 
     private PlayerLocales() {
 

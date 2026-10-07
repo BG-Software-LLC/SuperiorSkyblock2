@@ -111,7 +111,8 @@ public abstract class AbstractNMSChunks implements NMSChunks {
         CompletableFuture<List<CalculatedChunk.Blocks>> completableFuture = new CompletableFuture<>();
 
         NMSUtils.runActionOnChunks(chunkPositionsToCalculate, false,
-                getCalculateChunkCallback(completableFuture, unloadedChunksCache, allCalculatedChunks));
+                getCalculateChunkCallback(completableFuture, unloadedChunksCache, allCalculatedChunks)
+                        .onFailure(completableFuture::completeExceptionally));
 
         return completableFuture;
     }
@@ -129,7 +130,8 @@ public abstract class AbstractNMSChunks implements NMSChunks {
         List<NMSUtils.UnloadedChunkCompound> unloadedChunkCompounds = new LinkedList<>();
 
         NMSUtils.runActionOnEntityChunks(chunkPositions,
-                getEntitiesChunkCallback(allCalculatedChunks, unloadedChunkCompounds, completableFuture));
+                getEntitiesChunkCallback(allCalculatedChunks, unloadedChunkCompounds, completableFuture)
+                        .onFailure(completableFuture::completeExceptionally));
 
         return completableFuture;
     }

@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrack
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
-import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -26,6 +25,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -33,10 +35,13 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
     private static final Set<EntityType> TRACKABLE_ENTITIES = initializeTrackableEntities();
     private static final long CALCULATE_DELAY = TimeUnit.MINUTES.toMillis(5);
+    private static final Map<UUID, EntityReservation> ENTITY_RESERVATIONS = new ConcurrentHashMap<>();
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final KeyMap<Integer> entityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
+    private KeyMap<Integer> entityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
+    private final Object entityCountsLock = new Object();
+    private final KeyMap<Integer> pendingEntityCounts = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
 
     private final Island island;
 
@@ -49,6 +54,10 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
     @Override
     public boolean trackEntity(Key key, int amount) {
+        return trackEntity(null, key, amount);
+    }
+
+    public boolean trackEntity(UUID entityId, Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
         Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), key, amount);
@@ -68,12 +77,64 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             return false;
         }
 
-        int currentAmount = entityCounts.getOrDefault(key, 0);
-        entityCounts.put(key, currentAmount + amount);
+        synchronized (this.entityCountsLock) {
+            if (this.beingRecalculated)
+                return false;
+            EntityReservation reservation = entityId == null ? null : ENTITY_RESERVATIONS.get(entityId);
+            if (reservation != null && reservation.tracker == this && reservation.committed)
+                return false;
+            int currentAmount = this.entityCounts.getOrDefault(key, 0);
+            this.entityCounts.put(key, currentAmount + amount);
+            if (reservation != null && reservation.tracker == this) {
+                removePendingReservation(reservation);
+                reservation.committed = true;
+            }
+        }
 
         Log.debugResult(Debug.ENTITY_SPAWN, "Return", "Success");
 
         return true;
+    }
+
+    public boolean reserveEntity(UUID entityId, Key key, int amount, int limit) {
+        Preconditions.checkNotNull(entityId, "entityId parameter cannot be null.");
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkArgument(amount > 0, "amount parameter must be positive.");
+        if (limit < 0)
+            return true;
+        synchronized (this.entityCountsLock) {
+            EntityReservation previous = ENTITY_RESERVATIONS.get(entityId);
+            if (previous != null)
+                return previous.tracker == this;
+            if (this.beingRecalculated)
+                return false;
+            int pendingAmount = this.pendingEntityCounts.getOrDefault(key, 0);
+            if ((long) this.entityCounts.getOrDefault(key, 0) + pendingAmount + amount > limit)
+                return false;
+            EntityReservation reservation = new EntityReservation(this, key, amount);
+            if (ENTITY_RESERVATIONS.putIfAbsent(entityId, reservation) != null)
+                return false;
+            this.pendingEntityCounts.put(key, pendingAmount + amount);
+            return true;
+        }
+    }
+
+    public static void releaseEntityReservation(UUID entityId) {
+        EntityReservation reservation = ENTITY_RESERVATIONS.get(entityId);
+        if (reservation == null)
+            return;
+        synchronized (reservation.tracker.entityCountsLock) {
+            if (ENTITY_RESERVATIONS.remove(entityId, reservation) && !reservation.committed)
+                reservation.tracker.removePendingReservation(reservation);
+        }
+    }
+
+    private void removePendingReservation(EntityReservation reservation) {
+        int remaining = this.pendingEntityCounts.getOrDefault(reservation.key, 0) - reservation.amount;
+        if (remaining > 0)
+            this.pendingEntityCounts.put(reservation.key, remaining);
+        else
+            this.pendingEntityCounts.remove(reservation.key);
     }
 
     @Override
@@ -97,13 +158,16 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             return false;
         }
 
-        int currentAmount = entityCounts.getOrDefault(key, -1);
-
-        if (currentAmount != -1) {
-            if (currentAmount > amount) {
-                entityCounts.put(key, currentAmount - amount);
-            } else {
-                entityCounts.remove(key);
+        synchronized (this.entityCountsLock) {
+            if (this.beingRecalculated)
+                return false;
+            int currentAmount = this.entityCounts.getOrDefault(key, -1);
+            if (currentAmount != -1) {
+                if (currentAmount > amount) {
+                    this.entityCounts.put(key, currentAmount - amount);
+                } else {
+                    this.entityCounts.remove(key);
+                }
             }
         }
 
@@ -114,31 +178,40 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
     @Override
     public int getEntityCount(Key key) {
-        return entityCounts.getOrDefault(key, 0);
+        synchronized (this.entityCountsLock) {
+            return this.entityCounts.getOrDefault(key, 0);
+        }
     }
 
     @Override
     public Map<Key, Integer> getEntitiesCounts() {
-        return Collections.unmodifiableMap(entityCounts);
+        KeyMap<Integer> snapshot = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+        synchronized (this.entityCountsLock) {
+            snapshot.putAll(this.entityCounts);
+        }
+        return Collections.unmodifiableMap(snapshot);
     }
 
     @Override
     public void clearEntityCounts() {
-        this.entityCounts.clear();
+        synchronized (this.entityCountsLock) {
+            this.entityCounts.clear();
+        }
     }
 
     @Override
     public void recalculateEntityCounts() {
-        if (beingRecalculated || !canRecalculateEntityCounts())
-            return;
-
-        this.beingRecalculated = true;
-
-        Log.debug(Debug.CHUNK_CALCULATION_ENTITIES, island.getOwner().getName());
+        synchronized (this.entityCountsLock) {
+            long currentTime = System.currentTimeMillis();
+            if (this.beingRecalculated || !this.pendingEntityCounts.isEmpty() ||
+                    currentTime - this.lastCalculateTime <= CALCULATE_DELAY)
+                return;
+            this.beingRecalculated = true;
+            this.lastCalculateTime = currentTime;
+        }
 
         try {
-            this.lastCalculateTime = System.currentTimeMillis();
-
+            Log.debug(Debug.CHUNK_CALCULATION_ENTITIES, island.getOwner().getName());
             CompletableFutureList<List<CalculatedChunk.Entities>> chunkEntities = new CompletableFutureList<>(-1);
 
             IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
@@ -151,38 +224,36 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
             BukkitExecutor.async(() -> {
                 try {
-                    KeyMap<Counter> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
+                    KeyMap<Integer> recalculatedEntityCounts = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+                    AtomicBoolean failed = new AtomicBoolean();
 
                     chunkEntities.forEachCompleted(worldCalculatedChunk -> worldCalculatedChunk.forEach(calculatedChunk -> {
                         Log.debugResult(Debug.CHUNK_CALCULATION_ENTITIES, "Chunk Finished", calculatedChunk.getPosition());
                         calculatedChunk.getEntityCounts().forEach((entity, count) -> {
                             if (canTrackEntity(entity))
-                                recalculatedEntityCounts.computeIfAbsent(entity, i -> new Counter(0)).inc(count.get());
+                                recalculatedEntityCounts.put(entity, recalculatedEntityCounts.getRaw(entity, 0) + count.get());
                         });
                     }), error -> {
                         error.printStackTrace();
-                        beingRecalculated = false;
+                        failed.set(true);
                     });
 
-                    if (!beingRecalculated)
+                    if (failed.get())
                         return;
 
-                    clearEntityCounts();
-
-                    if (!recalculatedEntityCounts.isEmpty()) {
-                        recalculatedEntityCounts.forEach((entity, count) -> {
-                            Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), entity, count.get());
-                            this.entityCounts.put(entity, count.get());
-                        });
+                    recalculatedEntityCounts.forEach((entity, count) ->
+                            Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), entity, count));
+                    synchronized (this.entityCountsLock) {
+                        this.entityCounts = recalculatedEntityCounts;
                     }
                 } finally {
+                    this.beingRecalculated = false;
                     IslandsDatabaseBridge.saveEntityCounts(this.island);
-                    beingRecalculated = false;
                 }
             });
         } catch (Exception error) {
+            this.beingRecalculated = false;
             IslandsDatabaseBridge.saveEntityCounts(this.island);
-            beingRecalculated = false;
             throw error;
         }
     }
@@ -190,7 +261,10 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     @Override
     public boolean canRecalculateEntityCounts() {
         long currentTime = System.currentTimeMillis();
-        return currentTime - lastCalculateTime > CALCULATE_DELAY;
+        synchronized (this.entityCountsLock) {
+            return !this.beingRecalculated && this.pendingEntityCounts.isEmpty() &&
+                    currentTime - this.lastCalculateTime > CALCULATE_DELAY;
+        }
     }
 
     private boolean canTrackEntity(Key key) {
@@ -201,6 +275,20 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             return TRACKABLE_ENTITIES.contains(((EntityTypeKey) key).getEntityType());
         } else {
             return key.toString().contains("MINECART");
+        }
+    }
+
+    private static class EntityReservation {
+
+        private final DefaultIslandEntitiesTrackerAlgorithm tracker;
+        private final Key key;
+        private final int amount;
+        private boolean committed;
+
+        private EntityReservation(DefaultIslandEntitiesTrackerAlgorithm tracker, Key key, int amount) {
+            this.tracker = tracker;
+            this.key = key;
+            this.amount = amount;
         }
     }
 

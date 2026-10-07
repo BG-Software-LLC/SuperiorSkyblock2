@@ -46,7 +46,7 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
             return;
 
         // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(location, () -> {
             if (block.getType() == Materials.SPAWNER.toBukkitType())
                 plugin.getNMSWorld().listenSpawner(location, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
         }, 20L);
@@ -83,7 +83,7 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
             // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
             // Block entities that are not spawners will not be touched.
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync(new Location(chunk.getWorld(), chunk.getX() << 4, 0, chunk.getZ() << 4), () -> {
                 if (chunk.isLoaded()) {
                     blockEntities.forEach(blockEntity -> {
                         plugin.getNMSWorld().listenSpawner(blockEntity, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
