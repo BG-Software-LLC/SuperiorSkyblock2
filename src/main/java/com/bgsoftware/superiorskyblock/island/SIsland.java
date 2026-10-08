@@ -212,12 +212,12 @@ public class SIsland implements Island {
      * Island Upgrade Values
      */
     private final Synchronized<IntValue> borderSize = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
-    private final Synchronized<IntValue> warpsLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
-    private final Synchronized<IntValue> teamLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
     private final Synchronized<IntValue> coopLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<IntValue> teamLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<IntValue> warpsLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
     private final Synchronized<DoubleValue> cropGrowth = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
-    private final Synchronized<DoubleValue> spawnerRates = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
     private final Synchronized<DoubleValue> mobDrops = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<DoubleValue> spawnerRates = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
     private final Synchronized<Value<BigDecimal>> bankLimit = Synchronized.of(Value.syncedFixed(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
     private final Synchronized<Int2ObjectMapView<IntValue>> roleLimits = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
     private final Synchronized<EnumerateMap<Dimension, KeyMap<IntValue>>> generatorAmounts = Synchronized.of(new EnumerateMap<>(Dimension.values()));
@@ -815,8 +815,9 @@ public class SIsland implements Island {
             }
 
             if ((reason == MemberRemoveReason.DISBAND && missionData.isDisbandReset()) ||
-                    ((reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) && missionData.isLeaveReset()))
+                    ((reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) && missionData.isLeaveReset())) {
                 superiorPlayer.resetMission(mission);
+            }
         });
 
         if (reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) {
@@ -856,10 +857,87 @@ public class SIsland implements Island {
     }
 
     @Override
+    public Map<PlayerRole, Integer> getRoleLimits() {
+        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty)) {
+            return Collections.emptyMap();
+        }
+
+        Map<PlayerRole, Integer> roleLimitsBuilder = new HashMap<>();
+
+        this.roleLimits.read(roleLimits -> {
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+
+                int limit = entry.getValue().get();
+
+                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                    PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+                    if (playerRole != null) {
+                        roleLimitsBuilder.put(playerRole, limit);
+                    }
+                }
+            }
+        });
+
+        return roleLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimitsBuilder);
+    }
+
+    @Override
+    public Map<PlayerRole, Integer> getCustomRoleLimits() {
+        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty)) {
+            return Collections.emptyMap();
+        }
+
+        Map<PlayerRole, Integer> roleLimitsBuilder = new HashMap<>();
+
+        this.roleLimits.read(roleLimits -> {
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+
+                if (!entry.getValue().isSynced()) {
+                    int limit = entry.getValue().get();
+
+                    if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                        PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+                        if (playerRole != null) {
+                            roleLimitsBuilder.put(playerRole, limit);
+                        }
+                    }
+                }
+            }
+        });
+
+        return roleLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimitsBuilder);
+    }
+
+    @Override
+    public int getRoleLimit(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
+
+        IntValue roleLimit = this.roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId()));
+
+        return roleLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : roleLimit.get();
+    }
+
+    @Override
+    public int getRoleLimitRaw(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.roleLimits.readAndGet(roleLimits ->
+                roleLimits.get(playerRole.getId())), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
     public void setRoleLimit(PlayerRole playerRole, int roleLimit) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
 
-        int finalRoleLimit = Math.max(0, roleLimit);
+        int finalRoleLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, roleLimit);
 
         Log.debug(Debug.SET_ROLE_LIMIT, owner.getName(), playerRole.getName(), finalRoleLimit);
 
@@ -883,25 +961,16 @@ public class SIsland implements Island {
         IntValue oldRoleLimit = this.roleLimits.readAndGet(roleLimits ->
                 roleLimits.get(playerRole.getId()));
 
-        if (oldRoleLimit == null) {
+        if (oldRoleLimit == null || oldRoleLimit.isSynced()) {
             return;
         }
 
-        // In case the old value was synced, we want to keep it in Database and cache as a -1 value.
-        if (oldRoleLimit.isSynced()) {
-            IslandsDatabaseBridge.saveRoleLimit(this, playerRole, IslandUpgradeConstants.NO_LIMIT_VALUE);
-            this.roleLimits.write(roleLimits ->
-                    roleLimits.put(playerRole.getId(), IntValue.fixed(IslandUpgradeConstants.NO_LIMIT_VALUE)));
-        } else {
-            IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
-            this.roleLimits.write(roleLimits -> roleLimits.remove(playerRole.getId()));
+        this.roleLimits.write(roleLimits -> roleLimits.remove(playerRole.getId()));
+        IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
 
-            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
-            syncRoleLimit(defaultUpgradeLevel, playerRole);
-
-            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
-                    syncRoleLimit((SUpgradeLevel) getUpgradeLevel(upgrade), playerRole));
-        }
+        syncRoleLimit(DefaultUpgradeLevel.getInstance(), playerRole);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncRoleLimit((SUpgradeLevel) getUpgradeLevel(upgrade), playerRole));
     }
 
     @Override
@@ -914,75 +983,6 @@ public class SIsland implements Island {
 
         this.roleLimits.write(Int2ObjectMapView::clear);
         IslandsDatabaseBridge.clearRoleLimits(this);
-    }
-
-    @Override
-    public int getRoleLimit(PlayerRole playerRole) {
-        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-
-        IntValue roleLimit = this.roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId()));
-
-        return roleLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : roleLimit.get();
-    }
-
-    @Override
-    public int getRoleLimitRaw(PlayerRole playerRole) {
-        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-
-        return IntValue.getNonSynced(this.roleLimits.readAndGet(roleLimits ->
-                roleLimits.get(playerRole.getId())), IslandUpgradeConstants.SYNCED_VALUE);
-    }
-
-    @Override
-    public Map<PlayerRole, Integer> getRoleLimits() {
-        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty)) {
-            return Collections.emptyMap();
-        }
-
-        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
-
-        this.roleLimits.read(roleLimitsMap -> {
-            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimitsMap.entryIterator();
-
-            while (iterator.hasNext()) {
-                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
-
-                int limit = entry.getValue().get();
-
-                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                    roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), limit);
-                }
-            }
-        });
-
-        return roleLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimits);
-    }
-
-    @Override
-    public Map<PlayerRole, Integer> getCustomRoleLimits() {
-        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty)) {
-            return Collections.emptyMap();
-        }
-
-        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
-
-        this.roleLimits.read(roleLimitsMap -> {
-            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimitsMap.entryIterator();
-
-            while (iterator.hasNext()) {
-                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
-
-                if (!entry.getValue().isSynced()) {
-                    int limit = entry.getValue().get();
-
-                    if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                        roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), limit);
-                    }
-                }
-            }
-        });
-
-        return roleLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimits);
     }
 
     /*
@@ -3243,6 +3243,38 @@ public class SIsland implements Island {
     }
 
     @Override
+    public Map<Key, Integer> getBlocksLimits() {
+        KeyMap<Integer> blockLimitsBuilder = KeyMap.createKeyMap();
+
+        this.blockLimits.forEach((key, limitValue) -> {
+            int limit = limitValue.get();
+
+            if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                blockLimitsBuilder.put(key, limit);
+            }
+        });
+
+        return blockLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(blockLimitsBuilder);
+    }
+
+    @Override
+    public Map<Key, Integer> getCustomBlocksLimits() {
+        KeyMap<Integer> blockLimitsBuilder = KeyMap.createKeyMap();
+
+        this.blockLimits.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                int limit = limitValue.get();
+
+                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                    blockLimitsBuilder.put(key, limit);
+                }
+            }
+        });
+
+        return blockLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(blockLimitsBuilder);
+    }
+
+    @Override
     public int getBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
@@ -3268,54 +3300,10 @@ public class SIsland implements Island {
     }
 
     @Override
-    public Map<Key, Integer> getBlocksLimits() {
-        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
-
-        this.blockLimits.forEach((key, limitValue) -> {
-            int limit = limitValue.get();
-
-            if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                blockLimits.put(key, limit);
-            }
-        });
-
-        return blockLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(blockLimits);
-    }
-
-    @Override
-    public Map<Key, Integer> getCustomBlocksLimits() {
-        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
-
-        this.blockLimits.forEach((key, limitValue) -> {
-            if (!limitValue.isSynced()) {
-                int limit = limitValue.get();
-
-                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                    blockLimits.put(key, limit);
-                }
-            }
-        });
-
-        return blockLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(blockLimits);
-    }
-
-    @Override
-    public void clearBlockLimits() {
-        Log.debug(Debug.CLEAR_BLOCK_LIMITS, owner.getName());
-
-        if (this.blockLimits.isEmpty()) {
-            return;
-        }
-
-        this.blockLimits.clear();
-        IslandsDatabaseBridge.clearBlockLimits(this);
-    }
-
-    @Override
     public void setBlockLimit(Key key, int blockLimit) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        int finalBlockLimit = Math.max(0, blockLimit);
+        int finalBlockLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, blockLimit);
 
         Log.debug(Debug.SET_BLOCK_LIMIT, owner.getName(), key, finalBlockLimit);
 
@@ -3338,24 +3326,28 @@ public class SIsland implements Island {
 
         IntValue oldBlockLimit = this.blockLimits.get(key);
 
-        if (oldBlockLimit == null) {
+        if (oldBlockLimit == null || oldBlockLimit.isSynced()) {
             return;
         }
 
-        // In case the old value was synced, we want to keep it in Database and cache as a -1 value.
-        if (oldBlockLimit.isSynced()) {
-            IslandsDatabaseBridge.saveBlockLimit(this, key, IslandUpgradeConstants.NO_LIMIT_VALUE);
-            this.blockLimits.put(key, IntValue.fixed(IslandUpgradeConstants.NO_LIMIT_VALUE));
-        } else {
-            IslandsDatabaseBridge.removeBlockLimit(this, key);
-            this.blockLimits.remove(key);
+        this.blockLimits.remove(key);
+        IslandsDatabaseBridge.removeBlockLimit(this, key);
 
-            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
-            syncBlockLimit(defaultUpgradeLevel, key);
+        syncBlockLimit(DefaultUpgradeLevel.getInstance(), key);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncBlockLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+    }
 
-            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
-                    syncBlockLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+    @Override
+    public void clearBlockLimits() {
+        Log.debug(Debug.CLEAR_BLOCK_LIMITS, owner.getName());
+
+        if (this.blockLimits.isEmpty()) {
+            return;
         }
+
+        this.blockLimits.clear();
+        IslandsDatabaseBridge.clearBlockLimits(this);
     }
 
     @Override
@@ -3396,6 +3388,38 @@ public class SIsland implements Island {
     }
 
     @Override
+    public Map<Key, Integer> getEntitiesLimitsAsKeys() {
+        KeyMap<Integer> entityLimitsBuilder = KeyMap.createKeyMap();
+
+        this.entityLimits.forEach((key, limitValue) -> {
+            int limit = limitValue.get();
+
+            if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                entityLimitsBuilder.put(key, limit);
+            }
+        });
+
+        return entityLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityLimitsBuilder);
+    }
+
+    @Override
+    public Map<Key, Integer> getCustomEntitiesLimits() {
+        KeyMap<Integer> entityLimitsBuilder = KeyMap.createKeyMap();
+
+        this.entityLimits.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                int limit = limitValue.get();
+
+                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                    entityLimitsBuilder.put(key, limit);
+                }
+            }
+        });
+
+        return entityLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityLimitsBuilder);
+    }
+
+    @Override
     public int getEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
 
@@ -3412,50 +3436,6 @@ public class SIsland implements Island {
     }
 
     @Override
-    public Map<Key, Integer> getEntitiesLimitsAsKeys() {
-        KeyMap<Integer> entityLimits = KeyMap.createKeyMap();
-
-        this.entityLimits.forEach((key, limitValue) -> {
-            int limit = limitValue.get();
-
-            if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                entityLimits.put(key, limit);
-            }
-        });
-
-        return entityLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityLimits);
-    }
-
-    @Override
-    public Map<Key, Integer> getCustomEntitiesLimits() {
-        KeyMap<Integer> entityLimits = KeyMap.createKeyMap();
-
-        this.entityLimits.forEach((key, limitValue) -> {
-            if (!limitValue.isSynced()) {
-                int limit = limitValue.get();
-
-                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                    entityLimits.put(key, limit);
-                }
-            }
-        });
-
-        return entityLimits.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityLimits);
-    }
-
-    @Override
-    public void clearEntitiesLimits() {
-        Log.debug(Debug.CLEAR_ENTITY_LIMITS, owner.getName());
-
-        if (this.entityLimits.isEmpty()) {
-            return;
-        }
-
-        this.entityLimits.clear();
-        IslandsDatabaseBridge.clearEntityLimits(this);
-    }
-
-    @Override
     public void setEntityLimit(EntityType entityType, int limit) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
 
@@ -3466,7 +3446,7 @@ public class SIsland implements Island {
     public void setEntityLimit(Key key, int entityLimit) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        int finalLimit = Math.max(0, entityLimit);
+        int finalLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, entityLimit);
 
         Log.debug(Debug.SET_ENTITY_LIMIT, owner.getName(), key, finalLimit);
 
@@ -3488,24 +3468,28 @@ public class SIsland implements Island {
 
         IntValue oldEntityLimit = this.entityLimits.get(key);
 
-        if (oldEntityLimit == null) {
+        if (oldEntityLimit == null || oldEntityLimit.isSynced()) {
             return;
         }
 
-        // In case the old value was synced, we want to keep it in Database and cache as a -1 value.
-        if (oldEntityLimit.isSynced()) {
-            IslandsDatabaseBridge.saveEntityLimit(this, key, IslandUpgradeConstants.NO_LIMIT_VALUE);
-            this.entityLimits.put(key, IntValue.fixed(IslandUpgradeConstants.NO_LIMIT_VALUE));
-        } else {
-            IslandsDatabaseBridge.removeEntityLimit(this, key);
-            this.entityLimits.remove(key);
+        this.entityLimits.remove(key);
+        IslandsDatabaseBridge.removeEntityLimit(this, key);
 
-            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
-            syncEntityLimit(defaultUpgradeLevel, key);
+        syncEntityLimit(DefaultUpgradeLevel.getInstance(), key);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncEntityLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+    }
 
-            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
-                    syncEntityLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+    @Override
+    public void clearEntitiesLimits() {
+        Log.debug(Debug.CLEAR_ENTITY_LIMITS, owner.getName());
+
+        if (this.entityLimits.isEmpty()) {
+            return;
         }
+
+        this.entityLimits.clear();
+        IslandsDatabaseBridge.clearEntityLimits(this);
     }
 
     @Override
@@ -3594,13 +3578,7 @@ public class SIsland implements Island {
 
     @Override
     public void updateUpgrades() {
-        clearUpgrades(false);
-
-        // We want to update the default upgrade first, then the actual upgrades.
-        syncUpgrade(DefaultUpgradeLevel.getInstance(), false);
-
-        // Updating all real upgrades.
-        plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), false));
+        syncUpgrades(false);
     }
 
     @Override
@@ -3705,10 +3683,51 @@ public class SIsland implements Island {
      */
 
     @Override
+    public Map<PotionEffectType, Integer> getPotionEffects() {
+        Map<PotionEffectType, Integer> effectLevelsBuilder = new ArrayMap<>();
+
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            int level = levelValue.get();
+
+            if (level > 0) {
+                effectLevelsBuilder.put(potionEffectType, level);
+            }
+        });
+
+        return effectLevelsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(effectLevelsBuilder);
+    }
+
+    @Override
+    public Map<PotionEffectType, Integer> getCustomPotionEffects() {
+        Map<PotionEffectType, Integer> effectLevelsBuilder = new ArrayMap<>();
+
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            if (!levelValue.isSynced()) {
+                int level = levelValue.get();
+
+                if (level > 0) {
+                    effectLevelsBuilder.put(potionEffectType, level);
+                }
+            }
+        });
+
+        return effectLevelsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(effectLevelsBuilder);
+    }
+
+    @Override
+    public int getPotionEffectLevel(PotionEffectType potionEffectType) {
+        Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
+
+        IntValue effectLevel = this.effectLevels.get(potionEffectType);
+
+        return effectLevel == null ? 0 : effectLevel.get();
+    }
+
+    @Override
     public void setPotionEffect(PotionEffectType potionEffectType, int effectLevel) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
 
-        int finalEffectLevel = Math.max(1, effectLevel);
+        int finalEffectLevel = Math.max(0, effectLevel);
 
         Log.debug(Debug.SET_ISLAND_EFFECT, owner.getName(), potionEffectType.getName(), finalEffectLevel);
 
@@ -3721,13 +3740,17 @@ public class SIsland implements Island {
 
         registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
-            assert player != null;
-            if (oldEffectLevel != null && oldEffectLevel.get() > effectLevel) {
-                player.removePotionEffect(potionEffectType);
-            }
 
-            PotionEffect potionEffect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, effectLevel - 1);
-            player.addPotionEffect(potionEffect, true);
+            if (player != null) {
+                if (oldEffectLevel != null && oldEffectLevel.get() > effectLevel) {
+                    player.removePotionEffect(potionEffectType);
+                }
+
+                if (effectLevel > 0) {
+                    PotionEffect potionEffect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, effectLevel - 1);
+                    player.addPotionEffect(potionEffect, true);
+                }
+            }
         })));
 
         IslandsDatabaseBridge.saveIslandEffect(this, potionEffectType, finalEffectLevel);
@@ -3741,72 +3764,24 @@ public class SIsland implements Island {
 
         IntValue oldEffectLevel = this.effectLevels.get(potionEffectType);
 
-        if (oldEffectLevel == null) {
+        if (oldEffectLevel == null || oldEffectLevel.isSynced()) {
             return;
         }
 
         registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
+
             if (player != null) {
                 player.removePotionEffect(potionEffectType);
             }
         })));
 
-        // In case the old value was synced, we want to keep it in Database and cache as a 0 value.
-        if (oldEffectLevel.isSynced()) {
-            IslandsDatabaseBridge.saveIslandEffect(this, potionEffectType, 0);
-            this.effectLevels.put(potionEffectType, IntValue.fixed(0));
-        } else {
-            IslandsDatabaseBridge.removeIslandEffect(this, potionEffectType);
-            this.effectLevels.remove(potionEffectType);
+        this.effectLevels.remove(potionEffectType);
+        IslandsDatabaseBridge.removeIslandEffect(this, potionEffectType);
 
-            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
-            syncEffectLevel(defaultUpgradeLevel, potionEffectType);
-
-            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
-                    syncEffectLevel((SUpgradeLevel) getUpgradeLevel(upgrade), potionEffectType));
-        }
-    }
-
-    @Override
-    public int getPotionEffectLevel(PotionEffectType potionEffectType) {
-        Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
-
-        IntValue effectLevel = this.effectLevels.get(potionEffectType);
-
-        return effectLevel == null ? 0 : effectLevel.get();
-    }
-
-    @Override
-    public Map<PotionEffectType, Integer> getPotionEffects() {
-        Map<PotionEffectType, Integer> effectLevels = new ArrayMap<>();
-
-        this.effectLevels.forEach((potionEffectType, levelValue) -> {
-            int level = levelValue.get();
-
-            if (level > 0) {
-                effectLevels.put(potionEffectType, level);
-            }
-        });
-
-        return effectLevels.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(effectLevels);
-    }
-
-    @Override
-    public Map<PotionEffectType, Integer> getCustomPotionEffects() {
-        Map<PotionEffectType, Integer> effectLevels = new ArrayMap<>();
-
-        this.effectLevels.forEach((potionEffectType, levelValue) -> {
-            if (!levelValue.isSynced()) {
-                int level = levelValue.get();
-
-                if (level > 0) {
-                    effectLevels.put(potionEffectType, level);
-                }
-            }
-        });
-
-        return effectLevels.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(effectLevels);
+        syncEffectLevel(DefaultUpgradeLevel.getInstance(), potionEffectType);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncEffectLevel((SUpgradeLevel) getUpgradeLevel(upgrade), potionEffectType));
     }
 
     @Override
@@ -4407,6 +4382,169 @@ public class SIsland implements Island {
      */
 
     @Override
+    public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Integer> generatorAmountsBuilder = new HashMap<>();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            int amount = amountValue.get();
+
+            if (amount > 0) {
+                generatorAmountsBuilder.put(key.toString(), amount);
+            }
+        });
+
+        return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
+    }
+
+    @Override
+    public Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<Key, Integer> generatorAmountsBuilder = KeyMap.createKeyMap();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            if (!amountValue.isSynced()) {
+                int amount = amountValue.get();
+
+                if (amount > 0) {
+                    generatorAmountsBuilder.put(key, amount);
+                }
+            }
+        });
+
+        return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
+    }
+
+    @Override
+    public int getGeneratorTotalAmount(Dimension dimension) {
+        int totalAmount = 0;
+
+        for (int amount : getGeneratorAmounts(dimension).values()) {
+            totalAmount += amount;
+        }
+
+        return totalAmount;
+    }
+
+    @Override
+    public int getGeneratorAmount(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return 0;
+        }
+
+        IntValue generatorAmount = dimensionGeneratorAmounts.get(key);
+
+        return generatorAmount == null ? 0 : generatorAmount.get();
+    }
+
+    @Override
+    public void setGeneratorAmount(Key key, @Size int amount, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        int finalGeneratorAmount = Math.max(0, amount);
+
+        Log.debug(Debug.SET_GENERATOR_RATE, owner.getName(), key, finalGeneratorAmount, dimension);
+
+        KeyMap<IntValue> dimensionGeneratorAmount = this.generatorAmounts.writeAndGet(
+                generatorAmounts -> generatorAmounts.computeIfAbsent(dimension,
+                        unused -> KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL)));
+
+        IntValue oldGeneratorAmount = dimensionGeneratorAmount.put(key, IntValue.fixed(finalGeneratorAmount));
+
+        if (oldGeneratorAmount != null && !oldGeneratorAmount.isSynced() &&
+                finalGeneratorAmount == IntValue.getNonSynced(oldGeneratorAmount, IslandUpgradeConstants.SYNCED_VALUE)) {
+            return;
+        }
+
+        IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, finalGeneratorAmount);
+    }
+
+    @Override
+    public void removeGeneratorAmount(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        Log.debug(Debug.REMOVE_GENERATOR_RATE, owner.getName(), key, dimension);
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return;
+        }
+
+        IntValue oldGeneratorAmount = dimensionGeneratorAmounts.get(key);
+
+        if (oldGeneratorAmount == null || oldGeneratorAmount.isSynced()) {
+            return;
+        }
+
+        dimensionGeneratorAmounts.remove(key);
+        IslandsDatabaseBridge.removeGeneratorRate(this, dimension, key);
+
+        syncGeneratorAmount(DefaultUpgradeLevel.getInstance(), key, dimension);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncGeneratorAmount((SUpgradeLevel) getUpgradeLevel(upgrade), key, dimension));
+    }
+
+    @Override
+    public void clearGeneratorAmounts(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        Log.debug(Debug.CLEAR_GENERATOR_RATES, owner.getName(), dimension.getName());
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null || dimensionGeneratorAmounts.isEmpty()) {
+            return;
+        }
+
+        dimensionGeneratorAmounts.clear();
+        IslandsDatabaseBridge.clearGeneratorRates(this, dimension);
+    }
+
+    @Override
+    public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        return getGeneratorAmounts(dimension).keySet().stream().collect(Collectors.toMap(key -> key,
+                key -> getGeneratorAmount(Keys.ofMaterialAndData(key), dimension)));
+    }
+
+    @Override
+    public int getGeneratorPercentage(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        int totalAmount = getGeneratorTotalAmount(dimension);
+        return totalAmount == 0 ? 0 : (getGeneratorAmount(key, dimension) * 100) / totalAmount;
+    }
+
+    @Override
     public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
         setGeneratorPercentage(key, percentage, dimension, null, false);
     }
@@ -4480,177 +4618,6 @@ public class SIsland implements Island {
         }
 
         return true;
-    }
-
-    @Override
-    public int getGeneratorPercentage(Key key, Dimension dimension) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        int totalAmount = getGeneratorTotalAmount(dimension);
-        return totalAmount == 0 ? 0 : (getGeneratorAmount(key, dimension) * 100) / totalAmount;
-    }
-
-    @Override
-    public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        return getGeneratorAmounts(dimension).keySet().stream().collect(Collectors.toMap(key -> key,
-                key -> getGeneratorAmount(Keys.ofMaterialAndData(key), dimension)));
-    }
-
-    @Override
-    public void setGeneratorAmount(Key key, @Size int amount, Dimension dimension) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        int finalGeneratorAmount = Math.max(1, amount);
-
-        Log.debug(Debug.SET_GENERATOR_RATE, owner.getName(), key, finalGeneratorAmount, dimension);
-
-        KeyMap<IntValue> dimensionGeneratorAmount = this.generatorAmounts.writeAndGet(
-                generatorAmounts -> generatorAmounts.computeIfAbsent(dimension,
-                        unused -> KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL)));
-
-        IntValue oldGeneratorAmount = dimensionGeneratorAmount.put(key, IntValue.fixed(finalGeneratorAmount));
-
-        if (oldGeneratorAmount != null && !oldGeneratorAmount.isSynced() &&
-                finalGeneratorAmount == IntValue.getNonSynced(oldGeneratorAmount, IslandUpgradeConstants.SYNCED_VALUE)) {
-            return;
-        }
-
-        IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, finalGeneratorAmount);
-    }
-
-    @Override
-    public void removeGeneratorAmount(Key key, Dimension dimension) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        Log.debug(Debug.REMOVE_GENERATOR_RATE, owner.getName(), key, dimension);
-
-        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
-                generatorAmounts -> generatorAmounts.get(dimension));
-
-        if (dimensionGeneratorAmounts == null) {
-            return;
-        }
-
-        IntValue oldGeneratorAmount = dimensionGeneratorAmounts.get(key);
-
-        if (oldGeneratorAmount == null) {
-            return;
-        }
-
-        // In case the old value was synced, we want to keep it in Database and cache as a 0 value.
-        if (oldGeneratorAmount.isSynced()) {
-            IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, 0);
-            dimensionGeneratorAmounts.put(key, IntValue.fixed(0));
-        } else {
-            IslandsDatabaseBridge.removeGeneratorRate(this, dimension, key);
-            dimensionGeneratorAmounts.remove(key);
-
-            SUpgradeLevel defaultUpgradeLevel = DefaultUpgradeLevel.getInstance();
-            syncGeneratorAmount(defaultUpgradeLevel, key, dimension);
-
-            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
-                    syncGeneratorAmount((SUpgradeLevel) getUpgradeLevel(upgrade), key, dimension));
-        }
-    }
-
-    @Override
-    public int getGeneratorAmount(Key key, Dimension dimension) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
-                generatorAmounts -> generatorAmounts.get(dimension));
-
-        if (dimensionGeneratorAmounts == null) {
-            return 0;
-        }
-
-        IntValue generatorAmount = dimensionGeneratorAmounts.get(key);
-
-        return generatorAmount == null ? 0 : generatorAmount.get();
-    }
-
-    @Override
-    public int getGeneratorTotalAmount(Dimension dimension) {
-        int totalAmount = 0;
-
-        for (int amount : getGeneratorAmounts(dimension).values()) {
-            totalAmount += amount;
-        }
-
-        return totalAmount;
-    }
-
-    @Override
-    public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
-                generatorAmounts -> generatorAmounts.get(dimension));
-
-        if (dimensionGeneratorAmounts == null) {
-            return Collections.emptyMap();
-        }
-
-        Map<String, Integer> generatorAmounts = new HashMap<>();
-
-        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
-            int amount = amountValue.get();
-
-            if (amount > 0) {
-                generatorAmounts.put(key.toString(), amount);
-            }
-        });
-
-        return generatorAmounts.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmounts);
-    }
-
-    @Override
-    public Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension) {
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
-                generatorAmounts -> generatorAmounts.get(dimension));
-
-        if (dimensionGeneratorAmounts == null) {
-            return Collections.emptyMap();
-        }
-
-        Map<Key, Integer> generatorAmounts = KeyMap.createKeyMap();
-
-        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
-            if (!amountValue.isSynced()) {
-                int amount = amountValue.get();
-
-                if (amount > 0) {
-                    generatorAmounts.put(key, amount);
-                }
-            }
-        });
-
-        return generatorAmounts.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmounts);
-    }
-
-    @Override
-    public void clearGeneratorAmounts(Dimension dimension) {
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        Log.debug(Debug.CLEAR_GENERATOR_RATES, owner.getName(), dimension.getName());
-
-        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
-                generatorAmounts -> generatorAmounts.get(dimension));
-
-        if (dimensionGeneratorAmounts == null || dimensionGeneratorAmounts.isEmpty()) {
-            return;
-        }
-
-        dimensionGeneratorAmounts.clear();
-        IslandsDatabaseBridge.clearGeneratorRates(this, dimension);
     }
 
     @Nullable
@@ -4897,6 +4864,7 @@ public class SIsland implements Island {
 
     private void applyEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
         Player player = superiorPlayer.asPlayer();
+
         if (player != null) {
             getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
                     new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
@@ -4905,8 +4873,10 @@ public class SIsland implements Island {
 
     private void removeEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
         Player player = superiorPlayer.asPlayer();
-        if (player != null)
+
+        if (player != null) {
             getPotionEffects().keySet().forEach(player::removePotionEffect);
+        }
     }
 
     private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {

@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -72,11 +71,6 @@ public class CmdAdminSetCoopLimit implements IAdminIslandCommand {
         }
 
         int limit = arguments.getNumber();
-
-        if (limit < IslandUpgradeConstants.NO_LIMIT_VALUE) {
-            Message.INVALID_LIMIT.send(sender, limit);
-            return;
-        }
 
         int islandsChangedCount = 0;
 

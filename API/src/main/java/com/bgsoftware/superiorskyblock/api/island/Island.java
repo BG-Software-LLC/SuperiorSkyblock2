@@ -264,6 +264,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setTeamLimit(int teamLimit);
 
     /**
+     * Get all the role limits for the island.
+     */
+    Map<PlayerRole, Integer> getRoleLimits();
+
+    /**
+     * Get all the custom role limits for the island.
+     */
+    Map<PlayerRole, Integer> getCustomRoleLimits();
+
+    /**
      * Get the limit of players that can have the same role at a time.
      *
      * @param playerRole The role to check.
@@ -276,16 +286,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param playerRole The role to check.
      */
     int getRoleLimitRaw(PlayerRole playerRole);
-
-    /**
-     * Get all the role limits for the island.
-     */
-    Map<PlayerRole, Integer> getRoleLimits();
-
-    /**
-     * Get all the custom role limits for the island.
-     */
-    Map<PlayerRole, Integer> getCustomRoleLimits();
 
     /**
      * Set the limit of the amount of players that can have the role in the island.
@@ -2092,6 +2092,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     IslandBlocksTrackerAlgorithm getBlocksTracker();
 
     /**
+     * Get all the blocks limits for the island.
+     */
+    Map<Key, Integer> getBlocksLimits();
+
+    /**
+     * Get all the custom blocks limits for the island.
+     */
+    Map<Key, Integer> getCustomBlocksLimits();
+
+    /**
      * Get the block limit of a block.
      *
      * @param key The block's key to check.
@@ -2113,16 +2123,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param key The block's key to check.
      */
     Key getBlockLimitKey(Key key);
-
-    /**
-     * Get all the blocks limits for the island.
-     */
-    Map<Key, Integer> getBlocksLimits();
-
-    /**
-     * Get all the custom blocks limits for the island.
-     */
-    Map<Key, Integer> getCustomBlocksLimits();
 
     /**
      * Set the block limit of a block.
@@ -2171,6 +2171,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     IslandEntitiesTrackerAlgorithm getEntitiesTracker();
 
     /**
+     * Get all the entities limits for the island.
+     */
+    Map<Key, Integer> getEntitiesLimitsAsKeys();
+
+    /**
+     * Get all the custom entities limits for the island.
+     */
+    Map<Key, Integer> getCustomEntitiesLimits();
+
+    /**
      * Get the entity limit of an entity.
      *
      * @param entityType The entity's type to check.
@@ -2183,16 +2193,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param key The key of the entity to check.
      */
     int getEntityLimit(Key key);
-
-    /**
-     * Get all the entities limits for the island.
-     */
-    Map<Key, Integer> getEntitiesLimitsAsKeys();
-
-    /**
-     * Get all the custom entities limits for the island.
-     */
-    Map<Key, Integer> getCustomEntitiesLimits();
 
     /**
      * Set the entity limit of an entity.
@@ -2357,14 +2357,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
 
     /**
-     * Get the level of an island effect.
-     *
-     * @param type The potion to check.
-     * @return The level of the potion. If 0, it means that this is not an active effect on the island.
-     */
-    int getPotionEffectLevel(PotionEffectType type);
-
-    /**
      * Get a list of all active island effects with their levels.
      */
     Map<PotionEffectType, Integer> getPotionEffects();
@@ -2373,6 +2365,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get a list of all custom active island effects with their levels.
      */
     Map<PotionEffectType, Integer> getCustomPotionEffects();
+
+    /**
+     * Get the level of an island effect.
+     *
+     * @param type The potion to check.
+     * @return The level of the potion. If 0, it means that this is not an active effect on the island.
+     */
+    int getPotionEffectLevel(PotionEffectType type);
 
     /**
      * Add a potion effect to the island.
@@ -2655,16 +2655,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
 
     /**
-     * Get the amount of a specific key in a specific world.
-     */
-    int getGeneratorAmount(Key key, Dimension dimension);
-
-    /**
-     * Get the total amount of all the generator keys together.
-     */
-    int getGeneratorTotalAmount(Dimension dimension);
-
-    /**
      * Get the amounts of the materials for the cobblestone generator in the island.
      */
     Map<String, Integer> getGeneratorAmounts(Dimension dimension);
@@ -2673,6 +2663,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the custom amounts of the materials for the cobblestone generator in the island.
      */
     Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension);
+
+    /**
+     * Get the total amount of all the generator keys together.
+     */
+    int getGeneratorTotalAmount(Dimension dimension);
+
+    /**
+     * Get the amount of a specific key in a specific world.
+     */
+    int getGeneratorAmount(Key key, Dimension dimension);
 
     /**
      * Set an amount for a specific key in a specific world.
@@ -2690,6 +2690,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void clearGeneratorAmounts(Dimension dimension);
 
     /**
+     * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
+     */
+    Map<String, Integer> getGeneratorPercentages(Dimension dimension);
+
+    /**
      * Get the percentage for a specific key in a specific world.
      * The formula is (amount * 100) / total_amount.
      *
@@ -2697,11 +2702,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param dimension The world dimension.
      */
     int getGeneratorPercentage(Key key, Dimension dimension);
-
-    /**
-     * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
-     */
-    Map<String, Integer> getGeneratorPercentages(Dimension dimension);
 
     /**
      * Set a percentage for a specific key in a specific world.

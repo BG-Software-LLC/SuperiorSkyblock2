@@ -81,7 +81,7 @@ public class CmdAdminSetEffect implements IAdminIslandCommand {
 
         int level = arguments.getNumber();
 
-        if (level < 1) {
+        if (level < 0) {
             Message.INVALID_LEVEL.send(sender, level);
             return;
         }

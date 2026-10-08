@@ -93,7 +93,7 @@ public class CmdAdminAddEffect implements IAdminIslandCommand {
 
         for (Island island : islands) {
             int currentLevel = island.getPotionEffectLevel(effectType);
-            if (currentLevel + level < 1) {
+            if (currentLevel + level < 0) {
                 isInvalid = true;
                 continue;
             }

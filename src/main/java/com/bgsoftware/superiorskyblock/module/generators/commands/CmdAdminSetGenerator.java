@@ -87,7 +87,7 @@ public class CmdAdminSetGenerator implements IAdminIslandCommand {
 
         int amount = arguments.getNumber();
 
-        if (!percentage && amount < 1) {
+        if (!percentage && amount < 0) {
             Message.INVALID_AMOUNT.send(sender, amount);
             return;
         }

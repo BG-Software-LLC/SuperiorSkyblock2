@@ -79,11 +79,6 @@ public class CmdAdminSetEntityLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        if (limit < 0) {
-            Message.INVALID_LIMIT.send(sender, limit);
-            return;
-        }
-
         int islandsChangedCount = 0;
 
         for (Island island : islands) {

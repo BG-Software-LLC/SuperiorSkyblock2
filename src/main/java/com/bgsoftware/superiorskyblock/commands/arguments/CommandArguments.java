@@ -268,7 +268,14 @@ public class CommandArguments {
     }
 
     public static NumberArgument<Integer> getLimit(CommandSender sender, String argument) {
-        return getInt(sender, argument, Message.INVALID_LIMIT);
+        NumberArgument<Integer> limit = getInt(sender, argument, Message.INVALID_LIMIT);
+
+        if (limit.isSucceed() && limit.getNumber() < IslandUpgradeConstants.NO_LIMIT_VALUE) {
+            Message.INVALID_LIMIT.send(sender, argument);
+            return new NumberArgument<>(limit.getNumber(), false);
+        }
+
+        return limit;
     }
 
     public static NumberArgument<Integer> getAdditionalLimit(CommandSender sender, String argument) {
