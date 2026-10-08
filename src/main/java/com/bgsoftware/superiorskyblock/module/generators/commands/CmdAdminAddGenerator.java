@@ -104,6 +104,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
             return;
         }
 
+        boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
@@ -117,6 +118,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
             } else {
                 int currentAmount = island.getGeneratorAmount(material, dimension);
                 if (currentAmount + amount < 1) {
+                    isInvalid = true;
                     continue;
                 }
 
@@ -134,7 +136,9 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            Message.INVALID_AMOUNT.send(sender, amount);
+            if (isInvalid) {
+                Message.INVALID_AMOUNT.send(sender, amount);
+            }
             return;
         }
 

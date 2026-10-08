@@ -71,6 +71,7 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
             return;
         }
 
+        boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
@@ -78,6 +79,7 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
             BigDecimal currentLimit = island.getBankLimit();
             if (currentLimit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) <= 0
                     || currentLimit.add(limit).compareTo(BigDecimal.ZERO) < 0) {
+                isInvalid = true;
                 continue;
             }
 
@@ -91,7 +93,9 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            Message.INVALID_LIMIT.send(sender, limit);
+            if (isInvalid) {
+                Message.INVALID_LIMIT.send(sender, limit);
+            }
             return;
         }
 

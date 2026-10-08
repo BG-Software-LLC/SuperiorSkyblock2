@@ -87,12 +87,14 @@ public class CmdAdminAddEffect implements IAdminIslandCommand {
             return;
         }
 
+        boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             int currentLevel = island.getPotionEffectLevel(effectType);
             if (currentLevel + level < 1) {
+                isInvalid = true;
                 continue;
             }
 
@@ -106,7 +108,9 @@ public class CmdAdminAddEffect implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            Message.INVALID_LEVEL.send(sender, level);
+            if (isInvalid) {
+                Message.INVALID_LEVEL.send(sender, level);
+            }
             return;
         }
 

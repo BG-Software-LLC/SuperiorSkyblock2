@@ -73,12 +73,14 @@ public class CmdAdminAddTeamLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
+        boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             int currentLimit = island.getTeamLimit();
             if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE || currentLimit + limit < 0) {
+                isInvalid = true;
                 continue;
             }
 
@@ -92,7 +94,9 @@ public class CmdAdminAddTeamLimit implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            Message.INVALID_LIMIT.send(sender, limit);
+            if (isInvalid) {
+                Message.INVALID_LIMIT.send(sender, limit);
+            }
             return;
         }
 

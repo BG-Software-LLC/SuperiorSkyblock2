@@ -83,12 +83,14 @@ public class CmdAdminAddRoleLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
+        boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             int currentLimit = island.getRoleLimit(playerRole);
             if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE || currentLimit + limit < 0) {
+                isInvalid = true;
                 continue;
             }
 
@@ -102,7 +104,9 @@ public class CmdAdminAddRoleLimit implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            Message.INVALID_LIMIT.send(sender, limit);
+            if (isInvalid) {
+                Message.INVALID_LIMIT.send(sender, limit);
+            }
             return;
         }
 

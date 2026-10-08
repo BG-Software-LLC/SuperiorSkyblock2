@@ -72,6 +72,7 @@ public class CmdAdminAddMobDrops implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
+        boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
@@ -91,7 +92,9 @@ public class CmdAdminAddMobDrops implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            Message.INVALID_MULTIPLIER.send(sender, multiplier);
+            if (isInvalid) {
+                Message.INVALID_MULTIPLIER.send(sender, multiplier);
+            }
             return;
         }
 

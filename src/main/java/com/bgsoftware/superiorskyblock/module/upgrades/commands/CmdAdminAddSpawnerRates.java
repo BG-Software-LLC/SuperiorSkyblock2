@@ -72,12 +72,14 @@ public class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
+        boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             double currentMultiplier = island.getSpawnerRatesMultiplier();
             if (currentMultiplier + multiplier < 1) {
+                isInvalid = true;
                 continue;
             }
 
@@ -91,7 +93,9 @@ public class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            Message.INVALID_MULTIPLIER.send(sender, multiplier);
+            if (isInvalid) {
+                Message.INVALID_MULTIPLIER.send(sender, multiplier);
+            }
             return;
         }
 
