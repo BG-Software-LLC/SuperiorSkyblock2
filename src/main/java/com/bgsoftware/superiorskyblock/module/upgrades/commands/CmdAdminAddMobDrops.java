@@ -79,6 +79,7 @@ public class CmdAdminAddMobDrops implements IAdminIslandCommand {
         for (Island island : islands) {
             double currentMultiplier = island.getMobDropsMultiplier();
             if (currentMultiplier + multiplier < 1) {
+                isInvalid = true;
                 continue;
             }
 
