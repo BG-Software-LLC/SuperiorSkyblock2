@@ -905,6 +905,18 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void clearRoleLimits() {
+        Log.debug(Debug.CLEAR_ROLE_LIMITS, this.owner.getName());
+
+        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty)) {
+            return;
+        }
+
+        this.roleLimits.write(Int2ObjectMapView::clear);
+        IslandsDatabaseBridge.clearRoleLimits(this);
+    }
+
+    @Override
     public int getRoleLimit(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
 

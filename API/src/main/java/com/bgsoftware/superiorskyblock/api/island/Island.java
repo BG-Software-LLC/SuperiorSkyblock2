@@ -302,6 +302,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
     void removeRoleLimit(PlayerRole playerRole);
 
+    /**
+     * Clear all the role limits of the island.
+     */
+    void clearRoleLimits();
+
     /*
      * Visitor related methods
      */

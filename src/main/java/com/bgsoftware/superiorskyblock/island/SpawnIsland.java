@@ -1837,6 +1837,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void clearRoleLimits() {
+        // Do nothing.
+    }
+
+    @Override
     public int getRoleLimit(PlayerRole playerRole) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }

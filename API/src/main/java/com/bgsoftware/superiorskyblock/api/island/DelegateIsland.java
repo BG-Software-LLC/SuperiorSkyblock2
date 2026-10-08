@@ -1683,6 +1683,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void clearRoleLimits() {
+        this.handle.clearRoleLimits();
+    }
+
+    @Override
     public int getRoleLimit(PlayerRole playerRole) {
         return this.handle.getRoleLimit(playerRole);
     }
