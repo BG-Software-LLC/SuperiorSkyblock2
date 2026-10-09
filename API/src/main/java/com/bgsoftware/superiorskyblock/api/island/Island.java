@@ -298,6 +298,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     BlockPosition getCenterPosition();
 
     /**
+     * Update the island's entire area from the current configuration.
+     */
+    void updateEntireArea();
+
+    /**
      * Access the island's world.
      * This method will load the world safely if it is not loaded.
      *

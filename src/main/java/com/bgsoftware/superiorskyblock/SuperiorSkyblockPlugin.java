@@ -486,7 +486,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             schematicsHandler.loadData();
         } else {
             BukkitExecutor.sync(gridHandler::updateSpawn, 1L);
-            gridHandler.syncUpgrades();
+            gridHandler.refreshIslandsFromSettings();
             schematicsHandler.loadSchematics();
         }
 

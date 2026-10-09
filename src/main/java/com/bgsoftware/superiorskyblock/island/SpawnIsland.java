@@ -367,6 +367,10 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void updateEntireArea() {
+    }
+
+    @Override
     public CompletableFuture<World> accessIslandWorld(Dimension unused) {
         return CompletableFuture.completedFuture(this.spawnWorld);
     }

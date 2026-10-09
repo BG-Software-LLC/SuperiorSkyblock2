@@ -237,6 +237,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void updateEntireArea() {
+        this.handle.updateEntireArea();
+    }
+
+    @Override
     public CompletableFuture<World> accessIslandWorld(Dimension dimension) {
         return this.handle.accessIslandWorld(dimension);
     }
