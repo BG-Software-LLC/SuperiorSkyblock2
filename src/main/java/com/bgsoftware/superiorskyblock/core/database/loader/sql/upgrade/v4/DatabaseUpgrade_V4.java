@@ -19,6 +19,12 @@ public class DatabaseUpgrade_V4 implements Runnable {
 
     @Override
     public void run() {
+        updateIslandsSettingsSyncedValue();
+        deleteSyncedRecords("islands_block_limits");
+        deleteSyncedRecords("islands_entity_limits");
+    }
+
+    private static void updateIslandsSettingsSyncedValue() {
         List<IDatabaseTransaction> databaseTransactions = new ArrayList<>();
 
         databaseTransactions.add(updateColumn("size"));
@@ -39,6 +45,14 @@ public class DatabaseUpgrade_V4 implements Runnable {
         return new CustomSQLDatabaseTransaction(
                 "UPDATE {prefix}islands_settings SET " + column + "=? WHERE " + column + "=-1"
         ).bindObject(IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    private static void deleteSyncedRecords(String table) {
+        try {
+            DBSession.execute(new CustomSQLDatabaseTransaction(
+                    "DELETE FROM {prefix}" + table + " WHERE limit<=-1")).get();
+        } catch (InterruptedException | ExecutionException ignored) {
+        }
     }
 
 }
