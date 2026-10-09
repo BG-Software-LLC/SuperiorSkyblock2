@@ -574,6 +574,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lSziget | &7Elhagytad a szigetedet.'
 LEFT_ISLAND_COOP: '&e&lSziget | &7Már nem vagy {0} szigetének coop tagja.'
 LEFT_ISLAND_COOP_NAME: '&e&lSziget | &7Már nem vagy a(z) {0} sziget coop tagja.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lVilágok | &7A(z) {0} világ mostantól minden sziget számára zárolva van!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lVilágok | &7A(z) {0} világ mostantól zárolva van a(z) {1} sziget számára!'

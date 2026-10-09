@@ -570,6 +570,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lWyspa | &7Opusciles swoja wyspe.'
 LEFT_ISLAND_COOP: '&e&lWyspa | &7Nie jestes juz czlonkiem trybu wspólpracy na wyspie {0}.'
 LEFT_ISLAND_COOP_NAME: '&e&lWyspa | &7Nie jestes juz czlonkiem spóldzielni na wyspie {0}.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'

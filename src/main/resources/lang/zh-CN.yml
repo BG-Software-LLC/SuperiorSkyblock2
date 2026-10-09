@@ -573,6 +573,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&l岛屿 | &7你离开了你的岛屿.'
 LEFT_ISLAND_COOP: '&e&l岛屿 | &7你不再是玩家 {0} 的岛屿合作成员.'
 LEFT_ISLAND_COOP_NAME: '&e&l岛屿 | &7你不再是岛屿 {0} 的合作成员.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&l世界 | &7世界 {0} 已对所有岛屿锁定!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&l世界 | &7世界 {0} 已对岛屿 {1} 锁定!'

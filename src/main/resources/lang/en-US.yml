@@ -573,6 +573,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lIsland | &7You left your island.'
 LEFT_ISLAND_COOP: '&e&lIsland | &7You are no longer a co-op member of {0}''s island.'
 LEFT_ISLAND_COOP_NAME: '&e&lIsland | &7You are no longer a co-op member of the island {0}.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'

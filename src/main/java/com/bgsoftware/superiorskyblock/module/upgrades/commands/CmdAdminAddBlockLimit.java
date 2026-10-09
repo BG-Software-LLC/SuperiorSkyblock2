@@ -80,13 +80,19 @@ public class CmdAdminAddBlockLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
+        boolean isUnlimited = false;
         boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             int currentLimit = island.getBlockLimit(key);
-            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE || currentLimit + limit < 0) {
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                isUnlimited = true;
+                continue;
+            }
+
+            if (currentLimit + limit < 0) {
                 isInvalid = true;
                 continue;
             }
@@ -101,7 +107,9 @@ public class CmdAdminAddBlockLimit implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount <= 0) {
-            if (isInvalid) {
+            if (isUnlimited) {
+                Message.LIMIT_IS_UNLIMITED.send(sender);
+            } else if (isInvalid) {
                 Message.INVALID_LIMIT.send(sender, limit);
             }
             return;

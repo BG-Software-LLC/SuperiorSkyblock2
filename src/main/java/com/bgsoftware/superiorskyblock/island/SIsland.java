@@ -958,14 +958,21 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_ROLE_LIMIT, owner.getName(), playerRole.getName());
 
-        IntValue oldRoleLimit = this.roleLimits.readAndGet(roleLimits ->
-                roleLimits.get(playerRole.getId()));
+        boolean removed = this.roleLimits.writeAndGet(roleLimits -> {
+            IntValue oldRoleLimit = roleLimits.get(playerRole.getId());
 
-        if (oldRoleLimit == null || oldRoleLimit.isSynced()) {
+            if (oldRoleLimit == null || oldRoleLimit.isSynced()) {
+                return false;
+            }
+
+            roleLimits.remove(playerRole.getId());
+            return true;
+        });
+
+        if (!removed) {
             return;
         }
 
-        this.roleLimits.write(roleLimits -> roleLimits.remove(playerRole.getId()));
         IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
 
         syncRoleLimit(DefaultUpgradeLevel.getInstance(), playerRole);
@@ -3768,13 +3775,8 @@ public class SIsland implements Island {
             return;
         }
 
-        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
-            Player player = superiorPlayer.asPlayer();
-
-            if (player != null) {
-                player.removePotionEffect(potionEffectType);
-            }
-        })));
+        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer ->
+                removePotionEffect(superiorPlayer.asPlayer(), potionEffectType))));
 
         this.effectLevels.remove(potionEffectType);
         IslandsDatabaseBridge.removeIslandEffect(this, potionEffectType);
@@ -3782,6 +3784,9 @@ public class SIsland implements Island {
         syncEffectLevel(DefaultUpgradeLevel.getInstance(), potionEffectType);
         plugin.getUpgrades().getUpgrades().forEach(upgrade ->
                 syncEffectLevel((SUpgradeLevel) getUpgradeLevel(upgrade), potionEffectType));
+
+        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer ->
+                addPotionEffect(superiorPlayer.asPlayer(), potionEffectType))));
     }
 
     @Override
@@ -3789,14 +3794,14 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
-            applyEffectsNoUpgradeCheck(superiorPlayer);
+            addPotionEffects(superiorPlayer);
         }
     }
 
     @Override
     public void applyEffects() {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
-            getAllPlayersInside().forEach(this::applyEffectsNoUpgradeCheck);
+            getAllPlayersInside().forEach(this::addPotionEffects);
         }
     }
 
@@ -3805,14 +3810,14 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
-            removeEffectsNoUpgradeCheck(superiorPlayer);
+            removePotionEffects(superiorPlayer);
         }
     }
 
     @Override
     public void removeEffects() {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
-            getAllPlayersInside().forEach(this::removeEffectsNoUpgradeCheck);
+            getAllPlayersInside().forEach(this::removePotionEffects);
         }
     }
 
@@ -4862,21 +4867,47 @@ public class SIsland implements Island {
         return this.giveInterestFailed;
     }
 
-    private void applyEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
-        Player player = superiorPlayer.asPlayer();
-
-        if (player != null) {
-            getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
-                    new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
+    private void addPotionEffect(@Nullable Player player, PotionEffectType potionEffectType) {
+        if (player == null) {
+            return;
         }
+
+        IntValue effectLevel = this.effectLevels.get(potionEffectType);
+
+        if (effectLevel == null || effectLevel.get() < 1) {
+            return;
+        }
+
+        player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, effectLevel.get() - 1), true);
     }
 
-    private void removeEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
+    private void removePotionEffect(@Nullable Player player, PotionEffectType potionEffectType) {
+        if (player == null) {
+            return;
+        }
+
+        player.removePotionEffect(potionEffectType);
+    }
+
+    private void addPotionEffects(SuperiorPlayer superiorPlayer) {
         Player player = superiorPlayer.asPlayer();
 
-        if (player != null) {
-            getPotionEffects().keySet().forEach(player::removePotionEffect);
+        if (player == null) {
+            return;
         }
+
+        getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
+                new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
+    }
+
+    private void removePotionEffects(SuperiorPlayer superiorPlayer) {
+        Player player = superiorPlayer.asPlayer();
+
+        if (player == null) {
+            return;
+        }
+
+        getPotionEffects().keySet().forEach(player::removePotionEffect);
     }
 
     private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {
@@ -5568,8 +5599,8 @@ public class SIsland implements Island {
                     KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
 
                     if (dimensionGeneratorAmounts != null && !upgradeDimensionGeneratorAmounts.isEmpty()) {
-                        KeyMap<IntValue> dimensionGeneratorRatesCopy = dimensionGeneratorAmounts;
-                        dimensionGeneratorRatesCopy.removeIf(key -> dimensionGeneratorRatesCopy.get(key).isSynced());
+                        KeyMap<IntValue> dimensionGeneratorAmountsCopy = dimensionGeneratorAmounts;
+                        dimensionGeneratorAmountsCopy.removeIf(key -> dimensionGeneratorAmountsCopy.get(key).isSynced());
                     }
 
                     for (Map.Entry<Key, IntValue> entry : upgradeDimensionGeneratorAmounts.entrySet()) {
@@ -5664,18 +5695,26 @@ public class SIsland implements Island {
     }
 
     private void syncGeneratorAmount(SUpgradeLevel upgradeLevel, Key key, Dimension dimension) {
-        Map<Key, IntValue> upgradeGeneratorAmounts = upgradeLevel.getGeneratorUpgradeValue().get(dimension);
+        Map<Key, IntValue> upgradeDimensionGeneratorAmounts = upgradeLevel.getGeneratorUpgradeValue().get(dimension);
 
-        if (upgradeGeneratorAmounts == null) {
+        if (upgradeDimensionGeneratorAmounts == null || upgradeDimensionGeneratorAmounts.isEmpty()) {
             return;
         }
 
-        IntValue generatorAmount = upgradeGeneratorAmounts.get(key);
+        this.generatorAmounts.write(generatorAmounts -> {
+            KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
 
-        if (generatorAmount != null) {
-            this.generatorAmounts.write(generatorAmounts -> {
-                KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
+            if (dimensionGeneratorAmounts != null) {
+                IntValue currentValue = dimensionGeneratorAmounts.get(key);
 
+                if (currentValue != null && currentValue.isSynced()) {
+                    dimensionGeneratorAmounts.remove(key);
+                }
+            }
+
+            IntValue generatorAmount = upgradeDimensionGeneratorAmounts.get(key);
+
+            if (generatorAmount != null) {
                 if (generatorAmount.get() < 0) {
                     if (dimensionGeneratorAmounts != null) {
                         dimensionGeneratorAmounts.remove(key);
@@ -5683,12 +5722,13 @@ public class SIsland implements Island {
                 } else {
                     if (dimensionGeneratorAmounts == null) {
                         dimensionGeneratorAmounts = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+                        generatorAmounts.put(dimension, dimensionGeneratorAmounts);
                     }
 
                     dimensionGeneratorAmounts.put(key, generatorAmount);
                 }
-            });
-        }
+            }
+        });
     }
 
     private void updateIslandChests() {
