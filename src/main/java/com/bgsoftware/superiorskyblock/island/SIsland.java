@@ -984,12 +984,38 @@ public class SIsland implements Island {
     public void clearRoleLimits() {
         Log.debug(Debug.CLEAR_ROLE_LIMITS, this.owner.getName());
 
-        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty)) {
+        List<PlayerRole> customRoleLimits = this.roleLimits.writeAndGet(roleLimits -> {
+            List<PlayerRole> rolesToSync = new ArrayList<>();
+
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+
+                if (!entry.getValue().isSynced()) {
+                    PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+                    if (playerRole != null) {
+                        rolesToSync.add(playerRole);
+                    }
+
+                    iterator.remove();
+                }
+            }
+
+            return rolesToSync;
+        });
+
+        if (customRoleLimits == null || customRoleLimits.isEmpty()) {
             return;
         }
 
-        this.roleLimits.write(Int2ObjectMapView::clear);
         IslandsDatabaseBridge.clearRoleLimits(this);
+
+        for (PlayerRole playerRole : customRoleLimits) {
+            syncRoleLimit(DefaultUpgradeLevel.getInstance(), playerRole);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncRoleLimit((SUpgradeLevel) getUpgradeLevel(upgrade), playerRole));
+        }
     }
 
     /*
@@ -3349,12 +3375,26 @@ public class SIsland implements Island {
     public void clearBlockLimits() {
         Log.debug(Debug.CLEAR_BLOCK_LIMITS, owner.getName());
 
-        if (this.blockLimits.isEmpty()) {
+        List<Key> customBlockLimits = new ArrayList<>();
+
+        this.blockLimits.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customBlockLimits.add(key);
+            }
+        });
+
+        if (customBlockLimits.isEmpty()) {
             return;
         }
 
-        this.blockLimits.clear();
+        customBlockLimits.forEach(this.blockLimits::remove);
         IslandsDatabaseBridge.clearBlockLimits(this);
+
+        for (Key key : customBlockLimits) {
+            syncBlockLimit(DefaultUpgradeLevel.getInstance(), key);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncBlockLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+        }
     }
 
     @Override
@@ -3491,12 +3531,26 @@ public class SIsland implements Island {
     public void clearEntitiesLimits() {
         Log.debug(Debug.CLEAR_ENTITY_LIMITS, owner.getName());
 
-        if (this.entityLimits.isEmpty()) {
+        List<Key> customEntityLimits = new ArrayList<>();
+
+        this.entityLimits.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customEntityLimits.add(key);
+            }
+        });
+
+        if (customEntityLimits.isEmpty()) {
             return;
         }
 
-        this.entityLimits.clear();
+        customEntityLimits.forEach(this.entityLimits::remove);
         IslandsDatabaseBridge.clearEntityLimits(this);
+
+        for (Key key : customEntityLimits) {
+            syncEntityLimit(DefaultUpgradeLevel.getInstance(), key);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncEntityLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+        }
     }
 
     @Override
@@ -3790,6 +3844,44 @@ public class SIsland implements Island {
     }
 
     @Override
+    public void clearEffects() {
+        Log.debug(Debug.CLEAR_ISLAND_EFFECTS, owner.getName());
+
+        List<PotionEffectType> customEffectLevels = new ArrayList<>();
+
+        this.effectLevels.forEach((potionEffectType, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customEffectLevels.add(potionEffectType);
+            }
+        });
+
+        if (customEffectLevels.isEmpty()) {
+            return;
+        }
+
+        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+            for (PotionEffectType potionEffectType : customEffectLevels) {
+                removePotionEffect(superiorPlayer.asPlayer(), potionEffectType);
+            }
+        })));
+
+        customEffectLevels.forEach(this.effectLevels::remove);
+        IslandsDatabaseBridge.clearIslandEffects(this);
+
+        for (PotionEffectType potionEffectType : customEffectLevels) {
+            syncEffectLevel(DefaultUpgradeLevel.getInstance(), potionEffectType);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncEffectLevel((SUpgradeLevel) getUpgradeLevel(upgrade), potionEffectType));
+        }
+
+        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+            for (PotionEffectType potionEffectType : customEffectLevels) {
+                addPotionEffect(superiorPlayer.asPlayer(), potionEffectType);
+            }
+        })));
+    }
+
+    @Override
     public void applyEffects(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
@@ -3819,19 +3911,6 @@ public class SIsland implements Island {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
             getAllPlayersInside().forEach(this::removePotionEffects);
         }
-    }
-
-    @Override
-    public void clearEffects() {
-        Log.debug(Debug.CLEAR_ISLAND_EFFECTS, owner.getName());
-
-        if (this.effectLevels.isEmpty()) {
-            return;
-        }
-
-        this.effectLevels.clear();
-        removeEffects();
-        IslandsDatabaseBridge.clearIslandEffects(this);
     }
 
     /*
@@ -4528,8 +4607,26 @@ public class SIsland implements Island {
             return;
         }
 
-        dimensionGeneratorAmounts.clear();
+        List<Key> customGeneratorAmounts = new ArrayList<>();
+
+        dimensionGeneratorAmounts.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customGeneratorAmounts.add(key);
+            }
+        });
+
+        if (customGeneratorAmounts.isEmpty()) {
+            return;
+        }
+
+        customGeneratorAmounts.forEach(dimensionGeneratorAmounts::remove);
         IslandsDatabaseBridge.clearGeneratorRates(this, dimension);
+
+        for (Key key : customGeneratorAmounts) {
+            syncGeneratorAmount(DefaultUpgradeLevel.getInstance(), key, dimension);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncGeneratorAmount((SUpgradeLevel) getUpgradeLevel(upgrade), key, dimension));
+        }
     }
 
     @Override
