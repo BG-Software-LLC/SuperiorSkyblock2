@@ -596,7 +596,13 @@ public class CommandArguments {
 
         try {
             d = Double.parseDouble(argument);
-            d = Math.round(d * 100) / 100D;
+
+            if (!Double.isFinite(d)) {
+                locale.send(sender, argument);
+                status = false;
+            } else {
+                d = Math.round(d * 100) / 100D;
+            }
         } catch (IllegalArgumentException ex) {
             locale.send(sender, argument);
             status = false;
