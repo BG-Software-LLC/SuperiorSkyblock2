@@ -300,8 +300,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     /**
      * Update the island's entire area from the current configuration.
      */
-    default void updateEntireArea() {
-    }
+    void updateEntireArea();
 
     /**
      * Access the island's world.

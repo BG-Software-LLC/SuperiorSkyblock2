@@ -150,7 +150,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         }
     }
 
-    public void reloadIslands() {
+    public void refreshIslandsFromSettings() {
         getIslands().forEach(island -> {
             island.updateEntireArea();
             island.updateUpgrades();
