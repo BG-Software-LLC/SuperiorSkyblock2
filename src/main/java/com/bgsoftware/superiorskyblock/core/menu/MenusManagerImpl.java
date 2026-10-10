@@ -18,7 +18,10 @@ import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
+import com.bgsoftware.superiorskyblock.api.menu.hologram.HologramButton;
+import com.bgsoftware.superiorskyblock.api.menu.hologram.HologramMenuStyle;
 import com.bgsoftware.superiorskyblock.api.menu.layout.DialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.HologramMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedDialogMenuLayout;
@@ -39,10 +42,13 @@ import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContext
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyItem;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.body.DialogBodyText;
+import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramButtonImpl;
+import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramMenuStyleImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedDialogMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedInventoryMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.RegularHologramMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularInventoryMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
@@ -584,6 +590,11 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     }
 
     @Override
+    public <V extends MenuView<V, ?>> HologramMenuLayout.Builder<V> createHologramLayoutBuilder() {
+        return new RegularHologramMenuLayoutImpl.Builder<>();
+    }
+
+    @Override
     @Deprecated
     public <V extends PagedMenuView<V, ?, E>, E> PagedMenuLayout.Builder<V, E> createPagedPatternBuilder() {
         return createInventoryPagedLayoutBuilder();
@@ -634,6 +645,16 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     @Override
     public DialogButton.Builder createDialogButtonBuilder() {
         return new DialogButtonImpl.Builder();
+    }
+
+    @Override
+    public HologramButton.Builder createHologramButtonBuilder() {
+        return new HologramButtonImpl.Builder();
+    }
+
+    @Override
+    public HologramMenuStyle.Builder createHologramStyleBuilder() {
+        return new HologramMenuStyleImpl.Builder();
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.menu.button;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
+import com.bgsoftware.superiorskyblock.api.menu.hologram.HologramButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import org.bukkit.inventory.ItemStack;
@@ -32,6 +33,15 @@ public interface MenuTemplateButton<V extends MenuView<V, ?>> {
      */
     @Nullable
     DialogButton getButtonDialog();
+
+    /**
+     * Get the appearance of the button in hologram menus.
+     * If null, the default appearance of the menu is used.
+     * <p>
+     * This method is only relevant for buttons in hologram-based menus.
+     */
+    @Nullable
+    HologramButton getButtonHologram();
 
     /**
      * Get the sound to play when clicking the button.
@@ -95,6 +105,14 @@ public interface MenuTemplateButton<V extends MenuView<V, ?>> {
          * @param buttonDialog The data of the dialog button.
          */
         Builder<V> setButtonDialog(DialogButton buttonDialog);
+
+        /**
+         * Set the appearance of the button in hologram menus.
+         * Unlike {@link #setButtonDialog(DialogButton)}, it can be set together with an item.
+         *
+         * @param buttonHologram The appearance of the button.
+         */
+        Builder<V> setButtonHologram(@Nullable HologramButton buttonHologram);
 
         /**
          * Set the sound to play when clicking the button.

@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeysManagerImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenusManagerImpl;
+import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramMenuWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlocksManagerImpl;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.container.DefaultStackedBlocksContainer;
@@ -71,6 +72,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFightChooser;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
+import com.bgsoftware.superiorskyblock.nms.NMSHologramMenus;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
@@ -133,6 +135,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
     private Optional<NMSDialogs> nmsDialogs;
+    private Optional<NMSHologramMenus> nmsHologramMenus = Optional.empty();
     private NMSDragonFight nmsDragonFight;
     private NMSEntities nmsEntities;
     private NMSHolograms nmsHolograms;
@@ -217,6 +220,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             loadingStage = PluginLoadingStage.START_ENABLE;
 
             BukkitExecutor.init(this);
+
+            if (this.nmsHologramMenus.isPresent())
+                BukkitExecutor.timer(HologramMenuWrapper::tickAll, 1L);
 
             loadUpgradeCostLoaders();
 
@@ -357,6 +363,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             // Shutdown task is running from another thread, causing closing of inventories to cause errors.
             // This check should prevent it.
             if (Bukkit.isPrimaryThread()) {
+                HologramMenuWrapper.closeAll();
                 Bukkit.getOnlinePlayers().forEach(player -> {
                     SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                     player.closeInventory();
@@ -424,6 +431,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             } catch (NMSLoadException e) {
                 // Failed to load NMSDialogs
                 this.nmsDialogs = Optional.empty();
+            }
+
+            try {
+                this.nmsHologramMenus = Optional.of(nmsLoader.loadNMSHandler(NMSHologramMenus.class));
+            } catch (NMSLoadException e) {
+                // Failed to load NMSHologramMenus
+                this.nmsHologramMenus = Optional.empty();
             }
 
             return true;
@@ -646,6 +660,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     public Optional<NMSDialogs> getNMSDialogs() {
         return nmsDialogs;
+    }
+
+    public Optional<NMSHologramMenus> getNMSHologramMenus() {
+        return nmsHologramMenus;
     }
 
     public NMSDragonFight getNMSDragonFight() {

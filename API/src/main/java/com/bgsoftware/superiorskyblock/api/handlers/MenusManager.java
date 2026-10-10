@@ -16,7 +16,10 @@ import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
+import com.bgsoftware.superiorskyblock.api.menu.hologram.HologramButton;
+import com.bgsoftware.superiorskyblock.api.menu.hologram.HologramMenuStyle;
 import com.bgsoftware.superiorskyblock.api.menu.layout.DialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.HologramMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedDialogMenuLayout;
@@ -906,6 +909,11 @@ public interface MenusManager {
     <V extends MenuView<V, ?>> DialogMenuLayout.Builder<V> createDialogLayoutBuilder();
 
     /**
+     * Create a new pattern builder for building a hologram based menu.
+     */
+    <V extends MenuView<V, ?>> HologramMenuLayout.Builder<V> createHologramLayoutBuilder();
+
+    /**
      * Create a new pattern builder for building a paged-based menu.
      *
      * @deprecated See {@link InventoryMenuLayout} and {@link DialogMenuLayout}
@@ -965,6 +973,16 @@ public interface MenusManager {
      * Create a new builder for a {@link DialogButton} object.
      */
     DialogButton.Builder createDialogButtonBuilder();
+
+    /**
+     * Create a new builder for a {@link HologramButton} object.
+     */
+    HologramButton.Builder createHologramButtonBuilder();
+
+    /**
+     * Create a new builder for a {@link HologramMenuStyle} object.
+     */
+    HologramMenuStyle.Builder createHologramStyleBuilder();
 
     /**
      * Creates a new click context in a menu.

@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
+import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramMenuWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandChat;
@@ -228,6 +229,11 @@ public class PlayersListener extends AbstractGameEventListener {
         DialogWrapper<?> dialog = DialogWrapper.getByPlayer(player.getUniqueId());
         if (dialog != null)
             dialog.onCloseDialog();
+
+        // Destroy current opened hologram menu
+        HologramMenuWrapper<?> hologramMenu = HologramMenuWrapper.getByPlayer(player.getUniqueId());
+        if (hologramMenu != null)
+            hologramMenu.close(false);
     }
 
     private void onPlayerGameModeChange(GameEvent<GameEventArgs.PlayerGamemodeChangeEvent> e) {

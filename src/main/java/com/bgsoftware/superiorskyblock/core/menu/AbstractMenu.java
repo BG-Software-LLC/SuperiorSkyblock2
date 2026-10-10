@@ -12,7 +12,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContextImpl;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
+import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramMenuWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.RegularHologramMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
@@ -27,11 +29,13 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     protected boolean isInventoryMenu;
+    protected boolean isHologramMenu;
 
     protected AbstractMenu(String identifier, MenuParseResult<V> parseResult) {
         super(identifier, parseResult.getLayoutBuilder().build(), parseResult.getOpeningSound(),
                 parseResult.isPreviousMoveAllowed(), parseResult.isSkipOneItem());
         this.isInventoryMenu = this.menuLayout instanceof InventoryMenuLayout;
+        this.isHologramMenu = this.menuLayout instanceof RegularHologramMenuLayoutImpl;
     }
 
     @Override
@@ -75,6 +79,8 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
 
         if (this.isInventoryMenu) {
             return refreshInventoryViewInternal(view);
+        } else if (this.isHologramMenu) {
+            return refreshHologramViewInternal(view);
         } else {
             return refreshDialogViewInternal(view);
         }
@@ -105,6 +111,21 @@ public abstract class AbstractMenu<V extends AbstractMenuView<V, A>, A extends V
                     view.setDialog(dialog);
                     result.complete(view);
                 });
+            }
+        });
+        return result;
+    }
+
+    private CompletableFuture<V> refreshHologramViewInternal(V view) {
+        CompletableFuture<V> result = new CompletableFuture<>();
+        // Hologram menus are only drawn when they are opened, which must be done from the main thread.
+        BukkitExecutor.ensureMain(() -> {
+            try {
+                HologramMenuWrapper<V> hologramMenu = ((RegularHologramMenuLayoutImpl<V>) this.menuLayout).buildHologramMenu(view);
+                view.setHologramMenu(hologramMenu);
+                result.complete(view);
+            } catch (Throwable error) {
+                result.completeExceptionally(error);
             }
         });
         return result;

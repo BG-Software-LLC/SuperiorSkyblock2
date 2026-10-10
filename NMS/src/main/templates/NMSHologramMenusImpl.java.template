@@ -1,0 +1,483 @@
+//<generate-if:HOLOGRAM_MENUS_SUPPORT>
+package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
+
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.nms.NMSHologramMenus;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetCameraPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Display;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class NMSHologramMenusImpl implements NMSHologramMenus {
+
+    private static final String CHANNEL_HANDLER_NAME = "superiorskyblock_hologram_menu";
+
+    /* The size of the background of a text display that has a single space as its text. */
+    private static final float BLANK_TEXT_WIDTH = 0.125f;
+    private static final float BLANK_TEXT_HEIGHT = 0.25f;
+    /* The background of text displays is not centered around the entity, but 0.5 pixels to its right. */
+    private static final float BLANK_TEXT_CENTER_OFFSET = 0.0125f;
+    /* The height of a single line of text. Text is rendered above the entity, and not centered around it. */
+    private static final float TEXT_LINE_HEIGHT = 0.25f;
+    /* The distance between two elements, so elements that were added later are rendered in front. */
+    private static final float ELEMENTS_DEPTH = 0.01f;
+    /* Texts should not be wrapped to multiple lines. */
+    private static final int TEXT_LINE_WIDTH = 2000;
+    private static final Color TRANSPARENT_COLOR = Color.fromARGB(0, 0, 0, 0);
+    private static final AxisAngle4f NO_ROTATION = new AxisAngle4f();
+    /* Items are rendered with their back to the direction their entity looks at, unlike texts. */
+    private static final AxisAngle4f ITEM_ROTATION = new AxisAngle4f((float) Math.PI, 0f, 1f, 0f);
+    /* Items are flattened, so blocks look the same way they look in inventories. */
+    private static final float ITEM_DEPTH = 0.001f;
+    private static final org.bukkit.entity.Display.Brightness FULL_BRIGHTNESS = new org.bukkit.entity.Display.Brightness(15, 15);
+
+    /* Cached data that tells the viewer to start interpolating an element immediately. */
+    private static SynchedEntityData.DataValue<?> startInterpolationData;
+
+    @Override
+    public Renderer createRenderer(Player viewer, Location origin, float distance, InputListener listener) {
+        return new RendererImpl(((CraftPlayer) viewer).getHandle(), origin, distance, listener);
+    }
+
+    private static class RendererImpl implements Renderer {
+
+        private final List<Element> elements = new ArrayList<>();
+
+        private final ServerPlayer serverPlayer;
+        private final InputListener listener;
+        private final double originX;
+        private final double originY;
+        private final double originZ;
+        private final float yaw;
+        private final float distance;
+
+        private Display.TextDisplay cameraAnchor;
+        private Display.TextDisplay vehicleAnchor;
+        private Channel channel;
+        private boolean locked = false;
+
+        RendererImpl(ServerPlayer serverPlayer, Location origin, float distance, InputListener listener) {
+            this.serverPlayer = serverPlayer;
+            this.listener = listener;
+            this.originX = origin.getX();
+            this.originY = origin.getY();
+            this.originZ = origin.getZ();
+            this.yaw = origin.getYaw();
+            this.distance = distance;
+        }
+
+        @Override
+        public int addText(String text, float x, float y, float scale, boolean shadowed) {
+            // Text is rendered above the entity, and not centered around it.
+            Element element = createTextElement(0f, -(TEXT_LINE_HEIGHT * scale) / 2, new Vector3f(scale, scale, scale));
+            element.textDisplay.setText(text);
+            element.textDisplay.setShadowed(shadowed);
+            element.textDisplay.setBackgroundColor(TRANSPARENT_COLOR);
+            element.setPosition(x, y);
+            return element.id;
+        }
+
+        @Override
+        public int addTooltip(String text, float x, float y, float scale, int argb) {
+            Element element = createTextElement(0f, 0f, new Vector3f(scale, scale, scale));
+            element.textDisplay.setText(text);
+            element.textDisplay.setShadowed(true);
+            element.textDisplay.setAlignment(TextDisplay.TextAlignment.LEFT);
+            element.textDisplay.setBackgroundColor(Color.fromARGB(argb));
+            element.setPosition(x, y);
+            return element.id;
+        }
+
+        @Override
+        public int addRectangle(float x, float y, float width, float height, int argb) {
+            // The background of a blank text is stretched to the size of the rectangle.
+            float scaleX = width / BLANK_TEXT_WIDTH;
+            float scaleY = height / BLANK_TEXT_HEIGHT;
+            Element element = createTextElement(-BLANK_TEXT_CENTER_OFFSET * scaleX, -height / 2, new Vector3f(scaleX, scaleY, 1f));
+            element.textDisplay.setText(" ");
+            element.textDisplay.setShadowed(false);
+            element.textDisplay.setBackgroundColor(Color.fromARGB(argb));
+            element.setPosition(x, y);
+            return element.id;
+        }
+
+        @Override
+        public int addItem(ItemStack itemStack, float x, float y, float width, float height) {
+            Display.ItemDisplay display = new Display.ItemDisplay(${ENTITY_TYPE_VALUES_CLASS}.ITEM_DISPLAY, this.serverPlayer.level());
+            Element element = createElement(display, 0f, 0f, new Vector3f(width, height, ITEM_DEPTH), ITEM_ROTATION);
+            ItemDisplay itemDisplay = (ItemDisplay) element.bukkitEntity;
+            itemDisplay.setItemStack(itemStack);
+            itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
+            element.setPosition(x, y);
+            return element.id;
+        }
+
+        private Element createTextElement(float offsetX, float offsetY, Vector3f scale) {
+            Element element = createElement(createDisplay(), offsetX, offsetY, scale, NO_ROTATION);
+            element.textDisplay.setLineWidth(TEXT_LINE_WIDTH);
+            element.textDisplay.setDefaultBackground(false);
+            return element;
+        }
+
+        private Element createElement(Display display, float offsetX, float offsetY, Vector3f scale, AxisAngle4f rotation) {
+            int id = this.elements.size();
+            // All the elements are located in the eyes of the viewer, and are moved to the panel by their transformation.
+            // Displays are rotated to face the viewer, therefore their z-axis points to the viewer.
+            display.setPos(this.originX, this.originY, this.originZ);
+            display.setYRot(this.yaw + 180f);
+            float depth = -this.distance + ELEMENTS_DEPTH * id;
+            Element element = new Element(id, display, offsetX, offsetY, depth, scale, rotation);
+            element.bukkitEntity.setBrightness(FULL_BRIGHTNESS);
+            // Makes the element move smoothly when it is being moved.
+            element.bukkitEntity.setInterpolationDuration(1);
+            this.elements.add(element);
+            return element;
+        }
+
+        private Display.TextDisplay createDisplay() {
+            return new Display.TextDisplay(${ENTITY_TYPE_VALUES_CLASS}.TEXT_DISPLAY, this.serverPlayer.level());
+        }
+
+        private Display.TextDisplay createDisplay(double x, double y, double z, float yaw) {
+            Display.TextDisplay display = createDisplay();
+            display.setPos(x, y, z);
+            display.setYRot(yaw);
+            return display;
+        }
+
+        @Override
+        public void show() {
+            if (!this.locked) {
+                this.locked = true;
+                lockView();
+            }
+
+            for (Element element : this.elements) {
+                if (!element.spawned) {
+                    element.spawned = true;
+                    spawnEntity(element.entity);
+                }
+            }
+        }
+
+        private void lockView() {
+            // The camera of the viewer is locked on an entity that looks at the panel.
+            // In order to keep receiving the rotation of the viewer while his camera is locked, he must ride an entity.
+            this.cameraAnchor = createDisplay(this.originX, this.originY, this.originZ, this.yaw);
+            this.vehicleAnchor = createDisplay(this.serverPlayer.getX(), this.serverPlayer.getY(), this.serverPlayer.getZ(), this.yaw);
+
+            spawnEntity(this.cameraAnchor);
+            spawnEntity(this.vehicleAnchor);
+
+            sendPacket(new ClientboundSetCameraPacket(this.cameraAnchor));
+            sendPacket(createPassengersPacket(this.vehicleAnchor, this.serverPlayer.getId()));
+
+            this.channel = findChannel(this.serverPlayer);
+            if (this.channel != null) {
+                Channel channel = this.channel;
+                InputHandler inputHandler = new InputHandler(this.serverPlayer, this.listener);
+                channel.eventLoop().execute(() -> {
+                    if (channel.pipeline().get(CHANNEL_HANDLER_NAME) == null && channel.pipeline().get("packet_handler") != null)
+                        channel.pipeline().addBefore("packet_handler", CHANNEL_HANDLER_NAME, inputHandler);
+                });
+            }
+        }
+
+        private void spawnEntity(Display entity) {
+            sendPacket(new ClientboundAddEntityPacket(entity.getId(), entity.getUUID(),
+                    entity.getX(), entity.getY(), entity.getZ(), entity.getXRot(), entity.getYRot(),
+                    entity.getType(), 0, Vec3.ZERO, entity.getYRot()));
+
+            List<SynchedEntityData.DataValue<?>> entityData = entity.getEntityData().getNonDefaultValues();
+            if (entityData != null && !entityData.isEmpty())
+                sendPacket(new ClientboundSetEntityDataPacket(entity.getId(), entityData));
+
+            // Marks all the data of the entity as sent.
+            entity.getEntityData().packDirty();
+        }
+
+        @Override
+        public void moveElement(int elementId, float x, float y) {
+            Element element = this.elements.get(elementId);
+            element.setPosition(x, y);
+
+            if (!element.spawned)
+                return;
+
+            List<SynchedEntityData.DataValue<?>> entityData = element.entity.getEntityData().packDirty();
+            if (entityData == null || entityData.isEmpty())
+                return;
+
+            // The transformation is only interpolated when the viewer is told when to start doing it.
+            entityData = new ArrayList<>(entityData);
+            entityData.add(getStartInterpolationData());
+
+            sendPacket(new ClientboundSetEntityDataPacket(element.entity.getId(), entityData));
+        }
+
+        private SynchedEntityData.DataValue<?> getStartInterpolationData() {
+            if (startInterpolationData == null) {
+                // The data cannot be marked as dirty without changing it, so it is created manually.
+                // Its identifier is found by changing it in a dummy entity.
+                Display.TextDisplay display = createDisplay();
+                ((TextDisplay) display.getBukkitEntity()).setInterpolationDelay(1);
+                List<SynchedEntityData.DataValue<?>> entityData = display.getEntityData().packDirty();
+                if (entityData == null || entityData.size() != 1)
+                    throw new IllegalStateException("Cannot find the interpolation delay of display entities");
+                startInterpolationData = createStartInterpolationData(entityData.get(0));
+            }
+
+            return startInterpolationData;
+        }
+
+        @SuppressWarnings("unchecked")
+        private static SynchedEntityData.DataValue<Integer> createStartInterpolationData(SynchedEntityData.DataValue<?> dataValue) {
+            SynchedEntityData.DataValue<Integer> interpolationDelayData = (SynchedEntityData.DataValue<Integer>) dataValue;
+            return new SynchedEntityData.DataValue<>(interpolationDelayData.id(), interpolationDelayData.serializer(), 0);
+        }
+
+        @Override
+        public void setColor(int elementId, int argb) {
+            Element element = this.elements.get(elementId);
+            if (element.textDisplay == null)
+                return;
+            element.textDisplay.setBackgroundColor(Color.fromARGB(argb));
+            sendDirtyData(element);
+        }
+
+        @Override
+        public void setText(int elementId, String text) {
+            Element element = this.elements.get(elementId);
+            if (element.textDisplay == null)
+                return;
+            element.textDisplay.setText(text);
+            sendDirtyData(element);
+        }
+
+        private void sendDirtyData(Element element) {
+            if (!element.spawned)
+                return;
+
+            List<SynchedEntityData.DataValue<?>> entityData = element.entity.getEntityData().packDirty();
+            if (entityData != null && !entityData.isEmpty())
+                sendPacket(new ClientboundSetEntityDataPacket(element.entity.getId(), entityData));
+        }
+
+        @Override
+        public void clear() {
+            removeElements();
+        }
+
+        private void removeElements() {
+            int[] entityIds = this.elements.stream()
+                    .filter(element -> element.spawned)
+                    .mapToInt(element -> element.entity.getId())
+                    .toArray();
+            if (entityIds.length > 0)
+                sendPacket(new ClientboundRemoveEntitiesPacket(entityIds));
+            this.elements.clear();
+        }
+
+        @Override
+        public void destroy() {
+            removeElements();
+
+            if (!this.locked)
+                return;
+
+            this.locked = false;
+
+            if (this.channel != null) {
+                Channel channel = this.channel;
+                channel.eventLoop().execute(() -> {
+                    if (channel.pipeline().get(CHANNEL_HANDLER_NAME) != null)
+                        channel.pipeline().remove(CHANNEL_HANDLER_NAME);
+                });
+                this.channel = null;
+            }
+
+            if (this.serverPlayer.hasDisconnected())
+                return;
+
+            sendPacket(new ClientboundSetCameraPacket(this.serverPlayer));
+            sendPacket(createPassengersPacket(this.vehicleAnchor));
+            sendPacket(new ClientboundRemoveEntitiesPacket(this.cameraAnchor.getId(), this.vehicleAnchor.getId()));
+
+            // The viewer was moved to the location of his vehicle on his side only, so his location must be synced.
+            this.serverPlayer.connection.teleport(this.serverPlayer.getX(), this.serverPlayer.getY(),
+                    this.serverPlayer.getZ(), this.serverPlayer.getYRot(), this.serverPlayer.getXRot());
+        }
+
+        private void sendPacket(Packet<?> packet) {
+            this.serverPlayer.connection.send(packet);
+        }
+
+        private static Packet<?> createPassengersPacket(Entity vehicle, int... passengers) {
+            // The packet can only be created from the real passengers of an entity, which the viewer is not one of.
+            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+            try {
+                buf.writeVarInt(vehicle.getId());
+                buf.writeVarIntArray(passengers);
+                return ${SET_PASSENGERS_PACKET_FROM_BUFFER}(buf);
+            } finally {
+                buf.release();
+            }
+        }
+
+        private static Channel findChannel(ServerPlayer serverPlayer) {
+            for (Connection connection : MinecraftServer.getServer().getConnection().getConnections()) {
+                if (connection.getPacketListener() == serverPlayer.connection)
+                    return connection.channel;
+            }
+
+            return null;
+        }
+
+    }
+
+    private static class Element {
+
+        private final int id;
+        private final Display entity;
+        private final org.bukkit.entity.Display bukkitEntity;
+        // Only set for elements that are rendered using texts.
+        private final TextDisplay textDisplay;
+        // The offset between the center of the element and the location its entity is rendered in.
+        private final float offsetX;
+        private final float offsetY;
+        private final float depth;
+        private final Vector3f scale;
+        private final AxisAngle4f rotation;
+        private boolean spawned = false;
+
+        Element(int id, Display entity, float offsetX, float offsetY, float depth, Vector3f scale, AxisAngle4f rotation) {
+            this.id = id;
+            this.entity = entity;
+            this.bukkitEntity = (org.bukkit.entity.Display) entity.getBukkitEntity();
+            this.textDisplay = this.bukkitEntity instanceof TextDisplay ? (TextDisplay) this.bukkitEntity : null;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+            this.depth = depth;
+            this.scale = scale;
+            this.rotation = rotation;
+        }
+
+        void setPosition(float x, float y) {
+            this.bukkitEntity.setTransformation(new Transformation(
+                    new Vector3f(x + this.offsetX, y + this.offsetY, this.depth),
+                    new AxisAngle4f(this.rotation), new Vector3f(this.scale), NO_ROTATION));
+        }
+
+    }
+
+    private static class InputHandler extends ChannelInboundHandlerAdapter {
+
+        private final ServerPlayer serverPlayer;
+        private final InputListener listener;
+        private boolean exited = false;
+
+        InputHandler(ServerPlayer serverPlayer, InputListener listener) {
+            this.serverPlayer = serverPlayer;
+            this.listener = listener;
+        }
+
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+            if (!handlePacket(packet))
+                super.channelRead(ctx, packet);
+        }
+
+        /**
+         * @return true if the packet should not be handled by the server.
+         */
+        private boolean handlePacket(Object packet) {
+            if (packet instanceof ${SWING_PACKET_CLASS} || packet instanceof ${ATTACK_PACKET_CLASS}) {
+                BukkitExecutor.sync(() -> this.listener.onClick(false));
+                return true;
+            }
+
+            if (packet instanceof ServerboundPlayerInputPacket) {
+                // The viewer tries to dismount his vehicle.
+                if (!this.exited && ((ServerboundPlayerInputPacket) packet).${PLAYER_INPUT_PACKET_SHIFT_METHOD}) {
+                    this.exited = true;
+                    BukkitExecutor.sync(this.listener::onExit);
+                }
+                return true;
+            }
+
+            // The viewer should not interact with the world behind the menu.
+            // Block interactions are predicted by the viewer, and must be acknowledged in order to be reverted.
+
+            if (packet instanceof ServerboundInteractPacket)
+                return true;
+
+            if (packet instanceof ServerboundUseItemOnPacket) {
+                acknowledgeBlockChange(((ServerboundUseItemOnPacket) packet).${USE_ITEM_PACKET_SEQUENCE_METHOD});
+                BukkitExecutor.sync(() -> this.listener.onClick(true));
+                return true;
+            }
+
+            if (packet instanceof ServerboundUseItemPacket) {
+                acknowledgeBlockChange(((ServerboundUseItemPacket) packet).${USE_ITEM_PACKET_SEQUENCE_METHOD});
+                BukkitExecutor.sync(() -> this.listener.onClick(true));
+                return true;
+            }
+
+            if (packet instanceof ServerboundPlayerActionPacket) {
+                ServerboundPlayerActionPacket playerActionPacket = (ServerboundPlayerActionPacket) packet;
+                switch (playerActionPacket.getAction()) {
+                    case START_DESTROY_BLOCK:
+                        // The viewer clicked on a block that is behind the menu.
+                        BukkitExecutor.sync(() -> this.listener.onClick(false));
+                        // fallthrough
+                    case ABORT_DESTROY_BLOCK:
+                    case STOP_DESTROY_BLOCK:
+                        acknowledgeBlockChange(playerActionPacket.getSequence());
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            return false;
+        }
+
+        private void acknowledgeBlockChange(int sequence) {
+            this.serverPlayer.connection.send(new ClientboundBlockChangedAckPacket(sequence));
+        }
+
+    }
+
+}
