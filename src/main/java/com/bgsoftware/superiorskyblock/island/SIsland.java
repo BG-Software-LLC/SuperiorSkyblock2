@@ -870,14 +870,10 @@ public class SIsland implements Island {
             while (iterator.hasNext()) {
                 Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
 
-                int limit = entry.getValue().get();
+                PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
 
-                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                    PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
-
-                    if (playerRole != null) {
-                        roleLimitsBuilder.put(playerRole, limit);
-                    }
+                if (playerRole != null) {
+                    roleLimitsBuilder.put(playerRole, entry.getValue().get());
                 }
             }
         });
@@ -900,14 +896,10 @@ public class SIsland implements Island {
                 Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
 
                 if (!entry.getValue().isSynced()) {
-                    int limit = entry.getValue().get();
+                    PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
 
-                    if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                        PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
-
-                        if (playerRole != null) {
-                            roleLimitsBuilder.put(playerRole, limit);
-                        }
+                    if (playerRole != null) {
+                        roleLimitsBuilder.put(playerRole, entry.getValue().get());
                     }
                 }
             }
@@ -3280,11 +3272,7 @@ public class SIsland implements Island {
         KeyMap<Integer> blockLimitsBuilder = KeyMap.createKeyMap();
 
         this.blockLimits.forEach((key, limitValue) -> {
-            int limit = limitValue.get();
-
-            if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                blockLimitsBuilder.put(key, limit);
-            }
+            blockLimitsBuilder.put(key, limitValue.get());
         });
 
         return blockLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(blockLimitsBuilder);
@@ -3296,11 +3284,7 @@ public class SIsland implements Island {
 
         this.blockLimits.forEach((key, limitValue) -> {
             if (!limitValue.isSynced()) {
-                int limit = limitValue.get();
-
-                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                    blockLimitsBuilder.put(key, limit);
-                }
+                blockLimitsBuilder.put(key, limitValue.get());
             }
         });
 
@@ -3439,11 +3423,7 @@ public class SIsland implements Island {
         KeyMap<Integer> entityLimitsBuilder = KeyMap.createKeyMap();
 
         this.entityLimits.forEach((key, limitValue) -> {
-            int limit = limitValue.get();
-
-            if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                entityLimitsBuilder.put(key, limit);
-            }
+            entityLimitsBuilder.put(key, limitValue.get());
         });
 
         return entityLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityLimitsBuilder);
@@ -3455,11 +3435,7 @@ public class SIsland implements Island {
 
         this.entityLimits.forEach((key, limitValue) -> {
             if (!limitValue.isSynced()) {
-                int limit = limitValue.get();
-
-                if (limit > IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                    entityLimitsBuilder.put(key, limit);
-                }
+                entityLimitsBuilder.put(key, limitValue.get());
             }
         });
 
@@ -3748,11 +3724,7 @@ public class SIsland implements Island {
         Map<PotionEffectType, Integer> effectLevelsBuilder = new ArrayMap<>();
 
         this.effectLevels.forEach((potionEffectType, levelValue) -> {
-            int level = levelValue.get();
-
-            if (level > 0) {
-                effectLevelsBuilder.put(potionEffectType, level);
-            }
+            effectLevelsBuilder.put(potionEffectType, levelValue.get());
         });
 
         return effectLevelsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(effectLevelsBuilder);
@@ -3764,11 +3736,7 @@ public class SIsland implements Island {
 
         this.effectLevels.forEach((potionEffectType, levelValue) -> {
             if (!levelValue.isSynced()) {
-                int level = levelValue.get();
-
-                if (level > 0) {
-                    effectLevelsBuilder.put(potionEffectType, level);
-                }
+                effectLevelsBuilder.put(potionEffectType, levelValue.get());
             }
         });
 
@@ -4465,6 +4433,7 @@ public class SIsland implements Island {
      *  Generator related methods
      */
 
+    @Deprecated
     @Override
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
@@ -4479,11 +4448,27 @@ public class SIsland implements Island {
         Map<String, Integer> generatorAmountsBuilder = new HashMap<>();
 
         dimensionGeneratorAmounts.forEach((key, amountValue) -> {
-            int amount = amountValue.get();
+            generatorAmountsBuilder.put(key.toString(), amountValue.get());
+        });
 
-            if (amount > 0) {
-                generatorAmountsBuilder.put(key.toString(), amount);
-            }
+        return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorAmountsAsKeys(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        KeyMap<Integer> generatorAmountsBuilder = KeyMap.createKeyMap();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            generatorAmountsBuilder.put(key, amountValue.get());
         });
 
         return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
@@ -4504,11 +4489,7 @@ public class SIsland implements Island {
 
         dimensionGeneratorAmounts.forEach((key, amountValue) -> {
             if (!amountValue.isSynced()) {
-                int amount = amountValue.get();
-
-                if (amount > 0) {
-                    generatorAmountsBuilder.put(key, amount);
-                }
+                generatorAmountsBuilder.put(key, amountValue.get());
             }
         });
 
@@ -4519,7 +4500,7 @@ public class SIsland implements Island {
     public int getGeneratorTotalAmount(Dimension dimension) {
         int totalAmount = 0;
 
-        for (int amount : getGeneratorAmounts(dimension).values()) {
+        for (int amount : getGeneratorAmountsAsKeys(dimension).values()) {
             totalAmount += amount;
         }
 
@@ -4629,12 +4610,45 @@ public class SIsland implements Island {
         }
     }
 
+    @Deprecated
     @Override
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        return getGeneratorAmounts(dimension).keySet().stream().collect(Collectors.toMap(key -> key,
-                key -> getGeneratorAmount(Keys.ofMaterialAndData(key), dimension)));
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Integer> generatorPercentagesBuilder = new HashMap<>();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            generatorPercentagesBuilder.put(key.toString(), getGeneratorPercentage(key, dimension));
+        });
+
+        return generatorPercentagesBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorPercentagesBuilder);
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorPercentagesAsKeys(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<Key, Integer> generatorPercentagesBuilder = KeyMap.createKeyMap();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            generatorPercentagesBuilder.put(key, getGeneratorPercentage(key, dimension));
+        });
+
+        return generatorPercentagesBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorPercentagesBuilder);
     }
 
     @Override
@@ -4642,8 +4656,9 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        int totalAmount = getGeneratorTotalAmount(dimension);
-        return totalAmount == 0 ? 0 : (getGeneratorAmount(key, dimension) * 100) / totalAmount;
+        int generatorTotalAmount = getGeneratorTotalAmount(dimension);
+
+        return generatorTotalAmount == 0 ? 0 : (getGeneratorAmount(key, dimension) * 100) / generatorTotalAmount;
     }
 
     @Override
@@ -4740,28 +4755,30 @@ public class SIsland implements Island {
 
         Log.debug(Debug.GENERATE_BLOCK, owner.getName(), location, dimension.getName(), optimizeDefaultBlock);
 
-        int totalGeneratorAmounts = getGeneratorTotalAmount(dimension);
+        int generatorTotalAmount = getGeneratorTotalAmount(dimension);
 
-        if (totalGeneratorAmounts == 0) {
+        if (generatorTotalAmount == 0) {
             Log.debugResult(Debug.GENERATE_BLOCK, "Return No Generator Rates", "null");
             return null;
         }
 
-        Map<String, Integer> generatorAmounts = getGeneratorAmounts(dimension);
+        Map<Key, Integer> dimensionGeneratorAmounts = getGeneratorAmountsAsKeys(dimension);
 
         GeneratorType generatorType = GeneratorType.fromDimension(dimension);
         Key defaultBlockKey = generatorType.getDefaultBlock();
         Key newStateKey = defaultBlockKey;
 
-        if (totalGeneratorAmounts == 1) {
-            newStateKey = Keys.ofMaterialAndData(generatorAmounts.keySet().iterator().next());
+        if (dimensionGeneratorAmounts.size() == 1 && dimensionGeneratorAmounts.values().iterator().next() > 0) {
+            newStateKey = dimensionGeneratorAmounts.keySet().iterator().next();
         } else {
-            int generatedIndex = ThreadLocalRandom.current().nextInt(totalGeneratorAmounts);
+            int generatedIndex = ThreadLocalRandom.current().nextInt(generatorTotalAmount);
             int currentIndex = 0;
-            for (Map.Entry<String, Integer> entry : generatorAmounts.entrySet()) {
+
+            for (Map.Entry<Key, Integer> entry : dimensionGeneratorAmounts.entrySet()) {
                 currentIndex += entry.getValue();
+
                 if (generatedIndex < currentIndex) {
-                    newStateKey = Keys.ofMaterialAndData(entry.getKey());
+                    newStateKey = entry.getKey();
                     break;
                 }
             }
@@ -4993,8 +5010,13 @@ public class SIsland implements Island {
             return;
         }
 
-        getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
-                new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            int level = levelValue.get();
+
+            if (level > 0) {
+                player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true);
+            }
+        });
     }
 
     private void removePotionEffects(SuperiorPlayer superiorPlayer) {
@@ -5004,7 +5026,7 @@ public class SIsland implements Island {
             return;
         }
 
-        getPotionEffects().keySet().forEach(player::removePotionEffect);
+        this.effectLevels.keySet().forEach(player::removePotionEffect);
     }
 
     private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {

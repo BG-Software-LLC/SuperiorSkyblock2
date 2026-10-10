@@ -2656,8 +2656,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the amounts of the materials for the cobblestone generator in the island.
+     *
+     * @deprecated See {@link #getGeneratorAmountsAsKeys(Dimension)}
      */
+    @Deprecated
     Map<String, Integer> getGeneratorAmounts(Dimension dimension);
+
+    /**
+     * Get the amounts of the materials for the cobblestone generator in the island.
+     */
+    Map<Key, Integer> getGeneratorAmountsAsKeys(Dimension dimension);
 
     /**
      * Get the custom amounts of the materials for the cobblestone generator in the island.
@@ -2691,8 +2699,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
+     *
+     * @deprecated See {@link #getGeneratorPercentagesAsKeys(Dimension)}
      */
+    @Deprecated
     Map<String, Integer> getGeneratorPercentages(Dimension dimension);
+
+    /**
+     * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
+     */
+    Map<Key, Integer> getGeneratorPercentagesAsKeys(Dimension dimension);
 
     /**
      * Get the percentage for a specific key in a specific world.
@@ -2748,7 +2764,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Generate a block at a specified location.
-     * The method calculates a block to generate from {@link #getGeneratorAmounts(Dimension)}.
+     * The method calculates a block to generate from {@link #getGeneratorAmountsAsKeys(Dimension)}.
      * It doesn't look for any conditions for generating it - lava, water, etc are not required.
      * The method will fail if there are no valid generator rates for the environment.
      *
@@ -2764,7 +2780,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Generate a block at a specified location.
-     * The method calculates a block to generate from {@link #getGeneratorAmounts(Dimension)}.
+     * The method calculates a block to generate from {@link #getGeneratorAmountsAsKeys(Dimension)}.
      * It doesn't look for any conditions for generating it - lava, water, etc are not required.
      * The method will fail if there are no valid generator rates for the environment.
      *

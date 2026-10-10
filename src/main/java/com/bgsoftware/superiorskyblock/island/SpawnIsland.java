@@ -2017,8 +2017,14 @@ public class SpawnIsland implements Island {
         return 0;
     }
 
+    @Deprecated
     @Override
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorPercentagesAsKeys(Dimension dimension) {
         return Collections.emptyMap();
     }
 
@@ -2042,8 +2048,14 @@ public class SpawnIsland implements Island {
         return 0;
     }
 
+    @Deprecated
     @Override
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorAmountsAsKeys(Dimension dimension) {
         return Collections.emptyMap();
     }
 
