@@ -64,33 +64,48 @@ public class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Double> arguments = CommandArguments.getMultiplier(sender, args[3]);
+        NumberArgument<Double> arguments = CommandArguments.getAdditionalMultiplier(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         double multiplier = arguments.getNumber();
 
+        boolean isInvalid = false;
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            double currentMultiplier = island.getSpawnerRatesMultiplier();
+            if (currentMultiplier + multiplier < 1) {
+                isInvalid = true;
+                continue;
+            }
+
             PluginEvent<PluginEventArgs.IslandChangeSpawnerRates> event = PluginEventsFactory.callIslandChangeSpawnerRatesEvent(
-                    island, sender, island.getSpawnerRatesMultiplier() + multiplier);
+                    island, sender, currentMultiplier + multiplier);
             if (!event.isCancelled()) {
                 island.setSpawnerRatesMultiplier(event.getArgs().spawnerRates);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            if (isInvalid) {
+                Message.INVALID_MULTIPLIER.send(sender, multiplier);
+            }
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_SPAWNER_RATES_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_SPAWNER_RATES_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_SPAWNER_RATES.send(sender, targetPlayer.getName());
+        }
     }
 
 }

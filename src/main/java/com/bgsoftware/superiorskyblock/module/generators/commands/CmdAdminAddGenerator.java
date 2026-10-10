@@ -75,17 +75,24 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
         Key material = Keys.ofMaterialAndData(args[3]);
         boolean percentage = args[4].endsWith("%");
 
-        if (percentage)
+        if (percentage) {
             args[4] = args[4].substring(0, args[4].length() - 1);
+        }
 
         NumberArgument<Integer> arguments = CommandArguments.getAmount(sender, args[4]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int amount = arguments.getNumber();
 
-        if (amount == 0 || (percentage && (amount < 0 || amount > 100))) {
+        if (!percentage && amount == 0) {
+            Message.INVALID_AMOUNT.send(sender, amount);
+            return;
+        }
+
+        if (percentage && (amount < 0 || amount > 100)) {
             Message.INVALID_PERCENTAGE.send(sender);
             return;
         }
@@ -93,9 +100,12 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
         Dimension dimension = args.length == 5 ? plugin.getSettings().getWorlds().getDefaultWorldDimension() :
                 CommandArguments.getDimension(sender, args[5]);
 
-        if (dimension == null)
+        if (dimension == null) {
             return;
+        }
 
+        boolean isInvalid = false;
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
@@ -106,35 +116,39 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
                     continue;
                 }
             } else {
-                int generatorRate = island.getGeneratorAmount(material, dimension) + amount;
-
-                if (generatorRate <= 0) {
-                    if (!PluginEventsFactory.callIslandRemoveGeneratorRateEvent(island, sender, material, dimension))
-                        continue;
-
-                    island.removeGeneratorAmount(material, dimension);
-                } else {
-                    PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event = PluginEventsFactory.callIslandChangeGeneratorRateEvent(
-                            island, sender, material, dimension, island.getGeneratorAmount(material, dimension) + amount);
-
-                    if (event.isCancelled())
-                        continue;
-
-                    island.setGeneratorAmount(material, event.getArgs().generatorRate, dimension);
+                int currentAmount = island.getGeneratorAmount(material, dimension);
+                if (currentAmount + amount < 0) {
+                    isInvalid = true;
+                    continue;
                 }
+
+                PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event = PluginEventsFactory.callIslandChangeGeneratorRateEvent(
+                        island, sender, material, dimension, currentAmount + amount);
+                if (event.isCancelled()) {
+                    continue;
+                }
+
+                island.setGeneratorAmount(material, event.getArgs().generatorRate, dimension);
             }
+
+            changedIsland = island;
             ++islandsChangedCount;
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            if (isInvalid) {
+                Message.INVALID_AMOUNT.send(sender, amount);
+            }
             return;
+        }
 
-        if (islands.size() != 1)
+        if (islandsChangedCount > 1) {
             Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
-        else if (targetPlayer == null)
-            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), changedIsland.getName());
+        } else {
             Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
+        }
     }
 
     @Override

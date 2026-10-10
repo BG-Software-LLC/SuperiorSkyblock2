@@ -64,33 +64,48 @@ public class CmdAdminAddCropGrowth implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Double> arguments = CommandArguments.getMultiplier(sender, args[3]);
+        NumberArgument<Double> arguments = CommandArguments.getAdditionalMultiplier(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         double multiplier = arguments.getNumber();
 
+        boolean isInvalid = false;
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            double currentMultiplier = island.getCropGrowthMultiplier();
+            if (currentMultiplier + multiplier < 1) {
+                isInvalid = true;
+                continue;
+            }
+
             PluginEvent<PluginEventArgs.IslandChangeCropGrowth> event = PluginEventsFactory.callIslandChangeCropGrowthEvent(
-                    island, sender, island.getCropGrowthMultiplier() + multiplier);
+                    island, sender, currentMultiplier + multiplier);
             if (!event.isCancelled()) {
                 island.setCropGrowthMultiplier(event.getArgs().cropGrowth);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            if (isInvalid) {
+                Message.INVALID_MULTIPLIER.send(sender, multiplier);
+            }
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_CROP_GROWTH_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_CROP_GROWTH_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_CROP_GROWTH_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_CROP_GROWTH.send(sender, targetPlayer.getName());
+        }
     }
 
 }

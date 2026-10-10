@@ -217,6 +217,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Çakıl taşı jeneratörü için bir m
   yüzdesini ekle.
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: Başka bir oyuncunun adası için mob düşürme
   çarpanını artır.
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: Başka bir oyuncunun ada boyutunu genişlet.
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: Başka bir oyuncunun adası için spawner
   oranları çarpanını artır.
@@ -258,9 +259,12 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: Bir adanın değerini yeniden hesapla.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Eklentinin tüm yapılandırmalarını ve görevlerini
   yeniden yükle.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Bir adadan blok limitini kaldır.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_EFFECT: 'Remove an effect from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_GENERATOR: 'Remove a material from the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Bir oyuncu tarafından verilen tüm değerlendirmeleri
   kaldır.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Bir ada için bir dünyayı sıfırla.
@@ -664,6 +668,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lAda | &7Adandan ayrıldın.'
 LEFT_ISLAND_COOP: '&e&lAda | &7Artık {0}''ın adasında co-op üyesi değilsin.'
 LEFT_ISLAND_COOP_NAME: '&e&lAda | &7Artık {0} adasında co-op üyesi değilsin.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the

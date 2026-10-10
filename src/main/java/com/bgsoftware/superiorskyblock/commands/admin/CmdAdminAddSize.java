@@ -64,10 +64,11 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Integer> arguments = CommandArguments.getSize(sender, args[3]);
+        NumberArgument<Integer> arguments = CommandArguments.getAdditionalSize(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int size = arguments.getNumber();
 
@@ -76,29 +77,52 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
             return;
         }
 
+        boolean isInvalid = false;
+        boolean isBiggerThanMax = false;
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            int currentSize = island.getIslandSize();
+            if (currentSize + size < 1) {
+                isInvalid = true;
+                continue;
+            }
+
+            if (currentSize + size > plugin.getSettings().getMaxIslandSize()) {
+                isBiggerThanMax = true;
+                continue;
+            }
+
             PluginEvent<PluginEventArgs.IslandChangeBorderSize> event = PluginEventsFactory.callIslandChangeBorderSizeEvent(
-                    island, sender, island.getIslandSize() + size);
+                    island, sender, currentSize + size);
             if (!event.isCancelled()) {
                 island.setIslandSize(event.getArgs().borderSize);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            if (isInvalid) {
+                Message.INVALID_SIZE.send(sender, size);
+            } else if (isBiggerThanMax) {
+                Message.SIZE_BIGGER_MAX.send(sender);
+            }
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_ISLAND_SIZE_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_ISLAND_SIZE_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_ISLAND_SIZE_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
+        }
 
-        if (plugin.getSettings().isBuildOutsideIsland())
+        if (plugin.getSettings().isBuildOutsideIsland()) {
             Message.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
+        }
     }
 
 }

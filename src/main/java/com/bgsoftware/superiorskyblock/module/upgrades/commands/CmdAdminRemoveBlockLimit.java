@@ -71,20 +71,22 @@ public class CmdAdminRemoveBlockLimit implements IAdminIslandCommand {
 
         for (Island island : islands) {
             if (PluginEventsFactory.callIslandRemoveBlockLimitEvent(island, sender, key)) {
-                ++islandsChangedCount;
                 island.removeBlockLimit(key);
+                ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_BLOCK_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_BLOCK_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_BLOCK_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), targetPlayer.getName());
+        }
     }
 
     @Override

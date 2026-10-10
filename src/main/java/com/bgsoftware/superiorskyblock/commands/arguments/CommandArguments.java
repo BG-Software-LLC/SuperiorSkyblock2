@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -267,7 +268,61 @@ public class CommandArguments {
     }
 
     public static NumberArgument<Integer> getLimit(CommandSender sender, String argument) {
-        return getInt(sender, argument, Message.INVALID_LIMIT);
+        NumberArgument<Integer> limit = getInt(sender, argument, Message.INVALID_LIMIT);
+
+        if (limit.isSucceed() && limit.getNumber() < IslandUpgradeConstants.NO_LIMIT_VALUE) {
+            Message.INVALID_LIMIT.send(sender, argument);
+            return new NumberArgument<>(limit.getNumber(), false);
+        }
+
+        return limit;
+    }
+
+    public static NumberArgument<Integer> getAdditionalLimit(CommandSender sender, String argument) {
+        NumberArgument<Integer> limit = getInt(sender, argument, Message.INVALID_LIMIT);
+
+        if (limit.isSucceed() && limit.getNumber() == 0) {
+            Message.INVALID_LIMIT.send(sender, argument);
+            return new NumberArgument<>(limit.getNumber(), false);
+        }
+
+        return limit;
+    }
+
+    public static BigDecimal getBankLimit(CommandSender sender, String argument) {
+        BigDecimal limit;
+
+        try {
+            limit = new BigDecimal(argument);
+        } catch (IllegalArgumentException ex) {
+            Message.INVALID_LIMIT.send(sender, argument);
+            return null;
+        }
+
+        if (limit.compareTo(BigDecimal.ZERO) < 0 && !limit.equals(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE)) {
+            Message.INVALID_LIMIT.send(sender, argument);
+            return null;
+        }
+
+        return limit;
+    }
+
+    public static BigDecimal getAdditionalBankLimit(CommandSender sender, String argument) {
+        BigDecimal limit;
+
+        try {
+            limit = new BigDecimal(argument);
+        } catch (IllegalArgumentException ex) {
+            Message.INVALID_LIMIT.send(sender, argument);
+            return null;
+        }
+
+        if (limit.compareTo(BigDecimal.ZERO) == 0) {
+            Message.INVALID_LIMIT.send(sender, argument);
+            return null;
+        }
+
+        return limit;
     }
 
     public static BigDecimal getBigDecimalAmount(CommandSender sender, String argument) {
@@ -287,19 +342,25 @@ public class CommandArguments {
     }
 
     public static NumberArgument<Double> getMultiplier(CommandSender sender, String argument) {
-        double multiplier = 0;
-        boolean status = true;
+        NumberArgument<Double> multiplier = getRoundedDouble(sender, argument, Message.INVALID_MULTIPLIER);
 
-        try {
-            multiplier = Double.parseDouble(argument);
-            // Makes sure the multiplier is rounded.
-            multiplier = Math.round(multiplier * 100) / 100D;
-        } catch (IllegalArgumentException ex) {
+        if (multiplier.isSucceed() && multiplier.getNumber() < 1) {
             Message.INVALID_MULTIPLIER.send(sender, argument);
-            status = false;
+            return new NumberArgument<>(multiplier.getNumber(), false);
         }
 
-        return new NumberArgument<>(multiplier, status);
+        return multiplier;
+    }
+
+    public static NumberArgument<Double> getAdditionalMultiplier(CommandSender sender, String argument) {
+        NumberArgument<Double> multiplier = getRoundedDouble(sender, argument, Message.INVALID_MULTIPLIER);
+
+        if (multiplier.isSucceed() && multiplier.getNumber() == 0) {
+            Message.INVALID_MULTIPLIER.send(sender, argument);
+            return new NumberArgument<>(multiplier.getNumber(), false);
+        }
+
+        return multiplier;
     }
 
     public static PotionEffectType getPotionEffect(CommandSender sender, String argument) {
@@ -328,7 +389,25 @@ public class CommandArguments {
     }
 
     public static NumberArgument<Integer> getSize(CommandSender sender, String argument) {
-        return getInt(sender, argument, Message.INVALID_SIZE);
+        NumberArgument<Integer> size = getInt(sender, argument, Message.INVALID_SIZE);
+
+        if (size.isSucceed() && size.getNumber() < 1) {
+            Message.INVALID_SIZE.send(sender, argument);
+            return new NumberArgument<>(size.getNumber(), false);
+        }
+
+        return size;
+    }
+
+    public static NumberArgument<Integer> getAdditionalSize(CommandSender sender, String argument) {
+        NumberArgument<Integer> size = getInt(sender, argument, Message.INVALID_SIZE);
+
+        if (size.isSucceed() && size.getNumber() == 0) {
+            Message.INVALID_SIZE.send(sender, argument);
+            return new NumberArgument<>(size.getNumber(), false);
+        }
+
+        return size;
     }
 
     public static IslandWarp getWarp(CommandSender sender, Island island, String[] args, int start) {
@@ -509,6 +588,27 @@ public class CommandArguments {
         }
 
         return new NumberArgument<>(i, status);
+    }
+
+    private static NumberArgument<Double> getRoundedDouble(CommandSender sender, String argument, Message locale) {
+        double d = 0;
+        boolean status = true;
+
+        try {
+            d = Double.parseDouble(argument);
+
+            if (!Double.isFinite(d)) {
+                locale.send(sender, argument);
+                status = false;
+            } else {
+                d = Math.round(d * 100) / 100D;
+            }
+        } catch (IllegalArgumentException ex) {
+            locale.send(sender, argument);
+            status = false;
+        }
+
+        return new NumberArgument<>(d, status);
     }
 
 }
