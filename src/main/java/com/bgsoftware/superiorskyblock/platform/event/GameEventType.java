@@ -41,6 +41,7 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntitySpawnEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityTargetEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityTeleportEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ExplosionPrimeEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.GenericGameEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.HangingBreakEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.HangingPlaceEvent;
@@ -124,6 +125,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<EntitySpawnEvent> ENTITY_SPAWN_EVENT = register(EntitySpawnEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<EntityTargetEvent> ENTITY_TARGET_EVENT = register(EntityTargetEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<EntityTeleportEvent> ENTITY_TELEPORT_EVENT = register(EntityTeleportEvent.class, GameEventFlags.ENTITY_EVENT);
+    public static final GameEventType<ExplosionPrimeEvent> EXPLOSION_PRIME_EVENT = register(ExplosionPrimeEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<HangingBreakEvent> HANGING_BREAK_EVENT = register(HangingBreakEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<HangingPlaceEvent> HANGING_PLACE_EVENT = register(HangingPlaceEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<ProjectileHitEvent> PROJECTILE_HIT_EVENT = register(ProjectileHitEvent.class, GameEventFlags.ENTITY_EVENT | GameEventFlags.MAYBE_BLOCK_EVENT);

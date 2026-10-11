@@ -62,6 +62,7 @@ import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -171,6 +172,7 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.ENTITY_TARGET_EVENT, EntityTargetEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_TELEPORT_EVENT, EntityTeleportEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_TELEPORT_EVENT, PlayerTeleportEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.EXPLOSION_PRIME_EVENT, ExplosionPrimeEvent.class, this::createGameEvent);
         createEventListener(GameEventType.HANGING_BREAK_EVENT, HangingBreakEvent.class, this::createGameEvent);
         createEventListener(GameEventType.HANGING_PLACE_EVENT, HangingPlaceEvent.class, this::createGameEvent2);
         createEventListener(GameEventType.PROJECTILE_HIT_EVENT, ProjectileHitEvent.class, this::createGameEvent);
@@ -632,6 +634,12 @@ public class BukkitEventsListener implements Listener {
         entityTeleportEvent.to = e.getTo();
         entityTeleportEvent.cause = e.getCause();
         return eventType.createEvent(entityTeleportEvent);
+    }
+
+    private GameEvent<GameEventArgs.ExplosionPrimeEvent> createGameEvent(GameEventType<GameEventArgs.ExplosionPrimeEvent> eventType, GameEventPriority priority, ExplosionPrimeEvent e) {
+        GameEventArgs.ExplosionPrimeEvent explosionPrimeEvent = new GameEventArgs.ExplosionPrimeEvent();
+        explosionPrimeEvent.entity = e.getEntity();
+        return eventType.createEvent(explosionPrimeEvent);
     }
 
     private GameEvent<GameEventArgs.HangingBreakEvent> createGameEvent(GameEventType<GameEventArgs.HangingBreakEvent> eventType, GameEventPriority priority, HangingBreakEvent e) {

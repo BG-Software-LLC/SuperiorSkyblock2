@@ -170,6 +170,18 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         }
     }
 
+    private void onExplosionPrime(GameEvent<GameEventArgs.ExplosionPrimeEvent> e) {
+        Entity entity = e.getArgs().entity;
+
+        if (entity.getType() != EntityType.ENDER_CRYSTAL || shouldIgnoreWorldEvents(entity.getWorld()))
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.BLOCK_EXPLOSION))
+                e.setCancelled();
+        }
+    }
+
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
         Entity entity = e.getArgs().entity;
 
@@ -226,6 +238,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         IslandFlag islandFlag;
 
         switch (source.getType()) {
+            case ENDER_CRYSTAL:
+                islandFlag = IslandFlags.BLOCK_EXPLOSION;
+                break;
             case CREEPER:
                 islandFlag = IslandFlags.CREEPER_EXPLOSION;
                 break;
@@ -390,6 +405,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onBlockExplode);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onEntityExplode);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEntityChangeBlock);
+        registerCallback(GameEventType.EXPLOSION_PRIME_EVENT, GameEventPriority.LOWEST, this::onExplosionPrime);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEntitySpawn);
         registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.LOWEST, this::onHangingBreak);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.MONITOR, this::onFireballDamage);

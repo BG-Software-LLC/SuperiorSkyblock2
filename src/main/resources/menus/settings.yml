@@ -166,13 +166,13 @@ settings:
       type: BED
       name: '&6Block Explosion'
       lore:
-        - '&7Allow block explosions inside your island.'
+        - '&7Allow block and end crystal explosions.'
         - '&7Currently &aENABLED&7.'
     settings-disabled:
       type: BED
       name: '&6Block Explosion'
       lore:
-        - '&7Allow block explosions inside your island.'
+        - '&7Allow block and end crystal explosions.'
         - '&7Currently &cDISABLED&7.'
     sound:
       type: ORB_PICKUP

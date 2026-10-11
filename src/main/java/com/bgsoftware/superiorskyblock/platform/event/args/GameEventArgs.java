@@ -225,6 +225,10 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
+    public static class ExplosionPrimeEvent extends EntityEvent {
+
+    }
+
     public static class BlockExplodeEvent extends BlockEvent {
 
         public List<Block> blocks;
