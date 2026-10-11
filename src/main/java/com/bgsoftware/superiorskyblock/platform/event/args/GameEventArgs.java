@@ -97,6 +97,7 @@ public class GameEventArgs implements IEventArgs {
 
     public static class HangingBreakEvent extends EntityEvent {
 
+        @Nullable
         public Entity remover;
         public org.bukkit.event.hanging.HangingBreakEvent.RemoveCause removeCause;
 
@@ -218,6 +219,13 @@ public class GameEventArgs implements IEventArgs {
     }
 
     public static class EntityExplodeEvent extends EntityEvent {
+
+        public List<Block> blocks;
+        public boolean isSoftExplosion;
+
+    }
+
+    public static class BlockExplodeEvent extends BlockEvent {
 
         public List<Block> blocks;
         public boolean isSoftExplosion;

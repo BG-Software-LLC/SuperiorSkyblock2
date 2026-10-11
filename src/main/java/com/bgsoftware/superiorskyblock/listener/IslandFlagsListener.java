@@ -127,7 +127,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     /* ENTITY EXPLOSIONS */
 
-    private void onHangingBreakByEntity(GameEvent<GameEventArgs.HangingBreakEvent> e) {
+    private void onHangingBreak(GameEvent<GameEventArgs.HangingBreakEvent> e) {
         Entity entity = e.getArgs().entity;
 
         // We only check island flags in relevant worlds
@@ -140,6 +140,13 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
             HangingBreakEvent.RemoveCause removeCause = e.getArgs().removeCause;
             Entity remover = e.getArgs().remover;
+
+            if (remover == null) {
+                if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION &&
+                        preventAction(entityLocation, IslandFlags.BLOCK_EXPLOSION))
+                    e.setCancelled();
+                return;
+            }
 
             if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION) {
                 if (remover instanceof Player) {
@@ -172,6 +179,18 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventEntityExplosion(entity, entity.getLocation(wrapper.getHandle())))
+                e.getArgs().blocks.clear();
+        }
+    }
+
+    private void onBlockExplode(GameEvent<GameEventArgs.BlockExplodeEvent> e) {
+        Block block = e.getArgs().block;
+
+        if (shouldIgnoreWorldEvents(block.getWorld()))
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.BLOCK_EXPLOSION))
                 e.getArgs().blocks.clear();
         }
     }
@@ -368,10 +387,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private void registerListeners() {
+        registerCallback(GameEventType.BLOCK_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onBlockExplode);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onEntityExplode);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEntityChangeBlock);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEntitySpawn);
-        registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.LOWEST, this::onHangingBreakByEntity);
+        registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.LOWEST, this::onHangingBreak);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.MONITOR, this::onFireballDamage);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.LOWEST, this::onBlockFlow);
         registerCallback(GameEventType.BLOCK_GROW_EVENT, GameEventPriority.LOWEST, this::onCropsGrowth);
