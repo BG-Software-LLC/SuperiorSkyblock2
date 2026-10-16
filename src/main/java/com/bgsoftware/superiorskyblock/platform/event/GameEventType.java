@@ -11,6 +11,7 @@ import java.util.List;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockBreakEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockBurnEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockDispenseEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockExplodeEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockFadeEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockFormEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.BlockFromToEvent;
@@ -40,6 +41,7 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntitySpawnEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityTargetEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.EntityTeleportEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ExplosionPrimeEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.GenericGameEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.HangingBreakEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.HangingPlaceEvent;
@@ -83,6 +85,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<BlockBreakEvent> BLOCK_BREAK_EVENT = register(BlockBreakEvent.class, GameEventFlags.BLOCK_EVENT | GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<BlockBurnEvent> BLOCK_BURN_EVENT = register(BlockBurnEvent.class, GameEventFlags.BLOCK_EVENT);
     public static final GameEventType<BlockDispenseEvent> BLOCK_DISPENSE_EVENT = register(BlockDispenseEvent.class, GameEventFlags.BLOCK_EVENT);
+    public static final GameEventType<BlockExplodeEvent> BLOCK_EXPLODE_EVENT = register(BlockExplodeEvent.class, GameEventFlags.BLOCK_EVENT);
     public static final GameEventType<BlockFadeEvent> BLOCK_FADE_EVENT = register(BlockFadeEvent.class, GameEventFlags.BLOCK_EVENT);
     public static final GameEventType<BlockFormEvent> BLOCK_FORM_EVENT = register(BlockFormEvent.class, GameEventFlags.BLOCK_EVENT);
     public static final GameEventType<BlockFromToEvent> BLOCK_FROM_TO_EVENT = register(BlockFromToEvent.class, GameEventFlags.BLOCK_EVENT);
@@ -122,6 +125,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<EntitySpawnEvent> ENTITY_SPAWN_EVENT = register(EntitySpawnEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<EntityTargetEvent> ENTITY_TARGET_EVENT = register(EntityTargetEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<EntityTeleportEvent> ENTITY_TELEPORT_EVENT = register(EntityTeleportEvent.class, GameEventFlags.ENTITY_EVENT);
+    public static final GameEventType<ExplosionPrimeEvent> EXPLOSION_PRIME_EVENT = register(ExplosionPrimeEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<HangingBreakEvent> HANGING_BREAK_EVENT = register(HangingBreakEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<HangingPlaceEvent> HANGING_PLACE_EVENT = register(HangingPlaceEvent.class, GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<ProjectileHitEvent> PROJECTILE_HIT_EVENT = register(ProjectileHitEvent.class, GameEventFlags.ENTITY_EVENT | GameEventFlags.MAYBE_BLOCK_EVENT);

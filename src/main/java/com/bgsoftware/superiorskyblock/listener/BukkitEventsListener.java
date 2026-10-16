@@ -25,6 +25,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -34,6 +35,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
@@ -60,6 +62,7 @@ import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -112,6 +115,8 @@ public class BukkitEventsListener implements Listener {
             ProjectileHitEvent.class, "getHitEntity");
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
+    private static final ReflectMethod<Enum<?>> BLOCK_EXPLOSION_RESULT = new ReflectMethod<>(
+            BlockExplodeEvent.class, "getExplosionResult");
     @Nullable
     private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
 
@@ -124,6 +129,7 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.BLOCK_BREAK_EVENT, BlockBreakEvent.class, this::createGameEvent);
         createEventListener(GameEventType.BLOCK_BURN_EVENT, BlockBurnEvent.class, this::createGameEvent);
         createEventListener(GameEventType.BLOCK_DISPENSE_EVENT, BlockDispenseEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.BLOCK_EXPLODE_EVENT, BlockExplodeEvent.class, this::createGameEvent);
         createEventListener(GameEventType.BLOCK_FADE_EVENT, BlockFadeEvent.class, this::createGameEvent);
         createEventListener(GameEventType.BLOCK_FORM_EVENT, BlockFormEvent.class, this::createGameEvent);
         createEventListener(GameEventType.BLOCK_FROM_TO_EVENT, BlockFromToEvent.class, this::createGameEvent);
@@ -166,7 +172,8 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.ENTITY_TARGET_EVENT, EntityTargetEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_TELEPORT_EVENT, EntityTeleportEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_TELEPORT_EVENT, PlayerTeleportEvent.class, this::createGameEvent);
-        createEventListener(GameEventType.HANGING_BREAK_EVENT, HangingBreakByEntityEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.EXPLOSION_PRIME_EVENT, ExplosionPrimeEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.HANGING_BREAK_EVENT, HangingBreakEvent.class, this::createGameEvent);
         createEventListener(GameEventType.HANGING_PLACE_EVENT, HangingPlaceEvent.class, this::createGameEvent2);
         createEventListener(GameEventType.PROJECTILE_HIT_EVENT, ProjectileHitEvent.class, this::createGameEvent);
         createEventListener(GameEventType.PROJECTILE_LAUNCH_EVENT, ProjectileLaunchEvent.class, this::createGameEvent);
@@ -207,8 +214,8 @@ public class BukkitEventsListener implements Listener {
         }
 
         try {
-            Class entityBreakByEntityEventClass = Class.forName("io.papermc.paper.event.entity.EntityBreakByEntityEvent");
-            createEventListener(GameEventType.HANGING_BREAK_EVENT, entityBreakByEntityEventClass, new EntityBreakByEntityEventFunction());
+            Class entityBreakEventClass = Class.forName("io.papermc.paper.event.entity.EntityBreakEvent");
+            createEventListener(GameEventType.HANGING_BREAK_EVENT, entityBreakEventClass, new EntityBreakEventFunction());
         } catch (ClassNotFoundException ignored) {
         }
 
@@ -290,6 +297,15 @@ public class BukkitEventsListener implements Listener {
         blockDispenseEvent.dispensedItem = e.getItem();
         blockDispenseEvent.velocity = e.getVelocity();
         return eventType.createEvent(blockDispenseEvent);
+    }
+
+    private GameEvent<GameEventArgs.BlockExplodeEvent> createGameEvent(GameEventType<GameEventArgs.BlockExplodeEvent> eventType, GameEventPriority priority, BlockExplodeEvent e) {
+        GameEventArgs.BlockExplodeEvent blockExplodeEvent = new GameEventArgs.BlockExplodeEvent();
+        blockExplodeEvent.block = e.getBlock();
+        blockExplodeEvent.blocks = e.blockList();
+        blockExplodeEvent.isSoftExplosion = BLOCK_EXPLOSION_RESULT.isValid() &&
+                BLOCK_EXPLOSION_RESULT.invoke(e).name().equals("TRIGGER_BLOCK");
+        return eventType.createEvent(blockExplodeEvent);
     }
 
     private GameEvent<GameEventArgs.BlockFadeEvent> createGameEvent(GameEventType<GameEventArgs.BlockFadeEvent> eventType, GameEventPriority priority, BlockFadeEvent e) {
@@ -620,10 +636,17 @@ public class BukkitEventsListener implements Listener {
         return eventType.createEvent(entityTeleportEvent);
     }
 
-    private GameEvent<GameEventArgs.HangingBreakEvent> createGameEvent(GameEventType<GameEventArgs.HangingBreakEvent> eventType, GameEventPriority priority, HangingBreakByEntityEvent e) {
+    private GameEvent<GameEventArgs.ExplosionPrimeEvent> createGameEvent(GameEventType<GameEventArgs.ExplosionPrimeEvent> eventType, GameEventPriority priority, ExplosionPrimeEvent e) {
+        GameEventArgs.ExplosionPrimeEvent explosionPrimeEvent = new GameEventArgs.ExplosionPrimeEvent();
+        explosionPrimeEvent.entity = e.getEntity();
+        return eventType.createEvent(explosionPrimeEvent);
+    }
+
+    private GameEvent<GameEventArgs.HangingBreakEvent> createGameEvent(GameEventType<GameEventArgs.HangingBreakEvent> eventType, GameEventPriority priority, HangingBreakEvent e) {
         GameEventArgs.HangingBreakEvent hangingBreakEvent = new GameEventArgs.HangingBreakEvent();
         hangingBreakEvent.entity = e.getEntity();
-        hangingBreakEvent.remover = e.getRemover();
+        if (e instanceof HangingBreakByEntityEvent)
+            hangingBreakEvent.remover = ((HangingBreakByEntityEvent) e).getRemover();
         hangingBreakEvent.removeCause = e.getCause();
         return eventType.createEvent(hangingBreakEvent);
     }
@@ -935,10 +958,13 @@ public class BukkitEventsListener implements Listener {
         }
     }
 
-    private static class EntityBreakByEntityEventFunction implements GameEventCreator<GameEventArgs.HangingBreakEvent, Event> {
+    private static class EntityBreakEventFunction implements GameEventCreator<GameEventArgs.HangingBreakEvent, Event> {
+
+        private static final Class<?> ENTITY_BREAK_BY_ENTITY_EVENT_CLASS = new ClassInfo(
+                "io.papermc.paper.event.entity.EntityBreakByEntityEvent", ClassInfo.PackageType.UNKNOWN).findClass();
 
         private static final ReflectMethod<Enum<?>> GET_CAUSE_METHOD = new ReflectMethod<>(
-                new ClassInfo("io.papermc.paper.event.entity.EntityBreakByEntityEvent", ClassInfo.PackageType.UNKNOWN),
+                new ClassInfo("io.papermc.paper.event.entity.EntityBreakEvent", ClassInfo.PackageType.UNKNOWN),
                 "getCause", new ClassInfo[0]);
         private static final ReflectMethod<Entity> GET_REMOVER_METHOD = new ReflectMethod<>(
                 new ClassInfo("io.papermc.paper.event.entity.EntityBreakByEntityEvent", ClassInfo.PackageType.UNKNOWN),
@@ -948,11 +974,15 @@ public class BukkitEventsListener implements Listener {
         public GameEvent<GameEventArgs.HangingBreakEvent> execute(GameEventType<GameEventArgs.HangingBreakEvent> eventType, GameEventPriority priority, Event e) {
             org.bukkit.event.entity.EntityEvent entityEvent = (org.bukkit.event.entity.EntityEvent) e;
 
+            if (entityEvent.getEntity() instanceof Hanging)
+                return null;
+
             GameEventArgs.HangingBreakEvent hangingBreakEvent = new GameEventArgs.HangingBreakEvent();
 
             hangingBreakEvent.entity = entityEvent.getEntity();
             hangingBreakEvent.removeCause = HangingBreakEvent.RemoveCause.valueOf(GET_CAUSE_METHOD.invoke(e).name());
-            hangingBreakEvent.remover = GET_REMOVER_METHOD.invoke(e);
+            if (ENTITY_BREAK_BY_ENTITY_EVENT_CLASS.isInstance(e))
+                hangingBreakEvent.remover = GET_REMOVER_METHOD.invoke(e);
             return eventType.createEvent(hangingBreakEvent);
         }
     }
