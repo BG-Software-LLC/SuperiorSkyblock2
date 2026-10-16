@@ -839,6 +839,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getEffectiveIslandSize() {
+        return this.handle.getEffectiveIslandSize();
+    }
+
+    @Override
     public String getDiscord() {
         return this.handle.getDiscord();
     }
@@ -1484,6 +1489,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getBlockLimitRaw(Key key) {
+        return this.handle.getBlockLimitRaw(key);
+    }
+
+    @Override
     public int getExactBlockLimit(Key key) {
         return this.handle.getExactBlockLimit(key);
     }
@@ -1536,6 +1546,11 @@ public class DelegateIsland implements Island {
     @Override
     public int getEntityLimit(Key key) {
         return this.handle.getEntityLimit(key);
+    }
+
+    @Override
+    public int getEntityLimitRaw(Key key) {
+        return this.handle.getEntityLimitRaw(key);
     }
 
     @Override
@@ -1636,6 +1651,11 @@ public class DelegateIsland implements Island {
     @Override
     public int getPotionEffectLevel(PotionEffectType type) {
         return this.handle.getPotionEffectLevel(type);
+    }
+
+    @Override
+    public int getPotionEffectLevelRaw(PotionEffectType type) {
+        return this.handle.getPotionEffectLevelRaw(type);
     }
 
     @Override
@@ -1892,6 +1912,11 @@ public class DelegateIsland implements Island {
     @Override
     public int getGeneratorAmount(Key key, Dimension dimension) {
         return this.handle.getGeneratorAmount(key, dimension);
+    }
+
+    @Override
+    public int getGeneratorAmountRaw(Key key, Dimension dimension) {
+        return this.handle.getGeneratorAmountRaw(key, dimension);
     }
 
     @Override

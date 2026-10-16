@@ -50,7 +50,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
     private static void deleteSyncedRecords(String table) {
         try {
             DBSession.execute(new CustomSQLDatabaseTransaction(
-                    "DELETE FROM {prefix}" + table + " WHERE limit<=-1")).get();
+                    "DELETE FROM {prefix}" + table + " WHERE `limit`<=-1")).get();
         } catch (InterruptedException | ExecutionException ignored) {
         }
     }

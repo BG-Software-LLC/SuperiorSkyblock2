@@ -2099,6 +2099,11 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getEffectiveIslandSize() {
+        return this.borderSize.readAndGet(IntValue::get);
+    }
+
+    @Override
     public int getIslandSizeRaw() {
         return this.borderSize.readAndGet(islandSize -> islandSize.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
@@ -3301,6 +3306,13 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getBlockLimitRaw(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.blockLimits.get(key), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
     public int getExactBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
@@ -3456,6 +3468,13 @@ public class SIsland implements Island {
         IntValue entityLimit = this.entityLimits.get(key);
 
         return entityLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : entityLimit.get();
+    }
+
+    @Override
+    public int getEntityLimitRaw(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.entityLimits.get(key), IslandUpgradeConstants.SYNCED_VALUE);
     }
 
     @Override
@@ -3750,6 +3769,13 @@ public class SIsland implements Island {
         IntValue effectLevel = this.effectLevels.get(potionEffectType);
 
         return effectLevel == null ? 0 : effectLevel.get();
+    }
+
+    @Override
+    public int getPotionEffectLevelRaw(PotionEffectType potionEffectType) {
+        Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.effectLevels.get(potionEffectType), IslandUpgradeConstants.SYNCED_VALUE);
     }
 
     @Override
@@ -4522,6 +4548,21 @@ public class SIsland implements Island {
         IntValue generatorAmount = dimensionGeneratorAmounts.get(key);
 
         return generatorAmount == null ? 0 : generatorAmount.get();
+    }
+
+    @Override
+    public int getGeneratorAmountRaw(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return IslandUpgradeConstants.SYNCED_VALUE;
+        }
+
+        return IntValue.getNonSynced(dimensionGeneratorAmounts.get(key), IslandUpgradeConstants.SYNCED_VALUE);
     }
 
     @Override
@@ -5537,11 +5578,12 @@ public class SIsland implements Island {
 
         this.roleLimits.write(roleLimits -> {
             Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+
             while (iterator.hasNext()) {
                 Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
 
                 if (overrideCustom && !entry.getValue().isSynced()) {
-                    PlayerRole playerRole = plugin.getRoles().getPlayerRole(entry.getKey());
+                    PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
 
                     if (playerRole != null) {
                         IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
@@ -5559,15 +5601,19 @@ public class SIsland implements Island {
                 KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
 
                 if (dimensionGeneratorAmounts != null) {
-                    dimensionGeneratorAmounts.forEach((key, generatorAmount) -> {
-                        if (overrideCustom && !generatorAmount.isSynced()) {
-                            IslandsDatabaseBridge.removeGeneratorRate(this, dimension, key);
+                    Iterator<Map.Entry<Key, IntValue>> iterator = dimensionGeneratorAmounts.entrySet().iterator();
+
+                    while (iterator.hasNext()) {
+                        Map.Entry<Key, IntValue> entry = iterator.next();
+
+                        if (overrideCustom && !entry.getValue().isSynced()) {
+                            IslandsDatabaseBridge.removeGeneratorRate(this, dimension, entry.getKey());
                         }
 
-                        if (overrideCustom || generatorAmount.isSynced()) {
-                            dimensionGeneratorAmounts.remove(key);
+                        if (overrideCustom || entry.getValue().isSynced()) {
+                            iterator.remove();
                         }
-                    });
+                    }
                 }
             }
         });

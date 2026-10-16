@@ -83,7 +83,7 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            int currentSize = island.getIslandSize();
+            int currentSize = island.getEffectiveIslandSize();
             if (currentSize + size < 1) {
                 isInvalid = true;
                 continue;

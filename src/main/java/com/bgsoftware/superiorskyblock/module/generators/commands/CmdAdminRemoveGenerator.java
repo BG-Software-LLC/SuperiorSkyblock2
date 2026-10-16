@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -67,7 +68,7 @@ public class CmdAdminRemoveGenerator implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Key material = Keys.ofMaterialAndData(args[3]);
+        Key key = Keys.ofMaterialAndData(args[3]);
 
         Dimension dimension = args.length == 4 ? plugin.getSettings().getWorlds().getDefaultWorldDimension() :
                 CommandArguments.getDimension(sender, args[4]);
@@ -79,10 +80,15 @@ public class CmdAdminRemoveGenerator implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (PluginEventsFactory.callIslandRemoveGeneratorRateEvent(island, sender, material, dimension)) {
-                island.removeGeneratorAmount(material, dimension);
-                ++islandsChangedCount;
+            if (island.getGeneratorAmountRaw(key, dimension) != IslandUpgradeConstants.SYNCED_VALUE) {
+                if (!PluginEventsFactory.callIslandRemoveGeneratorRateEvent(island, sender, key, dimension)) {
+                    continue;
+                }
+
+                island.removeGeneratorAmount(key, dimension);
             }
+
+            ++islandsChangedCount;
         }
 
         if (islandsChangedCount <= 0) {
@@ -90,11 +96,11 @@ public class CmdAdminRemoveGenerator implements IAdminIslandCommand {
         }
 
         if (islandsChangedCount > 1) {
-            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
+            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));
         } else if (targetPlayer == null) {
-            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());
+            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), islands.get(0).getName());
         } else {
-            Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
+            Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), targetPlayer.getName());
         }
     }
 

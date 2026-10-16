@@ -1016,6 +1016,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public int getEffectiveIslandSize() {
+        return islandSize;
+    }
+
+    @Override
     public void setIslandSize(int islandSize) {
         // Do nothing.
     }
@@ -1637,6 +1642,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public int getBlockLimitRaw(Key key) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
     public int getExactBlockLimit(Key key) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
@@ -1688,6 +1698,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getEntityLimit(Key key) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public int getEntityLimitRaw(Key key) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
@@ -1788,6 +1803,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getPotionEffectLevel(PotionEffectType type) {
+        return 0;
+    }
+
+    @Override
+    public int getPotionEffectLevelRaw(PotionEffectType type) {
         return 0;
     }
 
@@ -2040,6 +2060,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getGeneratorAmount(Key key, Dimension dimension) {
+        return 0;
+    }
+
+    @Override
+    public int getGeneratorAmountRaw(Key key, Dimension dimension) {
         return 0;
     }
 

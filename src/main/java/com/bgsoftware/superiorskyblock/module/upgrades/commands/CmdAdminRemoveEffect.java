@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;
 
@@ -73,10 +74,15 @@ public class CmdAdminRemoveEffect implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (PluginEventsFactory.callIslandRemoveEffectEvent(island, sender, effectType)) {
+            if (island.getPotionEffectLevelRaw(effectType) != IslandUpgradeConstants.SYNCED_VALUE) {
+                if (!PluginEventsFactory.callIslandRemoveEffectEvent(island, sender, effectType)) {
+                    continue;
+                }
+
                 island.removePotionEffect(effectType);
-                ++islandsChangedCount;
             }
+
+            ++islandsChangedCount;
         }
 
         if (islandsChangedCount <= 0) {

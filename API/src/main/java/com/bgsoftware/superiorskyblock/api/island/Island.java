@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.island;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -296,14 +297,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setRoleLimit(PlayerRole playerRole, int limit);
 
     /**
-     * Remove the limit of the amount of players that can have the role in the island.
+     * Remove the custom limit of the amount of players that can have the role in the island.
      *
      * @param playerRole The role to remove the limit.
      */
     void removeRoleLimit(PlayerRole playerRole);
 
     /**
-     * Clear all the role limits of the island.
+     * Clear all the custom role limits of the island.
      */
     void clearRoleLimits();
 
@@ -1260,9 +1261,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void updateIslandFly(SuperiorPlayer superiorPlayer);
 
     /**
-     * Get the island radius of the island.
+     * Get the island radius of the island in respect to the {@link SettingsManager#isBuildOutsideIsland()}.
      */
     int getIslandSize();
+
+    /**
+     * Get the island radius of the island without respecting the {@link SettingsManager#isBuildOutsideIsland()}.
+     */
+    int getEffectiveIslandSize();
 
     /**
      * Get the island radius of the island that was set with a command.
@@ -2109,6 +2115,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     int getBlockLimit(Key key);
 
     /**
+     * Get the block limit of a block that was set using a command.
+     *
+     * @param key The block's key to check.
+     */
+    int getBlockLimitRaw(Key key);
+
+    /**
      * Get the block limit of a block.
      * Unlike getBlockLimit(Key), this method returns the count for
      * the exactly block that is given as a parameter.
@@ -2133,14 +2146,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setBlockLimit(Key key, int limit);
 
     /**
-     * Remove the limit of a block.
+     * Remove the custom limit of a block.
      *
      * @param key The block's key to remove it's limit.
      */
     void removeBlockLimit(Key key);
 
     /**
-     * Clear all the block limits of the island.
+     * Clear all the custom block limits of the island.
      */
     void clearBlockLimits();
 
@@ -2195,6 +2208,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     int getEntityLimit(Key key);
 
     /**
+     * Get the entity limit of an entity that was set using a command.
+     *
+     * @param key The key of the entity to check.
+     */
+    int getEntityLimitRaw(Key key);
+
+    /**
      * Set the entity limit of an entity.
      *
      * @param entityType The entity's type to set the limit to.
@@ -2211,14 +2231,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setEntityLimit(Key key, int limit);
 
     /**
-     * Remove the limit of an entity.
+     * Remove the custom limit of an entity.
      *
      * @param key The entity's key to remove it's limit.
      */
     void removeEntityLimit(Key key);
 
     /**
-     * Clear all the entities limits from the island.
+     * Clear all the custom entities limits from the island.
      */
     void clearEntitiesLimits();
 
@@ -2375,6 +2395,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     int getPotionEffectLevel(PotionEffectType type);
 
     /**
+     * Get the level of an island effect that was set using a command.
+     *
+     * @param type The potion to check.
+     */
+    int getPotionEffectLevelRaw(PotionEffectType type);
+
+    /**
      * Add a potion effect to the island.
      *
      * @param type  The potion effect to add.
@@ -2383,14 +2410,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void setPotionEffect(PotionEffectType type, int level);
 
     /**
-     * Remove a potion effect from the island.
+     * Remove a custom potion effect from the island.
      *
      * @param type The potion effect to remove.
      */
     void removePotionEffect(PotionEffectType type);
 
     /**
-     * Remove all the effects from the island.
+     * Remove all the custom effects from the island.
      */
     void clearEffects();
 
@@ -2683,12 +2710,17 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     int getGeneratorAmount(Key key, Dimension dimension);
 
     /**
+     * Get the amount of a specific key in a specific world that was set using a command.
+     */
+    int getGeneratorAmountRaw(Key key, Dimension dimension);
+
+    /**
      * Set an amount for a specific key in a specific world.
      */
     void setGeneratorAmount(Key key, @Size int amount, Dimension dimension);
 
     /**
-     * Remove a rate for a specific key in a specific world.
+     * Remove a custom rate for a specific key in a specific world.
      */
     void removeGeneratorAmount(Key key, Dimension dimension);
 

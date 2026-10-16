@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -70,10 +71,15 @@ public class CmdAdminRemoveBlockLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (PluginEventsFactory.callIslandRemoveBlockLimitEvent(island, sender, key)) {
+            if (island.getBlockLimitRaw(key) != IslandUpgradeConstants.SYNCED_VALUE) {
+                if (!PluginEventsFactory.callIslandRemoveBlockLimitEvent(island, sender, key)) {
+                    continue;
+                }
+
                 island.removeBlockLimit(key);
-                ++islandsChangedCount;
             }
+
+            ++islandsChangedCount;
         }
 
         if (islandsChangedCount <= 0) {
