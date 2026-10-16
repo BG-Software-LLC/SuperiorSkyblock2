@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v2.Datab
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v3.DatabaseUpgrade_V3;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v4.DatabaseUpgrade_V4;
 import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
 
 import java.sql.ResultSet;
@@ -36,35 +37,53 @@ public class SQLDatabase {
     }
 
     public static UpgradeResult upgradeDatabase() {
-        MutableInt databaseVersionMutable = new MutableInt(0);
+        MutableInt databaseVersionMutable = new MutableInt(-1);
 
         DBSession.select("ssb_metadata", "", new QueryResult<ResultSet>()
-                .onSuccess(result -> databaseVersionMutable.set(result.getInt("version")))
+                .onSuccess(result -> {
+                    if (result.next())
+                        databaseVersionMutable.set(result.getInt("version"));
+                })
                 .onFail(error -> {
                 }));
 
-        int databaseVersion = databaseVersionMutable.get();
+        int originalDatabaseVersion = databaseVersionMutable.get();
+
+        if (originalDatabaseVersion == -1) {
+            // No version is stored. If it's a new database, there is nothing to upgrade.
+            // Otherwise, the database was created before versioning was introduced.
+            if (isNewDatabase())
+                return new UpgradeResult(false, true, getCurrentDatabaseVersion());
+
+            originalDatabaseVersion = 0;
+        }
+
+        int databaseVersion = originalDatabaseVersion;
         while (databaseVersion < DATABASE_UPGRADES.length) {
             DATABASE_UPGRADES[databaseVersion++].run();
         }
 
-        return new UpgradeResult(databaseVersion > databaseVersionMutable.get(), databaseVersion);
+        return new UpgradeResult(databaseVersion > originalDatabaseVersion, false, databaseVersion);
     }
 
     public static int getCurrentDatabaseVersion() {
         return DATABASE_UPGRADES.length;
     }
 
-    private static void createMetadataTable() {
-        MutableInt databaseVersion = new MutableInt(0);
-
-        // We check if "islands" table exists. If not, it's a new database,
-        // therefore the DB version should be latest. Otherwise, 0.
+    private static boolean isNewDatabase() {
+        // We check if "islands" table exists. If not, it's a new database.
+        MutableBoolean isNewDatabase = new MutableBoolean(false);
         DBSession.select("islands", "", new QueryResult<ResultSet>()
-                .onFail(error -> databaseVersion.set(getCurrentDatabaseVersion())));
+                .onFail(error -> isNewDatabase.set(true)));
+        return isNewDatabase.get();
+    }
+
+    private static void createMetadataTable() {
+        // If it's a new database, the DB version should be latest. Otherwise, 0.
+        int databaseVersion = isNewDatabase() ? getCurrentDatabaseVersion() : 0;
 
         DBSession.createTable("ssb_metadata",
-                new Column("version", "INTEGER DEFAULT " + databaseVersion.get())
+                new Column("version", "INTEGER DEFAULT " + databaseVersion)
         );
     }
 
@@ -299,15 +318,21 @@ public class SQLDatabase {
     public static class UpgradeResult {
 
         private final boolean upgraded;
+        private final boolean newDatabase;
         private final int databaseVersion;
 
-        UpgradeResult(boolean upgraded, int databaseVersion) {
+        UpgradeResult(boolean upgraded, boolean newDatabase, int databaseVersion) {
             this.upgraded = upgraded;
+            this.newDatabase = newDatabase;
             this.databaseVersion = databaseVersion;
         }
 
         public boolean isUpgraded() {
             return upgraded;
+        }
+
+        public boolean isNewDatabase() {
+            return newDatabase;
         }
 
         public int getDatabaseVersion() {
