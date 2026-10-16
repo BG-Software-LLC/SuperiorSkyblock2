@@ -28,7 +28,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
     private final KeyMap<BigInteger> blockCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
 
     private final Island island;
-    private boolean loadingDataMode = false;
+    private volatile boolean loadingDataMode = false;
 
     public DefaultIslandBlocksTrackerAlgorithm(Island island) {
         this.island = island;
@@ -115,23 +115,36 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
     @Override
     public BigInteger getBlockCount(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockCounts.getOrDefault(key, BigInteger.ZERO);
+        synchronized (this.blockCounts) {
+            return blockCounts.getOrDefault(key, BigInteger.ZERO);
+        }
     }
 
     @Override
     public BigInteger getExactBlockCount(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockCounts.getRaw(key, BigInteger.ZERO);
+        synchronized (this.blockCounts) {
+            return blockCounts.getRaw(key, BigInteger.ZERO);
+        }
     }
 
     @Override
     public Map<Key, BigInteger> getBlockCounts() {
-        return Collections.unmodifiableMap(this.blockCounts);
+        if (!plugin.getTaskScheduler().isFolia())
+            return Collections.unmodifiableMap(this.blockCounts);
+
+        KeyMap<BigInteger> snapshot = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+        synchronized (this.blockCounts) {
+            snapshot.putAll(this.blockCounts);
+        }
+        return Collections.unmodifiableMap(snapshot);
     }
 
     @Override
     public void clearBlockCounts() {
-        this.blockCounts.clear();
+        synchronized (this.blockCounts) {
+            this.blockCounts.clear();
+        }
     }
 
     @Override
@@ -144,8 +157,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
 
         Log.debug(Debug.BLOCK_COUNT_INCREASE, island.getOwner().getName(), key, amount);
 
-        BigInteger currentAmount = blockCounts.getRaw(valueKey, BigInteger.ZERO);
-        blockCounts.put(valueKey, currentAmount.add(amount));
+        increaseCount(valueKey, amount);
 
         if (loadingDataMode)
             return;
@@ -156,8 +168,7 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
 
         if (!limitKey.equals(valueKey)) {
             Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "Limit Key", limitKey);
-            currentAmount = blockCounts.getRaw(limitKey, BigInteger.ZERO);
-            blockCounts.put(limitKey, currentAmount.add(amount));
+            increaseCount(limitKey, amount);
             limitCount = true;
         }
 
@@ -165,19 +176,27 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
             BlockValue blockValue = plugin.getBlockValues().getBlockValue(globalKey);
             if (blockValue != BlockValue.ZERO) {
                 Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "Global Key", globalKey);
-                currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
-                blockCounts.put(globalKey, currentAmount.add(amount));
+                increaseCount(globalKey, amount);
             }
+        }
+    }
+
+    private void increaseCount(Key key, BigInteger amount) {
+        synchronized (this.blockCounts) {
+            BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
+            blockCounts.put(key, currentAmount.add(amount));
         }
     }
 
     private void removeCounts(Key key, BigInteger amount) {
         Log.debug(Debug.BLOCK_COUNT_DECREASE, island.getOwner().getName(), key, amount);
-        BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
-        if (currentAmount.compareTo(amount) <= 0)
-            blockCounts.remove(key);
-        else
-            blockCounts.put(key, currentAmount.subtract(amount));
+        synchronized (this.blockCounts) {
+            BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
+            if (currentAmount.compareTo(amount) <= 0)
+                blockCounts.remove(key);
+            else
+                blockCounts.put(key, currentAmount.subtract(amount));
+        }
     }
 
 }

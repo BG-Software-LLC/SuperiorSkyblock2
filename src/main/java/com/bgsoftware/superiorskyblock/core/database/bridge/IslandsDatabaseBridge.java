@@ -37,21 +37,22 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class IslandsDatabaseBridge {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
+    private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new HashMap<>();
 
     private IslandsDatabaseBridge() {
     }
@@ -872,31 +873,47 @@ public class IslandsDatabaseBridge {
     }
 
     public static void markIslandChestsToBeSaved(Island island, IslandChest islandChest) {
-        SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(island.getUniqueId(), u -> new EnumMap<>(FutureSave.class))
-                .computeIfAbsent(FutureSave.ISLAND_CHESTS, e -> new HashSet<>())
-                .add(islandChest);
+        UUID islandUUID = island.getUniqueId();
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(islandUUID, u -> new EnumMap<>(FutureSave.class))
+                    .computeIfAbsent(FutureSave.ISLAND_CHESTS, e -> Collections.newSetFromMap(new IdentityHashMap<>()))
+                    .add(islandChest);
+        }
     }
 
     public static void markBlockCountsToBeSaved(Island island) {
-        Set<Object> varsForBlockCounts = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(island.getUniqueId(), u -> new EnumMap<>(FutureSave.class))
-                .computeIfAbsent(FutureSave.BLOCK_COUNTS, e -> new HashSet<>());
-        if (varsForBlockCounts.isEmpty())
-            varsForBlockCounts.add(new Object());
+        UUID islandUUID = island.getUniqueId();
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            Set<Object> varsForBlockCounts = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(islandUUID, u -> new EnumMap<>(FutureSave.class))
+                    .computeIfAbsent(FutureSave.BLOCK_COUNTS, e -> new HashSet<>());
+            if (varsForBlockCounts.isEmpty())
+                varsForBlockCounts.add(new Object());
+        }
     }
 
     public static void markPersistentDataContainerToBeSaved(Island island) {
-        Set<Object> varsForPersistentData = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(island.getUniqueId(), u -> new EnumMap<>(FutureSave.class))
-                .computeIfAbsent(FutureSave.PERSISTENT_DATA, e -> new HashSet<>());
-        if (varsForPersistentData.isEmpty())
-            varsForPersistentData.add(new Object());
+        UUID islandUUID = island.getUniqueId();
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            Set<Object> varsForPersistentData = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(islandUUID, u -> new EnumMap<>(FutureSave.class))
+                    .computeIfAbsent(FutureSave.PERSISTENT_DATA, e -> new HashSet<>());
+            if (varsForPersistentData.isEmpty())
+                varsForPersistentData.add(new Object());
+        }
     }
 
     public static boolean isModified(Island island) {
-        return SAVE_METHODS_TO_BE_EXECUTED.containsKey(island.getUniqueId());
+        UUID islandUUID = island.getUniqueId();
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            return SAVE_METHODS_TO_BE_EXECUTED.containsKey(islandUUID);
+        }
     }
 
     public static void executeFutureSaves(Island island) {
-        Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.remove(island.getUniqueId());
+        UUID islandUUID = island.getUniqueId();
+        Map<FutureSave, Set<Object>> futureSaves;
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            futureSaves = SAVE_METHODS_TO_BE_EXECUTED.remove(islandUUID);
+        }
         if (futureSaves != null) {
             for (Map.Entry<FutureSave, Set<Object>> futureSaveEntry : futureSaves.entrySet()) {
                 switch (futureSaveEntry.getKey()) {
@@ -916,18 +933,22 @@ public class IslandsDatabaseBridge {
     }
 
     public static void executeFutureSaves(Island island, FutureSave futureSave) {
-        Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.get(island.getUniqueId());
+        UUID islandUUID = island.getUniqueId();
+        Set<Object> values;
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.get(islandUUID);
 
-        if (futureSaves == null)
-            return;
+            if (futureSaves == null)
+                return;
 
-        Set<Object> values = futureSaves.remove(futureSave);
+            values = futureSaves.remove(futureSave);
 
-        if (values == null)
-            return;
+            if (values == null)
+                return;
 
-        if (futureSaves.isEmpty())
-            SAVE_METHODS_TO_BE_EXECUTED.remove(island.getUniqueId());
+            if (futureSaves.isEmpty())
+                SAVE_METHODS_TO_BE_EXECUTED.remove(islandUUID);
+        }
 
         switch (futureSave) {
             case BLOCK_COUNTS:

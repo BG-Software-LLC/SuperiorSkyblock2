@@ -26,11 +26,13 @@ import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.external.blocks.ICustomBlocksProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -59,6 +61,8 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
     @Override
     public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
+        if (BukkitExecutor.isFolia())
+            return calculateIslandFolia(island);
         CompletableFuture<IslandCalculationResult> result = new CompletableFuture<>();
         BukkitExecutor.ensureMain(() -> calculateIslandInternal(island, result));
         return result;
@@ -171,6 +175,56 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
             Profiler.end(profiler);
 
             result.complete(blockCounts);
+        });
+    }
+
+    private CompletableFuture<IslandCalculationResult> calculateIslandFolia(Island island) {
+        List<CompletableFuture<BlockCountsTracker>> futures = new ArrayList<>();
+        IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
+                .forEach((worldInfo, positions) -> positions.forEach(position -> {
+                    Location location = new Location(position.getWorld(), position.getX() << 4, 0, position.getZ() << 4);
+                    ChunkPosition chunkPosition = position.copy();
+                    futures.add(ChunksProvider.loadChunk(position.copy(), ChunkLoadReason.BLOCKS_RECALCULATE, chunk -> {
+                        if (plugin.getProviders().hasSnapshotsSupport())
+                            plugin.getProviders().takeSnapshots(chunk);
+                    }).thenCompose(chunk -> {
+                        List<ChunkPosition> chunkPositions = new LinkedList<>();
+                        chunkPositions.add(chunkPosition.copy());
+                        return plugin.getNMSChunks().calculateChunks(chunkPositions, CACHED_CALCULATED_CHUNKS);
+                    }).thenCompose(chunks -> BukkitExecutor.submit(location, () -> {
+                        BlockCountsTracker counts = new BlockCountsTracker();
+                        for (CalculatedChunk.Blocks chunk : chunks) {
+                            chunk.getBlockCounts().forEach((key, count) -> {
+                                if (!(key instanceof SpawnerKey))
+                                    counts.addCounts(key, count.get());
+                            });
+                            for (Location spawnerLocation : chunk.getSpawners()) {
+                                Pair<Integer, String> spawner = plugin.getProviders().getSpawnersProvider().getSpawner(spawnerLocation);
+                                Key key = spawner.getValue() == null ? Keys.of(spawnerLocation.getBlock()) :
+                                        Keys.ofSpawner(spawner.getValue(), spawnerLocation);
+                                counts.addCounts(key, spawner.getKey());
+                            }
+                            if (!loadExternalBlocksForChunk(chunkPosition, counts))
+                                throw new IllegalStateException("Unable to count custom blocks in " + chunkPosition);
+                            plugin.getStackedBlocks().forEach(chunkPosition, stackedBlock ->
+                                    counts.addCounts(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1));
+                        }
+                        return counts;
+                    })).whenComplete((ignored, error) -> {
+                        plugin.getProviders().releaseSnapshots(chunkPosition);
+                        chunkPosition.release();
+                    }));
+                }));
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(ignored -> {
+            BlockCountsTracker result = new BlockCountsTracker();
+            futures.forEach(future -> future.join().blockCounts.forEach((key, amount) ->
+                    result.blockCounts.put(key, result.blockCounts.getRaw(key, BigInteger.ZERO).add(amount))));
+            MINECART_BLOCK_TYPES.forEach(types -> {
+                int count = island.getEntitiesTracker().getEntityCount(types.getKey());
+                if (count > 0)
+                    result.addCounts(types.getValue(), count);
+            });
+            return result;
         });
     }
 

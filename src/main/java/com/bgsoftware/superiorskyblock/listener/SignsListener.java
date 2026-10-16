@@ -78,7 +78,7 @@ public class SignsListener extends AbstractGameEventListener {
 
         // We want to update the sign only one tick later, so other plugins don't interface with it
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1916
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(block.getLocation(), () -> {
             BlockState blockState = block.getState();
             if (blockState instanceof Sign) {
                 Sign sign = (Sign) blockState;

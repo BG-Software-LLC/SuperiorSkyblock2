@@ -17,10 +17,13 @@ import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
+import com.bgsoftware.superiorskyblock.api.platform.TaskScheduler;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import org.bukkit.plugin.Plugin;
 
 public interface SuperiorSkyblock extends Plugin {
+
+    TaskScheduler getTaskScheduler();
 
     /**
      * Get the grid of the core.

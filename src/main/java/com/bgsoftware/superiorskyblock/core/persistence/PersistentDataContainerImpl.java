@@ -30,14 +30,16 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
 
     @Override
     public boolean has(String key) {
-        return innerTag.containsKey(key);
+        synchronized (innerTag) {
+            return innerTag.containsKey(key);
+        }
     }
 
     @Override
     public <T> boolean hasKeyOfType(String key, PersistentDataType<T> type) {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
         Preconditions.checkNotNull(type, "type parameter cannot be null");
-        Tag<?> tag = innerTag.getTag(key).orElse(null);
+        Tag<?> tag = getTag(key);
         return tag != null && PersistenceDataTypeSerializer.isTagOfType(tag, type);
     }
 
@@ -57,7 +59,11 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
         Preconditions.checkNotNull(type, "type parameter cannot be null");
         Preconditions.checkNotNull(value, "value parameter cannot be null");
         Preconditions.checkNotNull(returnType, "returnType parameter cannot be null");
-        Tag<?> oldValue = innerTag.setTag(key, PersistenceDataTypeSerializer.serialize(value, type));
+        Tag<?> newValue = PersistenceDataTypeSerializer.serialize(value, type);
+        Tag<?> oldValue;
+        synchronized (innerTag) {
+            oldValue = innerTag.setTag(key, newValue);
+        }
 
         this.saveFunction.accept(holder);
 
@@ -68,7 +74,10 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
     @Override
     public Object remove(String key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
-        Tag<?> oldValue = innerTag.remove(key);
+        Tag<?> oldValue;
+        synchronized (innerTag) {
+            oldValue = innerTag.remove(key);
+        }
 
         this.saveFunction.accept(holder);
 
@@ -81,10 +90,15 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
         Preconditions.checkNotNull(type, "type parameter cannot be null");
 
-        if (!hasKeyOfType(key, type))
+        Tag<?> oldValue = getTag(key);
+        if (oldValue == null || !PersistenceDataTypeSerializer.isTagOfType(oldValue, type))
             return null;
 
-        Tag<?> oldValue = innerTag.remove(key);
+        synchronized (innerTag) {
+            if (innerTag.getTag(key).orElse(null) != oldValue)
+                return null;
+            innerTag.remove(key);
+        }
 
         this.saveFunction.accept(holder);
 
@@ -121,17 +135,21 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
 
     @Override
     public boolean isEmpty() {
-        return innerTag.isEmpty();
+        synchronized (innerTag) {
+            return innerTag.isEmpty();
+        }
     }
 
     @Override
     public int size() {
-        return innerTag.size();
+        synchronized (innerTag) {
+            return innerTag.size();
+        }
     }
 
     @Override
     public void forEach(BiConsumer<String, Object> action) {
-        innerTag.getValue().forEach((key, value) -> {
+        snapshot().getValue().forEach((key, value) -> {
             action.accept(key, value.getValue());
         });
     }
@@ -141,7 +159,7 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
         ByteArrayOutputStream byteArrayDataOutput = new ByteArrayOutputStream();
 
         try {
-            innerTag.write(new DataOutputStream(byteArrayDataOutput));
+            snapshot().write(new DataOutputStream(byteArrayDataOutput));
         } catch (IOException ignored) {
         }
 
@@ -152,7 +170,10 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
     public void load(byte[] data) {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
         try {
-            this.innerTag.putAll((CompoundTag) Tag.fromStream(new DataInputStream(byteArrayInputStream), 0));
+            CompoundTag loaded = (CompoundTag) Tag.fromStream(new DataInputStream(byteArrayInputStream), 0);
+            synchronized (innerTag) {
+                this.innerTag.putAll(loaded);
+            }
         } catch (Exception error) {
             throw new IllegalArgumentException(error);
         }
@@ -160,15 +181,19 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
 
     @Nullable
     private <T> T _getOfType(String key, PersistentDataType<T> type, @Nullable T def) {
-        Tag<?> tag = innerTag.getTag(key).orElse(null);
+        Tag<?> tag = getTag(key);
 
         if (tag == null) {
             return def;
         }
 
         if (tag instanceof PersistentDataTagSerialized) {
-            tag = ((PersistentDataTagSerialized) tag).getPersistentDataTag(type);
-            innerTag.setTag(key, tag);
+            Tag<?> deserialized = ((PersistentDataTagSerialized) tag).getPersistentDataTag(type);
+            synchronized (innerTag) {
+                if (innerTag.getTag(key).orElse(null) == tag)
+                    innerTag.setTag(key, deserialized);
+            }
+            tag = deserialized;
         }
 
         return PersistenceDataTypeSerializer.deserialize(tag, type);
@@ -176,9 +201,21 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
 
     @Nullable
     private Object _get(String key, @Nullable Object def) {
-        Tag<?> tag = innerTag.getTag(key).orElse(null);
+        Tag<?> tag = getTag(key);
         return tag == null ? def : tag.getValue();
     }
 
+    @Nullable
+    private Tag<?> getTag(String key) {
+        synchronized (innerTag) {
+            return innerTag.getTag(key).orElse(null);
+        }
+    }
+
+    private CompoundTag snapshot() {
+        synchronized (innerTag) {
+            return innerTag.copy();
+        }
+    }
 
 }

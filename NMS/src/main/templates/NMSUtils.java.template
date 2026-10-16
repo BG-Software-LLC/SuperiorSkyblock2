@@ -99,6 +99,24 @@ public class NMSUtils {
     private static void runActionOnChunksInternal(Collection<ChunkPosition> chunksCoords,
                                                   ChunkCallback chunkCallback,
                                                   Consumer<List<ChunkPosition>> onUnloadChunkAction) {
+        if (BukkitExecutor.isFolia()) {
+            List<CompletableFuture<org.bukkit.Chunk>> futures = new java.util.ArrayList<>(chunksCoords.size());
+            chunksCoords.forEach(chunkPosition -> futures.add(ChunksProvider.loadChunk(chunkPosition.copy(),
+                    chunkCallback.chunkLoadReason, chunk -> {
+                        ServerLevel serverLevel = ((CraftWorld) chunk.getWorld()).getHandle();
+                        synchronized (chunkCallback) {
+                            chunkCallback.onLoadedChunk(serverLevel.getChunk(chunk.getX(), chunk.getZ()));
+                        }
+                    })));
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).whenComplete((ignored, error) -> {
+                if (error != null)
+                    chunkCallback.onFailure(error);
+                else
+                    chunkCallback.onFinish();
+            });
+            return;
+        }
+
         List<ChunkPosition> unloadedChunks = new LinkedList<>();
         List<LevelChunk> loadedChunks = new LinkedList<>();
 
@@ -418,6 +436,7 @@ public class NMSUtils {
 
         private final ChunkLoadReason chunkLoadReason;
         private final boolean isWaitForChunkLoad;
+        private Consumer<Throwable> failureHandler = error -> Log.error(error, "Failed to process island chunks:");
 
         @Nullable
         protected CountDownLatch chunkLoadLatch;
@@ -432,6 +451,15 @@ public class NMSUtils {
         public abstract void onUnloadedChunk(UnloadedChunkCompound unloadedChunkCompound);
 
         public abstract void onFinish();
+
+        public final ChunkCallback onFailure(Consumer<Throwable> failureHandler) {
+            this.failureHandler = failureHandler;
+            return this;
+        }
+
+        public final void onFailure(Throwable error) {
+            this.failureHandler.accept(error);
+        }
 
         protected final void latchCountDown() {
             if (this.chunkLoadLatch != null)

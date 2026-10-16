@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.player.inventory.FoliaInventoryReturns;
 import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
@@ -144,7 +145,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
         boolean teleportToSpawn = moveResult != MoveResult.SUCCESS;
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(player, () -> {
             if (!player.isOnline())
                 return;
 
@@ -152,7 +153,9 @@ public class PlayersListener extends AbstractGameEventListener {
             if (!plugin.getProviders().notifySkinsListeners(superiorPlayer))
                 plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
 
-            if (!superiorPlayer.hasBypassModeEnabled()) {
+            FoliaInventoryReturns.restoreOnJoin(superiorPlayer, player);
+            boolean restoringPreview = IslandPreviewListener.restoreOnJoin(plugin, superiorPlayer, player);
+            if (!restoringPreview && !superiorPlayer.hasBypassModeEnabled()) {
                 Island delayedIsland;
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                     delayedIsland = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
@@ -219,6 +222,15 @@ public class PlayersListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.regionManagerService.get().handlePlayerQuit(superiorPlayer, player.getLocation(wrapper.getHandle()));
+        }
+
+        if (BukkitExecutor.isFolia()) {
+            superiorPlayer.updateWorldBorder(null);
+            if (superiorPlayer.hasIslandFlyEnabled() && player.getGameMode() != GameMode.CREATIVE &&
+                    player.getGameMode() != GameMode.SPECTATOR) {
+                player.setFlying(false);
+                player.setAllowFlight(false);
+            }
         }
 
         // Remove all player chat-listeners
@@ -311,7 +323,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
         if (island != null && superiorPlayer.hasIslandFlyEnabled() && !player.getAllowFlight() &&
                 island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync(player, () -> {
                 player.setAllowFlight(true);
                 player.setFlying(true);
             }, 1L);
@@ -494,6 +506,9 @@ public class PlayersListener extends AbstractGameEventListener {
 
         SIslandChest islandChest = (SIslandChest) inventoryHolder;
 
+        if (islandChest.getFoliaChest() != null)
+            return;
+
         if (islandChest.isUpdating()) {
             e.setCancelled();
         } else {
@@ -531,7 +546,7 @@ public class PlayersListener extends AbstractGameEventListener {
         Location respawnLocation = e.getArgs().bukkitEvent.getRespawnLocation();
         Player player = e.getArgs().player;
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(player, () -> {
             if (!player.isOnline())
                 return;
 

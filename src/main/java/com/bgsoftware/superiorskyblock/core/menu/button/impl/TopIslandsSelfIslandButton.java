@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -73,7 +74,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
             GameSoundImpl.playSound(player, islandSound);
 
             if (islandCommands != null) {
-                islandCommands.forEach(command -> Bukkit.dispatchCommand(command.startsWith("PLAYER:") ?
+                islandCommands.forEach(command -> CommandsManagerImpl.dispatchCommand(command.startsWith("PLAYER:") ?
                                 player : Bukkit.getConsoleSender(),
                         command.replace("PLAYER:", "")
                                 .replace("%player%", player.getName())
@@ -101,7 +102,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
         GameSoundImpl.playSound(player, noIslandSound);
 
         if (noIslandCommands != null)
-            noIslandCommands.forEach(command -> Bukkit.dispatchCommand(command.startsWith("PLAYER:") ?
+            noIslandCommands.forEach(command -> CommandsManagerImpl.dispatchCommand(command.startsWith("PLAYER:") ?
                             player : Bukkit.getConsoleSender(),
                     command.replace("PLAYER:", "").replace("%player%", player.getName())));
     }

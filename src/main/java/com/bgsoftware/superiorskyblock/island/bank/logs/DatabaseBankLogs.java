@@ -11,6 +11,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +36,7 @@ public class DatabaseBankLogs implements IBankLogs {
             .build(new CacheLoader<Integer, List<BankTransaction>>() {
                 @Override
                 public List<BankTransaction> load(@NotNull Integer ignored) {
-                    return new LinkedList<>();
+                    return Collections.synchronizedList(new LinkedList<>());
                 }
             });
 
@@ -81,7 +82,10 @@ public class DatabaseBankLogs implements IBankLogs {
     private List<BankTransaction> collectBankTransactions() {
         List<BankTransaction> bankTransactionList = new LinkedList<>();
         bankTransactionList.addAll(cachedBankTransactions.getUnchecked(0));
-        bankTransactionList.addAll(sessionBankTransactions.getUnchecked(0));
+        List<BankTransaction> sessionTransactions = sessionBankTransactions.getUnchecked(0);
+        synchronized (sessionTransactions) {
+            bankTransactionList.addAll(sessionTransactions);
+        }
         return bankTransactionList;
     }
 
