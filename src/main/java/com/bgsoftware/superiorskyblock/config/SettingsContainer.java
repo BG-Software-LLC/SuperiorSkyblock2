@@ -750,7 +750,26 @@ public class SettingsContainer {
             removeInvalidEntityKeys = true;
         }
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        ConfigurationSection tameable = cfg.getConfigurationSection("TAMEABLE");
+        if (tameable != null) {
+            if (!cfg.contains("TAMED"))
+                cfg.createSection("TAMED");
+
+            for (Map.Entry<String, Object> entry : tameable.getValues(true).entrySet()) {
+                String path = "TAMED." + entry.getKey();
+                if (!(entry.getValue() instanceof ConfigurationSection) && !cfg.contains(path))
+                    cfg.set(path, entry.getValue());
+            }
+
+            cfg.set("TAMEABLE", null);
+            try {
+                cfg.save(file);
+            } catch (IOException error) {
+                Log.errorFromFile(error, file.getName(), "Failed to save converted entity categories:");
+            }
+        }
 
         if (removeInvalidEntityKeys) {
             EntityCategoriesSection.removeInvalidEntityKeys(cfg, file);
