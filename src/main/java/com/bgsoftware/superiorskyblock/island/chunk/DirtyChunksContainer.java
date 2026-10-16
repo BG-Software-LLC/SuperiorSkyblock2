@@ -32,11 +32,21 @@ public class DirtyChunksContainer {
     public DirtyChunksContainer(Island island) {
         this.island = island;
 
-        BlockPosition minimum = island.getMinimumPosition();
+        BlockPosition minimum;
+        BlockPosition maximum;
+        if (island.isSpawn()) {
+            minimum = island.getMinimumPosition();
+            maximum = island.getMaximumPosition();
+        } else {
+            int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() * 1.5);
+            BlockPosition center = island.getCenterPosition();
+            minimum = center.offset(-islandDistance, 0, -islandDistance);
+            maximum = center.offset(islandDistance, 0, islandDistance);
+        }
+
         this.minChunkX = minimum.getX() >> 4;
         this.minChunkZ = minimum.getZ() >> 4;
 
-        BlockPosition maximum = island.getMaximumPosition();
         int maxChunkX = maximum.getX() >> 4;
         int maxChunkZ = maximum.getZ() >> 4;
         // The chunk ranges are inclusive on both ends, therefore the amount of chunks in each
