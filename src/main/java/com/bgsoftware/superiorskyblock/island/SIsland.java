@@ -400,7 +400,6 @@ public class SIsland implements Island {
 
         updateDatesFormatter();
         checkMembersDuplication();
-        updateOldUpgradeValues();
         updateUpgrades();
         updateIslandChests();
 
@@ -5382,74 +5381,6 @@ public class SIsland implements Island {
 
         // Syncing all real upgrades.
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), overrideCustom));
-    }
-
-    private void updateOldUpgradeValues() {
-        if (getIslandSize() == plugin.getSettings().getDefaultValues().getIslandSize()) {
-            this.borderSize.set(DefaultUpgradeLevel.getInstance().getBorderSizeUpgradeValue());
-        }
-
-        if (getCropGrowthMultiplier() == plugin.getSettings().getDefaultValues().getCropGrowth()) {
-            this.cropGrowth.set(DefaultUpgradeLevel.getInstance().getCropGrowthUpgradeValue());
-        }
-
-        if (getMobDropsMultiplier() == plugin.getSettings().getDefaultValues().getMobDrops()) {
-            this.mobDrops.set(DefaultUpgradeLevel.getInstance().getMobDropsUpgradeValue());
-        }
-
-        if (getSpawnerRatesMultiplier() == plugin.getSettings().getDefaultValues().getSpawnerRates()) {
-            this.spawnerRates.set(DefaultUpgradeLevel.getInstance().getSpawnerRatesUpgradeValue());
-        }
-
-        if (getCoopLimit() == plugin.getSettings().getDefaultValues().getCoopLimit()) {
-            this.coopLimit.set(DefaultUpgradeLevel.getInstance().getCoopLimitUpgradeValue());
-        }
-
-        if (getTeamLimit() == plugin.getSettings().getDefaultValues().getTeamLimit()) {
-            this.teamLimit.set(DefaultUpgradeLevel.getInstance().getTeamLimitUpgradeValue());
-        }
-
-        if (getWarpsLimit() == plugin.getSettings().getDefaultValues().getWarpsLimit()) {
-            this.warpsLimit.set(DefaultUpgradeLevel.getInstance().getWarpsLimitUpgradeValue());
-        }
-
-        this.blockLimits.forEach((key, value) -> {
-            Integer defaultValue = plugin.getSettings().getDefaultValues().getBlockLimits().get(key);
-
-            if (defaultValue != null && value.get() == defaultValue) {
-                this.blockLimits.put(key, IntValue.syncedFixed(defaultValue));
-            }
-        });
-
-        this.entityLimits.forEach((key, value) -> {
-            Integer defaultValue = plugin.getSettings().getDefaultValues().getEntityLimits().get(key);
-
-            if (defaultValue != null && value.get() == defaultValue) {
-                this.entityLimits.put(key, IntValue.syncedFixed(defaultValue));
-            }
-        });
-
-        this.generatorAmounts.write(generatorAmounts -> {
-            for (Dimension dimension : Dimension.values()) {
-                Map<Key, Integer> defaultGeneratorAmounts = plugin.getSettings().getDefaultValues().getRealGeneratorsMap().get(dimension);
-
-                if (defaultGeneratorAmounts != null) {
-                    KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
-
-                    if (dimensionGeneratorAmounts == null) {
-                        continue;
-                    }
-
-                    dimensionGeneratorAmounts.forEach((key, value) -> {
-                        Integer defaultValue = defaultGeneratorAmounts.get(key);
-
-                        if (defaultValue != null && value.get() == defaultValue) {
-                            dimensionGeneratorAmounts.put(key, IntValue.syncedFixed(defaultValue));
-                        }
-                    });
-                }
-            }
-        });
     }
 
     private void clearUpgrades(boolean overrideCustom) {
