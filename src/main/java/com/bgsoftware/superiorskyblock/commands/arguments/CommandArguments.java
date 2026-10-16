@@ -299,7 +299,7 @@ public class CommandArguments {
             return null;
         }
 
-        if (limit.compareTo(BigDecimal.ZERO) < 0 && !limit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE)) {
+        if (limit.compareTo(BigDecimal.ZERO) < 0 && limit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) != 0) {
             Message.INVALID_LIMIT.send(sender, argument);
             return null;
         }
