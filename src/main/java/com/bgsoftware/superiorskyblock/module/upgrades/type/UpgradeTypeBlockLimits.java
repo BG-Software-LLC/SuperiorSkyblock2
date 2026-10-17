@@ -191,12 +191,13 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             Material targetBlockType = targetBlock.getType();
 
             if (Materials.isMinecart(dispenseItemType)) {
-                if (!Materials.isRail(targetBlockType)) {
+                if (!Materials.isRail(targetBlockType) && !(targetBlockType == Material.AIR
+                        && Materials.isRail(targetBlock.getRelative(BlockFace.DOWN).getType()))) {
                     return;
                 }
             } else if (Materials.isChestBoat(dispenseItemType)) {
-                if (!Materials.isWater(targetBlockType) && !(targetBlockType == Material.AIR
-                        && Materials.isWater(targetBlock.getRelative(BlockFace.DOWN).getType()))) {
+                if (!plugin.getNMSWorld().isWaterLogged(targetBlock) && !(targetBlockType == Material.AIR
+                        && plugin.getNMSWorld().isWaterLogged(targetBlock.getRelative(BlockFace.DOWN)))) {
                     return;
                 }
             } else {
