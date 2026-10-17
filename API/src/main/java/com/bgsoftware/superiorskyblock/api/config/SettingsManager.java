@@ -1451,6 +1451,7 @@ public interface SettingsManager {
 
     }
 
+    @Deprecated
     interface Interactables {
 
         /**
