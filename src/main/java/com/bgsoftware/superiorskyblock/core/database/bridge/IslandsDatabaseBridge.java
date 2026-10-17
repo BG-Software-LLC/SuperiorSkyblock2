@@ -368,6 +368,11 @@ public class IslandsDatabaseBridge {
         });
     }
 
+    public static void clearRoleLimits(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge ->
+                databaseBridge.deleteObject("islands_role_limits", createFilter("island", island)));
+    }
+
     public static void removeRoleLimit(Island island, PlayerRole playerRole) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
             try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {

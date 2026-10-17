@@ -20,6 +20,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminAddDisbands());
         registerCommand(new CmdAdminAddSize());
         registerCommand(new CmdAdminAddTeamLimit());
+        registerCommand(new CmdAdminAddRoleLimit());
         registerCommand(new CmdAdminAddWarpsLimit());
         registerCommand(new CmdAdminBypass());
         registerCommand(new CmdAdminChest());
@@ -46,6 +47,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminRecalc());
         registerCommand(new CmdAdminReload());
         registerCommand(new CmdAdminRemoveRatings());
+        registerCommand(new CmdAdminRemoveRoleLimit());
         registerCommand(new CmdAdminResetPermissions());
         registerCommand(new CmdAdminResetSettings());
         registerCommand(new CmdAdminResetWorld());

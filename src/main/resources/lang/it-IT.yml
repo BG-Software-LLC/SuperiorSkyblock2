@@ -170,6 +170,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: Aggiungi un effetto isola per l'isola di u
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: Aumenta il limite di entità per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Aggiungi la percentuale di un materiale per il generatore di ciottoli.
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: Aumenta il moltiplicatore dei mob drops per l'isola di un altro giocatore.
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: Espandi la dimensione dell'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: Aumenta il moltiplicatore dei tassi di generazione per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: Aumenta il limite di membri per l'isola di un altro giocatore.
@@ -205,9 +206,12 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: Potenzia un aggiornamento per un isola.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Ricalcola il valore di un'isola.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Ricarica tutte le configurazioni e le attività del plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Rimuovi il limite di un blocco da un'isola.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_EFFECT: 'Remove an effect from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_GENERATOR: 'Remove a material from the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Rimuovi tutte le valutazioni fornite da un giocatore.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Ripristina il mondo su un''isole.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
@@ -577,6 +581,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lIsola | &7Hai lasciato la tua isola.'
 LEFT_ISLAND_COOP: '&e&lIsola | &7Non sei più un membro coop dell''isola di {0}.'
 LEFT_ISLAND_COOP_NAME: '&e&lIsola | &7Non sei più un membro coop dell''isola {0}.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'

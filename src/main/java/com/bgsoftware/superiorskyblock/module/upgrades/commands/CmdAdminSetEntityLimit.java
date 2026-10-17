@@ -73,8 +73,9 @@ public class CmdAdminSetEntityLimit implements IAdminIslandCommand {
 
         NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[4]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int limit = arguments.getNumber();
 
@@ -89,15 +90,17 @@ public class CmdAdminSetEntityLimit implements IAdminIslandCommand {
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()));
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), targetPlayer.getName());
+        }
     }
 
     @Override
