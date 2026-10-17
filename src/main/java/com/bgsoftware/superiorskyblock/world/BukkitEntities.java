@@ -38,12 +38,17 @@ import java.util.Optional;
 
 public class BukkitEntities {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Synchronized<Int2ObjectMapView<List<ItemStack>>> entityContent = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
+    @Nullable
+    private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
     @Nullable
     private static final EntityType NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "NAUTILUS");
     @Nullable
     private static final EntityType ZOMBIE_NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "ZOMBIE_NAUTILUS");
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final Synchronized<Int2ObjectMapView<List<ItemStack>>> entityContent =
+            Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
 
     private BukkitEntities() {
 
@@ -128,7 +133,7 @@ public class BukkitEntities {
 
     public static boolean canHaveLimit(EntityType entityType) {
         Class<?> entityClass = entityType.getEntityClass();
-        return (entityClass != null && (LivingEntity.class.isAssignableFrom(entityClass) ||
+        return (entityClass != null && (LivingEntity.class.isAssignableFrom(entityClass) || entityType == CUSHION_TYPE ||
                 Hanging.class.isAssignableFrom(entityClass) || Vehicle.class.isAssignableFrom(entityClass)));
     }
 

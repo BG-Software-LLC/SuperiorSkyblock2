@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_18.utils.TickingBlockList;
 import com.google.common.base.Suppliers;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -24,8 +25,12 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -51,6 +56,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_18_R2.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -72,6 +78,18 @@ public class NMSUtilsVersioned {
             EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
     private static final ReflectMethod<CompletableFuture<CompoundTag>> WORKER_LOAD_ASYNC = new ReflectMethod<>(
             IOWorker.class, CompletableFuture.class, 1, ChunkPos.class);
+
+    public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
+    }
+
+    public static int getLevelChunkX(LevelChunk levelChunk) {
+        return levelChunk.getPos().x;
+    }
+
+    public static int getLevelChunkZ(LevelChunk levelChunk) {
+        return levelChunk.getPos().z;
+    }
 
     public static CompoundTag readChunk(ChunkMap chunkMap, ChunkPos chunkPos) throws IOException {
         return chunkMap.read(chunkPos);
@@ -258,6 +276,14 @@ public class NMSUtilsVersioned {
 
     public static EndDragonFight getEndDragonFight(ServerLevel serverLevel) {
         return serverLevel.dragonFight();
+    }
+
+    public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
+        // Fight origin does not exist in this version; DragonUtils handles the podium position instead.
+    }
+
+    public static void removeDragonTicket(ServerLevel serverLevel) {
+        serverLevel.getChunkSource().removeRegionTicket(TicketType.DRAGON, new ChunkPos(0, 0), 9, Unit.INSTANCE);
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {

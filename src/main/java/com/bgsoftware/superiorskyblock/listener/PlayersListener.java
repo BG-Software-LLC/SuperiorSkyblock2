@@ -180,6 +180,10 @@ public class PlayersListener extends AbstractGameEventListener {
 
     private void onPlayerQuit(GameEvent<GameEventArgs.PlayerQuitEvent> e) {
         Player player = e.getArgs().player;
+
+        // Pending requests of dangerous commands should not be executed after the player left.
+        plugin.getCommands().cancelDangerousRequests(player.getUniqueId());
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if (superiorPlayer instanceof SuperiorNPCPlayer) {

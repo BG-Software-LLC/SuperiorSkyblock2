@@ -90,6 +90,14 @@ ARMOR_STAND:
     DAMAGE: BREAK
     INTERACT: BUILD
 
+CUSHION:
+  entities:
+    - CUSHION
+  actions:
+    SPAWN: BUILD
+    DAMAGE: BREAK
+    INTERACT: INTERACT
+
 ITEM_FRAME:
   entities:
     - GLOW_ITEM_FRAME

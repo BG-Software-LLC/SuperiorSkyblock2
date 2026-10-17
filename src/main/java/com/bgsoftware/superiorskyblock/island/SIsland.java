@@ -400,7 +400,6 @@ public class SIsland implements Island {
         plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
 
         updateDatesFormatter();
-        startBankInterest();
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
@@ -413,6 +412,10 @@ public class SIsland implements Island {
 
         this.islandBank.setBalance(builder.balance);
         builder.bankTransactions.forEach(this.islandBank::loadTransaction);
+
+        // We need to load the transactions and balance before the bank interest process starts.
+        startBankInterest();
+
         if (builder.persistentData.length > 0)
             getPersistentDataContainer().load(builder.persistentData);
 
@@ -1878,7 +1881,7 @@ public class SIsland implements Island {
     @Override
     public void updateBorder() {
         Log.debug(Debug.UPDATE_BORDER, owner.getName());
-        getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this));
+        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this)));
     }
 
     @Override
@@ -4576,7 +4579,7 @@ public class SIsland implements Island {
             calculationResult = calculationAlgorithm.calculateIsland(this);
         }
 
-        calculationResult.whenComplete((result, error) -> {
+        calculationResult.whenCompleteAsync((result, error) -> {
             beingRecalculated = false;
             boolean isLastActiveTask = plugin.getGrid().stopCalcTask();
 
@@ -4608,7 +4611,7 @@ public class SIsland implements Island {
 
             saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel, true, isLastActiveTask);
             updateLastTime();
-        });
+        }, BukkitExecutor.SYNC_EXECUTOR);
     }
 
     private boolean hasGiveInterestFailed() {

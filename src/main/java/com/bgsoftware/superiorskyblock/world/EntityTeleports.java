@@ -203,23 +203,23 @@ public class EntityTeleports {
                     for (int z = 0; z < 16; z++) {
                         int y = chunkSnapshot.getHighestBlockYAt(x, z);
 
-                        if (y - 1 <= worldMinLimit || y + 1 >= worldBuildLimit)
+                        // ChunkSnapshot#getHighestBlockYAt returns the highest block in 1.18+, and the
+                        // block above it in older versions. Therefore, we check both possible standing spots.
+                        int safeY;
+                        if (y > worldMinLimit && y + 2 < worldBuildLimit &&
+                                WorldBlocks.isSafeStandingSpot(chunkSnapshot, x, y + 1, z)) {
+                            safeY = y + 1;
+                        } else if (y - 1 > worldMinLimit && y + 1 < worldBuildLimit &&
+                                WorldBlocks.isSafeStandingSpot(chunkSnapshot, x, y, z)) {
+                            safeY = y;
+                        } else {
                             continue;
+                        }
 
                         int worldX = chunkSnapshot.getX() * 16 + x;
                         int worldZ = chunkSnapshot.getZ() * 16 + z;
 
-                        // In some versions, the ChunkSnapshot#getHighestBlockYAt seems to return
-                        // one block above the actual highest block. Therefore, the check is on the
-                        // returned block and the block below it.
-                        Location safeSpot;
-                        if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
-                            safeSpot = new Location(islandsWorld, worldX, y, worldZ);
-                        } else if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
-                            safeSpot = new Location(islandsWorld, worldX, y - 1, worldZ);
-                        } else {
-                            continue;
-                        }
+                        Location safeSpot = new Location(islandsWorld, worldX, safeY, worldZ);
 
                         double distanceFromHome = safeSpot.distanceSquared(homeLocation);
                         if (closestSafeSpot == null || distanceFromHome < closestSafeSpotDistance) {

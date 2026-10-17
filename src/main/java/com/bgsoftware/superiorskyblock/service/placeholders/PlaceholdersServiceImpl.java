@@ -55,7 +55,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)");
     private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
 
-    private static final Pattern BAN_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("ban_(.+)");
+    private static final Pattern BAN_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("ban_(\\d+)");
     private static final Pattern BIOME_PLACEHOLDER_PATTERN = Pattern.compile("island_biome_(.+)");
     private static final Pattern BLOCK_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_count_(.+)");
     private static final Pattern BLOCK_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("island_block_level_(.+)");
@@ -63,7 +63,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_level_(.+)");
     private static final Pattern BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_total_worth_(.+)");
     private static final Pattern BLOCK_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("island_block_worth_(.+)");
-    private static final Pattern COOP_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("coop_(.+)");
+    private static final Pattern COOP_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("coop_(\\d+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_count_(.+)");
     private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("island_data_(.+)");
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("island_effect_(.+)");
@@ -72,12 +72,12 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
     private static final Pattern GENERATOR_AMOUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_amount_(.+)");
     private static final Pattern GENERATOR_PERCENTAGE_PLACEHOLDER_PATTERN = Pattern.compile("island_generator_percentage_(.+)");
-    private static final Pattern MEMBER_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
+    private static final Pattern MEMBER_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("member_(\\d+)");
     private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
     private static final Pattern MISSION_STATUS_PATTERN = Pattern.compile("mission_status_(.+)");
     private static final Pattern PERMISSION_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_(.+)");
     private static final Pattern PERMISSION_ROLE_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_role_(.+)");
-    private static final Pattern PLAYER_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
+    private static final Pattern PLAYER_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("player_(\\d+)");
     private static final Pattern ROLE_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_role_count_(.+)");
     private static final Pattern ROLE_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_role_limit_(.+)");
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
@@ -87,9 +87,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
     private static final Pattern TOP_CUSTOM_PLACEHOLDER_PATTERN = Pattern.compile("(\\d+)_(.+)");
-    private static final Pattern UNIQUE_VISITOR_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("unique_visitor_(.+)");
+    private static final Pattern UNIQUE_VISITOR_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("unique_visitor_(\\d+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
-    private static final Pattern VISITOR_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("visitor_(.+)");
+    private static final Pattern VISITOR_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("visitor_(\\d+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
     private static final Pattern WORLD_UNLOCKED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_unlocked_(.+)");
     private static final Pattern WORLD_ENABLED_PLACEHOLDER_PATTERN = Pattern.compile("island_world_enabled_(.+)");

@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -472,11 +473,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         Player player = asPlayer();
         if (player != null) {
-            playerTeleportAlgorithm.teleportWithResult(player, location).whenComplete((result, error) -> {
+            playerTeleportAlgorithm.teleportWithResult(player, location).whenCompleteAsync((result, error) -> {
                 if (teleportResult != null) {
                     teleportResult.accept(error != null ? PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR : result);
                 }
-            });
+            }, BukkitExecutor.SYNC_EXECUTOR);
         } else if (teleportResult != null) {
             teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
         }
@@ -523,14 +524,14 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         Player player = asPlayer();
         if (player != null) {
             setPlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
-            playerTeleportAlgorithm.teleportWithResult(player, island, dimension).whenComplete((result, error) -> {
+            playerTeleportAlgorithm.teleportWithResult(player, island, dimension).whenCompleteAsync((result, error) -> {
                 player.setFallDistance(0f);
                 removePlayerStatus(PlayerStatus.FALL_DAMAGE_IMMUNED);
 
                 if (teleportResult != null) {
                     teleportResult.accept(error != null ? PlayerTeleportAlgorithm.TeleportResult.UNEXPECTED_ERROR : result);
                 }
-            });
+            }, BukkitExecutor.SYNC_EXECUTOR);
         } else if (teleportResult != null) {
             teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.OFFLINE_PLAYER);
         }
@@ -718,7 +719,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void updateWorldBorder(@Nullable Island island) {
-        plugin.getNMSWorld().setWorldBorder(this, island);
+        BukkitExecutor.ensureMain(() -> plugin.getNMSWorld().setWorldBorder(this, island));
     }
 
     @Override
