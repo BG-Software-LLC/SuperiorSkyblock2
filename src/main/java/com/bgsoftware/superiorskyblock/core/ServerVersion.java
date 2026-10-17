@@ -23,8 +23,9 @@ public enum ServerVersion {
     v1_21(121),
     v26_1(261),
     v26_2(262),
+    v26_3(263),
 
-    UNKONWN(-1);
+    UNKNOWN(-1);
 
     private static final ServerVersion currentVersion;
     private static final String bukkitVersion;
@@ -33,7 +34,7 @@ public enum ServerVersion {
     static {
         bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
         String[] sections = bukkitVersion.split("\\.");
-        currentVersion = Optional.ofNullable(EnumHelper.getEnum(ServerVersion.class, "v" + sections[0] + "_" + sections[1])).orElse(UNKONWN);
+        currentVersion = Optional.ofNullable(EnumHelper.getEnum(ServerVersion.class, "v" + sections[0] + "_" + sections[1])).orElse(UNKNOWN);
         legacy = isLessThan(ServerVersion.v1_13);
     }
 
@@ -76,7 +77,7 @@ public enum ServerVersion {
     }
 
     private static boolean isValidVersion(ServerVersion compareVersion) {
-        return currentVersion != UNKONWN && compareVersion != UNKONWN;
+        return currentVersion != UNKNOWN && compareVersion != UNKNOWN;
     }
 
 }

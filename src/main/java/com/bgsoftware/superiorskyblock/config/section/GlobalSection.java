@@ -311,6 +311,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().pricesProvider;
     }
 
+    public String getVanishProvider() {
+        return getContainer().vanishProvider;
+    }
+
     public BlockValuesManager.SyncWorthStatus getSyncWorth() {
         return getContainer().syncWorth;
     }
@@ -329,6 +333,10 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public List<String> getDisabledCommands() {
         return getContainer().disabledCommands;
+    }
+
+    public List<String> getDangerousCommands() {
+        return getContainer().dangerousCommands;
     }
 
     public List<String> getDisabledHooks() {

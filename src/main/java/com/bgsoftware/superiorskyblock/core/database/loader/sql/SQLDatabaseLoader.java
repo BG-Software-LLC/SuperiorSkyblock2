@@ -32,6 +32,9 @@ public class SQLDatabaseLoader extends MachineStateDatabaseLoader {
 
         try {
             DBSession.select("ssb_metadata", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
+                if (!resultSet.next())
+                    return;
+
                 int databaseVersion = resultSet.getInt("version");
 
                 if (databaseVersion > SQLDatabase.getCurrentDatabaseVersion())
@@ -46,7 +49,8 @@ public class SQLDatabaseLoader extends MachineStateDatabaseLoader {
 
         SQLDatabase.initializeDatabase();
 
-        if (databaseUpgradeResult.isUpgraded())
+        // New databases have an empty metadata table, therefore we must save the version for them as well.
+        if (databaseUpgradeResult.isUpgraded() || databaseUpgradeResult.isNewDatabase())
             GridDatabaseBridge.updateVersion(plugin.getGrid(), databaseUpgradeResult.getDatabaseVersion());
 
         DBSession.select("grid", "", new QueryResult<ResultSet>()

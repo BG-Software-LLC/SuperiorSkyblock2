@@ -68,12 +68,11 @@ public class SpawnersProvider_RoseStacker1_5 implements SpawnersProvider_AutoDet
 
                 int increaseAmount = e.getStack().getStackSize() + e.getIncreaseAmount() > e.getStack().getStackSettings().getMaxStackSize() ?
                         e.getStack().getStackSettings().getMaxStackSize() - e.getStack().getStackSize() : e.getIncreaseAmount();
-                int newBlocksCount = e.isNew() ? Math.max(1, increaseAmount - 1) : increaseAmount;
 
-                if (island.hasReachedBlockLimit(blockKey, newBlocksCount)) {
+                if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                     e.setCancelled(true);
                 } else {
-                    island.handleBlockPlace(blockKey, newBlocksCount);
+                    island.handleBlockPlace(blockKey, increaseAmount);
                 }
             }
         }

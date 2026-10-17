@@ -572,6 +572,14 @@ public interface SettingsManager {
     String getPricesProvider();
 
     /**
+     * The vanish provider to use.
+     * If set to AUTO, the plugin will automatically detect an available vanish provider and use it.
+     * If set to METADATA, the Bukkit 'vanished' metadata value will be used.
+     * Config-path: vanish-provider
+     */
+    String getVanishProvider();
+
+    /**
      * The sync-worth status of the plugin.
      * Config-path: sync-worth
      */
@@ -600,6 +608,13 @@ public interface SettingsManager {
      * Config-path: disabled-commands
      */
     List<String> getDisabledCommands();
+
+    /**
+     * List of admin commands that are considered dangerous.
+     * When executed by players, these commands must be approved by the console before being executed.
+     * Config-path: dangerous-commands
+     */
+    List<String> getDangerousCommands();
 
     /**
      * List of plugins that their hooks should not be enabled.

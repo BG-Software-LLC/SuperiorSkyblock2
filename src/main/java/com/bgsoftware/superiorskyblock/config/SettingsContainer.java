@@ -206,11 +206,13 @@ public class SettingsContainer {
     public final String spawnersProvider;
     public final String stackedBlocksProvider;
     public final String pricesProvider;
+    public final String vanishProvider;
     public final BlockValuesManagerImpl.SyncWorthStatus syncWorth;
     public final boolean negativeWorth;
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
     public final List<String> disabledCommands;
+    public final List<String> dangerousCommands;
     public final List<String> disabledHooks;
     public final boolean schematicNameArgument;
     public final String islandChestTitle;
@@ -401,7 +403,7 @@ public class SettingsContainer {
         if (config.isConfigurationSection("default-placeholders")) {
             for (String placeholderName : config.getConfigurationSection("default-placeholders").getKeys(false)) {
                 String placeholder = placeholderName.replace("superior_", "").toLowerCase(Locale.ENGLISH);
-                String replacement = config.getString("default-placeholders." + placeholder);
+                String replacement = config.getString("default-placeholders." + placeholderName);
                 defaultPlaceholders.put(placeholder, replacement);
             }
         }
@@ -543,12 +545,15 @@ public class SettingsContainer {
         spawnersProvider = config.getString("spawners-provider", "AUTO");
         stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
         pricesProvider = config.getString("prices-provider", "AUTO");
+        vanishProvider = config.getString("vanish-provider", "AUTO");
         syncWorth = BlockValuesManagerImpl.SyncWorthStatus.of(config.getString("sync-worth", "NONE"));
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
         disabledEvents = Collections.unmodifiableList(config.getStringList("disabled-events")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         disabledCommands = Collections.unmodifiableList(config.getStringList("disabled-commands")
+                .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
+        dangerousCommands = Collections.unmodifiableList(config.getStringList("dangerous-commands")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         disabledHooks = Collections.unmodifiableList(config.getStringList("disabled-hooks")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));

@@ -2,7 +2,24 @@ group 'Hooks:Nova'
 
 java {
     toolchain {
+        // JDK 25 is required to read the Java 25 compiled Nova API classes.
         languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+// Emit Java 21 bytecode instead of Java 25. Paper's PluginRemapper bundles ASM 9.7,
+// which cannot read class file major version 69 (Java 25) and fails to remap the plugin
+// jar on older Minecraft versions. Java 21 (major 65) stays within its supported range.
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+}
+
+// options.release lowers the compileClasspath's TargetJvmVersion attribute to 21, which
+// makes Gradle reject the Java 25 only Nova API during dependency resolution. Force the
+// attribute back to 25 so the API resolves while our own output stays at Java 21.
+configurations.compileClasspath {
+    attributes {
+        attribute(org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
     }
 }
 

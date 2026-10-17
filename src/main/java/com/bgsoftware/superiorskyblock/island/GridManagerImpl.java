@@ -268,7 +268,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         pendingCreationTasks.add(builder.owner.getUniqueId());
 
-        this.islandCreationAlgorithm.createIsland(builder, this.lastIsland).whenComplete((islandCreationResult, error) -> {
+        this.islandCreationAlgorithm.createIsland(builder, this.lastIsland).whenCompleteAsync((islandCreationResult, error) -> {
 
             pendingCreationTasks.remove(builder.owner.getUniqueId());
 
@@ -295,7 +295,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             builder.owner.setIsland(null);
 
             Message.CREATE_ISLAND_FAILURE.send(builder.owner);
-        });
+        }, BukkitExecutor.SYNC_EXECUTOR);
     }
 
     private void createIslandInternalOnSuccessCallback(IslandBuilderImpl builder, Biome biome, boolean offset,

@@ -98,6 +98,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private ChunksProvider chunksProvider = new ChunksProvider_Default();
     private MenusProvider menusProvider;
     private boolean listenToSpawnerChanges = true;
+    private boolean listenToSpawnerChangesUsingEggs = true;
 
     private final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
         @Override
@@ -466,6 +467,10 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         return listenToSpawnerChanges;
     }
 
+    public boolean shouldListenToSpawnerChangesUsingEggs() {
+        return listenToSpawnerChangesUsingEggs;
+    }
+
     private void registerGeneralHooks() {
         if (canRegisterHook("JetsMinions"))
             registerHook("JetsMinionsHook");
@@ -550,7 +555,12 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
         Optional<SpawnersProvider> spawnersProvider = Optional.empty();
 
-        if (canRegisterHook("MergedSpawner") &&
+        if (canRegisterHook("SmartSpawner") &&
+                (auto || configSpawnersProvider.equalsIgnoreCase("SmartSpawner"))) {
+            spawnersProvider = createInstance("spawners.SpawnersProvider_SmartSpawner");
+            listenToSpawnerChanges = false;
+            listenToSpawnerChangesUsingEggs = false;
+        } else if (canRegisterHook("MergedSpawner") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
             spawnersProvider = createInstance("spawners.SpawnersProvider_MergedSpawner");
             listenToSpawnerChanges = false;
@@ -681,20 +691,41 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     private void registerVanishProvider() {
+        String configVanishProvider = plugin.getSettings().getVanishProvider();
+        boolean auto = configVanishProvider.equalsIgnoreCase("Auto");
+        boolean metadata = configVanishProvider.equalsIgnoreCase("Metadata") ||
+                configVanishProvider.equalsIgnoreCase("Default");
+
+        if (metadata) {
+            setVanishProvider(new VanishProvider_Default());
+            return;
+        }
+
         Optional<VanishProvider> vanishProvider = Optional.empty();
 
-        if (canRegisterHook("VanishNoPacket")) {
+        if (canRegisterHook("VanishNoPacket") &&
+                (auto || configVanishProvider.equalsIgnoreCase("VanishNoPacket"))) {
             vanishProvider = createInstance("vanish.VanishProvider_VanishNoPacket");
-        } else if (canRegisterHook("SuperVanish") ||
-                canRegisterHook("PremiumVanish")) {
+        } else if ((canRegisterHook("SuperVanish") &&
+                (auto || configVanishProvider.equalsIgnoreCase("SuperVanish"))) ||
+                (canRegisterHook("PremiumVanish") &&
+                        (auto || configVanishProvider.equalsIgnoreCase("PremiumVanish")))) {
             vanishProvider = createInstance("vanish.VanishProvider_SuperVanish");
-        } else if (canRegisterHook("Essentials")) {
+        } else if (canRegisterHook("Essentials") &&
+                (auto || configVanishProvider.equalsIgnoreCase("Essentials"))) {
             vanishProvider = createInstance("vanish.VanishProvider_Essentials");
-        } else if (canRegisterHook("CMI")) {
+        } else if (canRegisterHook("CMI") &&
+                (auto || configVanishProvider.equalsIgnoreCase("CMI"))) {
             vanishProvider = createInstance("vanish.VanishProvider_CMI");
         }
 
-        vanishProvider.ifPresent(this::setVanishProvider);
+        if (vanishProvider.isPresent()) {
+            setVanishProvider(vanishProvider.get());
+        } else if (!auto) {
+            Log.warnFromFile("config.yml", "Cannot use vanish provider '", configVanishProvider,
+                    "', using Metadata instead.");
+            setVanishProvider(new VanishProvider_Default());
+        }
     }
 
     private void registerAFKProvider() {

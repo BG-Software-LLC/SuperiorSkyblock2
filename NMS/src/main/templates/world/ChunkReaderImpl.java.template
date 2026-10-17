@@ -60,8 +60,8 @@ public class ChunkReaderImpl implements ChunkReader {
         this.serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         LevelChunk levelChunk = this.serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
 
-        this.x = levelChunk.locX;
-        this.z = levelChunk.locZ;
+        this.x = NMSUtilsVersioned.getLevelChunkX(levelChunk);
+        this.z = NMSUtilsVersioned.getLevelChunkZ(levelChunk);
 
         LevelChunkSection[] levelChunkSections = levelChunk.getSections();
         this.blockids = new PalettedContainer[levelChunkSections.length];
