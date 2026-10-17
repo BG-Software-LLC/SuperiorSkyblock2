@@ -65,6 +65,7 @@ public class DefaultValuesSection extends SettingsContainerHolder implements Set
     }
 
     @Override
+    @Deprecated
     public Map<Key, Integer>[] getGenerators() {
         Map<Key, Integer>[] generators = new Map[Dimension.values().size()];
 
