@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import io.lumine.mythic.api.mobs.MythicMob;
 import io.lumine.mythic.bukkit.MythicBukkit;
-import io.lumine.mythic.core.mobs.ActiveMob;
+import io.lumine.mythic.core.mobs.MobExecutor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
@@ -32,10 +32,12 @@ public class MythicMobsHook {
 
     private static KeySet collectMythicMobsKeys() {
         KeySet mythicMobsKeys = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
+
         for (MythicMob mythicMob : MythicBukkit.inst().getMobManager().getMobTypes()) {
             EntityType entityType = mythicMob.getMythicEntity().getBukkitType();
             mythicMobsKeys.add(Keys.of(entityType));
         }
+
         return mythicMobsKeys;
     }
 
@@ -49,13 +51,21 @@ public class MythicMobsHook {
 
         @Override
         public Key getCustomKey(Entity entity) {
-            ActiveMob activeMob = MythicBukkit.inst().getMobManager().getMythicMobInstance(entity);
+            MobExecutor mobExecutor = MythicBukkit.inst().getMobManager();
 
-            if (activeMob == null) {
+            String mythicType = mobExecutor.getMythicType(entity).orElse(null);
+
+            if (mythicType == null) {
                 return null;
             }
 
-            return Keys.of(MYTHIC_MOBS_PREFIX, activeMob.getMobType().toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
+            MythicMob mythicMob = mobExecutor.getMythicMob(mythicType).orElse(null);
+
+            if (mythicMob != null && mobExecutor.getVanillaTypes().contains(mythicMob)) {
+                return null;
+            }
+
+            return Keys.of(MYTHIC_MOBS_PREFIX, mythicType.toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
         }
 
         @Override
