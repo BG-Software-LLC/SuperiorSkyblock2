@@ -1,6 +1,14 @@
 group 'Missions:FarmingMissions'
 
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.enginehub.org/repo/' }
+    maven { url 'https://nexus.neetgames.com/repository/maven-public' }
+}
+
 dependencies {
+    compileOnly 'com.sk89q.worldguard:worldguard-core:7.0.1-SNAPSHOT'
+    compileOnly 'com.gmail.nossr50.mcMMO:mcMMO:2.1.182-SNAPSHOT'
     compileOnly "org.spigotmc:v1_16_R3:latest"
 }
 
