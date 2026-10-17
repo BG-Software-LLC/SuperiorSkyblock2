@@ -30,8 +30,11 @@ public class IslandPlayerDetector implements PlayerDetector {
     }
 
     public static IslandPlayerDetector trialSpawnerPlayerDetector(Island island, PlayerDetector original) {
-        return new IslandPlayerDetector(island, original, () ->
-                List.of(BuiltinEntityCategory.MONSTER.getEntityCategory().getDamagePrivilege()));
+        return new IslandPlayerDetector(island, original, () -> {
+            IslandPrivilege islandPrivilege = BuiltinEntityCategory.MONSTER.getEntityCategory().getDamagePrivilege();
+
+            return islandPrivilege == null ? Collections.emptyList() : Collections.singletonList(islandPrivilege);
+        });
     }
 
     private IslandPlayerDetector(Island island, PlayerDetector original, Supplier<List<IslandPrivilege>> requiredPrivileges) {

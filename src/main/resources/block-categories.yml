@@ -74,6 +74,7 @@ custom-categories:
       - CAVE_VINES
       - CAVE_VINES_PLANT
       - FARMLAND
+      - SOIL
       - SWEET_BERRY_BUSH
     actions:
       INTERACT: FARM_TRAMPING
@@ -110,7 +111,6 @@ custom-categories:
       - BLUE_CANDLE
       - BROWN_BED
       - BROWN_CANDLE
-      - BURNING_FURNACE
       - CAKE
       - CAKE_BLOCK
       - CAMPFIRE
@@ -198,7 +198,6 @@ custom-categories:
       - MANGROVE_FENCE_GATE
       - MANGROVE_PRESSURE_PLATE
       - MANGROVE_TRAPDOOR
-      - MOB_SPAWNER
       - NETHER_BRICK_FENCE
       - NETHER_FENCE
       - NOTE_BLOCK
@@ -278,9 +277,7 @@ custom-categories:
       - REPEATER
       - REPEATING_COMMAND_BLOCK
       - RESPAWN_ANCHOR
-      - SIGN_POST
       - SMITHING_TABLE
-      - SOIL
       - SOUL_CAMPFIRE
       - SPRUCE_BUTTON
       - SPRUCE_DOOR
@@ -298,7 +295,6 @@ custom-categories:
       - TNT
       - TRAP_DOOR
       - TWISTING_VINES
-      - WALL_SIGN
       - WARPED_BUTTON
       - WARPED_DOOR
       - WARPED_FENCE
@@ -383,10 +379,12 @@ custom-categories:
       - POPLAR_SIGN
       - POPLAR_WALL_HANGING_SIGN
       - POPLAR_WALL_SIGN
+      - SIGN_POST
       - SPRUCE_HANGING_SIGN
       - SPRUCE_SIGN
       - SPRUCE_WALL_HANGING_SIGN
       - SPRUCE_WALL_SIGN
+      - WALL_SIGN
       - WARPED_HANGING_SIGN
       - WARPED_SIGN
       - WARPED_WALL_HANGING_SIGN
@@ -415,6 +413,7 @@ custom-categories:
       - BIRCH_SHELF
       - BLAST_FURNACE
       - BREWING_STAND
+      - BURNING_FURNACE
       - CHERRY_SHELF
       - CHISELED_BOOKSHELF
       - CRAFTER

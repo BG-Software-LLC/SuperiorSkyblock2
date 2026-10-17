@@ -4,6 +4,9 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
+
+import java.util.Objects;
 
 public class BlockCategoryImpl implements BlockCategory {
 
@@ -19,7 +22,7 @@ public class BlockCategoryImpl implements BlockCategory {
     public BlockCategoryImpl(String name, KeySet blocks, @Nullable IslandPrivilege placePrivilege,
                       @Nullable IslandPrivilege breakPrivilege, @Nullable IslandPrivilege interactPrivilege) {
         this.name = name;
-        this.blocks = blocks;
+        this.blocks = KeySets.unmodifiableKeySet(blocks);
         this.placePrivilege = placePrivilege;
         this.breakPrivilege = breakPrivilege;
         this.interactPrivilege = interactPrivilege;
@@ -48,6 +51,26 @@ public class BlockCategoryImpl implements BlockCategory {
     @Override
     public IslandPrivilege getInteractPrivilege() {
         return this.interactPrivilege;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        BlockCategoryImpl blockCategory = (BlockCategoryImpl) obj;
+
+        return Objects.equals(this.name, blockCategory.name);
     }
 
 }

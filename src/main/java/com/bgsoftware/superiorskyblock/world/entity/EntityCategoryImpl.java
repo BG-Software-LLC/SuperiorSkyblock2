@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 
+import java.util.Objects;
+
 public class EntityCategoryImpl implements EntityCategory {
 
     private final String name;
@@ -68,4 +70,25 @@ public class EntityCategoryImpl implements EntityCategory {
     public IslandFlag getNaturalSpawningIslandFlag() {
         return this.naturalSpawnFlag;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        EntityCategoryImpl entityCategory = (EntityCategoryImpl) obj;
+
+        return Objects.equals(this.name, entityCategory.name);
+    }
+
 }

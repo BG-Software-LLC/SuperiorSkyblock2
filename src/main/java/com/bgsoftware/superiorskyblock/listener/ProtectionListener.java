@@ -672,7 +672,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(entity);
 
-        List<EntityCategory> entityCategories = BukkitEntities.getCategories(entity);
+        List<EntityCategory> entityCategories = BukkitEntities.getCategories(hitEntity);
         List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories,
                 EntityCategory::getDamagePrivilege);
 

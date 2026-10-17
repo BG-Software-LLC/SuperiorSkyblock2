@@ -564,7 +564,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(location, "location cannot be null");
         Preconditions.checkNotNull(islandPrivileges, "islandPrivileges cannot be null");
-        Preconditions.checkArgument(!islandPrivileges.isEmpty(), "islandPrivileges cannot be empty");
 
         // We do not care about spawn island when spawn protection is disabled,
         // and therefore only island worlds are relevant.

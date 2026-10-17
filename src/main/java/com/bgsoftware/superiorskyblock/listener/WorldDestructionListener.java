@@ -103,6 +103,13 @@ public class WorldDestructionListener extends AbstractGameEventListener {
     }
 
     private void onBucketDispense(GameEvent<GameEventArgs.BlockDispenseEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We care about destruction of island worlds only
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld())) {
+            return;
+        }
+
         Material itemType = e.getArgs().dispensedItem.getType();
 
         if (!(itemType == Material.BUCKET || itemType == Material.WATER_BUCKET || itemType == Material.LAVA_BUCKET))
@@ -110,7 +117,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
         Vector velocity = e.getArgs().velocity;
 
-        Location dispenseBlockLocation = new Location(e.getArgs().block.getWorld(), velocity.getBlockX(),
+        Location dispenseBlockLocation = new Location(block.getWorld(), velocity.getBlockX(),
                 velocity.getBlockY(), velocity.getBlockZ());
 
         if (preventDestruction(dispenseBlockLocation))
