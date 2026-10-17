@@ -185,6 +185,12 @@ public class CmdAdminShow implements IAdminIslandCommand {
                         Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE);
             }
 
+            // Island entity categories limits
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
+                collectIslandData(superiorPlayer, locale, island::getEntityCategoryLimits, island::getCustomEntityCategoryLimits,
+                        Message.ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS_LINE);
+            }
+
             // Island block limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
                 collectIslandData(superiorPlayer, locale, island::getBlocksLimits, island::getCustomBlocksLimits,

@@ -78,6 +78,9 @@ CHANGED_CROP_GROWTH: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש י
 CHANGED_CROP_GROWTH_ALL: '&e&lםיגורדש | &7החלצהב ןכדוע םייאה לכ לש הלידגה סונוב..'
 CHANGED_CROP_GROWTH_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לש הלידגה סונוב.'
 CHANGED_DISCORD: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש דרוקסידה.'
+CHANGED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}''s island.'
+CHANGED_ENTITY_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for all the islands.'
+CHANGED_ENTITY_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}.'
 CHANGED_ENTITY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}''s island.'
 CHANGED_ENTITY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for all the islands.'
 CHANGED_ENTITY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}.'
@@ -126,6 +129,7 @@ COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: '...דרוקסיד'
 COMMAND_ARGUMENT_EFFECT: 'potion-effect'
 COMMAND_ARGUMENT_EMAIL: ליימיא
+COMMAND_ARGUMENT_ENTITY_CATEGORY: 'entity-category'
 COMMAND_ARGUMENT_ENTITY: entity
 COMMAND_ARGUMENT_ISLAND_NAME: יאה םש
 COMMAND_ARGUMENT_ISLAND_ROLE: הגרד
@@ -172,6 +176,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Add a bonus to a player.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Increase coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH: 'Increase the crop growth multiplier for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: 'Add an island effect for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_CATEGORY_LIMIT: 'Increase entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: 'Increase entity limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: 'Add percentage of a material for the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: 'Increase the mob drops multiplier for another player''s island.'
@@ -209,6 +214,7 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: יא לש יווש שדחמ בשחל.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא שדחמ ןועטל.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיגורידה לכ תא קוחמל.
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
@@ -224,6 +230,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another pl
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: רחא ןקחש לש יא של הלידגה סונוב תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: ןקחש לש תורתומה תוקיחמה תומכ תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: 'Set the island effect level of another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_CATEGORY_LIMIT: 'Set entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Set entity limit for another player''s island.
 COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: רחא ןקחשל יא לע תוגיהנמה תא ריבעהל.
@@ -408,6 +415,7 @@ INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
+INVALID_ENTITY_CATEGORY: '&c&lError | &7Invalid entity category {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
 INVALID_ISLAND: '&c&lהאיגש | &7יא ךל ןיא.'
@@ -490,6 +498,10 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lIsland | &7Entities Limits:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Entity Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lיא | &7הלידג סונוב: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lיא | &7םיבוממ םיטירפ סונוב: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
@@ -712,6 +724,7 @@ RATE_REMOVE_ALL: '&e&lיא | &7החלצהב {0} לש םיגורידה לכ תא 
 RATE_REMOVE_ALL_ISLANDS: '&e&lIsland | &7Successfully removed all ratings of all the islands.'
 RATE_SUCCESS: '&e&lיא | &7םיבכוכ {0} םע הזה יאה תא תגריד!'
 REACHED_BLOCK_LIMIT: '&e&lםיגורדש | &7{0} קולבה לש יאב םיקולבה תלבגמל תעגה.'
+REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'
 RECALC_ALREADY_RUNNING: '&c&lError | &7Your island is already being recalculated.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lError | &7This island is already being recalculated.'
