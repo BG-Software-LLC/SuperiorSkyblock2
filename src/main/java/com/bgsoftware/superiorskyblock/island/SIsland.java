@@ -4525,6 +4525,9 @@ public class SIsland implements Island {
 
     @Override
     public void setChestRows(int index, int rows) {
+        Preconditions.checkArgument(index >= 0, "index parameter cannot be negative.");
+        Preconditions.checkArgument(rows >= 1 && rows <= 6, "rows parameter must be between 1 and 6.");
+
         IslandChest[] islandChests = this.islandChests.get();
         int oldSize = islandChests.length;
 
@@ -4541,8 +4544,9 @@ public class SIsland implements Island {
 
         IslandChest islandChest = islandChests[index];
 
-        if (!updatedIslandChests && islandChest.getRows() == rows)
+        if (!updatedIslandChests && islandChest.getRows() == rows) {
             return;
+        }
 
         islandChests[index].setRows(rows);
 

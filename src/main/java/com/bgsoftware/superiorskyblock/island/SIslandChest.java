@@ -54,6 +54,8 @@ public class SIslandChest implements IslandChest {
 
     @Override
     public void setRows(int rows) {
+        Preconditions.checkArgument(rows >= 1 && rows <= 6, "rows parameter must be between 1 and 6.");
+
         BukkitExecutor.ensureMain(() -> {
             try {
                 updateFlag.set(true);
@@ -61,7 +63,7 @@ public class SIslandChest implements IslandChest {
                 Inventory oldInventory = inventory;
                 inventory = plugin.getProviders().getUIProvider().createInventory(this, 9 * rows, title);
                 inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
-                inventory.getViewers().forEach(humanEntity -> {
+                oldInventory.getViewers().forEach(humanEntity -> {
                     if (humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))
                         humanEntity.openInventory(inventory);
                 });

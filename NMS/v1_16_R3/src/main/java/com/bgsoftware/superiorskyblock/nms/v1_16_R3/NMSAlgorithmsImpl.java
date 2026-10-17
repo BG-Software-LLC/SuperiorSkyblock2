@@ -72,9 +72,13 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final ReflectField<String> TITLE_FIELD = new ReflectField<>(
+    private static final ReflectField<Object> ADVENTURE_TITLE_FIELD = new ReflectField<>(
             new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
-                    ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title");
+                    ClassInfo.PackageType.CRAFTBUKKIT), Object.class, "adventure$title").removeFinal();
+
+    private static final ReflectField<String> TITLE_FIELD = new ReflectField<String>(
+            new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
+                    ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title").removeFinal();
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
@@ -105,6 +109,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
             if (TITLE_FIELD.isValid()) {
                 TITLE_FIELD.set(iInventory, title);
+            }
+
+            if (ADVENTURE_TITLE_FIELD.isValid()) {
+                net.kyori.adventure.text.Component component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(title);
+                ADVENTURE_TITLE_FIELD.set(iInventory, component);
             }
         }
     }

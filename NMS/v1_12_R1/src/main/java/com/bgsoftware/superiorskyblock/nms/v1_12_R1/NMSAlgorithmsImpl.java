@@ -50,9 +50,9 @@ import java.util.Optional;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
-    private static final ReflectField<String> TITLE_FIELD = new ReflectField<>(
+    private static final ReflectField<String> TITLE_FIELD = new ReflectField<String>(
             new ClassInfo("inventory.CraftInventoryCustom$MinecraftInventory",
-                    ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title");
+                    ClassInfo.PackageType.CRAFTBUKKIT), String.class, "title").removeFinal();
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
