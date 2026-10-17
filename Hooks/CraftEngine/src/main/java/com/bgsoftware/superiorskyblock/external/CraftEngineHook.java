@@ -41,7 +41,7 @@ public class CraftEngineHook {
         plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), plugin);
         if (!registered) {
             registered = true;
-            plugin.getBlockValues().registerKeyParser(new CraftEngineKeyParser(), collectCustomKeys());
+            plugin.getKeys().registerCustomMaterialKeyParser(new CraftEngineKeyParser(), collectCustomKeys());
         }
     }
 

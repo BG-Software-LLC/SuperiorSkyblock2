@@ -40,7 +40,7 @@ public class CraftEngineHook26 {
         Bukkit.getPluginManager().registerEvents(new ListenerImpl(), plugin);
         if (!registered) {
             registered = true;
-            plugin.getBlockValues().registerKeyParser(new CraftEngineKeyParser(), collectCustomKeys());
+            plugin.getKeys().registerCustomMaterialKeyParser(new CraftEngineKeyParser(), collectCustomKeys());
         }
     }
 

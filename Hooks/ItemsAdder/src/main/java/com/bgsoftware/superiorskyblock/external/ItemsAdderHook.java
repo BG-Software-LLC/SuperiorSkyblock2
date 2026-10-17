@@ -47,7 +47,7 @@ public class ItemsAdderHook {
         plugin.getServer().getPluginManager().registerEvents(new ListenerImpl(), plugin);
         if (!registered) {
             registered = true;
-            plugin.getBlockValues().registerKeyParser(new ItemsAdderKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
+            plugin.getKeys().registerCustomMaterialKeyParser(new ItemsAdderKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
         }
     }
 

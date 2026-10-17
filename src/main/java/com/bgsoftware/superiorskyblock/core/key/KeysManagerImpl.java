@@ -1,10 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.key;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
+import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMapStrategy;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
@@ -13,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.google.common.base.Preconditions;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -21,11 +25,17 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class KeysManagerImpl extends Manager implements KeysManager {
+
+    private final KeyMap<List<CustomKeyParser>> customMaterialKeyParsers = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+    private final KeyMap<List<CustomKeyParser>> customEntityTypeKeyParsers = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
 
     public KeysManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -34,6 +44,69 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     @Override
     public void loadData() {
         // No data to be loaded.
+    }
+
+    @Override
+    public void registerCustomMaterialKeyParser(CustomKeyParser customKeyParser, Key... keys) {
+        Preconditions.checkNotNull(customKeyParser, "customKeyParser parameter cannot be null.");
+        Preconditions.checkNotNull(keys, "keys parameter cannot be null.");
+
+        for (Key key : keys) {
+            this.customMaterialKeyParsers.computeIfAbsent(key, unused -> new LinkedList<>()).add(customKeyParser);
+        }
+    }
+
+    @Override
+    public void registerCustomEntityTypeKeyParser(CustomKeyParser customKeyParser, Key... keys) {
+        Preconditions.checkNotNull(customKeyParser, "customKeyParser parameter cannot be null.");
+        Preconditions.checkNotNull(keys, "keys parameter cannot be null.");
+
+        for (Key key : keys) {
+            this.customEntityTypeKeyParsers.computeIfAbsent(key, unused -> new LinkedList<>()).add(customKeyParser);
+        }
+    }
+
+    public Key convertKey(Key originalKey, Location location) {
+        return getFirstCustomKey(originalKey, this.customEntityTypeKeyParsers.get(originalKey),
+                customKeyParser -> customKeyParser.getCustomKey(location));
+    }
+
+    public Key convertKey(Key originalKey, ItemStack itemStack) {
+        return getFirstCustomKey(originalKey, this.customEntityTypeKeyParsers.get(originalKey),
+                customKeyParser -> customKeyParser.getCustomKey(itemStack, originalKey));
+    }
+
+    public Key convertKey(Key originalKey, Entity entity) {
+        return getFirstCustomKey(originalKey, this.customEntityTypeKeyParsers.get(originalKey),
+                customKeyParser -> customKeyParser.getCustomKey(entity));
+    }
+
+    private Key getFirstCustomKey(Key originalKey, @Nullable List<CustomKeyParser> customKeyParsers,
+                                  Function<CustomKeyParser, Key> customKeyFunction) {
+        if (customKeyParsers != null) {
+            for (CustomKeyParser customKeyParser : customKeyParsers) {
+                Key key = customKeyFunction.apply(customKeyParser);
+
+                if (key != null && !key.equals(originalKey)) {
+                    return key;
+                }
+            }
+        }
+
+        return originalKey;
+    }
+
+    @Nullable
+    public Pair<Key, ItemStack> convertCustomKeyItem(Key originalKey) {
+        for (Map.Entry<Key, List<CustomKeyParser>> entry : this.customMaterialKeyParsers.entrySet()) {
+            for (CustomKeyParser customKeyParser : entry.getValue()) {
+                if (customKeyParser.isCustomKey(originalKey)) {
+                    return new Pair<>(entry.getKey(), customKeyParser.getCustomKeyItem(originalKey));
+                }
+            }
+        }
+
+        return new Pair<>(originalKey, null);
     }
 
     @Override
