@@ -16,6 +16,8 @@ public interface SchematicsContainer {
 
     Map<String, Schematic> getSchematics();
 
+    boolean isDefaultSchematic(String schematic);
+
     void addSchematicParser(SchematicParser schematicParser);
 
     List<SchematicParser> getSchematicParsers();

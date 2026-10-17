@@ -17,7 +17,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
@@ -37,6 +36,7 @@ import java.util.Locale;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -159,7 +159,7 @@ public class CommandTabCompletes {
     public static List<String> getSchematics(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
-                .filter(schematic -> IslandUtils.isDefaultSchematic(schematic)
+                .filter(schematic -> plugin.getSchematics().isDefaultSchematic(schematic)
                         && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .build(plugin.getSchematics().getSchematics());
     }
