@@ -125,7 +125,8 @@ public class CmdAdminModules implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length != 3 ? Collections.emptyList() : CommandTabCompletes.getModules(plugin, args[2]);
+        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "load", "unload")
+                : args.length == 3 ? CommandTabCompletes.getModules(plugin, args[2]) : Collections.emptyList();
     }
 
 }
