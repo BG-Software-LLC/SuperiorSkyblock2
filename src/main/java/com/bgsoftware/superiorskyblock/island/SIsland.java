@@ -4472,9 +4472,8 @@ public class SIsland implements Island {
 
         Map<String, Integer> generatorAmountsBuilder = new HashMap<>();
 
-        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
-            generatorAmountsBuilder.put(key.toString(), amountValue.get());
-        });
+        dimensionGeneratorAmounts.forEach((key, amountValue) ->
+                generatorAmountsBuilder.put(key.toString(), amountValue.get()));
 
         return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
     }
@@ -4492,9 +4491,8 @@ public class SIsland implements Island {
 
         KeyMap<Integer> generatorAmountsBuilder = KeyMap.createKeyMap();
 
-        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
-            generatorAmountsBuilder.put(key, amountValue.get());
-        });
+        dimensionGeneratorAmounts.forEach((key, amountValue) ->
+                generatorAmountsBuilder.put(key, amountValue.get()));
 
         return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
     }
@@ -4630,8 +4628,8 @@ public class SIsland implements Island {
 
         List<Key> customGeneratorAmounts = new ArrayList<>();
 
-        dimensionGeneratorAmounts.forEach((key, limitValue) -> {
-            if (!limitValue.isSynced()) {
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            if (!amountValue.isSynced()) {
                 customGeneratorAmounts.add(key);
             }
         });
@@ -4725,47 +4723,98 @@ public class SIsland implements Island {
                 return false;
             }
 
-            removeGeneratorAmount(key, dimension);
-        } else if (percentage == 100) {
-            KeyMap<IntValue> originalDimensionGeneratorAmounts = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
-            originalDimensionGeneratorAmounts.putAll(dimensionGeneratorAmounts);
-            dimensionGeneratorAmounts.clear();
+            IntValue oldValue = dimensionGeneratorAmounts.get(key);
 
-            int generatorRate = 1;
+            if (oldValue != null) {
+                // We need to "fake" remove old value, if it was synced.
+                if (oldValue.isSynced()) {
+                    setGeneratorAmount(key, 0, dimension);
+                } else {
+                    removeGeneratorAmount(key, dimension);
+                }
+            }
+        } else if (percentage == 100) {
+            int amount = 1;
 
             if (callEvent) {
                 PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event =
-                        PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, generatorRate);
+                        PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, amount);
+
                 if (event.isCancelled()) {
-                    // Restore the original values
-                    dimensionGeneratorAmounts.putAll(originalDimensionGeneratorAmounts);
                     return false;
                 }
-                generatorRate = event.getArgs().generatorRate;
+
+                amount = event.getArgs().generatorRate;
             }
 
-            setGeneratorAmount(key, generatorRate, dimension);
+            List<Map.Entry<Key, IntValue>> entries = new ArrayList<>(dimensionGeneratorAmounts.entrySet());
+
+            for (Map.Entry<Key, IntValue> entry : entries) {
+                Key blockKey = entry.getKey();
+
+                if (blockKey.equals(key)) {
+                    continue;
+                }
+
+                IntValue oldValue = entry.getValue();
+
+                // We need to "fake" remove old value, if it was synced.
+                if (oldValue != null) {
+                    if (oldValue.isSynced()) {
+                        setGeneratorAmount(blockKey, 0, dimension);
+                    } else {
+                        removeGeneratorAmount(blockKey, dimension);
+                    }
+                }
+            }
+
+            setGeneratorAmount(key, amount, dimension);
         } else {
-            //Removing the key from the generator
-            removeGeneratorAmount(key, dimension);
+            setGeneratorAmount(key, 0, dimension);
 
             int totalAmount = getGeneratorTotalAmount(dimension);
-            double realPercentage = percentage / 100D;
-            double amount = (realPercentage * totalAmount) / (1 - realPercentage);
-            if (amount < 1) {
-                dimensionGeneratorAmounts.entrySet().forEach(entry -> {
-                    int newAmount = entry.getValue().get() * 10;
-                    if (entry.getValue().isSynced()) {
-                        entry.setValue(IntValue.syncedFixed(newAmount));
-                    } else {
-                        entry.setValue(IntValue.fixed(newAmount));
+            int amount;
+
+            if (totalAmount == 0) {
+                amount = 1;
+            } else {
+                int multiplier = 100 - percentage;
+                amount = totalAmount * percentage;
+
+                KeyMap<Integer> newDimensionGeneratorAmounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+
+                dimensionGeneratorAmounts.forEach((blockKey, amountValue) -> {
+                    int oldAmount = amountValue.get();
+
+                    if (oldAmount > 0) {
+                        newDimensionGeneratorAmounts.put(blockKey, oldAmount * multiplier);
                     }
                 });
-                amount *= 10;
+
+                // To avoid multiplying the amounts every time the percentage for a given key changes,
+                // we must find the greatest common divisor and divide the new values by it.
+                int currentGreatestCommonDivisor = amount;
+                for (int value : newDimensionGeneratorAmounts.values()) {
+                    currentGreatestCommonDivisor = getGreatestCommonDivisor(currentGreatestCommonDivisor, value);
+                }
+
+                if (currentGreatestCommonDivisor > 1) {
+                    final int finalGreatestCommonDivisor = currentGreatestCommonDivisor;
+                    newDimensionGeneratorAmounts.replaceAll((blockKey, value) -> value / finalGreatestCommonDivisor);
+                    amount /= finalGreatestCommonDivisor;
+                }
+
+                newDimensionGeneratorAmounts.forEach((blockKey, value) -> {
+                    IntValue oldValue = dimensionGeneratorAmounts.get(blockKey);
+
+                    if (oldValue == null || oldValue.get() != value) {
+                        setGeneratorAmount(blockKey, value, dimension);
+                    }
+                });
             }
 
             PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event =
-                    PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, (int) Math.round(amount));
+                    PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, amount);
 
             if (event.isCancelled()) {
                 return false;
@@ -4775,6 +4824,10 @@ public class SIsland implements Island {
         }
 
         return true;
+    }
+
+    private int getGreatestCommonDivisor(int a, int b) {
+        return b == 0 ? a : getGreatestCommonDivisor(b, a % b);
     }
 
     @Nullable
