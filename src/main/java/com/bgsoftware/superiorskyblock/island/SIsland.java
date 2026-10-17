@@ -133,7 +133,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -403,7 +402,7 @@ public class SIsland implements Island {
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
-        updateIslandChests();
+        updateChests();
 
         // We can only track entity counts after upgrades are set up
         if (!builder.entityCounts.isEmpty()) {
@@ -4526,6 +4525,9 @@ public class SIsland implements Island {
 
     @Override
     public void setChestRows(int index, int rows) {
+        Preconditions.checkArgument(index >= 0, "index parameter cannot be negative.");
+        Preconditions.checkArgument(rows >= 1 && rows <= 6, "rows parameter must be between 1 and 6.");
+
         IslandChest[] islandChests = this.islandChests.get();
         int oldSize = islandChests.length;
 
@@ -4542,12 +4544,37 @@ public class SIsland implements Island {
 
         IslandChest islandChest = islandChests[index];
 
-        if (!updatedIslandChests && islandChest.getRows() == rows)
+        if (!updatedIslandChests && islandChest.getRows() == rows) {
             return;
+        }
 
         islandChests[index].setRows(rows);
 
         IslandsDatabaseBridge.markIslandChestsToBeSaved(this, islandChests[index]);
+    }
+
+    @Override
+    public void updateChests() {
+        IslandChest[] islandChests = this.islandChests.get();
+
+        for (IslandChest islandChest : islandChests) {
+            islandChest.updateTitle();
+        }
+
+        int defaultPages = plugin.getSettings().getIslandChests().getDefaultPages();
+        if (islandChests.length >= defaultPages) {
+            return;
+        }
+
+        IslandChest[] newIslandChests = Arrays.copyOf(islandChests, defaultPages);
+
+        for (int index = islandChests.length; index < defaultPages; index++) {
+            IslandChest islandChest = new SIslandChest(this, index);
+            islandChest.setRows(plugin.getSettings().getIslandChests().getDefaultSize());
+            newIslandChests[index] = islandChest;
+        }
+
+        this.islandChests.set(newIslandChests);
     }
 
     private void calcIslandWorthInternal(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
@@ -5281,22 +5308,6 @@ public class SIsland implements Island {
                 }
             }
         });
-    }
-
-    private void updateIslandChests() {
-        List<IslandChest> islandChestList = new ArrayList<>(Arrays.asList(this.islandChests.get()));
-        boolean updatedChests = false;
-
-        while (islandChestList.size() < plugin.getSettings().getIslandChests().getDefaultPages()) {
-            IslandChest newIslandChest = new SIslandChest(this, islandChestList.size());
-            newIslandChest.setRows(plugin.getSettings().getIslandChests().getDefaultSize());
-            islandChestList.add(newIslandChest);
-            updatedChests = true;
-        }
-
-        if (updatedChests) {
-            this.islandChests.set(islandChestList.toArray(new IslandChest[0]));
-        }
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth) {
