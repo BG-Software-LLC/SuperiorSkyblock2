@@ -4575,6 +4575,8 @@ public class SIsland implements Island {
         }
 
         this.islandChests.set(newIslandChests);
+
+        plugin.getMenus().refreshIslandChest(this);
     }
 
     private void calcIslandWorthInternal(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
