@@ -45,7 +45,11 @@ public class Keys {
     }
 
     public static Key of(EntityType entityType) {
-        return EntityTypeKey.of(entityType);
+        return Keys.of(entityType, null);
+    }
+
+    public static Key of(EntityType entityType, @Nullable String data) {
+        return EntityTypeKey.of(entityType, data);
     }
 
     public static Key ofEntityType(String key) {
@@ -61,7 +65,7 @@ public class Keys {
             return Keys.of(entityTypeName, data, KeyIndicator.ENTITY_TYPE);
         }
 
-        return Keys.of(entityType);
+        return Keys.of(entityType, data);
     }
 
     /* Block keys */
@@ -168,7 +172,7 @@ public class Keys {
         try {
             return Keys.of(material, Short.parseShort(data));
         } catch (NumberFormatException e) {
-            return Keys.of(material);
+            return MaterialKey.of(material, data, MaterialKeySource.BLOCK);
         }
     }
 
