@@ -24,7 +24,7 @@ import java.util.Objects;
 
 public enum BuiltinEntityCategory {
 
-    TAMEABLE {
+    TAMED(true) {
         @Override
         protected boolean isEntityListedInternal(Class<? extends Entity> entityClass) {
             return Tameable.class.isAssignableFrom(entityClass);
@@ -76,7 +76,20 @@ public enum BuiltinEntityCategory {
             return getEntitiesInternal();
         }
     };
+    private final boolean entityStateRequired;
     private WeakReference<EntityCategory> entityCategoryReference;
+
+    BuiltinEntityCategory() {
+        this(false);
+    }
+
+    BuiltinEntityCategory(boolean entityStateRequired) {
+        this.entityStateRequired = entityStateRequired;
+    }
+
+    public boolean requiresEntityState() {
+        return entityStateRequired;
+    }
 
     public KeySet getEntities() {
         return entities.get();
