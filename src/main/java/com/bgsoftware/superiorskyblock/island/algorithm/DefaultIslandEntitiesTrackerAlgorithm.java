@@ -10,28 +10,25 @@ import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.key.EntityBlockMapper;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.google.common.base.Preconditions;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrackerAlgorithm {
 
-    private static final Set<EntityType> TRACKABLE_ENTITIES = initializeTrackableEntities();
     private static final long CALCULATE_DELAY = TimeUnit.MINUTES.toMillis(5);
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -193,27 +190,26 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
         return currentTime - lastCalculateTime > CALCULATE_DELAY;
     }
 
-    private boolean canTrackEntity(Key key) {
-        if (island.getEntityLimit(key) != IslandUpgradeConstants.NO_LIMIT_VALUE)
+    private boolean canTrackEntity(Key entityKey) {
+        if (island.getEntityLimit(entityKey) != IslandUpgradeConstants.NO_LIMIT_VALUE) {
             return true;
-
-        if (key instanceof EntityTypeKey) {
-            return TRACKABLE_ENTITIES.contains(((EntityTypeKey) key).getEntityType());
-        } else {
-            return key.toString().contains("MINECART");
-        }
-    }
-
-    private static Set<EntityType> initializeTrackableEntities() {
-        EnumSet<EntityType> trackableEntities = EnumSet.noneOf(EntityType.class);
-
-        for (EntityType entityType : EntityType.values()) {
-            if (entityType.name().contains("MINECART")) {
-                trackableEntities.add(entityType);
-            }
         }
 
-        return trackableEntities.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(trackableEntities);
+        if (!plugin.getSettings().isCountEntitiesAsBlocks()) {
+            return false;
+        }
+
+        Key blockKey = EntityBlockMapper.getBlockFromEntity(entityKey);
+
+        if (blockKey != null) {
+            boolean hasBlockValue = plugin.getBlockValues().getBlockValue(blockKey) != BlockValue.ZERO;
+            boolean hasBlockLimit = island.getBlockLimit(blockKey) != IslandUpgradeConstants.NO_LIMIT_VALUE;
+            boolean isValuesMenu = plugin.getBlockValues().isValuesMenu(blockKey);
+
+            return hasBlockValue || hasBlockLimit || isValuesMenu;
+        }
+
+        return false;
     }
 
 }
