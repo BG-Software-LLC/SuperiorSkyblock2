@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.key.types.LazyKey;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
-import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,8 +30,6 @@ import java.util.regex.Pattern;
 
 public class Keys {
 
-    public static final Key EMPTY = CustomKey.of("", null, KeyIndicator.CUSTOM);
-
     private static final Pattern KEY_SPLITTER_PATTERN = Pattern.compile("[:;]");
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -43,8 +40,12 @@ public class Keys {
 
     /* Entity keys */
 
+    public static Key of(Entity entity) {
+        return plugin.getKeys().convertKey(Keys.of(entity.getType()), entity);
+    }
+
     public static Key of(EntityType entityType) {
-        return of(entityType, null);
+        return Keys.of(entityType, null);
     }
 
     public static Key of(EntityType entityType, @Nullable String data) {
@@ -52,33 +53,37 @@ public class Keys {
     }
 
     public static Key ofEntityType(String key) {
-        String[] keySections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
-        String data = keySections.length >= 2 ? keySections[1] : null;
-        EntityType entityType = EnumHelper.getEnum(EntityType.class, keySections[0].toUpperCase(Locale.ENGLISH));
-        return entityType == null ? CustomKey.of(keySections[0], data, KeyIndicator.ENTITY_TYPE) : of(entityType, data);
+        String[] sections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
+
+        return Keys.ofEntityType(sections[0], sections.length >= 2 ? sections[1] : null);
     }
 
-    public static Key of(Entity entity) {
-        Key baseKey = BukkitEntities.getLimitEntityType(entity);
-        return plugin.getBlockValues().convertKey(baseKey, entity);
+    private static Key ofEntityType(String entityTypeName, @Nullable String data) {
+        EntityType entityType = EnumHelper.getEnum(EntityType.class, entityTypeName.toUpperCase(Locale.ENGLISH));
+
+        if (entityType == null) {
+            return Keys.of(entityTypeName, data, KeyIndicator.ENTITY_TYPE);
+        }
+
+        return Keys.of(entityType, data);
     }
 
     /* Block keys */
 
     public static Key of(Block block) {
-        Material blockType = block.getType();
+        Material material = block.getType();
 
         Key baseKey;
-        if (blockType == Materials.SPAWNER.toBukkitType()) {
+        if (material == Materials.SPAWNER.toBukkitType()) {
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             baseKey = getSpawnerKeyFromCreatureSpawner(creatureSpawner);
         } else {
             short data = plugin.getNMSAlgorithms().getBlockDataValue(block);
-            baseKey = MaterialKey.of(blockType, data, MaterialKeySource.BLOCK);
+            baseKey = MaterialKey.of(material, data, MaterialKeySource.BLOCK);
         }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            return plugin.getBlockValues().convertKey(baseKey, block.getLocation(wrapper.getHandle()));
+            return plugin.getKeys().convertKey(baseKey, block.getLocation(wrapper.getHandle()));
         }
     }
 
@@ -92,40 +97,50 @@ public class Keys {
         }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            return plugin.getBlockValues().convertKey(baseKey, blockState.getLocation(wrapper.getHandle()));
+            return plugin.getKeys().convertKey(baseKey, blockState.getLocation(wrapper.getHandle()));
         }
     }
 
     public static Key of(Key baseKey, Location location) {
         Preconditions.checkArgument(baseKey instanceof MaterialKey);
-        return plugin.getBlockValues().convertKey(baseKey, location);
+
+        return plugin.getKeys().convertKey(baseKey, location);
     }
 
     /* Item keys */
 
     public static Key of(ItemStack itemStack) {
-        Material itemType = itemStack.getType();
-        Key baseKey = (itemType == Materials.SPAWNER.toBukkitType()) ?
-                plugin.getProviders().getSpawnerKey(itemStack) :
-                MaterialKey.of(itemType, itemStack.getDurability(), MaterialKeySource.ITEM);
-        return plugin.getBlockValues().convertKey(baseKey, itemStack);
+        Material material = itemStack.getType();
+
+        Key baseKey;
+        if (material == Materials.SPAWNER.toBukkitType()) {
+            baseKey = plugin.getProviders().getSpawnerKey(itemStack);
+        } else {
+            baseKey = MaterialKey.of(material, itemStack.getDurability(), MaterialKeySource.ITEM);
+        }
+
+        return plugin.getKeys().convertKey(baseKey, itemStack);
     }
 
-    public static Key of(Material type, short data) {
-        if (ServerVersion.isLessThan(ServerVersion.v1_21) || type == Materials.SPAWNER.toBukkitType()) {
-            return of(new ItemStack(type, 1, data));
+    public static Key of(Material material) {
+        return material == Materials.SPAWNER.toBukkitType() ? SpawnerKey.GLOBAL_KEY : MaterialKey.of(material);
+    }
+
+    public static Key of(Material material, short data) {
+        if (ServerVersion.isLessThan(ServerVersion.v1_21) || material == Materials.SPAWNER.toBukkitType()) {
+            return Keys.of(new ItemStack(material, 1, data));
         }
 
         // In 1.21, we cannot set invalid durability for ItemStacks.
         // Therefore, this code is duplicated from the above method, but
         // creates the baseKey directly, not from ItemStack.
-        Key baseKey = MaterialKey.of(type, data, MaterialKeySource.ITEM);
+        Key baseKey = MaterialKey.of(material, data, MaterialKeySource.ITEM);
 
         try {
             // Now we try to convert the key.
             // This may throw an exception that is handled below.
-            ItemStack itemStack = new ItemStack(type, 1, data);
-            return plugin.getBlockValues().convertKey(baseKey, itemStack);
+            ItemStack itemStack = new ItemStack(material, 1, data);
+            return plugin.getKeys().convertKey(baseKey, itemStack);
         } catch (IllegalArgumentException error) {
             // In 1.21, you cannot create ItemStack out of Material types that are not an item
             // If this occurs, we simply return the base key.
@@ -133,34 +148,32 @@ public class Keys {
         }
     }
 
-    public static Key of(Material type) {
-        return type == Materials.SPAWNER.toBukkitType() ? SpawnerKey.GLOBAL_KEY : MaterialKey.of(type);
+    public static Key ofMaterialAndData(String key) {
+        String[] sections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
+
+        return Keys.ofMaterialAndData(sections[0], sections.length >= 2 ? sections[1] : null);
     }
 
-    public static Key ofMaterialAndData(String material, @Nullable String data) {
-        Material blockType = EnumHelper.getEnum(Material.class, material);
-        if (blockType == null)
-            return Keys.of(material, data, KeyIndicator.MATERIAL);
+    private static Key ofMaterialAndData(String materialName, @Nullable String data) {
+        Material material = EnumHelper.getEnum(Material.class, materialName.toUpperCase(Locale.ENGLISH));
 
-        if (Text.isBlank(data)) {
-            return Keys.of(blockType);
+        if (material == null) {
+            return Keys.of(materialName, data, KeyIndicator.MATERIAL);
         }
 
-        if (blockType == Materials.SPAWNER.toBukkitType()) {
-            return ofSpawner(data);
+        if (Text.isBlank(data)) {
+            return Keys.of(material);
+        }
+
+        if (material == Materials.SPAWNER.toBukkitType()) {
+            return Keys.ofSpawner(data);
         }
 
         try {
-            short blockData = Short.parseShort(data);
-            return Keys.of(blockType, blockData);
-        } catch (NumberFormatException error) {
-            return MaterialKey.of(blockType, data, MaterialKeySource.BLOCK);
+            return Keys.of(material, Short.parseShort(data));
+        } catch (NumberFormatException e) {
+            return MaterialKey.of(material, data, MaterialKeySource.BLOCK);
         }
-    }
-
-    public static Key ofMaterialAndData(String key) {
-        String[] keySections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
-        return ofMaterialAndData(keySections[0], keySections.length >= 2 ? keySections[1] : null);
     }
 
     /* Spawner keys */
@@ -170,26 +183,27 @@ public class Keys {
     }
 
     public static Key ofSpawner(EntityType entityType, Location location) {
-        return plugin.getBlockValues().convertKey(ofSpawner(entityType), location);
+        return plugin.getKeys().convertKey(Keys.ofSpawner(entityType), location);
     }
 
-    public static Key ofSpawner(String customType) {
-        return SpawnerKey.of(ofEntityType(customType));
+    public static Key ofSpawner(String key) {
+        return SpawnerKey.of(Keys.ofEntityType(key));
     }
 
-    public static Key ofSpawner(String customType, Location location) {
-        return plugin.getBlockValues().convertKey(ofSpawner(customType), location);
+    public static Key ofSpawner(String key, Location location) {
+        return plugin.getKeys().convertKey(Keys.ofSpawner(key), location);
     }
 
     /* Custom keys */
 
-    public static Key of(String globalKey, @Nullable String subKey, KeyIndicator keyType) {
-        return CustomKey.of(globalKey, subKey, keyType);
+    public static Key of(String globalKey, @Nullable String subKey, KeyIndicator keyIndicator) {
+        return CustomKey.of(globalKey, subKey, keyIndicator);
     }
 
     public static Key ofCustom(String key) {
-        String[] sections = KEY_SPLITTER_PATTERN.split(key);
-        return of(sections[0], sections.length > 2 ? sections[1] : null, KeyIndicator.CUSTOM);
+        String[] sections = KEY_SPLITTER_PATTERN.split(key, 2);
+
+        return Keys.of(sections[0], sections.length >= 2 ? sections[1] : null, KeyIndicator.CUSTOM);
     }
 
     public static <T extends Key> Key of(Class<T> baseKeyClass, LazyReference<T> keyLoader) {
@@ -199,6 +213,7 @@ public class Keys {
     private static SpawnerKey getSpawnerKeyFromCreatureSpawner(CreatureSpawner creatureSpawner) {
         EntityTypeKey entityTypeKey = Optional.ofNullable(creatureSpawner.getSpawnedType())
                 .map(EntityTypeKey::of).orElse(null);
+
         return SpawnerKey.of(entityTypeKey);
     }
 
