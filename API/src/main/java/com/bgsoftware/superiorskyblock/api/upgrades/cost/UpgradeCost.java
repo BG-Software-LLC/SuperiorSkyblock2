@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.upgrades.cost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
 
 public interface UpgradeCost {
 
@@ -29,6 +30,11 @@ public interface UpgradeCost {
      * @param superiorPlayer The player to withdraw from.
      */
     void withdrawCost(SuperiorPlayer superiorPlayer);
+
+    default CompletableFuture<Void> withdrawCostAsync(SuperiorPlayer superiorPlayer) {
+        withdrawCost(superiorPlayer);
+        return CompletableFuture.completedFuture(null);
+    }
 
     /**
      * Clone this cost with a new cost value.

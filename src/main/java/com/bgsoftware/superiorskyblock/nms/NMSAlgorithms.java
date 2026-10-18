@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
 import com.bgsoftware.superiorskyblock.listener.BukkitEventsListener;
 import org.bukkit.Location;
@@ -12,6 +13,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
@@ -35,6 +37,11 @@ public interface NMSAlgorithms {
             return enumValue.name();
         }
     };
+
+    @Nullable
+    default Pair<Boolean, ItemStack[]> processBundleClick(Player player, ItemStack slot, ItemStack cursor, boolean rightClick) {
+        return null;
+    }
 
     void registerCommand(BukkitCommand command);
 

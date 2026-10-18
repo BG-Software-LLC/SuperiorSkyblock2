@@ -51,7 +51,7 @@ public class RateIslandButton extends AbstractMenuViewButton<IslandMenuView> {
         IslandUtils.sendMessage(island, Message.RATE_ANNOUNCEMENT, Collections.emptyList(),
                 inventoryViewer.getName(), rating.getValue());
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        BukkitExecutor.sync(menuView.getInventoryViewer().asPlayer(), menuView::closeView, 1L);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<IslandMenuView> {

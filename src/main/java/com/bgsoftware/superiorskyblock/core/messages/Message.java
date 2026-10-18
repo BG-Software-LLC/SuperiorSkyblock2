@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
@@ -20,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public enum Message {
@@ -798,6 +799,16 @@ public enum Message {
     CUSTOM(true) {
         @Override
         public void send(CommandSender sender, Locale locale, Object... args) {
+        if (BukkitExecutor.isFolia() && sender instanceof Player && !BukkitExecutor.isOwned((Player) sender)) {
+            Player player = (Player) sender;
+            Object[] messageArgs = args.clone();
+            BukkitExecutor.ensureMain(player, () -> {
+                if (player.isOnline())
+                    send(player, locale, messageArgs);
+            });
+            return;
+        }
+
             String message = args.length == 0 ? null : args[0] == null ? null : args[0].toString();
 
             if (Text.isBlank(message))
@@ -829,9 +840,9 @@ public enum Message {
 
     private final String defaultMessage;
     private final boolean isCustom;
-    private final Map<Locale, IMessageComponent> messages = new ArrayMap<>();
+    private final Map<Locale, IMessageComponent> messages = new ConcurrentHashMap<>();
     @Nullable
-    private Collection<UUID> delayedMessages;
+    private volatile Collection<UUID> delayedMessages;
 
     Message() {
         this(null);
@@ -975,6 +986,16 @@ public enum Message {
     }
 
     public final void send(CommandSender sender, Object... args) {
+        if (BukkitExecutor.isFolia() && sender instanceof Player && !BukkitExecutor.isOwned((Player) sender)) {
+            Player player = (Player) sender;
+            Object[] messageArgs = args.clone();
+            BukkitExecutor.ensureMain(player, () -> {
+                if (player.isOnline())
+                    send(player, messageArgs);
+            });
+            return;
+        }
+
         if (sender instanceof Player) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
             if (!PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
@@ -989,12 +1010,23 @@ public enum Message {
     }
 
     public void send(CommandSender sender, Locale locale, Object... args) {
+        if (BukkitExecutor.isFolia() && sender instanceof Player && !BukkitExecutor.isOwned((Player) sender)) {
+            Player player = (Player) sender;
+            Object[] messageArgs = args.clone();
+            BukkitExecutor.ensureMain(player, () -> {
+                if (player.isOnline())
+                    send(player, locale, messageArgs);
+            });
+            return;
+        }
+
         IMessageComponent messageComponent = getComponent(locale);
         if (messageComponent == null)
             return;
 
         if (sender instanceof Player) {
             UUID playerUUID = ((Player) sender).getUniqueId();
+            Collection<UUID> delayedMessages = this.delayedMessages;
             if (delayedMessages != null && !delayedMessages.add(playerUUID))
                 return;
         }
@@ -1009,7 +1041,10 @@ public enum Message {
     }
 
     private void setMessage(Locale locale, IMessageComponent messageComponent) {
-        messages.put(locale, messageComponent);
+        if (messageComponent == null)
+            messages.remove(locale);
+        else
+            messages.put(locale, messageComponent);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

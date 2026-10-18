@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -145,7 +144,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
     private static void regenerateSchematicInternal(Island island, Dimension dimension, Schematic schematic) {
         Location centerLocation = island.getCenter(dimension);
-        Location schematicPlacementLocation = centerLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
+        Location schematicPlacementLocation = centerLocation.clone().subtract(0, 1, 0);
 
         schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
             island.setSchematicGenerate(dimension);

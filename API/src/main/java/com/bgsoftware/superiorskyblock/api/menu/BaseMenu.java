@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -90,9 +91,7 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
 
     @Override
     public void refreshViews() {
-        synchronized (openedMenuViews) {
-            openedMenuViews.forEach(V::refreshView);
-        }
+        filterViews(view -> true, V::refreshView);
     }
 
     @Override
@@ -102,9 +101,7 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
 
     @Override
     public void closeViews() {
-        synchronized (openedMenuViews) {
-            openedMenuViews.forEach(V::closeView);
-        }
+        filterViews(view -> true, V::closeView);
     }
 
     @Override
@@ -125,12 +122,27 @@ public abstract class BaseMenu<V extends MenuView<V, A>, A extends ViewArgs> imp
     }
 
     protected final void filterViews(Predicate<V> viewFilter, Consumer<V> onMatch) {
+        List<V> views;
         synchronized (openedMenuViews) {
-            openedMenuViews.forEach(view -> {
+            views = new ArrayList<>(openedMenuViews);
+        }
+        views.forEach(view -> {
+            Runnable action = () -> {
                 if (viewFilter.test(view))
                     onMatch.accept(view);
-            });
-        }
+            };
+            if (!SuperiorSkyblockAPI.getScheduler().isFolia()) {
+                action.run();
+                return;
+            }
+            Player player = view.getInventoryViewer().asPlayer();
+            if (player == null)
+                return;
+            if (SuperiorSkyblockAPI.getScheduler().isOwned(player))
+                action.run();
+            else
+                SuperiorSkyblockAPI.getScheduler().entity(player, action, null, 1L, 0L);
+        });
     }
 
     @Override

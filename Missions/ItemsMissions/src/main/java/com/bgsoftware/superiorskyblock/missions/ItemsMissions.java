@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.missions;
 
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
@@ -75,7 +76,7 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
 
     @Override
     protected void clearModuleData(ItemsTracker data) {
-        data.itemsTracker.clear();
+        data.clearTrackedItems();
     }
 
     @Override
@@ -107,8 +108,11 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
     private int countItemsForPlayerInternal(Player player, ItemsTracker itemsTracker) {
         long currTime = System.currentTimeMillis();
 
-        if (itemsTracker.lastCountTime > 0 && currTime < itemsTracker.lastCountTime)
-            return itemsTracker.totalItemAmount;
+        Integer cachedCount = itemsTracker.getCachedCount(currTime);
+        if (cachedCount != null)
+            return cachedCount;
+
+        ItemsTracker countedItems = new ItemsTracker();
 
         try (Wrapper<ItemProgress[]> progressLookupWrapper = ITEM_PROGRESS_POOL.obtain()) {
             ItemProgress[] progressLookup = progressLookupWrapper.getHandle();
@@ -116,21 +120,19 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
                 itemProgress.count = 0;
             }
 
-            itemsTracker.clear(currTime);
-
             for (ItemStack itemStack : player.getInventory().getContents()) {
                 if (itemStack != null && itemStack.getType() != Material.AIR) {
                     Pair<Key, Integer> missionItemData = getMissionItemData(itemStack);
                     if (missionItemData != null) {
                         ItemProgress itemProgress = progressLookup[missionItemData.getValue()];
                         int counted = itemProgress.track(itemStack.getAmount());
-                        itemsTracker.track(itemStack, missionItemData.getKey(), counted);
+                        countedItems.track(itemStack, missionItemData.getKey(), counted);
                     }
                 }
             }
         }
 
-        return itemsTracker.totalItemAmount;
+        return itemsTracker.update(countedItems, currTime);
     }
 
     @Override
@@ -196,7 +198,7 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
         if (!this.plugin.getMissions().canCompleteNoProgress(superiorPlayer, this))
             return;
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(unused -> {
+        BukkitExecutor.async(() -> superiorPlayer.runIfOnline(unused -> {
             if (canComplete(superiorPlayer))
                 this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
         }), 2L);
@@ -220,10 +222,7 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
     }
 
     private static void removeItems(PlayerInventory inventory, ItemsTracker itemsTracker) {
-        if (itemsTracker.itemsTracker.isEmpty())
-            return;
-
-        for (Pair<ItemStack, Integer> itemToRemove : itemsTracker.itemsTracker) {
+        for (Pair<ItemStack, Integer> itemToRemove : itemsTracker.getTrackedItems()) {
             ItemStack itemStack = itemToRemove.getKey();
             int removeCount = itemToRemove.getValue();
             int itemAmount = itemStack.getAmount();
@@ -273,7 +272,7 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
         private int totalItemAmount = 0;
         private long lastCountTime = -1;
 
-        void track(ItemStack itemStack, Key itemKey, int count) {
+        synchronized void track(ItemStack itemStack, Key itemKey, int count) {
             if (count > 0) {
                 itemsTracker.add(new Pair<>(itemStack, count));
                 this.totalItemAmount += count;
@@ -281,16 +280,31 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
             }
         }
 
-        int getCount(Key key) {
+        synchronized int getCount(Key key) {
             Counter counter = this.countedItems.get(key);
             return counter == null ? 0 : counter.get();
         }
 
-        void clear(long currTime) {
-            itemsTracker.clear();
-            countedItems.clear();
-            totalItemAmount = 0;
-            lastCountTime = currTime + COUNT_INVENTORY_THRESHOLD;
+        synchronized int update(ItemsTracker snapshot, long currTime) {
+            this.itemsTracker.clear();
+            this.itemsTracker.addAll(snapshot.itemsTracker);
+            this.countedItems.clear();
+            this.countedItems.putAll(snapshot.countedItems);
+            this.totalItemAmount = snapshot.totalItemAmount;
+            this.lastCountTime = currTime + COUNT_INVENTORY_THRESHOLD;
+            return this.totalItemAmount;
+        }
+
+        synchronized Integer getCachedCount(long currTime) {
+            return this.lastCountTime > 0 && currTime < this.lastCountTime ? this.totalItemAmount : null;
+        }
+
+        synchronized Set<Pair<ItemStack, Integer>> getTrackedItems() {
+            return new HashSet<>(this.itemsTracker);
+        }
+
+        synchronized void clearTrackedItems() {
+            this.itemsTracker.clear();
         }
 
         @Nullable

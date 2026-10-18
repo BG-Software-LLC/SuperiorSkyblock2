@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.menu.MenuIslandCreationConfig;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
@@ -56,7 +57,7 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
     @Override
     public void onButtonClickLackPermission(ButtonClickContext<MenuIslandCreation.View> context) {
         super.onButtonClickLackPermission(context);
-        getTemplate().lackPermissionCommands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+        getTemplate().lackPermissionCommands.forEach(command -> CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", context.getPlayer().getName())));
     }
 

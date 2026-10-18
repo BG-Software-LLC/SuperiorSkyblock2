@@ -28,7 +28,7 @@ public class BanButton extends AbstractMenuViewButton<MenuConfirmBan.View> {
         if (getTemplate().banPlayer)
             IslandUtils.handleBanPlayer(clickedPlayer, menuView.getIsland(), menuView.getSuperiorPlayer());
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        BukkitExecutor.sync(menuView.getInventoryViewer().asPlayer(), menuView::closeView, 1L);
     }
 
     public static class Builder extends AbstractMenuTemplateButton.AbstractBuilder<MenuConfirmBan.View> {

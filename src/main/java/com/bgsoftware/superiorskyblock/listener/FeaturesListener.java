@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -13,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
-import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -38,6 +38,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -48,7 +49,7 @@ import java.util.function.Function;
 
 public class FeaturesListener extends AbstractGameEventListener {
 
-    private static final EnumerateMap<PluginEventType<?>, PlaceholdersPopulator<?>> POPULATORS = new EnumerateMap<>(PluginEventType.values());
+    private static final Map<PluginEventType<?>, PlaceholdersPopulator<?>> POPULATORS = new ConcurrentHashMap<>();
 
     @Nullable
     private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
@@ -90,7 +91,7 @@ public class FeaturesListener extends AbstractGameEventListener {
             for (String command : commands) {
                 for (Map.Entry<String, String> replaceEntry : placeholdersReplaces.entrySet())
                     command = command.replace(replaceEntry.getKey(), replaceEntry.getValue());
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(), command);
             }
         });
     }

@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Either;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
@@ -35,7 +36,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class PortalsListener extends AbstractGameEventListener {
+
+    private static final Material END_PORTAL = EnumHelper.getEnum(Material.class, "END_PORTAL", "ENDER_PORTAL");
+
+    private final Set<UUID> pendingEndPortalTeleports = ConcurrentHashMap.newKeySet();
 
     private final LazyReference<PortalsManagerService> portalsManager = new LazyReference<PortalsManagerService>() {
         @Override
@@ -83,8 +92,59 @@ public class PortalsListener extends AbstractGameEventListener {
             return;
         }
 
+        if (BukkitExecutor.isFolia() && world.getEnvironment() == World.Environment.THE_END &&
+                portalLocation.getBlock().getType() == END_PORTAL) {
+            e.setCancelled();
+            UUID entityId = entity.getUniqueId();
+            if (!pendingEndPortalTeleports.add(entityId))
+                return;
+
+            SuperiorPlayer teleportedPlayer = entity instanceof Player ?
+                    plugin.getPlayers().getSuperiorPlayer((Player) entity) : null;
+            if (teleportedPlayer != null)
+                teleportedPlayer.setPlayerStatus(PlayerStatus.LEAVING_ISLAND);
+
+            Runnable onFinish = () -> {
+                pendingEndPortalTeleports.remove(entityId);
+                if (teleportedPlayer != null)
+                    teleportedPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
+            };
+            Location sourceLocation = portalLocation.clone();
+            try {
+                plugin.getTaskScheduler().entity(entity, () -> {
+                    try {
+                        Location currentLocation = entity.getLocation();
+                        if (!entity.isValid() || currentLocation.getWorld() != sourceLocation.getWorld() ||
+                                currentLocation.distanceSquared(sourceLocation) > 4.0 ||
+                                sourceLocation.getBlock().getType() != END_PORTAL) {
+                            onFinish.run();
+                            return;
+                        }
+                        Dimension dimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+                        IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
+                            try {
+                                islandWorldResult.ifRight(error -> onFinish.run()).ifLeft(unused ->
+                                        EntityTeleports.teleportUntilSuccess(entity,
+                                                island.getIslandHome(dimension).clone(), 5, onFinish));
+                            } catch (Throwable error) {
+                                onFinish.run();
+                                throw error;
+                            }
+                        });
+                    } catch (Throwable error) {
+                        onFinish.run();
+                        throw error;
+                    }
+                }, onFinish, 5L, 0L);
+            } catch (Throwable error) {
+                onFinish.run();
+                throw error;
+            }
+            return;
+        }
+
         // Simulate end portal
-        if (world.getEnvironment() == World.Environment.THE_END) {
+        if (!BukkitExecutor.isFolia() && world.getEnvironment() == World.Environment.THE_END) {
             /* We teleport the player to his island instead of cancelling the event.
             Therefore, we must prevent the player from acting like he entered another island or left his island.*/
 
