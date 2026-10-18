@@ -67,18 +67,18 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     }
 
     public Key convertKey(Key originalKey, Location location) {
-        return getFirstCustomKey(originalKey, this.customEntityTypeKeyParsers.get(originalKey),
+        return getFirstCustomKey(originalKey, this.customMaterialKeyParsers.get(originalKey),
                 customKeyParser -> customKeyParser.getCustomKey(location));
-    }
-
-    public Key convertKey(Key originalKey, ItemStack itemStack) {
-        return getFirstCustomKey(originalKey, this.customEntityTypeKeyParsers.get(originalKey),
-                customKeyParser -> customKeyParser.getCustomKey(itemStack, originalKey));
     }
 
     public Key convertKey(Key originalKey, Entity entity) {
         return getFirstCustomKey(originalKey, this.customEntityTypeKeyParsers.get(originalKey),
                 customKeyParser -> customKeyParser.getCustomKey(entity));
+    }
+
+    public Key convertKey(Key originalKey, ItemStack itemStack) {
+        return getFirstCustomKey(originalKey, this.customMaterialKeyParsers.get(originalKey),
+                customKeyParser -> customKeyParser.getCustomKey(itemStack, originalKey));
     }
 
     private Key getFirstCustomKey(Key originalKey, @Nullable List<CustomKeyParser> customKeyParsers,
@@ -112,92 +112,104 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     @Override
     public Key getKey(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.of(entityType)).markAPIKey();
     }
 
     @Override
     public Key getEntityTypeKey(String entityTypeName) {
         Preconditions.checkNotNull(entityTypeName, "entityTypeName parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.ofEntityType(entityTypeName)).markAPIKey();
     }
 
     @Override
     public Key getKey(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.of(entity)).markAPIKey();
     }
 
     @Override
     public Key getKey(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.of(block)).markAPIKey();
     }
 
     @Override
     public Key getKey(BlockState blockState) {
         Preconditions.checkNotNull(blockState, "blockState parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.of(blockState)).markAPIKey();
     }
 
     @Override
     public Key getKey(ItemStack itemStack) {
-        Preconditions.checkNotNull(itemStack, "material parameter cannot be null.");
+        Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.of(itemStack)).markAPIKey();
     }
 
     @Override
     public Key getKey(Material material, short data) {
         Preconditions.checkNotNull(material, "material parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.of(material, data)).markAPIKey();
     }
 
     @Override
     public Key getKey(Material material) {
         Preconditions.checkNotNull(material, "material parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.of(material)).markAPIKey();
     }
 
     @Override
     public Key getMaterialAndDataKey(String type) {
         Preconditions.checkNotNull(type, "type parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.ofMaterialAndData(type)).markAPIKey();
     }
 
     @Override
     public Key getSpawnerKey(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.ofSpawner(entityType)).markAPIKey();
     }
 
     @Override
     public Key getSpawnerKey(String entityTypeName) {
         Preconditions.checkNotNull(entityTypeName, "entityTypeName parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.ofSpawner(entityTypeName)).markAPIKey();
     }
 
     @Override
     public Key getKey(String key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
         // Due to backwards compatibility, we want to try and check if this is either a MaterialKey or EntityTypeKey.
         Key materialKey = Key.ofMaterialAndData(key);
-        if (materialKey instanceof MaterialKey)
+        if (materialKey instanceof MaterialKey) {
             return materialKey;
+        }
 
         Key entityTypeKey = Key.ofEntityType(key);
-        if (entityTypeKey instanceof EntityTypeKey)
+        if (entityTypeKey instanceof EntityTypeKey) {
             return entityTypeKey;
+        }
 
         // This key does not fit MaterialKey nor EntityTypeKey, therefore we'll create a CustomKey.
-
-        String[] keySections = key.split(":");
-        Key customKey = Keys.of(keySections[0], keySections.length >= 2 ? keySections[1] : null, KeyIndicator.CUSTOM);
-        return ((BaseKey<? extends Key>) customKey).markAPIKey();
+        return ((BaseKey<? extends Key>) Keys.ofCustom(key)).markAPIKey();
     }
 
     @Override
     public Key getKey(String globalKey, String subKey) {
         Preconditions.checkNotNull(globalKey, "globalKey parameter cannot be null.");
         Preconditions.checkNotNull(subKey, "subKey parameter cannot be null.");
+
         return ((BaseKey<? extends Key>) Keys.of(globalKey, subKey, KeyIndicator.CUSTOM)).markAPIKey();
     }
 
@@ -208,9 +220,13 @@ public class KeysManagerImpl extends Manager implements KeysManager {
 
     @Override
     public KeySet createKeySet(Supplier<Set<String>> setCreator, Collection<Key> collection) {
-        if (collection instanceof KeySet) return (KeySet) collection;
+        if (collection instanceof KeySet) {
+            return (KeySet) collection;
+        }
+
         KeySet keySet = KeySets.createSet(KeyIndicator.CUSTOM, KeySetStrategy.custom(setCreator));
         keySet.addAll(collection);
+
         return keySet;
     }
 
@@ -221,9 +237,13 @@ public class KeysManagerImpl extends Manager implements KeysManager {
 
     @Override
     public <V> KeyMap<V> createKeyMap(Supplier<Map<String, V>> mapCreator, Map<Key, V> map) {
-        if (map instanceof KeyMap) return (KeyMap<V>) map;
+        if (map instanceof KeyMap) {
+            return (KeyMap<V>) map;
+        }
+
         KeyMap<V> keyMap = KeyMaps.createMap(KeyIndicator.CUSTOM, KeyMapStrategy.custom(mapCreator));
         keyMap.putAll(map);
+
         return keyMap;
     }
 
