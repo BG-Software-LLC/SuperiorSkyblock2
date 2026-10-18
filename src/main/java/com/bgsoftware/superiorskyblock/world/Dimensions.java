@@ -31,6 +31,15 @@ public class Dimensions {
         return ENVIRONMENT_TO_DIMENSION.get(environment);
     }
 
+    @Nullable
+    public static Dimension getSafe(@Nullable String name) {
+        try {
+            return Dimension.getByName(name);
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
     private Dimensions() {
 
     }

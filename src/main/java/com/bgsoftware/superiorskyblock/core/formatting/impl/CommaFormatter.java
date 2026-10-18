@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
 import com.bgsoftware.superiorskyblock.core.formatting.IFormatter;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CommaFormatter implements IFormatter<Stream<String>> {
@@ -16,10 +17,8 @@ public class CommaFormatter implements IFormatter<Stream<String>> {
     }
 
     @Override
-    public String format(Stream<String> values) {
-        StringBuilder stringBuilder = new StringBuilder();
-        values.forEach(value -> stringBuilder.append(", ").append(value));
-        return stringBuilder.substring(2);
+    public String format(Stream<String> stream) {
+        return stream.collect(Collectors.joining(", "));
     }
 
 }
