@@ -58,7 +58,7 @@ public class Keys {
         EntityType entityType = EnumHelper.getEnum(EntityType.class, entityTypeName.toUpperCase(Locale.ENGLISH));
 
         if (entityType == null) {
-            Keys.of(entityTypeName, data, KeyIndicator.ENTITY_TYPE);
+            return Keys.of(entityTypeName, data, KeyIndicator.ENTITY_TYPE);
         }
 
         return Keys.of(entityType);
