@@ -58,4 +58,20 @@ public interface MenuIslandCreationConfig {
      */
     Biome getBiome();
 
+    /**
+     * Get the spawn yaw of the island's home location from where the schematic was placed.
+     */
+    @Nullable
+    default Float getSpawnYaw() {
+        return null;
+    }
+
+    /**
+     * Get the spawn pitch of the island's home location from where the schematic was placed.
+     */
+    @Nullable
+    default Float getSpawnPitch() {
+        return null;
+    }
+
 }
