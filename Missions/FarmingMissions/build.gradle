@@ -1,9 +1,8 @@
 group 'Missions:FarmingMissions'
 
 dependencies {
-    compileOnly 'com.sk89q:WorldGuard:7.0.0-beta-03'
     compileOnly 'com.gmail.nossr50:mcMMO:2.1.202'
-    compileOnly "org.spigotmc:v1_16_R3:latest"
+    compileOnly 'org.spigotmc:v1_16_R3:latest'
 }
 
 shadowJar {

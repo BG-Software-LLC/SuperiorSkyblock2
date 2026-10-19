@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.KeyRequirements;
