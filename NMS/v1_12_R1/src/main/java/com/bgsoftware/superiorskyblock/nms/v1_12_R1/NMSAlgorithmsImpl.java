@@ -64,13 +64,15 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public void setTitle(Inventory inventory, String title) {
-        if (inventory instanceof CraftInventoryCustom) {
-            CraftInventoryCustom craftInventoryCustom = (CraftInventoryCustom) inventory;
-            IInventory iInventory = craftInventoryCustom.getInventory();
+        if (!(inventory instanceof CraftInventoryCustom)) {
+            return;
+        }
 
-            if (TITLE_FIELD.isValid()) {
-                TITLE_FIELD.set(iInventory, title);
-            }
+        CraftInventoryCustom craftInventoryCustom = (CraftInventoryCustom) inventory;
+        IInventory iInventory = craftInventoryCustom.getInventory();
+
+        if (TITLE_FIELD.isValid()) {
+            TITLE_FIELD.set(iInventory, title);
         }
     }
 

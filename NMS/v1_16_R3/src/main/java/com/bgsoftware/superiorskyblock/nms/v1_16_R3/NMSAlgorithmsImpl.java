@@ -103,18 +103,20 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public void setTitle(Inventory inventory, String title) {
-        if (inventory instanceof CraftInventoryCustom) {
-            CraftInventoryCustom craftInventoryCustom = (CraftInventoryCustom) inventory;
-            IInventory iInventory = craftInventoryCustom.getInventory();
+        if (!(inventory instanceof CraftInventoryCustom)) {
+            return;
+        }
 
-            if (TITLE_FIELD.isValid()) {
-                TITLE_FIELD.set(iInventory, title);
-            }
+        CraftInventoryCustom craftInventoryCustom = (CraftInventoryCustom) inventory;
+        IInventory iInventory = craftInventoryCustom.getInventory();
 
-            if (ADVENTURE_TITLE_FIELD.isValid()) {
-                net.kyori.adventure.text.Component component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(title);
-                ADVENTURE_TITLE_FIELD.set(iInventory, component);
-            }
+        if (ADVENTURE_TITLE_FIELD.isValid()) {
+            net.kyori.adventure.text.Component component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(title);
+            ADVENTURE_TITLE_FIELD.set(iInventory, component);
+        } else if (TITLE_FIELD.isValid()) {
+            TITLE_FIELD.set(iInventory, title);
+        } else {
+            throw new RuntimeException("Cannot find ADVENTURE_TITLE_FIELD and TITLE_FIELD");
         }
     }
 
