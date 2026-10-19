@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
@@ -292,6 +293,32 @@ public class IslandsDatabaseBridge {
             try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
                 DBColumn column = pool.obtain().withNameAndValue("block", block.toString());
                 databaseBridge.deleteObject("islands_block_limits", createFilter(pool, "island", island, column));
+            }
+        });
+    }
+
+    public static void saveEntityCategoryLimit(Island island, EntityCategory entityCategory, int limit) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+                databaseBridge.insertObject("islands_entity_category_limits",
+                        pool.obtain().withNameAndValue("island", island.getUniqueId().toString()),
+                        pool.obtain().withNameAndValue("entity_category", entityCategory.getName().toLowerCase(Locale.ENGLISH)),
+                        pool.obtain().withNameAndValue("limit", limit)
+                );
+            }
+        });
+    }
+
+    public static void clearEntityCategoryLimits(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge ->
+                databaseBridge.deleteObject("islands_entity_category_limits", createFilter("island", island)));
+    }
+
+    public static void removeEntityCategoryLimit(Island island, EntityCategory entityCategory) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+                DBColumn column = pool.obtain().withNameAndValue("entity_category", entityCategory.getName().toLowerCase(Locale.ENGLISH));
+                databaseBridge.deleteObject("islands_entity_category_limits", createFilter(pool, "island", island, column));
             }
         });
     }
@@ -830,6 +857,8 @@ public class IslandsDatabaseBridge {
                 databaseBridge.deleteObject("islands_chests", islandFilter);
             if (!island.getPotionEffects().isEmpty())
                 databaseBridge.deleteObject("islands_effects", islandFilter);
+            if (!island.getEntityCategoryLimits().isEmpty())
+                databaseBridge.deleteObject("islands_entity_category_limits", islandFilter);
             if (!island.getEntitiesLimitsAsKeys().isEmpty())
                 databaseBridge.deleteObject("islands_entity_limits", islandFilter);
             if (!island.getAllSettings().isEmpty())

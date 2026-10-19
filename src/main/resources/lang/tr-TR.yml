@@ -96,6 +96,9 @@ CHANGED_CROP_GROWTH_ALL: '&e&lYükseltmeler | &7Tüm adaların bitki büyüme ç
 CHANGED_CROP_GROWTH_NAME: '&e&lYükseltmeler | &7{0} adasının bitki büyüme çarpanı
   başarıyla güncellendi.'
 CHANGED_DISCORD: '&e&lAda | &7Ada discordu başarıyla {0} olarak değiştirildi.'
+CHANGED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}''s island.'
+CHANGED_ENTITY_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for all the islands.'
+CHANGED_ENTITY_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}.'
 CHANGED_ENTITY_LIMIT: '&e&lYükseltmeler | &7{0} varlıklarının {1}''in adası için limiti
   başarıyla güncellendi.'
 CHANGED_ENTITY_LIMIT_ALL: '&e&lYükseltmeler | &7{0} varlıklarının tüm adalar için
@@ -162,6 +165,7 @@ COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: iksir-efekti
 COMMAND_ARGUMENT_EMAIL: e-posta
+COMMAND_ARGUMENT_ENTITY_CATEGORY: 'entity-category'
 COMMAND_ARGUMENT_ENTITY: varlık
 COMMAND_ARGUMENT_ISLAND_NAME: ada-adı
 COMMAND_ARGUMENT_ISLAND_ROLE: ada-rolü
@@ -211,6 +215,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH: Başka bir oyuncunun adası için bit
   çarpanını artır.
 COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: Başka bir oyuncunun adası için bir ada efekti
   ekle.
+COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_CATEGORY_LIMIT: 'Increase entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: Başka bir oyuncunun adası için varlık
   limitini artır.
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Çakıl taşı jeneratörü için bir materyalin
@@ -258,6 +263,7 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: Bir adanın değerini yeniden hesapla.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Eklentinin tüm yapılandırmalarını ve görevlerini
   yeniden yükle.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Bir adadan blok limitini kaldır.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Bir oyuncu tarafından verilen tüm değerlendirmeleri
   kaldır.
@@ -279,6 +285,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Başka bir oyuncunun adası için bit
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Bir oyuncunun ada dağıtma miktarını ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Başka bir oyuncunun adasının ada efekt seviyesini
   ayarla.
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_CATEGORY_LIMIT: 'Set entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Başka bir oyuncunun adası için varlık
   limitini ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
@@ -476,6 +483,7 @@ INVALID_BORDER_COLOR: '&c&lHata | &7Geçersiz sınır rengi {0}.'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lHata | &7Geçersiz efekt {0}.'
 INVALID_ENTITY: '&c&lHata | &7Geçersiz varlık {0}.'
+INVALID_ENTITY_CATEGORY: '&c&lError | &7Invalid entity category {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lHata | &7Geçersiz aralık {0}.'
 INVALID_ISLAND: '&c&lHata | &7Bir adan yok.'
@@ -562,6 +570,10 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lAda | &7Varlık Limitleri:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lAda | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Entity Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lAda | &7Jeneratör Oranları ({1}):
   {0}
@@ -817,6 +829,7 @@ RATE_REMOVE_ALL_ISLANDS: '&e&lAda | &7Tüm adaların tüm değerlendirmeleri ba�
   kaldırıldı.'
 RATE_SUCCESS: '&e&lAda | &7Bu adayı {0} yıldızla değerlendirdin!'
 REACHED_BLOCK_LIMIT: '&e&lYükseltmeler | &7Ada için {0} Bloğu limitine ulaştın.'
+REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lYükseltmeler | &7Varlık {0} için adanın limitine ulaştın.'
 RECALC_ALREADY_RUNNING: '&c&lHata | &7Adan zaten yeniden hesaplanıyor.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lHata | &7Bu ada zaten yeniden hesaplanıyor.'

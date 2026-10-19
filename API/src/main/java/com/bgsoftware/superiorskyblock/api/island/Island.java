@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
@@ -2175,6 +2176,58 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean hasReachedBlockLimit(Key key, int amount);
 
     /**
+     * Get the entity category limit of an entity category.
+     *
+     * @param entityCategory The entity category to check.
+     */
+    int getEntityCategoryLimit(EntityCategory entityCategory);
+
+    /**
+     * Get all the entity category limits for the island.
+     */
+    Map<EntityCategory, Integer> getEntityCategoryLimits();
+
+    /**
+     * Get all the custom entity category limits for the island.
+     */
+    Map<EntityCategory, Integer> getCustomEntityCategoryLimits();
+
+    /**
+     * Clear all the entity category limits from the island.
+     */
+    void clearEntityCategoryLimits();
+
+    /**
+     * Set the entity category limit of an entity category.
+     *
+     * @param entityCategory The entity category to set the limit to.
+     * @param limit          The limit to set.
+     */
+    void setEntityCategoryLimit(EntityCategory entityCategory, int limit);
+
+    /**
+     * Remove the entity category limit of an entity category.
+     *
+     * @param entityCategory The entity category to remove it's limit.
+     */
+    void removeEntityCategoryLimit(EntityCategory entityCategory);
+
+    /**
+     * A method to check if a specific entity category has reached the limit.
+     *
+     * @param entityCategory The entity category to check.
+     */
+    CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory);
+
+    /**
+     * A method to check if a specific entity category has reached the limit.
+     *
+     * @param entityCategory The entity category to check.
+     * @param amount         The amount of entities that were added.
+     */
+    CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory, int amount);
+
+    /**
      * Get the entity limit of an entity.
      *
      * @param entityType The entity's type to check.
@@ -2948,6 +3001,10 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
         Builder addUniqueVisitor(SuperiorPlayer superiorPlayer, long visitTime);
 
         Map<SuperiorPlayer, Long> getUniqueVisitors();
+
+        Builder setEntityCategoryLimit(EntityCategory entityCategory, int limit);
+
+        Map<EntityCategory, Integer> getEntityCategoryLimits();
 
         Builder setEntityLimit(Key entity, int limit);
 

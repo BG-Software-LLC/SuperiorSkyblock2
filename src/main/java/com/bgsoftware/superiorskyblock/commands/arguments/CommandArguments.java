@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.arguments;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -217,6 +218,16 @@ public class CommandArguments {
             stringBuilder.append(" ").append(args[i]);
 
         return colorize ? Formatters.COLOR_FORMATTER.format(stringBuilder.substring(1)) : stringBuilder.substring(1);
+    }
+
+    public static EntityCategory getEntityCategory(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(argument);
+
+        if (entityCategory == null) {
+            Message.INVALID_ENTITY_CATEGORY.send(sender, argument);
+        }
+
+        return entityCategory;
     }
 
     public static PlayerRole getPlayerRole(CommandSender sender, String argument) {

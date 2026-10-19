@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.island;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
@@ -1525,6 +1526,46 @@ public class DelegateIsland implements Island {
     @Override
     public boolean hasReachedBlockLimit(Key key, @Size int amount) {
         return this.handle.hasReachedBlockLimit(key, amount);
+    }
+
+    @Override
+    public int getEntityCategoryLimit(EntityCategory entityCategory) {
+        return this.handle.getEntityCategoryLimit(entityCategory);
+    }
+
+    @Override
+    public Map<EntityCategory, Integer> getEntityCategoryLimits() {
+        return this.handle.getEntityCategoryLimits();
+    }
+
+    @Override
+    public Map<EntityCategory, Integer> getCustomEntityCategoryLimits() {
+        return this.handle.getCustomEntityCategoryLimits();
+    }
+
+    @Override
+    public void clearEntityCategoryLimits() {
+        this.handle.clearEntityCategoryLimits();
+    }
+
+    @Override
+    public void setEntityCategoryLimit(EntityCategory entityCategory, int limit) {
+        this.handle.setEntityCategoryLimit(entityCategory, limit);
+    }
+
+    @Override
+    public void removeEntityCategoryLimit(EntityCategory entityCategory) {
+        this.handle.removeEntityCategoryLimit(entityCategory);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory) {
+        return this.handle.hasReachedEntityCategoryLimit(entityCategory);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory, int amount) {
+        return this.handle.hasReachedEntityCategoryLimit(entityCategory, amount);
     }
 
     @Override
