@@ -443,6 +443,8 @@ GENERATOR_CLEARED: '&e&lAda | &7{0}''ın adası için jeneratör miktarları ba�
 GENERATOR_CLEARED_NAME: '&e&lAda | &7{0} adasının jeneratör miktarları başarıyla temizlendi.'
 GENERATOR_CLEARED_ALL: '&e&lAda | &7Tüm adalar için jeneratör miktarları başarıyla
   temizlendi.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lAda | &7{0}''ın jeneratör miktarı başarıyla {1}''in adasına
   güncellendi.'
 GENERATOR_UPDATED_NAME: '&e&lAda | &7{0}''ın jeneratör miktarı başarıyla {1} adasına

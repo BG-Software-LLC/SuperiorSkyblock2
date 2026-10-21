@@ -364,6 +364,8 @@ FORMAT_DAY_NAME: jour
 GENERATOR_CLEARED: '&e&lIle | &7Nettoyage des taux des générateurs pour l''île de {0}.'
 GENERATOR_CLEARED_NAME: '&e&lIle | &7Nettoyage des taux des générateurs pour l''île {0}.'
 GENERATOR_CLEARED_ALL: '&e&lIle | &7Nettoyage des taux des générateurs de toutes les îles.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
 GLOBAL_COMMAND_EXECUTED: '&e&lIle | &7Éxécution de la commande sur les membres de l''île de {0} !'

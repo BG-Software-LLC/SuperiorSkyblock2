@@ -11,6 +11,10 @@ import org.bukkit.event.Cancellable;
 
 /**
  * IslandChangeGeneratorRateEvent is called when a generator-rate of an island is changed.
+ * <p>
+ * When it is called by {@link Island#setGeneratorPercentage(Key, int, Dimension, SuperiorPlayer, boolean)}
+ * for a percentage above 0, the other blocks of the generator still have their old amounts:
+ * the generator-rate is relative to their new amounts, which are only set after the event.
  */
 public class IslandChangeGeneratorRateEvent extends IslandEvent implements Cancellable {
 

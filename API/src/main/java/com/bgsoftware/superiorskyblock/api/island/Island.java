@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeGeneratorRateEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandRemoveGeneratorRateEvent;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
@@ -2753,16 +2754,25 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Set a percentage for a specific key in a specific world.
-     * Percentage can be between 0 and 100 (0 will remove the key from the list).
+     * Percentage can be between 0 and 100.
      * Calling this method will not make events get fired.
      * <p>
-     * This function sets the amount of the key using the following formula:
-     * amount = (percentage * total_amount) / (1 - percentage)
+     * If the percentage is 0, the custom amount of the key is removed. If the key also has an amount
+     * from upgrades, it is kept with a custom amount of 0 instead. The other blocks are not changed.
      * <p>
-     * If the percentage is 100, the rest of the amounts will be cleared and
-     * the material's amount will be set to 1.
+     * Otherwise, the amount of the key is set to (percentage * total_amount_of_other_blocks), and the amounts
+     * of the other blocks are multiplied by (100 - percentage). If these amounts would still have a total above
+     * 100 after they are divided by their greatest common divisor, the key gets an amount of (percentage) instead,
+     * and the other blocks share (100 - percentage) by their amounts, rounded to whole numbers.
+     * All the amounts are then divided by their greatest common divisor, so their total is as small as possible
+     * and never above 100, and the key is exactly at the percentage.
+     * The amounts of the other blocks that changed are saved as custom amounts. A block that ends with an amount
+     * of 0 (all of them if the percentage is 100, or blocks with a small share that were rounded down) is set to 0
+     * the same way as the key for a percentage of 0.
      * <p>
-     * The amount is rounded to ensure a smaller loss, and currently it's 1%~ loss.
+     * If there are no other blocks in the generator, the rest of the percentage is given to the default
+     * block of the generator: basalt in the nether on 1.16 and above, and cobblestone otherwise.
+     * If the key is itself the default block, its amount is set to 1, so it ends at 100%.
      *
      * @param key        The block to change the generator rate of.
      * @param percentage The percentage to set the new rate.
@@ -2772,22 +2782,39 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Set a percentage for a specific key in a specific world.
-     * Percentage can be between 0 and 100 (0 will remove the key from the list).
+     * Percentage can be between 0 and 100.
      * <p>
-     * This function sets the amount of the key using the following formula:
-     * amount = (percentage * total_amount) / (1 - percentage)
+     * If the percentage is 0, the custom amount of the key is removed. If the key also has an amount
+     * from upgrades, it is kept with a custom amount of 0 instead. The other blocks are not changed.
      * <p>
-     * If the percentage is 100, the rest of the amounts will be cleared and
-     * the material's amount will be set to 1.
+     * Otherwise, the amount of the key is set to (percentage * total_amount_of_other_blocks), and the amounts
+     * of the other blocks are multiplied by (100 - percentage). If these amounts would still have a total above
+     * 100 after they are divided by their greatest common divisor, the key gets an amount of (percentage) instead,
+     * and the other blocks share (100 - percentage) by their amounts, rounded to whole numbers.
+     * All the amounts are then divided by their greatest common divisor, so their total is as small as possible
+     * and never above 100, and the key is exactly at the percentage.
+     * The amounts of the other blocks that changed are saved as custom amounts. A block that ends with an amount
+     * of 0 (all of them if the percentage is 100, or blocks with a small share that were rounded down) is set to 0
+     * the same way as the key for a percentage of 0.
      * <p>
-     * The amount is rounded to ensure a smaller loss, and currently it's 1%~ loss.
+     * If there are no other blocks in the generator, the rest of the percentage is given to the default
+     * block of the generator: basalt in the nether on 1.16 and above, and cobblestone otherwise.
+     * If the key is itself the default block, its amount is set to 1, so it ends at 100%.
+     * <p>
+     * If callEvent is true, {@link IslandRemoveGeneratorRateEvent} is called when the percentage is 0, and
+     * {@link IslandChangeGeneratorRateEvent} otherwise, whose generator-rate (which listeners may change)
+     * is used as the new amount of the key. Nothing is changed before the event is called, or if it is
+     * cancelled. For a percentage above 0, the other blocks still have their old amounts during
+     * the event: the generator-rate is relative to their new amounts, which are only set after the event.
+     * Changes made to the other blocks during the event may be overwritten.
      *
      * @param key        The block to change the generator rate of.
      * @param percentage The percentage to set the new rate.
      * @param dimension  The world to change the rates in.
      * @param caller     The player that changes the percentages (used for the event).
      *                   If null, it means the console did the operation.
-     * @param callEvent  Whether to call the {@link IslandChangeGeneratorRateEvent}
+     * @param callEvent  Whether to call the {@link IslandChangeGeneratorRateEvent},
+     *                   or the {@link IslandRemoveGeneratorRateEvent} if the percentage is 0.
      * @return Whether the operation succeed.
      * The operation may fail if callEvent is true and the event was cancelled.
      */

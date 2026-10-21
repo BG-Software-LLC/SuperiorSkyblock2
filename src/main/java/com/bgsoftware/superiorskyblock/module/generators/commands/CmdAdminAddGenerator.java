@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.world.GeneratorType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -104,16 +105,25 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
             return;
         }
 
+        Key defaultBlock = GeneratorType.fromDimension(dimension).getDefaultBlock();
         boolean isInvalid = false;
         Island changedIsland = null;
         int islandsChangedCount = 0;
+        int islandsFilledWithDefaultBlockCount = 0;
+        int defaultBlockPercentage = 0;
 
         for (Island island : islands) {
             if (percentage) {
                 int ratePercentage = Math.max(0, Math.min(100, island.getGeneratorPercentage(material, dimension) + amount));
+                int oldDefaultBlockAmount = defaultBlock == null ? 0 : island.getGeneratorAmount(defaultBlock, dimension);
                 if (!island.setGeneratorPercentage(material, ratePercentage, dimension,
                         sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, true)) {
                     continue;
+                }
+
+                if (CmdAdminSetGenerator.isFilledWithDefaultBlock(island, material, dimension, defaultBlock, oldDefaultBlockAmount)) {
+                    ++islandsFilledWithDefaultBlockCount;
+                    defaultBlockPercentage = island.getGeneratorPercentage(defaultBlock, dimension);
                 }
             } else {
                 int currentAmount = island.getGeneratorAmount(material, dimension);
@@ -148,6 +158,11 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
             Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), changedIsland.getName());
         } else {
             Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
+        }
+
+        if (islandsFilledWithDefaultBlockCount > 0) {
+            CmdAdminSetGenerator.sendFilledWithDefaultBlockMessage(sender, defaultBlock, defaultBlockPercentage,
+                    islandsFilledWithDefaultBlockCount, islandsChangedCount);
         }
     }
 

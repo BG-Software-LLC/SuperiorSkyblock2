@@ -375,6 +375,8 @@ FORMAT_DAY_NAME: םוי
 GENERATOR_CLEARED: '&e&lIsland | &7Successfully cleared the generator amounts for {0}''s island.'
 GENERATOR_CLEARED_NAME: '&e&lIsland | &7Successfully cleared the generator amounts for the island of {0}.'
 GENERATOR_CLEARED_ALL: '&e&lIsland | &7Successfully cleared the generator amounts for all the islands.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lיא | &7החלצהב ןכדוע {1} לש יאה לש רוטארנגב {0} רמוחה לש
   תומכה.'
 GENERATOR_UPDATED_NAME: '&e&lיא | &7החלצהב ןכדוע {1} יאה לש רוטארנגב {0} רמוחה

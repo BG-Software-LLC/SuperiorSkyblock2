@@ -460,6 +460,8 @@ GENERATOR_CLEARED_NAME: '&e&lInsel | &7Die Generator Anzahl für die Insel {0} w
   erfolgreich ausgeglichen.'
 GENERATOR_CLEARED_ALL: '&e&lInsel | &7Erfolgreich die Generator Anzahl für alle Inseln
   gelöscht.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lInsel | &7Der Generator Anzahl von {0} wurde erfolgreich auf
   die Insel von {1} aktualisiert.'
 GENERATOR_UPDATED_NAME: '&e&lInsel | &7Der Generator Anzahl von {0} wurde erfolgreich

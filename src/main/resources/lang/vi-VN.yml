@@ -410,6 +410,8 @@ FORMAT_DAY_NAME: ngày
 GENERATOR_CLEARED: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho đảo của {0}.'
 GENERATOR_CLEARED_NAME: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho đảo {0}.'
 GENERATOR_CLEARED_ALL: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho tất cả các đảo.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo của {1}.'
 GENERATOR_UPDATED_NAME: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo {1}.'
 GENERATOR_UPDATED_ALL: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho tất cả các đảo.'

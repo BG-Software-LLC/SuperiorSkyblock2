@@ -367,6 +367,8 @@ FORMAT_DAY_NAME: giorno
 GENERATOR_CLEARED: '&e&lIsola | &7Cancellati con successo gli importi del generatore per l''isola di {0}.'
 GENERATOR_CLEARED_NAME: '&e&lIsola | &7Cancellati con successo gli importi del generatore per l''isola {0}.'
 GENERATOR_CLEARED_ALL: '&e&lIsola | &7Cancellati con successo gli importi del generatore per tutte le isole.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione di {0} sull''isola di {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione di {0} sull''isola {1}.'
 
