@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ClassInfo;
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
@@ -117,6 +118,10 @@ public class BukkitEventsListener implements Listener {
             ProjectileHitEvent.class, "getHitBlock");
     private static final ReflectMethod<Enum<?>> BLOCK_EXPLOSION_RESULT = new ReflectMethod<>(
             BlockExplodeEvent.class, "getExplosionResult");
+    @Nullable
+    private static final Enum<?> TRIGGER_BLOCK = new ReflectField<Enum<?>>(
+            new ClassInfo("org.bukkit.ExplosionResult", ClassInfo.PackageType.UNKNOWN),
+            Enum.class, "TRIGGER_BLOCK").get(null);
     @Nullable
     private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
 
@@ -303,8 +308,8 @@ public class BukkitEventsListener implements Listener {
         GameEventArgs.BlockExplodeEvent blockExplodeEvent = new GameEventArgs.BlockExplodeEvent();
         blockExplodeEvent.block = e.getBlock();
         blockExplodeEvent.blocks = e.blockList();
-        blockExplodeEvent.isSoftExplosion = BLOCK_EXPLOSION_RESULT.isValid() &&
-                BLOCK_EXPLOSION_RESULT.invoke(e).name().equals("TRIGGER_BLOCK");
+        blockExplodeEvent.isSoftExplosion = TRIGGER_BLOCK != null && BLOCK_EXPLOSION_RESULT.isValid() &&
+                BLOCK_EXPLOSION_RESULT.invoke(e) == TRIGGER_BLOCK;
         return eventType.createEvent(blockExplodeEvent);
     }
 
