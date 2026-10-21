@@ -25,6 +25,7 @@ public class DirtyChunksContainer {
     private final Island island;
     private final int minChunkX;
     private final int minChunkZ;
+    private final int chunksInXAxis;
     private final int chunksInZAxis;
     private final int totalChunksCount;
     private final boolean shouldSave;
@@ -51,10 +52,10 @@ public class DirtyChunksContainer {
         int maxChunkZ = maximum.getZ() >> 4;
         // The chunk ranges are inclusive on both ends, therefore the amount of chunks in each
         // axis is the difference between the bounds plus one.
-        int chunksInXAxis = (maxChunkX - this.minChunkX) + 1;
+        this.chunksInXAxis = (maxChunkX - this.minChunkX) + 1;
 
         this.chunksInZAxis = (maxChunkZ - this.minChunkZ) + 1;
-        this.totalChunksCount = chunksInXAxis * this.chunksInZAxis;
+        this.totalChunksCount = this.chunksInXAxis * this.chunksInZAxis;
 
         this.shouldSave = !island.isSpawn();
     }
@@ -134,6 +135,9 @@ public class DirtyChunksContainer {
     private int getChunkIndex(ChunkPosition chunkPosition) {
         int deltaX = chunkPosition.getX() - this.minChunkX;
         int deltaZ = chunkPosition.getZ() - this.minChunkZ;
+        if (deltaX < 0 || deltaX >= this.chunksInXAxis || deltaZ < 0 || deltaZ >= this.chunksInZAxis)
+            return -1;
+
         // The index is encoded in a row-major order, so the stride is the amount of chunks in the Z axis.
         return deltaX * this.chunksInZAxis + deltaZ;
     }
