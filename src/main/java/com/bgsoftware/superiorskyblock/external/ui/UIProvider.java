@@ -97,4 +97,6 @@ public interface UIProvider {
      */
     Inventory createInventory(InventoryHolder inventoryHolder, InventoryType inventoryType, String title);
 
+    Object parseInventoryTitle(String title);
+
 }
