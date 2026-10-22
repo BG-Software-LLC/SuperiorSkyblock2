@@ -119,14 +119,13 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
             return;
         }
 
-
         Container container = craftInventoryCustom.getInventory();
 
         Object parsedTitle = plugin.getProviders().getUIProvider().parseInventoryTitle(title);
 
         if (ADVENTURE_TITLE_FIELD.isValid()) {
-            net.kyori.adventure.text.Component component = parsed instanceof net.kyori.adventure.text.Component ?
-                    (net.kyori.adventure.text.Component) parsed :
+            net.kyori.adventure.text.Component component = parsedTitle instanceof net.kyori.adventure.text.Component ?
+                    (net.kyori.adventure.text.Component) parsedTitle :
                     net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(title);
 
             ADVENTURE_TITLE_FIELD.set(container, component);

@@ -113,10 +113,10 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         if (ADVENTURE_TITLE_FIELD.isValid()) {
             net.kyori.adventure.text.Component component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(title);
             ADVENTURE_TITLE_FIELD.set(iInventory, component);
-        } else if (TITLE_FIELD.isValid()) {
+        }
+
+        if (TITLE_FIELD.isValid()) {
             TITLE_FIELD.set(iInventory, title);
-        } else {
-            throw new RuntimeException("Cannot find ADVENTURE_TITLE_FIELD and TITLE_FIELD");
         }
     }
 
