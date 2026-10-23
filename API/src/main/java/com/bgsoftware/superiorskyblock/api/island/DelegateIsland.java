@@ -36,7 +36,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -1889,6 +1888,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorPercentage(key, dimension);
+    }
+
+    @Override
     @Deprecated
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
         return this.handle.getGeneratorPercentages(dimension);
@@ -1917,6 +1921,16 @@ public class DelegateIsland implements Island {
     @Override
     public int getGeneratorAmountRaw(Key key, Dimension dimension) {
         return this.handle.getGeneratorAmountRaw(key, dimension);
+    }
+
+    @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorAmount(key, dimension);
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorAmountRaw(key, dimension);
     }
 
     @Override

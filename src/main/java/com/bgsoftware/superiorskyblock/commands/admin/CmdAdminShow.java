@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
@@ -197,7 +198,6 @@ public class CmdAdminShow implements IAdminIslandCommand {
                 for (Dimension dimension : Dimension.values()) {
                     StringBuilder islandDataMessage = new StringBuilder();
 
-                    Map<Key, Integer> customGeneratorValues = island.getCustomGeneratorAmounts(dimension);
                     for (Map.Entry<Key, Integer> entry : island.getGeneratorAmountsAsKeys(dimension).entrySet()) {
                         StringBuilder lineDataMessage = new StringBuilder();
 
@@ -208,7 +208,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
                                 island.getGeneratorAmount(key, dimension))
                         );
 
-                        if (!customGeneratorValues.containsKey(key)) {
+                        if (island.getExactGeneratorAmountRaw(key, dimension) == IslandUpgradeConstants.SYNCED_VALUE) {
                             lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
                         }
 

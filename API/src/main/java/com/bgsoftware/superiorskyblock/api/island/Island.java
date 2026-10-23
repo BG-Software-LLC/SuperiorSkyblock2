@@ -159,18 +159,24 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the coop players limit of the island.
+     *
+     * @return The limit, or -1 if there is no limit.
      */
     int getCoopLimit();
 
     /**
      * Get the coop players limit of the island that was set using a command.
+     *
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
      */
     int getCoopLimitRaw();
 
     /**
      * Set the coop players limit of the island.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
-     * @param coopLimit The coop players limit to set.
+     * @param coopLimit The coop players limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setCoopLimit(int coopLimit);
 
@@ -250,28 +256,36 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the team limit of the island.
+     *
+     * @return The limit, or -1 if there is no limit.
      */
     int getTeamLimit();
 
     /**
      * Get the team limit of the island that was set with a command.
+     *
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
      */
     int getTeamLimitRaw();
 
     /**
      * Set the team limit of the island.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
-     * @param teamLimit The team limit to set.
+     * @param teamLimit The team limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setTeamLimit(int teamLimit);
 
     /**
      * Get all the role limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<PlayerRole, Integer> getRoleLimits();
 
     /**
      * Get all the custom role limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<PlayerRole, Integer> getCustomRoleLimits();
 
@@ -279,6 +293,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the limit of players that can have the same role at a time.
      *
      * @param playerRole The role to check.
+     * @return The limit, or -1 if there is no limit.
      */
     int getRoleLimit(PlayerRole playerRole);
 
@@ -286,14 +301,17 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the limit of players that can have the same role at a time that was set using a command.
      *
      * @param playerRole The role to check.
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
      */
     int getRoleLimitRaw(PlayerRole playerRole);
 
     /**
      * Set the limit of the amount of players that can have the role in the island.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
      * @param playerRole The role to set the limit to.
-     * @param limit      The limit to set.
+     * @param limit      The limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setRoleLimit(PlayerRole playerRole, int limit);
 
@@ -1273,6 +1291,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the island radius of the island that was set with a command.
+     *
+     * @return The custom radius, or -2 if there is no custom radius and the radius comes from upgrades.
      */
     int getIslandSizeRaw();
 
@@ -1538,18 +1558,24 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the limit of the bank.
+     *
+     * @return The limit, or -1 if there is no limit.
      */
     BigDecimal getBankLimit();
 
     /**
      * Get the limit of the bank that was set using a command.
+     *
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
      */
     BigDecimal getBankLimitRaw();
 
     /**
      * Set a new limit for the bank.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
-     * @param bankLimit The limit to set. Use -1 to remove the limit.
+     * @param bankLimit The limit to set. Use -1 to remove the limit; any lower value is set as -1.
      */
     void setBankLimit(BigDecimal bankLimit);
 
@@ -2100,11 +2126,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get all the blocks limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<Key, Integer> getBlocksLimits();
 
     /**
      * Get all the custom blocks limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<Key, Integer> getCustomBlocksLimits();
 
@@ -2112,6 +2140,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the block limit of a block.
      *
      * @param key The block's key to check.
+     * @return The limit, or -1 if there is no limit.
      */
     int getBlockLimit(Key key);
 
@@ -2119,6 +2148,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the block limit of a block that was set using a command.
      *
      * @param key The block's key to check.
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
      */
     int getBlockLimitRaw(Key key);
 
@@ -2140,9 +2171,10 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Set the block limit of a block.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
      * @param key   The block's key to set the limit to.
-     * @param limit The limit to set.
+     * @param limit The limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setBlockLimit(Key key, int limit);
 
@@ -2186,11 +2218,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get all the entities limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<Key, Integer> getEntitiesLimitsAsKeys();
 
     /**
      * Get all the custom entities limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<Key, Integer> getCustomEntitiesLimits();
 
@@ -2198,6 +2232,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the entity limit of an entity.
      *
      * @param entityType The entity's type to check.
+     * @return The limit, or -1 if there is no limit.
      */
     int getEntityLimit(EntityType entityType);
 
@@ -2205,6 +2240,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the entity limit of an entity.
      *
      * @param key The key of the entity to check.
+     * @return The limit, or -1 if there is no limit.
      */
     int getEntityLimit(Key key);
 
@@ -2212,22 +2248,26 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the entity limit of an entity that was set using a command.
      *
      * @param key The key of the entity to check.
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
      */
     int getEntityLimitRaw(Key key);
 
     /**
      * Set the entity limit of an entity.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
      * @param entityType The entity's type to set the limit to.
-     * @param limit      The limit to set.
+     * @param limit      The limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setEntityLimit(EntityType entityType, int limit);
 
     /**
      * Set the entity limit of an entity.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
      * @param key   The key of the entity to set the limit to.
-     * @param limit The limit to set.
+     * @param limit The limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setEntityLimit(Key key, int limit);
 
@@ -2329,6 +2369,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the crop-growth multiplier for the island that was set using a command.
+     *
+     * @return The custom multiplier, or -2 if there is no custom multiplier and the multiplier comes from upgrades.
      */
     double getCropGrowthRaw();
 
@@ -2346,6 +2388,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the mob-drops multiplier for the island that was set using a command.
+     *
+     * @return The custom multiplier, or -2 if there is no custom multiplier and the multiplier comes from upgrades.
      */
     double getMobDropsRaw();
 
@@ -2363,6 +2407,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the spawner-rates multiplier for the island that was set using a command.
+     *
+     * @return The custom multiplier, or -2 if there is no custom multiplier and the multiplier comes from upgrades.
      */
     double getSpawnerRatesRaw();
 
@@ -2379,11 +2425,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get a list of all active island effects with their levels.
+     * An effect with a level of 0 is not active on the island.
      */
     Map<PotionEffectType, Integer> getPotionEffects();
 
     /**
      * Get a list of all custom active island effects with their levels.
+     * An effect with a level of 0 is not active on the island.
      */
     Map<PotionEffectType, Integer> getCustomPotionEffects();
 
@@ -2399,14 +2447,17 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the level of an island effect that was set using a command.
      *
      * @param type The potion to check.
+     * @return The custom level, or -2 if there is no custom level and the level comes from upgrades.
+     * A custom level of 0 means the effect is turned off.
      */
     int getPotionEffectLevelRaw(PotionEffectType type);
 
     /**
-     * Add a potion effect to the island.
+     * Set the level of an island effect.
+     * The level is saved as a custom level, which is used instead of the level from upgrades.
      *
-     * @param type  The potion effect to add.
-     * @param level The level of the potion effect.
+     * @param type  The potion effect to set.
+     * @param level The level of the potion effect. Levels below 0 are set as 0.
      */
     void setPotionEffect(PotionEffectType type, int level);
 
@@ -2581,18 +2632,24 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the warps limit of the island.
+     *
+     * @return The limit, or -1 if there is no limit.
      */
     int getWarpsLimit();
 
     /**
      * Get the warps limit of the island that was set using a command.
+     *
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
      */
     int getWarpsLimitRaw();
 
     /**
      * Set the warps limit for the island.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
-     * @param warpsLimit The limit to set.
+     * @param warpsLimit The limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setWarpsLimit(int warpsLimit);
 
@@ -2684,6 +2741,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the amounts of the materials for the cobblestone generator in the island.
+     * Blocks with an amount of 0 may be included; they are never generated.
      *
      * @deprecated See {@link #getGeneratorAmountsAsKeys(Dimension)}
      */
@@ -2692,11 +2750,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the amounts of the materials for the cobblestone generator in the island.
+     * Blocks with an amount of 0 may be included; they are never generated.
      */
     Map<Key, Integer> getGeneratorAmountsAsKeys(Dimension dimension);
 
     /**
      * Get the custom amounts of the materials for the cobblestone generator in the island.
+     * Blocks with an amount of 0 may be included; they are never generated.
      */
     Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension);
 
@@ -2707,13 +2767,42 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the amount of a specific key in a specific world.
+     * If the key has data (for example STONE:1) and is not in the generator, the amount of its
+     * global key (STONE) is returned. See {@link #getExactGeneratorAmount(Key, Dimension)}.
+     *
+     * @return The amount, or 0 if neither the key nor its global key is in the generator.
      */
     int getGeneratorAmount(Key key, Dimension dimension);
 
     /**
      * Get the amount of a specific key in a specific world that was set using a command.
+     * Like {@link #getGeneratorAmount(Key, Dimension)}, a key with data that is not in the generator
+     * uses its global key. See {@link #getExactGeneratorAmountRaw(Key, Dimension)}.
+     *
+     * @return The custom amount, or -2 if there is no custom amount.
+     * The key may still have an amount from upgrades.
      */
     int getGeneratorAmountRaw(Key key, Dimension dimension);
+
+    /**
+     * Get the amount of a specific key in a specific world.
+     * Unlike {@link #getGeneratorAmount(Key, Dimension)}, this method returns the amount of the exact key
+     * that is given as a parameter: a key with data (for example STONE:1) doesn't use the amount of its
+     * global key (STONE).
+     *
+     * @return The amount, or 0 if the key is not in the generator.
+     */
+    int getExactGeneratorAmount(Key key, Dimension dimension);
+
+    /**
+     * Get the amount of a specific key in a specific world that was set using a command.
+     * Unlike {@link #getGeneratorAmountRaw(Key, Dimension)}, this method checks only the exact key
+     * that is given as a parameter, like {@link #getExactGeneratorAmount(Key, Dimension)}.
+     *
+     * @return The custom amount, or -2 if the key has no custom amount.
+     * The key may still have an amount from upgrades.
+     */
+    int getExactGeneratorAmountRaw(Key key, Dimension dimension);
 
     /**
      * Set an amount for a specific key in a specific world.
@@ -2732,6 +2821,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
+     * Blocks with an amount of 0 may be included; they are never generated.
      *
      * @deprecated See {@link #getGeneratorPercentagesAsKeys(Dimension)}
      */
@@ -2740,17 +2830,29 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
+     * Blocks with an amount of 0 may be included; they are never generated.
      */
     Map<Key, Integer> getGeneratorPercentagesAsKeys(Dimension dimension);
 
     /**
      * Get the percentage for a specific key in a specific world.
-     * The formula is (amount * 100) / total_amount.
+     * The formula is (amount * 100) / total_amount, where amount is {@link #getGeneratorAmount(Key, Dimension)}.
      *
      * @param key       The material key
      * @param dimension The world dimension.
      */
     int getGeneratorPercentage(Key key, Dimension dimension);
+
+    /**
+     * Get the percentage for a specific key in a specific world.
+     * The formula is (amount * 100) / total_amount, where amount is
+     * {@link #getExactGeneratorAmount(Key, Dimension)}: unlike {@link #getGeneratorPercentage(Key, Dimension)},
+     * a key with data (for example STONE:1) doesn't use the amount of its global key (STONE).
+     *
+     * @param key       The material key
+     * @param dimension The world dimension.
+     */
+    int getExactGeneratorPercentage(Key key, Dimension dimension);
 
     /**
      * Set a percentage for a specific key in a specific world.
@@ -2759,6 +2861,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * <p>
      * If the percentage is 0, the custom amount of the key is removed. If the key also has an amount
      * from upgrades, it is kept with a custom amount of 0 instead. The other blocks are not changed.
+     * If the key has no amount (it is not in the generator, or its amount is already 0), nothing is changed.
      * <p>
      * Otherwise, the amount of the key is set to (percentage * total_amount_of_other_blocks), and the amounts
      * of the other blocks are multiplied by (100 - percentage). If these amounts would still have a total above
@@ -2786,6 +2889,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * <p>
      * If the percentage is 0, the custom amount of the key is removed. If the key also has an amount
      * from upgrades, it is kept with a custom amount of 0 instead. The other blocks are not changed.
+     * If the key has no amount (it is not in the generator, or its amount is already 0), nothing is changed.
      * <p>
      * Otherwise, the amount of the key is set to (percentage * total_amount_of_other_blocks), and the amounts
      * of the other blocks are multiplied by (100 - percentage). If these amounts would still have a total above
@@ -2801,8 +2905,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * block of the generator: basalt in the nether on 1.16 and above, and cobblestone otherwise.
      * If the key is itself the default block, its amount is set to 1, so it ends at 100%.
      * <p>
-     * If callEvent is true, {@link IslandRemoveGeneratorRateEvent} is called when the percentage is 0, and
-     * {@link IslandChangeGeneratorRateEvent} otherwise, whose generator-rate (which listeners may change)
+     * If callEvent is true, {@link IslandRemoveGeneratorRateEvent} is called when the percentage is 0
+     * (but not when nothing is changed, see above), and {@link IslandChangeGeneratorRateEvent} when the
+     * percentage is above 0, whose generator-rate (which listeners may change)
      * is used as the new amount of the key. Nothing is changed before the event is called, or if it is
      * cancelled. For a percentage above 0, the other blocks still have their old amounts during
      * the event: the generator-rate is relative to their new amounts, which are only set after the event.

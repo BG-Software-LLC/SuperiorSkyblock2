@@ -3797,12 +3797,12 @@ public class SIsland implements Island {
             Player player = superiorPlayer.asPlayer();
 
             if (player != null) {
-                if (oldEffectLevel != null && oldEffectLevel.get() > effectLevel) {
+                if (oldEffectLevel != null && oldEffectLevel.get() > finalEffectLevel) {
                     player.removePotionEffect(potionEffectType);
                 }
 
-                if (effectLevel > 0) {
-                    PotionEffect potionEffect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, effectLevel - 1);
+                if (finalEffectLevel > 0) {
+                    PotionEffect potionEffect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, finalEffectLevel - 1);
                     player.addPotionEffect(potionEffect, true);
                 }
             }
@@ -3823,8 +3823,11 @@ public class SIsland implements Island {
             return;
         }
 
-        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer ->
-                removePotionEffect(superiorPlayer.asPlayer(), potionEffectType))));
+        // A level of 0 doesn't give the effect, so a potion effect of that type is the player's own.
+        if (oldEffectLevel.get() > 0) {
+            registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer ->
+                    removePotionEffect(superiorPlayer.asPlayer(), potionEffectType))));
+        }
 
         this.effectLevels.remove(potionEffectType);
         IslandsDatabaseBridge.removeIslandEffect(this, potionEffectType);
@@ -3841,11 +3844,17 @@ public class SIsland implements Island {
     public void clearEffects() {
         Log.debug(Debug.CLEAR_ISLAND_EFFECTS, owner.getName());
 
-        List<PotionEffectType> customEffectLevels = new ArrayList<>();
+        List<PotionEffectType> customEffectLevels = new LinkedList<>();
+        // Only these are given to the players, as a level of 0 doesn't give the effect.
+        List<PotionEffectType> activeCustomEffects = new LinkedList<>();
 
         this.effectLevels.forEach((potionEffectType, limitValue) -> {
             if (!limitValue.isSynced()) {
                 customEffectLevels.add(potionEffectType);
+
+                if (limitValue.get() > 0) {
+                    activeCustomEffects.add(potionEffectType);
+                }
             }
         });
 
@@ -3854,7 +3863,7 @@ public class SIsland implements Island {
         }
 
         registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
-            for (PotionEffectType potionEffectType : customEffectLevels) {
+            for (PotionEffectType potionEffectType : activeCustomEffects) {
                 removePotionEffect(superiorPlayer.asPlayer(), potionEffectType);
             }
         })));
@@ -4564,6 +4573,38 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return 0;
+        }
+
+        IntValue generatorAmount = dimensionGeneratorAmounts.getRaw(key, null);
+
+        return generatorAmount == null ? 0 : generatorAmount.get();
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return IslandUpgradeConstants.SYNCED_VALUE;
+        }
+
+        return IntValue.getNonSynced(dimensionGeneratorAmounts.getRaw(key, null), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
     public void setGeneratorAmount(Key key, @Size int amount, Dimension dimension) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
@@ -4600,7 +4641,7 @@ public class SIsland implements Island {
             return;
         }
 
-        IntValue oldGeneratorAmount = dimensionGeneratorAmounts.get(key);
+        IntValue oldGeneratorAmount = dimensionGeneratorAmounts.getRaw(key, null);
 
         if (oldGeneratorAmount == null || oldGeneratorAmount.isSynced()) {
             return;
@@ -4701,6 +4742,16 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        int generatorTotalAmount = getGeneratorTotalAmount(dimension);
+
+        return generatorTotalAmount == 0 ? 0 : (getExactGeneratorAmount(key, dimension) * 100) / generatorTotalAmount;
+    }
+
+    @Override
     public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
         setGeneratorPercentage(key, percentage, dimension, null, false);
     }
@@ -4716,6 +4767,11 @@ public class SIsland implements Island {
         Log.debug(Debug.SET_GENERATOR_PERCENTAGE, owner.getName(), key, percentage, dimension.getName(), caller, callEvent);
 
         if (percentage == 0) {
+            // There is nothing to remove if the key is not in the generator, or if its amount is already 0.
+            if (getExactGeneratorAmount(key, dimension) <= 0) {
+                return true;
+            }
+
             if (callEvent && !PluginEventsFactory.callIslandRemoveGeneratorRateEvent(this, caller, key, dimension)) {
                 return false;
             }
@@ -5129,7 +5185,12 @@ public class SIsland implements Island {
             return;
         }
 
-        this.effectLevels.keySet().forEach(player::removePotionEffect);
+        // A level of 0 doesn't give the effect, so a potion effect of that type is the player's own.
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            if (levelValue.get() > 0) {
+                player.removePotionEffect(potionEffectType);
+            }
+        });
     }
 
     private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {
@@ -5763,7 +5824,7 @@ public class SIsland implements Island {
                     }
 
                     for (Map.Entry<Key, IntValue> entry : upgradeDimensionGeneratorAmounts.entrySet()) {
-                        IntValue currentValue = dimensionGeneratorAmounts == null ? null : dimensionGeneratorAmounts.get(entry.getKey());
+                        IntValue currentValue = dimensionGeneratorAmounts == null ? null : dimensionGeneratorAmounts.getRaw(entry.getKey(), null);
 
                         if (currentValue == null || overrideCustom || currentValue.isSynced()) {
                             if (entry.getValue().get() < 0) {
@@ -5864,7 +5925,7 @@ public class SIsland implements Island {
             KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
 
             if (dimensionGeneratorAmounts != null) {
-                IntValue currentValue = dimensionGeneratorAmounts.get(key);
+                IntValue currentValue = dimensionGeneratorAmounts.getRaw(key, null);
 
                 if (currentValue != null && currentValue.isSynced()) {
                     dimensionGeneratorAmounts.remove(key);
@@ -5888,20 +5949,6 @@ public class SIsland implements Island {
                 }
             }
         });
-    }
-
-    // Unlike getGeneratorAmount, this doesn't fall back to the global key, so only the amount stored for the key is read.
-    private int getExactGeneratorAmount(Key key, Dimension dimension) {
-        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
-                generatorAmounts -> generatorAmounts.get(dimension));
-
-        if (dimensionGeneratorAmounts == null) {
-            return 0;
-        }
-
-        IntValue generatorAmount = dimensionGeneratorAmounts.getRaw(key, null);
-
-        return generatorAmount == null ? 0 : generatorAmount.get();
     }
 
     private void zeroGeneratorAmount(Key key, Dimension dimension) {

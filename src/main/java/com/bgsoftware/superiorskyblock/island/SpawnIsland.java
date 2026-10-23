@@ -2037,6 +2037,11 @@ public class SpawnIsland implements Island {
         return 0;
     }
 
+    @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        return 0;
+    }
+
     @Deprecated
     @Override
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
@@ -2065,6 +2070,16 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getGeneratorAmountRaw(Key key, Dimension dimension) {
+        return 0;
+    }
+
+    @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        return 0;
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
         return 0;
     }
 

@@ -114,7 +114,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
 
         for (Island island : islands) {
             if (percentage) {
-                int ratePercentage = Math.max(0, Math.min(100, island.getGeneratorPercentage(material, dimension) + amount));
+                int ratePercentage = Math.max(0, Math.min(100, island.getExactGeneratorPercentage(material, dimension) + amount));
                 int oldDefaultBlockAmount = defaultBlock == null ? 0 : island.getGeneratorAmount(defaultBlock, dimension);
                 if (!island.setGeneratorPercentage(material, ratePercentage, dimension,
                         sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, true)) {
@@ -126,7 +126,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
                     defaultBlockPercentage = island.getGeneratorPercentage(defaultBlock, dimension);
                 }
             } else {
-                int currentAmount = island.getGeneratorAmount(material, dimension);
+                int currentAmount = island.getExactGeneratorAmount(material, dimension);
                 if (currentAmount + amount < 0) {
                     isInvalid = true;
                     continue;
