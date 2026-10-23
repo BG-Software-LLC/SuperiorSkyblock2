@@ -3797,12 +3797,12 @@ public class SIsland implements Island {
             Player player = superiorPlayer.asPlayer();
 
             if (player != null) {
-                if (oldEffectLevel != null && oldEffectLevel.get() > effectLevel) {
+                if (oldEffectLevel != null && oldEffectLevel.get() > finalEffectLevel) {
                     player.removePotionEffect(potionEffectType);
                 }
 
-                if (effectLevel > 0) {
-                    PotionEffect potionEffect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, effectLevel - 1);
+                if (finalEffectLevel > 0) {
+                    PotionEffect potionEffect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, finalEffectLevel - 1);
                     player.addPotionEffect(potionEffect, true);
                 }
             }
@@ -3823,8 +3823,11 @@ public class SIsland implements Island {
             return;
         }
 
-        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer ->
-                removePotionEffect(superiorPlayer.asPlayer(), potionEffectType))));
+        // A level of 0 doesn't give the effect, so a potion effect of that type is the player's own.
+        if (oldEffectLevel.get() > 0) {
+            registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer ->
+                    removePotionEffect(superiorPlayer.asPlayer(), potionEffectType))));
+        }
 
         this.effectLevels.remove(potionEffectType);
         IslandsDatabaseBridge.removeIslandEffect(this, potionEffectType);
@@ -3841,11 +3844,17 @@ public class SIsland implements Island {
     public void clearEffects() {
         Log.debug(Debug.CLEAR_ISLAND_EFFECTS, owner.getName());
 
-        List<PotionEffectType> customEffectLevels = new ArrayList<>();
+        List<PotionEffectType> customEffectLevels = new LinkedList<>();
+        // Only these are given to the players, as a level of 0 doesn't give the effect.
+        List<PotionEffectType> activeCustomEffects = new LinkedList<>();
 
         this.effectLevels.forEach((potionEffectType, limitValue) -> {
             if (!limitValue.isSynced()) {
                 customEffectLevels.add(potionEffectType);
+
+                if (limitValue.get() > 0) {
+                    activeCustomEffects.add(potionEffectType);
+                }
             }
         });
 
@@ -3854,7 +3863,7 @@ public class SIsland implements Island {
         }
 
         registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
-            for (PotionEffectType potionEffectType : customEffectLevels) {
+            for (PotionEffectType potionEffectType : activeCustomEffects) {
                 removePotionEffect(superiorPlayer.asPlayer(), potionEffectType);
             }
         })));
@@ -5171,7 +5180,12 @@ public class SIsland implements Island {
             return;
         }
 
-        this.effectLevels.keySet().forEach(player::removePotionEffect);
+        // A level of 0 doesn't give the effect, so a potion effect of that type is the player's own.
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            if (levelValue.get() > 0) {
+                player.removePotionEffect(potionEffectType);
+            }
+        });
     }
 
     private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {
