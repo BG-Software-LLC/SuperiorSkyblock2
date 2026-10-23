@@ -74,10 +74,15 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension)){
+            if (!island.getCustomGeneratorAmounts(dimension).isEmpty()) {
+                if (!PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension)) {
+                    continue;
+                }
+
                 island.clearGeneratorAmounts(dimension);
-                ++islandsChangedCount;
             }
+
+            ++islandsChangedCount;
         }
 
         if (islandsChangedCount <= 0) {

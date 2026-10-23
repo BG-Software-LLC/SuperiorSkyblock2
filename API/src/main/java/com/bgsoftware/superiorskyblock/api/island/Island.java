@@ -2861,6 +2861,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * <p>
      * If the percentage is 0, the custom amount of the key is removed. If the key also has an amount
      * from upgrades, it is kept with a custom amount of 0 instead. The other blocks are not changed.
+     * If the key has no amount (it is not in the generator, or its amount is already 0), nothing is changed.
      * <p>
      * Otherwise, the amount of the key is set to (percentage * total_amount_of_other_blocks), and the amounts
      * of the other blocks are multiplied by (100 - percentage). If these amounts would still have a total above
@@ -2888,6 +2889,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * <p>
      * If the percentage is 0, the custom amount of the key is removed. If the key also has an amount
      * from upgrades, it is kept with a custom amount of 0 instead. The other blocks are not changed.
+     * If the key has no amount (it is not in the generator, or its amount is already 0), nothing is changed.
      * <p>
      * Otherwise, the amount of the key is set to (percentage * total_amount_of_other_blocks), and the amounts
      * of the other blocks are multiplied by (100 - percentage). If these amounts would still have a total above
@@ -2903,8 +2905,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * block of the generator: basalt in the nether on 1.16 and above, and cobblestone otherwise.
      * If the key is itself the default block, its amount is set to 1, so it ends at 100%.
      * <p>
-     * If callEvent is true, {@link IslandRemoveGeneratorRateEvent} is called when the percentage is 0, and
-     * {@link IslandChangeGeneratorRateEvent} otherwise, whose generator-rate (which listeners may change)
+     * If callEvent is true, {@link IslandRemoveGeneratorRateEvent} is called when the percentage is 0
+     * (but not when nothing is changed, see above), and {@link IslandChangeGeneratorRateEvent} when the
+     * percentage is above 0, whose generator-rate (which listeners may change)
      * is used as the new amount of the key. Nothing is changed before the event is called, or if it is
      * cancelled. For a percentage above 0, the other blocks still have their old amounts during
      * the event: the generator-rate is relative to their new amounts, which are only set after the event.

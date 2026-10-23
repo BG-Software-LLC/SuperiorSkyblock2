@@ -4767,6 +4767,11 @@ public class SIsland implements Island {
         Log.debug(Debug.SET_GENERATOR_PERCENTAGE, owner.getName(), key, percentage, dimension.getName(), caller, callEvent);
 
         if (percentage == 0) {
+            // There is nothing to remove if the key is not in the generator, or if its amount is already 0.
+            if (getExactGeneratorAmount(key, dimension) <= 0) {
+                return true;
+            }
+
             if (callEvent && !PluginEventsFactory.callIslandRemoveGeneratorRateEvent(this, caller, key, dimension)) {
                 return false;
             }
