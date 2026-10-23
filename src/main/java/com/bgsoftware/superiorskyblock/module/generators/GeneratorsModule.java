@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.IModuleConfiguration;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminAddGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminClearGenerator;
+import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminRemoveGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminSetGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.listeners.GeneratorsListener;
 import org.bukkit.event.Listener;
@@ -62,7 +63,8 @@ public class GeneratorsModule extends BuiltinModule<GeneratorsModule.Configurati
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        return new SuperiorCommand[]{new CmdAdminAddGenerator(), new CmdAdminClearGenerator(), new CmdAdminSetGenerator()};
+        return new SuperiorCommand[]{new CmdAdminAddGenerator(), new CmdAdminClearGenerator(),
+                new CmdAdminRemoveGenerator(), new CmdAdminSetGenerator()};
     }
 
     @Override

@@ -1016,6 +1016,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public int getEffectiveIslandSize() {
+        return islandSize;
+    }
+
+    @Override
     public void setIslandSize(int islandSize) {
         // Do nothing.
     }
@@ -1637,6 +1642,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public int getBlockLimitRaw(Key key) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
     public int getExactBlockLimit(Key key) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
@@ -1688,6 +1698,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getEntityLimit(Key key) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public int getEntityLimitRaw(Key key) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
@@ -1792,6 +1807,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public int getPotionEffectLevelRaw(PotionEffectType type) {
+        return 0;
+    }
+
+    @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
         return Collections.emptyMap();
     }
@@ -1833,6 +1853,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public void removeRoleLimit(PlayerRole playerRole) {
+        // Do nothing.
+    }
+
+    @Override
+    public void clearRoleLimits() {
         // Do nothing.
     }
 
@@ -2013,7 +2038,18 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        return 0;
+    }
+
+    @Deprecated
+    @Override
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorPercentagesAsKeys(Dimension dimension) {
         return Collections.emptyMap();
     }
 
@@ -2033,12 +2069,33 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public int getGeneratorTotalAmount(Dimension dimension) {
+    public int getGeneratorAmountRaw(Key key, Dimension dimension) {
         return 0;
     }
 
     @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        return 0;
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
+        return 0;
+    }
+
+    @Override
+    public int getGeneratorTotalAmount(Dimension dimension) {
+        return 0;
+    }
+
+    @Deprecated
+    @Override
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorAmountsAsKeys(Dimension dimension) {
         return Collections.emptyMap();
     }
 
