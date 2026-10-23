@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v4;
 
-import com.bgsoftware.common.databasebridge.sql.query.QueryResult;
 import com.bgsoftware.common.databasebridge.sql.transaction.CustomSQLDatabaseTransaction;
 import com.bgsoftware.common.databasebridge.transaction.IDatabaseTransaction;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -8,10 +7,8 @@ import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
-import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

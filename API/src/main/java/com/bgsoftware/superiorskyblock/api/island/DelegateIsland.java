@@ -36,7 +36,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
