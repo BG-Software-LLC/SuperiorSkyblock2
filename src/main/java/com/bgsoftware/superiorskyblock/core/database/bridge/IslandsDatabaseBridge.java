@@ -211,7 +211,7 @@ public class IslandsDatabaseBridge {
     }
 
     public static void saveSize(Island island) {
-        updateIslandSettingsValue(island, "size", island.getIslandSize());
+        updateIslandSettingsValue(island, "size", island.getEffectiveIslandSize());
     }
 
     public static void saveDiscord(Island island) {
