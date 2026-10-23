@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.key.types;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
@@ -45,7 +46,8 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     };
 
     protected final Material type;
-    private final short durability;
+    @Nullable
+    private final Short durability;
     private final String durabilityAsString;
     protected final boolean isGlobalType;
     private final MaterialKeySource materialKeySource;
@@ -63,6 +65,11 @@ public class MaterialKey extends BaseKey<MaterialKey> {
         return new MaterialKey(type, durability, false, materialKeySource);
     }
 
+    public static MaterialKey of(Material type, String data, MaterialKeySource materialKeySource) {
+        Preconditions.checkArgument(type != Materials.SPAWNER.toBukkitType());
+        return new MaterialKey(type, data, false, materialKeySource);
+    }
+
     public static MaterialKey of(Material type) {
         return GLOBAL_MATERIAL_KEYS_CACHE.computeIfAbsent(type, unused ->
                 new MaterialKey(type, (short) 0, true, MaterialKeySource.BLOCK));
@@ -72,11 +79,24 @@ public class MaterialKey extends BaseKey<MaterialKey> {
         this(type, durability, isGlobalType, materialKeySource, false);
     }
 
+    protected MaterialKey(Material type, String data, boolean isGlobalType, MaterialKeySource materialKeySource) {
+        this(type, data, isGlobalType, materialKeySource, false);
+    }
+
     protected MaterialKey(Material type, short durability, boolean isGlobalType, MaterialKeySource materialKeySource, boolean apiKey) {
         super(MaterialKey.class, apiKey);
         this.type = Preconditions.checkNotNull(type, "type parameter cannot be null");
         this.durability = durability;
         this.durabilityAsString = isGlobalType ? "" : String.valueOf(this.durability);
+        this.isGlobalType = isGlobalType;
+        this.materialKeySource = materialKeySource;
+    }
+
+    protected MaterialKey(Material type, String data, boolean isGlobalType, MaterialKeySource materialKeySource, boolean apiKey) {
+        super(MaterialKey.class, apiKey);
+        this.type = Preconditions.checkNotNull(type, "type parameter cannot be null");
+        this.durability = null;
+        this.durabilityAsString = isGlobalType ? "" : data;
         this.isGlobalType = isGlobalType;
         this.materialKeySource = materialKeySource;
     }
@@ -112,7 +132,11 @@ public class MaterialKey extends BaseKey<MaterialKey> {
 
     @Override
     protected boolean equalsInternal(MaterialKey other) {
-        return this.type == other.type && this.durability == other.durability && this.isGlobalType == other.isGlobalType;
+        if (this.type != other.type || this.isGlobalType != other.isGlobalType)
+            return false;
+
+        return this.durability == null ? other.durability != null && Objects.equal(this.durabilityAsString, other.durabilityAsString) :
+                Objects.equal(this.durability, other.durability);
     }
 
     @Override

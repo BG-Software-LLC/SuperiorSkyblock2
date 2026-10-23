@@ -1,11 +1,13 @@
 package com.bgsoftware.superiorskyblock.core.key.types;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.EntityType;
 
 import java.util.EnumMap;
+import java.util.Objects;
 
 public class EntityTypeKey extends BaseKey<EntityTypeKey> {
 
@@ -30,9 +32,16 @@ public class EntityTypeKey extends BaseKey<EntityTypeKey> {
     };
 
     private final EntityType entityType;
+    @Nullable
+    private final String data;
+    private final String dataAsString;
 
     public static EntityTypeKey of(EntityType entityType) {
         return ENTITY_TYPE_KEYS_CACHE.computeIfAbsent(entityType, EntityTypeKey::new);
+    }
+
+    public static EntityTypeKey of(EntityType entityType, @Nullable String data) {
+        return data == null ? of(entityType) : new EntityTypeKey(entityType, data, false);
     }
 
     private EntityTypeKey(EntityType entityType) {
@@ -40,8 +49,14 @@ public class EntityTypeKey extends BaseKey<EntityTypeKey> {
     }
 
     private EntityTypeKey(EntityType entityType, boolean apiKey) {
+        this(entityType, null, apiKey);
+    }
+
+    private EntityTypeKey(EntityType entityType, @Nullable String data, boolean apiKey) {
         super(EntityTypeKey.class, apiKey);
         this.entityType = Preconditions.checkNotNull(entityType, "entityType cannot be null");
+        this.data = data;
+        this.dataAsString = this.data == null ? "" : this.data;
     }
 
     @Override
@@ -51,32 +66,34 @@ public class EntityTypeKey extends BaseKey<EntityTypeKey> {
 
     @Override
     public EntityTypeKey toGlobalKey() {
-        return this;
+        return this.data == null ? this : EntityTypeKey.of(this.entityType);
     }
 
     @Override
     public String getSubKey() {
-        return "";
+        return this.dataAsString;
     }
 
     @Override
     protected int compareToInternal(EntityTypeKey other) {
-        return Integer.compare(this.entityType.ordinal(), other.entityType.ordinal());
+        int compare = Integer.compare(this.entityType.ordinal(), other.entityType.ordinal());
+        if (compare != 0) return compare;
+        return this.data == null ? other.data == null ? 0 : 1 : this.data.compareTo(other.data);
     }
 
     @Override
     protected String toStringInternal() {
-        return this.getGlobalKey();
+        return this.data == null ? this.getGlobalKey() : this.getGlobalKey() + ":" + this.getSubKey();
     }
 
     @Override
     protected int hashCodeInternal() {
-        return this.entityType.hashCode();
+        return Objects.hash(this.entityType, this.data);
     }
 
     @Override
     protected boolean equalsInternal(EntityTypeKey other) {
-        return this.entityType == other.entityType;
+        return this.entityType == other.entityType && Objects.equals(this.data, other.data);
     }
 
     @Override

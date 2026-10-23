@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.key;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -43,15 +44,18 @@ public class Keys {
     /* Entity keys */
 
     public static Key of(EntityType entityType) {
-        return EntityTypeKey.of(entityType);
+        return of(entityType, null);
     }
 
-    public static Key ofEntityType(String customType) {
-        try {
-            return EntityTypeKey.of(EntityType.valueOf(customType.toUpperCase(Locale.ENGLISH)));
-        } catch (IllegalArgumentException error) {
-            return CustomKey.of(customType, null, KeyIndicator.ENTITY_TYPE);
-        }
+    public static Key of(EntityType entityType, @Nullable String data) {
+        return EntityTypeKey.of(entityType, data);
+    }
+
+    public static Key ofEntityType(String key) {
+        String[] keySections = KEY_SPLITTER_PATTERN.split(key.toUpperCase(Locale.ENGLISH), 2);
+        String data = keySections.length >= 2 ? keySections[1] : null;
+        EntityType entityType = EnumHelper.getEnum(EntityType.class, keySections[0].toUpperCase(Locale.ENGLISH));
+        return entityType == null ? CustomKey.of(keySections[0], data, KeyIndicator.ENTITY_TYPE) : of(entityType, data);
     }
 
     public static Key of(Entity entity) {
@@ -134,18 +138,23 @@ public class Keys {
     }
 
     public static Key ofMaterialAndData(String material, @Nullable String data) {
+        Material blockType = EnumHelper.getEnum(Material.class, material);
+        if (blockType == null)
+            return Keys.of(material, data, KeyIndicator.MATERIAL);
+
+        if (Text.isBlank(data)) {
+            return Keys.of(blockType);
+        }
+
+        if (blockType == Materials.SPAWNER.toBukkitType()) {
+            return ofSpawner(data);
+        }
+
         try {
-            Material blockType = Material.valueOf(material);
-            if (Text.isBlank(data)) {
-                return Keys.of(blockType);
-            }
-            if (blockType == Materials.SPAWNER.toBukkitType()) {
-                return ofSpawner(data);
-            }
             short blockData = Short.parseShort(data);
             return Keys.of(blockType, blockData);
-        } catch (Exception error) {
-            return Keys.of(material, data, KeyIndicator.MATERIAL);
+        } catch (NumberFormatException error) {
+            return MaterialKey.of(blockType, data, MaterialKeySource.BLOCK);
         }
     }
 
