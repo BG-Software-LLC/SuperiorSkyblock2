@@ -80,7 +80,7 @@ public class CmdAdminRemoveGenerator implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (island.getGeneratorAmountRaw(key, dimension) != IslandUpgradeConstants.SYNCED_VALUE) {
+            if (island.getExactGeneratorAmountRaw(key, dimension) != IslandUpgradeConstants.SYNCED_VALUE) {
                 if (!PluginEventsFactory.callIslandRemoveGeneratorRateEvent(island, sender, key, dimension)) {
                     continue;
                 }

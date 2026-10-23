@@ -4564,6 +4564,38 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return 0;
+        }
+
+        IntValue generatorAmount = dimensionGeneratorAmounts.getRaw(key, null);
+
+        return generatorAmount == null ? 0 : generatorAmount.get();
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
+                generatorAmounts -> generatorAmounts.get(dimension));
+
+        if (dimensionGeneratorAmounts == null) {
+            return IslandUpgradeConstants.SYNCED_VALUE;
+        }
+
+        return IntValue.getNonSynced(dimensionGeneratorAmounts.getRaw(key, null), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
     public void setGeneratorAmount(Key key, @Size int amount, Dimension dimension) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
@@ -4600,7 +4632,7 @@ public class SIsland implements Island {
             return;
         }
 
-        IntValue oldGeneratorAmount = dimensionGeneratorAmounts.get(key);
+        IntValue oldGeneratorAmount = dimensionGeneratorAmounts.getRaw(key, null);
 
         if (oldGeneratorAmount == null || oldGeneratorAmount.isSynced()) {
             return;
@@ -4698,6 +4730,16 @@ public class SIsland implements Island {
         int generatorTotalAmount = getGeneratorTotalAmount(dimension);
 
         return generatorTotalAmount == 0 ? 0 : (getGeneratorAmount(key, dimension) * 100) / generatorTotalAmount;
+    }
+
+    @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        int generatorTotalAmount = getGeneratorTotalAmount(dimension);
+
+        return generatorTotalAmount == 0 ? 0 : (getExactGeneratorAmount(key, dimension) * 100) / generatorTotalAmount;
     }
 
     @Override
@@ -5763,7 +5805,7 @@ public class SIsland implements Island {
                     }
 
                     for (Map.Entry<Key, IntValue> entry : upgradeDimensionGeneratorAmounts.entrySet()) {
-                        IntValue currentValue = dimensionGeneratorAmounts == null ? null : dimensionGeneratorAmounts.get(entry.getKey());
+                        IntValue currentValue = dimensionGeneratorAmounts == null ? null : dimensionGeneratorAmounts.getRaw(entry.getKey(), null);
 
                         if (currentValue == null || overrideCustom || currentValue.isSynced()) {
                             if (entry.getValue().get() < 0) {
@@ -5864,7 +5906,7 @@ public class SIsland implements Island {
             KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
 
             if (dimensionGeneratorAmounts != null) {
-                IntValue currentValue = dimensionGeneratorAmounts.get(key);
+                IntValue currentValue = dimensionGeneratorAmounts.getRaw(key, null);
 
                 if (currentValue != null && currentValue.isSynced()) {
                     dimensionGeneratorAmounts.remove(key);
@@ -5888,20 +5930,6 @@ public class SIsland implements Island {
                 }
             }
         });
-    }
-
-    // Unlike getGeneratorAmount, this doesn't fall back to the global key, so only the amount stored for the key is read.
-    private int getExactGeneratorAmount(Key key, Dimension dimension) {
-        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(
-                generatorAmounts -> generatorAmounts.get(dimension));
-
-        if (dimensionGeneratorAmounts == null) {
-            return 0;
-        }
-
-        IntValue generatorAmount = dimensionGeneratorAmounts.getRaw(key, null);
-
-        return generatorAmount == null ? 0 : generatorAmount.get();
     }
 
     private void zeroGeneratorAmount(Key key, Dimension dimension) {

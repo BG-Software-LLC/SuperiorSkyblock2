@@ -1889,6 +1889,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorPercentage(key, dimension);
+    }
+
+    @Override
     @Deprecated
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
         return this.handle.getGeneratorPercentages(dimension);
@@ -1917,6 +1922,16 @@ public class DelegateIsland implements Island {
     @Override
     public int getGeneratorAmountRaw(Key key, Dimension dimension) {
         return this.handle.getGeneratorAmountRaw(key, dimension);
+    }
+
+    @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorAmount(key, dimension);
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorAmountRaw(key, dimension);
     }
 
     @Override
