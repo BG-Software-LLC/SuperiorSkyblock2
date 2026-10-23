@@ -53,13 +53,17 @@ public abstract class CropsTickingMethod {
 
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
+
         PluginModule pluginModule = plugin.getModules().getModule("upgrades");
+
         if (pluginModule instanceof UpgradesModule upgradesModule) {
             upgradesModule.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
                 if (key instanceof MaterialKey materialKey) {
                     Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());
-                    if (block != null && block.defaultBlockState().isRandomlyTicking())
+
+                    if (block != null && block.defaultBlockState().isRandomlyTicking()) {
                         CROPS_TO_GROW_CACHE.add(block);
+                    }
                 }
             });
         }

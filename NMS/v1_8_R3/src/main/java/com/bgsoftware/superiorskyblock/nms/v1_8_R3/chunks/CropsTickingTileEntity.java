@@ -2,11 +2,13 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.UpgradesModule;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -133,13 +135,22 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
 
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
-        BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
-            if (key instanceof MaterialKey) {
-                Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
-                if (block != null && block.isTicking())
-                    CROPS_TO_GROW_CACHE.add(block);
-            }
-        });
+
+        PluginModule pluginModule = plugin.getModules().getModule("upgrades");
+
+        if (pluginModule instanceof UpgradesModule) {
+            UpgradesModule upgradesModule = (UpgradesModule) pluginModule;
+
+            upgradesModule.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
+                if (key instanceof MaterialKey) {
+                    Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
+
+                    if (block != null && block.isTicking()) {
+                        CROPS_TO_GROW_CACHE.add(block);
+                    }
+                }
+            });
+        }
     }
 
 }
