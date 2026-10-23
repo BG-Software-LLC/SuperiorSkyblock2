@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetMobDrops;
@@ -36,7 +37,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
     public UpgradeTypeMobDrops(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        isWildStackerInstalled = Bukkit.getPluginManager().isPluginEnabled("WildStacker");
+        this.isWildStackerInstalled = Bukkit.getPluginManager().isPluginEnabled("WildStacker");
     }
 
     @Override
@@ -49,61 +50,67 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
         return Arrays.asList(new CmdAdminAddMobDrops(), new CmdAdminSetMobDrops());
     }
 
-    private static boolean canDupeDropsForEntity(Entity entity) {
-        return entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof ArmorStand);
-    }
-
     private class MobDropsListener implements Listener {
 
         // Priority is set to HIGH for fixing detection with WildStacker
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/540
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onLastDamageEntity(EntityDamageEvent e) {
-            if (!canDupeDropsForEntity(e.getEntity()))
+            if (!canMultiplyDrops(e.getEntity())) {
                 return;
+            }
 
             LivingEntity livingEntity = (LivingEntity) e.getEntity();
 
-            if (livingEntity.getHealth() - e.getFinalDamage() > 0)
+            if (livingEntity.getHealth() - e.getFinalDamage() > 0) {
                 return;
+            }
 
             Island island;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 island = plugin.getGrid().getIslandAt(livingEntity.getLocation(wrapper.getHandle()));
             }
-            if (island == null)
+
+            if (island == null) {
                 return;
+            }
 
             BukkitEntities.cacheEntityEquipment(livingEntity);
         }
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onEntityDeath(EntityDeathEvent e) {
-            if (!canDupeDropsForEntity(e.getEntity()))
+            if (!canMultiplyDrops(e.getEntity())) {
                 return;
-
-            if (!isWhitelisted(e.getEntity()) || isBlacklisted(e.getEntity()))
-                return;
-
-            Island island;
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
             }
-            if (island == null)
-                return;
 
-            if (BuiltinModules.UPGRADES.getConfiguration().isMobDropsOnlyPlayerKills()) {
-                EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
-                if (!(lastDamage instanceof EntityDamageByEntityEvent) ||
-                        !BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()).isPresent())
+            try {
+                Island island;
+                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                    island = plugin.getGrid().getIslandAt(e.getEntity().getLocation(wrapper.getHandle()));
+                }
+
+                if (island == null) {
                     return;
+                }
+
+                if (BuiltinModules.UPGRADES.getConfiguration().isMobDropsOnlyPlayerKills()) {
+                    EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
+
+                    if (!(lastDamage instanceof EntityDamageByEntityEvent) ||
+                            !BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()).isPresent()) {
+                        return;
+                    }
+                }
+
+                double mobDropsMultiplier = island.getMobDropsMultiplier();
+
+                if (mobDropsMultiplier > 1) {
+                    modifyEventDrops(e.getDrops(), e.getEntity(), mobDropsMultiplier);
+                }
+            } finally {
+                BukkitEntities.clearEntityEquipment(e.getEntity());
             }
-
-            double mobDropsMultiplier = island.getMobDropsMultiplier();
-            if (mobDropsMultiplier > 1)
-                modifyEventDrops(e.getDrops(), e.getEntity(), mobDropsMultiplier);
-
-            BukkitEntities.clearEntityEquipment(e.getEntity());
         }
 
         private void modifyEventDrops(List<ItemStack> drops, LivingEntity livingEntity, double mobDropsMultiplier) {
@@ -111,8 +118,9 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
             for (ItemStack itemStack : drops) {
                 if (itemStack != null && !BukkitEntities.isEquipment(livingEntity, itemStack)) {
-                    if (!isWhitelisted(itemStack) || isBlacklisted(itemStack))
+                    if (!canMultiplyDrops(itemStack)) {
                         continue;
+                    }
 
                     int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
 
@@ -130,8 +138,9 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
                             ItemStack stackItem = itemStack.clone();
                             stackItem.setAmount(itemStack.getMaxStackSize());
 
-                            for (int i = 0; i < stackAmounts - 1; i++)
+                            for (int i = 0; i < stackAmounts - 1; i++) {
                                 dropsToAdd.add(itemStack.clone());
+                            }
                         }
 
                         if (leftOvers > 0) {
@@ -147,30 +156,49 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
                 }
             }
 
-            if (dropsToAdd != null)
+            if (dropsToAdd != null) {
                 drops.addAll(dropsToAdd);
+            }
         }
 
     }
 
-    private boolean isWhitelisted(ItemStack itemStack) {
-        KeySet whitelistedItems = BuiltinModules.UPGRADES.getConfiguration().getMobDropsWhitelistedItems();
-        return whitelistedItems.isEmpty() || whitelistedItems.contains(Key.of(itemStack));
-    }
+    private static boolean canMultiplyDrops(Entity entity) {
+        if (!(entity instanceof LivingEntity) || entity instanceof Player || entity instanceof ArmorStand) {
+            return false;
+        }
 
-    private boolean isBlacklisted(ItemStack itemStack) {
-        KeySet blacklistedItems = BuiltinModules.UPGRADES.getConfiguration().getMobDropsBlacklistedItems();
-        return blacklistedItems.contains(Key.of(itemStack));
-    }
-
-    private boolean isWhitelisted(Entity entity) {
         KeySet whitelistedEntities = BuiltinModules.UPGRADES.getConfiguration().getMobDropsWhitelistedEntities();
-        return whitelistedEntities.isEmpty() || whitelistedEntities.contains(Key.of(entity));
+        KeySet blacklistedEntities = BuiltinModules.UPGRADES.getConfiguration().getMobDropsBlacklistedEntities();
+
+        if (whitelistedEntities.isEmpty() && blacklistedEntities.isEmpty()) {
+            return true;
+        }
+
+        Key key = Keys.of(entity);
+
+        if (blacklistedEntities.contains(key)) {
+            return false;
+        }
+
+        return whitelistedEntities.isEmpty() || whitelistedEntities.contains(key);
     }
 
-    private boolean isBlacklisted(Entity entity) {
-        KeySet blacklistedEntities = BuiltinModules.UPGRADES.getConfiguration().getMobDropsBlacklistedEntities();
-        return blacklistedEntities.contains(Key.of(entity));
+    private static boolean canMultiplyDrops(ItemStack itemStack) {
+        KeySet whitelistedItems = BuiltinModules.UPGRADES.getConfiguration().getMobDropsWhitelistedItems();
+        KeySet blacklistedItems = BuiltinModules.UPGRADES.getConfiguration().getMobDropsBlacklistedItems();
+
+        if (whitelistedItems.isEmpty() && blacklistedItems.isEmpty()) {
+            return true;
+        }
+
+        Key key = Keys.of(itemStack);
+
+        if (blacklistedItems.contains(key)) {
+            return false;
+        }
+
+        return whitelistedItems.isEmpty() || whitelistedItems.contains(key);
     }
 
 }

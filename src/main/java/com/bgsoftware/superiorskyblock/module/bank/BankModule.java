@@ -74,7 +74,7 @@ public class BankModule extends BuiltinModule<BankModule.Configuration> {
 
         Configuration(CommentedConfiguration config) {
             this.enabled = config.getBoolean("enabled");
-            int bankWorthRate = config.getInt("bank-worth-rate", 1000);
+            int bankWorthRate = config.getDouble("bank-worth-rate", 1000);
             this.bankWorthRate = bankWorthRate == 0 ? 0D : 1D / bankWorthRate;
             double disbandRefund = Math.max(0, Math.min(100, config.getDouble("disband-refund"))) / 100D;
             this.hasDisbandRefund = disbandRefund > 0;
