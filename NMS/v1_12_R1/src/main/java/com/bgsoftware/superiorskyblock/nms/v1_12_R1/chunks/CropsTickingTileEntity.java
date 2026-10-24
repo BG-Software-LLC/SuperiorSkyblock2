@@ -2,14 +2,13 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.UpgradesModule;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
@@ -87,7 +86,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
     @Override
     public void e() {
-        if (++currentTick <= plugin.getSettings().getCropsInterval())
+        if (++currentTick <= BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval())
             return;
 
         Chunk chunk = this.chunk.get();
@@ -102,7 +101,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
         int worldRandomTick = world.getGameRules().c("randomTickSpeed");
 
-        int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * plugin.getSettings().getCropsInterval());
+        int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval());
 
         if (chunkRandomTickSpeed > 0) {
             for (ChunkSection chunkSection : chunk.getSections()) {
@@ -132,14 +131,22 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
-        plugin.getSettings().getCropsToGrow().forEach(cropName -> {
-            Key key = Keys.ofMaterialAndData(cropName);
-            if (key instanceof MaterialKey) {
-                Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
-                if (block != null && block.isTicking())
-                    CROPS_TO_GROW_CACHE.add(block);
-            }
-        });
+
+        PluginModule pluginModule = plugin.getModules().getModule("upgrades");
+
+        if (pluginModule instanceof UpgradesModule) {
+            UpgradesModule upgradesModule = (UpgradesModule) pluginModule;
+
+            upgradesModule.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
+                if (key instanceof MaterialKey) {
+                    Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
+
+                    if (block != null && block.isTicking()) {
+                        CROPS_TO_GROW_CACHE.add(block);
+                    }
+                }
+            });
+        }
     }
 
 }

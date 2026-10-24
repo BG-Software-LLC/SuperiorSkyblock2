@@ -2,10 +2,11 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.UpgradesModule;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
@@ -54,14 +55,22 @@ public abstract class CropsTickingMethod {
 
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
-        plugin.getSettings().getCropsToGrow().forEach(cropName -> {
-            Key key = Keys.ofMaterialAndData(cropName);
-            if (key instanceof MaterialKey) {
-                Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
-                if (block != null && block.getBlockData().isTicking())
-                    CROPS_TO_GROW_CACHE.add(block);
-            }
-        });
+
+        PluginModule pluginModule = plugin.getModules().getModule("upgrades");
+
+        if (pluginModule instanceof UpgradesModule) {
+            UpgradesModule upgradesModule = (UpgradesModule) pluginModule;
+
+            upgradesModule.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
+                if (key instanceof MaterialKey) {
+                    Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
+
+                    if (block != null && block.getBlockData().isTicking()) {
+                        CROPS_TO_GROW_CACHE.add(block);
+                    }
+                }
+            });
+        }
     }
 
     private static class PaperCropsTickingMethod extends CropsTickingMethod {
