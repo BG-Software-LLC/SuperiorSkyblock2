@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.flag;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 
@@ -47,6 +48,15 @@ public class IslandFlags {
         }
 
         return ALL_FLAG_NAMES;
+    }
+
+    @Nullable
+    public static IslandFlag getSafe(@Nullable String name) {
+        try {
+            return IslandFlag.getByName(name);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     private static IslandFlag register(String name) {

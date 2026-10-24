@@ -116,6 +116,15 @@ public class IslandPrivileges {
         return ALL_PRIVILEGE_NAMES;
     }
 
+    @Nullable
+    public static IslandPrivilege getSafe(@Nullable String name) {
+        try {
+            return IslandPrivilege.getByName(name);
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
     @NotNull
     private static IslandPrivilege register(String name) {
         return Objects.requireNonNull(register(name, true));
