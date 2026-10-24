@@ -120,8 +120,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         }
 
         loadContainerFromConfig(config);
-
-        PluginEventsFactory.callSettingsUpdateEvent();
     }
 
     @Override

@@ -2,10 +2,9 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
-import com.bgsoftware.superiorskyblock.module.upgrades.UpgradesModule;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.TickingBlockList;
 import net.minecraft.core.BlockPos;
@@ -54,19 +53,15 @@ public abstract class CropsTickingMethod {
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
 
-        PluginModule pluginModule = plugin.getModules().getModule("upgrades");
+        BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
+            if (key instanceof MaterialKey materialKey) {
+                Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());
 
-        if (pluginModule instanceof UpgradesModule upgradesModule) {
-            upgradesModule.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
-                if (key instanceof MaterialKey materialKey) {
-                    Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());
-
-                    if (block != null && block.defaultBlockState().isRandomlyTicking()) {
-                        CROPS_TO_GROW_CACHE.add(block);
-                    }
+                if (block != null && block.defaultBlockState().isRandomlyTicking()) {
+                    CROPS_TO_GROW_CACHE.add(block);
                 }
-            });
-        }
+            }
+        });
     }
 
     private static class PaperCropsTickingMethod extends CropsTickingMethod {
