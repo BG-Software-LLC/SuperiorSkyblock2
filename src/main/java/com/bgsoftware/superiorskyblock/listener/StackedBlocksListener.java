@@ -27,6 +27,7 @@ import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServic
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -207,11 +208,22 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         if (e.getArgs().isSoftExplosion)
             return;
 
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(e.getArgs().entity.getWorld()))
+        handleStackedBlockExplode(e.getArgs().entity.getWorld(), e.getArgs().blocks);
+    }
+
+    private void onBlockExplode(GameEvent<GameEventArgs.BlockExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
             return;
 
-        Iterator<Block> blockIterator = e.getArgs().blocks.iterator();
+        handleStackedBlockExplode(e.getArgs().block.getWorld(), e.getArgs().blocks);
+    }
+
+    private void handleStackedBlockExplode(World world, List<Block> blocks) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(world))
+            return;
+
+        Iterator<Block> blockIterator = blocks.iterator();
         while (blockIterator.hasNext()) {
             Block block = blockIterator.next();
 
@@ -377,6 +389,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockBreak);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockInteract);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockBreakByEntity);
+        registerCallback(GameEventType.BLOCK_EXPLODE_EVENT, GameEventPriority.HIGHEST, this::onBlockExplode);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.HIGHEST, this::onStackedBlockExplode);
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.LOWEST, this::onPistonExtend);
         registerCallback(GameEventType.PISTON_RETRACT_EVENT, GameEventPriority.LOWEST, this::onPistonRetract);

@@ -558,6 +558,7 @@ change-island-rating: true
 # A list of default settings for new islands.
 # You can find a list of settings here: https://wiki.bg-software.com/superiorskyblock/island-settings
 default-settings:
+  - 'BLOCK_EXPLOSION'
   - 'CREEPER_EXPLOSION'
   - 'NATURAL_ANIMALS_SPAWN'
   - 'NATURAL_MONSTER_SPAWN'

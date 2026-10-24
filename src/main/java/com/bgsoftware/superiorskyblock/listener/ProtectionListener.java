@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Animals;
@@ -65,6 +66,8 @@ public class ProtectionListener extends AbstractGameEventListener {
     private static final Material CHORUS_FRUIT = EnumHelper.getEnum(Material.class, "CHORUS_FRUIT");
     @Nullable
     private static final Material BRUSH = EnumHelper.getEnum(Material.class, "BRUSH");
+    @Nullable
+    private static final Material END_CRYSTAL = EnumHelper.getEnum(Material.class, "END_CRYSTAL");
     @Nullable
     private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
     @Nullable
@@ -108,6 +111,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (handleBedPlace(e)) return;
         if (handleSignColorChange(e)) return;
         if (handleBrushUse(e)) return;
+        if (handleEndCrystalPlace(e)) return;
         if (handleEntityPlace(e)) return;
         if (handleEntityInteract(e)) return;
         handleBlockInteract(e, e.getArgs().player, e.getArgs().action, e.getArgs().clickedBlock, e.getArgs().usedHand, e.getArgs().usedItem);
@@ -205,6 +209,29 @@ public class ProtectionListener extends AbstractGameEventListener {
             interactionResult = this.protectionManager.get().handleCustomInteraction(
                     superiorPlayer, e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), IslandPrivileges.BRUSH);
         }
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+            e.setCancelled();
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean handleEndCrystalPlace(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
+        Action action = e.getArgs().action;
+        ItemStack usedItem = e.getArgs().usedItem;
+
+        if (action != Action.RIGHT_CLICK_BLOCK || usedItem == null || usedItem.getType() != END_CRYSTAL)
+            return false;
+
+        Block clickedBlock = e.getArgs().clickedBlock;
+        Material blockType = clickedBlock.getType();
+        if (blockType != Material.OBSIDIAN && blockType != Material.BEDROCK)
+            return false;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+        InteractionResult interactionResult = this.protectionManager.get().handleBlockPlace(
+                superiorPlayer, clickedBlock.getRelative(BlockFace.UP));
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
             return true;
