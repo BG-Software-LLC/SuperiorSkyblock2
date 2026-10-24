@@ -313,6 +313,9 @@ public class BukkitEventsListener implements Listener {
     private GameEvent<GameEventArgs.BlockExplodeEvent> createGameEvent(GameEventType<GameEventArgs.BlockExplodeEvent> eventType, GameEventPriority priority, BlockExplodeEvent e) {
         GameEventArgs.BlockExplodeEvent blockExplodeEvent = new GameEventArgs.BlockExplodeEvent();
         blockExplodeEvent.block = e.getBlock();
+        // Older Paper versions (e.g. 1.20.4) can return a null or unplaced snapshot.
+        // Use the event block location because an unplaced snapshot has no world.
+        // AIR snapshots are ignored because they do not represent a source block to count.
         BlockState sourceBlockState = EXPLODED_BLOCK_STATE.isValid() ? EXPLODED_BLOCK_STATE.invoke(e) : null;
         if (sourceBlockState != null && sourceBlockState.getType() != Material.AIR) {
             blockExplodeEvent.sourceBlock = Keys.of(MaterialKey.of(sourceBlockState.getType(),
