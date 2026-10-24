@@ -43,6 +43,11 @@ public class DelegateIslandChest implements IslandChest {
     }
 
     @Override
+    public void updateTitle() {
+        this.handle.updateTitle();
+    }
+
+    @Override
     public Inventory getInventory() {
         return this.handle.getInventory();
     }
