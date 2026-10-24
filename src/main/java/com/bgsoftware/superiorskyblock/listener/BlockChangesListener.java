@@ -552,7 +552,8 @@ public class BlockChangesListener extends AbstractGameEventListener {
         Entity entity = e.getArgs().entity;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            handleBlocksExplode(entity.getLocation(wrapper.getHandle()), e.getArgs().blocks, entity instanceof TNTPrimed);
+            handleBlocksExplode(entity.getLocation(wrapper.getHandle()), e.getArgs().blocks,
+                    entity instanceof TNTPrimed ? ConstantKeys.TNT : null);
         }
     }
 
@@ -560,24 +561,33 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (e.getArgs().isSoftExplosion)
             return;
 
+        Block block = e.getArgs().block;
+        Key sourceBlock = e.getArgs().sourceBlock;
+        List<Block> blocks = e.getArgs().blocks;
+        if (sourceBlock != null && blocks.contains(block) && sourceBlock.equals(Keys.of(block)))
+            sourceBlock = null;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            handleBlocksExplode(e.getArgs().block.getLocation(wrapper.getHandle()), e.getArgs().blocks, false);
+            handleBlocksExplode(block.getLocation(wrapper.getHandle()), blocks, sourceBlock);
         }
     }
 
-    private void handleBlocksExplode(Location explodeLocation, List<Block> blocks, boolean explodedTNT) {
+    private void handleBlocksExplode(Location explodeLocation, List<Block> blocks, @Nullable Key sourceBlock) {
         // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(explodeLocation.getWorld()))
             return;
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         blocks.forEach(block -> {
+            if (block.getType() == Material.AIR)
+                return;
+
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
 
-        if (explodedTNT)
-            blockCounts.put(ConstantKeys.TNT, blockCounts.getOrDefault(ConstantKeys.TNT, 0) + 1);
+        if (sourceBlock != null)
+            blockCounts.put(sourceBlock, blockCounts.getOrDefault(sourceBlock, 0) + 1);
 
         this.worldRecordService.get().recordMultiBlocksBreak(blockCounts, explodeLocation, REGULAR_RECORD_FLAGS);
     }

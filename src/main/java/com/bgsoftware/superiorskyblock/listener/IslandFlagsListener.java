@@ -178,7 +178,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.BLOCK_EXPLOSION))
-                e.setCancelled();
+                e.getArgs().radius = 0;
         }
     }
 

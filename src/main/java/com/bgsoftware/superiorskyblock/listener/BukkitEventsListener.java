@@ -11,6 +11,8 @@ import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.MaterialKeySource;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -24,6 +26,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
@@ -116,6 +119,8 @@ public class BukkitEventsListener implements Listener {
             ProjectileHitEvent.class, "getHitEntity");
     private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(
             ProjectileHitEvent.class, "getHitBlock");
+    private static final ReflectMethod<BlockState> EXPLODED_BLOCK_STATE = new ReflectMethod<>(
+            BlockExplodeEvent.class, "getExplodedBlockState");
     private static final ReflectMethod<Enum<?>> BLOCK_EXPLOSION_RESULT = new ReflectMethod<>(
             BlockExplodeEvent.class, "getExplosionResult");
     @Nullable
@@ -177,7 +182,8 @@ public class BukkitEventsListener implements Listener {
         createEventListener(GameEventType.ENTITY_TARGET_EVENT, EntityTargetEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_TELEPORT_EVENT, EntityTeleportEvent.class, this::createGameEvent);
         createEventListener(GameEventType.ENTITY_TELEPORT_EVENT, PlayerTeleportEvent.class, this::createGameEvent);
-        createEventListener(GameEventType.EXPLOSION_PRIME_EVENT, ExplosionPrimeEvent.class, this::createGameEvent);
+        createEventListener(GameEventType.EXPLOSION_PRIME_EVENT, ExplosionPrimeEvent.class, this::createGameEvent,
+                (e, gameEvent) -> e.setRadius(gameEvent.getArgs().radius));
         createEventListener(GameEventType.HANGING_BREAK_EVENT, HangingBreakEvent.class, this::createGameEvent);
         createEventListener(GameEventType.HANGING_PLACE_EVENT, HangingPlaceEvent.class, this::createGameEvent2);
         createEventListener(GameEventType.PROJECTILE_HIT_EVENT, ProjectileHitEvent.class, this::createGameEvent);
@@ -307,6 +313,12 @@ public class BukkitEventsListener implements Listener {
     private GameEvent<GameEventArgs.BlockExplodeEvent> createGameEvent(GameEventType<GameEventArgs.BlockExplodeEvent> eventType, GameEventPriority priority, BlockExplodeEvent e) {
         GameEventArgs.BlockExplodeEvent blockExplodeEvent = new GameEventArgs.BlockExplodeEvent();
         blockExplodeEvent.block = e.getBlock();
+        BlockState sourceBlockState = EXPLODED_BLOCK_STATE.isValid() ? EXPLODED_BLOCK_STATE.invoke(e) : null;
+        if (sourceBlockState != null && sourceBlockState.getType() != Material.AIR) {
+            blockExplodeEvent.sourceBlock = Keys.of(MaterialKey.of(sourceBlockState.getType(),
+                    plugin.getNMSAlgorithms().getBlockDataValue(sourceBlockState), MaterialKeySource.BLOCK),
+                    e.getBlock().getLocation());
+        }
         blockExplodeEvent.blocks = e.blockList();
         blockExplodeEvent.isSoftExplosion = TRIGGER_BLOCK != null && BLOCK_EXPLOSION_RESULT.isValid() &&
                 BLOCK_EXPLOSION_RESULT.invoke(e) == TRIGGER_BLOCK;
@@ -644,6 +656,7 @@ public class BukkitEventsListener implements Listener {
     private GameEvent<GameEventArgs.ExplosionPrimeEvent> createGameEvent(GameEventType<GameEventArgs.ExplosionPrimeEvent> eventType, GameEventPriority priority, ExplosionPrimeEvent e) {
         GameEventArgs.ExplosionPrimeEvent explosionPrimeEvent = new GameEventArgs.ExplosionPrimeEvent();
         explosionPrimeEvent.entity = e.getEntity();
+        explosionPrimeEvent.radius = e.getRadius();
         return eventType.createEvent(explosionPrimeEvent);
     }
 
