@@ -100,8 +100,20 @@ public interface WorldRecordService {
      * @param entityType The type of the entity that spawned.
      * @param location   The location of where the entity was spawned.
      * @return The result of recording the entity spawn.
+     * @deprecated See {@link WorldRecordService#recordEntitySpawn(Key, Location)}
+     *             Do not use the old method, as it will not detect custom mobs.
      */
+    @Deprecated
     RecordResult recordEntitySpawn(EntityType entityType, Location location);
+
+    /**
+     * Record an entity spawning into the world.
+     *
+     * @param entityKey The key of the entity that spawned.
+     * @param location  The location of where the entity was spawned.
+     * @return The result of recording the entity spawn.
+     */
+    RecordResult recordEntitySpawn(Key entityKey, Location location);
 
     /**
      * Record an entity despawning from the world.
@@ -117,7 +129,19 @@ public interface WorldRecordService {
      * @param entityType The type of the entity that despawned.
      * @param location   The location of where the entity was despawned.
      * @return The result of recording the entity despawn.
+     * @deprecated See {@link WorldRecordService#recordEntityDespawn(Entity)}
+     *             Do not use the old method, as it will not detect custom mobs.
      */
+    @Deprecated
     RecordResult recordEntityDespawn(EntityType entityType, Location location);
+
+    /**
+     * Record an entity despawning from the world.
+     *
+     * @param entityKey The key of the entity that despawned.
+     * @param location  The location of where the entity was despawned.
+     * @return The result of recording the entity despawn.
+     */
+    RecordResult recordEntityDespawn(Key entityKey, Location location);
 
 }
