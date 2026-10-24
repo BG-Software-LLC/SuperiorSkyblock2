@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.service.placeholders;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -67,6 +68,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_count_(.+)");
     private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("island_data_(.+)");
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("island_effect_(.+)");
+    private static final Pattern ENTITY_CATEGORY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_category_count_(.+)");
+    private static final Pattern ENTITY_CATEGORY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_category_limit_(.+)");
     private static final Pattern ENTITY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_count_(.+)");
     private static final Pattern ENTITY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_limit_(.+)");
     private static final Pattern FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
@@ -638,6 +641,24 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                         return Optional.empty();
                     }
                     return Optional.of(island.getPotionEffectLevel(potionEffectType) + "");
+                }
+
+                if ((matcher = ENTITY_CATEGORY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String entityCategoryName = matcher.group(1);
+                    EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entityCategoryName);
+                    if (entityCategory == null) {
+                        return Optional.empty();
+                    }
+                    return Optional.of(island.getEntitiesTracker().getEntityCategoryCount(entityCategory) + "");
+                }
+
+                if ((matcher = ENTITY_CATEGORY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String entityCategoryName = matcher.group(1);
+                    EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entityCategoryName);
+                    if (entityCategory == null) {
+                        return Optional.empty();
+                    }
+                    return Optional.of(island.getEntityCategoryLimit(entityCategory) + "");
                 }
 
                 if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {

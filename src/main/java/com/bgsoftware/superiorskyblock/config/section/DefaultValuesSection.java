@@ -25,6 +25,11 @@ public class DefaultValuesSection extends SettingsContainerHolder implements Set
     }
 
     @Override
+    public Map<String, Integer> getEntityCategoryLimits() {
+        return getContainer().defaultEntityCategoryLimits;
+    }
+
+    @Override
     public Map<Key, Integer> getEntityLimits() {
         return getContainer().defaultEntityLimits;
     }

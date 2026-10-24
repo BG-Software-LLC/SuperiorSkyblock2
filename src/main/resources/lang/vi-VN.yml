@@ -88,6 +88,9 @@ CHANGED_CROP_GROWTH_ALL: '&e&lNâng Cấp | &7Thay thành công hệ số tăng 
 CHANGED_CROP_GROWTH_NAME: '&e&lNâng Cấp | &7Thay thành công hệ số tăng trưởng cây
   trồng của đảo {0}.'
 CHANGED_DISCORD: '&e&lĐảo | &7Thay đổi thành công discord của đảo thành {0}.'
+CHANGED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}''s island.'
+CHANGED_ENTITY_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for all the islands.'
+CHANGED_ENTITY_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}.'
 CHANGED_ENTITY_LIMIT: '&e&lNâng Cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho đảo của {1}.'
 CHANGED_ENTITY_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho tất cả các đảo.'
 CHANGED_ENTITY_LIMIT_NAME: '&e&lNâng Cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho đảo {1}.'
@@ -143,6 +146,7 @@ COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: hieu-ung-thuoc
 COMMAND_ARGUMENT_EMAIL: email
+COMMAND_ARGUMENT_ENTITY_CATEGORY: 'entity-category'
 COMMAND_ARGUMENT_ENTITY: vat-the
 COMMAND_ARGUMENT_ISLAND_NAME: ten-dao
 COMMAND_ARGUMENT_ISLAND_ROLE: vai-tro-dao
@@ -189,6 +193,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Thêm thưởng cho người chơi.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Tăng giới hạn thành viên đảo co-op của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH: 'Tăng hệ số tăng trưởng cây trồng của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: 'Thêm hiệu ứng đảo của người chơi khác.'
+COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_CATEGORY_LIMIT: 'Increase entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: 'Tăng giới hạn vật thể của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: 'Thêm phần trăm vật liệu cho máy tạo đá cuội.'
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: 'Tăng hệ số vật phẩm của quái rớt ra của người chơi khác.'
@@ -229,6 +234,7 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: Cập nhật mức độ nâng cấp cho hòn 
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Xóa giới hạn khối khỏi một hòn đảo.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
   một người chơi.
@@ -247,6 +253,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Đặt hệ số tăng trưởng cây
   của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Đặt số lượng người cho đảo của người chơi.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: 'Đặt hiệu ứng đảo của người chơi khác.'
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_CATEGORY_LIMIT: 'Set entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Đặt giới hạn vật thể của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Chuyển một hòn đảo cho người khác.
@@ -444,6 +451,7 @@ INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lLỗi | &7Hiệu ứng không hợp lệ {0}.'
 INVALID_ENTITY: '&c&lLỗi | &7Vật thể không chính xác {0}.'
+INVALID_ENTITY_CATEGORY: '&c&lError | &7Invalid entity category {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lLỗi | &7Thời gian nghỉ không hợp lệ {0}.'
 INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'
@@ -528,6 +536,10 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lĐảo | &7Giới hạn các vật thể:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lĐảo | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Entity Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lĐảo | &7Cây trồng đa cấp: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lĐảo | &7Drops đa cấp: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
@@ -772,6 +784,7 @@ RATE_REMOVE_ALL: '&e&lĐánh giá | &7Thành công xóa bỏ tất cả đánh g
 RATE_REMOVE_ALL_ISLANDS: '&e&lĐảo | &7Thành công xóa bỏ tất cả đánh giá của tất cả các đảo.'
 RATE_SUCCESS: '&e&lĐánh giá | &7Bạn đánh giả đảo này với {0} sao!'
 REACHED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
+REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'
 RECALC_ALREADY_RUNNING: '&c&lLỗi | &7Đảo của bạn đang được tính toán lại, vui lòng chờ.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lLỗi | &7Hòn đảo này đang được tính toán lại, vui lòng chờ.'
