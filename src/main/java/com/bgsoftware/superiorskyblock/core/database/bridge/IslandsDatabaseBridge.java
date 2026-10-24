@@ -211,7 +211,7 @@ public class IslandsDatabaseBridge {
     }
 
     public static void saveSize(Island island) {
-        updateIslandSettingsValue(island, "size", island.getIslandSize());
+        updateIslandSettingsValue(island, "size", island.getEffectiveIslandSize());
     }
 
     public static void saveDiscord(Island island) {
@@ -366,6 +366,11 @@ public class IslandsDatabaseBridge {
                 );
             }
         });
+    }
+
+    public static void clearRoleLimits(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge ->
+                databaseBridge.deleteObject("islands_role_limits", createFilter("island", island)));
     }
 
     public static void removeRoleLimit(Island island, PlayerRole playerRole) {

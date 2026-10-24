@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -64,33 +65,56 @@ public class CmdAdminAddCoopLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[3]);
+        NumberArgument<Integer> arguments = CommandArguments.getAdditionalLimit(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int limit = arguments.getNumber();
 
+        boolean isUnlimited = false;
+        boolean isInvalid = false;
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
+            int currentLimit = island.getCoopLimit();
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                isUnlimited = true;
+                continue;
+            }
+
+            if (currentLimit + limit < 0) {
+                isInvalid = true;
+                continue;
+            }
+
             PluginEvent<PluginEventArgs.IslandChangeCoopLimit> event = PluginEventsFactory.callIslandChangeCoopLimitEvent(
-                    island, sender, island.getCoopLimit() + limit);
+                    island, sender, currentLimit + limit);
             if (!event.isCancelled()) {
                 island.setCoopLimit(event.getArgs().coopLimit);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
+            if (isUnlimited) {
+                Message.LIMIT_IS_UNLIMITED.send(sender);
+            } else if (isInvalid) {
+                Message.INVALID_LIMIT.send(sender, limit);
+            }
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_COOP_LIMIT_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.CHANGED_COOP_LIMIT_NAME.send(sender, islands.get(0).getName());
-        else
+        } else if (targetPlayer == null) {
+            Message.CHANGED_COOP_LIMIT_NAME.send(sender, changedIsland.getName());
+        } else {
             Message.CHANGED_COOP_LIMIT.send(sender, targetPlayer.getName());
+        }
     }
 
 }
