@@ -151,6 +151,25 @@ settings:
       volume: 0.2
       pitch: 0.2
 
+  block_explosion:
+    display-menu: true
+    settings-enabled:
+      type: RED_BED
+      name: '&6Block Explosion'
+      lore:
+        - '&7Allow block and end crystal explosions.'
+        - '&7Currently &aENABLED&7.'
+    settings-disabled:
+      type: RED_BED
+      name: '&6Block Explosion'
+      lore:
+        - '&7Allow block and end crystal explosions.'
+        - '&7Currently &cDISABLED&7.'
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+
   creeper_explosion:
     display-menu: true
     settings-enabled:

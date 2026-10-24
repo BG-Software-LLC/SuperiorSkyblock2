@@ -42,6 +42,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -550,23 +551,45 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         Entity entity = e.getArgs().entity;
 
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            handleBlocksExplode(entity.getLocation(wrapper.getHandle()), e.getArgs().blocks,
+                    entity instanceof TNTPrimed ? ConstantKeys.TNT : null);
+        }
+    }
+
+    private void onBlockExplode(GameEvent<GameEventArgs.BlockExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
+            return;
+
+        Block block = e.getArgs().block;
+        Key sourceBlock = e.getArgs().sourceBlock;
+        List<Block> blocks = e.getArgs().blocks;
+        if (sourceBlock != null && blocks.contains(block) && sourceBlock.equals(Keys.of(block)))
+            sourceBlock = null;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            handleBlocksExplode(block.getLocation(wrapper.getHandle()), blocks, sourceBlock);
+        }
+    }
+
+    private void handleBlocksExplode(Location explodeLocation, List<Block> blocks, @Nullable Key sourceBlock) {
         // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+        if (!plugin.getGrid().isIslandsWorld(explodeLocation.getWorld()))
             return;
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        e.getArgs().blocks.forEach(block -> {
+        blocks.forEach(block -> {
+            if (block.getType() == Material.AIR)
+                return;
+
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
 
-        if (entity instanceof TNTPrimed)
-            blockCounts.put(ConstantKeys.TNT, blockCounts.getOrDefault(ConstantKeys.TNT, 0) + 1);
+        if (sourceBlock != null)
+            blockCounts.put(sourceBlock, blockCounts.getOrDefault(sourceBlock, 0) + 1);
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            this.worldRecordService.get().recordMultiBlocksBreak(blockCounts,
-                    entity.getLocation(wrapper.getHandle()), REGULAR_RECORD_FLAGS);
-        }
+        this.worldRecordService.get().recordMultiBlocksBreak(blockCounts, explodeLocation, REGULAR_RECORD_FLAGS);
     }
 
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
@@ -640,6 +663,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.LEAVES_DECAY_EVENT, GameEventPriority.MONITOR, this::onLeavesDecay);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.MONITOR, this::onBlockFromTo);
         registerCallback(GameEventType.BLOCK_FADE_EVENT, GameEventPriority.MONITOR, this::onBlockFade);
+        registerCallback(GameEventType.BLOCK_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onBlockExplode);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);
 

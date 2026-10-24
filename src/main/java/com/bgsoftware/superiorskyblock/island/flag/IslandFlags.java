@@ -14,6 +14,7 @@ public class IslandFlags {
     public static final IslandFlag ALWAYS_MIDDLE_NIGHT = register("ALWAYS_MIDDLE_NIGHT");
     public static final IslandFlag ALWAYS_RAIN = register("ALWAYS_RAIN");
     public static final IslandFlag ALWAYS_SHINY = register("ALWAYS_SHINY");
+    public static final IslandFlag BLOCK_EXPLOSION = register("BLOCK_EXPLOSION");
     public static final IslandFlag CREEPER_EXPLOSION = register("CREEPER_EXPLOSION");
     public static final IslandFlag CROPS_GROWTH = register("CROPS_GROWTH");
     public static final IslandFlag EGG_LAY = register("EGG_LAY");
