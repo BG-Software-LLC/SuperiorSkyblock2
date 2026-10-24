@@ -506,16 +506,16 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("ProtocolLib"))
             registerHook("ProtocolLibHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Oraxen"))
+        if (canRegisterHook("Oraxen"))
             registerHook("OraxenHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Nexo"))
+        if (canRegisterHook("Nexo"))
             registerHook("NexoHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Nova"))
+        if (canRegisterHook("Nova"))
             registerHook("NovaHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
+        if (canRegisterHook("ItemsAdder"))
             registerHook("ItemsAdderHook");
 
         if (canRegisterHook("MythicMobs"))
@@ -524,7 +524,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("Plan"))
             registerHook("PlanHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine")) {
+        if (canRegisterHook("CraftEngine")) {
             // We load the hook with an extra delay to let CraftEngine load its data first
             Plugin plugin = Bukkit.getPluginManager().getPlugin("CraftEngine");
             if (plugin.getDescription().getVersion().startsWith("0.0.")) {
