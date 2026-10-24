@@ -150,8 +150,15 @@ public class GridManagerImpl extends Manager implements GridManager {
         }
     }
 
-    public void syncUpgrades() {
-        getIslands().forEach(Island::updateUpgrades);
+    public void refreshIslandsFromSettings() {
+        for (Island island : getIslands()) {
+            try {
+                island.updateEntireArea();
+                island.updateUpgrades();
+            } catch (Throwable error) {
+                Log.error(error, "Failed to refresh island ", island.getUniqueId(), " from settings:");
+            }
+        }
     }
 
     public UUID getServerUUID() {
