@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
@@ -210,8 +211,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public boolean isWaterLogged(org.bukkit.block.Block block) {
-        Material blockType = block.getType();
-        return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
+        return Materials.isWater(block.getType());
     }
 
     @Override

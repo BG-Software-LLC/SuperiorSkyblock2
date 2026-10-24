@@ -965,6 +965,10 @@ player-respawn:
 # will be saved to the database despite the threshold.
 block-counts-save-threshold: 100
 
+# Should some entities also be counted as blocks?
+# This applies to entities that include a block component, such as minecarts and chest boats.
+count-entities-as-blocks: true
+
 # Support for chat-signing in 1.19 or above.
 # When set to true, the plugin will properly handle messages to not interface
 # with the signing of chat messages. However, this may cause issues with other
