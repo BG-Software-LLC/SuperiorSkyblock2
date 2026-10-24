@@ -22,7 +22,7 @@
 #     # The island flag required so the entities can spawn vanilla
 #     NATURAL_SPAWN: <ISLAND_FLAG>
 # You can create as many custom categories as you want.
-# There are custom groups used for detecting animals, monsters and tameable entities.
+# There are custom groups used for detecting animals, monsters and tamed entities.
 # These groups do not have `entities` and the entities are added automatically depending on your Minecraft version.
 
 # Custom interact groups
@@ -116,7 +116,7 @@ PAINTING:
     INTERACT: PAINTING
 
 # Custom built-in groups
-TAMEABLE:
+TAMED:
   actions:
     DAMAGE: TAMED_ANIMAL_DAMAGE
 
