@@ -75,7 +75,7 @@ public class CmdAdminSetCoopLimit implements IAdminIslandCommand {
 
         for (Island island : islands) {
             PluginEvent<PluginEventArgs.IslandChangeCoopLimit> event = PluginEventsFactory.callIslandChangeCoopLimitEvent(
-                    island, sender, island.getCoopLimit() + limit);
+                    island, sender, limit);
             if (!event.isCancelled()) {
                 island.setCoopLimit(event.getArgs().coopLimit);
                 ++islandsChangedCount;
