@@ -8,6 +8,9 @@ import java.lang.reflect.Modifier;
 
 public class DragonUtils {
 
+    // Only valid in versions where the field is public (before 1.20). Newer versions calculate the podium
+    // location using the fight origin of the dragon, which is set in AbstractIslandEntityEnderDragon.
+    // Do not make this field valid for newer versions, otherwise the island offset will be applied twice.
     private static final ReflectField<BlockPos> END_PODIUM_LOCATION = new ReflectField<BlockPos>(
             EndPodiumFeature.class, BlockPos.class,
             Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL, 1)
@@ -20,13 +23,16 @@ public class DragonUtils {
     }
 
     public static void runWithPodiumPosition(BlockPos podiumPosition, Runnable runnable) {
+        // Calls may be nested (for example, spike crystals are reset while the dragon fight is ticked),
+        // so we restore the previous position instead of resetting it.
+        BlockPos previousPodiumPosition = currentPodiumPosition;
         try {
             END_PODIUM_LOCATION.set(null, podiumPosition);
             currentPodiumPosition = podiumPosition;
             runnable.run();
         } finally {
-            END_PODIUM_LOCATION.set(null, BlockPos.ZERO);
-            currentPodiumPosition = BlockPos.ZERO;
+            END_PODIUM_LOCATION.set(null, previousPodiumPosition);
+            currentPodiumPosition = previousPodiumPosition;
         }
     }
 

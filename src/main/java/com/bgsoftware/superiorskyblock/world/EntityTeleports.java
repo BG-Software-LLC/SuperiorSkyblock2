@@ -212,23 +212,21 @@ public class EntityTeleports {
                     for (int z = 0; z < 16; z++) {
                         int y = chunkSnapshot.getHighestBlockYAt(x, z);
 
-                        if (y - 1 <= worldMinLimit || y + 1 >= worldBuildLimit)
-                            continue;
-
-                        int worldX = chunkSnapshot.getX() * 16 + x;
-                        int worldZ = chunkSnapshot.getZ() * 16 + z;
-
-                        // In some versions, the ChunkSnapshot#getHighestBlockYAt seems to return
-                        // one block above the actual highest block. Therefore, the check is on the
-                        // returned block and the block below it.
+                        // ChunkSnapshot#getHighestBlockYAt returns the highest block in 1.18+, and the
+                        // block above it in older versions. Therefore, we check both possible standing spots.
                         int safeY;
-                        if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
+                        if (y > worldMinLimit && y + 2 < worldBuildLimit &&
+                                WorldBlocks.isSafeStandingSpot(chunkSnapshot, x, y + 1, z)) {
+                            safeY = y + 1;
+                        } else if (y - 1 > worldMinLimit && y + 1 < worldBuildLimit &&
+                                WorldBlocks.isSafeStandingSpot(chunkSnapshot, x, y, z)) {
                             safeY = y;
-                        } else if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
-                            safeY = y - 1;
                         } else {
                             continue;
                         }
+
+                        int worldX = chunkSnapshot.getX() * 16 + x;
+                        int worldZ = chunkSnapshot.getZ() * 16 + z;
 
                         double dx = worldX - homeX;
                         double dy = safeY - homeY;

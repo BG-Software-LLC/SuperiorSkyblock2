@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops;
 
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;

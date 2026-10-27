@@ -1,22 +1,17 @@
 package com.bgsoftware.superiorskyblock.core.menu.layout;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogMenuType;
-import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedDialogMenuLayout;
-import com.bgsoftware.superiorskyblock.api.menu.layout.PagedInventoryMenuLayout;
-import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
-import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.CurrentPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.NextPageButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.PreviousPageButton;
-import com.bgsoftware.superiorskyblock.core.menu.layout.order.CustomPagedLayoutOrder;
-import com.bgsoftware.superiorskyblock.core.menu.layout.order.PagedLayoutOrder;
-import org.bukkit.event.inventory.InventoryType;
+import com.bgsoftware.superiorskyblock.core.menu.layout.custom.CustomPagedLayout;
+import com.bgsoftware.superiorskyblock.core.menu.layout.custom.PagedLayout;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PagedDialogMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> extends RegularDialogMenuLayoutImpl<V> implements PagedDialogMenuLayout<V> {
@@ -35,7 +30,7 @@ public class PagedDialogMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> exte
             implements PagedDialogMenuLayout.Builder<V, E> {
 
         @Nullable
-        private PagedLayoutOrder<V> layoutOrder;
+        private PagedLayout<V> layoutOrder;
 
         @Override
         public Builder<V, E> setPreviousPageSlots(List<Integer> slots) {
@@ -63,9 +58,45 @@ public class PagedDialogMenuLayoutImpl<V extends PagedMenuView<V, ?, E>, E> exte
 
         @Override
         public Builder<V, E> setCustomLayoutOrder(List<Integer> slotsOrder) {
-            slotsOrder.removeIf(slot -> !(super.buttons[slot] instanceof PagedMenuTemplateButton));
-            if (!slotsOrder.isEmpty())
-                this.layoutOrder = new CustomPagedLayoutOrder<>(slotsOrder);
+            List<List<Integer>> validSlotsLayout = new ArrayList<>();
+
+            for (int slot : slotsOrder) {
+                if (slot >= 0 && slot < super.buttons.length &&
+                        super.buttons[slot] instanceof PagedMenuTemplateButton) {
+                    validSlotsLayout.add(Collections.singletonList(slot));
+                }
+            }
+
+            if (!validSlotsLayout.isEmpty()) {
+                this.layoutOrder = new CustomPagedLayout<>(validSlotsLayout);
+            }
+
+            return this;
+        }
+
+        @Override
+        public Builder<V, E> setCustomLayout(List<List<Integer>> slotsLayout) {
+            List<List<Integer>> validSlotsLayout = new ArrayList<>();
+
+            for (List<Integer> slots : slotsLayout) {
+                List<Integer> validSlots = new ArrayList<>();
+
+                for (int slot : slots) {
+                    if (slot >= 0 && slot < super.buttons.length &&
+                            super.buttons[slot] instanceof PagedMenuTemplateButton) {
+                        validSlots.add(slot);
+                    }
+                }
+
+                if (!validSlots.isEmpty()) {
+                    validSlotsLayout.add(validSlots);
+                }
+            }
+
+            if (!validSlotsLayout.isEmpty()) {
+                this.layoutOrder = new CustomPagedLayout<>(validSlotsLayout);
+            }
+
             return this;
         }
 

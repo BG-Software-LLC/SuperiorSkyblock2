@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core;
 
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,7 +23,6 @@ public enum Materials {
     BONE_MEAL("INK_SACK", 15),
     NETHER_PORTAL("PORTAL"),
     END_PORTAL_FRAME("ENDER_PORTAL_FRAME");
-
 
     private static final EnumMap<Material, EnumSet<Tag>> MATERIAL_TAGS = setupMaterialTags();
     private static final EnumSet<Material> BLOCK_NON_LEGACY_MATERIALS = allOf(material -> material.isBlock() && !isLegacy(material));
@@ -62,10 +60,6 @@ public enum Materials {
     public static boolean hasTag(Material material, Tag tag) {
         EnumSet<Tag> materialsTag = MATERIAL_TAGS.get(material);
         return materialsTag != null && materialsTag.contains(tag);
-    }
-
-    public static boolean isSlab(Material material) {
-        return hasTag(material, Tag.SLAB);
     }
 
     public static boolean isWater(Material material) {
@@ -132,6 +126,10 @@ public enum Materials {
         return hasTag(material, Tag.COPPER_GOLEM);
     }
 
+    public static boolean isCushion(Material material) {
+        return hasTag(material, Tag.CUSHION);
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
@@ -142,10 +140,6 @@ public enum Materials {
 
     public static String patchOldMaterialName(String type) {
         return PATCHED_MATERIAL_NAMES.getOrDefault(type, type);
-    }
-
-    public static void init() {
-
     }
 
     private static EnumSet<Material> allOf(Predicate<Material> predicate) {
@@ -200,6 +194,8 @@ public enum Materials {
             if (copperBase.equals("COPPER_BLOCK") || copperBase.equals("EXPOSED_COPPER") ||
                     copperBase.equals("WEATHERED_COPPER") || copperBase.equals("OXIDIZED_COPPER"))
                 materialTags.add(Tag.COPPER_GOLEM);
+            if (materialName.contains("CUSHION"))
+                materialTags.add(Tag.CUSHION);
 
             if (!materialTags.isEmpty())
                 enumMap.put(material, materialTags);
@@ -236,7 +232,8 @@ public enum Materials {
         HARNESS,
         HOE,
         SHELF,
-        COPPER_GOLEM
+        COPPER_GOLEM,
+        CUSHION
 
     }
 

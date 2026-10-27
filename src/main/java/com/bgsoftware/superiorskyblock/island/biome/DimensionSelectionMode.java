@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.api.enums;
+package com.bgsoftware.superiorskyblock.island.biome;
 
 /**
  * Used to determine the dimension in which the player changes their island's biome.

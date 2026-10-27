@@ -14,6 +14,7 @@ import com.google.common.base.Suppliers;
 import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -30,9 +31,13 @@ import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -62,6 +67,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBiome;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R3.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -87,6 +93,18 @@ public class NMSUtilsVersioned {
             ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
     private static final ReflectField<IOWorker> ENTITY_STORAGE_WORKER = new ReflectField<>(
             EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+    public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
+    }
+
+    public static int getLevelChunkX(LevelChunk levelChunk) {
+        return levelChunk.getPos().x;
+    }
+
+    public static int getLevelChunkZ(LevelChunk levelChunk) {
+        return levelChunk.getPos().z;
+    }
 
     public static CompoundTag readChunk(ChunkMap chunkMap, ChunkPos chunkPos) {
         return chunkMap.read(chunkPos).join().orElse(null);
@@ -289,6 +307,14 @@ public class NMSUtilsVersioned {
 
     public static EndDragonFight getEndDragonFight(ServerLevel serverLevel) {
         return serverLevel.getDragonFight();
+    }
+
+    public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
+        enderDragon.setFightOrigin(fightOrigin);
+    }
+
+    public static void removeDragonTicket(ServerLevel serverLevel) {
+        serverLevel.getChunkSource().removeRegionTicket(TicketType.DRAGON, new ChunkPos(0, 0), 9, Unit.INSTANCE);
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {

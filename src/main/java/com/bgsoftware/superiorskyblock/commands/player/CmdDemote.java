@@ -86,7 +86,7 @@ public class CmdDemote implements IPermissibleCommand {
         do {
             previousRole = previousRole.getPreviousRole();
             roleLimit = previousRole == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : island.getRoleLimit(previousRole);
-        } while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit >= island.getIslandMembers(previousRole).size());
+        } while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit <= island.getIslandMembers(previousRole).size());
 
         if (previousRole == null) {
             Message.LAST_ROLE_DEMOTE.send(superiorPlayer);
