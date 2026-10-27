@@ -742,8 +742,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 from == null ? null : plugin.getGrid().getIslandAt(from), from, to, enterCause);
     }
 
-    // Variant that takes an already-computed fromIsland to avoid a duplicate getIslandAt(from) lookup
-    // on the hot move/teleport paths, where the caller already needs the from-island for the leave check.
     private MoveResult handlePlayerEnterIslandInternal(SuperiorPlayer superiorPlayer, Island toIsland, @Nullable Island fromIsland, @Nullable Location from, Location to, IslandEnterEvent.EnterCause enterCause) {
         // This can happen after the leave event is cancelled.
         if (superiorPlayer.hasPlayerStatus(PlayerStatus.LEAVING_ISLAND)) {

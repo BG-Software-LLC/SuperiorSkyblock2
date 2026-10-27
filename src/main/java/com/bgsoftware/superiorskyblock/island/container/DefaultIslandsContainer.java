@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.MutableWorldPosition;
-import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -162,9 +161,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
         if (island == null)
             return null;
 
-        // Verify the X/Z area intercept without allocating a WorldPosition per lookup, by reusing a
-        // pooled mutable position. Semantics match isInside(WorldPosition) (area-only, no world check).
-        try (MutableWorldPosition worldPosition = ObjectsPools.WORLD_POSITION.obtain()) {
+        try (MutableWorldPosition worldPosition = MutableWorldPosition.POOL.obtain()) {
             boolean inside = island.isInside(worldPosition.set(location.getX(), location.getY(), location.getZ()));
             return inside ? island : null;
         }

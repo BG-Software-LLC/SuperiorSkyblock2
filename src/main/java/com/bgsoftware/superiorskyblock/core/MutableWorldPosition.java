@@ -8,16 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import java.util.function.Consumer;
-
-/**
- * A mutable, pooled {@link WorldPosition} used to avoid allocating a new position per lookup on
- * hot paths (e.g. {@code getIslandAt}). Obtain an instance from {@link ObjectsPools#WORLD_POSITION},
- * set its coordinates and release it back (preferably via try-with-resources).
- */
 public class MutableWorldPosition implements WorldPosition, ObjectsPool.Releasable, AutoCloseable {
 
-    private final Consumer<MutableWorldPosition> releaseMethod;
+    public static final ObjectsPool<MutableWorldPosition> POOL = new ObjectsPool<>(MutableWorldPosition::new);
 
     private double x;
     private double y;
@@ -25,8 +18,8 @@ public class MutableWorldPosition implements WorldPosition, ObjectsPool.Releasab
     private float yaw;
     private float pitch;
 
-    MutableWorldPosition(Consumer<MutableWorldPosition> releaseMethod) {
-        this.releaseMethod = releaseMethod;
+    private MutableWorldPosition() {
+
     }
 
     public MutableWorldPosition set(double x, double y, double z) {
@@ -134,7 +127,7 @@ public class MutableWorldPosition implements WorldPosition, ObjectsPool.Releasab
 
     @Override
     public void release() {
-        this.releaseMethod.accept(this);
+        POOL.release(this);
     }
 
     @Override
