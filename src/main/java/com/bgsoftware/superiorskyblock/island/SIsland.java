@@ -160,6 +160,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SIsland implements Island {
@@ -511,6 +512,36 @@ public class SIsland implements Island {
         return playersInside.readAndGet(playersInside -> new SequentialListBuilder<SuperiorPlayer>()
                 .filter(SuperiorPlayer::isOnline)
                 .build(playersInside));
+    }
+
+    // Both methods below iterate playersInside without building a list, for hot event paths
+    // (redstone / entity spawn) that fire constantly.
+
+    @Override
+    public boolean anyPlayerInsideMatches(Predicate<SuperiorPlayer> predicate) {
+        Preconditions.checkNotNull(predicate, "predicate parameter cannot be null.");
+
+        return playersInside.readAndGet(playersInside -> {
+            for (SuperiorPlayer superiorPlayer : playersInside) {
+                if (predicate.test(superiorPlayer))
+                    return true;
+            }
+            return false;
+        });
+    }
+
+    @Override
+    public int countPlayersInside(Predicate<SuperiorPlayer> predicate) {
+        Preconditions.checkNotNull(predicate, "predicate parameter cannot be null.");
+
+        return playersInside.readAndGet(playersInside -> {
+            int count = 0;
+            for (SuperiorPlayer superiorPlayer : playersInside) {
+                if (predicate.test(superiorPlayer))
+                    ++count;
+            }
+            return count;
+        });
     }
 
     @Override
@@ -3686,8 +3717,11 @@ public class SIsland implements Island {
 
     @Override
     public WarpCategory getWarpCategory(int slot) {
-        return warpCategories.values().stream().filter(warpCategory -> warpCategory.getSlot() == slot)
-                .findAny().orElse(null);
+        for (WarpCategory warpCategory : warpCategories.values()) {
+            if (warpCategory.getSlot() == slot)
+                return warpCategory;
+        }
+        return null;
     }
 
     @Override
