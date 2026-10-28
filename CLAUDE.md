@@ -101,7 +101,7 @@ Players use builders (`SuperiorPlayerBuilderImpl`) for construction. NPC players
 - **Bridges**: Dedicated bridge classes (GridDatabaseBridge, IslandsDatabaseBridge, PlayersDatabaseBridge) handle specific entity persistence
 - **SQL implementation**: `SQLDatabaseBridge` backed by HikariCP connection pooling
 
-ObjectPools (ObjectsPools) provide pooled reuse of DBColumn and Batch objects for allocation efficiency.
+`ObjectsPools.DB_COLUMN_BATCH` provides pooled reuse of `DBColumn` objects for allocation efficiency (see **Object Pooling** under Coding Conventions).
 
 ### NMS (Native Minecraft Server) Abstraction
 
@@ -192,6 +192,50 @@ Custom plugin events (in `core.events.plugin.PluginEventsFactory`) abstract Bukk
 9. **Observer**: Custom event system with callback registrations
 10. **Adapter**: Provider wrappers for external plugin integration (PlaceholderAPI, Vault, etc.)
 
+## Coding Conventions
+
+### Object Pooling
+
+Many code paths here run per-tick or per-event (move, block place/break, chunk load), so short-lived allocations add up. `ObjectsPool<T>` (`core/ObjectsPool.java`) is a thread-safe free-list of reusable objects, and `ObjectsPools` (`core/ObjectsPools.java`) holds the shared pools:
+
+- `ObjectsPools.LOCATION` — reusable Bukkit `Location`s
+- `ObjectsPools.LAZY_LOCATION` — reusable `LazyWorldLocation`s
+- `ObjectsPools.DB_COLUMN_BATCH` — a batch of `DBColumn`s for a single database operation
+
+**Locations are the main case.** Bukkit's no-arg `getLocation()` on `Player`, `Entity` and `Block` allocates a new `Location` on every call. Use the overload that fills an existing one (`getLocation(Location)`), and get that `Location` from the pool. The plugin's own types expose the same overload, e.g. `SuperiorPlayer#getLocation(Location)` and `IslandWarp#getLocation(Location)`. Always use try-with-resources so the object goes back to the pool:
+
+```java
+Island island;
+try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+    island = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
+}
+```
+
+Database operations follow the same pattern with a batch:
+
+```java
+try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+    databaseBridge.insertObject("players_missions",
+            pool.obtain().withNameAndValue("player", uuid.toString()),
+            pool.obtain().withNameAndValue("name", missionName));
+}
+```
+
+Rules:
+- **A pooled object must not escape its try block.** Don't store it in a field or collection, return it, hand it to an async/scheduled task, or keep a reference after the block. Once it's released, another caller can obtain and overwrite it. Pull out what you need (the island, block coords, a world) inside the block. If you need to keep the `Location`, `clone()` it first.
+- Never release a pooled object twice, and never use it after `close()`.
+- Some classes pool themselves: they implement `ObjectsPool.Releasable` + `AutoCloseable` and have a private static `POOL` (`ChunkPosition`, `ButtonClickContextImpl`, `WorldGeneratorOptionsImpl`, `SuperiorNPCPlayer`). `ChunkPosition.of(...)` returns a pooled instance by default. Use it in try-with-resources, and call `copy()` (or the `fromPool = false` overload) when the position will be stored, e.g. as a map key.
+- To add a pool for a new wrapped type, use `ObjectsPools.createNewPool(() -> new Foo(...))`, as `NMSUtils.java.template` does for `BlockPos.MutableBlockPos`.
+
+### LinkedList vs ArrayList
+
+Pick the list type by how it will be accessed:
+
+- **`LinkedList`**: lists that are only appended to and then iterated (or used as a queue): tab-completion results, collected search results, batches of objects to process, temporary aliases. This is the default in the codebase.
+- **`ArrayList`**: lists that need random access by index (`get(i)`, `set(i, ...)`, binary search, sorting then indexing), such as sorted top-islands lists, menu page/slot lookups and pattern rows. Also use it when the final size is known up front, so it can be pre-sized: `new ArrayList<>(size)`.
+
+Never call `get(i)` in a loop on a `LinkedList`. Each call is O(n), so the loop becomes O(n²). If a list needs both cheap appends and indexed reads, use `ArrayList`.
+
 ## Module Structure
 
 ### Root Build
@@ -219,6 +263,7 @@ Published separately as `com.bgsoftware:SuperiorSkyblockAPI` to Maven repo (http
 - **Never change observable behaviour** of an existing API method — if the semantics must change, add a new method instead.
 - **Extend, don't replace**: add new methods alongside the old ones. Have the old method delegate to the new one so existing callers continue to work unchanged.
 - **`@Deprecated` is not removal** — mark old methods `@Deprecated` when a better alternative exists, but keep them functional and delegating.
+- **Adding methods to interfaces that have a `Delegate*` variant is allowed.** Third-party plugins don't implement these interfaces directly. They extend the matching `Delegate*` class, which wraps a `handle` and forwards every call to it (`Island` → `DelegateIsland`, `SuperiorPlayer` → `DelegateSuperiorPlayer`, `IslandBank` → `DelegateIslandBank`, `IslandWarp` → `DelegateIslandWarp`, `IslandsFactory` → `DelegateIslandsFactory`, the algorithm and container interfaces, etc.). When you add a method to one of these interfaces, you must also add a forwarding override to its `Delegate*` class (`return this.handle.newMethod(...);`) and implement it in the plugin's concrete classes. For interfaces **without** a `Delegate*` variant (e.g. the `hooks/*Provider` interfaces), a new method must be a `default` method so existing third-party implementations still load.
 
 Example pattern when behaviour needs to change:
 
