@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.IRequirements;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,25 +17,25 @@ public abstract class DataTracker<K, R extends IRequirements<K>> {
         this.trackedData = trackedData;
     }
 
-    public void track(K key, int amount) {
+    public synchronized void track(K key, int amount) {
         this.trackedData.computeIfAbsent(key, k -> new Counter(0)).inc(amount);
         globalCounter.inc(amount);
     }
 
-    public void load(K blockKey, int amount) {
+    public synchronized void load(K blockKey, int amount) {
         this.trackedData.put(blockKey, new Counter(amount));
         globalCounter.inc(amount);
     }
 
-    public int getCount(K blockKey) {
+    public synchronized int getCount(K blockKey) {
         return Optional.ofNullable(this.trackedData.get(blockKey)).map(Counter::get).orElse(0);
     }
 
-    public int getGlobalCounter() {
+    public synchronized int getGlobalCounter() {
         return this.globalCounter.get();
     }
 
-    public int getCounts(R blocks) {
+    public synchronized int getCounts(R blocks) {
         if (blocks.isContainsAll())
             return getGlobalCounter();
 
@@ -43,12 +44,18 @@ public abstract class DataTracker<K, R extends IRequirements<K>> {
         return blocksCount.get();
     }
 
-    public void clear() {
+    public synchronized void clear() {
         this.trackedData.clear();
     }
 
-    public Map<K, Counter> getCounts() {
-        return Collections.unmodifiableMap(this.trackedData);
+    public synchronized Map<K, Counter> getCounts() {
+        Map<K, Counter> snapshot = createSnapshotMap();
+        this.trackedData.forEach((key, count) -> snapshot.put(key, new Counter(count.get())));
+        return Collections.unmodifiableMap(snapshot);
+    }
+
+    protected Map<K, Counter> createSnapshotMap() {
+        return new HashMap<>();
     }
 
 }

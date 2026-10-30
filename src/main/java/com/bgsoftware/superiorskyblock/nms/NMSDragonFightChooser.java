@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;
@@ -47,7 +48,7 @@ public class NMSDragonFightChooser implements NMSDragonFight {
         getDelegate().awardTheEndAchievement(player);
     }
 
-    private NMSDragonFight getDelegate() {
+    private synchronized NMSDragonFight getDelegate() {
         if (this.delegate == null) {
             if (plugin.getSettings() == null)
                 throw new RuntimeException("Called NMSDragonFightChooser#getDelegate before settings initialized");
@@ -60,6 +61,8 @@ public class NMSDragonFightChooser implements NMSDragonFight {
                         try {
                             this.delegate = this.enabledInstanceSupplier.get();
                         } catch (NMSLoadException error) {
+                            if (BukkitExecutor.isFolia())
+                                throw new IllegalStateException("Failed to load Folia dragon fights", error);
                             Log.error(error, "Failed to load NMSDragonFight, disabling it...");
                             this.delegate = new NMSDragonFightImpl();
                         }

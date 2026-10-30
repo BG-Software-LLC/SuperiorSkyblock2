@@ -7,12 +7,14 @@ import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.player.OfflinePlayerData;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 public class ClearActions {
 
@@ -87,6 +89,16 @@ public class ClearActions {
                                        @Nullable Island islandToTeleport) {
         if (clearActions.isEmpty() && islandToTeleport == null)
             return;
+
+        if (BukkitExecutor.isFolia()) {
+            Player player = superiorPlayer.asPlayer();
+            if (player != null && !BukkitExecutor.isOwned(player)) {
+                Collection<ClearAction> actions = new ArrayList<>(clearActions);
+                Runnable retry = () -> runClearActions(superiorPlayer, actions, islandToTeleport);
+                plugin.getTaskScheduler().entity(player, retry, () -> BukkitExecutor.sync(retry), 1L, 0L);
+                return;
+            }
+        }
 
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
         OfflinePlayerData offlinePlayerData;

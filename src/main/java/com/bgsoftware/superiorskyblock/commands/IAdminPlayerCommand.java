@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +27,13 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
                     return;
                 }
 
-                execute(plugin, sender, targetPlayer, args);
+                Player player = targetPlayer.asPlayer();
+                if (plugin.getTaskScheduler().isFolia() && player != null && !plugin.getTaskScheduler().isOwned(player)) {
+                    String[] arguments = args.clone();
+                    plugin.getTaskScheduler().entity(player, () -> execute(plugin, sender, arguments), null, 0L, 0L);
+                } else {
+                    execute(plugin, sender, targetPlayer, args);
+                }
             }
         } else {
             List<SuperiorPlayer> players = CommandArguments.getMultiplePlayers(plugin, sender, args[2]);

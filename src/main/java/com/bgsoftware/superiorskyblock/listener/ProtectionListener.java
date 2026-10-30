@@ -662,11 +662,12 @@ public class ProtectionListener extends AbstractGameEventListener {
                     if (hitBlock != null) {
                         ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
                         hitBlock.setType(Material.AIR);
-                        BukkitExecutor.sync(() -> {
+                        BukkitExecutor.sync(hitBlock.getLocation(), () -> {
                             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                                 cachedBlock.setBlock(hitBlock.getLocation(wrapper.getHandle()));
+                            } finally {
+                                cachedBlock.release();
                             }
-                            cachedBlock.release();
                         }, 1L);
                     }
                 }

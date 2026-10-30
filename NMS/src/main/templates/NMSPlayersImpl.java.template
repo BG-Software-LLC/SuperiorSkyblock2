@@ -10,6 +10,8 @@ import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.player.OfflinePlayerDa
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.mojang.authlib.properties.Property;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -99,18 +101,30 @@ public class NMSPlayersImpl implements NMSPlayers {
 
         @Override
         public void addPlayer(Player player) {
+            if (BukkitExecutor.isFolia() && !SuperiorSkyblockAPI.getScheduler().isGlobalThread()) {
+                BukkitExecutor.ensureMain(() -> addPlayer(player));
+                return;
+            }
             this.bossBar.addPlayer(player);
             this.bossBarTask.registerTask(player);
         }
 
         @Override
         public void removeAll() {
-            this.bossBar.removeAll();
+            if (BukkitExecutor.isFolia() && !SuperiorSkyblockAPI.getScheduler().isGlobalThread()) {
+                BukkitExecutor.ensureMain(this::removeAll);
+                return;
+            }
             this.bossBar.getPlayers().forEach(this.bossBarTask::unregisterTask);
+            this.bossBar.removeAll();
         }
 
         @Override
         public void setProgress(double progress) {
+            if (BukkitExecutor.isFolia() && !SuperiorSkyblockAPI.getScheduler().isGlobalThread()) {
+                BukkitExecutor.ensureMain(() -> setProgress(progress));
+                return;
+            }
             this.bossBar.setProgress(progress);
         }
 

@@ -105,7 +105,11 @@ public class DefaultModulesContainer implements ModulesContainer {
 
     @Override
     public void removeModuleData(PluginModule module) {
-        this.modulesData.remove(module);
+        ModuleData previous = this.modulesData.remove(module);
+        if (this.plugin.getTaskScheduler().isFolia() && previous != null && previous.getListeners() != null) {
+            for (Listener listener : previous.getListeners())
+                HandlerList.unregisterAll(listener);
+        }
     }
 
     private static class ModuleInitializeDataImpl implements ModuleInitializeData {

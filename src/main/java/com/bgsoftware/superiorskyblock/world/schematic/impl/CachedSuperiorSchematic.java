@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import org.bukkit.Location;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -91,33 +90,23 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
         WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
         worldEditSession.applyData(worldEditSessionCache.sessionData, location);
 
-        worldEditSessionCache.prePlaceTasks.forEach(schematicBlock -> {
-            schematicBlock.doPrePlace(island);
-
+        List<SchematicBlock> postPlaceTasks = new LinkedList<>();
+        worldEditSessionCache.prePlaceTasks.forEach(cachedBlock -> {
             Location newBlockLoc = new Location(
                     location.getWorld(),
-                    location.getBlockX() - worldEditSessionCache.baseLocation.getX() + schematicBlock.getLocation().getBlockX(),
-                    schematicBlock.getLocation().getBlockY(),
-                    location.getBlockZ() - worldEditSessionCache.baseLocation.getZ() + schematicBlock.getLocation().getBlockZ()
+                    location.getBlockX() - worldEditSessionCache.baseLocation.getX() + cachedBlock.getLocation().getBlockX(),
+                    cachedBlock.getLocation().getBlockY(),
+                    location.getBlockZ() - worldEditSessionCache.baseLocation.getZ() + cachedBlock.getLocation().getBlockZ()
             );
-
+            SchematicBlock schematicBlock = cachedBlock.setLocation(newBlockLoc);
+            schematicBlock.doPrePlace(island);
             worldEditSession.setBlock(newBlockLoc, schematicBlock.getCombinedId(),
                     schematicBlock.getStatesTag(), schematicBlock.getTileEntityData());
+            if (schematicBlock.shouldPostPlace())
+                postPlaceTasks.add(schematicBlock);
         });
 
         Profiler.end(placeProfiler);
-
-        List<SchematicBlock> postPlaceTasks = worldEditSessionCache.postPlaceTasks.isEmpty() ? Collections.emptyList() : new LinkedList<>();
-        worldEditSessionCache.postPlaceTasks.forEach(schematicBlock -> {
-            Location newBlockLoc = new Location(
-                    location.getWorld(),
-                    location.getBlockX() - worldEditSessionCache.baseLocation.getX() + schematicBlock.getLocation().getBlockX(),
-                    schematicBlock.getLocation().getBlockY(),
-                    location.getBlockZ() - worldEditSessionCache.baseLocation.getZ() + schematicBlock.getLocation().getBlockZ()
-            );
-
-            postPlaceTasks.add(schematicBlock.setLocation(newBlockLoc));
-        });
 
         this.baseSchematic.finishPlaceSchematic(worldEditSession, postPlaceTasks,
                 island, location, profiler, callback, onFailure);
@@ -186,7 +175,7 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
         this.baseSchematic.populateSessionWithSchematicBlocks(worldEditSession, location, prePlaceTasks, postPlaceTasks);
         WorldEditSession.Data sessionData = worldEditSession.readData(location);
         worldEditSession.release();
-        return new WorldEditSessionCache(sessionData, prePlaceTasks, postPlaceTasks, location);
+        return new WorldEditSessionCache(sessionData, prePlaceTasks, location);
     }
 
     private static int posKey(int x, int z) {
@@ -221,13 +210,11 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
 
         private final WorldEditSession.Data sessionData;
         private final List<SchematicBlock> prePlaceTasks;
-        private final List<SchematicBlock> postPlaceTasks;
         private final Location baseLocation;
 
-        WorldEditSessionCache(WorldEditSession.Data sessionData, List<SchematicBlock> prePlaceTasks, List<SchematicBlock> postPlaceTasks, Location baseLocation) {
+        WorldEditSessionCache(WorldEditSession.Data sessionData, List<SchematicBlock> prePlaceTasks, Location baseLocation) {
             this.sessionData = sessionData;
             this.prePlaceTasks = prePlaceTasks;
-            this.postPlaceTasks = postPlaceTasks;
             this.baseLocation = baseLocation;
         }
 

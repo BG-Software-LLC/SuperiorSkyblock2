@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.missions;
 
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
@@ -61,7 +62,7 @@ public final class CraftingMissions extends BuiltinMission<CraftingMissions.Craf
 
     @Override
     protected void clearModuleData(CraftingsTracker data) {
-        data.craftedItems.clear();
+        data.clear();
     }
 
     @Override
@@ -102,7 +103,7 @@ public final class CraftingMissions extends BuiltinMission<CraftingMissions.Craf
         for (Map.Entry<SuperiorPlayer, CraftingsTracker> entry : entrySet()) {
             String uuid = entry.getKey().getUniqueId().toString();
             int index = 0;
-            for (Map.Entry<ItemStack, Integer> craftedEntry : entry.getValue().craftedItems.entrySet()) {
+            for (Map.Entry<ItemStack, Integer> craftedEntry : entry.getValue().getCraftedItems().entrySet()) {
                 section.set(uuid + "." + index + ".item", craftedEntry.getKey());
                 section.set(uuid + "." + index + ".amount", craftedEntry.getValue());
                 index++;
@@ -125,7 +126,7 @@ public final class CraftingMissions extends BuiltinMission<CraftingMissions.Craf
             for (String key : section.getConfigurationSection(uuid).getKeys(false)) {
                 ItemStack itemStack = section.getItemStack(uuid + "." + key + ".item");
                 int amount = section.getInt(uuid + "." + key + ".amount");
-                craftingsTracker.craftedItems.put(itemStack, amount);
+                craftingsTracker.load(itemStack, amount);
             }
         }
     }
@@ -191,7 +192,7 @@ public final class CraftingMissions extends BuiltinMission<CraftingMissions.Craf
         if (e.getRawSlot() == requiredSlot && itemsToCraft.containsKey(resultItem) &&
                 this.plugin.getMissions().canCompleteNoProgress(superiorPlayer, this)) {
             int amountOfResult = countItems(e.getWhoClicked(), resultItem);
-            Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            BukkitExecutor.sync(e.getWhoClicked(), () -> {
                 int afterTickAmountOfResult = countItems(e.getWhoClicked(), resultItem);
                 resultItem.setAmount(afterTickAmountOfResult - amountOfResult);
                 trackItem(superiorPlayer, resultItem);
@@ -208,7 +209,7 @@ public final class CraftingMissions extends BuiltinMission<CraftingMissions.Craf
 
         blocksTracker.trackItem(itemStack);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this.plugin, () -> superiorPlayer.runIfOnline(player -> {
+        BukkitExecutor.async(() -> superiorPlayer.runIfOnline(player -> {
             if (canComplete(superiorPlayer))
                 this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
         }), 2L);
@@ -237,16 +238,39 @@ public final class CraftingMissions extends BuiltinMission<CraftingMissions.Craf
 
         private final Map<ItemStack, Integer> craftedItems = new HashMap<>();
 
+        void clear() {
+            synchronized (this.craftedItems) {
+                this.craftedItems.clear();
+            }
+        }
+
+        void load(ItemStack itemStack, int amount) {
+            synchronized (this.craftedItems) {
+                this.craftedItems.put(itemStack, amount);
+            }
+        }
+
+        Map<ItemStack, Integer> getCraftedItems() {
+            synchronized (this.craftedItems) {
+                return new HashMap<>(this.craftedItems);
+            }
+        }
+
         void trackItem(ItemStack itemStack) {
             ItemStack keyItem = itemStack.clone();
             keyItem.setAmount(1);
-            craftedItems.put(keyItem, craftedItems.getOrDefault(keyItem, 0) + itemStack.getAmount());
+            int amount = itemStack.getAmount();
+            synchronized (this.craftedItems) {
+                this.craftedItems.put(keyItem, this.craftedItems.getOrDefault(keyItem, 0) + amount);
+            }
         }
 
         int getCrafts(ItemStack itemStack) {
             ItemStack keyItem = itemStack.clone();
             keyItem.setAmount(1);
-            return craftedItems.getOrDefault(keyItem, 0);
+            synchronized (this.craftedItems) {
+                return this.craftedItems.getOrDefault(keyItem, 0);
+            }
         }
 
     }

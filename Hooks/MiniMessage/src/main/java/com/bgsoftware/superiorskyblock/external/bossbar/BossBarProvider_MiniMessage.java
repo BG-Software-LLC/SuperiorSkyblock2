@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.external.bossbar;
 
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.ParsingException;
@@ -68,6 +70,10 @@ public class BossBarProvider_MiniMessage implements BossBarProvider {
 
         @Override
         public void addPlayer(Player player) {
+            if (BukkitExecutor.isFolia() && !SuperiorSkyblockAPI.getScheduler().isGlobalThread()) {
+                BukkitExecutor.ensureMain(() -> addPlayer(player));
+                return;
+            }
             if (this.players.add(player)) {
                 player.showBossBar(this.bossBar);
                 this.bossBarTask.registerTask(player);
@@ -76,6 +82,10 @@ public class BossBarProvider_MiniMessage implements BossBarProvider {
 
         @Override
         public void removeAll() {
+            if (BukkitExecutor.isFolia() && !SuperiorSkyblockAPI.getScheduler().isGlobalThread()) {
+                BukkitExecutor.ensureMain(this::removeAll);
+                return;
+            }
             for (Player player : this.players) {
                 player.hideBossBar(this.bossBar);
                 this.bossBarTask.unregisterTask(player);
@@ -85,6 +95,10 @@ public class BossBarProvider_MiniMessage implements BossBarProvider {
 
         @Override
         public void setProgress(double progress) {
+            if (BukkitExecutor.isFolia() && !SuperiorSkyblockAPI.getScheduler().isGlobalThread()) {
+                BukkitExecutor.ensureMain(() -> setProgress(progress));
+                return;
+            }
             this.bossBar.progress((float) Math.max(0.0, Math.min(1.0, progress)));
         }
 

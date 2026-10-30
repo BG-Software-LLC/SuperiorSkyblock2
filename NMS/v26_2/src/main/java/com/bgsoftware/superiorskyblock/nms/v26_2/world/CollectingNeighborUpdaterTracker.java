@@ -29,6 +29,10 @@ public class CollectingNeighborUpdaterTracker extends CollectingNeighborUpdater 
 
     @Override
     public void shapeUpdate(Direction direction, BlockState state, BlockPos pos, BlockPos neighborPos, @Block.UpdateFlags int flags, int recursionLeft) {
+        if (!plugin.isEnabled()) {
+            super.shapeUpdate(direction, state, pos, neighborPos, flags, recursionLeft);
+            return;
+        }
         BlockState oldState = this.level.getBlockState(pos);
         // The block entity must be captured before the update, as it might be removed by it.
         BlockEntity oldBlockEntity = oldState.hasBlockEntity() ? this.level.getBlockEntity(pos) : null;

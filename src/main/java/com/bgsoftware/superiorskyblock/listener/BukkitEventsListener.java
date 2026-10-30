@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
@@ -49,6 +50,7 @@ import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -220,7 +222,7 @@ public class BukkitEventsListener implements Listener {
         }
 
         boolean registeredChatListener = false;
-        if (plugin.getSettings().getChatSigningSupport()) {
+        if (plugin.getSettings().getChatSigningSupport() || plugin.getTaskScheduler().isFolia()) {
             try {
                 Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
                 createEventListener(GameEventType.PLAYER_CHAT_EVENT, io.papermc.paper.event.player.AsyncChatEvent.class, new AsyncChatEventFunctions(), new AsyncChatEventFunctions());
@@ -229,7 +231,7 @@ public class BukkitEventsListener implements Listener {
             }
         }
 
-        if (!registeredChatListener)
+        if (!registeredChatListener || plugin.getTaskScheduler().isFolia())
             createEventListener(GameEventType.PLAYER_CHAT_EVENT, AsyncPlayerChatEvent.class, this::createGameEvent);
 
         try {
@@ -851,6 +853,11 @@ public class BukkitEventsListener implements Listener {
                                                                                 Class<E> bukkitEventClass,
                                                                                 GameEventCreator<Args, E> function,
                                                                                 @Nullable ApplyBukkitEventFunction<E, Args> applyBukkitEventFunction) {
+        if (plugin.getTaskScheduler().isFolia()) {
+            for (GameEventPriority priority : GameEventPriority.values())
+                createEventListenerForPriority(eventType, bukkitEventClass, priority, function, applyBukkitEventFunction);
+            return;
+        }
         Map<GameEventPriority, List<EventCallback>> callbacks = plugin.getGameEventsDispatcher().getCallbacks(eventType);
         if (!callbacks.isEmpty()) {
             callbacks.keySet().forEach(priority ->
@@ -865,35 +872,54 @@ public class BukkitEventsListener implements Listener {
                                                                                            @Nullable ApplyBukkitEventFunction<E, Args> applyBukkitEventFunction) {
         EventPriority bukkitEventPriority = EventPriority.valueOf(gameEventPriority.name());
         plugin.getServer().getPluginManager().registerEvent(bukkitEventClass, this, bukkitEventPriority, (listener, event) -> {
-            if (!bukkitEventClass.isAssignableFrom(event.getClass()))
-                return;
-
-            IEventsDispatcher customEventsDispatcher = plugin.getEventsDispatcher();
-            if (customEventsDispatcher != null) {
-                if (customEventsDispatcher.notifyEvent(event, bukkitEventPriority))
+            try {
+                if (!bukkitEventClass.isAssignableFrom(event.getClass()))
                     return;
-                if (!customEventsDispatcher.shouldFallbackToDefaultExecutorOnFailure())
+                if (plugin.getTaskScheduler().isFolia()) {
+                    if (!plugin.getGameEventsDispatcher().hasCallbacks(eventType, gameEventPriority))
+                        return;
+                    if (eventType == GameEventType.PLAYER_CHAT_EVENT &&
+                            (function instanceof AsyncChatEventFunctions) != plugin.getSettings().getChatSigningSupport())
+                        return;
+                }
+
+                IEventsDispatcher customEventsDispatcher = plugin.getEventsDispatcher();
+                if (customEventsDispatcher != null) {
+                    if (customEventsDispatcher.notifyEvent(event, bukkitEventPriority))
+                        return;
+                    if (!customEventsDispatcher.shouldFallbackToDefaultExecutorOnFailure())
+                        return;
+                }
+
+                GameEvent<Args> gameEvent = function.execute(eventType, gameEventPriority, (E) event);
+                if (gameEvent == null)
                     return;
+
+                boolean cancelledBeforeDispatch = false;
+
+                if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
+                    gameEvent.setCancelled();
+                    cancelledBeforeDispatch = true;
+                }
+
+                plugin.getGameEventsDispatcher().onGameEvent(gameEvent, gameEventPriority);
+                if (!cancelledBeforeDispatch && gameEvent.isCancelled()) {
+                    if (event instanceof Cancellable)
+                        ((Cancellable) event).setCancelled(true);
+                }
+                if (applyBukkitEventFunction != null)
+                    applyBukkitEventFunction.apply((E) event, gameEvent);
+            } finally {
+                if (plugin.getTaskScheduler().isFolia() && eventType == GameEventType.ENTITY_SPAWN_EVENT &&
+                        gameEventPriority == GameEventPriority.MONITOR) {
+                    Entity entity = event instanceof EntitySpawnEvent ?
+                            ((EntitySpawnEvent) event).getEntity() :
+                            event instanceof HangingPlaceEvent ? ((HangingPlaceEvent) event).getEntity() :
+                            event instanceof VehicleCreateEvent ? ((VehicleCreateEvent) event).getVehicle() : null;
+                    if (entity != null)
+                        DefaultIslandEntitiesTrackerAlgorithm.releaseEntityReservation(entity.getUniqueId());
+                }
             }
-
-            GameEvent<Args> gameEvent = function.execute(eventType, gameEventPriority, (E) event);
-            if (gameEvent == null)
-                return;
-
-            boolean cancelledBeforeDispatch = false;
-
-            if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
-                gameEvent.setCancelled();
-                cancelledBeforeDispatch = true;
-            }
-
-            plugin.getGameEventsDispatcher().onGameEvent(gameEvent, gameEventPriority);
-            if (!cancelledBeforeDispatch && gameEvent.isCancelled()) {
-                if (event instanceof Cancellable)
-                    ((Cancellable) event).setCancelled(true);
-            }
-            if (applyBukkitEventFunction != null)
-                applyBukkitEventFunction.apply((E) event, gameEvent);
         }, plugin, false);
     }
 
@@ -963,7 +989,7 @@ public class BukkitEventsListener implements Listener {
         public GameEvent<GameEventArgs.EntityDeathEvent> execute(GameEventType<GameEventArgs.EntityDeathEvent> eventType, GameEventPriority priority, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent e) {
             Location entityLocation = e.getEntity().getLocation();
 
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync(entityLocation, () -> {
                 if (e.getEntity().isValid() && !e.getEntity().isDead())
                     return;
 

@@ -29,19 +29,20 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class PortalsManagerServiceImpl implements PortalsManagerService, IService {
 
-    private final AutoRemovalCollection<UUID> generatingSchematicsIslands = AutoRemovalCollection.newHashSet(20, TimeUnit.SECONDS);
+    private final Collection<UUID> generatingSchematicsIslands;
 
     private final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
         @Override
@@ -54,6 +55,8 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
 
     public PortalsManagerServiceImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+        this.generatingSchematicsIslands = plugin.getTaskScheduler().isFolia() ? ConcurrentHashMap.newKeySet() :
+                AutoRemovalCollection.newHashSet(20, TimeUnit.SECONDS);
     }
 
     @Override
@@ -240,6 +243,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             return EntityPortalResult.WORLD_NOT_UNLOCKED;
         }
 
+        boolean generating = false;
         try {
             // We want to prevent the players from being teleported in this time.
             if (generatingSchematicsIslands.contains(island.getUniqueId()))
@@ -284,7 +288,9 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                 return EntityPortalResult.INVALID_SCHEMATIC;
             }
 
-            generatingSchematicsIslands.add(island.getUniqueId());
+            if (!generatingSchematicsIslands.add(island.getUniqueId()))
+                return EntityPortalResult.SCHEMATIC_GENERATING_COOLDOWN;
+            generating = true;
 
             // If schematic was already generated, or no schematic should be generated, simply
             // teleport player to destination location.
@@ -305,61 +311,71 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             }
 
             IslandWorlds.accessIslandWorldAsync(island, destination, true, islandWorldResult -> {
-                islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
-                    Location centerLocation = island.getCenter(destination);
-                    Location schematicPlacementLocation = centerLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
+                islandWorldResult.ifRight(error -> failSchematicGeneration(island, superiorPlayer, error)).ifLeft(world -> {
+                    try {
+                        Location centerLocation = island.getCenter(destination);
+                        Location schematicPlacementLocation = centerLocation.clone().subtract(0, 1, 0);
 
-                    BigDecimal originalWorth = island.getRawWorth();
-                    BigDecimal originalLevel = island.getRawLevel();
+                        BigDecimal originalWorth = island.getRawWorth();
+                        BigDecimal originalLevel = island.getRawLevel();
 
-                    schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
-                        generatingSchematicsIslands.remove(island.getUniqueId());
-                        island.setSchematicGenerate(destination);
+                        schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
+                            generatingSchematicsIslands.remove(island.getUniqueId());
+                            island.setSchematicGenerate(destination);
 
-                        SettingsManager.Worlds.DimensionConfig destinationConfig = plugin.getSettings().getWorlds().getDimensionConfig(destination);
-                        if (destinationConfig != null && destinationConfig.isSchematicOffset()) {
-                            {
-                                BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth);
-                                PluginEvent<PluginEventArgs.IslandChangeWorthBonus> event = PluginEventsFactory.callIslandChangeWorthBonusEvent(
-                                        island, (SuperiorPlayer) null, IslandChangeWorthBonusEvent.Reason.SCHEMATIC, island.getBonusWorth().subtract(schematicWorth));
-                                if (!event.isCancelled())
-                                    island.setBonusWorth(event.getArgs().worthBonus);
+                            SettingsManager.Worlds.DimensionConfig destinationConfig = plugin.getSettings().getWorlds().getDimensionConfig(destination);
+                            if (destinationConfig != null && destinationConfig.isSchematicOffset()) {
+                                {
+                                    BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth);
+                                    PluginEvent<PluginEventArgs.IslandChangeWorthBonus> event = PluginEventsFactory.callIslandChangeWorthBonusEvent(
+                                            island, (SuperiorPlayer) null, IslandChangeWorthBonusEvent.Reason.SCHEMATIC, island.getBonusWorth().subtract(schematicWorth));
+                                    if (!event.isCancelled())
+                                        island.setBonusWorth(event.getArgs().worthBonus);
+                                }
+                                {
+                                    BigDecimal schematicLevel = island.getRawLevel().subtract(originalLevel);
+                                    PluginEvent<PluginEventArgs.IslandChangeLevelBonus> event = PluginEventsFactory.callIslandChangeLevelBonusEvent(
+                                            island, (SuperiorPlayer) null, IslandChangeLevelBonusEvent.Reason.SCHEMATIC, island.getBonusLevel().subtract(schematicLevel));
+                                    if (!event.isCancelled())
+                                        island.setBonusLevel(event.getArgs().levelBonus);
+                                }
                             }
-                            {
-                                BigDecimal schematicLevel = island.getRawLevel().subtract(originalLevel);
-                                PluginEvent<PluginEventArgs.IslandChangeLevelBonus> event = PluginEventsFactory.callIslandChangeLevelBonusEvent(
-                                        island, (SuperiorPlayer) null, IslandChangeLevelBonusEvent.Reason.SCHEMATIC, island.getBonusLevel().subtract(schematicLevel));
-                                if (!event.isCancelled())
-                                    island.setBonusLevel(event.getArgs().levelBonus);
+
+                            Location homeLocation = schematic.adjustRotation(centerLocation);
+                            island.setIslandHome(homeLocation);
+
+                            if (destination.getEnvironment() == World.Environment.THE_END && superiorPlayer != null) {
+                                BukkitExecutor.ensureMain(entity, () -> plugin.getNMSDragonFight().awardTheEndAchievement((Player) entity));
+                                this.dragonBattleService.get().resetEnderDragonBattle(island, destination);
                             }
-                        }
 
-                        Location homeLocation = schematic.adjustRotation(centerLocation);
-                        island.setIslandHome(homeLocation);
-
-                        if (destination.getEnvironment() == World.Environment.THE_END && superiorPlayer != null) {
-                            plugin.getNMSDragonFight().awardTheEndAchievement((Player) entity);
-                            this.dragonBattleService.get().resetEnderDragonBattle(island, destination);
-                        }
-
-                        if (superiorPlayer != null) {
-                            superiorPlayer.teleport(homeLocation);
-                        } else {
-                            EntityTeleports.teleport(entity, homeLocation);
-                        }
-                    }, error -> {
-                        generatingSchematicsIslands.remove(island.getUniqueId());
-                        error.printStackTrace();
-                        if (superiorPlayer != null)
-                            Message.CREATE_WORLD_FAILURE.send(superiorPlayer);
-                    });
+                            if (superiorPlayer != null) {
+                                superiorPlayer.teleport(homeLocation);
+                            } else {
+                                EntityTeleports.teleport(entity, homeLocation);
+                            }
+                        }, error -> failSchematicGeneration(island, superiorPlayer, error));
+                    } catch (Throwable error) {
+                        failSchematicGeneration(island, superiorPlayer, error);
+                    }
                 });
             });
 
-        } catch (NullPointerException ignored) {
+        } catch (RuntimeException error) {
+            if (generating)
+                generatingSchematicsIslands.remove(island.getUniqueId());
+            if (!(error instanceof NullPointerException))
+                throw error;
         }
 
         return EntityPortalResult.SUCCEED;
+    }
+
+    private void failSchematicGeneration(Island island, @Nullable SuperiorPlayer superiorPlayer, Throwable error) {
+        generatingSchematicsIslands.remove(island.getUniqueId());
+        error.printStackTrace();
+        if (superiorPlayer != null)
+            Message.CREATE_WORLD_FAILURE.send(superiorPlayer);
     }
 
     @Nullable

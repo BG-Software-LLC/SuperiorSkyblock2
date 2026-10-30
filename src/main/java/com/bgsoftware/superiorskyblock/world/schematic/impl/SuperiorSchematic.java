@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -240,6 +241,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>(affectedChunks.size());
 
         AtomicBoolean failed = new AtomicBoolean(false);
+        AtomicBoolean finishing = new AtomicBoolean(false);
         MutableBoolean printedWarning = new MutableBoolean(false);
 
         affectedChunks.forEach(chunkPosition -> {
@@ -260,7 +262,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
                     if (cropGrowthEnabled && island.isInsideRange(chunk)) {
-                        BukkitExecutor.ensureMain(() -> plugin.getNMSChunks().startTickingChunk(island, chunk, false));
+                        BukkitExecutor.ensureMain(new Location(chunk.getWorld(), chunk.getX() << 4, 0, chunk.getZ() << 4),
+                                () -> plugin.getNMSChunks().startTickingChunk(island, chunk, false));
                     }
 
                     island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
@@ -269,29 +272,40 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                 } catch (Throwable error) {
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Loading Chunk", error);
                     failed.set(true);
-                    Profiler.end(profiler);
-                    if (onFailure != null)
-                        onFailure.accept(error);
+                    throw new CompletionException(error);
                 }
             }));
         });
 
-        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenCompleteAsync((v, error) -> {
+        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0]))
+                .thenCompose(ignored -> {
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
+                    finishing.set(true);
+                    return worldEditSession.finishAsync(island);
+                })
+                .thenCompose(ignored -> {
+                    List<CompletableFuture<Void>> postPlaceFutures = new ArrayList<>();
+                    if (island.getOwner().isOnline()) {
+                        postPlaceTasks.forEach(block -> postPlaceFutures.add(BukkitExecutor.submit(block.getLocation(), () -> {
+                            block.doPostPlace(island);
+                            return null;
+                        })));
+                    }
+                    return CompletableFuture.allOf(postPlaceFutures.toArray(new CompletableFuture[0]));
+                }).whenCompleteAsync((v, error) -> {
+            if (error != null) {
+                if (!finishing.get())
+                    worldEditSession.release();
+                Profiler.end(profiler);
+                if (onFailure != null)
+                    onFailure.accept(error);
+                return;
+            }
             if (failed.get())
                 return;
 
-            Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
-
             try {
-                Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
-                worldEditSession.finish(island);
-
-                if (island.getOwner().isOnline()) {
-                    postPlaceTasks.forEach(schematicBlock -> {
-                        schematicBlock.doPostPlace(island);
-                    });
-                }
-
                 Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
 
                 island.handleBlocksPlace(cachedCounts);

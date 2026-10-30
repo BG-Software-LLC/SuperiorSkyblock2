@@ -13,12 +13,22 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
+import org.bukkit.generator.ChunkGenerator;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
 import java.util.function.IntFunction;
+import java.util.concurrent.CompletableFuture;
 
 public interface NMSWorld {
+
+    default CompletableFuture<World> createWorldAsync(String name, World.Environment environment, ChunkGenerator generator) {
+        return BukkitExecutor.submit(() -> WorldCreator.name(name).environment(environment).type(WorldType.FLAT)
+                .generator(generator).createWorld());
+    }
 
     Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z);
 

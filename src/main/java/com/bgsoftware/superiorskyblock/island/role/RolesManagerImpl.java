@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.RolesManager;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.island.role.container.RolesContainer;
 import com.google.common.base.Preconditions;
@@ -28,7 +29,9 @@ public class RolesManagerImpl extends Manager implements RolesManager {
 
     @Override
     public void loadData() throws ManagerLoadException {
-        this.rolesContainer.clearRoles();
+        List<PlayerRole> loadedRoles = BukkitExecutor.isFolia() ? new LinkedList<>() : null;
+        if (loadedRoles == null)
+            this.rolesContainer.clearRoles();
 
         ConfigurationSection rolesSection = plugin.getSettings().getIslandRoles().getSection();
 
@@ -42,8 +45,8 @@ public class RolesManagerImpl extends Manager implements RolesManager {
         if (coopSection == null)
             throw new ManagerLoadException("Missing \"coop\" section for island roles", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
 
-        SPlayerRole guestsRole = loadRole(guestSection, GUEST_ROLE_INDEX, null);
-        SPlayerRole coopRole = loadRole(coopSection, COOP_ROLE_INDEX, guestsRole);
+        SPlayerRole guestsRole = loadRole(guestSection, GUEST_ROLE_INDEX, null, loadedRoles);
+        SPlayerRole coopRole = loadRole(coopSection, COOP_ROLE_INDEX, guestsRole, loadedRoles);
 
         ConfigurationSection laddersSection = rolesSection.getConfigurationSection("ladder");
 
@@ -57,8 +60,10 @@ public class RolesManagerImpl extends Manager implements RolesManager {
 
         SPlayerRole previousRole = coopRole;
         for (ConfigurationSection roleSection : rolesByWeight)
-            previousRole = loadRole(roleSection, previousRole.getWeight() + 1, previousRole);
+            previousRole = loadRole(roleSection, previousRole.getWeight() + 1, previousRole, loadedRoles);
 
+        if (loadedRoles != null)
+            this.rolesContainer.replaceRoles(loadedRoles);
         SPlayerRole.refreshRoles();
     }
 
@@ -87,6 +92,8 @@ public class RolesManagerImpl extends Manager implements RolesManager {
 
     @Override
     public PlayerRole getLastRole() {
+        if (BukkitExecutor.isFolia())
+            return this.rolesContainer.getRoles().stream().max(Comparator.comparingInt(PlayerRole::getWeight)).orElse(null);
         return getPlayerRole(lastRole);
     }
 
@@ -105,7 +112,8 @@ public class RolesManagerImpl extends Manager implements RolesManager {
         return this.rolesContainer.getRoles();
     }
 
-    private SPlayerRole loadRole(ConfigurationSection section, int expectedWeight, SPlayerRole previousRole) throws ManagerLoadException {
+    private SPlayerRole loadRole(ConfigurationSection section, int expectedWeight, SPlayerRole previousRole,
+                                 @Nullable List<PlayerRole> loadedRoles) throws ManagerLoadException {
         int weight = section.getInt("weight", expectedWeight);
 
         if (weight != expectedWeight)
@@ -118,7 +126,10 @@ public class RolesManagerImpl extends Manager implements RolesManager {
 
         SPlayerRole playerRole = new SPlayerRole(name, displayName, id, weight, section.getStringList("permissions"), previousRole);
 
-        this.rolesContainer.addPlayerRole(playerRole);
+        if (loadedRoles == null)
+            this.rolesContainer.addPlayerRole(playerRole);
+        else
+            loadedRoles.add(playerRole);
 
         if (weight > lastRole)
             lastRole = weight;
