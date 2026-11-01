@@ -245,6 +245,12 @@ public class BukkitEventsListener implements Listener {
         }
 
         try {
+            Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
+            createEventListener(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, org.bukkit.event.player.PlayerTakeLecternBookEvent.class, new PlayerTakeLecternBookEventFunctions());
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        try {
             Class.forName("org.bukkit.event.raid.RaidTriggerEvent");
             createEventListener(GameEventType.RAID_TRIGGER_EVENT, org.bukkit.event.raid.RaidTriggerEvent.class, new RaidTriggerEventFunctions());
         } catch (Exception ignored) {
@@ -1022,6 +1028,18 @@ public class BukkitEventsListener implements Listener {
             playerPickupItemEvent.player = e.getPlayer();
             playerPickupItemEvent.pickedUpItem = e.getItem();
             return eventType.createEvent(playerPickupItemEvent);
+        }
+
+    }
+
+    private static class PlayerTakeLecternBookEventFunctions implements GameEventCreator<GameEventArgs.PlayerTakeLecternBookEvent, org.bukkit.event.player.PlayerTakeLecternBookEvent> {
+
+        @Override
+        public GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> execute(GameEventType<GameEventArgs.PlayerTakeLecternBookEvent> eventType, GameEventPriority priority, org.bukkit.event.player.PlayerTakeLecternBookEvent e) {
+            GameEventArgs.PlayerTakeLecternBookEvent playerTakeLecternBookEvent = new GameEventArgs.PlayerTakeLecternBookEvent();
+            playerTakeLecternBookEvent.player = e.getPlayer();
+            playerTakeLecternBookEvent.clickedBlock = e.getLectern().getBlock();
+            return eventType.createEvent(playerTakeLecternBookEvent);
         }
 
     }

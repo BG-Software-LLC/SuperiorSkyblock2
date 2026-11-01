@@ -326,6 +326,17 @@ public class ProtectionListener extends AbstractGameEventListener {
             e.setCancelled();
     }
 
+    private void onPlayerTakeLecternBook(GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> e) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+        InteractionResult interactionResult;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            interactionResult = this.protectionManager.get().handleCustomInteraction(
+                    superiorPlayer, e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), IslandPrivileges.PICKUP_LECTERN_BOOK);
+        }
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+            e.setCancelled();
+    }
+
     private void onBucketDispense(GameEvent<GameEventArgs.BlockDispenseEvent> e) {
         Material itemType = e.getArgs().dispensedItem.getType();
 
@@ -729,6 +740,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         registerCallback(GameEventType.ENTITY_BLOCK_FORM_EVENT, GameEventPriority.NORMAL, this::onFrostWalker);
         registerCallback(GameEventType.PLAYER_EMPTY_BUCKET_EVENT, GameEventPriority.NORMAL, this::onBucketEmpty);
         registerCallback(GameEventType.PLAYER_FILL_BUCKET_EVENT, GameEventPriority.NORMAL, this::onBucketFill);
+        registerCallback(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, GameEventPriority.NORMAL, this::onPlayerTakeLecternBook);
         registerCallback(GameEventType.BLOCK_DISPENSE_EVENT, GameEventPriority.NORMAL, this::onBucketDispense);
         registerCallback(GameEventType.PLAYER_ITEM_CONSUME_EVENT, GameEventPriority.NORMAL, this::onChorusFruitConsume);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.NORMAL, this::onEntityAttack);

@@ -383,6 +383,12 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
+    public static class PlayerTakeLecternBookEvent extends PlayerEvent {
+
+        public Block clickedBlock;
+
+    }
+
     public static class RaidTriggerEvent extends WorldEvent {
 
         public Player player;

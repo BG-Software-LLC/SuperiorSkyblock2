@@ -38,6 +38,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Lectern;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
@@ -70,6 +71,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final Material CAVE_VINES = EnumHelper.getEnum(Material.class, "CAVE_VINES");
     @Nullable
     private static final Material CAVE_VINES_PLANT = EnumHelper.getEnum(Material.class, "CAVE_VINES_PLANT");
+    @Nullable
+    private static final Material LECTERN = EnumHelper.getEnum(Material.class, "LECTERN");
     @Nullable
     private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
     @Nullable
@@ -228,6 +231,12 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 islandPrivilege = IslandPrivileges.FERTILIZE;
             } else if (stackedBlockAmount > 1) {
                 islandPrivilege = IslandPrivileges.BREAK;
+            } else if (blockType == LECTERN && action == Action.RIGHT_CLICK_BLOCK) {
+                if (!((Lectern) plugin.getNMSWorld().getBlockData(block)).hasBook()) {
+                    islandPrivilege = IslandPrivileges.BUILD;
+                } else if (islandPrivilege == IslandPrivileges.PICKUP_LECTERN_BOOK) {
+                    islandPrivilege = IslandPrivileges.READ_LECTERN_BOOK;
+                }
             }
 
             return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivilege,
