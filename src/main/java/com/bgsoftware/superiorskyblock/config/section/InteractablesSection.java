@@ -35,7 +35,7 @@ public class InteractablesSection implements SettingsManager.Interactables {
     private static final LazyReference<IslandPrivilege> PRIVILEGE_CHEST_ACCESS = lazyIslandPrivilege("CHEST_ACCESS");
     private static final LazyReference<IslandPrivilege> PRIVILEGE_FARM_TRAMPING = lazyIslandPrivilege("FARM_TRAMPING");
     private static final LazyReference<IslandPrivilege> PRIVILEGE_INTERACT = lazyIslandPrivilege("INTERACT");
-    private static final LazyReference<IslandPrivilege> PRIVILEGE_READ_LECTERN_BOOK = lazyIslandPrivilege("READ_LECTERN_BOOK");
+    private static final LazyReference<IslandPrivilege> PRIVILEGE_PICKUP_LECTERN_BOOK = lazyIslandPrivilege("PICKUP_LECTERN_BOOK");
     private static final LazyReference<IslandPrivilege> PRIVILEGE_SIGN_INTERACT = lazyIslandPrivilege("SIGN_INTERACT");
     private static final LazyReference<IslandPrivilege> PRIVILEGE_SPAWNER_BREAK = lazyIslandPrivilege("SPAWNER_BREAK");
     private static final LazyReference<IslandPrivilege> PRIVILEGE_TURTLE_EGG_TRAMPING = lazyIslandPrivilege("TURTLE_EGG_TRAMPING");
@@ -162,7 +162,7 @@ public class InteractablesSection implements SettingsManager.Interactables {
                 if (Materials.isChest(material)) {
                     islandPrivilege = PRIVILEGE_CHEST_ACCESS.get();
                 } else if (material == LECTERN) {
-                    islandPrivilege = PRIVILEGE_READ_LECTERN_BOOK.get();
+                    islandPrivilege = PRIVILEGE_PICKUP_LECTERN_BOOK.get();
                 } else if (isInventoryHolder(material)) {
                     islandPrivilege = PRIVILEGE_USE.get();
                 } else if (Materials.isSign(material)) {
