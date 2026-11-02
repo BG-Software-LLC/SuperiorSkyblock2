@@ -632,7 +632,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             if ((matcher = BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Key key = Keys.ofMaterialAndData(matcher.group(1));
 
-                BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
+                BigDecimal blockLevel = plugin.getBlockValues().getBlockValue(key).getLevel();
                 BigDecimal blockCount = new BigDecimal(island.getBlockCountAsBigInteger(key));
 
                 return Optional.of(String.valueOf(blockLevel.multiply(blockCount)));
@@ -812,7 +812,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
         if ((matcher = BLOCK_LEVEL_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
             Key key = Keys.ofMaterialAndData(matcher.group(1));
-            BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
+            BigDecimal blockLevel = plugin.getBlockValues().getBlockValue(key).getLevel();
 
             return Optional.of(String.valueOf(blockLevel));
         }
