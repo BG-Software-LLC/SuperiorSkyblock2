@@ -101,7 +101,7 @@ public class SPlayerRole implements PlayerRole {
     public static PlayerRole getSafe(@Nullable String name) {
         try {
             return plugin.getRoles().getPlayerRole(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             return null;
         }
     }

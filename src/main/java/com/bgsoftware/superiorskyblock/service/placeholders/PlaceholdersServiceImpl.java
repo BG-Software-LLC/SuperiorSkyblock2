@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,8 +56,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)");
-    private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
+    private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern BAN_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("ban_(\\d+)");
     private static final Pattern BIOME_PLACEHOLDER_PATTERN = Pattern.compile("biome_(.+)");
@@ -68,7 +69,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern BLOCK_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("block_worth_(.+)");
     private static final Pattern COOP_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("coop_(\\d+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("count_(.+)");
-    private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("data_(.+)");
+    private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("data_(.+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("effect_(.+)");
     private static final Pattern ENTITY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("entity_count_(.+)");
     private static final Pattern ENTITY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("entity_limit_(.+)");
@@ -83,7 +84,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern PLAYER_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("player_(\\d+)");
     private static final Pattern ROLE_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("role_count_(.+)");
     private static final Pattern ROLE_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("role_limit_(.+)");
-    private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("top_(.+)");
+    private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("top_(.+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
     private static final Pattern TOP_VALUE_RAW_PLACEHOLDER_PATTERN = Pattern.compile("value_raw_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
@@ -97,7 +98,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern WORLD_GENERATED_PLACEHOLDER_PATTERN = Pattern.compile("world_generated_(.+)");
     private static final Pattern WORLD_UNLOCKED_PLACEHOLDER_PATTERN = Pattern.compile("world_unlocked_(.+)");
 
-    private static final String ISLAND_PREFIX = "island_";
     private static final String LOCATION_PREFIX = "location_";
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PLACEHOLDER_PARSERS =
@@ -408,6 +408,12 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             plugin.getGrid().getTotalWorth().toString())
                     .build();
 
+    private static final Map<String, Dimension> DIMENSIONS_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, SortingType> SORTING_TYPES_CACHE = new ConcurrentHashMap<>();
+
+    private static int knownDimensionsCount = -1;
+    private static int knownSortingTypesCount = -1;
+
     private final Map<String, IslandPlaceholderParser> customIslandPlaceholderParsers = new HashMap<>();
     private final Map<String, PlayerPlaceholderParser> customPlayerPlaceholdersParsers = new HashMap<>();
 
@@ -495,19 +501,18 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         }
 
         if ((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
+            String subPlaceholder = matcher.group(1);
 
             placeholderResult = parsePlaceholdersForPlayer(superiorPlayer, subPlaceholder);
         } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
+            String subPlaceholder = matcher.group(1);
 
             Island island;
 
             if (superiorPlayer == null) {
                 island = null;
-            } else if (subPlaceholder.startsWith(LOCATION_PREFIX)) {
+            } else if (subPlaceholder.toLowerCase(Locale.ENGLISH).startsWith(LOCATION_PREFIX)) {
                 subPlaceholder = subPlaceholder.substring(LOCATION_PREFIX.length());
-                placeholder = ISLAND_PREFIX  + subPlaceholder;
 
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                     island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation(wrapper.getHandle()));
@@ -523,15 +528,17 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             return placeholderResult.get();
         }
 
-        String defaultPlaceholderValue = plugin.getSettings().getDefaultPlaceholders().get(placeholder);
+        String loweredPlaceholder = placeholder.toLowerCase(Locale.ENGLISH);
+
+        String defaultPlaceholderValue = plugin.getSettings().getDefaultPlaceholders().get(loweredPlaceholder);
 
         if (defaultPlaceholderValue != null) {
             return defaultPlaceholderValue;
         }
 
-        // We try to look for prefixes of placeholders
+        // We try to look for prefixes of placeholders.
         for (Map.Entry<String, String> entry : plugin.getSettings().getDefaultPlaceholders().entrySet()) {
-            if (placeholder.startsWith(entry.getKey())) {
+            if (loweredPlaceholder.startsWith(entry.getKey())) {
                 return entry.getValue();
             }
         }
@@ -541,10 +548,18 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     private static Optional<String> parsePlaceholdersForPlayer(@Nullable SuperiorPlayer superiorPlayer,
                                                                String subPlaceholder) {
+        String loweredSubPlaceholder = subPlaceholder.toLowerCase(Locale.ENGLISH);
+
         Matcher matcher;
 
         if (superiorPlayer != null) {
-            if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(subPlaceholder)).matches()) {
+            PlayerPlaceholderParser playerPlaceholderParser = PLAYER_PLACEHOLDER_PARSERS.get(loweredSubPlaceholder);
+
+            if (playerPlaceholderParser != null) {
+                return Optional.ofNullable(playerPlaceholderParser.apply(superiorPlayer));
+            }
+
+            if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 MissionCategory missionCategory = plugin.getMissions().getMissionCategory(matcher.group(1));
 
                 if (missionCategory == null) {
@@ -554,7 +569,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return handleCompletedMissionsPlaceholder(superiorPlayer.getCompletedMissions(), missionCategory);
             }
 
-            if ((matcher = MISSION_STATUS_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = MISSION_STATUS_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Mission<?> mission = plugin.getMissions().getMission(matcher.group(1));
 
                 if (mission == null || mission.getIslandMission()) {
@@ -564,9 +579,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasCompletedMission(mission),
                         superiorPlayer.getUserLocale()));
             }
-
-            return Optional.ofNullable(PLAYER_PLACEHOLDER_PARSERS.get(subPlaceholder))
-                    .map(placeholderParser -> placeholderParser.apply(superiorPlayer));
         }
 
         return Optional.empty();
@@ -575,14 +587,26 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static Optional<String> parsePlaceholdersForIsland(@Nullable Island island,
                                                                @Nullable SuperiorPlayer superiorPlayer,
                                                                String subPlaceholder) {
+        String loweredSubPlaceholder = subPlaceholder.toLowerCase(Locale.ENGLISH);
+
         Matcher matcher;
 
+        try {
+            IslandPlaceholderParser islandPlaceholderParser = ISLAND_PLACEHOLDER_PARSERS.get(subPlaceholder);
+
+            if (islandPlaceholderParser != null) {
+                return Optional.ofNullable(islandPlaceholderParser.apply(island, superiorPlayer));
+            }
+        } catch (NullPointerException ignored) {
+            // One of the island parses failed due to invalid island or superiorPlayer being sent.
+        }
+
         if (island != null) {
-            if ((matcher = BAN_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = BAN_INDEX_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handlePlayersIndexPlaceholder(island.getBannedPlayers(), matcher.group(1));
             }
 
-            if ((matcher = BIOME_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = BIOME_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Dimension dimension = Dimensions.getSafe(matcher.group(1));
 
                 if (dimension == null) {
@@ -592,20 +616,20 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(Formatters.CAPITALIZED_FORMATTER.format(island.getBiome(dimension).name()));
             }
 
-            if ((matcher = BLOCK_COUNT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches() ||
-                    (matcher = COUNT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = BLOCK_COUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches() ||
+                    (matcher = COUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Key key = Keys.ofMaterialAndData(matcher.group(1));
 
                 return Optional.of(String.valueOf(island.getBlockCountAsBigInteger(key)));
             }
 
-            if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Key key = Keys.ofMaterialAndData(matcher.group(1));
 
                 return Optional.of(String.valueOf(island.getBlockLimit(key)));
             }
 
-            if ((matcher = BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = BLOCK_TOTAL_LEVEL_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Key key = Keys.ofMaterialAndData(matcher.group(1));
 
                 BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
@@ -614,7 +638,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(String.valueOf(blockLevel.multiply(blockCount)));
             }
 
-            if ((matcher = BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = BLOCK_TOTAL_WORTH_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Key key = Keys.ofMaterialAndData(matcher.group(1));
 
                 BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(key);
@@ -623,10 +647,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(String.valueOf(blockWorth.multiply(blockCount)));
             }
 
-            if ((matcher = COOP_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = COOP_INDEX_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handlePlayersIndexPlaceholder(island.getCoopPlayers(), matcher.group(1));
             }
 
+            // Persistent Data Container is case-sensitive.
             if ((matcher = DATA_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                 Object object = island.getPersistentDataContainer().get(matcher.group(1));
 
@@ -637,7 +662,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(object.toString());
             }
 
-            if ((matcher = EFFECT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = EFFECT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 PotionEffectType potionEffectType = PotionEffectType.getByName(matcher.group(1));
 
                 if (potionEffectType == null) {
@@ -647,35 +672,35 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(String.valueOf(island.getPotionEffectLevel(potionEffectType)));
             }
 
-            if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Key key = Keys.ofEntityType(matcher.group(1));
 
                 return Optional.of(String.valueOf(island.getEntitiesTracker().getEntityCount(key)));
             }
 
-            if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Key key = Keys.ofEntityType(matcher.group(1));
 
                 return Optional.of(String.valueOf(island.getEntityLimit(key)));
             }
 
-            if ((matcher = FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = FLAG_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handleIslandFlagPlaceholder(island, superiorPlayer, matcher.group(1));
             }
 
-            if ((matcher = GENERATOR_AMOUNT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = GENERATOR_AMOUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handleGeneratorAmountPlaceholder(island, matcher.group(1));
             }
 
-            if ((matcher = GENERATOR_PERCENTAGE_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = GENERATOR_PERCENTAGE_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handleGeneratorPercentagePlaceholder(island, matcher.group(1));
             }
 
-            if ((matcher = MEMBER_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = MEMBER_INDEX_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handlePlayersIndexPlaceholder(island.getIslandMembers(false), matcher.group(1));
             }
 
-            if ((matcher = MISSION_STATUS_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = MISSION_STATUS_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Mission<?> mission = plugin.getMissions().getMission(matcher.group(1));
 
                 if (mission == null || !mission.getIslandMission()) {
@@ -685,7 +710,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.hasCompletedMission(mission), superiorPlayer.getUserLocale()));
             }
 
-            if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 MissionCategory missionCategory = plugin.getMissions().getMissionCategory(matcher.group(1));
 
                 if (missionCategory == null) {
@@ -695,19 +720,19 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return handleCompletedMissionsPlaceholder(island.getCompletedMissions(), missionCategory);
             }
 
-            if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                return handleIslandPrivilegePlaceholder(island, superiorPlayer, matcher.group(1));
-            }
-
-            if ((matcher = PERMISSION_ROLE_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = PERMISSION_ROLE_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handleRequiredPlayerRoleForIslandPrivilegePlaceholder(island, matcher.group(1));
             }
 
-            if ((matcher = PLAYER_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
+                return handleIslandPrivilegePlaceholder(island, superiorPlayer, matcher.group(1));
+            }
+
+            if ((matcher = PLAYER_INDEX_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handlePlayersIndexPlaceholder(island.getAllPlayersInside(), matcher.group(1));
             }
 
-            if ((matcher = ROLE_COUNT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = ROLE_COUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 PlayerRole playerRole = SPlayerRole.getSafe(matcher.group(1));
 
                 if (playerRole == null) {
@@ -717,7 +742,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(String.valueOf(island.getIslandMembers(playerRole).size()));
             }
 
-            if ((matcher = ROLE_LIMIT_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = ROLE_LIMIT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 PlayerRole playerRole = SPlayerRole.getSafe(matcher.group(1));
 
                 if (playerRole == null) {
@@ -727,11 +752,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(String.valueOf(island.getRoleLimit(playerRole)));
             }
 
-            if ((matcher = UNIQUE_VISITOR_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = UNIQUE_VISITOR_INDEX_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 return handlePlayersIndexPlaceholder(island.getUniqueVisitors(), matcher.group(1));
             }
 
-            if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Upgrade upgrade = plugin.getUpgrades().getUpgrade(matcher.group(1));
 
                 if (upgrade == null) {
@@ -741,11 +766,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(String.valueOf(island.getUpgradeLevel(upgrade).getLevel()));
             }
 
-            if ((matcher = VISITOR_INDEX_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                return handlePlayersIndexPlaceholder(island.getIslandVisitors(), matcher.group(1));
+            if ((matcher = VISITOR_INDEX_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
+                return handlePlayersIndexPlaceholder(island.getIslandVisitors(false), matcher.group(1));
             }
 
-            if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 String visitorName = matcher.group(1);
                 return Optional.of(island.getUniqueVisitorsWithTimes().stream()
                         .filter(uniqueVisitor -> uniqueVisitor.getKey().getName().equalsIgnoreCase(visitorName))
@@ -754,7 +779,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                         .orElse("Haven't Joined"));
             }
 
-            if ((matcher = WORLD_ENABLED_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = WORLD_ENABLED_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Dimension dimension = Dimensions.getSafe(matcher.group(1));
 
                 if (dimension == null) {
@@ -764,7 +789,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(dimension), superiorPlayer.getUserLocale()));
             }
 
-            if ((matcher = WORLD_GENERATED_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = WORLD_GENERATED_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Dimension dimension = Dimensions.getSafe(matcher.group(1));
 
                 if (dimension == null) {
@@ -774,7 +799,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.wasSchematicGenerated(dimension), superiorPlayer.getUserLocale()));
             }
 
-            if ((matcher = WORLD_UNLOCKED_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            if ((matcher = WORLD_UNLOCKED_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Dimension dimension = Dimensions.getSafe(matcher.group(1));
 
                 if (dimension == null) {
@@ -785,29 +810,23 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
         }
 
-        if ((matcher = BLOCK_LEVEL_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+        if ((matcher = BLOCK_LEVEL_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
             Key key = Keys.ofMaterialAndData(matcher.group(1));
             BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
             return Optional.of(String.valueOf(blockLevel));
         }
 
-        if ((matcher = BLOCK_WORTH_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+        if ((matcher = BLOCK_WORTH_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
             Key key = Keys.ofMaterialAndData(matcher.group(1));
             BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(key);
 
             return Optional.of(String.valueOf(blockWorth));
         }
 
+        // A top placeholder can parse another placeholder, which is case-sensitive.
         if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             return handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));
-        }
-
-        try {
-            return Optional.ofNullable(ISLAND_PLACEHOLDER_PARSERS.get(subPlaceholder))
-                    .map(placeholderParser -> placeholderParser.apply(island, superiorPlayer));
-        } catch (NullPointerException ignored) {
-            // One of the island parses failed due to invalid island being sent.
         }
 
         return Optional.empty();
@@ -905,8 +924,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         }
 
         String placeholderValue = subPlaceholder.substring(sortingType.getName().length() + 1);
+        String loweredPlaceholderValue = placeholderValue.toLowerCase(Locale.ENGLISH);
 
-        if (placeholderValue.equalsIgnoreCase("position")) {
+        if (loweredPlaceholderValue.equalsIgnoreCase("position")) {
             if (island == null) {
                 return Optional.empty();
             }
@@ -917,19 +937,19 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         Function<Island, String> function;
         Matcher matcher;
 
-        if ((matcher = TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
+        if ((matcher = TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN.matcher(loweredPlaceholderValue)).matches()) {
             function = targetIsland -> sortingType.getValue(targetIsland)
                     .map(value -> Formatters.FANCY_NUMBER_FORMATTER.format(value, superiorPlayer.getUserLocale()))
                     .orElse(null);
-        } else if ((matcher = TOP_VALUE_RAW_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
+        } else if ((matcher = TOP_VALUE_RAW_PLACEHOLDER_PATTERN.matcher(loweredPlaceholderValue)).matches()) {
             function = targetIsland -> sortingType.getValue(targetIsland)
                     .map(String::valueOf)
                     .orElse(null);
-        } else if ((matcher = TOP_VALUE_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
+        } else if ((matcher = TOP_VALUE_PLACEHOLDER_PATTERN.matcher(loweredPlaceholderValue)).matches()) {
             function = targetIsland -> sortingType.getValue(targetIsland)
                     .map(Formatters.NUMBER_FORMATTER::format)
                     .orElse(null);
-        } else if ((matcher = TOP_LEADER_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
+        } else if ((matcher = TOP_LEADER_PLACEHOLDER_PATTERN.matcher(loweredPlaceholderValue)).matches()) {
             function = targetIsland -> targetIsland.getOwner().getName();
         } else if ((matcher = TOP_CUSTOM_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
             String customPlaceholder = matcher.group(2);
@@ -955,6 +975,18 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     @Nullable
     private static Dimension extractDimension(String placeholder) {
+        int dimensionsCount = Dimension.values().size();
+
+        if (knownDimensionsCount != dimensionsCount) {
+            DIMENSIONS_CACHE.clear();
+            knownDimensionsCount = dimensionsCount;
+        }
+
+        return DIMENSIONS_CACHE.computeIfAbsent(placeholder, PlaceholdersServiceImpl::findDimension);
+    }
+
+    @Nullable
+    private static Dimension findDimension(String placeholder) {
         String[] sections = placeholder.split("_");
 
         if (sections.length < 2) {
@@ -962,6 +994,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         }
 
         StringBuilder stringBuilder = new StringBuilder();
+        Dimension finalDimension = null;
 
         for (int i = 0; i < sections.length - 1; i++) {
             if (i > 0) {
@@ -973,15 +1006,27 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             Dimension dimension = Dimensions.getSafe(stringBuilder.toString());
 
             if (dimension != null) {
-                return dimension;
+                finalDimension = dimension;
             }
         }
 
-        return null;
+        return finalDimension;
     }
 
     @Nullable
     private static SortingType extractSortingType(String placeholder) {
+        int sortingTypesCount = SortingType.values().size();
+
+        if (knownSortingTypesCount != sortingTypesCount) {
+            SORTING_TYPES_CACHE.clear();
+            knownSortingTypesCount = sortingTypesCount;
+        }
+
+        return SORTING_TYPES_CACHE.computeIfAbsent(placeholder, PlaceholdersServiceImpl::findSortingType);
+    }
+
+    @Nullable
+    private static SortingType findSortingType(String placeholder) {
         String[] sections = placeholder.split("_");
 
         if (sections.length < 2) {
@@ -989,6 +1034,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         }
 
         StringBuilder stringBuilder = new StringBuilder();
+        SortingType finalSortingType = null;
 
         for (int i = 0; i < sections.length - 1; i++) {
             if (i > 0) {
@@ -1000,11 +1046,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             SortingType sortingType = SortingType.getByName(stringBuilder.toString());
 
             if (sortingType != null) {
-                return sortingType;
+                finalSortingType = sortingType;
             }
         }
 
-        return null;
+        return finalSortingType;
     }
 
     private static WorldInfo getDefaultWorldInfo(Island island) {
