@@ -163,7 +163,7 @@ public enum Materials {
                 materialTags.add(Tag.LEGACY);
             if (materialName.contains("SLAB"))
                 materialTags.add(Tag.SLAB);
-            if (materialName.contains("WATER"))
+            if (materialName.equals("WATER") || (ServerVersion.isLegacy() && materialName.equals("STATIONARY_WATER")))
                 materialTags.add(Tag.WATER);
             if (materialName.contains("RAIL"))
                 materialTags.add(Tag.RAIL);
