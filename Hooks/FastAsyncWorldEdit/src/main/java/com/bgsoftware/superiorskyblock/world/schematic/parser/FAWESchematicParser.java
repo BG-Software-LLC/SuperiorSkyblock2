@@ -11,10 +11,6 @@ import java.io.IOException;
 
 public class FAWESchematicParser implements SchematicParser {
 
-    public FAWESchematicParser() {
-
-    }
-
     @Override
     public Schematic parseSchematic(DataInputStream inputStream, String schematicName) throws SchematicParseException {
         try {

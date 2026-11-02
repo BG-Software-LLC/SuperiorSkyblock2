@@ -1,0 +1,19 @@
+group 'Hooks:FastAsyncWorldEdit7'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.enginehub.org/repo/' }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+}
+
+dependencies {
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.0-SNAPSHOT'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly project(":")
+}
+
+if (project.hasProperty('hook.compile_fastasyncworldedit') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_fastasyncworldedit").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
