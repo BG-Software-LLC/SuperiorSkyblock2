@@ -567,8 +567,8 @@ public class BlockChangesListener extends AbstractGameEventListener {
         Key sourceBlock = e.getArgs().sourceBlock;
         // Only respawn anchors are recorded as the source block: vanilla removes the anchor before it explodes, so it
         // is never part of blockList().
-        if (sourceBlock != null && ((MaterialKey) sourceBlock).getMaterial() == RESPAWN_ANCHOR &&
-                block.getType() != RESPAWN_ANCHOR)
+        if (!(sourceBlock instanceof MaterialKey && ((MaterialKey) sourceBlock).getMaterial() == RESPAWN_ANCHOR &&
+                block.getType() != RESPAWN_ANCHOR))
             sourceBlock = null;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
