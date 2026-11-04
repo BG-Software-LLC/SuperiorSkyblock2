@@ -49,6 +49,7 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.LeavesDecayEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PistonExtendEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PistonRetractEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerAttackEntityEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerChangedWorldEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerChatEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerCommandEvent;
@@ -138,6 +139,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<DialogOpenEvent> DIALOG_OPEN_EVENT = register(GameEventFlags.INVENTORY_EVENT | GameEventFlags.PLAYER_EVENT);
 
     // Player Events
+    public static final GameEventType<PlayerAttackEntityEvent> PLAYER_ATTACK_ENTITY_EVENT = register(PlayerAttackEntityEvent.class, GameEventFlags.PLAYER_EVENT | GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<PlayerChangedWorldEvent> PLAYER_CHANGED_WORLD_EVENT = register(PlayerChangedWorldEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerChatEvent> PLAYER_CHAT_EVENT = register(PlayerChatEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerCommandEvent> PLAYER_COMMAND_EVENT = register(PlayerCommandEvent.class, GameEventFlags.PLAYER_EVENT);

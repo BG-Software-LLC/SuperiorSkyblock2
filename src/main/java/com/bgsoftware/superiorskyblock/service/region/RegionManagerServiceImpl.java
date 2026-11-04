@@ -84,6 +84,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final EntityType PARROT_TYPE = EnumHelper.getEnum(EntityType.class, "PARROT");
     @Nullable
     private static final Material GOLDEN_DANDELION_TYPE = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
+    @Nullable
+    private static final Material FIRE_CHARGE = EnumHelper.getEnum(Material.class, "FIRE_CHARGE");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static UnparsedEnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
@@ -285,7 +287,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                     (entityType == HAPPY_GHAST_TYPE && Materials.isHarness(usedItemType)) ||
                     (usedItemType == Material.SHEARS && plugin.getNMSEntities().canShearSaddleFromEntity(entity))) {
                 islandPrivilege = IslandPrivileges.SADDLE_ENTITY;
-            } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
+            } else if ((usedItemType == Material.FLINT_AND_STEEL || usedItemType == FIRE_CHARGE) && entity instanceof Creeper) {
                 islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
             } else if (usedItem != null && entity instanceof PoweredMinecart &&
                     plugin.getNMSEntities().isMinecartFuel(usedItem, (PoweredMinecart) entity)) {

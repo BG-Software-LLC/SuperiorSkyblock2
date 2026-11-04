@@ -1149,19 +1149,19 @@ permissions:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
@@ -2366,6 +2366,39 @@ permissions:
         - '{0}'
       flags:
         - HIDE_ADDITIONAL_TOOLTIP
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  sulfur_cube_interact:
+    display-menu: true
+    permission-enabled:
+      type: SULFUR_CUBE_SPAWN_EGG
+      name: '&6Sulfur Cube Interact'
+      lore:
+        - '&7Access to interact with sulfur cubes inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SULFUR_CUBE_SPAWN_EGG
+      name: '&6Sulfur Cube Interact'
+      lore:
+        - '&7Access to interact with sulfur cubes inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SULFUR_CUBE_SPAWN_EGG
+      name: '&6Sulfur Cube Interact'
+      lore:
+        - '&7Access to interact with sulfur cubes inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
