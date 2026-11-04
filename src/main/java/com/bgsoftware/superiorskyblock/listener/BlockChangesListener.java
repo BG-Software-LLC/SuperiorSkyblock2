@@ -62,6 +62,8 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
     @Nullable
     private static final Material COPPER_CHEST = EnumHelper.getEnum(Material.class, "COPPER_CHEST");
+    @Nullable
+    private static final Material RESPAWN_ANCHOR = EnumHelper.getEnum(Material.class, "RESPAWN_ANCHOR");
 
     private static final BlockFace[] COPPER_GOLEM_FACES = {
             BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
@@ -563,12 +565,14 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         Block block = e.getArgs().block;
         Key sourceBlock = e.getArgs().sourceBlock;
-        List<Block> blocks = e.getArgs().blocks;
-        if (sourceBlock != null && blocks.contains(block) && sourceBlock.equals(Keys.of(block)))
+        // Only respawn anchors are recorded as the source block: vanilla removes the anchor before it explodes, so it
+        // is never part of blockList().
+        if (sourceBlock != null && ((MaterialKey) sourceBlock).getMaterial() == RESPAWN_ANCHOR &&
+                block.getType() != RESPAWN_ANCHOR)
             sourceBlock = null;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            handleBlocksExplode(block.getLocation(wrapper.getHandle()), blocks, sourceBlock);
+            handleBlocksExplode(block.getLocation(wrapper.getHandle()), e.getArgs().blocks, sourceBlock);
         }
     }
 
