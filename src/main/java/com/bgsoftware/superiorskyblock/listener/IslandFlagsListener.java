@@ -1,12 +1,14 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -32,6 +34,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
@@ -47,6 +50,10 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
     @Nullable
     private static final EntityType SULFUR_CUBE_TYPE = EnumHelper.getEnum(EntityType.class, "SULFUR_CUBE");
+    // Since 1.19.4, the player that hit an end crystal is reported as the remover of hanging entities broken by its
+    // explosion. Paper reports the end crystal instead since it added HangingBreakByEntityEvent#getDamageSource.
+    private static final boolean END_CRYSTAL_EXPLOSION_REMOVER_IS_PLAYER = ServerVersion.isAtLeast(ServerVersion.v1_19) &&
+            !new ReflectMethod<>(HangingBreakByEntityEvent.class, "getDamageSource").isValid();
 
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
     // End crystals that explode in the current tick, mapped to their explosion radius.
@@ -156,9 +163,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
             if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION) {
                 if (remover instanceof Player) {
-                    // Explosion was set by TNT, or by an end crystal the player hit: older versions report the
-                    // player as the remover of hanging entities broken by an end crystal explosion.
-                    IslandFlag islandFlag = isNearEndCrystalExplosion(entityLocation) ?
+                    // Explosion was set by TNT, or by an end crystal the player hit.
+                    IslandFlag islandFlag = END_CRYSTAL_EXPLOSION_REMOVER_IS_PLAYER &&
+                            isNearEndCrystalExplosion(entityLocation) ?
                             IslandFlags.BLOCK_EXPLOSION : IslandFlags.TNT_EXPLOSION;
                     if (preventAction(entityLocation, islandFlag)) {
                         e.setCancelled();
@@ -188,7 +195,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Location crystalLocation = entity.getLocation();
         if (preventAction(crystalLocation, IslandFlags.BLOCK_EXPLOSION)) {
             e.getArgs().radius = 0;
-        } else {
+        } else if (END_CRYSTAL_EXPLOSION_REMOVER_IS_PLAYER) {
             endCrystalExplosions.put(crystalLocation, e.getArgs().radius);
             BukkitExecutor.sync(() -> endCrystalExplosions.remove(crystalLocation), 1L);
         }
