@@ -12,11 +12,13 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
@@ -31,6 +33,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.IService;
+import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
@@ -84,11 +87,20 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static final EntityType PARROT_TYPE = EnumHelper.getEnum(EntityType.class, "PARROT");
     @Nullable
     private static final Material GOLDEN_DANDELION_TYPE = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
+    @Nullable
+    private static final Material FIRE_CHARGE = EnumHelper.getEnum(Material.class, "FIRE_CHARGE");
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static UnparsedEnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
 
     private final SuperiorSkyblockPlugin plugin;
+
+    private final LazyReference<DragonBattleServiceImpl> dragonBattleService = new LazyReference<DragonBattleServiceImpl>() {
+        @Override
+        protected DragonBattleServiceImpl create() {
+            return (DragonBattleServiceImpl) plugin.getServices().getService(DragonBattleService.class);
+        }
+    };
 
     public RegionManagerServiceImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -184,7 +196,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Location blockLocation = block.getLocation(wrapper.getHandle());
             Key blockKey = Keys.of(block);
 
-            boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem);
+            boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem, block);
 
             int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
 
@@ -196,7 +208,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Material blockType = block.getType();
             Material usedItemType = usedItem == null ? null : usedItem.getType();
 
-            EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
+            EntityType spawnType = isInteractableItem ? BukkitItems.getEntityType(usedItem) : EntityType.UNKNOWN;
 
             if (spawnType != EntityType.UNKNOWN) {
                 List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(spawnType));
@@ -285,7 +297,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                     (entityType == HAPPY_GHAST_TYPE && Materials.isHarness(usedItemType)) ||
                     (usedItemType == Material.SHEARS && plugin.getNMSEntities().canShearSaddleFromEntity(entity))) {
                 islandPrivilege = IslandPrivileges.SADDLE_ENTITY;
-            } else if (usedItemType == Material.FLINT_AND_STEEL && entity instanceof Creeper) {
+            } else if ((usedItemType == Material.FLINT_AND_STEEL || usedItemType == FIRE_CHARGE) && entity instanceof Creeper) {
                 islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
             } else if (usedItem != null && entity instanceof PoweredMinecart &&
                     plugin.getNMSEntities().isMinecartFuel(usedItem, (PoweredMinecart) entity)) {
@@ -620,15 +632,16 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             MoveResult moveResult;
 
             Island toIsland = plugin.getGrid().getIslandAt(to);
+            // Compute the from-island once; both the enter and leave handling below need it.
+            fromIsland = plugin.getGrid().getIslandAt(from);
+            lookupFromIsland = false;
+
             if (toIsland != null) {
-                moveResult = handlePlayerEnterIslandInternal(superiorPlayer, toIsland, from, to, IslandEnterEvent.EnterCause.PLAYER_MOVE);
+                moveResult = handlePlayerEnterIslandInternal(superiorPlayer, toIsland, fromIsland, from, to, IslandEnterEvent.EnterCause.PLAYER_MOVE);
                 if (moveResult != MoveResult.SUCCESS)
                     return moveResult;
             }
 
-            lookupFromIsland = false;
-
-            fromIsland = plugin.getGrid().getIslandAt(from);
             if (fromIsland != null) {
                 moveResult = handlePlayerLeaveIslandInternal(superiorPlayer, fromIsland, from, to, IslandLeaveEvent.LeaveCause.PLAYER_MOVE);
                 if (moveResult != MoveResult.SUCCESS)
@@ -682,13 +695,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkArgument(to.getWorld() != null, "from world cannot be null");
 
         Island toIsland = plugin.getGrid().getIslandAt(to);
+        // Compute the from-island once; both the enter and leave handling below need it.
+        Island fromIsland = plugin.getGrid().getIslandAt(from);
         if (toIsland != null) {
-            MoveResult enterMove = handlePlayerEnterIslandInternal(superiorPlayer, toIsland, from, to, IslandEnterEvent.EnterCause.PLAYER_TELEPORT);
+            MoveResult enterMove = handlePlayerEnterIslandInternal(superiorPlayer, toIsland, fromIsland, from, to, IslandEnterEvent.EnterCause.PLAYER_TELEPORT);
             if (enterMove != MoveResult.SUCCESS)
                 return enterMove;
         }
 
-        Island fromIsland = plugin.getGrid().getIslandAt(from);
         if (fromIsland != null) {
             return handlePlayerLeaveIslandInternal(superiorPlayer, fromIsland, from, to, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT);
         }
@@ -736,6 +750,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     }
 
     private MoveResult handlePlayerEnterIslandInternal(SuperiorPlayer superiorPlayer, Island toIsland, @Nullable Location from, Location to, IslandEnterEvent.EnterCause enterCause) {
+        return handlePlayerEnterIslandInternal(superiorPlayer, toIsland,
+                from == null ? null : plugin.getGrid().getIslandAt(from), from, to, enterCause);
+    }
+
+    private MoveResult handlePlayerEnterIslandInternal(SuperiorPlayer superiorPlayer, Island toIsland, @Nullable Island fromIsland, @Nullable Location from, Location to, IslandEnterEvent.EnterCause enterCause) {
         // This can happen after the leave event is cancelled.
         if (superiorPlayer.hasPlayerStatus(PlayerStatus.LEAVING_ISLAND)) {
             superiorPlayer.removePlayerStatus(PlayerStatus.LEAVING_ISLAND);
@@ -756,8 +775,6 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return MoveResult.ISLAND_LOCKED;
         }
 
-        Island fromIsland = from == null ? null : plugin.getGrid().getIslandAt(from);
-
         boolean equalIslands = toIsland.equals(fromIsland);
         boolean toInsideRange = toIsland.isInsideRange(to);
         boolean fromInsideRange = from != null && fromIsland != null && fromIsland.isInsideRange(from);
@@ -775,6 +792,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 BukkitExecutor.sync(() -> {
                     superiorPlayer.removePlayerStatus(PlayerStatus.PORTALS_IMMUNED);
                 }, 100L);
+                this.dragonBattleService.get().restoreKilledEnderDragonBattle(toIsland, to.getWorld());
             }
 
             return MoveResult.SUCCESS;
@@ -787,6 +805,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         toIsland.setPlayerInside(superiorPlayer, true);
 
+        this.dragonBattleService.get().restoreKilledEnderDragonBattle(toIsland, to.getWorld());
+        handleIslandEnterEffects(superiorPlayer, toIsland);
+
+        return MoveResult.SUCCESS;
+    }
+
+    private void handleIslandEnterEffects(SuperiorPlayer superiorPlayer, Island toIsland) {
         if (!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)) {
             Message.ENTER_PVP_ISLAND.send(superiorPlayer);
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
@@ -804,25 +829,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         Player player = superiorPlayer.asPlayer();
         if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
-            BukkitExecutor.sync(() -> {
-                // Update player time and player weather with a delay.
-                // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
-                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
-                    player.setPlayerTime(0, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
-                    player.setPlayerTime(6000, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
-                    player.setPlayerTime(14000, false);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
-                    player.setPlayerTime(18000, false);
-                }
-
-                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
-                    player.setPlayerWeather(WeatherType.CLEAR);
-                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
-                    player.setPlayerWeather(WeatherType.DOWNFALL);
-                }
-            }, 1L);
+            BukkitExecutor.sync(() -> updatePlayerTimeAndWeather(player, toIsland), 1L);
         }
 
         if (superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()) {
@@ -835,8 +842,26 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             toIsland.applyEffects(superiorPlayer);
             plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland);
         }, 1L);
+    }
 
-        return MoveResult.SUCCESS;
+    private static void updatePlayerTimeAndWeather(Player player, Island toIsland) {
+        // Update player time and player weather with a delay.
+        // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
+        if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
+            player.setPlayerTime(0, false);
+        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
+            player.setPlayerTime(6000, false);
+        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
+            player.setPlayerTime(14000, false);
+        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
+            player.setPlayerTime(18000, false);
+        }
+
+        if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
+            player.setPlayerWeather(WeatherType.CLEAR);
+        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
+            player.setPlayerWeather(WeatherType.DOWNFALL);
+        }
     }
 
     private MoveResult handlePlayerLeaveIslandInternal(SuperiorPlayer superiorPlayer, Island fromIsland, Location from, @Nullable Location to, IslandLeaveEvent.LeaveCause leaveCause) {

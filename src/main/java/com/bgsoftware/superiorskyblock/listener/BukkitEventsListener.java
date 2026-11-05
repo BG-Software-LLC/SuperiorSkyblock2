@@ -84,6 +84,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -130,6 +131,8 @@ public class BukkitEventsListener implements Listener {
             Enum.class, "TRIGGER_BLOCK").get(null);
     @Nullable
     private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
+    @Nullable
+    private static final EntityType SULFUR_CUBE_TYPE = EnumHelper.getEnum(EntityType.class, "SULFUR_CUBE");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -229,6 +232,15 @@ public class BukkitEventsListener implements Listener {
             Class entityBreakEventClass = Class.forName("io.papermc.paper.event.entity.EntityBreakEvent");
             createEventListener(GameEventType.HANGING_BREAK_EVENT, entityBreakEventClass, new EntityBreakEventFunction());
         } catch (ClassNotFoundException ignored) {
+        }
+
+        // Only used for protecting sulfur cubes, which take no damage from attacks while holding a block.
+        if (SULFUR_CUBE_TYPE != null) {
+            try {
+                Class prePlayerAttackEntityEventClass = Class.forName("io.papermc.paper.event.player.PrePlayerAttackEntityEvent");
+                createEventListener(GameEventType.PLAYER_ATTACK_ENTITY_EVENT, prePlayerAttackEntityEventClass, new PrePlayerAttackEntityEventFunction());
+            } catch (ClassNotFoundException ignored) {
+            }
         }
 
         try {
@@ -1006,6 +1018,21 @@ public class BukkitEventsListener implements Listener {
             if (ENTITY_BREAK_BY_ENTITY_EVENT_CLASS.isInstance(e))
                 hangingBreakEvent.remover = GET_REMOVER_METHOD.invoke(e);
             return eventType.createEvent(hangingBreakEvent);
+        }
+    }
+
+    private static class PrePlayerAttackEntityEventFunction implements GameEventCreator<GameEventArgs.PlayerAttackEntityEvent, Event> {
+
+        private static final ReflectMethod<Entity> GET_ATTACKED_METHOD = new ReflectMethod<>(
+                new ClassInfo("io.papermc.paper.event.player.PrePlayerAttackEntityEvent", ClassInfo.PackageType.UNKNOWN),
+                "getAttacked", new ClassInfo[0]);
+
+        @Override
+        public GameEvent<GameEventArgs.PlayerAttackEntityEvent> execute(GameEventType<GameEventArgs.PlayerAttackEntityEvent> eventType, GameEventPriority priority, Event e) {
+            GameEventArgs.PlayerAttackEntityEvent playerAttackEntityEvent = new GameEventArgs.PlayerAttackEntityEvent();
+            playerAttackEntityEvent.player = ((PlayerEvent) e).getPlayer();
+            playerAttackEntityEvent.entity = GET_ATTACKED_METHOD.invoke(e);
+            return eventType.createEvent(playerAttackEntityEvent);
         }
     }
 

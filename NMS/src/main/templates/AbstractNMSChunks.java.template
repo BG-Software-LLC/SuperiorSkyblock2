@@ -54,6 +54,8 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractNMSChunks implements NMSChunks {
 
+    private static boolean creatingFakeEntities = false;
+
     protected final SuperiorSkyblockPlugin plugin;
 
     protected AbstractNMSChunks(SuperiorSkyblockPlugin plugin) {
@@ -244,21 +246,30 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     protected CalculatedChunk.Entities calculatedChunk(ChunkPosition chunkPosition, ServerLevel serverLevel, ListTag entitiesTag) {
         KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
 
-        for (Tag entityTag : entitiesTag) {
-            Entity fakeEntity = createEntityFromTag((CompoundTag) entityTag, serverLevel).orElse(null);
-            if(fakeEntity == null)
-                continue;
+        creatingFakeEntities = true;
+        try {
+            for (Tag entityTag : entitiesTag) {
+                Entity fakeEntity = createEntityFromTag((CompoundTag) entityTag, serverLevel).orElse(null);
+                if (fakeEntity == null)
+                    continue;
 
-            fakeEntity.valid = false;
-            if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
-                continue;
+                fakeEntity.valid = false;
+                if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
+                    continue;
 
-            Key entityKey = Keys.of(fakeEntity.getBukkitEntity());
+                Key entityKey = Keys.of(fakeEntity.getBukkitEntity());
 
-            chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+                chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+            }
+        } finally {
+            creatingFakeEntities = false;
         }
 
         return new CalculatedChunk.Entities(chunkPosition, chunkEntities);
+    }
+
+    public static boolean isCreatingFakeEntities() {
+        return creatingFakeEntities;
     }
 
     private void calculateChunkInternal(BlockState blockState, int x, int y, int z, ChunkPosition chunkPosition,

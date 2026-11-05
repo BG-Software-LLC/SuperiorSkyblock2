@@ -1116,19 +1116,19 @@ permissions:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'

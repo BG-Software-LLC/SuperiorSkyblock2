@@ -45,6 +45,8 @@ import java.util.Optional;
 public class IslandFlagsListener extends AbstractGameEventListener {
 
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
+    @Nullable
+    private static final EntityType SULFUR_CUBE_TYPE = EnumHelper.getEnum(EntityType.class, "SULFUR_CUBE");
 
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
     // End crystals that explode in the current tick, mapped to their explosion radius.
@@ -240,6 +242,10 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (shouldIgnoreWorldEvents(block.getWorld()))
             return;
 
+        // Sulfur cubes are only checked for their explosions, not when changing blocks (trampling farmland).
+        if (e.getArgs().entity.getType() == SULFUR_CUBE_TYPE)
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventEntityExplosion(e.getArgs().entity, block.getLocation(wrapper.getHandle())))
                 e.setCancelled();
@@ -263,7 +269,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     public boolean preventEntityExplosion(Entity source, Location explodeLocation) {
         IslandFlag islandFlag;
 
-        switch (source.getType()) {
+        EntityType entityType = source.getType();
+
+        switch (entityType) {
             case ENDER_CRYSTAL:
                 islandFlag = IslandFlags.BLOCK_EXPLOSION;
                 break;
@@ -287,8 +295,13 @@ public class IslandFlagsListener extends AbstractGameEventListener {
                     break;
                 }
             }
-            default:
+            default: {
+                if (entityType == SULFUR_CUBE_TYPE) {
+                    islandFlag = IslandFlags.TNT_EXPLOSION;
+                    break;
+                }
                 return false;
+            }
         }
 
         return preventAction(explodeLocation, islandFlag);

@@ -21,6 +21,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
+import ${CRAFTBUKKIT_PACKAGE}.entity.CraftEnderDragon;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Modifier;
@@ -31,8 +32,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
             EntityType.class, EntityType.EntityFactory.class, Modifier.PRIVATE | Modifier.FINAL, 1)
             .removeFinal();
 
-    private static final ReflectField<${END_DRAGON_FIGHT_CLASS}> WORLD_DRAGON_BATTLE = new ReflectField<>(
-            ServerLevel.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE, 1);
+    private static final ReflectField<${END_DRAGON_FIGHT_CLASS}> WORLD_DRAGON_BATTLE = initializeWorldDragonBattleField();
 
     private static boolean firstWorldPreparation = true;
 
@@ -65,7 +65,8 @@ public class NMSDragonFightImpl implements NMSDragonFight {
             return null;
 
         IslandEndDragonFight enderDragonBattle = dragonFight.HANDLER.getDragonFight(island.getCache());
-        return enderDragonBattle == null ? null : enderDragonBattle.getEnderDragon().getBukkitEntity();
+        IslandEntityEnderDragon enderDragon = enderDragonBattle == null ? null : enderDragonBattle.getEnderDragon();
+        return enderDragon == null ? null : enderDragon.getBukkitEntity();
     }
 
     @Override
@@ -84,6 +85,22 @@ public class NMSDragonFightImpl implements NMSDragonFight {
     }
 
     @Override
+    public void restoreKilledDragonBattle(Island island, Location location) {
+        World bukkitWorld = location.getWorld();
+
+        if (bukkitWorld == null)
+            return;
+
+        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
+
+        if (!(NMSUtilsVersioned.getEndDragonFight(serverLevel) instanceof EndDragonFightWrapper dragonFight))
+            return;
+
+        dragonFight.HANDLER.restoreKilledDragonFight(island, serverLevel,
+                new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+    }
+
+    @Override
     public void removeDragonBattle(Island island, Dimension dimension) {
         World bukkitWorld = island.getCenter(dimension).getWorld();
 
@@ -99,8 +116,23 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
         if (endDragonFight instanceof IslandEndDragonFight islandEndDragonFight) {
             islandEndDragonFight.removeBattlePlayers();
-            islandEndDragonFight.getEnderDragon().getBukkitEntity().remove();
+            IslandEntityEnderDragon enderDragon = islandEndDragonFight.getEnderDragon();
+            if (enderDragon != null)
+                enderDragon.getBukkitEntity().remove();
         }
+    }
+
+    @Override
+    public void replaceEnderDragon(Island island, org.bukkit.entity.EnderDragon enderDragon) {
+        ServerLevel serverLevel = ((CraftWorld) enderDragon.getWorld()).getHandle();
+
+        if (!(NMSUtilsVersioned.getEndDragonFight(serverLevel) instanceof EndDragonFightWrapper dragonFight) ||
+                !(((CraftEnderDragon) enderDragon).getHandle() instanceof IslandEntityEnderDragon islandEntityEnderDragon))
+            return;
+
+        IslandEndDragonFight islandEndDragonFight = dragonFight.HANDLER.getDragonFight(island.getCache());
+        if (islandEndDragonFight != null && islandEndDragonFight.hasOtherEnderDragon(islandEntityEnderDragon))
+            islandEndDragonFight.replaceEnderDragon(islandEntityEnderDragon);
     }
 
     @Override
@@ -108,6 +140,20 @@ public class NMSDragonFightImpl implements NMSDragonFight {
         Advancement advancement = Bukkit.getAdvancement(NamespacedKey.minecraft("end/root"));
         if (advancement != null)
             player.getAdvancementProgress(advancement).awardCriteria("");
+    }
+
+    private static ReflectField<${END_DRAGON_FIGHT_CLASS}> initializeWorldDragonBattleField() {
+        ReflectField<${END_DRAGON_FIGHT_CLASS}> worldDragonBattleField = new ReflectField<>(
+                ServerLevel.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+        if (worldDragonBattleField.isValid()) {
+            worldDragonBattleField = worldDragonBattleField.removeFinal();
+        } else {
+            worldDragonBattleField = new ReflectField<>(
+                    ServerLevel.class, ${END_DRAGON_FIGHT_CLASS}.class, Modifier.PRIVATE, 1);
+        }
+
+        return worldDragonBattleField;
     }
 
 }
