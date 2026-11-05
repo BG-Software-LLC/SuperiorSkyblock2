@@ -944,7 +944,8 @@ public class BukkitEventsListener implements Listener {
                 cancelledBeforeDispatch = true;
             }
 
-            plugin.getGameEventsDispatcher().onGameEvent(gameEvent, gameEventPriority);
+            boolean dispatchCancelled = event instanceof EntityExplodeEvent && gameEventPriority == GameEventPriority.MONITOR;
+            plugin.getGameEventsDispatcher().onGameEvent(gameEvent, gameEventPriority, dispatchCancelled);
             if (!cancelledBeforeDispatch && gameEvent.isCancelled()) {
                 if (event instanceof Cancellable)
                     ((Cancellable) event).setCancelled(true);

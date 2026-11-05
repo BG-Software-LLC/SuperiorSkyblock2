@@ -188,7 +188,7 @@ public enum Materials {
                 materialTags.add(Tag.CARPET);
             if (materialName.contains("HARNESS"))
                 materialTags.add(Tag.HARNESS);
-            if (materialName.contains("BED"))
+            if (materialName.endsWith("BED") || materialName.endsWith("BED_BLOCK"))
                 materialTags.add(Tag.BED);
             if (materialName.contains("_HOE"))
                 materialTags.add(Tag.HOE);
