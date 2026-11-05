@@ -82,9 +82,6 @@ public class ProtectionListener extends AbstractGameEventListener {
     @Nullable
     private static final Material SULFUR_SPIKE = EnumHelper.getEnum(Material.class, "SULFUR_SPIKE");
 
-    @Nullable
-    private final IslandPrivilege pickupLecternBookPrivilege;
-
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
         protected RegionManagerService create() {
@@ -94,7 +91,6 @@ public class ProtectionListener extends AbstractGameEventListener {
 
     public ProtectionListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
-        this.pickupLecternBookPrivilege = ServerVersion.isAtLeast(ServerVersion.v1_14) ? getPickupLecternBookPrivilege() : null;
         registerListeners();
     }
 
@@ -331,11 +327,16 @@ public class ProtectionListener extends AbstractGameEventListener {
     }
 
     private void onPlayerTakeLecternBook(GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> e) {
+        IslandPrivilege pickupLecternBookPrivilege = plugin.getSettings().getInteractablesMap()
+                .getRequiredPrivilege(Keys.ofMaterialAndData("lectern_book"));
+        if (pickupLecternBookPrivilege == null)
+            return;
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             interactionResult = this.protectionManager.get().handleCustomInteraction(
-                    superiorPlayer, e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), this.pickupLecternBookPrivilege);
+                    superiorPlayer, e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), pickupLecternBookPrivilege);
         }
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled();
@@ -735,16 +736,6 @@ public class ProtectionListener extends AbstractGameEventListener {
     }
 
     /* INTERNAL */
-
-    private static IslandPrivilege getPickupLecternBookPrivilege() {
-        for (IslandPrivilege islandPrivilege : IslandPrivilege.values()) {
-            if (islandPrivilege.getName().equals("PICKUP_LECTERN_BOOK"))
-                return islandPrivilege;
-        }
-
-        IslandPrivilege.register("PICKUP_LECTERN_BOOK");
-        return IslandPrivilege.getByName("PICKUP_LECTERN_BOOK");
-    }
 
     private void registerListeners() {
         registerCallback(GameEventType.BLOCK_PLACE_EVENT, GameEventPriority.NORMAL, this::onBlockPlace);
