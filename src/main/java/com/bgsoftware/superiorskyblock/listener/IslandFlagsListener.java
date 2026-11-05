@@ -1,12 +1,14 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -32,10 +34,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -45,8 +49,13 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
     @Nullable
     private static final EntityType SULFUR_CUBE_TYPE = EnumHelper.getEnum(EntityType.class, "SULFUR_CUBE");
+    // Since 1.19.4, the player that hit an end crystal is reported as the remover of hanging entities broken by its
+    // explosion. Paper reports the end crystal instead since it added HangingBreakByEntityEvent#getDamageSource.
+    private static final boolean END_CRYSTAL_EXPLOSION_REMOVER_IS_PLAYER = ServerVersion.isAtLeast(ServerVersion.v1_19) &&
+            !new ReflectMethod<>(HangingBreakByEntityEvent.class, "getDamageSource").isValid();
 
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
+    private final List<GameEventArgs.ExplosionPrimeEvent> explosionsInProgress = new ArrayList<>();
 
     private World spawnIslandWorld;
 
@@ -129,7 +138,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     /* ENTITY EXPLOSIONS */
 
-    private void onHangingBreakByEntity(GameEvent<GameEventArgs.HangingBreakEvent> e) {
+    private void onHangingBreak(GameEvent<GameEventArgs.HangingBreakEvent> e) {
         Entity entity = e.getArgs().entity;
 
         // We only check island flags in relevant worlds
@@ -143,10 +152,20 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             HangingBreakEvent.RemoveCause removeCause = e.getArgs().removeCause;
             Entity remover = e.getArgs().remover;
 
+            if (remover == null) {
+                if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION &&
+                        preventAction(entityLocation, IslandFlags.BLOCK_EXPLOSION))
+                    e.setCancelled();
+                return;
+            }
+
             if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION) {
                 if (remover instanceof Player) {
-                    // Explosion was set by TNT.
-                    if (preventAction(entityLocation, IslandFlags.TNT_EXPLOSION)) {
+                    // Explosion was set by TNT, or by an end crystal the player hit.
+                    IslandFlag islandFlag = END_CRYSTAL_EXPLOSION_REMOVER_IS_PLAYER &&
+                            isEndCrystalExplosion(entityLocation) ?
+                            IslandFlags.BLOCK_EXPLOSION : IslandFlags.TNT_EXPLOSION;
+                    if (preventAction(entityLocation, islandFlag)) {
                         e.setCancelled();
                         return;
                     }
@@ -165,6 +184,48 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         }
     }
 
+    private void onExplosionPrime(GameEvent<GameEventArgs.ExplosionPrimeEvent> e) {
+        Entity entity = e.getArgs().entity;
+
+        if (entity.getType() != EntityType.ENDER_CRYSTAL || shouldIgnoreWorldEvents(entity.getWorld()))
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.BLOCK_EXPLOSION))
+                e.getArgs().radius = 0;
+        }
+    }
+
+    private void onExplosionPrimeMonitor(GameEvent<GameEventArgs.ExplosionPrimeEvent> e) {
+        if (!END_CRYSTAL_EXPLOSION_REMOVER_IS_PLAYER || shouldIgnoreWorldEvents(e.getArgs().entity.getWorld()))
+            return;
+
+        GameEventArgs.ExplosionPrimeEvent explosion = e.getArgs();
+        explosionsInProgress.add(explosion);
+        BukkitExecutor.sync(() -> explosionsInProgress.remove(explosion), 1L);
+    }
+
+    private void onEntityExplodeMonitor(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        Entity entity = e.getArgs().entity;
+        explosionsInProgress.removeIf(explosion -> explosion.entity.equals(entity));
+    }
+
+    private boolean isEndCrystalExplosion(Location location) {
+        if (explosionsInProgress.isEmpty())
+            return false;
+
+        GameEventArgs.ExplosionPrimeEvent explosion = explosionsInProgress.get(explosionsInProgress.size() - 1);
+        if (explosion.entity.getType() != EntityType.ENDER_CRYSTAL)
+            return false;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location explosionLocation = explosion.entity.getLocation(wrapper.getHandle());
+            double damageRange = explosion.radius * 2;
+            return explosionLocation.getWorld() == location.getWorld() &&
+                    explosionLocation.distanceSquared(location) <= damageRange * damageRange;
+        }
+    }
+
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
         Entity entity = e.getArgs().entity;
 
@@ -174,6 +235,21 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventEntityExplosion(entity, entity.getLocation(wrapper.getHandle())))
+                e.getArgs().blocks.clear();
+        }
+    }
+
+    private void onBlockExplode(GameEvent<GameEventArgs.BlockExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
+            return;
+
+        Block block = e.getArgs().block;
+
+        if (shouldIgnoreWorldEvents(block.getWorld()))
+            return;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.BLOCK_EXPLOSION))
                 e.getArgs().blocks.clear();
         }
     }
@@ -215,6 +291,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         EntityType entityType = source.getType();
 
         switch (entityType) {
+            case ENDER_CRYSTAL:
+                islandFlag = IslandFlags.BLOCK_EXPLOSION;
+                break;
             case CREEPER:
                 islandFlag = IslandFlags.CREEPER_EXPLOSION;
                 break;
@@ -381,10 +460,14 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private void registerListeners() {
+        registerCallback(GameEventType.BLOCK_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onBlockExplode);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.LOWEST, this::onEntityExplode);
+        registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, false, this::onEntityExplodeMonitor);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEntityChangeBlock);
+        registerCallback(GameEventType.EXPLOSION_PRIME_EVENT, GameEventPriority.LOWEST, this::onExplosionPrime);
+        registerCallback(GameEventType.EXPLOSION_PRIME_EVENT, GameEventPriority.MONITOR, this::onExplosionPrimeMonitor);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.LOWEST, this::onEntitySpawn);
-        registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.LOWEST, this::onHangingBreakByEntity);
+        registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.LOWEST, this::onHangingBreak);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.MONITOR, this::onFireballDamage);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.LOWEST, this::onBlockFlow);
         registerCallback(GameEventType.BLOCK_GROW_EVENT, GameEventPriority.LOWEST, this::onCropsGrowth);

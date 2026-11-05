@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_8_R3.Block;
+import net.minecraft.server.v1_8_R3.BlockBed;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockDoubleStepAbstract;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -144,6 +145,8 @@ public class NMSChunksImpl implements NMSChunks {
                         for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
                             IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                             Block block = blockData.getBlock();
+                            if (block instanceof BlockBed && blockData.get(BlockBed.PART) == BlockBed.EnumBedPart.HEAD)
+                                continue;
                             if (block != Blocks.AIR) {
                                 Location location = new Location(bukkitWorld,
                                         (chunkPosition.getX() << 4) + bp.getX(),

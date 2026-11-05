@@ -39,8 +39,10 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Biome;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.command.defaults.BukkitCommand;
 import ${CRAFTBUKKIT_PACKAGE}.CraftServer;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
@@ -168,6 +170,16 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
     public short getBlockDataValue(org.bukkit.block.Block block) {
         BlockData blockData = block.getBlockData();
         return (short) (blockData instanceof Ageable ? ((Ageable) blockData).getAge() : 0);
+    }
+
+    @Override
+    public BlockFace getBedFacing(org.bukkit.block.BlockState blockState) {
+        return ((Bed) blockState.getBlockData()).getFacing();
+    }
+
+    @Override
+    public boolean isBedHead(org.bukkit.block.BlockState blockState) {
+        return ((Bed) blockState.getBlockData()).getPart() == Bed.Part.HEAD;
     }
 
     @Override

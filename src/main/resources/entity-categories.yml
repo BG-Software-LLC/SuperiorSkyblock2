@@ -110,6 +110,7 @@ END_CRYSTAL:
     - ENDER_CRYSTAL
   actions:
     SPAWN: BUILD
+    DAMAGE: BREAK
 
 ITEM_FRAME:
   entities:

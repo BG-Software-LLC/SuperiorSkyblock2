@@ -805,14 +805,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         toIsland.setPlayerInside(superiorPlayer, true);
 
+        this.dragonBattleService.get().restoreKilledEnderDragonBattle(toIsland, to.getWorld());
         handleIslandEnterEffects(superiorPlayer, toIsland);
 
         return MoveResult.SUCCESS;
     }
 
     private void handleIslandEnterEffects(SuperiorPlayer superiorPlayer, Island toIsland) {
-        this.dragonBattleService.get().restoreKilledEnderDragonBattle(toIsland, to.getWorld());
-
         if (!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)) {
             Message.ENTER_PVP_ISLAND.send(superiorPlayer);
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {

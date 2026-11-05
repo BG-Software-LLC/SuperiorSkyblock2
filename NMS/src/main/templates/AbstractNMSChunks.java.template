@@ -29,10 +29,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -277,7 +279,7 @@ public abstract class AbstractNMSChunks implements NMSChunks {
                                                List<Location> spawnersLocations) {
         Block block = blockState.getBlock();
 
-        if (block == Blocks.AIR)
+        if (block == Blocks.AIR || block instanceof BedBlock && blockState.getValue(BedBlock.PART) == BedPart.HEAD)
             return;
 
         Location location = new Location(chunkPosition.getWorld(),

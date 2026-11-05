@@ -62,6 +62,10 @@ public enum Materials {
         return materialsTag != null && materialsTag.contains(tag);
     }
 
+    public static boolean isAir(Material material) {
+        return hasTag(material, Tag.AIR);
+    }
+
     public static boolean isWater(Material material) {
         return hasTag(material, Tag.WATER);
     }
@@ -155,6 +159,8 @@ public enum Materials {
             EnumSet<Tag> materialTags = EnumSet.noneOf(Tag.class);
 
             String materialName = material.name();
+            if (materialName.equals("AIR") || materialName.endsWith("_AIR"))
+                materialTags.add(Tag.AIR);
             if (materialName.startsWith("LEGACY_"))
                 materialTags.add(Tag.LEGACY);
             if (materialName.contains("SLAB"))
@@ -182,7 +188,7 @@ public enum Materials {
                 materialTags.add(Tag.CARPET);
             if (materialName.contains("HARNESS"))
                 materialTags.add(Tag.HARNESS);
-            if (materialName.contains("BED"))
+            if (materialName.endsWith("BED") || materialName.endsWith("BED_BLOCK"))
                 materialTags.add(Tag.BED);
             if (materialName.contains("_HOE"))
                 materialTags.add(Tag.HOE);
@@ -233,7 +239,8 @@ public enum Materials {
         HOE,
         SHELF,
         COPPER_GOLEM,
-        CUSHION
+        CUSHION,
+        AIR
 
     }
 

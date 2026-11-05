@@ -26,7 +26,9 @@ import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BiomeStorage;
 import net.minecraft.server.v1_16_R3.Block;
+import net.minecraft.server.v1_16_R3.BlockBed;
 import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.BlockPropertyBedPart;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
 import net.minecraft.server.v1_16_R3.Blocks;
@@ -446,6 +448,8 @@ public class NMSChunksImpl implements NMSChunks {
                 for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
                     IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                     Block block = blockData.getBlock();
+                    if (block instanceof BlockBed && blockData.get(BlockBed.PART) == BlockPropertyBedPart.HEAD)
+                        continue;
                     if (block != Blocks.AIR) {
                         Location location = new Location(chunkPosition.getWorld(),
                                 (chunkPosition.getX() << 4) + bp.getX(),

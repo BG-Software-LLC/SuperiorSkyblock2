@@ -51,7 +51,12 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
     }
 
     public void onGameEvent(E event, P priority) {
-        if (event.isCancelled())
+        onGameEvent(event, priority, false);
+    }
+
+    public void onGameEvent(E event, P priority, boolean dispatchCancelled) {
+        boolean cancelledBeforeDispatch = event.isCancelled();
+        if (cancelledBeforeDispatch && !dispatchCancelled)
             return;
 
         EnumMap<P, List<RegisteredListener>> gameEventCallbacks = callbacks.get(event.getType());
@@ -73,7 +78,7 @@ public class EventsDispatcher<L, T extends EventType<?, ?>, P extends Enum<P>, E
         }
 
         List<E> capturedEvents = this.capturedEvents.get();
-        if (capturedEvents != null && filterCapturedEvent(event))
+        if (!cancelledBeforeDispatch && capturedEvents != null && filterCapturedEvent(event))
             capturedEvents.add(event);
     }
 

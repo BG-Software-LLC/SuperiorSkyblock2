@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,6 +43,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -61,6 +64,8 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
     @Nullable
     private static final Material COPPER_CHEST = EnumHelper.getEnum(Material.class, "COPPER_CHEST");
+    @Nullable
+    private static final Material RESPAWN_ANCHOR = EnumHelper.getEnum(Material.class, "RESPAWN_ANCHOR");
 
     private static final BlockFace[] COPPER_GOLEM_FACES = {
             BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
@@ -78,6 +83,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private final Collection<Location> alreadySpongeAbosrbCalled = AutoRemovalCollection.newArrayList(5L * 50, TimeUnit.MILLISECONDS);
     private final Collection<Location> alreadyChorusFlowerTracked = AutoRemovalCollection.newArrayList(1L * 50, TimeUnit.MILLISECONDS);
+    private final Map<Location, BedChange> bedChanges = new HashMap<>();
 
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
         @Override
@@ -101,6 +107,15 @@ public class BlockChangesListener extends AbstractGameEventListener {
             return;
 
         BlockState replacedState = e.getArgs().replacedState;
+
+        if (Materials.isBed(block.getType())) {
+            Location bedLocation = WorldBlocks.getBedFootLocation(block.getState(), block.getLocation());
+            if (bedLocation != null) {
+                BedChange bedChange = bedChanges.remove(bedLocation);
+                if (bedChange != null && replacedState.getType() != bedChange.material)
+                    recordBedBreak(bedLocation, bedChange);
+            }
+        }
 
         boolean shouldAvoidReplacedState = replacedState.equals(block.getState());
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -226,6 +241,23 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
 
+        BlockState oldState = e.getArgs().oldState;
+        if (Materials.isBed(oldState.getType())) {
+            Location blockLocation = block.getLocation();
+            Location bedLocation = WorldBlocks.getBedFootLocation(oldState, blockLocation);
+            if (blockLocation.equals(bedLocation))
+                handleBedChange(oldState, true);
+            if (!Materials.isAir(block.getType())) {
+                Location newBedLocation = WorldBlocks.getBedFootLocation(block.getState(), blockLocation);
+                if (!Materials.isBed(block.getType()) || blockLocation.equals(newBedLocation)) {
+                    bedChanges.remove(blockLocation);
+                    this.worldRecordService.get().recordBlockPlace(Keys.of(block), blockLocation, 1,
+                            null, REGULAR_RECORD_FLAGS);
+                }
+            }
+            return;
+        }
+
         Key newStateKey = Keys.of(block);
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -341,7 +373,70 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
 
+        if (Materials.isBed(block.getType())) {
+            handleBedChange(block.getState(), true);
+            return;
+        }
+
         this.worldRecordService.get().recordBlockBreak(block, REGULAR_RECORD_FLAGS);
+    }
+
+    private void handleBedChange(BlockState state, boolean broken) {
+        Location blockLocation = state.getLocation();
+        Location bedLocation = WorldBlocks.getBedFootLocation(state, blockLocation);
+        if (bedLocation == null)
+            return;
+
+        if (!blockLocation.equals(bedLocation)) {
+            state = WorldBlocks.getOtherBedPart(state);
+            if (state == null)
+                return;
+        }
+
+        BedChange bedChange = bedChanges.get(bedLocation);
+        if (bedChange == null) {
+            bedChange = new BedChange(state.getType(), Keys.of(state));
+            bedChanges.put(bedLocation, bedChange);
+            BedChange capturedChange = bedChange;
+            if (!broken) {
+                BukkitExecutor.sync(() -> {
+                    if (bedChanges.get(bedLocation) != capturedChange || capturedChange.recorded)
+                        return;
+                    if (bedLocation.getBlock().getType() == capturedChange.material)
+                        bedChanges.remove(bedLocation, capturedChange);
+                    else
+                        recordBedBreak(bedLocation, capturedChange);
+                }, 1L);
+            }
+            BukkitExecutor.sync(() -> bedChanges.remove(bedLocation, capturedChange), 2L);
+        }
+
+        if (broken)
+            recordBedBreak(bedLocation, bedChange);
+    }
+
+    private void recordBedBreak(Location bedLocation, BedChange bedChange) {
+        if (bedChange.recorded)
+            return;
+
+        bedChange.recorded = true;
+        this.worldRecordService.get().recordBlockBreak(bedChange.key, bedLocation, 1, REGULAR_RECORD_FLAGS);
+    }
+
+    private void onBedInteract(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
+        if (e.getArgs().action == Action.RIGHT_CLICK_BLOCK && e.getArgs().clickedBlock != null)
+            captureBed(e.getArgs().clickedBlock);
+    }
+
+    private void onBedPhysics(GameEvent<GameEventArgs.BlockPhysicsEvent> e) {
+        captureBed(e.getArgs().block);
+    }
+
+    private void captureBed(Block block) {
+        if (!Materials.isBed(block.getType()) || !plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        handleBedChange(block.getState(), false);
     }
 
     private void onBucketFill(GameEvent<GameEventArgs.PlayerFillBucketEvent> e) {
@@ -550,23 +645,61 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         Entity entity = e.getArgs().entity;
 
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            handleBlocksExplode(entity.getLocation(wrapper.getHandle()), e.getArgs().blocks,
+                    entity instanceof TNTPrimed ? ConstantKeys.TNT : null);
+        }
+    }
+
+    private void onBlockExplode(GameEvent<GameEventArgs.BlockExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
+            return;
+
+        Block block = e.getArgs().block;
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        bedChanges.forEach((bedLocation, bedChange) -> {
+            if (!bedChange.recorded && bedLocation.getWorld() == block.getWorld() &&
+                    bedLocation.getBlock().getType() != bedChange.material)
+                recordBedBreak(bedLocation, bedChange);
+        });
+
+        Key sourceBlock = e.getArgs().sourceBlock;
+        // Only respawn anchors are recorded as the source block: vanilla removes the anchor before it explodes, so it
+        // is never part of blockList().
+        if (!(sourceBlock instanceof MaterialKey && ((MaterialKey) sourceBlock).getMaterial() == RESPAWN_ANCHOR &&
+                block.getType() != RESPAWN_ANCHOR))
+            sourceBlock = null;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            handleBlocksExplode(block.getLocation(wrapper.getHandle()), e.getArgs().blocks, sourceBlock);
+        }
+    }
+
+    private void handleBlocksExplode(Location explodeLocation, List<Block> blocks, @Nullable Key sourceBlock) {
         // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+        if (!plugin.getGrid().isIslandsWorld(explodeLocation.getWorld()))
             return;
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        e.getArgs().blocks.forEach(block -> {
+        blocks.forEach(block -> {
+            if (Materials.isAir(block.getType()))
+                return;
+
+            if (Materials.isBed(block.getType())) {
+                handleBedChange(block.getState(), true);
+                return;
+            }
+
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
 
-        if (entity instanceof TNTPrimed)
-            blockCounts.put(ConstantKeys.TNT, blockCounts.getOrDefault(ConstantKeys.TNT, 0) + 1);
+        if (sourceBlock != null)
+            blockCounts.put(sourceBlock, blockCounts.getOrDefault(sourceBlock, 0) + 1);
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            this.worldRecordService.get().recordMultiBlocksBreak(blockCounts,
-                    entity.getLocation(wrapper.getHandle()), REGULAR_RECORD_FLAGS);
-        }
+        this.worldRecordService.get().recordMultiBlocksBreak(blockCounts, explodeLocation, REGULAR_RECORD_FLAGS);
     }
 
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
@@ -632,6 +765,8 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_SPREAD_EVENT, GameEventPriority.MONITOR, this::onBlockSpread);
         registerCallback(GameEventType.BLOCK_UPDATE_SHAPE_EVENT, GameEventPriority.MONITOR, this::onBlockShapeUpdate);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.MONITOR, this::onSpawnerChange);
+        registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.MONITOR, this::onBedInteract);
+        registerCallback(GameEventType.BLOCK_PHYSICS_EVENT, GameEventPriority.MONITOR, this::onBedPhysics);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.MONITOR, this::onEntityChangeBlock);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onBlockBreak);
         registerCallback(GameEventType.PLAYER_FILL_BUCKET_EVENT, GameEventPriority.MONITOR, this::onBucketFill);
@@ -640,6 +775,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.LEAVES_DECAY_EVENT, GameEventPriority.MONITOR, this::onLeavesDecay);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.MONITOR, this::onBlockFromTo);
         registerCallback(GameEventType.BLOCK_FADE_EVENT, GameEventPriority.MONITOR, this::onBlockFade);
+        registerCallback(GameEventType.BLOCK_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onBlockExplode);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);
 
@@ -669,6 +805,19 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private static Key getBlockKeyFromBucketMaterial(Material material) {
         return Keys.ofMaterialAndData(material.name().replace("_BUCKET", ""));
+    }
+
+    private static class BedChange {
+
+        private final Material material;
+        private final Key key;
+        private boolean recorded;
+
+        private BedChange(Material material, Key key) {
+            this.material = material;
+            this.key = key;
+        }
+
     }
 
 }

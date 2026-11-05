@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class SignsListener extends AbstractGameEventListener {
 
@@ -117,19 +118,31 @@ public class SignsListener extends AbstractGameEventListener {
 
         Entity entity = e.getArgs().entity;
 
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            handleSignExplode(entity.getLocation(wrapper.getHandle()), e.getArgs().blocks);
+        }
+    }
+
+    private void onBlockExplode(GameEvent<GameEventArgs.BlockExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
             return;
 
-        Island island;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+            handleSignExplode(e.getArgs().block.getLocation(wrapper.getHandle()), e.getArgs().blocks);
         }
+    }
+
+    private void handleSignExplode(Location explodeLocation, List<Block> blocks) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(explodeLocation.getWorld()))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(explodeLocation);
 
         if (!isValidIsland(island))
             return;
 
-        Iterator<Block> iterator = e.getArgs().blocks.iterator();
+        Iterator<Block> iterator = blocks.iterator();
         while (iterator.hasNext()) {
             Block block = iterator.next();
             IslandSigns.Result result = handleBlockBreak(island, block, null);
@@ -187,6 +200,7 @@ public class SignsListener extends AbstractGameEventListener {
     private void registerListeners() {
         registerCallback(GameEventType.SIGN_CHANGE_EVENT, GameEventPriority.MONITOR, this::onSignPlace);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onSignBreak);
+        registerCallback(GameEventType.BLOCK_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onBlockExplode);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onSignExplode);
     }
 
