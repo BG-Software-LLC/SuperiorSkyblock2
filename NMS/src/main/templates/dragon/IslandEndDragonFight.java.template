@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -10,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.DragonUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
+import com.bgsoftware.superiorskyblock.service.dragon.IslandEndCrystals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,6 +23,7 @@ import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonLandingPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
+import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
@@ -28,27 +32,35 @@ import net.minecraft.world.level.block.state.pattern.BlockPattern;
 import net.minecraft.world.level.block.state.pattern.BlockPatternBuilder;
 import net.minecraft.world.level.block.state.predicate.BlockPredicate;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.dimension.end.${DRAGON_RESPAWN_STAGE_CLASS};
 import net.minecraft.world.level.dimension.end.${END_DRAGON_FIGHT_CLASS};
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.feature.${SPIKE_FEATURE_CLASS};
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
+import org.bukkit.World;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 public class IslandEndDragonFight extends EndDragonFightWrapper {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final ReflectField<${END_DRAGON_FIGHT_CLASS}> DRAGON_BATTLE = initializeDragonBattleField();
     private static final ReflectField<Boolean> SCAN_FOR_LEGACY_PORTALS = new ReflectField<>(
             ${END_DRAGON_FIGHT_CLASS}.class, boolean.class, Modifier.PRIVATE, 3);
     private static final ReflectField<Boolean> WAS_DRAGON_KILLED = new ReflectField<>(
             ${END_DRAGON_FIGHT_CLASS}.class, boolean.class, Modifier.PRIVATE, 1);
+    private static final ReflectField<Boolean> WAS_DRAGON_PREVIOUSLY_KILLED = initializePreviouslyKilledField();
     private static final ReflectField<UUID> DRAGON_UUID = initializeDragonUUIDField();
 
     private static final ReflectField<Integer> TICKS_SINCE_DRAGON_SEEN = new ReflectField<>(
@@ -57,12 +69,22 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
             ${END_DRAGON_FIGHT_CLASS}.class, int.class, Modifier.PRIVATE, 4);
     private static final ReflectField<Vec3> LANDING_TARGET_POSITION = new ReflectField<>(
             DragonLandingPhase.class, Vec3.class, Modifier.PRIVATE, 1);
+    private static final ReflectField<Integer> RESPAWN_TIME = new ReflectField<>(
+            ${END_DRAGON_FIGHT_CLASS}.class, int.class, Modifier.PRIVATE, 5);
 
     // Vanilla points the beams of the respawn crystals to this position, which is above the vanilla podium.
     private static final BlockPos VANILLA_RESPAWN_BEAM_TARGET = new BlockPos(0, 128, 0);
 
+    // When summoning the pillars, vanilla points the beams to a spike for this amount of ticks, and rebuilds
+    // the spike in the last tick.
+    private static final int SUMMON_PILLAR_TICKS = 40;
+
     // Vanilla spawns the dragon at y=128, which is 64 blocks above the vanilla podium (y=64).
     private static final int DRAGON_SPAWN_HEIGHT_ABOVE_ISLAND = 64;
+
+    // Fights are not saved, so dragons keep whether the dragon of their island was killed before. Scoreboard tags
+    // are loaded before the fight of a loaded dragon is created, unlike the persistent data of the dragon.
+    private static final String PREVIOUSLY_KILLED_TAG = "superiorskyblock.previously_killed";
 
     private static final BlockPattern EXIT_PORTAL_PATTERN = BlockPatternBuilder.start()
             .aisle("       ", "       ", "       ", "   #   ", "       ", "       ", "       ")
@@ -79,6 +101,7 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
     private final ServerLevel serverLevel;
     @Nullable
     private final SpikesCache.IslandSpikes islandSpikes;
+    @Nullable
     private IslandEntityEnderDragon entityEnderDragon;
     private final Runnable tickTask;
     private final Runnable respawnTickTask;
@@ -92,6 +115,12 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
 
     public IslandEndDragonFight(Island island, ServerLevel serverLevel, BlockPos islandBlockPos,
                                 @Nullable IslandEntityEnderDragon islandEntityEnderDragon) {
+        this(island, serverLevel, islandBlockPos, islandEntityEnderDragon, null);
+    }
+
+    private IslandEndDragonFight(Island island, ServerLevel serverLevel, BlockPos islandBlockPos,
+                                 @Nullable IslandEntityEnderDragon islandEntityEnderDragon,
+                                 @Nullable BlockPos killedDragonExitPortalPos) {
         super(serverLevel, islandBlockPos);
 
         this.island = island;
@@ -100,7 +129,8 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
         this.serverLevel = serverLevel;
 
         // Must be initialized before spawning the dragon, as it resets the spike crystals.
-        SpikesCache.IslandSpikes islandSpikes = SpikesCache.createIslandSpikes(serverLevel, islandBlockPos);
+        SpikesCache.IslandSpikes islandSpikes = SpikesCache.createIslandSpikes(serverLevel, islandBlockPos,
+                getCrystalSpikes(island, serverLevel, islandBlockPos));
         this.islandSpikes = islandSpikes;
         if (islandSpikes == null) {
             this.tickTask = super::tick;
@@ -109,19 +139,59 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
             this.tickTask = () -> islandSpikes.runWith(super::tick);
             this.resetSpikeCrystalsTask = () -> islandSpikes.runWith(super::resetSpikeCrystals);
         }
-        // When respawning the dragon, vanilla rebuilds the end spikes, which would modify the island.
-        // We hide the spikes during the respawn, which makes vanilla skip this stage.
-        this.respawnTickTask = () -> SpikesCache.runWithoutSpikes(islandSpikes, super::tick);
+        if (islandSpikes != null && islandSpikes.isCrystalSpikes()) {
+            // The spikes of the island exist, so vanilla can summon them. We only replace the rebuilding of the
+            // spikes, so the island is not modified.
+            this.respawnTickTask = this::tickRespawnWithCrystalSpikes;
+        } else {
+            // When respawning the dragon, vanilla rebuilds the end spikes, which would modify the island.
+            // We hide the spikes during the respawn, which makes vanilla skip this stage.
+            this.respawnTickTask = () -> SpikesCache.runWithoutSpikes(islandSpikes, super::tick);
+        }
 
-        this.entityEnderDragon = islandEntityEnderDragon == null ? spawnEnderDragon() : islandEntityEnderDragon;
+        if (killedDragonExitPortalPos != null) {
+            // The dragon was killed, so the fight has no dragon until it is respawned.
+            this.entityEnderDragon = null;
+            setPortalPos(killedDragonExitPortalPos);
+        } else {
+            this.entityEnderDragon = islandEntityEnderDragon == null ? spawnEnderDragon() : islandEntityEnderDragon;
+        }
         // Vanilla only registers the death of the dragon with this uuid.
-        DRAGON_UUID.set(this, this.entityEnderDragon.getUUID());
+        DRAGON_UUID.set(this, this.entityEnderDragon == null ? null : this.entityEnderDragon.getUUID());
 
         SCAN_FOR_LEGACY_PORTALS.set(this, false);
-        WAS_DRAGON_KILLED.set(this, false);
-        DRAGON_BATTLE.set(this.entityEnderDragon, this);
+        WAS_DRAGON_KILLED.set(this, killedDragonExitPortalPos != null);
+        // Vanilla initializes the fight from the fight data of the world, which is not related to the island.
+        WAS_DRAGON_PREVIOUSLY_KILLED.set(this, killedDragonExitPortalPos != null || (this.entityEnderDragon != null &&
+                this.entityEnderDragon.getBukkitEntity().getScoreboardTags().contains(PREVIOUSLY_KILLED_TAG)));
+        if (this.entityEnderDragon != null)
+            DRAGON_BATTLE.set(this.entityEnderDragon, this);
 
         TICKS_SINCE_LAST_PLAYER_SCAN.set(this, Integer.MIN_VALUE);
+    }
+
+    /**
+     * Restore the fight of an island whose dragon was killed.
+     * The chunks of the exit portal must be loaded.
+     *
+     * @param island         The island to restore the fight of.
+     * @param serverLevel    The end world of the island.
+     * @param islandBlockPos The origin of the fight.
+     * @return The restored fight, or null if the dragon of the island was not killed.
+     */
+    @Nullable
+    public static IslandEndDragonFight restoreKilledDragonFight(Island island, ServerLevel serverLevel, BlockPos islandBlockPos) {
+        // The exit portal is only active when the dragon was killed and was not respawned. Otherwise, the dragon
+        // may be in an unloaded chunk, and its fight is restored when the dragon is loaded.
+        BlockPattern.BlockPatternMatch exitPortal = findExitPortalAtOrigin(serverLevel, islandBlockPos);
+        if (exitPortal == null)
+            return null;
+
+        BlockPos exitPortalPos = exitPortal.getBlock(3, 3, 3).getPos();
+        if (!serverLevel.getBlockState(exitPortalPos.east()).is(Blocks.END_PORTAL))
+            return null;
+
+        return new IslandEndDragonFight(island, serverLevel, islandBlockPos, null, exitPortalPos);
     }
 
     @Override
@@ -146,9 +216,11 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
 
         syncEnderDragon();
 
-        DragonPhaseInstance currentPhase = this.entityEnderDragon.getPhaseManager().getCurrentPhase();
-        if (currentPhase instanceof DragonLandingPhase && !this.islandBlockVectored.equals(currentPhase.getFlyTargetLocation())) {
-            LANDING_TARGET_POSITION.set(currentPhase, this.islandBlockVectored);
+        if (this.entityEnderDragon != null) {
+            DragonPhaseInstance currentPhase = this.entityEnderDragon.getPhaseManager().getCurrentPhase();
+            if (currentPhase instanceof DragonLandingPhase && !this.islandBlockVectored.equals(currentPhase.getFlyTargetLocation())) {
+                LANDING_TARGET_POSITION.set(currentPhase, this.islandBlockVectored);
+            }
         }
 
         if (++currentTick >= 20) {
@@ -184,26 +256,29 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
             }
         }
 
-        int highestBlock = this.serverLevel.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, this.islandBlockPos).getY();
+        BlockPattern.BlockPatternMatch blockPatternMatch = findExitPortalAtOrigin(this.serverLevel, this.islandBlockPos);
 
-        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
-            BlockPos.MutableBlockPos currentPosition = wrapper.getHandle();
-            currentPosition.set(this.islandBlockPos.getX(), 0, this.islandBlockPos.getZ());
-            for (int y = highestBlock; y >= NMSUtilsVersioned.getMinBuildHeight(this.serverLevel); --y) {
-                currentPosition.setY(y);
+        if (blockPatternMatch != null && getPortalPos() == null)
+            setPortalPos(blockPatternMatch.getBlock(3, 3, 3).getPos());
 
-                BlockPattern.BlockPatternMatch blockPatternMatch = EXIT_PORTAL_PATTERN.find(this.serverLevel, currentPosition);
+        return blockPatternMatch;
+    }
 
-                if (blockPatternMatch != null) {
-                    if(getPortalPos() == null)
-                        setPortalPos(blockPatternMatch.getBlock(3, 3, 3).getPos());
-
-                    return blockPatternMatch;
-                }
-            }
+    @Override
+    public void setDragonKilled(EnderDragon enderDragon) {
+        // Fights that were restored after a restart, or recreated, do not know their exit portal. Vanilla would place
+        // a new exit portal using the heightmap at the origin, which is above or below the existing one. Exit portals
+        // of islands are placed at the origin of their fights, so we only look for the existing one there, which does
+        // not load the chunks around the island.
+        if (getPortalPos() == null) {
+            BlockPattern.BlockPatternMatch exitPortal = findExitPortalAtOrigin(this.serverLevel, this.islandBlockPos);
+            if (exitPortal != null)
+                setPortalPos(exitPortal.getBlock(3, 3, 3).getPos());
         }
 
-        return null;
+        // The dragon is killed while it is ticked, not while the fight is ticked. Versions that use the podium
+        // position of vanilla for the exit portal would place it around (0, 0) otherwise.
+        DragonUtils.runWithPodiumPosition(this.islandBlockPos, () -> super.setDragonKilled(enderDragon));
     }
 
     @Override
@@ -233,8 +308,39 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
         return this.island;
     }
 
+    @Nullable
     public IslandEntityEnderDragon getEnderDragon() {
         return this.entityEnderDragon;
+    }
+
+    public boolean hasOtherEnderDragon(EnderDragon enderDragon) {
+        // A respawn summons a new dragon, so any other dragon belongs to the fight before the respawn.
+        if (this.respawnStage != null)
+            return true;
+
+        return this.entityEnderDragon != null && this.entityEnderDragon.isAlive() &&
+                !this.entityEnderDragon.getUUID().equals(enderDragon.getUUID());
+    }
+
+    public void replaceEnderDragon(IslandEntityEnderDragon enderDragon) {
+        if (this.respawnStage != null) {
+            // The new dragon is the one the respawn would summon, so the respawn ends as if it was completed.
+            for (EndCrystal endCrystal : getRespawnCrystals())
+                endCrystal.getBukkitEntity().remove();
+            this.respawnStage = null;
+            RESPAWN_TIME.set(this, 0);
+            resetSpikeCrystals();
+        }
+
+        if (this.entityEnderDragon != null && this.entityEnderDragon != enderDragon)
+            this.entityEnderDragon.getBukkitEntity().remove();
+
+        WAS_DRAGON_KILLED.set(this, false);
+        enderDragon.setIslandBlockPos(this.islandBlockPos);
+        DRAGON_BATTLE.set(enderDragon, this);
+        DRAGON_UUID.set(this, enderDragon.getUUID());
+        this.entityEnderDragon = enderDragon;
+        updatePreviouslyKilledTag(enderDragon);
     }
 
     private void updateBattlePlayers() {
@@ -282,7 +388,8 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
 
     private void syncEnderDragon() {
         UUID dragonUUID = DRAGON_UUID.get(this);
-        if (this.entityEnderDragon.getUUID().equals(dragonUUID))
+        UUID currentDragonUUID = this.entityEnderDragon == null ? null : this.entityEnderDragon.getUUID();
+        if (Objects.equals(currentDragonUUID, dragonUUID))
             return;
 
         // Vanilla created a new dragon (for example, when the dragon is respawned). It is created without the
@@ -291,7 +398,7 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
         if (!(entity instanceof IslandEntityEnderDragon newEnderDragon) || newEnderDragon.getIslandBlockPos() != null) {
             // Vanilla picked another dragon in the world, which may belong to another island.
             // Vanilla only registers the death of the dragon with this uuid, so we restore it.
-            DRAGON_UUID.set(this, this.entityEnderDragon.getUUID());
+            DRAGON_UUID.set(this, currentDragonUUID);
             return;
         }
 
@@ -299,21 +406,128 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
         DRAGON_BATTLE.set(newEnderDragon, this);
         moveToSpawnPosition(newEnderDragon);
         this.entityEnderDragon = newEnderDragon;
+        updatePreviouslyKilledTag(newEnderDragon);
+    }
+
+    public void updatePreviouslyKilledTag(IslandEntityEnderDragon enderDragon) {
+        if (WAS_DRAGON_PREVIOUSLY_KILLED.get(this))
+            enderDragon.getBukkitEntity().addScoreboardTag(PREVIOUSLY_KILLED_TAG);
     }
 
     private void updateRespawnCrystalsBeamTarget() {
-        BlockPos portalPos = getPortalPos();
-        if (portalPos == null)
-            return;
-
-        // The respawn crystals are placed around the exit portal, 3 blocks away from its center.
-        AABB respawnCrystalsArea = new AABB(portalPos).inflate(4, 2, 4);
         BlockPos beamTarget = this.islandBlockPos.above(DRAGON_SPAWN_HEIGHT_ABOVE_ISLAND);
 
-        for (EndCrystal endCrystal : this.serverLevel.getEntitiesOfClass(EndCrystal.class, respawnCrystalsArea)) {
+        for (EndCrystal endCrystal : getRespawnCrystals()) {
             if (VANILLA_RESPAWN_BEAM_TARGET.equals(endCrystal.getBeamTarget()))
                 endCrystal.setBeamTarget(beamTarget);
         }
+    }
+
+    private List<EndCrystal> getRespawnCrystals() {
+        BlockPos portalPos = getPortalPos();
+        if (portalPos == null)
+            return Collections.emptyList();
+
+        // The respawn crystals are placed around the exit portal, 3 blocks away from its center.
+        return this.serverLevel.getEntitiesOfClass(EndCrystal.class, new AABB(portalPos).inflate(4, 2, 4));
+    }
+
+    private void tickRespawnWithCrystalSpikes() {
+        // Must only be called when the island has crystal spikes.
+        assert this.islandSpikes != null;
+
+        int respawnTime = RESPAWN_TIME.get(this);
+
+        // When summoning the pillars, vanilla points the beams of the respawn crystals to the top of the spikes,
+        // which we want to keep. However, at the end of each beam, vanilla removes the blocks around the top of
+        // the spike, explodes it and rebuilds it. Therefore, we hide the spikes in these ticks, which makes
+        // vanilla only advance the animation, and place the crystal of the spike ourselves.
+        if (this.respawnStage != ${DRAGON_RESPAWN_STAGE_CLASS}.SUMMONING_PILLARS ||
+                respawnTime % SUMMON_PILLAR_TICKS != SUMMON_PILLAR_TICKS - 1) {
+            this.islandSpikes.runWith(super::tick);
+            return;
+        }
+
+        this.islandSpikes.runWithout(super::tick);
+
+        // Vanilla does not advance the animation if there are no players in the fight, or if it was aborted.
+        if (this.respawnStage == ${DRAGON_RESPAWN_STAGE_CLASS}.SUMMONING_PILLARS && RESPAWN_TIME.get(this) == respawnTime + 1)
+            restoreSpikeCrystal(respawnTime / SUMMON_PILLAR_TICKS);
+    }
+
+    private void restoreSpikeCrystal(int spikeIndex) {
+        // Must only be called when the island has crystal spikes.
+        assert this.islandSpikes != null;
+
+        List<${SPIKE_FEATURE_CLASS}.EndSpike> spikes = this.islandSpikes.getSpikes();
+        if (spikeIndex >= spikes.size())
+            return;
+
+        ${SPIKE_FEATURE_CLASS}.EndSpike spike = spikes.get(spikeIndex);
+        BlockPos crystalPos = new BlockPos(spike.getCenterX(), spike.getHeight() + 1, spike.getCenterZ());
+
+        // We cannot know if the spike already has a crystal when its entities are not loaded.
+        World bukkitWorld = this.serverLevel.getWorld();
+        int chunkX = crystalPos.getX() >> 4;
+        int chunkZ = crystalPos.getZ() >> 4;
+        if (!bukkitWorld.isChunkLoaded(chunkX, chunkZ) || !bukkitWorld.getChunkAt(chunkX, chunkZ).isEntitiesLoaded())
+            return;
+
+        // Unlike vanilla, we do not rebuild the spikes, as they are part of the island. If the top of the spike
+        // was removed, there is nothing for the crystal to stand on.
+        if (this.serverLevel.getBlockState(crystalPos.below()).isAir())
+            return;
+
+        List<EndCrystal> spikeCrystals = this.serverLevel.getEntitiesOfClass(EndCrystal.class, new AABB(crystalPos));
+        if (spikeCrystals.isEmpty()) {
+            EndCrystal endCrystal = new EndCrystal(this.serverLevel, crystalPos.getX() + 0.5D,
+                    crystalPos.getY(), crystalPos.getZ() + 0.5D);
+            NMSUtilsVersioned.addEntity(this.serverLevel, endCrystal, CreatureSpawnEvent.SpawnReason.DEFAULT);
+            spikeCrystals = Collections.singletonList(endCrystal);
+        }
+
+        // Similar to vanilla, the crystals of the spikes point to the dragon and cannot be destroyed until the
+        // dragon is summoned, which resets the spike crystals.
+        BlockPos beamTarget = this.islandBlockPos.above(DRAGON_SPAWN_HEIGHT_ABOVE_ISLAND);
+        for (EndCrystal endCrystal : spikeCrystals) {
+            endCrystal.setBeamTarget(beamTarget);
+            endCrystal.getBukkitEntity().setInvulnerable(true);
+        }
+
+        // Similar to vanilla, the crystal stands inside fire.
+        if (this.serverLevel.getBlockState(crystalPos).isAir())
+            this.serverLevel.setBlockAndUpdate(crystalPos, BaseFireBlock.getState(this.serverLevel, crystalPos));
+    }
+
+    @Nullable
+    private static BlockPattern.BlockPatternMatch findExitPortalAtOrigin(ServerLevel serverLevel, BlockPos islandBlockPos) {
+        int highestBlock = serverLevel.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, islandBlockPos).getY();
+
+        try (ObjectsPools.Wrapper<BlockPos.MutableBlockPos> wrapper = NMSUtils.BLOCK_POS_POOL.obtain()) {
+            BlockPos.MutableBlockPos currentPosition = wrapper.getHandle();
+            currentPosition.set(islandBlockPos.getX(), 0, islandBlockPos.getZ());
+            for (int y = highestBlock; y >= NMSUtilsVersioned.getMinBuildHeight(serverLevel); --y) {
+                currentPosition.setY(y);
+
+                BlockPattern.BlockPatternMatch blockPatternMatch = EXIT_PORTAL_PATTERN.find(serverLevel, currentPosition);
+
+                if (blockPatternMatch != null)
+                    return blockPatternMatch;
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static List<${SPIKE_FEATURE_CLASS}.EndSpike> getCrystalSpikes(Island island, ServerLevel serverLevel,
+                                                                    BlockPos islandBlockPos) {
+        Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(serverLevel.getWorld());
+        if (dimension == null)
+            return null;
+
+        // The spikes of the island are defined by the end crystals of its schematic.
+        return SpikesCache.createCrystalSpikes(IslandEndCrystals.getSchematicCrystals(island, dimension), islandBlockPos);
     }
 
     private static ReflectField<${END_DRAGON_FIGHT_CLASS}> initializeDragonBattleField() {
@@ -328,6 +542,17 @@ public class IslandEndDragonFight extends EndDragonFightWrapper {
         }
 
         return dragonBattleField;
+    }
+
+    private static ReflectField<Boolean> initializePreviouslyKilledField() {
+        // The field is public in newer versions.
+        ReflectField<Boolean> previouslyKilledField = new ReflectField<>(${END_DRAGON_FIGHT_CLASS}.class, boolean.class, Modifier.PUBLIC, 1);
+
+        if (!previouslyKilledField.isValid()) {
+            previouslyKilledField = new ReflectField<>(${END_DRAGON_FIGHT_CLASS}.class, boolean.class, Modifier.PRIVATE, 2);
+        }
+
+        return previouslyKilledField;
     }
 
     private static ReflectField<UUID> initializeDragonUUIDField() {

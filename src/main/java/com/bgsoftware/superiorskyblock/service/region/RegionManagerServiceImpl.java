@@ -12,11 +12,13 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
@@ -31,6 +33,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.IService;
+import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
@@ -91,6 +94,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     private static UnparsedEnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
 
     private final SuperiorSkyblockPlugin plugin;
+
+    private final LazyReference<DragonBattleServiceImpl> dragonBattleService = new LazyReference<DragonBattleServiceImpl>() {
+        @Override
+        protected DragonBattleServiceImpl create() {
+            return (DragonBattleServiceImpl) plugin.getServices().getService(DragonBattleService.class);
+        }
+    };
 
     public RegionManagerServiceImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -186,7 +196,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Location blockLocation = block.getLocation(wrapper.getHandle());
             Key blockKey = Keys.of(block);
 
-            boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem);
+            boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem, block);
 
             int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
 
@@ -198,7 +208,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Material blockType = block.getType();
             Material usedItemType = usedItem == null ? null : usedItem.getType();
 
-            EntityType spawnType = usedItem == null ? EntityType.UNKNOWN : BukkitItems.getEntityType(usedItem);
+            EntityType spawnType = isInteractableItem ? BukkitItems.getEntityType(usedItem) : EntityType.UNKNOWN;
 
             if (spawnType != EntityType.UNKNOWN) {
                 List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(spawnType));
@@ -782,6 +792,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 BukkitExecutor.sync(() -> {
                     superiorPlayer.removePlayerStatus(PlayerStatus.PORTALS_IMMUNED);
                 }, 100L);
+                this.dragonBattleService.get().restoreKilledEnderDragonBattle(toIsland, to.getWorld());
             }
 
             return MoveResult.SUCCESS;
@@ -800,6 +811,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     }
 
     private void handleIslandEnterEffects(SuperiorPlayer superiorPlayer, Island toIsland) {
+        this.dragonBattleService.get().restoreKilledEnderDragonBattle(toIsland, to.getWorld());
+
         if (!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)) {
             Message.ENTER_PVP_ISLAND.send(superiorPlayer);
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {

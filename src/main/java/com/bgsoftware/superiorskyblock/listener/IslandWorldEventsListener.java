@@ -14,7 +14,9 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.function.Predicate;
 
@@ -39,6 +41,8 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
 
         if (plugin.getSettings().getAFKIntegrations().isDisableSpawning())
             registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.HIGHEST, this::onEntitySpawn);
+
+        registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.MONITOR, this::onEnderDragonSpawn);
     }
 
     private void onBlockRedstone(GameEvent<GameEventArgs.BlockRedstoneEvent> e) {
@@ -86,6 +90,26 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
             return;
 
         e.setCancelled();
+    }
+
+    private void onEnderDragonSpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
+        // Dragon fights add their dragons with the default reason. Older versions add them at the vanilla spawn
+        // position before moving them to their island, so they must not be matched with the island there.
+        if (!(e.getArgs().entity instanceof EnderDragon) || e.getArgs().spawnReason == CreatureSpawnEvent.SpawnReason.DEFAULT)
+            return;
+
+        EnderDragon enderDragon = (EnderDragon) e.getArgs().entity;
+
+        if (!plugin.getGrid().isIslandsWorld(enderDragon.getWorld()))
+            return;
+
+        Island island;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            island = plugin.getGrid().getIslandAt(enderDragon.getLocation(wrapper.getHandle()));
+        }
+
+        if (island != null)
+            plugin.getNMSDragonFight().replaceEnderDragon(island, enderDragon);
     }
 
 }
