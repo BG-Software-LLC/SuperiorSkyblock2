@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.world;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import org.bukkit.Bukkit;
@@ -14,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 
 public class WorldBlocks {
 
@@ -21,6 +24,43 @@ public class WorldBlocks {
 
     private WorldBlocks() {
 
+    }
+
+    @Nullable
+    public static Location getBedFootLocation(BlockState blockState, Location stateLocation) {
+        if (!Materials.isBed(blockState.getType()))
+            return null;
+
+        BlockFace facing = plugin.getNMSAlgorithms().getBedFacing(blockState);
+        if (facing != BlockFace.NORTH && facing != BlockFace.SOUTH &&
+                facing != BlockFace.EAST && facing != BlockFace.WEST)
+            return null;
+
+        Location footLocation = stateLocation.clone();
+        if (plugin.getNMSAlgorithms().isBedHead(blockState))
+            footLocation.add(-facing.getModX(), 0, -facing.getModZ());
+        return footLocation;
+    }
+
+    @Nullable
+    public static BlockState getOtherBedPart(BlockState blockState) {
+        if (!blockState.isPlaced() || !Materials.isBed(blockState.getType()))
+            return null;
+
+        BlockFace facing = plugin.getNMSAlgorithms().getBedFacing(blockState);
+        if (facing != BlockFace.NORTH && facing != BlockFace.SOUTH &&
+                facing != BlockFace.EAST && facing != BlockFace.WEST)
+            return null;
+
+        boolean isHead = plugin.getNMSAlgorithms().isBedHead(blockState);
+        Block otherBlock = blockState.getBlock().getRelative(isHead ? facing.getOppositeFace() : facing);
+        if (otherBlock.getType() != blockState.getType())
+            return null;
+
+        BlockState otherState = otherBlock.getState();
+        return plugin.getNMSAlgorithms().isBedHead(otherState) != isHead &&
+                plugin.getNMSAlgorithms().getBedFacing(otherState) == facing ?
+                otherState : null;
     }
 
     public static boolean isSafeBlock(Block block) {

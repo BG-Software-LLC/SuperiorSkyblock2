@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.FallingBlock;
@@ -51,6 +52,23 @@ public interface NMSAlgorithms {
     short getBlockDataValue(BlockState blockState);
 
     short getBlockDataValue(Block block);
+
+    default BlockFace getBedFacing(BlockState blockState) {
+        switch (blockState.getRawData() & 3) {
+            case 0:
+                return BlockFace.SOUTH;
+            case 1:
+                return BlockFace.WEST;
+            case 2:
+                return BlockFace.NORTH;
+            default:
+                return BlockFace.EAST;
+        }
+    }
+
+    default boolean isBedHead(BlockState blockState) {
+        return (blockState.getRawData() & 8) != 0;
+    }
 
     short getMaxBlockDataValue(Material material);
 

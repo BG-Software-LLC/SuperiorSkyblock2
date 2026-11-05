@@ -36,9 +36,11 @@ import org.bukkit.block.Biome;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -155,6 +157,16 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     public short getBlockDataValue(org.bukkit.block.Block block) {
         BlockData blockData = block.getBlockData();
         return (short) (blockData instanceof Ageable ? ((Ageable) blockData).getAge() : 0);
+    }
+
+    @Override
+    public BlockFace getBedFacing(BlockState blockState) {
+        return ((Bed) blockState.getBlockData()).getFacing();
+    }
+
+    @Override
+    public boolean isBedHead(BlockState blockState) {
+        return ((Bed) blockState.getBlockData()).getPart() == Bed.Part.HEAD;
     }
 
     @Override
