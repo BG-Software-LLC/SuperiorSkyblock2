@@ -583,7 +583,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         blocks.forEach(block -> {
-            if (block.getType() == Material.AIR)
+            if (Materials.isAir(block.getType()))
                 return;
 
             Key blockKey = Keys.of(block);

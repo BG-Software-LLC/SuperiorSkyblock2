@@ -7,6 +7,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.platform.IEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
@@ -317,7 +318,7 @@ public class BukkitEventsListener implements Listener {
         // Use the event block location because an unplaced snapshot has no world.
         // AIR snapshots are ignored because they do not represent a source block to count.
         BlockState sourceBlockState = EXPLODED_BLOCK_STATE.isValid() ? EXPLODED_BLOCK_STATE.invoke(e) : null;
-        if (sourceBlockState != null && sourceBlockState.getType() != Material.AIR) {
+        if (sourceBlockState != null && !Materials.isAir(sourceBlockState.getType())) {
             blockExplodeEvent.sourceBlock = Keys.of(MaterialKey.of(sourceBlockState.getType(),
                     plugin.getNMSAlgorithms().getBlockDataValue(sourceBlockState), MaterialKeySource.BLOCK),
                     e.getBlock().getLocation());

@@ -98,6 +98,13 @@ CUSHION:
     DAMAGE: BREAK
     INTERACT: INTERACT
 
+END_CRYSTAL:
+  entities:
+    - END_CRYSTAL
+    - ENDER_CRYSTAL
+  actions:
+    DAMAGE: BREAK
+
 ITEM_FRAME:
   entities:
     - GLOW_ITEM_FRAME

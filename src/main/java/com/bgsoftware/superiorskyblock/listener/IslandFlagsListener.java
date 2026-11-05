@@ -37,7 +37,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class IslandFlagsListener extends AbstractGameEventListener {
@@ -45,6 +47,8 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     private static final EnumSet<CreatureSpawnEvent.SpawnReason> NATURAL_SPAWN_REASONS = initializeNaturalSpawnReasons();
 
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
+    // End crystals that explode in the current tick, mapped to their explosion radius.
+    private final Map<Location, Float> endCrystalExplosions = new HashMap<>();
 
     private World spawnIslandWorld;
 
@@ -150,8 +154,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
             if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION) {
                 if (remover instanceof Player) {
-                    // Explosion was set by TNT.
-                    if (preventAction(entityLocation, IslandFlags.TNT_EXPLOSION)) {
+                    // Explosion was set by TNT, or by an end crystal the player hit: older versions report the
+                    // player as the remover of hanging entities broken by an end crystal explosion.
+                    IslandFlag islandFlag = isNearEndCrystalExplosion(entityLocation) ?
+                            IslandFlags.BLOCK_EXPLOSION : IslandFlags.TNT_EXPLOSION;
+                    if (preventAction(entityLocation, islandFlag)) {
                         e.setCancelled();
                         return;
                     }
@@ -176,10 +183,26 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (entity.getType() != EntityType.ENDER_CRYSTAL || shouldIgnoreWorldEvents(entity.getWorld()))
             return;
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.BLOCK_EXPLOSION))
-                e.getArgs().radius = 0;
+        Location crystalLocation = entity.getLocation();
+        if (preventAction(crystalLocation, IslandFlags.BLOCK_EXPLOSION)) {
+            e.getArgs().radius = 0;
+        } else {
+            endCrystalExplosions.put(crystalLocation, e.getArgs().radius);
+            BukkitExecutor.sync(() -> endCrystalExplosions.remove(crystalLocation), 1L);
         }
+    }
+
+    private boolean isNearEndCrystalExplosion(Location location) {
+        for (Map.Entry<Location, Float> explosion : endCrystalExplosions.entrySet()) {
+            Location explosionLocation = explosion.getKey();
+            // Explosions damage entities up to twice their radius away.
+            double damageRange = explosion.getValue() * 2;
+            if (explosionLocation.getWorld() == location.getWorld() &&
+                    explosionLocation.distanceSquared(location) <= damageRange * damageRange)
+                return true;
+        }
+
+        return false;
     }
 
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
@@ -196,6 +219,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private void onBlockExplode(GameEvent<GameEventArgs.BlockExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
+            return;
+
         Block block = e.getArgs().block;
 
         if (shouldIgnoreWorldEvents(block.getWorld()))
