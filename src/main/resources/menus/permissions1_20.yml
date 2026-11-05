@@ -582,6 +582,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  copper_golem_interact:
+    display-menu: true
+    permission-enabled:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: COPPER_GOLEM_STATUE
+      name: '&6Copper Golem Interact'
+      lore:
+        - '&7Access to take items from copper golems.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   delete_warp:
     display-menu: true
     permission-enabled:
@@ -1540,6 +1573,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  nautilus_interact:
+    display-menu: true
+    permission-enabled:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: NAUTILUS_SHELL
+      name: '&6Nautilus Interact'
+      lore:
+        - '&7Access to interact with nautiluses inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   name_entity:
     display-menu: true
     permission-enabled:
@@ -2311,6 +2377,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  sulfur_cube_interact:
+    display-menu: true
+    permission-enabled:
+      type: SULFUR_CUBE_SPAWN_EGG
+      name: '&6Sulfur Cube Interact'
+      lore:
+        - '&7Access to interact with sulfur cubes inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SULFUR_CUBE_SPAWN_EGG
+      name: '&6Sulfur Cube Interact'
+      lore:
+        - '&7Access to interact with sulfur cubes inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SULFUR_CUBE_SPAWN_EGG
+      name: '&6Sulfur Cube Interact'
+      lore:
+        - '&7Access to interact with sulfur cubes inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   turtle_egg_tramping:
     display-menu: true
     permission-enabled:
@@ -2498,6 +2597,39 @@ permissions:
       name: '&6Villagers Trading'
       lore:
         - '&7Access to trade with villagers inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  wind_charge:
+    display-menu: true
+    permission-enabled:
+      type: WIND_CHARGE
+      name: '&6Wind Charge'
+      lore:
+        - '&7Access to use wind charges inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: WIND_CHARGE
+      name: '&6Wind Charge'
+      lore:
+        - '&7Access to use wind charges inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: WIND_CHARGE
+      name: '&6Wind Charge'
+      lore:
+        - '&7Access to use wind charges inside the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'

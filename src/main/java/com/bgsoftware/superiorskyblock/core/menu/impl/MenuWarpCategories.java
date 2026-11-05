@@ -105,7 +105,7 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         if (newMenu.isString("slots") || !newMenu.isConfigurationSection("items"))
             return false;
 
