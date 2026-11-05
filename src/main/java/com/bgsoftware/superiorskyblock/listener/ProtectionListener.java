@@ -328,7 +328,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
     private void onPlayerTakeLecternBook(GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> e) {
         IslandPrivilege pickupLecternBookPrivilege = plugin.getSettings().getInteractablesMap()
-                .getRequiredPrivilege(Keys.ofMaterialAndData("lectern_book"));
+                .getRequiredPrivilege(ConstantKeys.LECTERN_BOOK);
         if (pickupLecternBookPrivilege == null)
             return;
 

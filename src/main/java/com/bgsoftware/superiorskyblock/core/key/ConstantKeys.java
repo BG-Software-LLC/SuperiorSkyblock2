@@ -34,6 +34,7 @@ public class ConstantKeys {
     @Nullable
     public static final Key IRON_BLOCK = Keys.of(Material.IRON_BLOCK);
     public static final Key LAVA = Keys.of(Material.LAVA);
+    public static final Key LECTERN_BOOK = Keys.ofMaterialAndData("lectern_book");
     public static final Key MOB_SPAWNER = Keys.of(Materials.SPAWNER.toBukkitType());
     public static final Key OBSIDIAN = Keys.of(Material.OBSIDIAN);
     @Nullable
