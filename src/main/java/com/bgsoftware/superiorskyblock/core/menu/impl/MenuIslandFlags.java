@@ -183,7 +183,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/settings-gui.yml");
 
         if (!oldFile.exists())
