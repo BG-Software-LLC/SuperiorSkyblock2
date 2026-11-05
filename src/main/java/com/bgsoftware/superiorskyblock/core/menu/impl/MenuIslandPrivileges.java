@@ -288,7 +288,11 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         File oldFile = new File(plugin.getDataFolder(), "guis/permissions-gui.yml");
 
         if (!oldFile.exists()) {
-            return removeInvalidPrivileges(newMenu, firstTime);
+            if (firstTime) {
+                return removeInvalidPrivileges(newMenu);
+            } else {
+                return false;
+            }
         }
 
         //We want to reset the items of newMenu.
@@ -329,11 +333,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         return true;
     }
 
-    private static boolean removeInvalidPrivileges(YamlConfiguration config, boolean firstTime) {
-        if (!firstTime) {
-            return false;
-        }
-
+    private static boolean removeInvalidPrivileges(YamlConfiguration config) {
         boolean shouldSave = false;
 
         ConfigurationSection permissionsSection = config.getConfigurationSection("permissions");
