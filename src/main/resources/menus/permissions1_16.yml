@@ -75,6 +75,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  allay_interact:
+    display-menu: true
+    permission-enabled:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: ALLAY_SPAWN_EGG
+      name: '&6Allay Interact'
+      lore:
+        - '&7Access to interact with allays inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   animal_breed:
     display-menu: true
     permission-enabled:
@@ -1050,19 +1083,19 @@ permissions:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
       type: CREEPER_SPAWN_EGG
       name: '&6Ignite Creepers'
       lore:
-        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Access to ignite creepers with flint and steel or fire charges inside the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
@@ -1606,6 +1639,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  pickup_axolotl:
+    display-menu: true
+    permission-enabled:
+      type: AXOLOTL_SPAWN_EGG
+      name: '&6Pickup Axolotls'
+      lore:
+        - '&7Access to pickup axolotls using a water bucket inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: AXOLOTL_SPAWN_EGG
+      name: '&6Pickup Axolotls'
+      lore:
+        - '&7Access to pickup axolotls using a water bucket inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: AXOLOTL_SPAWN_EGG
+      name: '&6Pickup Axolotls'
+      lore:
+        - '&7Access to pickup axolotls using a water bucket inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   pickup_drops:
     display-menu: true
     permission-enabled:
@@ -1823,6 +1889,39 @@ permissions:
       name: '&6Saddle Entity'
       lore:
         - '&7Access to add saddle to entities inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  sculk_sensor:
+    display-menu: true
+    permission-enabled:
+      type: SCULK_SENSOR
+      name: '&6Sculk Sensor'
+      lore:
+        - '&7Access to trigger sculk sensors inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SCULK_SENSOR
+      name: '&6Sculk Sensor'
+      lore:
+        - '&7Access to trigger sculk sensors inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SCULK_SENSOR
+      name: '&6Sculk Sensor'
+      lore:
+        - '&7Access to trigger sculk sensors inside the island.'
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
@@ -2148,12 +2247,16 @@ permissions:
       lore:
         - '&7Access to break spawners inside the island.'
         - '&7Currently &aENABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     permission-disabled:
       type: SPAWNER
       name: '&6Spawner Break'
       lore:
         - '&7Access to break spawners inside the island.'
         - '&7Currently &cDISABLED&7.'
+      flags:
+        - HIDE_ATTRIBUTES
     role-permission:
       type: SPAWNER
       name: '&6Spawner Break'
@@ -2162,6 +2265,8 @@ permissions:
         - '&7Role: &e{}&7.'
         - ''
         - '{0}'
+      flags:
+        - HIDE_ATTRIBUTES
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP

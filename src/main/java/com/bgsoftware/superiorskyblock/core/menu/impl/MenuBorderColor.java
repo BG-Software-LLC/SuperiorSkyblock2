@@ -76,7 +76,7 @@ public class MenuBorderColor extends AbstractMenu<BaseMenuView, EmptyViewArgs> {
         return new MenuBorderColor(menuParseResult);
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/border-gui.yml");
 
         if (!oldFile.exists())
