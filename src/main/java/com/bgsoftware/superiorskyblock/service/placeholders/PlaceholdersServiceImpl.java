@@ -57,8 +57,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)");
+    private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
 
     private static final Pattern BAN_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("ban_(\\d+)");
     private static final Pattern BIOME_PLACEHOLDER_PATTERN = Pattern.compile("biome_(.+)");
@@ -70,7 +70,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern BLOCK_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("block_worth_(.+)");
     private static final Pattern COOP_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("coop_(\\d+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("count_(.+)");
-    private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("data_(.+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("data_(.+)");
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("effect_(.+)");
     private static final Pattern ENTITY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("entity_count_(.+)");
     private static final Pattern ENTITY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("entity_limit_(.+)");
@@ -85,7 +85,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern PLAYER_INDEX_PLACEHOLDER_PATTERN = Pattern.compile("player_(\\d+)");
     private static final Pattern ROLE_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("role_count_(.+)");
     private static final Pattern ROLE_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("role_limit_(.+)");
-    private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("top_(.+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("top_(.+)");
     private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
     private static final Pattern TOP_VALUE_RAW_PLACEHOLDER_PATTERN = Pattern.compile("value_raw_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
@@ -501,18 +501,22 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             return placeholderResult.get();
         }
 
-        if ((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String subPlaceholder = matcher.group(1);
+        String loweredPlaceholder = placeholder.toLowerCase(Locale.ENGLISH);
+
+        // The patterns are matched against the lowered placeholder. Their prefixes are ASCII, so lowering
+        // keeps their length, and matcher.start(1) is also the offset of the sub-placeholder in the original.
+        if ((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(loweredPlaceholder)).matches()) {
+            String subPlaceholder = placeholder.substring(matcher.start(1));
 
             placeholderResult = parsePlaceholdersForPlayer(superiorPlayer, subPlaceholder);
-        } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String subPlaceholder = matcher.group(1);
+        } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(loweredPlaceholder)).matches()) {
+            String subPlaceholder = placeholder.substring(matcher.start(1));
 
             Island island;
 
             if (superiorPlayer == null) {
                 island = null;
-            } else if (subPlaceholder.toLowerCase(Locale.ENGLISH).startsWith(LOCATION_PREFIX)) {
+            } else if (matcher.group(1).startsWith(LOCATION_PREFIX)) {
                 subPlaceholder = subPlaceholder.substring(LOCATION_PREFIX.length());
 
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -528,8 +532,6 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         if (placeholderResult.isPresent()) {
             return placeholderResult.get();
         }
-
-        String loweredPlaceholder = placeholder.toLowerCase(Locale.ENGLISH);
 
         String defaultPlaceholderValue = plugin.getSettings().getDefaultPlaceholders().get(loweredPlaceholder);
 
@@ -652,9 +654,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return handlePlayersIndexPlaceholder(island.getCoopPlayers(), matcher.group(1));
             }
 
-            // Persistent Data Container is case-sensitive.
-            if ((matcher = DATA_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                Object object = island.getPersistentDataContainer().get(matcher.group(1));
+            // Persistent Data Container is case-sensitive, so the key is taken from the original sub-placeholder.
+            if ((matcher = DATA_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
+                Object object = island.getPersistentDataContainer().get(subPlaceholder.substring(matcher.start(1)));
 
                 if (object == null) {
                     return Optional.empty();
@@ -826,8 +828,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         }
 
         // A top placeholder can parse another placeholder, which is case-sensitive.
-        if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            return handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));
+        if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
+            return handleTopIslandsPlaceholder(island, superiorPlayer, subPlaceholder.substring(matcher.start(1)));
         }
 
         return Optional.empty();
