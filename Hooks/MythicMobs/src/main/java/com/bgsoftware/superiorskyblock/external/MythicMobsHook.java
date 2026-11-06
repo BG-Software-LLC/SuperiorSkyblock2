@@ -1,19 +1,26 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import io.lumine.mythic.api.mobs.MythicMob;
 import io.lumine.mythic.api.mobs.entities.MythicEntityType;
 import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.bukkit.adapters.BukkitEntityType;
 import io.lumine.mythic.core.mobs.MobExecutor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings("unused")
@@ -29,6 +36,48 @@ public class MythicMobsHook {
             registered = true;
             plugin.getKeys().registerCustomEntityTypeKeyParser(new MythicMobsKeyParser(), collectCustomKeys());
         }
+
+        // Outside the check above, so "/is admin reload" checks the reloaded entity-categories.yml again.
+        warnAboutMobWithoutDamagePrivilege(plugin);
+    }
+
+    private static void warnAboutMobWithoutDamagePrivilege(SuperiorSkyblockPlugin plugin) {
+        SettingsManager.EntityCategories entityCategories = plugin.getSettings().getEntityCategoriesMap();
+        MobExecutor mobExecutor = MythicBukkit.inst().getMobManager();
+        Collection<MythicMob> vanillaTypes = mobExecutor.getVanillaTypes();
+
+        for (MythicMob mythicMob : mobExecutor.getMobTypes()) {
+            // Vanilla overrides keep their vanilla key, and therefore the categories of their vanilla type.
+            if (vanillaTypes.contains(mythicMob)) {
+                continue;
+            }
+
+            BukkitEntityType mythicEntity = mythicMob.getMythicEntity();
+            EntityType entityType = mythicEntity == null ? null : mythicEntity.getBukkitType();
+            // Skip entities the plugin doesn't track or protect (displays, markers, ...).
+            if (entityType == null || !BukkitEntities.canHaveLimit(entityType)) {
+                continue;
+            }
+
+            String mythicType = mythicMob.getInternalName();
+            Key mythicKey = Keys.of(MYTHIC_MOBS_PREFIX, mythicType.toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
+
+            // Same lookup as BukkitEntities#getCategories(Entity), so the warning matches the real protection.
+            if (!hasDamagePrivilege(entityCategories.getCategories(mythicKey))) {
+                Log.warn("The MythicMobs mob MYTHIC_MOBS:", mythicType, " is not in an entity category ",
+                        "with a DAMAGE action, so visitors can damage it on islands");
+            }
+        }
+    }
+
+    private static boolean hasDamagePrivilege(List<EntityCategory> entityCategories) {
+        for (EntityCategory entityCategory : entityCategories) {
+            if (entityCategory.getDamagePrivilege() != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static KeySet collectMythicMobsKeys() {
