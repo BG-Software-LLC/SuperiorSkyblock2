@@ -78,6 +78,8 @@ public class NMSUtilsVersioned {
             EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
     private static final ReflectMethod<CompletableFuture<CompoundTag>> WORKER_LOAD_ASYNC = new ReflectMethod<>(
             IOWorker.class, CompletableFuture.class, 1, ChunkPos.class);
+    private static final ReflectMethod<Void> ENDER_DRAGON_SET_PODIUM = new ReflectMethod<>(
+            EnderDragon.class, "setPodium", BlockPos.class);
 
     public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
         return CraftItemStack.asCraftMirror(itemStack);
@@ -279,7 +281,9 @@ public class NMSUtilsVersioned {
     }
 
     public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
-        // Fight origin does not exist in this version; DragonUtils handles the podium position instead.
+        // Fight origin does not exist in this version. Paper has a podium position instead; otherwise,
+        // DragonUtils handles the podium position.
+        ENDER_DRAGON_SET_PODIUM.invoke(enderDragon, fightOrigin);
     }
 
     public static void removeDragonTicket(ServerLevel serverLevel) {

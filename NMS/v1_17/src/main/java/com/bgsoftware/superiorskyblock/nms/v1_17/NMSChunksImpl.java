@@ -257,10 +257,6 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
 
             @Override
             public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
-                CompoundTag chunkCompound = unloadedChunkCompound.chunkCompound();
-                if (!chunkCompound.contains("Level", 10))
-                    return;
-
                 unloadedChunkCompounds.add(unloadedChunkCompound);
 
                 latchCountDown();
@@ -270,8 +266,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
             public void onFinish() {
                 BukkitExecutor.ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
-                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getCompound("Level")
-                                .getList("Entities", 10);
+                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getList("Entities", 10);
                         allCalculatedChunks.add(calculatedChunk(unloadedChunkCompound.chunkPosition(),
                                 unloadedChunkCompound.serverLevel(), entitiesTag));
                     }

@@ -81,6 +81,8 @@ public class NMSChunksImpl implements NMSChunks {
     private static final ReflectField<Collection<Entity>[]> ENTITY_SLICE_ARRAY = new ReflectField<>(
             Chunk.class, null, "entitySlices");
 
+    private static boolean creatingFakeEntities = false;
+
     private final SuperiorSkyblockPlugin plugin;
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
@@ -333,7 +335,14 @@ public class NMSChunksImpl implements NMSChunks {
                             if (entityType == null)
                                 continue;
 
-                            Entity fakeEntity = EntityTypes.a((NBTTagCompound) entityTag, worldServer).orElse(null);
+                            Entity fakeEntity;
+                            creatingFakeEntities = true;
+                            try {
+                                fakeEntity = EntityTypes.a((NBTTagCompound) entityTag, worldServer).orElse(null);
+                            } finally {
+                                creatingFakeEntities = false;
+                            }
+
                             if (fakeEntity != null) {
                                 fakeEntity.valid = false;
                                 if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
@@ -423,6 +432,10 @@ public class NMSChunksImpl implements NMSChunks {
                 blockEntities.add(new Location(bukkitWorld, blockPosition.getX(), blockPosition.getY(), blockPosition.getZ())));
 
         return blockEntities;
+    }
+
+    public static boolean isCreatingFakeEntities() {
+        return creatingFakeEntities;
     }
 
     private static CalculatedChunk.Blocks calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {

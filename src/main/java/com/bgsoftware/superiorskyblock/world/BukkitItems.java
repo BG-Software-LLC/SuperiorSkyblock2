@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -136,11 +137,17 @@ public class BukkitItems {
         return !itemType.isBlock() && itemType.name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
     }
 
-    public static boolean isInteractableItem(@Nullable ItemStack itemStack) {
+    public static boolean isInteractableItem(@Nullable ItemStack itemStack, Block clickedBlock) {
         if (itemStack == null)
             return false;
 
         Material itemType = itemStack.getType();
+
+        // End crystals can only be placed on obsidian and bedrock, other blocks are interacted with normally.
+        if (itemType == END_CRYSTAL_ITEM_TYPE) {
+            Material clickedBlockType = clickedBlock.getType();
+            return clickedBlockType == Material.OBSIDIAN || clickedBlockType == Material.BEDROCK;
+        }
 
         return itemType == Material.ARMOR_STAND || isValidAndSpawnEgg(itemType);
     }

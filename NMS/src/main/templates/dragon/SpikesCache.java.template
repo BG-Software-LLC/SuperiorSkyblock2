@@ -14,9 +14,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.feature.${SPIKE_FEATURE_CLASS};
+import org.bukkit.Location;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -36,10 +39,15 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     private static final ReflectField<LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>>> SPIKE_CACHE = new ReflectField<>(
             ${SPIKE_FEATURE_CLASS}.class, LoadingCache.class, Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, 1);
 
+    // Spikes defined by end crystals only need a small area around the crystal for finding it.
+    private static final int CRYSTAL_SPIKE_RADIUS = 1;
+
     @Nullable
     private static LoadingCache<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>> vanillaSpikesCache;
 
-    private static boolean hideSpikes = false;
+    // When set, the installed cache returns these spikes instead of computing them.
+    @Nullable
+    private static List<${SPIKE_FEATURE_CLASS}.EndSpike> overrideSpikes = null;
 
     private final LoadingCache<BlockPos, List<${SPIKE_FEATURE_CLASS}.EndSpike>> cachedSpikes = CacheBuilder.newBuilder()
             .expireAfterWrite(5L, TimeUnit.MINUTES).build(new InternalCacheLoader());
@@ -66,7 +74,14 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     }
 
     @Nullable
-    public static IslandSpikes createIslandSpikes(ServerLevel serverLevel, BlockPos podiumPosition) {
+    public static IslandSpikes createIslandSpikes(ServerLevel serverLevel, BlockPos podiumPosition,
+                                                  @Nullable List<${SPIKE_FEATURE_CLASS}.EndSpike> crystalSpikes) {
+        if (!SPIKE_FEATURE_IS_RECORD) {
+            // The installed cache computes the spikes around the podium position, so we only need to
+            // override it when the island has its own spikes.
+            return crystalSpikes == null ? null : new IslandSpikes(0, null, crystalSpikes, true);
+        }
+
         if (vanillaSpikesCache == null)
             return null;
 
@@ -75,7 +90,9 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
         for (Map.Entry<Long, List<${SPIKE_FEATURE_CLASS}.EndSpike>> entry : vanillaSpikesCache.asMap().entrySet()) {
             if (entry.getValue() == vanillaSpikes) {
                 long key = entry.getKey();
-                return new IslandSpikes(key, vanillaSpikes, computeSpikes(key, podiumPosition));
+                return crystalSpikes == null ?
+                        new IslandSpikes(key, vanillaSpikes, computeSpikes(key, podiumPosition), false) :
+                        new IslandSpikes(key, vanillaSpikes, crystalSpikes, true);
             }
         }
 
@@ -88,13 +105,51 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
             return;
         }
 
-        boolean previousHideSpikes = hideSpikes;
-        hideSpikes = true;
+        runWithOverrideSpikes(Collections.emptyList(), runnable);
+    }
+
+    private static void runWithOverrideSpikes(List<${SPIKE_FEATURE_CLASS}.EndSpike> spikes, Runnable runnable) {
+        // Calls may be nested, so we restore the previous spikes instead of clearing them.
+        List<${SPIKE_FEATURE_CLASS}.EndSpike> previousSpikes = overrideSpikes;
+        overrideSpikes = spikes;
         try {
             runnable.run();
         } finally {
-            hideSpikes = previousHideSpikes;
+            overrideSpikes = previousSpikes;
         }
+    }
+
+    /**
+     * Create spikes from the end crystals that stand on them.
+     * Similar to vanilla, the crystal stands on top of the spike, and the spikes are sorted around the podium.
+     *
+     * @param crystals       The locations of the end crystals.
+     * @param podiumPosition The position of the podium.
+     * @return The spikes, or null if there are no crystals.
+     */
+    @Nullable
+    public static List<${SPIKE_FEATURE_CLASS}.EndSpike> createCrystalSpikes(List<Location> crystals, BlockPos podiumPosition) {
+        if (crystals.isEmpty())
+            return null;
+
+        double podiumX = podiumPosition.getX() + 0.5D;
+        double podiumZ = podiumPosition.getZ() + 0.5D;
+
+        List<Location> sortedCrystals = new ArrayList<>(crystals);
+        // Vanilla spikes are ordered by their angle around the podium, which is also the order of the
+        // respawn animation.
+        sortedCrystals.sort(Comparator.comparingDouble(crystal -> {
+            double angle = Math.atan2(crystal.getZ() - podiumZ, crystal.getX() - podiumX);
+            return angle < 0 ? angle + 2 * Math.PI : angle;
+        }));
+
+        List<${SPIKE_FEATURE_CLASS}.EndSpike> spikesList = Lists.newArrayList();
+        for (Location crystal : sortedCrystals) {
+            spikesList.add(new ${SPIKE_FEATURE_CLASS}.EndSpike(crystal.getBlockX(), crystal.getBlockZ(),
+                    CRYSTAL_SPIKE_RADIUS, crystal.getBlockY() - 1, false));
+        }
+
+        return spikesList;
     }
 
     public static List<${SPIKE_FEATURE_CLASS}.EndSpike> computeSpikes(long worldSeed, BlockPos blockPos) {
@@ -120,8 +175,8 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     @Override
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> get(@NotNull Long worldSeed) throws ExecutionException {
-        if (hideSpikes)
-            return Collections.emptyList();
+        if (overrideSpikes != null)
+            return overrideSpikes;
 
         try {
             this.worldSeed = worldSeed;
@@ -134,8 +189,8 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     @Override
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> getUnchecked(@NotNull Long worldSeed) {
-        if (hideSpikes)
-            return Collections.emptyList();
+        if (overrideSpikes != null)
+            return overrideSpikes;
 
         try {
             this.worldSeed = worldSeed;
@@ -182,8 +237,8 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     public @NotNull
     List<${SPIKE_FEATURE_CLASS}.EndSpike> get(@NotNull Long worldSeed,
                                     @NotNull Callable<? extends List<${SPIKE_FEATURE_CLASS}.EndSpike>> loader) throws ExecutionException {
-        if (hideSpikes)
-            return Collections.emptyList();
+        if (overrideSpikes != null)
+            return overrideSpikes;
 
         try {
             this.worldSeed = worldSeed;
@@ -258,20 +313,45 @@ public class SpikesCache implements LoadingCache<Long, List<${SPIKE_FEATURE_CLAS
     public static class IslandSpikes {
 
         private final long key;
+        @Nullable
         private final List<${SPIKE_FEATURE_CLASS}.EndSpike> vanillaSpikes;
         private final List<${SPIKE_FEATURE_CLASS}.EndSpike> islandSpikes;
+        private final boolean crystalSpikes;
 
-        private IslandSpikes(long key, List<${SPIKE_FEATURE_CLASS}.EndSpike> vanillaSpikes, List<${SPIKE_FEATURE_CLASS}.EndSpike> islandSpikes) {
+        private IslandSpikes(long key, @Nullable List<${SPIKE_FEATURE_CLASS}.EndSpike> vanillaSpikes,
+                             List<${SPIKE_FEATURE_CLASS}.EndSpike> islandSpikes, boolean crystalSpikes) {
             this.key = key;
             this.vanillaSpikes = vanillaSpikes;
             this.islandSpikes = islandSpikes;
+            this.crystalSpikes = crystalSpikes;
+        }
+
+        public List<${SPIKE_FEATURE_CLASS}.EndSpike> getSpikes() {
+            return this.islandSpikes;
+        }
+
+        /**
+         * Whether the spikes are the actual spikes of the island, defined by the end crystals that stand on them.
+         * Otherwise, the spikes are the vanilla spikes moved to the island, which may not exist in the world.
+         */
+        public boolean isCrystalSpikes() {
+            return this.crystalSpikes;
         }
 
         public void runWith(Runnable runnable) {
             runWith(this.islandSpikes, runnable);
         }
 
+        public void runWithout(Runnable runnable) {
+            runWith(Collections.emptyList(), runnable);
+        }
+
         private void runWith(List<${SPIKE_FEATURE_CLASS}.EndSpike> spikes, Runnable runnable) {
+            if (!SPIKE_FEATURE_IS_RECORD) {
+                runWithOverrideSpikes(spikes, runnable);
+                return;
+            }
+
             // Calls may be nested, so we restore the previous spikes instead of the vanilla ones.
             List<${SPIKE_FEATURE_CLASS}.EndSpike> previousSpikes = vanillaSpikesCache.asMap().get(this.key);
             vanillaSpikesCache.put(this.key, spikes);

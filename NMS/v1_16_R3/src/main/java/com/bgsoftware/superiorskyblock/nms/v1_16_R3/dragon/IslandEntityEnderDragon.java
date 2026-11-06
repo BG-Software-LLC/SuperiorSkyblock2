@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.NMSChunksImpl;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.DifficultyDamageScaler;
 import net.minecraft.server.v1_16_R3.EntityEnderDragon;
@@ -71,6 +72,10 @@ public class IslandEntityEnderDragon extends EntityEnderDragon {
     }
 
     private void finalizeIslandEnderDragon() {
+        // Dragons created from unloaded chunks for counting entities are never added to the world.
+        if (NMSChunksImpl.isCreatingFakeEntities())
+            return;
+
         if (!(world instanceof WorldServer) || !(((WorldServer) world).getDragonBattle() instanceof EndWorldEnderDragonBattleHandler))
             return;
 
