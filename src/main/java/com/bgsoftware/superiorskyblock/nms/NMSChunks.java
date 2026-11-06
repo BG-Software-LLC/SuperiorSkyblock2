@@ -33,6 +33,15 @@ public interface NMSChunks {
 
     boolean isChunkEmpty(Chunk chunk);
 
+    /**
+     * Checks whether the chunk is empty without loading it.
+     * Returns false if the chunk cannot be accessed without loading it.
+     */
+    default boolean isChunkEmptyIfLoaded(Chunk chunk) {
+        // Versions that read the chunk through its own handle do not load it.
+        return isChunkEmpty(chunk);
+    }
+
     @Nullable
     Chunk getChunkIfLoaded(ChunkPosition chunkPosition);
 

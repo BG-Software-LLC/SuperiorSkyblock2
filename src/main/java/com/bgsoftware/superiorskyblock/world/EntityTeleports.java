@@ -193,8 +193,17 @@ public class EntityTeleports {
             }
 
             BukkitExecutor.createTask().runAsync(v -> {
-                Location closestSafeSpot = null;
+                // Track the closest safe spot as primitive coordinates to avoid allocating a
+                // Location per scanned block; a single Location is built once after the loop.
+                boolean foundSafeSpot = false;
+                int closestX = 0;
+                int closestY = 0;
+                int closestZ = 0;
                 double closestSafeSpotDistance = 0;
+
+                double homeX = homeLocation.getX();
+                double homeY = homeLocation.getY();
+                double homeZ = homeLocation.getZ();
 
                 int worldBuildLimit = islandsWorld.getMaxHeight();
                 int worldMinLimit = plugin.getNMSWorld().getMinHeight(islandsWorld);
@@ -219,17 +228,21 @@ public class EntityTeleports {
                         int worldX = chunkSnapshot.getX() * 16 + x;
                         int worldZ = chunkSnapshot.getZ() * 16 + z;
 
-                        Location safeSpot = new Location(islandsWorld, worldX, safeY, worldZ);
-
-                        double distanceFromHome = safeSpot.distanceSquared(homeLocation);
-                        if (closestSafeSpot == null || distanceFromHome < closestSafeSpotDistance) {
+                        double dx = worldX - homeX;
+                        double dy = safeY - homeY;
+                        double dz = worldZ - homeZ;
+                        double distanceFromHome = dx * dx + dy * dy + dz * dz;
+                        if (!foundSafeSpot || distanceFromHome < closestSafeSpotDistance) {
+                            foundSafeSpot = true;
                             closestSafeSpotDistance = distanceFromHome;
-                            closestSafeSpot = safeSpot;
+                            closestX = worldX;
+                            closestY = safeY;
+                            closestZ = worldZ;
                         }
                     }
                 }
 
-                return closestSafeSpot;
+                return foundSafeSpot ? new Location(islandsWorld, closestX, closestY, closestZ) : null;
             }).runSync(location -> {
                 if (location != null) {
                     onResult.accept(location);

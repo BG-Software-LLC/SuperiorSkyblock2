@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
+import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
@@ -347,6 +348,13 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                         } else {
                             EntityTeleports.teleport(entity, homeLocation);
                         }
+
+                        // Spawning the entities of the schematic, similar to the schematic of new islands.
+                        // The callback is only available while the paste callback runs.
+                        Runnable onTeleportCallback = schematic instanceof BaseSchematic ?
+                                ((BaseSchematic) schematic).onTeleportCallback() : null;
+                        if (onTeleportCallback != null)
+                            onTeleportCallback.run();
                     }, error -> {
                         generatingSchematicsIslands.remove(island.getUniqueId());
                         error.printStackTrace();

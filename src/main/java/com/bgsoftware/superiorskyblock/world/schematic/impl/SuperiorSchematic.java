@@ -355,6 +355,19 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         return this.onTeleportCallback;
     }
 
+    @Override
+    public List<Location> getEntityLocations(EntityType entityType, Location location) {
+        Location min = this.data.offset.applyToLocation(location);
+        List<Location> entityLocations = new LinkedList<>();
+
+        for (SchematicEntity entity : this.data.entities) {
+            if (entity.getEntityType() == entityType)
+                entityLocations.add(entity.getLocation(min));
+        }
+
+        return entityLocations;
+    }
+
     public SuperiorSchematic copy(String newName) {
         return new SuperiorSchematic(newName, this.data, this.cachedCounts);
     }
@@ -369,7 +382,17 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         // We spawn the entities with a delay, waiting for players to teleport to the island first.
         this.onTeleportCallback = () -> {
             BukkitExecutor.sync(() -> {
+                // Entities of the schematic may still exist from an earlier paste, for example outside the
+                // protected area after the world of the island was reset, or when the spot of a disbanded
+                // island is reused. We check all the entities before spawning any of them, so entities of the
+                // schematic that share the same block do not prevent each other from spawning.
+                List<SchematicEntity> entitiesToSpawn = new LinkedList<>();
                 for (SchematicEntity entity : data.entities) {
+                    if (!entity.isAlreadySpawned(min))
+                        entitiesToSpawn.add(entity);
+                }
+
+                for (SchematicEntity entity : entitiesToSpawn) {
                     entity.spawnEntity(min);
                 }
             }, 20L);
