@@ -144,7 +144,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("bank", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getIslandBank().getBalance()))
                     .put("bank_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandBank().getBalance(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandBank().getBalance(), getLocale(superiorPlayer)))
                     .put("bank_int", (island, superiorPlayer) ->
                             island.getIslandBank().getBalance().toBigInteger().toString())
                     .put("bank_raw", (island, superiorPlayer) ->
@@ -152,15 +152,15 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("bank_limit", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getBankLimit()))
                     .put("bank_limit_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimit(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimit(), getLocale(superiorPlayer)))
                     .put("bank_limit_int", (island, superiorPlayer) ->
                             island.getBankLimit().toBigInteger().toString())
                     .put("bank_limit_raw", (island, superiorPlayer) ->
                             island.getBankLimit().toString())
                     .put("bank_last_interest", (island, superiorPlayer) ->
-                            Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getLastInterestTime()), superiorPlayer.getUserLocale()))
+                            Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getLastInterestTime()), getLocale(superiorPlayer)))
                     .put("bank_next_interest", (island, superiorPlayer) ->
-                            Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getNextInterest()), superiorPlayer.getUserLocale()))
+                            Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getNextInterest()), getLocale(superiorPlayer)))
                     .put("bans_count", (island, superiorPlayer) ->
                             String.valueOf(island.getBannedPlayers().size()))
                     .put("bans_list", (island, superiorPlayer) ->
@@ -170,7 +170,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("bonus_level", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getBonusLevel()))
                     .put("bonus_level_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getBonusLevel(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getBonusLevel(), getLocale(superiorPlayer)))
                     .put("bonus_level_int", (island, superiorPlayer) ->
                             island.getBonusLevel().toBigInteger().toString())
                     .put("bonus_level_raw", (island, superiorPlayer) ->
@@ -178,7 +178,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("bonus_worth", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getBonusWorth()))
                     .put("bonus_worth_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getBonusWorth(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getBonusWorth(), getLocale(superiorPlayer)))
                     .put("bonus_worth_int", (island, superiorPlayer) ->
                             island.getBonusWorth().toBigInteger().toString())
                     .put("bonus_worth_raw", (island, superiorPlayer) ->
@@ -212,7 +212,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("drops_multiplier", (island, superiorPlayer) ->
                             String.valueOf(island.getMobDropsMultiplier()))
                     .put("exists", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island != null, superiorPlayer.getUserLocale()))
+                            Formatters.BOOLEAN_FORMATTER.format(island != null, getLocale(superiorPlayer)))
                     .put("home", (island, superiorPlayer) -> {
                         WorldInfo worldInfo = getDefaultWorldInfo(island);
                         return Formatters.LOCATION_FORMATTER.format(island.getIslandHomePosition(worldInfo.getDimension()).toLocation(worldInfo));
@@ -232,19 +232,19 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("is_visitor", (island, superiorPlayer) ->
                             Formatters.BOOLEAN_FORMATTER.format(island.isVisitor(superiorPlayer, true), superiorPlayer.getUserLocale()))
                     .put("last_time_updated", (island, superiorPlayer) ->
-                            Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getLastTimeUpdate()), superiorPlayer.getUserLocale()))
+                            Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getLastTimeUpdate()), getLocale(superiorPlayer)))
                     .put("leader", (island, superiorPlayer) ->
                             island.getOwner().getName())
                     .put("level", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getIslandLevel()))
                     .put("level_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), getLocale(superiorPlayer)))
                     .put("level_int", (island, superiorPlayer) ->
                             island.getIslandLevel().toBigInteger().toString())
                     .put("level_raw", (island, superiorPlayer) ->
                             island.getIslandLevel().toString())
                     .put("locked", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), superiorPlayer.getUserLocale()))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), getLocale(superiorPlayer)))
                     .put("missions_completed", (island, superiorPlayer) ->
                             String.valueOf(island.getCompletedMissions().size()))
                     .put("name", (island, superiorPlayer) ->
@@ -270,11 +270,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("rating_amount", (island, superiorPlayer) ->
                             String.valueOf(island.getRatingAmount()))
                     .put("rating_stars", (island, superiorPlayer) ->
-                            Formatters.RATING_FORMATTER.format(island.getTotalRating(), superiorPlayer.getUserLocale()))
+                            Formatters.RATING_FORMATTER.format(island.getTotalRating(), getLocale(superiorPlayer)))
                     .put("raw_bank_limit", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getBankLimitRaw()))
                     .put("raw_bank_limit_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimitRaw(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getBankLimitRaw(), getLocale(superiorPlayer)))
                     .put("raw_bank_limit_int", (island, superiorPlayer) ->
                             island.getBankLimitRaw().toBigInteger().toString())
                     .put("raw_bank_limit_raw", (island, superiorPlayer) ->
@@ -288,7 +288,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("raw_level", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getRawLevel()))
                     .put("raw_level_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getRawLevel(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getRawLevel(), getLocale(superiorPlayer)))
                     .put("raw_level_int", (island, superiorPlayer) ->
                             island.getRawLevel().toBigInteger().toString())
                     .put("raw_level_raw", (island, superiorPlayer) ->
@@ -304,7 +304,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("raw_worth", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getRawWorth()))
                     .put("raw_worth_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getRawWorth(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getRawWorth(), getLocale(superiorPlayer)))
                     .put("raw_worth_int", (island, superiorPlayer) ->
                             island.getRawWorth().toBigInteger().toString())
                     .put("raw_worth_raw", (island, superiorPlayer) ->
@@ -364,18 +364,18 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("worth", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(island.getWorth()))
                     .put("worth_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), getLocale(superiorPlayer)))
                     .put("worth_int", (island, superiorPlayer) ->
                             island.getWorth().toBigInteger().toString())
                     .put("worth_raw", (island, superiorPlayer) ->
                             island.getWorth().toString())
                     // Deprecated Island Placeholders
                     .put("end_unlocked", legacyPlaceholder("superior_island_end_unlocked", "superior_island_world_unlocked_the_end", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isEndEnabled(), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isEndEnabled(), getLocale(superiorPlayer))))
                     .put("nether_unlocked", legacyPlaceholder("superior_island_nether_unlocked", "superior_island_world_unlocked_nether", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isNetherEnabled(), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isNetherEnabled(), getLocale(superiorPlayer))))
                     .put("normal_unlocked", legacyPlaceholder("superior_island_normal_unlocked", "superior_island_world_unlocked_normal", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isNormalEnabled(), superiorPlayer.getUserLocale())))
+                            Formatters.BOOLEAN_FORMATTER.format(island.isNormalEnabled(), getLocale(superiorPlayer))))
                     .put("hoppers_limit", legacyPlaceholder("superior_island_hoppers_limit", "superior_island_block_limit_hopper", (island, superiorPlayer) ->
                             String.valueOf(island.getBlockLimit(ConstantKeys.HOPPER))))
                     .put("x", legacyPlaceholder("superior_island_x", "superior_island_center_x", (island, superiorPlayer) ->
@@ -388,13 +388,13 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("total_count", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getIslands().size()))
                     .put("total_count_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(plugin.getGrid().getIslands().size(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(plugin.getGrid().getIslands().size(), getLocale(superiorPlayer)))
                     .put("total_count_raw", (island, superiorPlayer) ->
                             String.valueOf(plugin.getGrid().getIslands().size()))
                     .put("total_level", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getTotalLevel()))
                     .put("total_level_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(plugin.getGrid().getTotalLevel(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(plugin.getGrid().getTotalLevel(), getLocale(superiorPlayer)))
                     .put("total_level_int", (island, superiorPlayer) ->
                             plugin.getGrid().getTotalLevel().toBigInteger().toString())
                     .put("total_level_raw", (island, superiorPlayer) ->
@@ -402,7 +402,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("total_worth", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getTotalWorth()))
                     .put("total_worth_format", (island, superiorPlayer) ->
-                            Formatters.FANCY_NUMBER_FORMATTER.format(plugin.getGrid().getTotalWorth(), superiorPlayer.getUserLocale()))
+                            Formatters.FANCY_NUMBER_FORMATTER.format(plugin.getGrid().getTotalWorth(), getLocale(superiorPlayer)))
                     .put("total_worth_int", (island, superiorPlayer) ->
                             plugin.getGrid().getTotalWorth().toBigInteger().toString())
                     .put("total_worth_raw", (island, superiorPlayer) ->
@@ -595,7 +595,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         Matcher matcher;
 
         try {
-            IslandPlaceholderParser islandPlaceholderParser = ISLAND_PLACEHOLDER_PARSERS.get(subPlaceholder);
+            IslandPlaceholderParser islandPlaceholderParser = ISLAND_PLACEHOLDER_PARSERS.get(loweredSubPlaceholder);
 
             if (islandPlaceholderParser != null) {
                 return Optional.ofNullable(islandPlaceholderParser.apply(island, superiorPlayer));
