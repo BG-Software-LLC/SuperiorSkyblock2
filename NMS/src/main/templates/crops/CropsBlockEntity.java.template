@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsTickingBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsTickingMethod;
@@ -75,7 +76,7 @@ public class CropsBlockEntity extends BlockEntity {
     }
 
     public void tick() {
-        if (++currentTick <= plugin.getSettings().getCropsInterval())
+        if (++currentTick <= BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval())
             return;
 
         LevelChunk levelChunk = this.chunk.get();
@@ -90,7 +91,7 @@ public class CropsBlockEntity extends BlockEntity {
         currentTick = 0;
 
         int worldRandomTick = serverLevel.getGameRules().${GET_RANDOM_TICK_SPEED_METHOD};
-        int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * plugin.getSettings().getCropsInterval());
+        int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * BuiltinModules.UPGRADES.getConfiguration().getCropGrowthInterval());
         if (chunkRandomTickSpeed > 0)
             CropsTickingMethod.tick(levelChunk, chunkRandomTickSpeed);
     }

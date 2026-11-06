@@ -468,6 +468,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, true);
             modulesHandler.runModuleLifecycle(ModuleLoadTime.BEFORE_WORLD_CREATION, true);
             modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, true);
+
+            // The configs of the modules were only reloaded now, after the settings update event was called.
+            // We call it again so caches that depend on module settings (such as crops to grow) are updated.
+            PluginEventsFactory.callSettingsUpdateEvent();
         }
 
         if (!checkScriptEngine()) {

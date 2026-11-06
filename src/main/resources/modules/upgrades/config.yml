@@ -9,29 +9,100 @@
 # When disabled, all module commands and features will also be disabled.
 enabled: true
 
-# Whether crop-growth should be enabled.
-# When disabled, the plugin will not alter crop growth.
-crop-growth: true
+# Settings related to the crop-growth multiplier.
+crop-growth:
+  # Whether the crop-growth multiplier should be enabled.
+  # When disabled, the plugin will not alter crop growth.
+  enabled: true
 
-# Whether mob drops should be enabled.
-# When disabled, the plugin will not alter mob drops.
-mob-drops: true
+  # How often the crops task should run. (in ticks)
+  # When the value is non-positive, the multiplier will not work.
+  interval: 5
 
-# Whether island-effects should be enabled.
-# When disabled, the plugin will not give any effects to any players.
-island-effects: true
+  # List of whitelisted crops that will be affected by the crop-growth multiplier.
+  # You can find a list of materials here: https://bg-software.com/materials/
+  whitelisted-crops:
+    - 'ACACIA_SAPLING'
+    - 'ATTACHED_MELON_STEM'
+    - 'ATTACHED_PUMPKIN_STEM'
+    - 'BAMBOO'
+    - 'BAMBOO_SAPLING'
+    - 'BEETROOTS'
+    - 'BIRCH_SAPLING'
+    - 'BROWN_MUSHROOM'
+    - 'CACTUS'
+    - 'CARROT'
+    - 'CARROTS'
+    - 'CAVE_VINES'
+    - 'CHERRY_SAPLING'
+    - 'CHORUS_FLOWER'
+    - 'COCOA'
+    - 'CROPS'
+    - 'DARK_OAK_SAPLING'
+    - 'JUNGLE_SAPLING'
+    - 'KELP'
+    - 'MANGROVE_PROPAGULE'
+    - 'MELON_STEM'
+    - 'NETHER_WART'
+    - 'NETHER_WARTS'
+    - 'OAK_SAPLING'
+    - 'PALE_OAK_SAPLING'
+    - 'PITCHER_CROP'
+    - 'POTATO'
+    - 'POTATOES'
+    - 'PUMPKIN_STEM'
+    - 'RED_MUSHROOM'
+    - 'SAPLING'
+    - 'SPRUCE_SAPLING'
+    - 'SUGAR_CANE'
+    - 'SUGAR_CANE_BLOCK'
+    - 'SWEET_BERRY_BUSH'
+    - 'TORCHFLOWER_CROP'
+    - 'TWISTING_VINES'
+    - 'VINE'
+    - 'WEEPING_VINES'
+    - 'WHEAT'
 
-# Whether spawner-rates should be enabled.
+# Settings related to the mob-drops multiplier.
+mob-drops:
+  # Whether the mob-drops multiplier should be enabled.
+  # When disabled, the plugin will not alter mob drops.
+  enabled: true
+
+  # Whether the mob-drops multiplier should only multiply drops from entities killed by players.
+  only-player-kills: false
+
+  # List of whitelisted items that will be multiplied.
+  # You can disable this feature by setting the section to 'whitelisted-items: []'
+  whitelisted-items: [ ]
+
+  # List of blacklisted items that won't be multiplied.
+  # You can disable this feature by setting the section to 'blacklisted-items: []'
+  blacklisted-items: [ ]
+
+  # List of whitelisted entities whose drops will be multiplied.
+  # You can disable this feature by setting the section to 'whitelisted-entities: []'
+  whitelisted-entities: [ ]
+
+  # List of blacklisted entities whose drops won't be multiplied.
+  # You can disable this feature by setting the section to 'blacklisted-entities: []'
+  blacklisted-entities: [ ]
+
+# Whether the spawner-rates multiplier should be enabled.
 # When disabled, the plugin will not alter spawner rates.
 spawner-rates: true
 
-# Whether block-limits should be enabled.
+# Whether the block-limits feature should be enabled.
 # When disabled, the plugin will not limit placement of blocks.
 block-limits: true
 
-# Whether entity-limits should be enabled.
+# Whether the entity-limits feature should be enabled.
 # When disabled, the plugin will not limit spawning of entities.
 entity-limits: true
+
+# Whether the island-effects feature should be enabled.
+# When disabled, the plugin will not give players any effects.
+island-effects: true
 
 # All the upgrades of the plugin
 # https://wiki.bg-software.com/superiorskyblock/upgrades

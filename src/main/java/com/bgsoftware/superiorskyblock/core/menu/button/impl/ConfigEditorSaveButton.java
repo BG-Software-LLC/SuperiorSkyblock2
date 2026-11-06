@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.Either;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -27,7 +28,10 @@ public class ConfigEditorSaveButton extends AbstractMenuViewButton<MenuConfigEdi
     public void onButtonClick(ButtonClickContext<MenuConfigEditor.View> context) {
         Player player = context.getPlayer();
         BukkitExecutor.async(() -> {
-            Menus.MENU_CONFIG_EDITOR.saveConfig(config -> plugin.getSettings().loadData());
+            Menus.MENU_CONFIG_EDITOR.saveConfig(config -> {
+                plugin.getSettings().loadData();
+                PluginEventsFactory.callSettingsUpdateEvent();
+            });
             player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Saved configuration successfully.");
             BukkitExecutor.sync(() -> {
                 getView().setPreviousMove(false);
