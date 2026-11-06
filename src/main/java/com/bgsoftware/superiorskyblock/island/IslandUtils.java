@@ -269,15 +269,18 @@ public class IslandUtils {
         handleKickPlayer(caller, caller.getName(), island, target);
     }
 
-    public static void handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target) {
-        if (!PluginEventsFactory.callIslandKickEvent(island, caller, target))
-            return;
+    public static boolean handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target) {
+        if (!PluginEventsFactory.callIslandKickEvent(island, caller, target)) {
+            return false;
+        }
 
         island.removeMember(target, MemberRemoveReason.KICK);
 
         IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, Collections.emptyList(), target.getName(), callerName);
 
         Message.GOT_KICKED.send(target, callerName);
+
+        return true;
     }
 
     public static boolean checkBanRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
