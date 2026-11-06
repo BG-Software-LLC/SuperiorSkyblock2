@@ -3,12 +3,14 @@ package com.bgsoftware.superiorskyblock.island.privilege;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 
 import java.util.Comparator;
@@ -80,6 +82,10 @@ public class IslandPrivileges {
 
     // Privileges from configurations
     @Nullable
+    public static IslandPrivilege CONFIG_LECTERN_BOOK;
+    @Nullable
+    public static IslandPrivilege CONFIG_TARGET_INTERACT;
+    @Nullable
     public static IslandPrivilege CONFIG_VAULT_INTERACT;
 
     private static String ALL_PRIVILEGE_NAMES;
@@ -98,11 +104,12 @@ public class IslandPrivileges {
     }
 
     private static void onSettingsUpdate() {
-        CONFIG_VAULT_INTERACT = null;
-
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+        SettingsManager.Interactables interactables = plugin.getSettings().getInteractablesMap();
+        CONFIG_LECTERN_BOOK = ConstantKeys.LECTERN == null ? null : interactables.getRequiredPrivilege(ConstantKeys.LECTERN);
+        CONFIG_TARGET_INTERACT = ConstantKeys.TARGET == null ? null : interactables.getRequiredPrivilege(ConstantKeys.TARGET);
         Key vaultKey = Keys.ofMaterialAndData("VAULT");
-        CONFIG_VAULT_INTERACT = plugin.getSettings().getInteractablesMap().getRequiredPrivilege(vaultKey);
+        CONFIG_VAULT_INTERACT = interactables.getRequiredPrivilege(vaultKey);
     }
 
     public static String getPrivilegesNames() {

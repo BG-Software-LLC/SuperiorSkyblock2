@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -254,6 +255,14 @@ public class BukkitEventsListener implements Listener {
             Class.forName("org.bukkit.event.player.PlayerAttemptPickupItemEvent");
             createEventListener(GameEventType.PLAYER_PICKUP_ITEM_EVENT, org.bukkit.event.player.PlayerAttemptPickupItemEvent.class, new PlayerPickupItemEventFunctions());
         } catch (Exception ignored) {
+        }
+
+        if (IslandPrivileges.CONFIG_LECTERN_BOOK != null) {
+            try {
+                Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
+                createEventListener(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, org.bukkit.event.player.PlayerTakeLecternBookEvent.class, new PlayerTakeLecternBookEventFunctions());
+            } catch (ClassNotFoundException ignored) {
+            }
         }
 
         try {
@@ -1049,6 +1058,18 @@ public class BukkitEventsListener implements Listener {
             playerPickupItemEvent.player = e.getPlayer();
             playerPickupItemEvent.pickedUpItem = e.getItem();
             return eventType.createEvent(playerPickupItemEvent);
+        }
+
+    }
+
+    private static class PlayerTakeLecternBookEventFunctions implements GameEventCreator<GameEventArgs.PlayerTakeLecternBookEvent, org.bukkit.event.player.PlayerTakeLecternBookEvent> {
+
+        @Override
+        public GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> execute(GameEventType<GameEventArgs.PlayerTakeLecternBookEvent> eventType, GameEventPriority priority, org.bukkit.event.player.PlayerTakeLecternBookEvent e) {
+            GameEventArgs.PlayerTakeLecternBookEvent playerTakeLecternBookEvent = new GameEventArgs.PlayerTakeLecternBookEvent();
+            playerTakeLecternBookEvent.player = e.getPlayer();
+            playerTakeLecternBookEvent.clickedBlock = e.getLectern().getBlock();
+            return eventType.createEvent(playerTakeLecternBookEvent);
         }
 
     }

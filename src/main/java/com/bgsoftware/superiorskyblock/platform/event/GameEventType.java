@@ -67,6 +67,7 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerQuitEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerRespawnEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerShearEntityEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerTakeLecternBookEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerUnleashEntityEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ProjectileHitEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ProjectileLaunchEvent;
@@ -157,6 +158,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<PlayerQuitEvent> PLAYER_QUIT_EVENT = register(PlayerQuitEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerRespawnEvent> PLAYER_RESPAWN_EVENT = register(PlayerRespawnEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerShearEntityEvent> PLAYER_SHEAR_ENTITY_EVENT = register(PlayerShearEntityEvent.class, GameEventFlags.PLAYER_EVENT | GameEventFlags.ENTITY_EVENT);
+    public static final GameEventType<PlayerTakeLecternBookEvent> PLAYER_TAKE_LECTERN_BOOK_EVENT = register(PlayerTakeLecternBookEvent.class, GameEventFlags.PLAYER_EVENT | GameEventFlags.BLOCK_EVENT);
     public static final GameEventType<PlayerUnleashEntityEvent> PLAYER_UNLEASH_ENTITY_EVENT = register(PlayerUnleashEntityEvent.class, GameEventFlags.PLAYER_EVENT | GameEventFlags.ENTITY_EVENT);
 
     @GameEventFlags
