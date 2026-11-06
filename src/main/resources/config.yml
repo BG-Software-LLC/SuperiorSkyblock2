@@ -242,6 +242,7 @@ island-roles:
       - SADDLE_ENTITY
       - SIGN_INTERACT
       - SCULK_SENSOR
+      - SULFUR_CUBE_INTERACT
       - TURTLE_EGG_TRAMPING
       - USE
       - VILLAGER_TRADING

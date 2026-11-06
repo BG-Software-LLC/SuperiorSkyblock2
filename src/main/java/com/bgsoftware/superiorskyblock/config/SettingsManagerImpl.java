@@ -103,8 +103,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         }
 
         loadContainerFromConfig(cfg);
-
-        PluginEventsFactory.callSettingsUpdateEvent();
     }
 
     @Override
@@ -775,6 +773,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.defaultContainers.setContainer(container);
         this.islandChests.setContainer(container);
         this.islandPreviews.setContainer(container);
+
+        PluginEventsFactory.callSettingsUpdateEvent();
     }
 
     private boolean convertData(YamlConfiguration cfg) {

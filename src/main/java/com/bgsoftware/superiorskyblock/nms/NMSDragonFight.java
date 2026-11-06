@@ -17,7 +17,15 @@ public interface NMSDragonFight {
 
     void startDragonBattle(Island island, Location location);
 
+    default void restoreKilledDragonBattle(Island island, Location location) {
+        // Do nothing.
+    }
+
     void removeDragonBattle(Island island, Dimension dimension);
+
+    default void replaceEnderDragon(Island island, EnderDragon enderDragon) {
+        // Do nothing.
+    }
 
     void awardTheEndAchievement(Player player);
 

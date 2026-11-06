@@ -172,7 +172,8 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
         try {
             this.lastCalculateTime = System.currentTimeMillis();
 
-            CompletableFutureList<List<CalculatedChunk.Entities>> chunkEntities = new CompletableFutureList<>(-1);
+            CompletableFutureList<List<CalculatedChunk.Entities>> chunkEntities = new CompletableFutureList<>(
+                    plugin.getSettings().getRecalcTaskTimeout());
 
             IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
                     .forEach(((worldInfo, worldChunks) -> {
@@ -186,7 +187,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                 try {
                     KeyMap<Counter> recalculatedEntityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
 
-                    chunkEntities.forEachCompleted(worldCalculatedChunk -> worldCalculatedChunk.forEach(calculatedChunk -> {
+                    boolean completed = chunkEntities.forEachCompleted(worldCalculatedChunk -> worldCalculatedChunk.forEach(calculatedChunk -> {
                         Log.debugResult(Debug.CHUNK_CALCULATION_ENTITIES, "Chunk Finished", calculatedChunk.getPosition());
                         calculatedChunk.getEntityCounts().forEach((entity, count) -> {
                             if (canTrackEntity(entity))
@@ -197,7 +198,8 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                         beingRecalculated = false;
                     });
 
-                    if (!beingRecalculated)
+                    // The current counts are kept when not all chunks were counted in time.
+                    if (!completed || !beingRecalculated)
                         return;
 
                     clearEntityCounts();

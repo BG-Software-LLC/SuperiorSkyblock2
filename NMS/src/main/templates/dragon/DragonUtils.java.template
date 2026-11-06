@@ -18,6 +18,15 @@ public class DragonUtils {
 
     private static BlockPos currentPodiumPosition = BlockPos.ZERO;
 
+    static {
+        // The field is written without initializing its class. If the class was initialized after the first
+        // write, it would reset the field to the vanilla position.
+        try {
+            Class.forName(EndPodiumFeature.class.getName(), true, EndPodiumFeature.class.getClassLoader());
+        } catch (ClassNotFoundException ignored) {
+        }
+    }
+
     private DragonUtils() {
 
     }

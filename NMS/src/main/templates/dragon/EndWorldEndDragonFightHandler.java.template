@@ -1,21 +1,40 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.cache.IslandCacheKey;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.cache.IslandCacheKeys;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.dragon.IslandEndDragonFight;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import org.bukkit.Chunk;
+import org.bukkit.World;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class EndWorldEndDragonFightHandler {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final IslandCacheKey<IslandEndDragonFight> CACHE_KEY = IslandCacheKeys.register("DRAGON_FIGHT", IslandEndDragonFight.class);
 
+    // Exit portals are 7x7 blocks around the origin of the fight.
+    private static final int EXIT_PORTAL_RADIUS = 3;
+
     private final List<IslandEndDragonFight> worldDragonFightsList = new LinkedList<>();
+    private final Set<UUID> restoringIslands = new HashSet<>();
 
     EndWorldEndDragonFightHandler() {
     }
@@ -54,6 +73,57 @@ public class EndWorldEndDragonFightHandler {
 
     public List<IslandEndDragonFight> getDragonFights() {
         return Collections.unmodifiableList(this.worldDragonFightsList);
+    }
+
+    /**
+     * Restore the fight of the island if its dragon was killed.
+     * Fights are restored when their dragon is loaded, so fights of killed dragons are lost when the server stops,
+     * and their dragons could not be respawned.
+     *
+     * @param island         The island to restore the fight of.
+     * @param serverLevel    The end world of the island.
+     * @param islandBlockPos The origin of the fight.
+     */
+    public void restoreKilledDragonFight(Island island, ServerLevel serverLevel, BlockPos islandBlockPos) {
+        if (getDragonFight(island.getCache()) != null || !this.restoringIslands.add(island.getUniqueId()))
+            return;
+
+        // Players may enter the island far from the origin, where the exit portal may not be loaded.
+        // The exit portal is only found in loaded chunks, so we load them without blocking the server.
+        // Nothing keeps these chunks loaded, so each one is held until all of them are loaded.
+        World bukkitWorld = serverLevel.getWorld();
+        int minChunkX = (islandBlockPos.getX() - EXIT_PORTAL_RADIUS) >> 4;
+        int maxChunkX = (islandBlockPos.getX() + EXIT_PORTAL_RADIUS) >> 4;
+        int minChunkZ = (islandBlockPos.getZ() - EXIT_PORTAL_RADIUS) >> 4;
+        int maxChunkZ = (islandBlockPos.getZ() + EXIT_PORTAL_RADIUS) >> 4;
+
+        List<Chunk> heldChunks = new LinkedList<>();
+        List<CompletableFuture<Chunk>> chunkFutures = new LinkedList<>();
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; ++chunkX) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; ++chunkZ) {
+                chunkFutures.add(ChunksProvider.loadChunk(ChunkPosition.of(bukkitWorld, chunkX, chunkZ),
+                        ChunkLoadReason.DRAGON_FIGHT_RESTORE, chunk -> {
+                            if (chunk != null && chunk.addPluginChunkTicket(plugin))
+                                heldChunks.add(chunk);
+                        }));
+            }
+        }
+
+        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenCompleteAsync((unused, error) -> {
+            try {
+                this.restoringIslands.remove(island.getUniqueId());
+
+                if (error != null || getDragonFight(island.getCache()) != null ||
+                        plugin.getGrid().getIslandByUUID(island.getUniqueId()) != island)
+                    return;
+
+                IslandEndDragonFight endDragonFight = IslandEndDragonFight.restoreKilledDragonFight(island, serverLevel, islandBlockPos);
+                if (endDragonFight != null)
+                    addDragonFight(island.getCache(), endDragonFight);
+            } finally {
+                heldChunks.forEach(chunk -> chunk.removePluginChunkTicket(plugin));
+            }
+        }, BukkitExecutor.SYNC_EXECUTOR);
     }
 
     @Nullable
