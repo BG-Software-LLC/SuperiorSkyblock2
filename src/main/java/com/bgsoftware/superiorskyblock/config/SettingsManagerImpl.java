@@ -71,6 +71,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     private final DefaultContainersSection defaultContainers = new DefaultContainersSection();
     private final IslandChestsSection islandChests = new IslandChestsSection();
     private final IslandPreviewsSection islandPreviews = new IslandPreviewsSection();
+    private boolean initialized;
 
     public SettingsManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -85,7 +86,14 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if (convertData(cfg)) {
+        boolean maxIslandSizeChanged = this.initialized && cfg.getInt("max-island-size", 200) != getMaxIslandSize();
+        if (maxIslandSizeChanged) {
+            Log.warn("You have changed the max-island-size value without deleting database.");
+            Log.warn("Restoring it to the old value...");
+            cfg.set("max-island-size", getMaxIslandSize());
+        }
+
+        if (convertData(cfg) || maxIslandSizeChanged) {
             try {
                 cfg.save(file);
             } catch (Exception error) {
@@ -775,6 +783,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.defaultContainers.setContainer(container);
         this.islandChests.setContainer(container);
         this.islandPreviews.setContainer(container);
+        this.initialized = true;
     }
 
     private boolean convertData(YamlConfiguration cfg) {

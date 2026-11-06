@@ -202,6 +202,7 @@ public class SIsland implements Island {
     };
     private final IslandArea entireArea = new IslandArea();
     private final IslandArea protectedArea = new IslandArea();
+    private int protectedAreaSize;
     /*
      * Island Identifiers
      */
@@ -392,10 +393,8 @@ public class SIsland implements Island {
             loadIslandWarp(warpRecord.name, worldInfo, warpRecord.worldPosition, warpCategory, warpRecord.isPrivate, warpRecord.icon);
         });
 
-        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
-                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
-        this.entireArea.update(this.center, islandDistance);
-        this.protectedArea.update(this.center, getIslandSize());
+        updateEntireArea();
+        updateProtectedArea();
 
         // We want to save all the limits to the custom block keys
         plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
@@ -929,6 +928,13 @@ public class SIsland implements Island {
     @Override
     public BlockPosition getCenterPosition() {
         return center;
+    }
+
+    @Override
+    public void updateEntireArea() {
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        this.entireArea.update(this.center, islandDistance);
     }
 
     @Override
@@ -1953,11 +1959,12 @@ public class SIsland implements Island {
 
         if (cropGrowthEnabled) {
             // We first collect all the chunks that are currently being ticked
-            oldChunks.setValue(getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED));
+            oldChunks.setValue(getLoadedProtectedChunks(this.protectedAreaSize));
         }
 
         // Changing the size of the island
         this.islandSize.set(islandSize);
+        updateProtectedArea();
 
         if (cropGrowthEnabled) {
             // We now collect the new chunks after the size was changed
@@ -1971,9 +1978,36 @@ public class SIsland implements Island {
             }));
         }
 
-        this.protectedArea.update(this.center, getIslandSize());
-
         updateBorder();
+    }
+
+    private void updateProtectedArea() {
+        this.protectedAreaSize = getIslandSize();
+        this.protectedArea.update(this.center, this.protectedAreaSize);
+    }
+
+    private List<Chunk> getLoadedProtectedChunks(int size) {
+        List<Chunk> chunks = new LinkedList<>();
+        BlockPosition minimum = this.center.offset(-size, 0, -size);
+        BlockPosition maximum = this.center.offset(size, 0, size);
+
+        for (Dimension dimension : Dimension.values()) {
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+            if (worldInfo == null || Bukkit.getWorld(worldInfo.getName()) == null)
+                continue;
+
+            for (int x = minimum.getX() >> 4; x <= maximum.getX() >> 4; ++x) {
+                for (int z = minimum.getZ() >> 4; z <= maximum.getZ() >> 4; ++z) {
+                    try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, x, z)) {
+                        Chunk chunk = plugin.getNMSChunks().getChunkIfLoaded(chunkPosition);
+                        if (chunk != null)
+                            chunks.add(chunk);
+                    }
+                }
+            }
+        }
+
+        return chunks;
     }
 
     @Override
@@ -5077,6 +5111,8 @@ public class SIsland implements Island {
     private void clearUpgrades(boolean overrideCustom) {
         if (overrideCustom || this.islandSize.get().isSynced()) {
             setIslandSizeInternal(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+        } else {
+            setIslandSizeInternal(this.islandSize.get());
         }
 
         warpsLimit.set(warpsLimit -> {
