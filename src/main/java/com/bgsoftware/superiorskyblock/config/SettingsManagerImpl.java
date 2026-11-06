@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -774,7 +775,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.islandChests.setContainer(container);
         this.islandPreviews.setContainer(container);
 
-        PluginEventsFactory.callSettingsUpdateEvent();
+        BukkitExecutor.ensureMain(PluginEventsFactory::callSettingsUpdateEvent);
     }
 
     private boolean convertData(YamlConfiguration cfg) {

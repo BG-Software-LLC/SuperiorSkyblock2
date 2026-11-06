@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.listener;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -14,6 +16,9 @@ public class BukkitListeners {
 
     private final SuperiorSkyblockPlugin plugin;
 
+    @Nullable
+    private BukkitEventsListener eventsListener;
+    private boolean settingsListenerRegistered;
     private String listenerRegisterFailure = "";
 
     public BukkitListeners(SuperiorSkyblockPlugin plugin) {
@@ -21,6 +26,11 @@ public class BukkitListeners {
     }
 
     public void registerListeners() {
+        if (!this.settingsListenerRegistered) {
+            plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, this::onSettingsUpdate);
+            this.settingsListenerRegistered = true;
+        }
+
         new AdminPlayersListener(this.plugin);
         new ChunksListener(this.plugin);
         new EntityTrackingListener(this.plugin);
@@ -44,12 +54,20 @@ public class BukkitListeners {
         if (!plugin.getSettings().getIslandPreviews().getLocations().isEmpty())
             new IslandPreviewListener(this.plugin);
 
-        safeEventsRegister(new BukkitEventsListener(this.plugin));
+        registerEventsListener();
     }
 
     public void unregisterListeners() {
+        this.eventsListener = null;
         plugin.getGameEventsDispatcher().clearCallbacks();
         HandlerList.unregisterAll(this.plugin);
+    }
+
+    private void onSettingsUpdate() {
+        if (this.eventsListener != null) {
+            HandlerList.unregisterAll(this.eventsListener);
+            registerEventsListener();
+        }
     }
 
     public void registerListenerFailureFilter() {
@@ -67,6 +85,11 @@ public class BukkitListeners {
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
         if (!listenerRegisterFailure.isEmpty())
             throw new RuntimeException(listenerRegisterFailure);
+    }
+
+    private void registerEventsListener() {
+        this.eventsListener = new BukkitEventsListener(this.plugin);
+        safeEventsRegister(this.eventsListener);
     }
 
 }

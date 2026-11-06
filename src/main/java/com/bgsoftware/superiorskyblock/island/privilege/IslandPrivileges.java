@@ -106,7 +106,7 @@ public class IslandPrivileges {
     private static void onSettingsUpdate() {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         SettingsManager.Interactables interactables = plugin.getSettings().getInteractablesMap();
-        CONFIG_LECTERN_BOOK = interactables.getRequiredPrivilege(ConstantKeys.LECTERN_BOOK);
+        CONFIG_LECTERN_BOOK = ConstantKeys.LECTERN == null ? null : interactables.getRequiredPrivilege(ConstantKeys.LECTERN);
         CONFIG_TARGET_INTERACT = ConstantKeys.TARGET == null ? null : interactables.getRequiredPrivilege(ConstantKeys.TARGET);
         Key vaultKey = Keys.ofMaterialAndData("VAULT");
         CONFIG_VAULT_INTERACT = interactables.getRequiredPrivilege(vaultKey);

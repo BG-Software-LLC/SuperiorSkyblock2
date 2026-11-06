@@ -327,9 +327,6 @@ public class ProtectionListener extends AbstractGameEventListener {
 
     private void onPlayerTakeLecternBook(GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> e) {
         IslandPrivilege pickupLecternBookPrivilege = IslandPrivileges.CONFIG_LECTERN_BOOK;
-        if (pickupLecternBookPrivilege == null)
-            return;
-
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {

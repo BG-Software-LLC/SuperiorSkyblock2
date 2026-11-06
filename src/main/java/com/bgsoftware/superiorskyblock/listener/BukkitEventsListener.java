@@ -245,10 +245,12 @@ public class BukkitEventsListener implements Listener {
         } catch (Exception ignored) {
         }
 
-        try {
-            Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
-            createEventListener(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, org.bukkit.event.player.PlayerTakeLecternBookEvent.class, new PlayerTakeLecternBookEventFunctions());
-        } catch (ClassNotFoundException ignored) {
+        if (IslandPrivileges.CONFIG_LECTERN_BOOK != null) {
+            try {
+                Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
+                createEventListener(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, org.bukkit.event.player.PlayerTakeLecternBookEvent.class, new PlayerTakeLecternBookEventFunctions());
+            } catch (ClassNotFoundException ignored) {
+            }
         }
 
         try {
