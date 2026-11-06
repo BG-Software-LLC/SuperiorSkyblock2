@@ -82,9 +82,9 @@ public class IslandPrivileges {
 
     // Privileges from configurations
     @Nullable
-    public static volatile IslandPrivilege CONFIG_LECTERN_BOOK;
+    public static IslandPrivilege CONFIG_LECTERN_BOOK;
     @Nullable
-    public static volatile IslandPrivilege CONFIG_TARGET_INTERACT;
+    public static IslandPrivilege CONFIG_TARGET_INTERACT;
     @Nullable
     public static IslandPrivilege CONFIG_VAULT_INTERACT;
 
