@@ -1970,6 +1970,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public void updateChests() {
+        this.handle.updateChests();
+    }
+
+    @Override
     public int hashCode() {
         return this.handle.hashCode();
     }

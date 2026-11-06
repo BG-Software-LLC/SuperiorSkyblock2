@@ -14,6 +14,7 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,6 +36,8 @@ public interface NMSAlgorithms {
             return enumValue.name();
         }
     };
+
+    void setTitle(Inventory inventory, String title);
 
     void registerCommand(BukkitCommand command);
 
