@@ -191,6 +191,7 @@ public class DataManager extends Manager {
         IslandsDeserializer.deserializeIslandFlags(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeGenerators(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeVisitors(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeEntityCategoryLimits(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeEntityLimits(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeEffects(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeIslandChest(islandsLoader, databaseCache);

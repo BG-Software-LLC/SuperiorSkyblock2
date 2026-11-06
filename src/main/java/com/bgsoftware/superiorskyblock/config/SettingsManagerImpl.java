@@ -51,9 +51,9 @@ import java.util.Set;
 public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private static final String[] IGNORED_SECTIONS = new String[]{
-            "config.yml", "default-values.block-limits", "default-values.entity-limits", "default-values.generator",
-            "default-values.role-limits", "default-values.island-effects", "stacked-blocks.limits", "island-roles.ladder",
-            "worlds.dimensions", "default-placeholders", "commands-cooldown", "default-containers.containers",
+            "config.yml", "default-values.block-limits", "default-values.entity-limits", "default-values.entity-category-limits",
+            "default-values.generator", "default-values.role-limits", "default-values.island-effects", "stacked-blocks.limits",
+            "island-roles.ladder", "worlds.dimensions", "default-placeholders", "commands-cooldown", "default-containers.containers",
             "event-commands", "command-aliases", "island-previews.locations", "message-delays"
     };
 

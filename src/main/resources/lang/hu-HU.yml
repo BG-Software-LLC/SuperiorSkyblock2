@@ -77,6 +77,9 @@ CHANGED_CROP_GROWTH: '&e&lFejlesztések | &7Sikeresen frissítetted {0} termény
 CHANGED_CROP_GROWTH_ALL: '&e&lFejlesztések | &7Sikeresen frissítetted az összes sziget terménynövekedési szorzóját.'
 CHANGED_CROP_GROWTH_NAME: '&e&lFejlesztések | &7Sikeresen frissítetted {0} terménynövekedési szorzóját.'
 CHANGED_DISCORD: '&e&lSziget | &7Sikeresen módosítottad a sziget Discordját erre: {0}.'
+CHANGED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}''s island.'
+CHANGED_ENTITY_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for all the islands.'
+CHANGED_ENTITY_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}.'
 CHANGED_ENTITY_LIMIT: '&e&lFejlesztések | &7Sikeresen frissítetted a(z) {0} entitás limitjét {1} szigetén.'
 CHANGED_ENTITY_LIMIT_ALL: '&e&lFejlesztések | &7Sikeresen frissítetted a(z) {0} entitás limitjét az összes szigeten.'
 CHANGED_ENTITY_LIMIT_NAME: '&e&lFejlesztések | &7Sikeresen frissítetted a(z) {0} entitás limitjét ennél: {1}.'
@@ -120,6 +123,7 @@ COMMAND_ARGUMENT_DIMENSION: 'dimenzió'
 COMMAND_ARGUMENT_DISCORD: 'discord...'
 COMMAND_ARGUMENT_EFFECT: 'bájital-effekt'
 COMMAND_ARGUMENT_EMAIL: 'e-mail'
+COMMAND_ARGUMENT_ENTITY_CATEGORY: 'entity-category'
 COMMAND_ARGUMENT_ENTITY: 'entitás'
 COMMAND_ARGUMENT_ISLAND_NAME: 'sziget-név'
 COMMAND_ARGUMENT_ISLAND_ROLE: 'sziget-rang'
@@ -165,6 +169,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Bónusz hozzáadása egy játékoshoz.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Másik játékos szigetének coop tag limitjének növelése.'
 COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH: 'Másik játékos szigetének terménynövekedési szorzójának növelése.'
 COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: 'Szigethatás hozzáadása egy másik játékos szigetéhez.'
+COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_CATEGORY_LIMIT: 'Increase entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: 'Másik játékos szigetének entitáslimitjének növelése.'
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: 'Anyag százalékos esélyének hozzáadása a kőgenerátorhoz.'
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: 'Másik játékos szigetének mob drop szorzójának növelése.'
@@ -203,6 +208,7 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Fejlesztés szintjének növelése egy sziget
 COMMAND_DESCRIPTION_ADMIN_RECALC: 'A sziget értékének újraszámítása.'
 COMMAND_DESCRIPTION_ADMIN_RELOAD: 'A plugin összes konfigurációjának és feladatának újratöltése.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Blokklimit eltávolítása egy szigetről.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Entitáslimit eltávolítása egy szigetről.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 'A játékos által adott összes értékelés törlése.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Egy adott sziget összes jogosultságának visszaállítása.'
@@ -218,6 +224,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Másik játékos szigetének coop tag
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: 'Másik játékos szigetének terménynövekedési szorzójának beállítása.'
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 'Játékos szigettörlési lehetőségeinek beállítása.'
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: 'Másik játékos szigetének szigethatás szintjének beállítása.'
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_CATEGORY_LIMIT: 'Set entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: 'Másik játékos szigetének entitáslimitjének beállítása.'
 COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Sziget előnézeti helyének beállítása.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 'Sziget tulajdonjogának átruházása másik játékosra.'
@@ -394,6 +401,7 @@ INVALID_BORDER_COLOR: '&c&lHiba | &7Érvénytelen borderszín: {0}.'
 INVALID_COMMAND: '&c&lHiba | &7Érvénytelen parancs: {0}.'
 INVALID_EFFECT: '&c&lHiba | &7Érvénytelen effekt: {0}.'
 INVALID_ENTITY: '&c&lHiba | &7Érvénytelen entitás: {0}.'
+INVALID_ENTITY_CATEGORY: '&c&lError | &7Invalid entity category {0}.'
 INVALID_ENVIRONMENT: '&c&lHiba | &7Érvénytelen dimenzió: {0}.'
 INVALID_INTERVAL: '&c&lHiba | &7Érvénytelen időköz: {0}.'
 INVALID_ISLAND: '&c&lHiba | &7Nincs szigeted.'
@@ -476,6 +484,10 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lSziget | &7Entitás limitek:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lSziget | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Entity Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lSziget | &7Generátor arányok ({1}):
   {0}
@@ -692,6 +704,7 @@ RATE_REMOVE_ALL: '&e&lSziget | &7Sikeresen eltávolítottad {0} összes értéke
 RATE_REMOVE_ALL_ISLANDS: '&e&lSziget | &7Sikeresen eltávolítottad az összes sziget összes értékelését.'
 RATE_SUCCESS: '&e&lSziget | &7{0} csillaggal értékelted ezt a szigetet!'
 REACHED_BLOCK_LIMIT: '&e&lFejlesztések | &7Elérted a(z) {0} blokk szigetlimitjét.'
+REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lFejlesztések | &7Elérted a(z) {0} entitás szigetlimitjét.'
 RECALC_ALREADY_RUNNING: '&c&lHiba | &7A szigeted újraszámítása már folyamatban van.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lHiba | &7Ennek a szigetnek az újraszámítása már folyamatban van.'
