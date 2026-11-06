@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
@@ -707,7 +708,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     return Optional.empty();
                 }
 
-                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.hasCompletedMission(mission), superiorPlayer.getUserLocale()));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.hasCompletedMission(mission), getLocale(superiorPlayer)));
             }
 
             if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
@@ -786,7 +787,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     return Optional.empty();
                 }
 
-                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(dimension), superiorPlayer.getUserLocale()));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.isDimensionEnabled(dimension), getLocale(superiorPlayer)));
             }
 
             if ((matcher = WORLD_GENERATED_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
@@ -796,7 +797,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     return Optional.empty();
                 }
 
-                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.wasSchematicGenerated(dimension), superiorPlayer.getUserLocale()));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.wasSchematicGenerated(dimension), getLocale(superiorPlayer)));
             }
 
             if ((matcher = WORLD_UNLOCKED_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
@@ -806,7 +807,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     return Optional.empty();
                 }
 
-                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.getUnlockedWorlds().contains(dimension), superiorPlayer.getUserLocale()));
+                return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.getUnlockedWorlds().contains(dimension), getLocale(superiorPlayer)));
             }
         }
 
@@ -868,7 +869,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         return Optional.of(String.valueOf(IslandUtils.getGeneratorPercentageDecimal(island, key, dimension)));
     }
 
-    private static Optional<String> handleIslandFlagPlaceholder(Island island, SuperiorPlayer superiorPlayer, String name) {
+    private static Optional<String> handleIslandFlagPlaceholder(Island island, @Nullable SuperiorPlayer superiorPlayer, String name) {
         IslandFlag islandFlag = IslandFlags.getSafe(name);
 
         if (islandFlag == null) {
@@ -876,13 +877,14 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         }
 
         return Optional.of(Formatters.BOOLEAN_FORMATTER.format(island.hasSettingsEnabled(islandFlag),
-                superiorPlayer.getUserLocale()));
+                getLocale(superiorPlayer)));
     }
 
-    private static Optional<String> handleIslandPrivilegePlaceholder(Island island, SuperiorPlayer superiorPlayer, String name) {
+    private static Optional<String> handleIslandPrivilegePlaceholder(Island island, @Nullable SuperiorPlayer superiorPlayer, String name) {
         IslandPrivilege islandPrivilege = IslandPrivileges.getSafe(name);
 
-        if (islandPrivilege == null) {
+        // A permission check needs a player (e.g. island_top_<type>_<n>_permission_<priv> parsed without a player).
+        if (islandPrivilege == null || superiorPlayer == null) {
             return Optional.empty();
         }
 
@@ -939,7 +941,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
         if ((matcher = TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN.matcher(loweredPlaceholderValue)).matches()) {
             function = targetIsland -> sortingType.getValue(targetIsland)
-                    .map(value -> Formatters.FANCY_NUMBER_FORMATTER.format(value, superiorPlayer.getUserLocale()))
+                    .map(value -> Formatters.FANCY_NUMBER_FORMATTER.format(value, getLocale(superiorPlayer)))
                     .orElse(null);
         } else if ((matcher = TOP_VALUE_RAW_PLACEHOLDER_PATTERN.matcher(loweredPlaceholderValue)).matches()) {
             function = targetIsland -> sortingType.getValue(targetIsland)
@@ -1051,6 +1053,10 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
         }
 
         return finalSortingType;
+    }
+
+    private static Locale getLocale(@Nullable SuperiorPlayer superiorPlayer) {
+        return superiorPlayer == null ? PlayerLocales.getDefaultLocale() : superiorPlayer.getUserLocale();
     }
 
     private static WorldInfo getDefaultWorldInfo(Island island) {
