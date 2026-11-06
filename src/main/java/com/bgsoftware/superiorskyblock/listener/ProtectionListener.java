@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -327,8 +326,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     }
 
     private void onPlayerTakeLecternBook(GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> e) {
-        IslandPrivilege pickupLecternBookPrivilege = plugin.getSettings().getInteractablesMap()
-                .getRequiredPrivilege(ConstantKeys.LECTERN_BOOK);
+        IslandPrivilege pickupLecternBookPrivilege = IslandPrivileges.CONFIG_LECTERN_BOOK;
         if (pickupLecternBookPrivilege == null)
             return;
 
@@ -650,8 +648,7 @@ public class ProtectionListener extends AbstractGameEventListener {
                     EntityType entityType = entity.getType();
 
                     if (hitBlockType == TARGET) {
-                        islandPrivilege = plugin.getSettings().getInteractablesMap()
-                                .getRequiredPrivilege(ConstantKeys.TARGET);
+                        islandPrivilege = IslandPrivileges.CONFIG_TARGET_INTERACT;
                     } else if (hitBlockType == CHORUS_FLOWER || hitBlockType == DECORATED_POT || (entityType == TRIDENT
                             && (hitBlockType == POINTED_DRIPSTONE || hitBlockType == SULFUR_SPIKE))) {
                         islandPrivilege = IslandPrivileges.BREAK;

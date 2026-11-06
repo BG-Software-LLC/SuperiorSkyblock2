@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -1036,6 +1037,9 @@ public class BukkitEventsListener implements Listener {
 
         @Override
         public GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> execute(GameEventType<GameEventArgs.PlayerTakeLecternBookEvent> eventType, GameEventPriority priority, org.bukkit.event.player.PlayerTakeLecternBookEvent e) {
+            if (IslandPrivileges.CONFIG_LECTERN_BOOK == null)
+                return null;
+
             GameEventArgs.PlayerTakeLecternBookEvent playerTakeLecternBookEvent = new GameEventArgs.PlayerTakeLecternBookEvent();
             playerTakeLecternBookEvent.player = e.getPlayer();
             playerTakeLecternBookEvent.clickedBlock = e.getLectern().getBlock();
