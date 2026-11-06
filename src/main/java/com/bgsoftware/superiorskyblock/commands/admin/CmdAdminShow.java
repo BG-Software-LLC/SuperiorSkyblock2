@@ -13,10 +13,10 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
@@ -198,19 +198,19 @@ public class CmdAdminShow implements IAdminIslandCommand {
                 for (Dimension dimension : Dimension.values()) {
                     StringBuilder islandDataMessage = new StringBuilder();
 
-                    Map<Key, Integer> customGeneratorValues = island.getCustomGeneratorAmounts(dimension);
-                    for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(dimension).entrySet()) {
+                    for (Map.Entry<Key, Integer> entry : island.getGeneratorAmountsAsKeys(dimension).entrySet()) {
                         StringBuilder lineDataMessage = new StringBuilder();
 
-                        Key key = Keys.ofMaterialAndData(entry.getKey());
+                        Key key = entry.getKey();
                         lineDataMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
-                                Formatters.CAPITALIZED_FORMATTER.format(entry.getKey()),
+                                Formatters.CAPITALIZED_FORMATTER.format(key.toString()),
                                 Formatters.NUMBER_FORMATTER.format(IslandUtils.getGeneratorPercentageDecimal(island, key, dimension)),
                                 island.getGeneratorAmount(key, dimension))
                         );
 
-                        if (!customGeneratorValues.containsKey(key))
+                        if (island.getExactGeneratorAmountRaw(key, dimension) == IslandUpgradeConstants.SYNCED_VALUE) {
                             lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                        }
 
                         Text.appendWithLine(islandDataMessage, lineDataMessage);
                     }

@@ -66,8 +66,9 @@ public class CmdAdminSetCoopLimit implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int limit = arguments.getNumber();
 
@@ -75,22 +76,24 @@ public class CmdAdminSetCoopLimit implements IAdminIslandCommand {
 
         for (Island island : islands) {
             PluginEvent<PluginEventArgs.IslandChangeCoopLimit> event = PluginEventsFactory.callIslandChangeCoopLimitEvent(
-                    island, sender, island.getCoopLimit() + limit);
+                    island, sender, limit);
             if (!event.isCancelled()) {
                 island.setCoopLimit(event.getArgs().coopLimit);
                 ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_COOP_LIMIT_ALL.send(sender);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_COOP_LIMIT_NAME.send(sender, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_COOP_LIMIT.send(sender, targetPlayer.getName());
+        }
     }
 
 }
