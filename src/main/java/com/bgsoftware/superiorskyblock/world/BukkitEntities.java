@@ -130,10 +130,6 @@ public class BukkitEntities {
         return Optional.empty();
     }
 
-    public static boolean canHaveBlock(Entity entity) {
-        return entity instanceof Minecart || (CHEST_BOAT_CLASS != null && CHEST_BOAT_CLASS.isInstance(entity));
-    }
-
     public static boolean canHaveBlock(EntityType entityType) {
         Class<?> entityClass = entityType.getEntityClass();
 
@@ -153,13 +149,15 @@ public class BukkitEntities {
     }
 
     public static boolean canBypassEntityLimit(Entity entity, boolean checkProviders) {
-        if (entity instanceof ArmorStand && !((ArmorStand) entity).isVisible())
+        if (entity instanceof ArmorStand && !((ArmorStand) entity).isVisible()) {
             return true;
+        }
 
         if (checkProviders) {
             for (EntitiesProvider entitiesProvider : plugin.getProviders().getEntitiesProviders()) {
-                if (!entitiesProvider.shouldTrackEntity(entity))
+                if (!entitiesProvider.shouldTrackEntity(entity)) {
                     return true;
+                }
             }
         }
 

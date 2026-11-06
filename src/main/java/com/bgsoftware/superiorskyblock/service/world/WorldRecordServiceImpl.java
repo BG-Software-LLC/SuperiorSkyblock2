@@ -9,12 +9,14 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.service.world.RecordResult;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.EntityBlockMapper;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -256,41 +258,55 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     public RecordResult recordEntitySpawn(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null");
 
-        if (entity.isDead())
+        if (entity.isDead()) {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
 
-        if (BukkitEntities.canBypassEntityLimit(entity))
+        if (BukkitEntities.canBypassEntityLimit(entity) || !canEntityBeTracked(entity.getType())) {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            return recordEntitySpawnInternal(entity.getType(), entity.getLocation(wrapper.getHandle()));
+            return recordEntitySpawnInternal(Keys.of(entity), entity.getLocation(wrapper.getHandle()));
         }
     }
 
     @Override
+    @Deprecated
     public RecordResult recordEntitySpawn(EntityType entityType, Location location) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null");
         Preconditions.checkNotNull(location, "location parameter cannot be null");
         Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
 
-        return recordEntitySpawnInternal(entityType, location);
-    }
-
-    private RecordResult recordEntitySpawnInternal(EntityType entityType, Location location) {
-        RecordResult recordResult = canEntityBeTracked(entityType);
-
-        if (recordResult != RecordResult.SUCCESS) {
-            return recordResult;
+        if (!canEntityBeTracked(entityType)) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
+        return recordEntitySpawnInternal(Keys.of(entityType), location);
+    }
+
+    @Override
+    public RecordResult recordEntitySpawn(Key entityKey, Location location) {
+        Preconditions.checkNotNull(entityKey, "entityKey parameter cannot be null");
+        Preconditions.checkNotNull(location, "location parameter cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
+
+        if (!canEntityBeTracked(getEntityType(entityKey))) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
+
+        return recordEntitySpawnInternal(entityKey, location);
+    }
+
+    private RecordResult recordEntitySpawnInternal(Key entityKey, Location location) {
         Island island = plugin.getGrid().getIslandAt(location);
 
         if (island == null) {
             return RecordResult.NOT_IN_ISLAND;
         }
 
-        island.getEntitiesTracker().trackEntity(Keys.of(entityType), 1);
-        // TODO: elsewhere
+        island.getEntitiesTracker().trackEntity(entityKey, 1);
+        // TODO: Create method for Island, similar to handleBlockPlace?
         IslandsDatabaseBridge.saveEntityCounts(island);
 
         return RecordResult.SUCCESS;
@@ -300,20 +316,20 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     public RecordResult recordEntityDespawn(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null");
 
-        if (BukkitEntities.canBypassEntityLimit(entity)) {
+        if (BukkitEntities.canBypassEntityLimit(entity) || !canEntityBeTracked(entity.getType())) {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
         RecordResult recordResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            recordResult = recordEntityDespawnInternal(entity.getType(), entity.getLocation(wrapper.getHandle()));
+            recordResult = recordEntityDespawnInternal(Keys.of(entity), entity.getLocation(wrapper.getHandle()));
         }
 
         if (recordResult != RecordResult.SUCCESS) {
             return recordResult;
         }
 
-        if (plugin.getSettings().isCountEntitiesAsBlocks() && BukkitEntities.canHaveBlock(entity)) {
+        if (plugin.getSettings().isCountEntitiesAsBlocks() && BukkitEntities.canHaveBlock(entity.getType())) {
             Key blockKey = EntityBlockMapper.getBlockFromEntity(Keys.of(entity));
 
             if (blockKey != null) {
@@ -327,45 +343,66 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     }
 
     @Override
+    @Deprecated
     public RecordResult recordEntityDespawn(EntityType entityType, Location location) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null");
         Preconditions.checkNotNull(location, "location parameter cannot be null");
         Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
 
-        return recordEntityDespawnInternal(entityType, location);
-    }
-
-    private RecordResult recordEntityDespawnInternal(EntityType entityType, Location location) {
-        RecordResult recordResult = canEntityBeTracked(entityType);
-
-        if (recordResult != RecordResult.SUCCESS) {
-            return recordResult;
+        if (!canEntityBeTracked(entityType)) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
+        return recordEntityDespawnInternal(Keys.of(entityType), location);
+    }
+
+    @Override
+    public RecordResult recordEntityDespawn(Key entityKey, Location location) {
+        Preconditions.checkNotNull(entityKey, "entityKey parameter cannot be null");
+        Preconditions.checkNotNull(location, "location parameter cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
+
+        if (!canEntityBeTracked(getEntityType(entityKey))) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
+
+        return recordEntityDespawnInternal(entityKey, location);
+    }
+
+    private RecordResult recordEntityDespawnInternal(Key entityKey, Location location) {
         Island island = plugin.getGrid().getIslandAt(location);
 
         if (island == null) {
             return RecordResult.NOT_IN_ISLAND;
         }
 
-        island.getEntitiesTracker().untrackEntity(Keys.of(entityType), 1);
-        // TODO: not here
+        island.getEntitiesTracker().untrackEntity(entityKey, 1);
+        // TODO: Create method for Island, similar to handleBlockBreak?
         IslandsDatabaseBridge.saveEntityCounts(island);
 
         return RecordResult.SUCCESS;
     }
 
-    private RecordResult canEntityBeTracked(EntityType entityType) {
+    @Nullable
+    private EntityType getEntityType(Key entityKey) {
+        EntityType entityType;
+
+        if (entityKey instanceof EntityTypeKey) {
+            entityType = ((EntityTypeKey) entityKey).getEntityType();
+        } else {
+            entityType = EnumHelper.getEnum(EntityType.class, entityKey.toString(), entityKey.getGlobalKey());
+        }
+
+        return entityType;
+    }
+
+    private boolean canEntityBeTracked(EntityType entityType) {
         boolean canHaveLimit = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)
                 && BukkitEntities.canHaveLimit(entityType);
         boolean canHaveBlock = plugin.getSettings().isCountEntitiesAsBlocks()
                 && BukkitEntities.canHaveBlock(entityType);
 
-        if (!canHaveLimit && !canHaveBlock) {
-            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
-        }
-
-        return RecordResult.SUCCESS;
+        return canHaveLimit || canHaveBlock;
     }
 
 }
