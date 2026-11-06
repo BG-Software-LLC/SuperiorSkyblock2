@@ -38,8 +38,18 @@ public class NMSDragonFightChooser implements NMSDragonFight {
     }
 
     @Override
+    public void restoreKilledDragonBattle(Island island, Location location) {
+        getDelegate().restoreKilledDragonBattle(island, location);
+    }
+
+    @Override
     public void removeDragonBattle(Island island, Dimension dimension) {
         getDelegate().removeDragonBattle(island, dimension);
+    }
+
+    @Override
+    public void replaceEnderDragon(Island island, EnderDragon enderDragon) {
+        getDelegate().replaceEnderDragon(island, enderDragon);
     }
 
     @Override

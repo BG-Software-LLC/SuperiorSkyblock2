@@ -12,6 +12,7 @@ public enum ChunkLoadReason {
     BIOME_REQUEST,
     WARP_SIGN_BREAK,
     SET_BIOME,
-    DELETE_CHUNK
+    DELETE_CHUNK,
+    DRAGON_FIGHT_RESTORE
 
 }

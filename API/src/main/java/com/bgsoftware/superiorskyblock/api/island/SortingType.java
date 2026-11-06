@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -57,7 +58,9 @@ public class SortingType implements Comparator<Island>, Enumerable {
      * @param name The name to check.
      */
     public static SortingType getByName(String name) {
-        return sortingTypes.get(name);
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+
+        return sortingTypes.get(name.toUpperCase(Locale.ENGLISH));
     }
 
     /**
@@ -105,6 +108,9 @@ public class SortingType implements Comparator<Island>, Enumerable {
     public static void register(String name, @Nullable Function<Island, Number> valueFunction, Comparator<Island> comparator, boolean handleEqualsIslands) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkNotNull(comparator, "comparator parameter cannot be null.");
+
+        name = name.toUpperCase(Locale.ENGLISH);
+
         Preconditions.checkState(!sortingTypes.containsKey(name), "SortingType with the name " + name + " already exists.");
 
         SortingType sortingType = new SortingType(name, valueFunction, comparator, handleEqualsIslands);

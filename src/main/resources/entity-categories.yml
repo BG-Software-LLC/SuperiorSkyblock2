@@ -75,6 +75,12 @@ NAUTILUS:
   actions:
     INTERACT: NAUTILUS_INTERACT
 
+SULFUR_CUBE:
+  entities:
+    - SULFUR_CUBE
+  actions:
+    INTERACT: SULFUR_CUBE_INTERACT
+
 VILLAGERS:
   entities:
     - VILLAGER
@@ -97,6 +103,13 @@ CUSHION:
     SPAWN: BUILD
     DAMAGE: BREAK
     INTERACT: INTERACT
+
+END_CRYSTAL:
+  entities:
+    - END_CRYSTAL
+    - ENDER_CRYSTAL
+  actions:
+    SPAWN: BUILD
 
 ITEM_FRAME:
   entities:

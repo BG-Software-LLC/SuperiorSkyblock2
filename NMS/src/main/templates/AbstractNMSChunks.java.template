@@ -44,7 +44,6 @@ import org.bukkit.World;
 import ${CRAFTBUKKIT_PACKAGE}.CraftChunk;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -53,6 +52,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractNMSChunks implements NMSChunks {
+
+    private static boolean creatingFakeEntities = false;
 
     protected final SuperiorSkyblockPlugin plugin;
 
@@ -149,8 +150,27 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     public boolean isChunkEmpty(Chunk bukkitChunk) {
         ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
-        return levelChunk != null && Arrays.stream(levelChunk.getSections()).allMatch(chunkSection ->
-                chunkSection == null || NMSUtilsVersioned.isLevelChunkSectionEmpty(chunkSection));
+        return isLevelChunkEmpty(levelChunk);
+    }
+
+    @Override
+    public boolean isChunkEmptyIfLoaded(Chunk bukkitChunk) {
+        ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        // We must not load the chunk, as this may be called while the chunk is being unloaded.
+        LevelChunk levelChunk = serverLevel.getChunkSource().getChunk(bukkitChunk.getX(), bukkitChunk.getZ(), false);
+        return isLevelChunkEmpty(levelChunk);
+    }
+
+    private static boolean isLevelChunkEmpty(@Nullable LevelChunk levelChunk) {
+        if (levelChunk == null)
+            return false;
+
+        for (LevelChunkSection chunkSection : levelChunk.getSections()) {
+            if (chunkSection != null && !NMSUtilsVersioned.isLevelChunkSectionEmpty(chunkSection))
+                return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -244,21 +264,30 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     protected CalculatedChunk.Entities calculatedChunk(ChunkPosition chunkPosition, ServerLevel serverLevel, ListTag entitiesTag) {
         KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
 
-        for (Tag entityTag : entitiesTag) {
-            Entity fakeEntity = createEntityFromTag((CompoundTag) entityTag, serverLevel).orElse(null);
-            if(fakeEntity == null)
-                continue;
+        creatingFakeEntities = true;
+        try {
+            for (Tag entityTag : entitiesTag) {
+                Entity fakeEntity = createEntityFromTag((CompoundTag) entityTag, serverLevel).orElse(null);
+                if (fakeEntity == null)
+                    continue;
 
-            fakeEntity.valid = false;
-            if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
-                continue;
+                fakeEntity.valid = false;
+                if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
+                    continue;
 
-            Key entityKey = Keys.of(fakeEntity.getBukkitEntity());
+                Key entityKey = Keys.of(fakeEntity.getBukkitEntity());
 
-            chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+                chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+            }
+        } finally {
+            creatingFakeEntities = false;
         }
 
         return new CalculatedChunk.Entities(chunkPosition, chunkEntities);
+    }
+
+    public static boolean isCreatingFakeEntities() {
+        return creatingFakeEntities;
     }
 
     private void calculateChunkInternal(BlockState blockState, int x, int y, int z, ChunkPosition chunkPosition,
