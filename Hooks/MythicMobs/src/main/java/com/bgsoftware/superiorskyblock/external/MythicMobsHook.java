@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import io.lumine.mythic.api.mobs.MythicMob;
+import io.lumine.mythic.api.mobs.entities.MythicEntityType;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.MobExecutor;
 import org.bukkit.entity.Entity;
@@ -61,7 +62,15 @@ public class MythicMobsHook {
 
             MythicMob mythicMob = mobExecutor.getMythicMob(mythicType).orElse(null);
 
-            if (mythicMob != null && mobExecutor.getVanillaTypes().contains(mythicMob)) {
+            if (mythicMob == null) {
+                // MythicMobs registers a vanilla override (a mob named after an entity type or one of its
+                // aliases, in any case: "zombie", "CaveSpider") under the type's own name, and drops an
+                // override that was removed from the config, so the lookup above misses both.
+                // Such mobs keep their vanilla key.
+                if (MythicEntityType.get(mythicType) != null) {
+                    return null;
+                }
+            } else if (mobExecutor.getVanillaTypes().contains(mythicMob)) {
                 return null;
             }
 
