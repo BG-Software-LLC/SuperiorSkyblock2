@@ -44,7 +44,6 @@ import org.bukkit.World;
 import ${CRAFTBUKKIT_PACKAGE}.CraftChunk;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -151,8 +150,27 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     public boolean isChunkEmpty(Chunk bukkitChunk) {
         ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
-        return levelChunk != null && Arrays.stream(levelChunk.getSections()).allMatch(chunkSection ->
-                chunkSection == null || NMSUtilsVersioned.isLevelChunkSectionEmpty(chunkSection));
+        return isLevelChunkEmpty(levelChunk);
+    }
+
+    @Override
+    public boolean isChunkEmptyIfLoaded(Chunk bukkitChunk) {
+        ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        // We must not load the chunk, as this may be called while the chunk is being unloaded.
+        LevelChunk levelChunk = serverLevel.getChunkSource().getChunk(bukkitChunk.getX(), bukkitChunk.getZ(), false);
+        return isLevelChunkEmpty(levelChunk);
+    }
+
+    private static boolean isLevelChunkEmpty(@Nullable LevelChunk levelChunk) {
+        if (levelChunk == null)
+            return false;
+
+        for (LevelChunkSection chunkSection : levelChunk.getSections()) {
+            if (chunkSection != null && !NMSUtilsVersioned.isLevelChunkSectionEmpty(chunkSection))
+                return false;
+        }
+
+        return true;
     }
 
     @Override
