@@ -99,11 +99,14 @@ public class SPlayerRole implements PlayerRole {
 
     @Nullable
     public static PlayerRole getSafe(@Nullable String name) {
-        try {
-            return plugin.getRoles().getPlayerRole(name);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return null;
+        if (name != null) {
+            try {
+                return plugin.getRoles().getPlayerRole(name);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
+
+        return null;
     }
 
     public static void refreshRoles() {

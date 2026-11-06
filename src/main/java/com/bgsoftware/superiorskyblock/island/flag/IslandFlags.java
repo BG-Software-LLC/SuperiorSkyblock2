@@ -52,11 +52,14 @@ public class IslandFlags {
 
     @Nullable
     public static IslandFlag getSafe(@Nullable String name) {
-        try {
-            return IslandFlag.getByName(name);
-        } catch (NullPointerException e) {
-            return null;
+        if (name != null) {
+            try {
+                return IslandFlag.getByName(name);
+            } catch (NullPointerException ignored) {
+            }
         }
+
+        return null;
     }
 
     private static IslandFlag register(String name) {

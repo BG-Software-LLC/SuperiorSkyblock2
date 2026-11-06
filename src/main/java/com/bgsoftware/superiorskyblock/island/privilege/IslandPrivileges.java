@@ -118,11 +118,14 @@ public class IslandPrivileges {
 
     @Nullable
     public static IslandPrivilege getSafe(@Nullable String name) {
-        try {
-            return IslandPrivilege.getByName(name);
-        } catch (NullPointerException e) {
-            return null;
+        if (name != null) {
+            try {
+                return IslandPrivilege.getByName(name);
+            } catch (NullPointerException ignored) {
+            }
         }
+
+        return null;
     }
 
     @NotNull

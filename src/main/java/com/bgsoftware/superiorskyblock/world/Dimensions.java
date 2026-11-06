@@ -33,11 +33,14 @@ public class Dimensions {
 
     @Nullable
     public static Dimension getSafe(@Nullable String name) {
-        try {
-            return Dimension.getByName(name);
-        } catch (NullPointerException e) {
-            return null;
+        if (name != null) {
+            try {
+                return Dimension.getByName(name);
+            } catch (NullPointerException ignored) {
+            }
         }
+
+        return null;
     }
 
     private Dimensions() {
