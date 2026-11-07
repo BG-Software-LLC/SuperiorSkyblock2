@@ -240,6 +240,7 @@ public class SettingsContainer {
     public final boolean deleteUnsafeWarps;
     public final List<RespawnAction> playerRespawnActions;
     public final BigInteger blockCountsSaveThreshold;
+    public final boolean countEntitiesAsBlocks;
     public final boolean chatSigningSupport;
     public final int commandsPerPage;
     public final boolean helpOnNoPermission;
@@ -625,6 +626,7 @@ public class SettingsContainer {
         });
         this.playerRespawnActions = Collections.unmodifiableList(playerRespawnActions);
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
+        countEntitiesAsBlocks = config.getBoolean("count-entities-as-blocks", true);
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
         commandsPerPage = config.getInt("commands-per-page", 7);
         helpOnInvalidCommand = config.getBoolean("help-on-invalid-command", true);

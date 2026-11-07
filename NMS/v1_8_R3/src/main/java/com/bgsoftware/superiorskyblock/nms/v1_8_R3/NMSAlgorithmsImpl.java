@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.KeyBlocksCache;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.EntityFallingBlock;
-import net.minecraft.server.v1_8_R3.EntityMinecartAbstract;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.Item;
@@ -27,7 +26,6 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFallingSand;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftMinecart;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
@@ -116,12 +114,6 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     public Key getBlockKey(int combinedId) {
         IBlockData blockData = Block.getByCombinedId(combinedId);
         return KeyBlocksCache.getBlockKey(blockData);
-    }
-
-    @Override
-    public Key getMinecartBlock(org.bukkit.entity.Minecart bukkitMinecart) {
-        EntityMinecartAbstract minecart = ((CraftMinecart) bukkitMinecart).getHandle();
-        return KeyBlocksCache.getBlockKey(minecart.getDisplayBlock());
     }
 
     @Override
