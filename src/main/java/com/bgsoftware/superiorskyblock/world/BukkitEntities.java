@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
@@ -113,11 +114,18 @@ public class BukkitEntities {
         entityContent.write(entityContent -> entityContent.remove(livingEntity.getEntityId()));
     }
 
+    @Nullable
+    public static SuperiorPlayer getSuperiorPlayerSource(Entity damager) {
+        return getPlayerSource(damager).map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
+    }
+
     public static Optional<Player> getPlayerSource(Entity damager) {
         if (damager instanceof Projectile) {
             ProjectileSource shooter = ((Projectile) damager).getShooter();
-            if (shooter instanceof Player)
+
+            if (shooter instanceof Player) {
                 return Optional.of((Player) shooter);
+            }
         } else if (damager instanceof Player) {
             return Optional.of((Player) damager);
         }
@@ -149,7 +157,7 @@ public class BukkitEntities {
         return false;
     }
 
-    public static boolean isTameable(Entity entity) {
+    public static boolean isTamed(Entity entity) {
         return entity instanceof Tameable && ((Tameable) entity).isTamed();
     }
 
@@ -163,10 +171,12 @@ public class BukkitEntities {
 
     public static List<EntityCategory> getCategories(Entity entity) {
         List<EntityCategory> categories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
-        if (isTameable(entity)) {
+
+        if (!isTamed(entity) ) {
             categories = new LinkedList<>(categories);
-            categories.add(BuiltinEntityCategory.TAMEABLE.getEntityCategory());
+            categories.remove(BuiltinEntityCategory.TAMEABLE.getEntityCategory());
         }
+
         return categories;
     }
 

@@ -45,7 +45,7 @@ public enum Materials {
         try {
             return Material.valueOf(ServerVersion.isLegacy() ? bukkitType : name());
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Couldn't cast " + name() + " into a bukkit enum. Contact Ome_R!");
+            throw new IllegalArgumentException("Couldn't cast " + name() + " into a Bukkit enum. Contact Ome_R!");
         }
     }
 
@@ -130,6 +130,14 @@ public enum Materials {
         return hasTag(material, Tag.CUSHION);
     }
 
+    public static boolean isGrassBlock(Material material) {
+        return hasTag(material, Tag.GRASS_BLOCK);
+    }
+
+    public static boolean isDirt(Material material) {
+        return hasTag(material, Tag.DIRT);
+    }
+
     public static Set<Material> getBlocksNonLegacy() {
         return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
@@ -157,8 +165,6 @@ public enum Materials {
             String materialName = material.name();
             if (materialName.startsWith("LEGACY_"))
                 materialTags.add(Tag.LEGACY);
-            if (materialName.contains("SLAB"))
-                materialTags.add(Tag.SLAB);
             if (materialName.contains("WATER"))
                 materialTags.add(Tag.WATER);
             if (materialName.contains("RAIL"))
@@ -196,6 +202,10 @@ public enum Materials {
                 materialTags.add(Tag.COPPER_GOLEM);
             if (materialName.contains("CUSHION"))
                 materialTags.add(Tag.CUSHION);
+            if (ServerVersion.isLegacy() ? material == Material.GRASS : materialName.equals("GRASS_BLOCK"))
+                materialTags.add(Tag.GRASS_BLOCK);
+            if (materialName.contains("DIRT"))
+                materialTags.add(Tag.DIRT);
 
             if (!materialTags.isEmpty())
                 enumMap.put(material, materialTags);
@@ -216,7 +226,6 @@ public enum Materials {
 
     public enum Tag {
 
-        SLAB,
         WATER,
         LEGACY,
         RAIL,
@@ -233,7 +242,9 @@ public enum Materials {
         HOE,
         SHELF,
         COPPER_GOLEM,
-        CUSHION
+        CUSHION,
+        GRASS_BLOCK,
+        DIRT
 
     }
 

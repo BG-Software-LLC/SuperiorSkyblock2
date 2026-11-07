@@ -2,18 +2,24 @@ package com.bgsoftware.superiorskyblock.service.region;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.google.common.base.Function;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 public class ProtectionHelper {
@@ -28,16 +34,19 @@ public class ProtectionHelper {
                                                    @Nullable SuperiorPlayer superiorPlayer, boolean sendMessages) {
         switch (interactionResult) {
             case ISLAND_RECALCULATE:
-                if (sendMessages && superiorPlayer != null)
+                if (sendMessages && superiorPlayer != null) {
                     Message.ISLAND_BEING_CALCULATED.send(superiorPlayer);
+                }
                 return true;
             case MISSING_PRIVILEGE:
-                if (sendMessages && superiorPlayer != null)
+                if (sendMessages && superiorPlayer != null) {
                     sendProtectionMessage(superiorPlayer.asPlayer());
+                }
                 return true;
             case OUTSIDE_ISLAND:
-                if (sendMessages && superiorPlayer != null)
+                if (sendMessages && superiorPlayer != null) {
                     Message.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
+                }
                 return true;
             case SUCCESS:
                 return false;
@@ -55,17 +64,50 @@ public class ProtectionHelper {
 
         Locale locale = PlayerLocales.getLocale(sender);
 
-        if (!isSpawnIsland)
+        if (!isSpawnIsland) {
             Message.ISLAND_PROTECTED.send(sender, locale);
-        else
+        } else {
             Message.SPAWN_PROTECTED.send(sender, locale);
+        }
 
         SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-        if (CommandsHelper.hasCommandAccess(bypassCommand, sender))
-            if (!isSpawnIsland)
+        if (bypassCommand != null && CommandsHelper.hasCommandAccess(bypassCommand, sender)) {
+            if (!isSpawnIsland) {
                 Message.ISLAND_PROTECTED_OPPED.send(sender, locale);
-            else
+            } else {
                 Message.SPAWN_PROTECTED_OPPED.send(sender, locale);
+            }
+        }
+    }
+
+    public static List<IslandPrivilege> getBlockPrivileges(List<BlockCategory> blockCategories,
+                                                           Function<BlockCategory, IslandPrivilege> function) {
+        List<IslandPrivilege> islandPrivileges = new LinkedList<>();
+
+        for (BlockCategory blockCategory : blockCategories) {
+            IslandPrivilege islandPrivilege = function.apply(blockCategory);
+
+            if (islandPrivilege != null) {
+                islandPrivileges.add(islandPrivilege);
+            }
+        }
+
+        return islandPrivileges;
+    }
+
+    public static List<IslandPrivilege> getEntityPrivileges(List<EntityCategory> entityCategories,
+                                                           Function<EntityCategory, IslandPrivilege> function) {
+        List<IslandPrivilege> islandPrivileges = new LinkedList<>();
+
+        for (EntityCategory entityCategory : entityCategories) {
+            IslandPrivilege islandPrivilege = function.apply(entityCategory);
+
+            if (islandPrivilege != null) {
+                islandPrivileges.add(islandPrivilege);
+            }
+        }
+
+        return islandPrivileges;
     }
 
 }
