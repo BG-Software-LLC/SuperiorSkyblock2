@@ -2,26 +2,29 @@ package com.bgsoftware.superiorskyblock.config;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.section.AFKIntegrationsSection;
+import com.bgsoftware.superiorskyblock.config.section.BlockCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.DatabaseSection;
 import com.bgsoftware.superiorskyblock.config.section.DefaultContainersSection;
 import com.bgsoftware.superiorskyblock.config.section.DefaultValuesSection;
+import com.bgsoftware.superiorskyblock.config.section.EntityCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.GlobalSection;
 import com.bgsoftware.superiorskyblock.config.section.InteractablesSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandChestsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandNamesSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandPreviewsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandRolesSection;
+import com.bgsoftware.superiorskyblock.config.section.LegacyEntityCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.SpawnSection;
 import com.bgsoftware.superiorskyblock.config.section.StackedBlocksSection;
 import com.bgsoftware.superiorskyblock.config.section.VisitorsSignSection;
@@ -30,6 +33,7 @@ import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.key.category.FixedKeyCategory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
@@ -597,14 +601,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public Set<Key> getValuableBlocks() {
-        BlockCategory blockCategory = this.getBlockCategoriesMap().getCategoryByName("VALUABLE_BLOCKS");
-
-        if (blockCategory == null) {
-            return Collections.emptySet();
-        }
-
-        return blockCategory.getBlocks();
+        KeyCategory blockCategory = this.getBlockCategoriesMapping().getCategoryByName("VALUABLE_BLOCKS");
+        return blockCategory instanceof FixedKeyCategory ?
+                ((FixedKeyCategory) blockCategory).getKeys() : Collections.emptySet();
     }
 
     @Override
@@ -734,9 +735,10 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     public List<String> getInteractables() {
         List<String> interactables = new LinkedList<>();
 
-        for (BlockCategory blockCategory : getBlockCategoriesMap().getCategories()) {
-            if (blockCategory.getInteractPrivilege() != null) {
-                for (Key key : blockCategory.getBlocks()) {
+        for (KeyCategory blockCategory : getBlockCategoriesMapping().getCategories()) {
+            if (blockCategory instanceof FixedKeyCategory &&
+                    blockCategory.getRequiredPrivilege(KeyCategory.Action.INTERACT) != null) {
+                for (Key key : ((FixedKeyCategory) blockCategory).getKeys()) {
                     interactables.add(key.toString());
                 }
             }
@@ -764,13 +766,19 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public BlockCategories getBlockCategoriesMap() {
-        return this.global.getBlockCategoriesMap();
+    @Deprecated
+    public EntityCategories getEntityCategoriesMap() {
+        return new LegacyEntityCategoriesSection(getEntityCategoriesMapping());
     }
 
     @Override
-    public EntityCategories getEntityCategoriesMap() {
-        return this.global.getEntityCategoriesMap();
+    public EntityCategoriesSection getEntityCategoriesMapping() {
+        return this.global.getEntityCategoriesMapping();
+    }
+
+    @Override
+    public BlockCategoriesSection getBlockCategoriesMapping() {
+        return this.global.getBlockCategoriesMapping();
     }
 
     public void updateValue(String path, Object value) throws IOException {
@@ -1078,11 +1086,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             List<String> entities = cfg.getStringList("entity-categories." + categoryName);
             if (!entities.isEmpty()) {
                 categoryName = categoryName.toUpperCase(Locale.ENGLISH);
-                commentedConfig.set(categoryName + ".entities", entities);
-                commentedConfig.set(categoryName + ".actions.SPAWN", categoryName + "_SPAWN");
-                commentedConfig.set(categoryName + ".actions.DAMAGE", categoryName + "_DAMAGE");
-                commentedConfig.set(categoryName + ".actions.SPAWNER_SPAWN", "SPAWNER_" + categoryName + "_SPAWN");
-                commentedConfig.set(categoryName + ".actions.NATURAL_SPAWN", "NATURAL_" + categoryName + "_SPAWN");
+                commentedConfig.set("custom-categories." + categoryName + ".entities", entities);
+                commentedConfig.set("custom-categories." + categoryName + ".actions.SPAWN", categoryName + "_SPAWN");
+                commentedConfig.set("custom-categories." + categoryName + ".actions.DAMAGE", categoryName + "_DAMAGE");
+                commentedConfig.set("custom-categories." + categoryName + ".actions.SPAWNER_SPAWN", "SPAWNER_" + categoryName + "_SPAWN");
+                commentedConfig.set("custom-categories." + categoryName + ".actions.NATURAL_SPAWN", "NATURAL_" + categoryName + "_SPAWN");
             }
         }
 
@@ -1120,24 +1128,31 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
     private boolean convertBlockCategories(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
         File interactablesFile = new File(plugin.getDataFolder(), "interactables.yml");
+        File blockCategoriesFile = new File(plugin.getDataFolder(), "block-categories.yml");
 
-        if (!interactablesFile.exists()) {
+        if (blockCategoriesFile.exists()) {
             return false;
         }
 
-        CommentedConfiguration interactablesCfg = CommentedConfiguration.loadConfiguration(interactablesFile);
+        YamlConfiguration interactablesCfg;
 
-        File blockCategoriesFile = new File(plugin.getDataFolder(), "block-categories.yml");
-
-        if (!blockCategoriesFile.exists()) {
-            plugin.saveResource("block-categories.yml", false);
+        if (interactablesFile.exists()) {
+            interactablesCfg = CommentedConfiguration.loadConfiguration(interactablesFile);
+        } else if (cfg.isList("interactables")) {
+            interactablesCfg = new YamlConfiguration();
+            interactablesCfg.set("interactables", cfg.getStringList("interactables"));
+            InteractablesSection.convertInteractables(interactablesCfg);
+        } else if (cfg.isList("valuable-blocks")) {
+            interactablesCfg = new YamlConfiguration();
+        } else {
+            return false;
         }
 
-        CommentedConfiguration blockCategoriesCfg = CommentedConfiguration.loadConfiguration(blockCategoriesFile);
+        CommentedConfiguration blockCategoriesCfg = CommentedConfiguration.loadConfiguration(plugin.getResource("block-categories.yml"));
 
         ConfigurationSection customCategories = blockCategoriesCfg.getConfigurationSection("custom-categories");
 
-        if (customCategories != null) {
+        if (customCategories != null && !interactablesCfg.getKeys(false).isEmpty()) {
             for (String categoryName : customCategories.getKeys(false)) {
                 if (customCategories.isList(categoryName + ".blocks")) {
                     blockCategoriesCfg.set("custom-categories." + categoryName + ".blocks", null);
@@ -1153,6 +1168,9 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         for (String islandPrivilegeName : interactablesCfg.getKeys(false)) {
             blockCategoriesCfg.set("custom-categories." + islandPrivilegeName + ".blocks", interactablesCfg.getStringList(islandPrivilegeName));
             blockCategoriesCfg.set("custom-categories." + islandPrivilegeName + ".actions.INTERACT", islandPrivilegeName);
+            if (islandPrivilegeName.equalsIgnoreCase("SPAWNER_BREAK")) {
+                blockCategoriesCfg.set("custom-categories." + islandPrivilegeName + ".actions.BREAK", islandPrivilegeName);
+            }
         }
 
         customCategories = blockCategoriesCfg.getConfigurationSection("custom-categories");
@@ -1166,7 +1184,10 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         try {
             blockCategoriesCfg.save(blockCategoriesFile);
-            interactablesFile.delete();
+            if (interactablesFile.exists() && !interactablesFile.renameTo(new File(plugin.getDataFolder(), "interactables.yml.old"))) {
+                Log.warnFromFile(interactablesFile.getName(), "Could not rename the file to interactables.yml.old");
+            }
+            cfg.set("interactables", null);
             cfg.set("valuable-blocks", null);
         } catch (Exception error) {
             Log.errorFromFile(error, blockCategoriesFile.getName(), "An unexpected error occurred while saving file:");

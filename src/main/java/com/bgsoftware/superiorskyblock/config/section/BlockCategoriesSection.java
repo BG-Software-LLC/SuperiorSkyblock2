@@ -1,53 +1,98 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
-import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
-import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.category.BuiltinKeyCategories;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
+import com.bgsoftware.superiorskyblock.core.key.category.FixedKeyCategory;
+import com.bgsoftware.superiorskyblock.core.key.category.PredicateKeyCategory;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.world.block.BlockCategoryImpl;
-import com.bgsoftware.superiorskyblock.world.block.BuiltinBlockCategory;
-import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Set;
 
-public class BlockCategoriesSection implements SettingsManager.BlockCategories {
+public class BlockCategoriesSection extends BaseCategoriesMapper {
 
     public static final String[] IGNORED_SECTIONS = new String[]{"custom-categories", "builtin-categories.ALL.actions"};
 
-    private final Map<String, BlockCategory> nameToCategory;
-    private final KeyMap<List<BlockCategory>> blockToCategory;
-
-    private final LazyReference<List<BlockCategory>> blockCategories = new LazyReference<List<BlockCategory>>() {
-        @Override
-        protected List<BlockCategory> create() {
-            return nameToCategory.isEmpty() ? Collections.emptyList() :
-                    Collections.unmodifiableList(new LinkedList<>(nameToCategory.values()));
-        }
-    };
-
     public BlockCategoriesSection(YamlConfiguration cfg) {
-        this.nameToCategory = loadInternal(cfg);
-        this.blockToCategory = convertBlockToCategoryInternal(this.nameToCategory.values());
+        super(cfg, KeyIndicator.MATERIAL);
+
+        // Cache all the known values
+        for (Material material : Material.values()) {
+            if (material.isBlock()) {
+                getCategories(Keys.of(material));
+            }
+        }
+
+    }
+
+    @Override
+    protected KeyCategory parseCustomCategory(ConfigurationSection section, KeyCategoryId key) {
+        KeySet blocks = KeySets.createHashSet(KeyIndicator.MATERIAL, section.getStringList("blocks"));
+
+        FixedKeyCategory category = new FixedKeyCategory(key.getName(), blocks);
+        category.setRequirement(KeyCategory.Action.PLACE, getOrRegisterPrivilege(section.getString("actions.PLACE")));
+        category.setRequirement(KeyCategory.Action.BREAK, getOrRegisterPrivilege(section.getString("actions.BREAK")));
+        category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(section.getString("actions.INTERACT")));
+
+        return category;
+    }
+
+    @Override
+    protected void loadBuiltinCategories(ConfigurationSection section, EnumerateMap<KeyCategoryId, KeyCategory> categories) {
+        categories.put(BuiltinKeyCategories.ALL, BuiltinKeyCategories.createAllCategory());
+
+        ConfigurationSection categoriesSection = section.getConfigurationSection("builtin-categories");
+        if (categoriesSection == null) {
+            return;
+        }
+
+        for (String categoryName : categoriesSection.getKeys(false)) {
+            KeyCategoryId key = KeyCategoryId.getByName(categoryName.toUpperCase(Locale.ENGLISH));
+            if (!BuiltinKeyCategories.ALL.equals(key)) {
+                Log.warnFromFile(getFileName(), "Invalid builtin category ", categoryName, ", skipping...");
+                continue;
+            }
+
+            ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
+
+            if (categorySection == null) {
+                continue;
+            }
+
+            KeySet skippedBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, categorySection.getStringList("skipped-blocks"));
+
+            PredicateKeyCategory allCategory = new PredicateKeyCategory(key.getName(),
+                    element -> !skippedBlocks.contains(element));
+            allCategory.setRequirement(KeyCategory.Action.PLACE,
+                    getOrRegisterPrivilege(categorySection.getString("actions.PLACE")));
+            allCategory.setRequirement(KeyCategory.Action.BREAK,
+                    getOrRegisterPrivilege(categorySection.getString("actions.BREAK")));
+            allCategory.setRequirement(KeyCategory.Action.INTERACT,
+                    getOrRegisterPrivilege(categorySection.getString("actions.INTERACT")));
+            categories.put(key, allCategory);
+        }
+
+    }
+
+    @Override
+    protected String getFileName() {
+        return "block-categories.yml";
     }
 
     public static void removeInvalidBlocks(YamlConfiguration config, File file) {
@@ -61,8 +106,8 @@ public class BlockCategoriesSection implements SettingsManager.BlockCategories {
 
             Iterator<String> iterator = blocks.iterator();
             while (iterator.hasNext()) {
-                Material material = EnumHelper.getEnum(Material.class, iterator.next());
-                if (material == null) {
+                String block = iterator.next().split(":")[0];
+                if (EnumHelper.getEnum(Material.class, block) == null) {
                     iterator.remove();
                     removed = true;
                 }
@@ -84,101 +129,34 @@ public class BlockCategoriesSection implements SettingsManager.BlockCategories {
         }
     }
 
-    private static Map<String, BlockCategory> loadInternal(YamlConfiguration config) {
-        Map<String, BlockCategory> blockCategories = new HashMap<>();
+    public static void warnMissingBlocks(YamlConfiguration config, YamlConfiguration defaultConfig) {
+        Set<String> blocks = new HashSet<>();
 
-        loadCategories(config, "builtin-categories", blockCategories, true);
-        loadCategories(config, "custom-categories", blockCategories, false);
+        ConfigurationSection categoriesSection = config.getConfigurationSection("custom-categories");
+        if (categoriesSection != null) {
+            for (String categoryName : categoriesSection.getKeys(false)) {
+                for (String block : categoriesSection.getStringList(categoryName + ".blocks")) {
+                    blocks.add(block.toUpperCase(Locale.ENGLISH));
+                }
+            }
+        }
 
-        return blockCategories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(blockCategories);
-    }
-
-    private static void loadCategories(YamlConfiguration config, String path, Map<String, BlockCategory> blockCategories, boolean builtin) {
-        ConfigurationSection categoriesSection = config.getConfigurationSection(path);
-        if (categoriesSection == null) {
+        ConfigurationSection defaultCategoriesSection = defaultConfig.getConfigurationSection("custom-categories");
+        if (defaultCategoriesSection == null) {
             return;
         }
 
-        for (String categoryName : categoriesSection.getKeys(false)) {
-            String key = categoryName.toLowerCase(Locale.ENGLISH);
-
-            if (blockCategories.containsKey(key)) {
-                Log.warnFromFile("block-categories.yml", "Duplicate block category ", categoryName, ", skipping...");
+        for (String categoryName : defaultCategoriesSection.getKeys(false)) {
+            if (!defaultCategoriesSection.isString(categoryName + ".actions.INTERACT")) {
                 continue;
             }
 
-            ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
-
-            if (categorySection == null) {
-                continue;
-            }
-
-            KeySet blocks;
-            if (builtin) {
-                BuiltinBlockCategory builtinBlockCategory;
-                try {
-                    builtinBlockCategory = BuiltinBlockCategory.valueOf(categoryName.toUpperCase(Locale.ENGLISH));
-                } catch (IllegalArgumentException e) {
-                    Log.warnFromFile("block-categories.yml", "Invalid builtin category ", categoryName, ", skipping...");
-                    continue;
+            for (String block : defaultCategoriesSection.getStringList(categoryName + ".blocks")) {
+                if (!blocks.contains(block) && EnumHelper.getEnum(Material.class, block) != null) {
+                    Log.warn("Potentially missing interactable block ", block);
                 }
-
-                blocks = KeySets.createHashSet(KeyIndicator.MATERIAL);
-                blocks.addAll(builtinBlockCategory.getBlocks());
-
-                if (categorySection.isList("skipped-blocks")) {
-                    KeySet skippedBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, categorySection.getStringList("skipped-blocks"));
-                    blocks.removeAll(skippedBlocks);
-                }
-            } else {
-                blocks = KeySets.createHashSet(KeyIndicator.MATERIAL, categorySection.getStringList("blocks"));
-            }
-
-            IslandPrivilege placePrivilege = getOrRegisterPrivilege(categorySection.getString("actions.PLACE"));
-            IslandPrivilege breakPrivilege = getOrRegisterPrivilege(categorySection.getString("actions.BREAK"));
-            IslandPrivilege interactPrivilege = getOrRegisterPrivilege(categorySection.getString("actions.INTERACT"));
-
-            blockCategories.put(key, new BlockCategoryImpl(categoryName, blocks, placePrivilege, breakPrivilege, interactPrivilege));
-        }
-    }
-
-    private static KeyMap<List<BlockCategory>> convertBlockToCategoryInternal(Collection<BlockCategory> blockCategories) {
-        KeyMap<List<BlockCategory>> categories = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
-
-        for (BlockCategory blockCategory : blockCategories) {
-            for (Key key : blockCategory.getBlocks()) {
-                categories.computeIfAbsent(key, k -> new LinkedList<>()).add(blockCategory);
             }
         }
-
-        if (categories.isEmpty()) {
-            return KeyMaps.createEmptyMap();
-        }
-
-        // Convert keyMap to unmodifiable.
-        KeyMap<List<BlockCategory>> categoriesUnmodifiable = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
-        categories.forEach((key, value) -> categoriesUnmodifiable.put(key, Collections.unmodifiableList(value)));
-        return KeyMaps.unmodifiableKeyMap(categoriesUnmodifiable);
-    }
-
-    @Override
-    public List<BlockCategory> getCategories() {
-        return this.blockCategories.get();
-    }
-
-    @Override
-    public List<BlockCategory> getCategories(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null");
-
-        return this.blockToCategory.getOrDefault(key, Collections.emptyList());
-    }
-
-    @Override
-    @Nullable
-    public BlockCategory getCategoryByName(String name) {
-        Preconditions.checkNotNull(name, "name parameter cannot be null");
-
-        return this.nameToCategory.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Nullable

@@ -1,15 +1,16 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.config.SettingsContainerHolder;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.category.FixedKeyCategory;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import org.bukkit.Material;
@@ -79,7 +80,7 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
             }
 
             List<String> blocks = cfg.getStringList(islandPrivilege);
-            blocks.add(blockKey.getGlobalKey());
+            blocks.add(blockKey.toString());
             cfg.set(islandPrivilege, blocks);
         }
 
@@ -95,12 +96,14 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
     }
 
     @Override
+    @Deprecated
     public Set<Key> getInteractables() {
         KeySet keySet = KeySets.createHashSet(KeyIndicator.MATERIAL);
 
-        for (BlockCategory blockCategory : getContainer().blockCategories.getCategories()) {
-            if (blockCategory.getInteractPrivilege() != null) {
-                keySet.addAll(blockCategory.getBlocks());
+        for (KeyCategory blockCategory : getContainer().blockCategories.getCategories()) {
+            if (blockCategory instanceof FixedKeyCategory &&
+                    blockCategory.getRequiredPrivilege(KeyCategory.Action.INTERACT) != null) {
+                keySet.addAll(((FixedKeyCategory) blockCategory).getKeys());
             }
         }
 
@@ -109,10 +112,12 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
 
     @Override
     @Nullable
+    @Deprecated
     public Set<Key> getInteractables(IslandPrivilege islandPrivilege) {
-        for (BlockCategory blockCategory : getContainer().blockCategories.getCategories()) {
-            if (blockCategory.getInteractPrivilege() == islandPrivilege) {
-                return blockCategory.getBlocks();
+        for (KeyCategory blockCategory : getContainer().blockCategories.getCategories()) {
+            if (blockCategory instanceof FixedKeyCategory &&
+                    blockCategory.getRequiredPrivilege(KeyCategory.Action.INTERACT) == islandPrivilege) {
+                return ((FixedKeyCategory) blockCategory).getKeys();
             }
         }
 
@@ -121,10 +126,12 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
 
     @Override
     @Nullable
+    @Deprecated
     public IslandPrivilege getRequiredPrivilege(Key key) {
-        for (BlockCategory blockCategory : getContainer().blockCategories.getCategories()) {
-            if (blockCategory.getInteractPrivilege() != null && blockCategory.getBlocks().contains(key)) {
-                return blockCategory.getInteractPrivilege();
+        for (KeyCategory blockCategory : getContainer().blockCategories.getCategories()) {
+            IslandPrivilege requiredPrivilege = blockCategory.getRequiredPrivilege(KeyCategory.Action.INTERACT);
+            if (requiredPrivilege != null && blockCategory.isListed(key)) {
+                return requiredPrivilege;
             }
         }
 

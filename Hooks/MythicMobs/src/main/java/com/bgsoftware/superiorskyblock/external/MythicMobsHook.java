@@ -1,10 +1,9 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -42,7 +41,6 @@ public class MythicMobsHook {
     }
 
     private static void warnAboutMobWithoutDamagePrivilege(SuperiorSkyblockPlugin plugin) {
-        SettingsManager.EntityCategories entityCategories = plugin.getSettings().getEntityCategoriesMap();
         MobExecutor mobExecutor = MythicBukkit.inst().getMobManager();
         Collection<MythicMob> vanillaTypes = mobExecutor.getVanillaTypes();
 
@@ -63,16 +61,16 @@ public class MythicMobsHook {
             Key mythicKey = Keys.of(MYTHIC_MOBS_PREFIX, mythicType.toUpperCase(Locale.ENGLISH), KeyIndicator.CUSTOM);
 
             // Same lookup as BukkitEntities#getCategories(Entity), so the warning matches the real protection.
-            if (!hasDamagePrivilege(entityCategories.getCategories(mythicKey))) {
+            if (!hasDamagePrivilege(plugin.getSettings().getEntityCategoriesMapping().getCategories(mythicKey))) {
                 Log.warn("The MythicMobs mob MYTHIC_MOBS:", mythicType, " is not in an entity category ",
                         "with a DAMAGE action, so visitors can damage it on islands");
             }
         }
     }
 
-    private static boolean hasDamagePrivilege(List<EntityCategory> entityCategories) {
-        for (EntityCategory entityCategory : entityCategories) {
-            if (entityCategory.getDamagePrivilege() != null) {
+    private static boolean hasDamagePrivilege(List<KeyCategory> entityCategories) {
+        for (KeyCategory entityCategory : entityCategories) {
+            if (entityCategory.getRequiredPrivilege(KeyCategory.Action.DAMAGE) != null) {
                 return true;
             }
         }

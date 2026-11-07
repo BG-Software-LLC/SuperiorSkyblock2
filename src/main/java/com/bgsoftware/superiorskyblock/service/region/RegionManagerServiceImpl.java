@@ -2,8 +2,6 @@ package com.bgsoftware.superiorskyblock.service.region;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
@@ -144,9 +142,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
         }
 
-        List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(Key.of(block));
-        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories,
-                BlockCategory::getPlacePrivilege);
+        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockPlacePrivileges(Keys.of(block));
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
@@ -167,15 +163,13 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
         }
 
-        List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(Key.of(block));
-        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories,
-                BlockCategory::getBreakPrivilege);
+        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(Keys.of(block));
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
 
             return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivileges, 0,
-                    true, true);
+                    true, true, null, true, true);
         }
     }
 
@@ -198,9 +192,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem, block);
             int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
 
-            List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(blockKey);
-
-            if (!isInteractableItem && stackedBlockAmount <= 1 && blockCategories.isEmpty()) {
+            if (!isInteractableItem && stackedBlockAmount <= 1 &&
+                    plugin.getSettings().getBlockCategoriesMapping().getCategories(blockKey).isEmpty()) {
                 return InteractionResult.SUCCESS;
             }
 
@@ -210,11 +203,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             EntityType entityType = isInteractableItem ? BukkitItems.getEntityType(usedItem) : EntityType.UNKNOWN;
 
             if (entityType != EntityType.UNKNOWN) {
-                List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(
-                        Keys.of(entityType));
-                List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories,
-                        EntityCategory::getSpawnPrivilege);
-
+                List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntitySpawnPrivileges(Keys.of(entityType));
                 return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivileges,
                         0, true, true);
             }
@@ -224,14 +213,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 return InteractionResult.SUCCESS;
             } else if (blockType == VAULT && (usedItem == null || (usedItemType != TRIAL_KEY && usedItemType != OMINOUS_TRIAL_KEY))) {
                 return InteractionResult.SUCCESS;
-            } else if ((Materials.isDirt(blockType) || Materials.isGrassBlock(blockType))) {
+            } else if (blockType == Materials.GRASS_BLOCK.toBukkitType() || Materials.isDirt(blockType)) {
                 if (usedItem != null && Materials.isHoe(usedItemType)) {
-                    islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories, BlockCategory::getPlacePrivilege);
+                    islandPrivileges = ProtectionHelper.getBlockPlacePrivileges(blockKey);
                 } else {
                     return InteractionResult.SUCCESS;
                 }
             } else if (stackedBlockAmount > 1) {
-                islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories, BlockCategory::getBreakPrivilege);
+                islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(blockKey);
             } else if (action == Action.RIGHT_CLICK_BLOCK && blockType == SWEET_BERRY_BUSH
                     && Materials.BONE_MEAL.toBukkitItem().isSimilar(usedItem)
                     && ((Ageable) plugin.getNMSWorld().getBlockData(block)).getAge() < 3) {
@@ -241,7 +230,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                     && !plugin.getNMSWorld().hasBerries(block)) {
                 islandPrivileges = Collections.singletonList(IslandPrivileges.FERTILIZE);
             } else {
-                islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories, BlockCategory::getInteractPrivilege);
+                islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(blockKey);
             }
 
             return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivileges,
@@ -315,13 +304,11 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                 interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, islandPrivilege,
                         0, true, true);
             } else {
-                List<EntityCategory> entityCategories = BukkitEntities.getCategories(entity);
-
                 List<IslandPrivilege> islandPrivileges;
                 if (entityType == PARROT && usedItemType == Material.COOKIE) {
-                    islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories, EntityCategory::getDamagePrivilege);
+                    islandPrivileges = ProtectionHelper.getEntityDamagePrivileges(entity);
                 } else {
-                    islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories, EntityCategory::getInteractPrivilege);
+                    islandPrivileges = ProtectionHelper.getEntityInteractPrivileges(entity);
                 }
 
                 interactionResult = handleInteractionInternal(superiorPlayer, entityLocation, islandPrivileges,
@@ -362,9 +349,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
         }
 
-        List<EntityCategory> entityCategories = BukkitEntities.getCategories(entity);
-        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories,
-                EntityCategory::getDamagePrivilege);
+        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityDamagePrivileges(entity);
 
         if (islandPrivileges.isEmpty()) {
             return InteractionResult.SUCCESS;
@@ -398,9 +383,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = vehicle.getLocation(wrapper.getHandle());
 
-            List<EntityCategory> entityCategories = BukkitEntities.getCategories(vehicle);
-            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityPrivileges(entityCategories,
-                    EntityCategory::getInteractPrivilege);
+            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityInteractPrivileges(vehicle);
+
             InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, entityLocation,
                     islandPrivileges, 0, true, false);
 
@@ -592,7 +576,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                                                         IslandPrivilege islandPrivilege, int extraRadius,
                                                         boolean checkIslandBoundaries, boolean checkRecalculation) {
         return handleInteractionInternal(superiorPlayer, location, Collections.singletonList(islandPrivilege),
-                extraRadius, checkIslandBoundaries, checkRecalculation, null, true);
+                extraRadius, checkIslandBoundaries, checkRecalculation, null, true, false);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -600,13 +584,14 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                                                         List<IslandPrivilege> islandPrivileges, int extraRadius,
                                                         boolean checkIslandBoundaries, boolean checkRecalculation) {
         return handleInteractionInternal(superiorPlayer, location, islandPrivileges,
-                extraRadius, checkIslandBoundaries, checkRecalculation, null, true);
+                extraRadius, checkIslandBoundaries, checkRecalculation, null, true, false);
     }
 
     private InteractionResult handleInteractionInternal(SuperiorPlayer superiorPlayer, Location location,
                                                         List<IslandPrivilege> islandPrivileges, int extraRadius,
                                                         boolean checkIslandBoundaries, boolean checkRecalculation,
-                                                        @Nullable Island island, boolean callIslandLookup) {
+                                                        @Nullable Island island, boolean callIslandLookup,
+                                                        boolean checkBoundariesWithoutPrivileges) {
         if (superiorPlayer.hasBypassModeEnabled()) {
             return InteractionResult.SUCCESS;
         }
@@ -616,15 +601,22 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         if (checkIslandBoundaries) {
+            boolean checkBoundaries = checkBoundariesWithoutPrivileges && islandPrivileges.isEmpty();
+
             for (IslandPrivilege islandPrivilege : islandPrivileges) {
                 if (!WORLD_PERMISSIONS_CACHE.contains(islandPrivilege)) {
-                    if (island == null && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
-                        return InteractionResult.OUTSIDE_ISLAND;
-                    }
+                    checkBoundaries = true;
+                    break;
+                }
+            }
 
-                    if (island != null && !island.isInsideRange(location, extraRadius)) {
-                        return InteractionResult.OUTSIDE_ISLAND;
-                    }
+            if (checkBoundaries) {
+                if (island == null && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
+                    return InteractionResult.OUTSIDE_ISLAND;
+                }
+
+                if (island != null && !island.isInsideRange(location, extraRadius)) {
+                    return InteractionResult.OUTSIDE_ISLAND;
                 }
             }
         }

@@ -42,6 +42,9 @@ public class ConstantKeys {
     @Nullable
     public static final Key OPEN_EYEBLOSSOM = Optional.ofNullable(EnumHelper.getEnum(Material.class, "OPEN_EYEBLOSSOM"))
             .map(Keys::of).orElse(null);
+    @Nullable
+    public static final Key POWDER_SNOW = Optional.ofNullable(EnumHelper.getEnum(Material.class, "POWDER_SNOW"))
+            .map(Keys::of).orElse(null);
     public static final Key SNOW_BLOCK = Keys.of(Material.SNOW_BLOCK);
     public static final Key SOUL_SAND = Keys.of(Material.SOUL_SAND);
     public static final Key TNT = Keys.of(Material.TNT);

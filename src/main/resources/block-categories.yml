@@ -288,6 +288,7 @@ custom-categories:
       - STONECUTTER
       - STONE_BUTTON
       - STONE_PRESSURE_PLATE
+      - STRAW_BED
       - STRUCTURE_BLOCK
       - TARGET
       - TEST_BLOCK

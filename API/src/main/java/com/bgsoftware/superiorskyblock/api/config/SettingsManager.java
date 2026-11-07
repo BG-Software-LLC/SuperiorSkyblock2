@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.api.config;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
@@ -631,8 +631,10 @@ public interface SettingsManager {
 
     /**
      * List of valuable-blocks.
-     * Config-path: valuable-blocks
+     *
+     * @deprecated See {@link #getBlockCategoriesMapping()}
      */
+    @Deprecated
     Set<Key> getValuableBlocks();
 
     /**
@@ -793,7 +795,7 @@ public interface SettingsManager {
     /**
      * Get all the interactable blocks.
      *
-     * @deprecated See {@link #getInteractablesMap}
+     * @deprecated See {@link #getBlockCategoriesMapping}
      */
     @Deprecated
     List<String> getInteractables();
@@ -801,7 +803,7 @@ public interface SettingsManager {
     /**
      * Get all the interactable blocks and their interact privilege.
      *
-     * @deprecated See {@link #getBlockCategoriesMap()}
+     * @deprecated See {@link #getBlockCategoriesMapping()}
      */
     @Deprecated
     Interactables getInteractablesMap();
@@ -809,20 +811,28 @@ public interface SettingsManager {
     /**
      * Custom entity categories to be used by the plugin.
      *
-     * @deprecated See {@link #getBlockCategoriesMap()}
+     * @deprecated See {@link #getBlockCategoriesMapping()} ()}
      */
     @Deprecated
     Map<String, KeySet> getEntityCategories();
 
     /**
+     * Custom entity categories to be used by the plugin.
+     *
+     * @deprecated See {@link #getEntityCategoriesMapping()}
+     */
+    @Deprecated
+    EntityCategories getEntityCategoriesMap();
+
+    /**
      * Custom block categories to be used by the plugin.
      */
-    BlockCategories getBlockCategoriesMap();
+    CategoriesMapper getBlockCategoriesMapping();
 
     /**
      * Custom entity categories to be used by the plugin.
      */
-    EntityCategories getEntityCategoriesMap();
+    CategoriesMapper getEntityCategoriesMapping();
 
     interface Database {
 
@@ -1476,30 +1486,31 @@ public interface SettingsManager {
 
     }
 
-    interface BlockCategories {
+    interface CategoriesMapper {
 
         /**
-         * Get all the categories from the block-categories file.
+         * Get all the categories from the categories file.
          */
-        List<BlockCategory> getCategories();
+        List<KeyCategory> getCategories();
 
         /**
-         * Get the block categories for a specific block key.
+         * Get the categories for a specific key.
          *
-         * @param key The block's key.
+         * @param key The key.
          */
-        List<BlockCategory> getCategories(Key key);
+        List<KeyCategory> getCategories(Key key);
 
         /**
-         * Get a block category by its name.
+         * Get a category by its name.
          *
          * @param name The name of the category.
          */
         @Nullable
-        BlockCategory getCategoryByName(String name);
+        KeyCategory getCategoryByName(String name);
 
     }
 
+    @Deprecated
     interface EntityCategories {
 
         /**

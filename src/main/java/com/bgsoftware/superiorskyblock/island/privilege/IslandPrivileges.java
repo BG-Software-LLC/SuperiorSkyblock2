@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.island.privilege;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -98,12 +97,10 @@ public class IslandPrivileges {
     }
 
     private static void onSettingsUpdate() {
-        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-        LECTERN_INTERACT_PRIVILEGES = Collections.unmodifiableList(ProtectionHelper.getBlockPrivileges(plugin.getSettings()
-                .getBlockCategoriesMap().getCategories(ConstantKeys.LECTERN), BlockCategory::getInteractPrivilege));
-        VAULT_INTERACT_PRIVILEGES = Collections.unmodifiableList(ProtectionHelper.getBlockPrivileges(plugin.getSettings()
-                .getBlockCategoriesMap().getCategories(ConstantKeys.VAULT), BlockCategory::getInteractPrivilege));
+        LECTERN_INTERACT_PRIVILEGES = ConstantKeys.LECTERN == null ? Collections.emptyList() :
+                ProtectionHelper.getBlockInteractPrivileges(ConstantKeys.LECTERN);
+        VAULT_INTERACT_PRIVILEGES = ConstantKeys.VAULT == null ? Collections.emptyList() :
+                ProtectionHelper.getBlockInteractPrivileges(ConstantKeys.VAULT);
     }
 
     public static String getPrivilegesNames() {

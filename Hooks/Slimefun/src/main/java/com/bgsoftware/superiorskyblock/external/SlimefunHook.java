@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.key.category.BuiltinKeyCategories;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -22,7 +23,6 @@ import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_RC13;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServiceHelper;
-import com.bgsoftware.superiorskyblock.world.block.BuiltinBlockCategory;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin;
@@ -114,18 +114,19 @@ public class SlimefunHook {
         switch (protectableAction) {
             case "ACCESS_INVENTORIES":
             case "INTERACT_BLOCK": {
-                List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(ConstantKeys.CHEST);
-                islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories, BlockCategory::getInteractPrivilege);
+                islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(ConstantKeys.CHEST);
                 break;
             }
             case "PLACE_BLOCK": {
-                BlockCategory blockCategory = BuiltinBlockCategory.ALL.getBlockCategory();
-                islandPrivileges = Collections.singletonList(blockCategory.getPlacePrivilege());
+                IslandPrivilege placePrivilege = plugin.getSettings().getBlockCategoriesMapping()
+                        .getCategoryByKey(BuiltinKeyCategories.ALL).getRequiredPrivilege(KeyCategory.Action.PLACE);
+                islandPrivileges = placePrivilege == null ? Collections.emptyList() : Collections.singletonList(placePrivilege);
                 break;
             }
             default: {
-                BlockCategory blockCategory = BuiltinBlockCategory.ALL.getBlockCategory();
-                islandPrivileges = Collections.singletonList(blockCategory.getBreakPrivilege());
+                IslandPrivilege breakPrivilege = plugin.getSettings().getBlockCategoriesMapping()
+                        .getCategoryByKey(BuiltinKeyCategories.ALL).getRequiredPrivilege(KeyCategory.Action.BREAK);
+                islandPrivileges = breakPrivilege == null ? Collections.emptyList() : Collections.singletonList(breakPrivilege);
                 break;
             }
         }

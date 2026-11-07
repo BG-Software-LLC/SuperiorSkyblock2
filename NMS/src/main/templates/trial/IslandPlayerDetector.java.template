@@ -4,9 +4,10 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.trial;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.key.category.BuiltinKeyCategories;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.world.entity.BuiltinEntityCategory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.trialspawner.PlayerDetector;
@@ -31,8 +32,8 @@ public class IslandPlayerDetector implements PlayerDetector {
 
     public static IslandPlayerDetector trialSpawnerPlayerDetector(Island island, PlayerDetector original) {
         return new IslandPlayerDetector(island, original, () -> {
-            IslandPrivilege islandPrivilege = BuiltinEntityCategory.MONSTER.getEntityCategory().getDamagePrivilege();
-
+            IslandPrivilege islandPrivilege = plugin.getSettings().getEntityCategoriesMapping()
+                    .getCategoryByKey(BuiltinKeyCategories.MONSTER).getRequiredPrivilege(KeyCategory.Action.DAMAGE);
             return islandPrivilege == null ? Collections.emptyList() : Collections.singletonList(islandPrivilege);
         });
     }
@@ -48,24 +49,25 @@ public class IslandPlayerDetector implements PlayerDetector {
         List<UUID> players = this.original.detect(serverLevel, entitySelector, blockPos, maxDistance, requireLineOfSight);
         List<IslandPrivilege> privileges = this.requiredPrivileges.get();
 
-        if (!privileges.isEmpty() && !players.isEmpty()) {
-            players = new LinkedList<>(players);
+        if(privileges.isEmpty() || players.isEmpty())
+            return players;
 
-            players.removeIf(uuid -> {
-                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
+        List<UUID> finalPlayers = new LinkedList<>();
 
-                for (IslandPrivilege privilege : privileges) {
-                    if (privilege != null && !island.hasPermission(superiorPlayer, privilege)) {
-                        return true;
-                    }
+        outerLoop:
+        for(UUID uuid : players) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
+
+            for (IslandPrivilege privilege : privileges) {
+                if (privilege != null && !island.hasPermission(superiorPlayer, privilege)) {
+                    continue outerLoop;
                 }
-                return false;
-            });
+            }
 
-            players = Collections.unmodifiableList(players);
+            finalPlayers.add(uuid);
         }
 
-        return players;
+        return finalPlayers.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(finalPlayers);
     }
 
 }

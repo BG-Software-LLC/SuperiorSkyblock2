@@ -430,12 +430,12 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().cacheSchematics;
     }
 
-    public SettingsManager.BlockCategories getBlockCategoriesMap() {
-        return getContainer().blockCategories;
+    public EntityCategoriesSection getEntityCategoriesMapping() {
+        return getContainer().entityCategories;
     }
 
-    public SettingsManager.EntityCategories getEntityCategoriesMap() {
-        return getContainer().entityCategories;
+    public BlockCategoriesSection getBlockCategoriesMapping() {
+        return getContainer().blockCategories;
     }
 
 }

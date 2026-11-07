@@ -30,7 +30,7 @@
 # populated automatically based on the server version.
 # You can use 'skipped-entities' to exclude specific entities from a built-in category.
 builtin-categories:
-  TAMEABLE:
+  TAMED:
     skipped-entities: [ ]
     actions:
       DAMAGE: TAMED_ANIMAL_DAMAGE

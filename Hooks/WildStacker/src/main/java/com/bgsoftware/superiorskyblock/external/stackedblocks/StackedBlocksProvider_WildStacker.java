@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.external.stackedblocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.block.BlockCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -160,8 +159,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
             Key blockKey = getBarrelKey(e.getBarrel());
 
-            List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(blockKey);
-            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories, BlockCategory::getBreakPrivilege);
+            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(blockKey);
 
             for (IslandPrivilege islandPrivilege : islandPrivileges) {
                 if (!island.hasPermission(player, islandPrivilege)) {
@@ -222,13 +220,11 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             Player player = e.getPlayer();
             Key blockKey = getBarrelKey(stackedBarrel);
 
-            List<BlockCategory> blockCategories = plugin.getSettings().getBlockCategoriesMap().getCategories(blockKey);
-
             List<IslandPrivilege> islandPrivileges;
             if (player.isSneaking()) {
-                islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories, BlockCategory::getPlacePrivilege);
+                islandPrivileges = ProtectionHelper.getBlockPlacePrivileges(blockKey);
             } else {
-                islandPrivileges = ProtectionHelper.getBlockPrivileges(blockCategories, BlockCategory::getBreakPrivilege);
+                islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(blockKey);
             }
 
             for (IslandPrivilege islandPrivilege : islandPrivileges) {

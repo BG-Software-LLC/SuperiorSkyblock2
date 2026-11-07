@@ -242,8 +242,8 @@ public class SettingsContainer {
     public final boolean helpOnNoPermission;
     public final boolean helpOnInvalidCommand;
     public final boolean cacheSchematics;
-    public final SettingsManager.BlockCategories blockCategories;
-    public final SettingsManager.EntityCategories entityCategories;
+    public final BlockCategoriesSection blockCategories;
+    public final EntityCategoriesSection entityCategories;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -703,7 +703,7 @@ public class SettingsContainer {
         return Collections.unmodifiableList(clearActions);
     }
 
-    private SettingsManager.BlockCategories loadBlockCategories(SuperiorSkyblockPlugin plugin) {
+    private BlockCategoriesSection loadBlockCategories(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "block-categories.yml");
 
         boolean removeInvalidBlocks = false;
@@ -726,10 +726,13 @@ public class SettingsContainer {
             Log.error(error, file, "An unexpected error occurred while loading file:");
         }
 
+        BlockCategoriesSection.warnMissingBlocks(config,
+                CommentedConfiguration.loadConfiguration(plugin.getResource("block-categories.yml")));
+
         return new BlockCategoriesSection(config);
     }
 
-    private SettingsManager.EntityCategories loadEntityCategories(SuperiorSkyblockPlugin plugin) {
+    private EntityCategoriesSection loadEntityCategories(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "entity-categories.yml");
 
         boolean removeInvalidEntities = false;
