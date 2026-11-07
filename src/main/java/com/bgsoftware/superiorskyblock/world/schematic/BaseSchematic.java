@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,5 +52,9 @@ public abstract class BaseSchematic implements Schematic {
 
     @Nullable
     public abstract Runnable onTeleportCallback();
+
+    public List<Location> getEntityLocations(EntityType entityType, Location location) {
+        return Collections.emptyList();
+    }
 
 }

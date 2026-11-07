@@ -130,7 +130,7 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
         if (!oldFile.exists())

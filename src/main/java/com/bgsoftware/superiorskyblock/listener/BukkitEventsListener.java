@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -76,6 +77,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -114,6 +116,8 @@ public class BukkitEventsListener implements Listener {
             ProjectileHitEvent.class, "getHitBlock");
     @Nullable
     private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
+    @Nullable
+    private static final EntityType SULFUR_CUBE_TYPE = EnumHelper.getEnum(EntityType.class, "SULFUR_CUBE");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -212,6 +216,15 @@ public class BukkitEventsListener implements Listener {
         } catch (ClassNotFoundException ignored) {
         }
 
+        // Only used for protecting sulfur cubes, which take no damage from attacks while holding a block.
+        if (SULFUR_CUBE_TYPE != null) {
+            try {
+                Class prePlayerAttackEntityEventClass = Class.forName("io.papermc.paper.event.player.PrePlayerAttackEntityEvent");
+                createEventListener(GameEventType.PLAYER_ATTACK_ENTITY_EVENT, prePlayerAttackEntityEventClass, new PrePlayerAttackEntityEventFunction());
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+
         try {
             Class.forName("com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent");
             createEventListener(GameEventType.ENTITY_DEATH_EVENT, com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent.class, new EntityRemoveFromWorldEventFunction());
@@ -242,6 +255,14 @@ public class BukkitEventsListener implements Listener {
             Class.forName("org.bukkit.event.player.PlayerAttemptPickupItemEvent");
             createEventListener(GameEventType.PLAYER_PICKUP_ITEM_EVENT, org.bukkit.event.player.PlayerAttemptPickupItemEvent.class, new PlayerPickupItemEventFunctions());
         } catch (Exception ignored) {
+        }
+
+        if (IslandPrivileges.CONFIG_LECTERN_BOOK != null) {
+            try {
+                Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
+                createEventListener(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, org.bukkit.event.player.PlayerTakeLecternBookEvent.class, new PlayerTakeLecternBookEventFunctions());
+            } catch (ClassNotFoundException ignored) {
+            }
         }
 
         try {
@@ -938,7 +959,7 @@ public class BukkitEventsListener implements Listener {
     private static class EntityBreakByEntityEventFunction implements GameEventCreator<GameEventArgs.HangingBreakEvent, Event> {
 
         private static final ReflectMethod<Enum<?>> GET_CAUSE_METHOD = new ReflectMethod<>(
-                new ClassInfo("io.papermc.paper.event.entity.EntityBreakByEntityEvent", ClassInfo.PackageType.UNKNOWN),
+                new ClassInfo("io.papermc.paper.event.entity.EntityBreakEvent", ClassInfo.PackageType.UNKNOWN),
                 "getCause", new ClassInfo[0]);
         private static final ReflectMethod<Entity> GET_REMOVER_METHOD = new ReflectMethod<>(
                 new ClassInfo("io.papermc.paper.event.entity.EntityBreakByEntityEvent", ClassInfo.PackageType.UNKNOWN),
@@ -954,6 +975,21 @@ public class BukkitEventsListener implements Listener {
             hangingBreakEvent.removeCause = HangingBreakEvent.RemoveCause.valueOf(GET_CAUSE_METHOD.invoke(e).name());
             hangingBreakEvent.remover = GET_REMOVER_METHOD.invoke(e);
             return eventType.createEvent(hangingBreakEvent);
+        }
+    }
+
+    private static class PrePlayerAttackEntityEventFunction implements GameEventCreator<GameEventArgs.PlayerAttackEntityEvent, Event> {
+
+        private static final ReflectMethod<Entity> GET_ATTACKED_METHOD = new ReflectMethod<>(
+                new ClassInfo("io.papermc.paper.event.player.PrePlayerAttackEntityEvent", ClassInfo.PackageType.UNKNOWN),
+                "getAttacked", new ClassInfo[0]);
+
+        @Override
+        public GameEvent<GameEventArgs.PlayerAttackEntityEvent> execute(GameEventType<GameEventArgs.PlayerAttackEntityEvent> eventType, GameEventPriority priority, Event e) {
+            GameEventArgs.PlayerAttackEntityEvent playerAttackEntityEvent = new GameEventArgs.PlayerAttackEntityEvent();
+            playerAttackEntityEvent.player = ((PlayerEvent) e).getPlayer();
+            playerAttackEntityEvent.entity = GET_ATTACKED_METHOD.invoke(e);
+            return eventType.createEvent(playerAttackEntityEvent);
         }
     }
 
@@ -1022,6 +1058,18 @@ public class BukkitEventsListener implements Listener {
             playerPickupItemEvent.player = e.getPlayer();
             playerPickupItemEvent.pickedUpItem = e.getItem();
             return eventType.createEvent(playerPickupItemEvent);
+        }
+
+    }
+
+    private static class PlayerTakeLecternBookEventFunctions implements GameEventCreator<GameEventArgs.PlayerTakeLecternBookEvent, org.bukkit.event.player.PlayerTakeLecternBookEvent> {
+
+        @Override
+        public GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> execute(GameEventType<GameEventArgs.PlayerTakeLecternBookEvent> eventType, GameEventPriority priority, org.bukkit.event.player.PlayerTakeLecternBookEvent e) {
+            GameEventArgs.PlayerTakeLecternBookEvent playerTakeLecternBookEvent = new GameEventArgs.PlayerTakeLecternBookEvent();
+            playerTakeLecternBookEvent.player = e.getPlayer();
+            playerTakeLecternBookEvent.clickedBlock = e.getLectern().getBlock();
+            return eventType.createEvent(playerTakeLecternBookEvent);
         }
 
     }
