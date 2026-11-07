@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.api.menu.layout.HologramMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedDialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedHologramMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedInventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
@@ -46,6 +47,7 @@ import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramMenuStyleImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuCustom;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.PagedHologramMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedInventoryMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularHologramMenuLayoutImpl;
@@ -592,6 +594,11 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     @Override
     public <V extends MenuView<V, ?>> HologramMenuLayout.Builder<V> createHologramLayoutBuilder() {
         return new RegularHologramMenuLayoutImpl.Builder<>();
+    }
+
+    @Override
+    public <V extends PagedMenuView<V, ?, E>, E> PagedHologramMenuLayout.Builder<V, E> createHologramPagedLayoutBuilder() {
+        return new PagedHologramMenuLayoutImpl.Builder<>();
     }
 
     @Override

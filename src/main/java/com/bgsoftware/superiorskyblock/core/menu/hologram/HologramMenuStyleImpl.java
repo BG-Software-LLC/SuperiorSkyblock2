@@ -9,6 +9,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class HologramMenuStyleImpl implements HologramMenuStyle {
 
+    /* The arrowhead-shaped pointer of unicode (U+1FBB0), which looks like the cursor of a mouse. */
+    public static final String POINTER = "\uD83E\uDFB0";
+    /* The tip of the pointer is at the top left of its text, 1 pixel to the left of its center and 4 pixels above it. */
+    public static final float ARROW_OFFSET_X = 0.025f;
+    public static final float ARROW_OFFSET_Y = -0.1f;
+
     public static final HologramMenuStyle DEFAULT = new Builder().build();
 
     private final float distance;
@@ -28,10 +34,29 @@ public class HologramMenuStyleImpl implements HologramMenuStyle {
     private final float buttonsSpacing;
     private final String cursorText;
     private final String hoveredCursorText;
+    @Nullable
+    private final ItemStack cursorItem;
+    @Nullable
+    private final ItemStack hoveredCursorItem;
     private final float cursorScale;
+    private final float hoveredCursorScale;
+    private final boolean cursorShadowed;
+    private final float cursorOffsetX;
+    private final float cursorOffsetY;
+    private final float cursorMenuMargin;
+    private final float cursorScreenMargin;
+    private final long clickDelay;
+    private final float cursorSpeed;
+    private final boolean cursorLimitedToMenu;
+    private final float screenFov;
+    private final float screenAspectRatio;
+    private final boolean crosshairHidden;
+    private final int pageAnimationDuration;
+    private final float pageAnimationDistance;
     private final boolean tooltipEnabled;
     private final float tooltipScale;
     private final int tooltipColor;
+    private final float tooltipOffset;
     private final HologramButton defaultButton;
 
     private HologramMenuStyleImpl(Builder builder) {
@@ -51,10 +76,27 @@ public class HologramMenuStyleImpl implements HologramMenuStyle {
         this.buttonsSpacing = builder.buttonsSpacing;
         this.cursorText = builder.cursorText;
         this.hoveredCursorText = builder.hoveredCursorText;
+        this.cursorItem = builder.cursorItem;
+        this.hoveredCursorItem = builder.hoveredCursorItem;
         this.cursorScale = builder.cursorScale;
+        this.hoveredCursorScale = builder.hoveredCursorScale;
+        this.cursorShadowed = builder.cursorShadowed;
+        this.cursorOffsetX = builder.cursorOffsetX;
+        this.cursorOffsetY = builder.cursorOffsetY;
+        this.cursorMenuMargin = builder.cursorMenuMargin;
+        this.cursorScreenMargin = builder.cursorScreenMargin;
+        this.clickDelay = builder.clickDelay;
+        this.cursorSpeed = builder.cursorSpeed;
+        this.cursorLimitedToMenu = builder.cursorLimitedToMenu;
+        this.screenFov = builder.screenFov;
+        this.screenAspectRatio = builder.screenAspectRatio;
+        this.crosshairHidden = builder.crosshairHidden;
+        this.pageAnimationDuration = builder.pageAnimationDuration;
+        this.pageAnimationDistance = builder.pageAnimationDistance;
         this.tooltipEnabled = builder.tooltipEnabled;
         this.tooltipScale = builder.tooltipScale;
         this.tooltipColor = builder.tooltipColor;
+        this.tooltipOffset = builder.tooltipOffset;
         this.defaultButton = builder.defaultButton;
     }
 
@@ -139,9 +181,91 @@ public class HologramMenuStyleImpl implements HologramMenuStyle {
         return this.hoveredCursorText;
     }
 
+    @Nullable
+    @Override
+    public ItemStack getCursorItem() {
+        return this.cursorItem == null ? null : this.cursorItem.clone();
+    }
+
+    @Nullable
+    @Override
+    public ItemStack getHoveredCursorItem() {
+        return this.hoveredCursorItem == null ? null : this.hoveredCursorItem.clone();
+    }
+
     @Override
     public float getCursorScale() {
         return this.cursorScale;
+    }
+
+    @Override
+    public float getHoveredCursorScale() {
+        return this.hoveredCursorScale;
+    }
+
+    @Override
+    public boolean isCursorShadowed() {
+        return this.cursorShadowed;
+    }
+
+    @Override
+    public float getCursorOffsetX() {
+        return this.cursorOffsetX;
+    }
+
+    @Override
+    public float getCursorOffsetY() {
+        return this.cursorOffsetY;
+    }
+
+    @Override
+    public float getCursorMenuMargin() {
+        return this.cursorMenuMargin;
+    }
+
+    @Override
+    public float getCursorScreenMargin() {
+        return this.cursorScreenMargin;
+    }
+
+    @Override
+    public long getClickDelay() {
+        return this.clickDelay;
+    }
+
+    @Override
+    public float getCursorSpeed() {
+        return this.cursorSpeed;
+    }
+
+    @Override
+    public boolean isCursorLimitedToMenu() {
+        return this.cursorLimitedToMenu;
+    }
+
+    @Override
+    public float getScreenFov() {
+        return this.screenFov;
+    }
+
+    @Override
+    public float getScreenAspectRatio() {
+        return this.screenAspectRatio;
+    }
+
+    @Override
+    public boolean isCrosshairHidden() {
+        return this.crosshairHidden;
+    }
+
+    @Override
+    public int getPageAnimationDuration() {
+        return this.pageAnimationDuration;
+    }
+
+    @Override
+    public float getPageAnimationDistance() {
+        return this.pageAnimationDistance;
     }
 
     @Override
@@ -157,6 +281,11 @@ public class HologramMenuStyleImpl implements HologramMenuStyle {
     @Override
     public int getTooltipColor() {
         return this.tooltipColor;
+    }
+
+    @Override
+    public float getTooltipOffset() {
+        return this.tooltipOffset;
     }
 
     @Override
@@ -180,12 +309,30 @@ public class HologramMenuStyleImpl implements HologramMenuStyle {
         private float sectionsSpacing = 0.15f;
         private float rowsSpacing = 0.15f;
         private float buttonsSpacing = 0.15f;
-        private String cursorText = ChatColor.WHITE + "+";
-        private String hoveredCursorText = ChatColor.AQUA + "+";
-        private float cursorScale = 1f;
+        private String cursorText = ChatColor.GRAY + POINTER;
+        private String hoveredCursorText = ChatColor.WHITE + POINTER;
+        private ItemStack cursorItem = null;
+        private ItemStack hoveredCursorItem = null;
+        private float cursorScale = 0.75f;
+        private float hoveredCursorScale = 0.75f;
+        private boolean cursorShadowed = true;
+        private float cursorOffsetX = ARROW_OFFSET_X;
+        private float cursorOffsetY = ARROW_OFFSET_Y;
+        private float cursorMenuMargin = 0.2f;
+        private float cursorScreenMargin = 0.1f;
+        private long clickDelay = 250L;
+        private float cursorSpeed = 1.5f;
+        private boolean cursorLimitedToMenu = false;
+        // The defaults of Minecraft: a field of view of 70 degrees, on a 16:9 screen.
+        private float screenFov = 70f;
+        private float screenAspectRatio = 16f / 9f;
+        private boolean crosshairHidden = true;
+        private int pageAnimationDuration = 6;
+        private float pageAnimationDistance = 0.6f;
         private boolean tooltipEnabled = true;
         private float tooltipScale = 0.6f;
         private int tooltipColor = 0xE0100010;
+        private float tooltipOffset = 0.15f;
         private HologramButton defaultButton = HologramButtonImpl.DEFAULT;
 
         @Override
@@ -288,8 +435,109 @@ public class HologramMenuStyleImpl implements HologramMenuStyle {
         }
 
         @Override
+        public Builder setCursorItem(@Nullable ItemStack cursorItem) {
+            this.cursorItem = cursorItem == null ? null : cursorItem.clone();
+            return this;
+        }
+
+        @Override
+        public Builder setHoveredCursorItem(@Nullable ItemStack hoveredCursorItem) {
+            this.hoveredCursorItem = hoveredCursorItem == null ? null : hoveredCursorItem.clone();
+            return this;
+        }
+
+        @Override
         public Builder setCursorScale(float cursorScale) {
             this.cursorScale = cursorScale;
+            return this;
+        }
+
+        @Override
+        public Builder setHoveredCursorScale(float hoveredCursorScale) {
+            this.hoveredCursorScale = hoveredCursorScale;
+            return this;
+        }
+
+        @Override
+        public Builder setCursorShadowed(boolean cursorShadowed) {
+            this.cursorShadowed = cursorShadowed;
+            return this;
+        }
+
+        @Override
+        public Builder setCursorOffsetX(float cursorOffsetX) {
+            this.cursorOffsetX = cursorOffsetX;
+            return this;
+        }
+
+        @Override
+        public Builder setCursorOffsetY(float cursorOffsetY) {
+            this.cursorOffsetY = cursorOffsetY;
+            return this;
+        }
+
+        @Override
+        public Builder setCursorMenuMargin(float cursorMenuMargin) {
+            this.cursorMenuMargin = cursorMenuMargin;
+            return this;
+        }
+
+        @Override
+        public Builder setCursorScreenMargin(float cursorScreenMargin) {
+            this.cursorScreenMargin = cursorScreenMargin;
+            return this;
+        }
+
+        @Override
+        public Builder setClickDelay(long clickDelay) {
+            Preconditions.checkArgument(clickDelay >= 0, "clickDelay cannot be negative");
+            this.clickDelay = clickDelay;
+            return this;
+        }
+
+        @Override
+        public Builder setCursorSpeed(float cursorSpeed) {
+            Preconditions.checkArgument(cursorSpeed > 0f, "cursorSpeed must be positive");
+            this.cursorSpeed = cursorSpeed;
+            return this;
+        }
+
+        @Override
+        public Builder setCursorLimitedToMenu(boolean cursorLimitedToMenu) {
+            this.cursorLimitedToMenu = cursorLimitedToMenu;
+            return this;
+        }
+
+        @Override
+        public Builder setScreenFov(float screenFov) {
+            Preconditions.checkArgument(screenFov > 0f && screenFov < 180f, "screenFov must be between 0 and 180");
+            this.screenFov = screenFov;
+            return this;
+        }
+
+        @Override
+        public Builder setScreenAspectRatio(float screenAspectRatio) {
+            Preconditions.checkArgument(screenAspectRatio > 0f, "screenAspectRatio must be positive");
+            this.screenAspectRatio = screenAspectRatio;
+            return this;
+        }
+
+        @Override
+        public Builder setCrosshairHidden(boolean crosshairHidden) {
+            this.crosshairHidden = crosshairHidden;
+            return this;
+        }
+
+        @Override
+        public Builder setPageAnimationDuration(int pageAnimationDuration) {
+            Preconditions.checkArgument(pageAnimationDuration >= 0, "pageAnimationDuration cannot be negative");
+            this.pageAnimationDuration = pageAnimationDuration;
+            return this;
+        }
+
+        @Override
+        public Builder setPageAnimationDistance(float pageAnimationDistance) {
+            this.pageAnimationDistance = pageAnimationDistance;
             return this;
         }
 
@@ -308,6 +556,12 @@ public class HologramMenuStyleImpl implements HologramMenuStyle {
         @Override
         public Builder setTooltipColor(int argb) {
             this.tooltipColor = argb;
+            return this;
+        }
+
+        @Override
+        public Builder setTooltipOffset(float tooltipOffset) {
+            this.tooltipOffset = tooltipOffset;
             return this;
         }
 

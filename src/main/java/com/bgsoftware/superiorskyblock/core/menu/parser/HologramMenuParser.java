@@ -1,16 +1,20 @@
 package com.bgsoftware.superiorskyblock.core.menu.parser;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.hologram.HologramButton;
 import com.bgsoftware.superiorskyblock.api.menu.hologram.HologramMenuStyle;
 import com.bgsoftware.superiorskyblock.api.menu.layout.HologramMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParseException;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
+import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.BackButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramMenuStyleImpl;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,12 +23,38 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 
 public class HologramMenuParser {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    /* The default size of cursors that are items, in blocks. */
+    private static final float DEFAULT_CURSOR_ITEM_SIZE = 0.25f;
+
     public static <V extends MenuView<V, ?>> MenuSlotsMap parseRegularMenuPatternInternal(
             String callerName, YamlConfiguration cfg, HologramMenuLayout.Builder<V> menuLayoutBuilder) {
+        return parseMenuPatternInternal(callerName, cfg, menuLayoutBuilder, buttonId -> new DummyButton.Builder<>());
+    }
+
+    public static <V extends PagedMenuView<V, ?, E>, E> MenuSlotsMap parsePagedMenuPatternInternal(
+            String callerName, YamlConfiguration cfg, HologramMenuLayout.Builder<V> menuLayoutBuilder) throws MenuParseException {
+        String backButton = cfg.getString("back", "");
+
+        MenuSlotsMap menuSlotsMap = parseMenuPatternInternal(callerName, cfg, menuLayoutBuilder, buttonId ->
+                backButton.indexOf(buttonId) != -1 ? new BackButton.Builder<>() : new DummyButton.Builder<>());
+
+        if (plugin.getSettings().isOnlyBackButton() && menuSlotsMap.getSlots(backButton).isEmpty())
+            throw new MenuParseException("Menu doesn't have a back button, it's impossible to close it.");
+
+        return menuSlotsMap;
+    }
+
+    private static <V extends MenuView<V, ?>> MenuSlotsMap parseMenuPatternInternal(
+            String callerName, YamlConfiguration cfg, HologramMenuLayout.Builder<V> menuLayoutBuilder,
+            Function<Character, AbstractMenuTemplateButton.AbstractBuilder<V>> buttonBuilderCreator) {
         MenuSlotsMap menuSlotsMap = new MenuSlotsMap();
 
         HologramMenuStyle style = parseStyle(callerName, cfg.getConfigurationSection("hologram"));
@@ -49,7 +79,8 @@ public class HologramMenuParser {
                 List<Integer> row = new ArrayList<>(patternLine.length());
                 for (int i = 0; i < patternLine.length(); ++i) {
                     char buttonId = patternLine.charAt(i);
-                    menuLayoutBuilder.setButton(slot, parseButton(callerName, cfg, buttonId, style));
+                    menuLayoutBuilder.setButton(slot, parseButton(callerName, cfg, buttonId, style,
+                            buttonBuilderCreator.apply(buttonId)));
                     menuSlotsMap.addSlot(buttonId, slot);
                     row.add(slot);
                     ++slot;
@@ -60,7 +91,8 @@ public class HologramMenuParser {
             // Each button is in a row of its own.
             for (String key : cfg.getConfigurationSection("buttons").getKeys(false)) {
                 char buttonId = key.charAt(0);
-                menuLayoutBuilder.setButton(slot, parseButton(callerName, cfg, buttonId, style));
+                menuLayoutBuilder.setButton(slot, parseButton(callerName, cfg, buttonId, style,
+                        buttonBuilderCreator.apply(buttonId)));
                 menuSlotsMap.addSlot(buttonId, slot);
                 ++slot;
             }
@@ -70,15 +102,14 @@ public class HologramMenuParser {
     }
 
     private static <V extends MenuView<V, ?>> MenuTemplateButton<V> parseButton(
-            String callerName, YamlConfiguration cfg, char buttonId, HologramMenuStyle style) {
+            String callerName, YamlConfiguration cfg, char buttonId, HologramMenuStyle style,
+            AbstractMenuTemplateButton.AbstractBuilder<V> buttonBuilder) {
         ConfigurationSection buttonSection = cfg.getConfigurationSection("buttons." + buttonId);
 
         // The item of the button can also be configured the same way it is done in inventory-based menus.
         ConfigurationSection itemSection = buttonSection != null && buttonSection.isConfigurationSection("item") ?
                 buttonSection.getConfigurationSection("item") : cfg.getConfigurationSection("items." + buttonId);
         TemplateItem buttonItem = MenuParserUtils.getItemStack(callerName, itemSection);
-
-        AbstractMenuTemplateButton.AbstractBuilder<V> buttonBuilder = new DummyButton.Builder<>();
 
         if (buttonItem != null)
             buttonBuilder.setButtonItem(buttonItem);
@@ -139,19 +170,124 @@ public class HologramMenuParser {
         styleBuilder.setRowsSpacing(getFloat(section, "spacing.rows", defaults.getRowsSpacing()));
         styleBuilder.setButtonsSpacing(getFloat(section, "spacing.buttons", defaults.getButtonsSpacing()));
 
-        styleBuilder.setCursorText(Formatters.COLOR_FORMATTER.format(section.getString("cursor.text", defaults.getCursorText())));
-        styleBuilder.setHoveredCursorText(Formatters.COLOR_FORMATTER.format(section.getString("cursor.hovered-text", defaults.getHoveredCursorText())));
-        styleBuilder.setCursorScale(getFloat(section, "cursor.scale", defaults.getCursorScale()));
+        parseCursor(callerName, section, styleBuilder, defaults);
+
+        float cursorSpeed = getFloat(section, "cursor.speed", defaults.getCursorSpeed());
+        if (cursorSpeed <= 0f) {
+            Log.warnFromFile(callerName, "Invalid hologram cursor speed: ", cursorSpeed, " - using the default one...");
+        } else {
+            styleBuilder.setCursorSpeed(cursorSpeed);
+        }
+
+        String cursorArea = section.getString("cursor.area", defaults.isCursorLimitedToMenu() ? "MENU" : "SCREEN");
+        if (cursorArea.equalsIgnoreCase("MENU")) {
+            styleBuilder.setCursorLimitedToMenu(true);
+        } else if (cursorArea.equalsIgnoreCase("SCREEN")) {
+            styleBuilder.setCursorLimitedToMenu(false);
+        } else {
+            Log.warnFromFile(callerName, "Invalid hologram cursor area '", cursorArea, "', it must be SCREEN or MENU - using the default one...");
+        }
+
+        float screenFov = getFloat(section, "cursor.screen-fov", defaults.getScreenFov());
+        if (screenFov <= 0f || screenFov >= 180f) {
+            Log.warnFromFile(callerName, "Invalid hologram screen fov: ", screenFov, " - using the default one...");
+        } else {
+            styleBuilder.setScreenFov(screenFov);
+        }
+
+        float screenAspectRatio = getFloat(section, "cursor.screen-aspect-ratio", defaults.getScreenAspectRatio());
+        if (screenAspectRatio <= 0f) {
+            Log.warnFromFile(callerName, "Invalid hologram screen aspect ratio: ", screenAspectRatio, " - using the default one...");
+        } else {
+            styleBuilder.setScreenAspectRatio(screenAspectRatio);
+        }
+
+        styleBuilder.setCrosshairHidden(section.getBoolean("hide-crosshair", defaults.isCrosshairHidden()));
+
+        int pageAnimationDuration = section.getInt("page-animation.duration", defaults.getPageAnimationDuration());
+        if (pageAnimationDuration < 0) {
+            Log.warnFromFile(callerName, "Invalid hologram page animation duration: ", pageAnimationDuration, " - using the default one...");
+        } else {
+            styleBuilder.setPageAnimationDuration(pageAnimationDuration);
+        }
+        styleBuilder.setPageAnimationDistance(getFloat(section, "page-animation.distance", defaults.getPageAnimationDistance()));
 
         styleBuilder.setTooltipEnabled(section.getBoolean("tooltip.enabled", defaults.isTooltipEnabled()));
         styleBuilder.setTooltipScale(getFloat(section, "tooltip.scale", defaults.getTooltipScale()));
         styleBuilder.setTooltipColor(parseColor(callerName, section.getString("tooltip.color"), defaults.getTooltipColor()));
+        styleBuilder.setTooltipOffset(getFloat(section, "tooltip.offset", defaults.getTooltipOffset()));
 
         ConfigurationSection buttonsSection = section.getConfigurationSection("buttons");
         if (buttonsSection != null)
             styleBuilder.setDefaultButton(parseButtonStyle(callerName, buttonsSection, defaults.getDefaultButton()).build());
 
         return styleBuilder.build();
+    }
+
+    /**
+     * Parse the cursor of a menu. Its type decides how it looks:
+     * ARROW is the cursor of a mouse, CROSSHAIR is a plus sign, TEXT is any text, and ITEM is any item.
+     */
+    private static void parseCursor(String callerName, ConfigurationSection section,
+                                    HologramMenuStyle.Builder styleBuilder, HologramMenuStyle defaults) {
+        // Menus that only set the text of their cursor keep using it.
+        String type = section.getString("cursor.type", section.isString("cursor.text") ? "TEXT" : "ARROW")
+                .toUpperCase(Locale.ENGLISH);
+
+        float defaultScale = defaults.getCursorScale();
+        float defaultOffsetX = 0f;
+        float defaultOffsetY = 0f;
+
+        if (type.equals("ITEM")) {
+            TemplateItem cursorItem = MenuParserUtils.getItemStack(callerName, section.getConfigurationSection("cursor.item"));
+            if (cursorItem == null) {
+                Log.warnFromFile(callerName, "Invalid item of the hologram cursor - using an arrow instead...");
+                type = "ARROW";
+            } else {
+                TemplateItem hoveredCursorItem = MenuParserUtils.getItemStack(callerName, section.getConfigurationSection("cursor.hovered-item"));
+                styleBuilder.setCursorItem(cursorItem.build());
+                styleBuilder.setHoveredCursorItem((hoveredCursorItem == null ? cursorItem : hoveredCursorItem).build());
+                // The scale of items is their size.
+                defaultScale = DEFAULT_CURSOR_ITEM_SIZE;
+            }
+        }
+
+        if (type.equals("TEXT")) {
+            String text = section.getString("cursor.text", "+");
+            styleBuilder.setCursorText(Formatters.COLOR_FORMATTER.format(text));
+            styleBuilder.setHoveredCursorText(Formatters.COLOR_FORMATTER.format(section.getString("cursor.hovered-text", text)));
+        } else if (!type.equals("ITEM")) {
+            if (!type.equals("ARROW") && !type.equals("CROSSHAIR")) {
+                Log.warnFromFile(callerName, "Invalid hologram cursor type '", type, "', it must be ARROW, CROSSHAIR, TEXT or ITEM - using an arrow instead...");
+                type = "ARROW";
+            }
+
+            String symbol = type.equals("ARROW") ? HologramMenuStyleImpl.POINTER : "+";
+            styleBuilder.setCursorText(Formatters.COLOR_FORMATTER.format(section.getString("cursor.color", "&7") + symbol));
+            styleBuilder.setHoveredCursorText(Formatters.COLOR_FORMATTER.format(section.getString("cursor.hovered-color", "&f") + symbol));
+
+            if (type.equals("ARROW")) {
+                // The tip of the arrow is the point that clicks.
+                defaultOffsetX = HologramMenuStyleImpl.ARROW_OFFSET_X;
+                defaultOffsetY = HologramMenuStyleImpl.ARROW_OFFSET_Y;
+            }
+        }
+
+        float cursorScale = getFloat(section, "cursor.scale", defaultScale);
+        styleBuilder.setCursorScale(cursorScale);
+        styleBuilder.setHoveredCursorScale(getFloat(section, "cursor.hovered-scale", cursorScale));
+        styleBuilder.setCursorShadowed(section.getBoolean("cursor.shadow", defaults.isCursorShadowed()));
+        styleBuilder.setCursorOffsetX(getFloat(section, "cursor.offset-x", defaultOffsetX));
+        styleBuilder.setCursorOffsetY(getFloat(section, "cursor.offset-y", defaultOffsetY));
+        styleBuilder.setCursorMenuMargin(getFloat(section, "cursor.menu-margin", defaults.getCursorMenuMargin()));
+        styleBuilder.setCursorScreenMargin(getFloat(section, "cursor.screen-margin", defaults.getCursorScreenMargin()));
+
+        long clickDelay = section.getLong("cursor.click-delay", defaults.getClickDelay());
+        if (clickDelay < 0) {
+            Log.warnFromFile(callerName, "Invalid hologram click delay: ", clickDelay, " - using the default one...");
+        } else {
+            styleBuilder.setClickDelay(clickDelay);
+        }
     }
 
     /**

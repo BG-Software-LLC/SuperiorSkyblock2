@@ -180,14 +180,6 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
 
         boolean isHologramMenu = backedMenu instanceof HologramMenuWrapper;
 
-        if (isHologramMenu && HologramMenuWrapper.getByPlayer(player.getUniqueId()) == null &&
-                (player.isInsideVehicle() || !isStandingOnBlock(player))) {
-            // While in a hologram menu, the player only sends his rotation to the server.
-            // Doing that in mid-air is considered by the server as flying.
-            Message.OPEN_HOLOGRAM_MENU_WHILE_NOT_ON_GROUND.send(inventoryViewer);
-            return false;
-        }
-
         if (backedMenu instanceof Inventory) {
             if (Arrays.equals(player.getOpenInventory().getTopInventory().getContents(), ((Inventory) backedMenu).getContents()))
                 return false;
@@ -232,10 +224,6 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         return true;
     }
 
-    private static boolean isStandingOnBlock(Player player) {
-        // Similar to the check done by the server for detecting flying players.
-        return player.getLocation().subtract(0, 0.0625, 0).getBlock().getType().isSolid();
-    }
 
     public void onClose() {
         closed = true;

@@ -222,7 +222,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             BukkitExecutor.init(this);
 
             if (this.nmsHologramMenus.isPresent())
-                BukkitExecutor.timer(HologramMenuWrapper::tickAll, 1L);
+                HologramMenuWrapper.startTicking();
 
             loadUpgradeCostLoaders();
 

@@ -1,33 +1,63 @@
 //<generate-if:HOLOGRAM_MENUS_SUPPORT>
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSHologramMenus;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetCameraPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
+import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
+import net.minecraft.network.protocol.game.ServerboundTeleportToEntityPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Interaction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
@@ -38,11 +68,24 @@ import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class NMSHologramMenusImpl implements NMSHologramMenus {
 
     private static final String CHANNEL_HANDLER_NAME = "superiorskyblock_hologram_menu";
+
+    /* The identifier of the flags of entities in their data, and the flag that makes them invisible. */
+    private static final int SHARED_FLAGS_DATA_ID = 0;
+    private static final byte INVISIBLE_FLAG = (byte) (1 << Entity.FLAG_INVISIBLE);
+    private static final int HOTBAR_SIZE = 9;
 
     /* The size of the background of a text display that has a single space as its text. */
     private static final float BLANK_TEXT_WIDTH = 0.125f;
@@ -51,8 +94,11 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
     private static final float BLANK_TEXT_CENTER_OFFSET = 0.0125f;
     /* The height of a single line of text. Text is rendered above the entity, and not centered around it. */
     private static final float TEXT_LINE_HEIGHT = 0.25f;
-    /* The distance between two elements, so elements that were added later are rendered in front. */
-    private static final float ELEMENTS_DEPTH = 0.01f;
+    /* The distance between two layers, so elements of higher layers are rendered in front. */
+    private static final float LAYER_DEPTH = 0.01f;
+    /* The distance between elements of the same layer, so they do not flicker when they overlap while moving. */
+    private static final float ELEMENT_DEPTH = 0.0003f;
+    private static final int ELEMENTS_PER_LAYER_DEPTH = 32;
     /* Texts should not be wrapped to multiple lines. */
     private static final int TEXT_LINE_WIDTH = 2000;
     private static final Color TRANSPARENT_COLOR = Color.fromARGB(0, 0, 0, 0);
@@ -61,19 +107,90 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
     private static final AxisAngle4f ITEM_ROTATION = new AxisAngle4f((float) Math.PI, 0f, 1f, 0f);
     /* Items are flattened, so blocks look the same way they look in inventories. */
     private static final float ITEM_DEPTH = 0.001f;
+    /* The maximum space between two rays that check whether blocks hide the panel, on the panel itself. */
+    private static final float FIT_RAYS_SPACING = 0.2f;
+    /* The area can be the entire screen of the viewer, in front of him and behind him, so the number of rays is limited. */
+    private static final int FIT_MAX_RAYS_PER_AXIS = 16;
+    /* The space that is kept between the panel and the blocks in front of it. */
+    private static final double FIT_MARGIN = 0.05;
+    /* The closest distance the panel can be drawn in, as blocks right in front of the viewer cannot be avoided. */
+    private static final float MIN_DISTANCE = 0.1f;
     private static final org.bukkit.entity.Display.Brightness FULL_BRIGHTNESS = new org.bukkit.entity.Display.Brightness(15, 15);
 
-    /* Cached data that tells the viewer to start interpolating an element immediately. */
+    /* The entities that receive the clicks of the viewer, in front of his camera and behind it. */
+    private static final float CLICK_TARGET_DISTANCE = 1f;
+    private static final float CLICK_TARGET_SIZE = 1f;
+
+    /* The ticks players have been in the air for, for versions that cannot reset them through a method. */
+    private static final ReflectField<Integer> ABOVE_GROUND_TICK_COUNT = new ReflectField<>(
+            ServerGamePacketListenerImpl.class, int.class, Modifier.PRIVATE, ${ABOVE_GROUND_TICK_COUNT_FIELD_INDEX});
+    private static final ReflectField<Integer> ABOVE_GROUND_VEHICLE_TICK_COUNT = new ReflectField<>(
+            ServerGamePacketListenerImpl.class, int.class, Modifier.PRIVATE, ${ABOVE_GROUND_TICK_COUNT_FIELD_INDEX} + 1);
+
+    private static final Runnable NO_MAIN_THREAD_TASK = () -> {
+    };
+
+    /* Cached data that tells the viewer to start interpolating an element immediately. Only used by the menus thread. */
     private static SynchedEntityData.DataValue<?> startInterpolationData;
 
     @Override
-    public Renderer createRenderer(Player viewer, Location origin, float distance, InputListener listener) {
-        return new RendererImpl(((CraftPlayer) viewer).getHandle(), origin, distance, listener);
+    public Renderer createRenderer(Player viewer, Location origin, float distance, boolean hideCrosshair, InputListener listener) {
+        return new RendererImpl(((CraftPlayer) viewer).getHandle(), origin, distance, hideCrosshair, listener);
+    }
+
+    @Override
+    public CapturedBlocks captureBlocks(Location center, double radius) {
+        ServerLevel serverLevel = ((CraftWorld) center.getWorld()).getHandle();
+
+        int minChunkX = (int) Math.floor(center.getX() - radius) >> 4;
+        int maxChunkX = (int) Math.floor(center.getX() + radius) >> 4;
+        int minChunkZ = (int) Math.floor(center.getZ() - radius) >> 4;
+        int maxChunkZ = (int) Math.floor(center.getZ() + radius) >> 4;
+
+        Map<Long, LevelChunk> chunks = new HashMap<>();
+
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; ++chunkX) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; ++chunkZ) {
+                ChunkAccess chunkAccess;
+                try {
+                    chunkAccess = serverLevel.getChunkIfLoadedImmediately(chunkX, chunkZ);
+                } catch (Throwable error) {
+                    // Not running on Paper.
+                    chunkAccess = serverLevel.getChunkIfLoaded(chunkX, chunkZ);
+                }
+
+                if (chunkAccess instanceof LevelChunk)
+                    chunks.put(getChunkKey(chunkX, chunkZ), (LevelChunk) chunkAccess);
+            }
+        }
+
+        return new CapturedBlocksImpl(chunks);
+    }
+
+    private static long getChunkKey(int chunkX, int chunkZ) {
+        return ((long) chunkX << 32) | (chunkZ & 0xFFFFFFFFL);
+    }
+
+    /**
+     * The chunks around a location. Their blocks are read by the menus thread, the same way chunks are read
+     * outside the main thread when calculating islands.
+     */
+    private static class CapturedBlocksImpl implements CapturedBlocks {
+
+        private final Map<Long, LevelChunk> chunks;
+
+        CapturedBlocksImpl(Map<Long, LevelChunk> chunks) {
+            this.chunks = chunks;
+        }
+
     }
 
     private static class RendererImpl implements Renderer {
 
-        private final List<Element> elements = new ArrayList<>();
+        // Identifiers of elements are never reused, so removed elements can be referenced safely.
+        private final Map<Integer, Element> elements = new LinkedHashMap<>();
+        private int nextElementId = 0;
+        private int layer = 0;
 
         private final ServerPlayer serverPlayer;
         private final InputListener listener;
@@ -81,21 +198,204 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
         private final double originY;
         private final double originZ;
         private final float yaw;
+        /* The rotation of the viewer before the menu was opened, as he turns his head to move the cursor. */
+        private final float initialYaw;
+        private final float initialPitch;
         private final float distance;
+        /* The state of the viewer when the renderer was created on the main thread, used by the menus thread. */
+        private final float viewerEyeHeight;
+        private final byte viewerSharedFlags;
+        private final int viewerHeldItemSlot;
+        // The rotation of the viewer, as last received from him by the packet handler.
+        private volatile float viewerYaw;
+        private volatile float viewerPitch;
 
-        private Display.TextDisplay cameraAnchor;
+        /* Elements are scaled towards the viewer by this amount, see getMaxScale. */
+        private float scale = 1f;
+
+        private ArmorStand cameraAnchor;
+        private final List<AttributeInstance> cameraAnchorAttributes = new ArrayList<>();
         private Display.TextDisplay vehicleAnchor;
+        private Interaction clickTarget;
+        private Interaction mirroredClickTarget;
+        /* Whether the viewer is in spectator mode on his side, which hides his crosshair, hand and hotbar. */
+        private final boolean spectatorView;
+        private final PacketHandler packetHandler;
         private Channel channel;
-        private boolean locked = false;
+        private volatile boolean locked = false;
 
-        RendererImpl(ServerPlayer serverPlayer, Location origin, float distance, InputListener listener) {
+        RendererImpl(ServerPlayer serverPlayer, Location origin, float distance, boolean spectatorView, InputListener listener) {
             this.serverPlayer = serverPlayer;
             this.listener = listener;
             this.originX = origin.getX();
             this.originY = origin.getY();
             this.originZ = origin.getZ();
             this.yaw = origin.getYaw();
+            this.initialYaw = serverPlayer.getYRot();
+            this.initialPitch = serverPlayer.getXRot();
+            this.viewerYaw = this.initialYaw;
+            this.viewerPitch = this.initialPitch;
+            this.viewerEyeHeight = serverPlayer.getEyeHeight();
+            this.viewerSharedFlags = getSharedFlags(serverPlayer);
+            this.viewerHeldItemSlot = serverPlayer.getBukkitEntity().getInventory().getHeldItemSlot();
+            this.channel = findChannel(serverPlayer);
+            this.spectatorView = spectatorView;
+            // Spectators do not see their hands, so their items do not need to be hidden.
+            this.packetHandler = new PacketHandler(serverPlayer, listener, this, !spectatorView);
             this.distance = distance;
+        }
+
+        @Override
+        public void tick() {
+            // While the menu is shown, the viewer only sends his rotation, and stays where he opened the menu.
+            // When that is in the air, the server considers him to be flying.
+            // Only fields are changed, which is fine to do outside the main thread.
+            ${RESET_FLYING_TICKS};
+        }
+
+        private static void resetFlyingTicks(ServerGamePacketListenerImpl connection) {
+            if (ABOVE_GROUND_TICK_COUNT.isValid())
+                ABOVE_GROUND_TICK_COUNT.set(connection, 0);
+            if (ABOVE_GROUND_VEHICLE_TICK_COUNT.isValid())
+                ABOVE_GROUND_VEHICLE_TICK_COUNT.set(connection, 0);
+        }
+
+        @Override
+        public boolean isViewerConnected() {
+            return !this.serverPlayer.hasDisconnected();
+        }
+
+        @Override
+        public float getViewerYaw() {
+            return this.viewerYaw;
+        }
+
+        @Override
+        public float getViewerPitch() {
+            return this.viewerPitch;
+        }
+
+        @Override
+        public float getMaxScale(CapturedBlocks capturedBlocks, float width, float height) {
+            // The panel is pulled towards the viewer until no ray from his eyes to the panel hits a block.
+            // As the panel is scaled down by the same amount, it looks the same to the viewer.
+            Map<Long, LevelChunk> chunks = ((CapturedBlocksImpl) capturedBlocks).chunks;
+            Vec3 eyes = new Vec3(this.originX, this.originY, this.originZ);
+
+            double yawRadians = Math.toRadians(this.yaw);
+            double forwardX = -Math.sin(yawRadians);
+            double forwardZ = Math.cos(yawRadians);
+            double rightX = -Math.cos(yawRadians);
+            double rightZ = -Math.sin(yawRadians);
+
+            int raysX = getRaysCount(width);
+            int raysY = getRaysCount(height);
+
+            float maxScale = 1f;
+
+            // The mirror of the panel behind the viewer must not be hidden by blocks either.
+            for (int side = 1; side >= -1; side -= 2) {
+                for (int i = 0; i < raysX; ++i) {
+                    double x = width * ((double) i / (raysX - 1) - 0.5);
+                    for (int j = 0; j < raysY; ++j) {
+                        double y = height * ((double) j / (raysY - 1) - 0.5);
+                        double directionX = (forwardX * this.distance + rightX * x) * side;
+                        double directionY = y;
+                        double directionZ = (forwardZ * this.distance + rightZ * x) * side;
+                        double length = Math.sqrt(directionX * directionX + directionY * directionY + directionZ * directionZ);
+                        double hitDistance = traceBlocks(chunks, eyes, eyes.add(directionX, directionY, directionZ));
+                        if (hitDistance >= 0)
+                            maxScale = Math.min(maxScale, (float) ((hitDistance - FIT_MARGIN) / length));
+                    }
+                }
+            }
+
+            return Math.max(maxScale, MIN_DISTANCE / this.distance);
+        }
+
+        /**
+         * Find the first block a line from {@code from} to {@code to} hits, using the outlines of blocks.
+         * Blocks are visited in the order the line passes through them.
+         *
+         * @return The distance from {@code from} to where the line hits a block, or -1 if it does not hit any.
+         */
+        private static double traceBlocks(Map<Long, LevelChunk> chunks, Vec3 from, Vec3 to) {
+            double deltaX = to.x - from.x;
+            double deltaY = to.y - from.y;
+            double deltaZ = to.z - from.z;
+
+            int x = (int) Math.floor(from.x);
+            int y = (int) Math.floor(from.y);
+            int z = (int) Math.floor(from.z);
+
+            int stepX = (int) Math.signum(deltaX);
+            int stepY = (int) Math.signum(deltaY);
+            int stepZ = (int) Math.signum(deltaZ);
+
+            // How much of the line is passed when moving a whole block on each axis, and when reaching the next block.
+            double stepLengthX = stepX == 0 ? Double.MAX_VALUE : Math.abs(1 / deltaX);
+            double stepLengthY = stepY == 0 ? Double.MAX_VALUE : Math.abs(1 / deltaY);
+            double stepLengthZ = stepZ == 0 ? Double.MAX_VALUE : Math.abs(1 / deltaZ);
+            double nextX = stepX == 0 ? Double.MAX_VALUE : (stepX > 0 ? x + 1 - from.x : from.x - x) * stepLengthX;
+            double nextY = stepY == 0 ? Double.MAX_VALUE : (stepY > 0 ? y + 1 - from.y : from.y - y) * stepLengthY;
+            double nextZ = stepZ == 0 ? Double.MAX_VALUE : (stepZ > 0 ? z + 1 - from.z : from.z - z) * stepLengthZ;
+
+            BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
+
+            while (true) {
+                double hitDistance = hitBlock(chunks, blockPos.set(x, y, z), from, to);
+                if (hitDistance >= 0)
+                    return hitDistance;
+
+                if (nextX < nextY && nextX < nextZ) {
+                    if (nextX > 1)
+                        return -1;
+                    x += stepX;
+                    nextX += stepLengthX;
+                } else if (nextY < nextZ) {
+                    if (nextY > 1)
+                        return -1;
+                    y += stepY;
+                    nextY += stepLengthY;
+                } else {
+                    if (nextZ > 1)
+                        return -1;
+                    z += stepZ;
+                    nextZ += stepLengthZ;
+                }
+            }
+        }
+
+        private static double hitBlock(Map<Long, LevelChunk> chunks, BlockPos.MutableBlockPos blockPos, Vec3 from, Vec3 to) {
+            LevelChunk levelChunk = chunks.get(getChunkKey(blockPos.getX() >> 4, blockPos.getZ() >> 4));
+            if (levelChunk == null)
+                // Chunks that are not loaded are not shown to the viewer, so they cannot hide the panel.
+                return -1;
+
+            BlockState blockState = levelChunk.getBlockState(blockPos);
+            if (blockState.isAir())
+                return -1;
+
+            VoxelShape shape = blockState.getShape(EmptyBlockGetter.INSTANCE, blockPos);
+            if (shape.isEmpty())
+                return -1;
+
+            BlockHitResult hitResult = shape.clip(from, to, blockPos.immutable());
+            return hitResult == null ? -1 : hitResult.getLocation().distanceTo(from);
+        }
+
+        private static int getRaysCount(float size) {
+            return Math.max(2, Math.min(FIT_MAX_RAYS_PER_AXIS, (int) Math.ceil(size / FIT_RAYS_SPACING) + 1));
+        }
+
+        @Override
+        public void setScale(float scale) {
+            this.scale = scale;
+        }
+
+        @Override
+        public void setLayer(int layer) {
+            this.layer = layer;
         }
 
         @Override
@@ -152,17 +452,18 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
         }
 
         private Element createElement(Display display, float offsetX, float offsetY, Vector3f scale, AxisAngle4f rotation) {
-            int id = this.elements.size();
+            int id = this.nextElementId++;
             // All the elements are located in the eyes of the viewer, and are moved to the panel by their transformation.
             // Displays are rotated to face the viewer, therefore their z-axis points to the viewer.
             display.setPos(this.originX, this.originY, this.originZ);
             display.setYRot(this.yaw + 180f);
-            float depth = -this.distance + ELEMENTS_DEPTH * id;
-            Element element = new Element(id, display, offsetX, offsetY, depth, scale, rotation);
+            float depth = -this.distance + LAYER_DEPTH * this.layer + ELEMENT_DEPTH * (id % ELEMENTS_PER_LAYER_DEPTH);
+            // The mirror is only sent to the viewer, so the dummy entity is only used for its identifiers.
+            Element element = new Element(id, display, createDisplay(), offsetX, offsetY, depth, scale, rotation, this.scale);
             element.bukkitEntity.setBrightness(FULL_BRIGHTNESS);
             // Makes the element move smoothly when it is being moved.
             element.bukkitEntity.setInterpolationDuration(1);
-            this.elements.add(element);
+            this.elements.put(id, element);
             return element;
         }
 
@@ -184,10 +485,10 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
                 lockView();
             }
 
-            for (Element element : this.elements) {
+            for (Element element : this.elements.values()) {
                 if (!element.spawned) {
                     element.spawned = true;
-                    spawnEntity(element.entity);
+                    spawnElement(element);
                 }
             }
         }
@@ -195,30 +496,169 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
         private void lockView() {
             // The camera of the viewer is locked on an entity that looks at the panel.
             // In order to keep receiving the rotation of the viewer while his camera is locked, he must ride an entity.
-            this.cameraAnchor = createDisplay(this.originX, this.originY, this.originZ, this.yaw);
+            this.cameraAnchor = createCameraAnchor();
             this.vehicleAnchor = createDisplay(this.serverPlayer.getX(), this.serverPlayer.getY(), this.serverPlayer.getZ(), this.yaw);
 
             spawnEntity(this.cameraAnchor);
+            if (!this.cameraAnchorAttributes.isEmpty())
+                sendPacket(new ClientboundUpdateAttributesPacket(this.cameraAnchor.getId(), this.cameraAnchorAttributes));
             spawnEntity(this.vehicleAnchor);
 
-            sendPacket(new ClientboundSetCameraPacket(this.cameraAnchor));
-            sendPacket(createPassengersPacket(this.vehicleAnchor, this.serverPlayer.getId()));
+            // Clicks on nothing are not reported by the viewer when his hand is empty or when he is a spectator,
+            // but clicks on entities always are. Invisible entities in front of his camera receive his clicks,
+            // and behind it for the mirrored third person view.
+            this.clickTarget = createClickTarget(1);
+            this.mirroredClickTarget = createClickTarget(-1);
+            spawnEntity(this.clickTarget);
+            spawnEntity(this.mirroredClickTarget);
 
-            this.channel = findChannel(this.serverPlayer);
+            sendPacket(new ClientboundSetCameraPacket(this.cameraAnchor));
+            // Riding the vehicle shows the viewer how to dismount it in his action bar, which is replaced by nothing.
+            // Paper sends action bars ahead of other packets that are not sent from the main thread, so both packets
+            // are bundled. The viewer handles bundled packets together and in order, so the message is never drawn.
+            sendBundle(createPassengersPacket(this.vehicleAnchor, this.serverPlayer.getId()),
+                    new ClientboundSetActionBarTextPacket(Component.empty()));
+
+            if (this.spectatorView) {
+                // Spectators do not see their crosshair and their hands. The real game mode of the viewer is not changed.
+                sendPacket(new ClientboundGameEventPacket(ClientboundGameEventPacket.CHANGE_GAME_MODE, GameType.SPECTATOR.getId()));
+            }
+
             if (this.channel != null) {
                 Channel channel = this.channel;
-                InputHandler inputHandler = new InputHandler(this.serverPlayer, this.listener);
+                PacketHandler packetHandler = this.packetHandler;
                 channel.eventLoop().execute(() -> {
                     if (channel.pipeline().get(CHANNEL_HANDLER_NAME) == null && channel.pipeline().get("packet_handler") != null)
-                        channel.pipeline().addBefore("packet_handler", CHANNEL_HANDLER_NAME, inputHandler);
+                        channel.pipeline().addBefore("packet_handler", CHANNEL_HANDLER_NAME, packetHandler);
                 });
+            }
+
+            hideViewer();
+        }
+
+        private void hideViewer() {
+            // The viewer is made invisible on his side only, so his arm and his model in his inventory are not shown.
+            sendPacket(createSharedFlagsPacket(this.serverPlayer.getId(), (byte) (this.viewerSharedFlags | INVISIBLE_FLAG)));
+
+            if (this.packetHandler.handItemsHidden) {
+                // Items in the hands of invisible players are still shown, so they are hidden on his side as well.
+                // Changing them plays the animation of switching items, which spectators do not see.
+                sendPacket(createInventorySlotPacket(this.serverPlayer, InventoryMenu.SHIELD_SLOT, net.minecraft.world.item.ItemStack.EMPTY));
+                hideHeldItem(this.viewerHeldItemSlot);
             }
         }
 
-        private void spawnEntity(Display entity) {
-            sendPacket(new ClientboundAddEntityPacket(entity.getId(), entity.getUUID(),
-                    entity.getX(), entity.getY(), entity.getZ(), entity.getXRot(), entity.getYRot(),
-                    entity.getType(), 0, Vec3.ZERO, entity.getYRot()));
+        /**
+         * Hide the item in a slot of the hotbar of the viewer, and show the item that was hidden before.
+         * Called when the viewer selects a different slot in his hotbar, from the main thread,
+         * and when the menu is shown, from the menus thread.
+         */
+        synchronized void hideHeldItem(int hotbarSlot) {
+            if (!this.locked || !this.packetHandler.handItemsHidden || hotbarSlot < 0 || hotbarSlot >= HOTBAR_SIZE ||
+                    this.serverPlayer.hasDisconnected())
+                return;
+
+            int oldHotbarSlot = this.packetHandler.hiddenHotbarSlot;
+            if (oldHotbarSlot == hotbarSlot)
+                return;
+
+            // The packet handler must know the new hidden slot before the item of the old one is sent.
+            this.packetHandler.hiddenHotbarSlot = hotbarSlot;
+
+            if (oldHotbarSlot != -1) {
+                int oldSlot = InventoryMenu.USE_ROW_SLOT_START + oldHotbarSlot;
+                sendPacket(createInventorySlotPacket(this.serverPlayer, oldSlot, this.serverPlayer.inventoryMenu.getSlot(oldSlot).getItem()));
+            }
+
+            sendPacket(createInventorySlotPacket(this.serverPlayer, InventoryMenu.USE_ROW_SLOT_START + hotbarSlot,
+                    net.minecraft.world.item.ItemStack.EMPTY));
+        }
+
+        /**
+         * Show the real state of the viewer to him again. Called from the main thread.
+         */
+        private void showViewer() {
+            if (this.spectatorView) {
+                sendPacket(new ClientboundGameEventPacket(ClientboundGameEventPacket.CHANGE_GAME_MODE,
+                        this.serverPlayer.gameMode.getGameModeForPlayer().getId()));
+                // Changing the game mode on the side of the viewer changed his abilities as well, such as flying.
+                this.serverPlayer.onUpdateAbilities();
+            }
+
+            sendPacket(createSharedFlagsPacket(this.serverPlayer.getId(), getSharedFlags(this.serverPlayer)));
+
+            if (this.packetHandler.handItemsHidden) {
+                // All the items of the viewer are sent again, including the ones that were hidden.
+                this.serverPlayer.inventoryMenu.sendAllDataToRemote();
+            }
+        }
+
+        /**
+         * Create the entity the camera of the viewer is locked on.
+         * It is a living entity, so its attributes can be changed:
+         * - Its eye height is the same as the eye height of the viewer, and it is placed at his feet.
+         *   The camera moves smoothly to the eye height of the entity it is locked on, which would be visible otherwise.
+         * - Third person views (F5) do not move the camera away from it.
+         */
+        private ArmorStand createCameraAnchor() {
+            ArmorStand armorStand = new ArmorStand(${ENTITY_TYPE_VALUES_CLASS}.ARMOR_STAND, this.serverPlayer.level());
+            org.bukkit.entity.ArmorStand bukkitArmorStand = (org.bukkit.entity.ArmorStand) armorStand.getBukkitEntity();
+            bukkitArmorStand.setInvisible(true);
+            bukkitArmorStand.setGravity(false);
+            bukkitArmorStand.setBasePlate(false);
+            bukkitArmorStand.setArms(false);
+
+            this.cameraAnchorAttributes.clear();
+
+            float viewerEyeHeight = this.viewerEyeHeight;
+            float armorStandEyeHeight = armorStand.getEyeHeight();
+            float eyeHeight = setAttribute(armorStand, ${SCALE_ATTRIBUTE}, viewerEyeHeight / armorStandEyeHeight,
+                    this.cameraAnchorAttributes) ? viewerEyeHeight : armorStandEyeHeight;
+            setAttribute(armorStand, ${CAMERA_DISTANCE_ATTRIBUTE}, 0, this.cameraAnchorAttributes);
+
+            armorStand.setPos(this.originX, this.originY - eyeHeight, this.originZ);
+            armorStand.setYRot(this.yaw);
+            armorStand.setYHeadRot(this.yaw);
+            return armorStand;
+        }
+
+        /**
+         * @param side 1 for the entity in front of the camera, -1 for the entity behind it.
+         */
+        private Interaction createClickTarget(int side) {
+            Interaction interaction = new Interaction(${ENTITY_TYPE_VALUES_CLASS}.INTERACTION, this.serverPlayer.level());
+            org.bukkit.entity.Interaction bukkitInteraction = (org.bukkit.entity.Interaction) interaction.getBukkitEntity();
+            bukkitInteraction.setInteractionWidth(CLICK_TARGET_SIZE);
+            bukkitInteraction.setInteractionHeight(CLICK_TARGET_SIZE);
+
+            double yawRadians = Math.toRadians(this.yaw);
+            // Interaction entities are centered horizontally around their position, and start from it vertically.
+            interaction.setPos(this.originX - Math.sin(yawRadians) * CLICK_TARGET_DISTANCE * side,
+                    this.originY - CLICK_TARGET_SIZE / 2,
+                    this.originZ + Math.cos(yawRadians) * CLICK_TARGET_DISTANCE * side);
+            return interaction;
+        }
+
+        /**
+         * @param attribute The attribute to set, or null if it does not exist in this version.
+         * @return Whether the attribute was set.
+         */
+        private static boolean setAttribute(LivingEntity entity, ${ATTRIBUTE_TYPE} attribute, double value,
+                                            List<AttributeInstance> changedAttributes) {
+            if (attribute == null)
+                return false;
+
+            AttributeInstance attributeInstance = entity.getAttribute(attribute);
+            if (attributeInstance == null)
+                return false;
+
+            attributeInstance.setBaseValue(value);
+            changedAttributes.add(attributeInstance);
+            return true;
+        }
+
+        private void spawnEntity(Entity entity) {
+            sendPacket(createAddEntityPacket(entity.getId(), entity.getUUID(), entity, entity.getYRot()));
 
             List<SynchedEntityData.DataValue<?>> entityData = entity.getEntityData().getNonDefaultValues();
             if (entityData != null && !entityData.isEmpty())
@@ -228,11 +668,58 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
             entity.getEntityData().packDirty();
         }
 
+        private void spawnElement(Element element) {
+            Display entity = element.entity;
+
+            sendPacket(createAddEntityPacket(entity.getId(), entity.getUUID(), entity, entity.getYRot()));
+            // The mirror of the element is turned around, so it is behind the viewer and faces him.
+            // The mirrored third person view (F5) turns the camera around, and sees the mirror instead.
+            sendPacket(createAddEntityPacket(element.mirrorId, element.mirrorUUID, entity, entity.getYRot() + 180f));
+
+            List<SynchedEntityData.DataValue<?>> entityData = entity.getEntityData().getNonDefaultValues();
+            if (entityData != null && !entityData.isEmpty())
+                sendElementData(element, entityData);
+
+            // Marks all the data of the entity as sent.
+            entity.getEntityData().packDirty();
+        }
+
+        private static Packet<?> createAddEntityPacket(int entityId, UUID uuid, Entity entity, float yaw) {
+            return new ClientboundAddEntityPacket(entityId, uuid,
+                    entity.getX(), entity.getY(), entity.getZ(), entity.getXRot(), yaw,
+                    entity.getType(), 0, Vec3.ZERO, yaw);
+        }
+
+        /**
+         * Send data of an element to the viewer, for both the element and its mirror.
+         */
+        private void sendElementData(Element element, List<SynchedEntityData.DataValue<?>> entityData) {
+            sendPacket(new ClientboundSetEntityDataPacket(element.entity.getId(), entityData));
+            sendPacket(new ClientboundSetEntityDataPacket(element.mirrorId, entityData));
+        }
+
         @Override
         public void moveElement(int elementId, float x, float y) {
             Element element = this.elements.get(elementId);
-            element.setPosition(x, y);
+            if (element == null)
+                return;
 
+            element.setPosition(x, y, element.sizeScale);
+            sendInterpolatedData(element);
+        }
+
+        @Override
+        public void animateElement(int elementId, float x, float y, float scale, int duration) {
+            Element element = this.elements.get(elementId);
+            if (element == null)
+                return;
+
+            element.bukkitEntity.setInterpolationDuration(duration);
+            element.setPosition(x, y, scale);
+            sendInterpolatedData(element);
+        }
+
+        private void sendInterpolatedData(Element element) {
             if (!element.spawned)
                 return;
 
@@ -244,7 +731,7 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
             entityData = new ArrayList<>(entityData);
             entityData.add(getStartInterpolationData());
 
-            sendPacket(new ClientboundSetEntityDataPacket(element.entity.getId(), entityData));
+            sendElementData(element, entityData);
         }
 
         private SynchedEntityData.DataValue<?> getStartInterpolationData() {
@@ -271,7 +758,7 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
         @Override
         public void setColor(int elementId, int argb) {
             Element element = this.elements.get(elementId);
-            if (element.textDisplay == null)
+            if (element == null || element.textDisplay == null)
                 return;
             element.textDisplay.setBackgroundColor(Color.fromARGB(argb));
             sendDirtyData(element);
@@ -280,9 +767,18 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
         @Override
         public void setText(int elementId, String text) {
             Element element = this.elements.get(elementId);
-            if (element.textDisplay == null)
+            if (element == null || element.textDisplay == null)
                 return;
             element.textDisplay.setText(text);
+            sendDirtyData(element);
+        }
+
+        @Override
+        public void setItem(int elementId, ItemStack itemStack) {
+            Element element = this.elements.get(elementId);
+            if (element == null || !(element.bukkitEntity instanceof ItemDisplay))
+                return;
+            ((ItemDisplay) element.bukkitEntity).setItemStack(itemStack);
             sendDirtyData(element);
         }
 
@@ -292,32 +788,50 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
 
             List<SynchedEntityData.DataValue<?>> entityData = element.entity.getEntityData().packDirty();
             if (entityData != null && !entityData.isEmpty())
-                sendPacket(new ClientboundSetEntityDataPacket(element.entity.getId(), entityData));
+                sendElementData(element, entityData);
+        }
+
+        @Override
+        public void removeElements(Collection<Integer> elementIds) {
+            List<Element> removedElements = new ArrayList<>(elementIds.size());
+            for (int elementId : elementIds) {
+                Element element = this.elements.remove(elementId);
+                if (element != null)
+                    removedElements.add(element);
+            }
+            sendRemovePacket(removedElements);
         }
 
         @Override
         public void clear() {
-            removeElements();
+            removeAllElements();
         }
 
-        private void removeElements() {
-            int[] entityIds = this.elements.stream()
-                    .filter(element -> element.spawned)
-                    .mapToInt(element -> element.entity.getId())
-                    .toArray();
-            if (entityIds.length > 0)
-                sendPacket(new ClientboundRemoveEntitiesPacket(entityIds));
+        private void removeAllElements() {
+            sendRemovePacket(this.elements.values());
             this.elements.clear();
         }
 
+        private void sendRemovePacket(Collection<Element> elements) {
+            int[] entityIds = elements.stream()
+                    .filter(element -> element.spawned)
+                    .flatMapToInt(element -> java.util.stream.IntStream.of(element.entity.getId(), element.mirrorId))
+                    .toArray();
+            if (entityIds.length > 0)
+                sendPacket(new ClientboundRemoveEntitiesPacket(entityIds));
+        }
+
         @Override
-        public void destroy() {
-            removeElements();
+        public Runnable destroy() {
+            removeAllElements();
 
             if (!this.locked)
-                return;
+                return NO_MAIN_THREAD_TASK;
 
             this.locked = false;
+
+            // The viewer must not be hidden by the packet handler anymore when he is shown again.
+            this.packetHandler.viewerHidden = false;
 
             if (this.channel != null) {
                 Channel channel = this.channel;
@@ -329,19 +843,40 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
             }
 
             if (this.serverPlayer.hasDisconnected())
-                return;
+                return NO_MAIN_THREAD_TASK;
 
             sendPacket(new ClientboundSetCameraPacket(this.serverPlayer));
             sendPacket(createPassengersPacket(this.vehicleAnchor));
-            sendPacket(new ClientboundRemoveEntitiesPacket(this.cameraAnchor.getId(), this.vehicleAnchor.getId()));
+            sendPacket(new ClientboundRemoveEntitiesPacket(this.cameraAnchor.getId(), this.vehicleAnchor.getId(),
+                    this.clickTarget.getId(), this.mirroredClickTarget.getId()));
 
-            // The viewer was moved to the location of his vehicle on his side only, so his location must be synced.
-            this.serverPlayer.connection.teleport(this.serverPlayer.getX(), this.serverPlayer.getY(),
-                    this.serverPlayer.getZ(), this.serverPlayer.getYRot(), this.serverPlayer.getXRot());
+            // The state of the viewer on the server is used from now on, which must be done on the main thread.
+            return () -> {
+                if (this.serverPlayer.hasDisconnected())
+                    return;
+
+                showViewer();
+
+                // The viewer was moved to the location of his vehicle on his side only, so his location must be synced.
+                // His rotation is set back to what it was before the menu was opened.
+                this.serverPlayer.connection.teleport(this.serverPlayer.getX(), this.serverPlayer.getY(),
+                        this.serverPlayer.getZ(), this.initialYaw, this.initialPitch);
+
+                // Riding the vehicle of the menu made the viewer leave his real vehicle on his side.
+                Entity realVehicle = this.serverPlayer.getVehicle();
+                if (realVehicle != null)
+                    sendPacket(new ClientboundSetPassengersPacket(realVehicle));
+            };
         }
 
         private void sendPacket(Packet<?> packet) {
             this.serverPlayer.connection.send(packet);
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private void sendBundle(Packet<?>... packets) {
+            // The type of the packets of bundles differs between versions, therefore a raw type is used.
+            sendPacket(new ClientboundBundlePacket((Iterable) Arrays.asList(packets)));
         }
 
         private static Packet<?> createPassengersPacket(Entity vehicle, int... passengers) {
@@ -356,10 +891,37 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
             }
         }
 
+        private static Packet<?> createSharedFlagsPacket(int entityId, byte sharedFlags) {
+            return new ClientboundSetEntityDataPacket(entityId, Collections.<SynchedEntityData.DataValue<?>>singletonList(
+                    new SynchedEntityData.DataValue<>(SHARED_FLAGS_DATA_ID, EntityDataSerializers.BYTE, sharedFlags)));
+        }
+
+        private static byte getSharedFlags(ServerPlayer serverPlayer) {
+            List<SynchedEntityData.DataValue<?>> entityData = serverPlayer.getEntityData().getNonDefaultValues();
+            if (entityData != null) {
+                for (SynchedEntityData.DataValue<?> dataValue : entityData) {
+                    if (dataValue.id() == SHARED_FLAGS_DATA_ID && dataValue.value() instanceof Byte)
+                        return (Byte) dataValue.value();
+                }
+            }
+
+            // The flags are not set, and therefore have their default value.
+            return 0;
+        }
+
+        private static Packet<?> createInventorySlotPacket(ServerPlayer serverPlayer, int slot, net.minecraft.world.item.ItemStack itemStack) {
+            InventoryMenu inventoryMenu = serverPlayer.inventoryMenu;
+            return new ClientboundContainerSetSlotPacket(inventoryMenu.containerId, inventoryMenu.getStateId(), slot, itemStack);
+        }
+
         private static Channel findChannel(ServerPlayer serverPlayer) {
-            for (Connection connection : MinecraftServer.getServer().getConnection().getConnections()) {
-                if (connection.getPacketListener() == serverPlayer.connection)
-                    return connection.channel;
+            List<Connection> connections = MinecraftServer.getServer().getConnection().getConnections();
+            // The list is synchronized, and must be locked while iterating over it.
+            synchronized (connections) {
+                for (Connection connection : connections) {
+                    if (connection.getPacketListener() == serverPlayer.connection)
+                        return connection.channel;
+                }
             }
 
             return null;
@@ -371,6 +933,9 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
 
         private final int id;
         private final Display entity;
+        // The identifiers of the mirror of the element, which only exists on the side of the viewer.
+        private final int mirrorId;
+        private final UUID mirrorUUID;
         private final org.bukkit.entity.Display bukkitEntity;
         // Only set for elements that are rendered using texts.
         private final TextDisplay textDisplay;
@@ -380,11 +945,18 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
         private final float depth;
         private final Vector3f scale;
         private final AxisAngle4f rotation;
+        // The amount the whole element is scaled by towards the viewer.
+        private final float viewScale;
+        // The size of the element relative to its original size.
+        private float sizeScale = 1f;
         private boolean spawned = false;
 
-        Element(int id, Display entity, float offsetX, float offsetY, float depth, Vector3f scale, AxisAngle4f rotation) {
+        Element(int id, Display entity, Entity mirror, float offsetX, float offsetY, float depth, Vector3f scale,
+                AxisAngle4f rotation, float viewScale) {
             this.id = id;
             this.entity = entity;
+            this.mirrorId = mirror.getId();
+            this.mirrorUUID = mirror.getUUID();
             this.bukkitEntity = (org.bukkit.entity.Display) entity.getBukkitEntity();
             this.textDisplay = this.bukkitEntity instanceof TextDisplay ? (TextDisplay) this.bukkitEntity : null;
             this.offsetX = offsetX;
@@ -392,39 +964,139 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
             this.depth = depth;
             this.scale = scale;
             this.rotation = rotation;
+            this.viewScale = viewScale;
         }
 
         void setPosition(float x, float y) {
+            setPosition(x, y, this.sizeScale);
+        }
+
+        /**
+         * @param sizeScale The size of the element relative to its original size. It is resized around its center.
+         */
+        void setPosition(float x, float y, float sizeScale) {
+            this.sizeScale = sizeScale;
             this.bukkitEntity.setTransformation(new Transformation(
-                    new Vector3f(x + this.offsetX, y + this.offsetY, this.depth),
-                    new AxisAngle4f(this.rotation), new Vector3f(this.scale), NO_ROTATION));
+                    new Vector3f(x + this.offsetX * sizeScale, y + this.offsetY * sizeScale, this.depth).mul(this.viewScale),
+                    new AxisAngle4f(this.rotation), new Vector3f(this.scale).mul(this.viewScale * sizeScale), NO_ROTATION));
         }
 
     }
 
-    private static class InputHandler extends ChannelInboundHandlerAdapter {
+    /**
+     * Captures the inputs of the viewer, and keeps him hidden from himself while the menu is shown.
+     */
+    private static class PacketHandler extends ChannelDuplexHandler {
 
         private final ServerPlayer serverPlayer;
         private final InputListener listener;
+        private final RendererImpl renderer;
+        private final boolean handItemsHidden;
         private boolean exited = false;
 
-        InputHandler(ServerPlayer serverPlayer, InputListener listener) {
+        // These are written from the main thread and read from the thread of the channel.
+        private volatile boolean viewerHidden = true;
+        private volatile int hiddenHotbarSlot = -1;
+
+        PacketHandler(ServerPlayer serverPlayer, InputListener listener, RendererImpl renderer, boolean handItemsHidden) {
             this.serverPlayer = serverPlayer;
             this.listener = listener;
+            this.renderer = renderer;
+            this.handItemsHidden = handItemsHidden;
         }
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+            if (packet instanceof ServerboundMovePlayerPacket) {
+                // The rotation of the viewer is read here, so the menus thread does not depend on the main thread.
+                ServerboundMovePlayerPacket movePlayerPacket = (ServerboundMovePlayerPacket) packet;
+                if (movePlayerPacket.hasRotation()) {
+                    this.renderer.viewerYaw = movePlayerPacket.getYRot(this.renderer.viewerYaw);
+                    this.renderer.viewerPitch = movePlayerPacket.getXRot(this.renderer.viewerPitch);
+                }
+
+                // The viewer stays where he opened the menu. Positions he sent before his view was locked,
+                // for example while falling, would otherwise still move him.
+                if (movePlayerPacket.hasPosition())
+                    return;
+            }
+
             if (!handlePacket(packet))
                 super.channelRead(ctx, packet);
+        }
+
+        @Override
+        public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
+            super.write(ctx, this.viewerHidden ? hideViewer(packet) : packet, promise);
+        }
+
+        /**
+         * Change data the server sends about the viewer so he stays hidden from himself.
+         *
+         * @return The packet to send instead.
+         */
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private Object hideViewer(Object packet) {
+            if (packet instanceof ClientboundSetEntityDataPacket) {
+                ClientboundSetEntityDataPacket entityDataPacket = (ClientboundSetEntityDataPacket) packet;
+                if (entityDataPacket.id() == this.serverPlayer.getId())
+                    return forceInvisible(entityDataPacket);
+            } else if (packet instanceof ClientboundContainerSetSlotPacket) {
+                ClientboundContainerSetSlotPacket slotPacket = (ClientboundContainerSetSlotPacket) packet;
+                if (slotPacket.getContainerId() == this.serverPlayer.inventoryMenu.containerId &&
+                        this.handItemsHidden && isHiddenSlot(slotPacket.getSlot()) && !slotPacket.getItem().isEmpty()) {
+                    return new ClientboundContainerSetSlotPacket(slotPacket.getContainerId(), slotPacket.getStateId(),
+                            slotPacket.getSlot(), net.minecraft.world.item.ItemStack.EMPTY);
+                }
+            } else if (packet instanceof ClientboundBundlePacket) {
+                List<Object> subPackets = new ArrayList<>();
+                boolean changed = false;
+                for (Object subPacket : ((ClientboundBundlePacket) packet).subPackets()) {
+                    Object newSubPacket = hideViewer(subPacket);
+                    changed |= newSubPacket != subPacket;
+                    subPackets.add(newSubPacket);
+                }
+                // The type of the sub-packets differs between versions, therefore a raw type is used.
+                if (changed)
+                    return new ClientboundBundlePacket((Iterable) subPackets);
+            }
+
+            return packet;
+        }
+
+        private boolean isHiddenSlot(int slot) {
+            int hiddenHotbarSlot = this.hiddenHotbarSlot;
+            return slot == InventoryMenu.SHIELD_SLOT ||
+                    (hiddenHotbarSlot != -1 && slot == InventoryMenu.USE_ROW_SLOT_START + hiddenHotbarSlot);
+        }
+
+        private static Object forceInvisible(ClientboundSetEntityDataPacket packet) {
+            List<SynchedEntityData.DataValue<?>> entityData = packet.packedItems();
+            for (int i = 0; i < entityData.size(); ++i) {
+                SynchedEntityData.DataValue<?> dataValue = entityData.get(i);
+                if (dataValue.id() == SHARED_FLAGS_DATA_ID && dataValue.value() instanceof Byte) {
+                    byte sharedFlags = (Byte) dataValue.value();
+                    if ((sharedFlags & INVISIBLE_FLAG) != 0)
+                        return packet;
+
+                    List<SynchedEntityData.DataValue<?>> newEntityData = new ArrayList<>(entityData);
+                    newEntityData.set(i, new SynchedEntityData.DataValue<>(SHARED_FLAGS_DATA_ID,
+                            EntityDataSerializers.BYTE, (byte) (sharedFlags | INVISIBLE_FLAG)));
+                    return new ClientboundSetEntityDataPacket(packet.id(), newEntityData);
+                }
+            }
+
+            return packet;
         }
 
         /**
          * @return true if the packet should not be handled by the server.
          */
         private boolean handlePacket(Object packet) {
-            if (packet instanceof ${SWING_PACKET_CLASS} || packet instanceof ${ATTACK_PACKET_CLASS}) {
-                BukkitExecutor.sync(() -> this.listener.onClick(false));
+            // Spectators report left clicks with a packet of their own.
+            if (packet instanceof ${SWING_PACKET_CLASS} || packet instanceof ${ATTACK_PACKET_CLASS} ||
+                    packet instanceof ${SPECTATOR_ACTION_PACKET_CLASS}) {
+                this.listener.onClick(false);
                 return true;
             }
 
@@ -432,26 +1104,49 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
                 // The viewer tries to dismount his vehicle.
                 if (!this.exited && ((ServerboundPlayerInputPacket) packet).${PLAYER_INPUT_PACKET_SHIFT_METHOD}) {
                     this.exited = true;
-                    BukkitExecutor.sync(this.listener::onExit);
+                    this.listener.onExit();
                 }
+                return true;
+            }
+
+            if (packet instanceof ServerboundSetCarriedItemPacket) {
+                // The viewer selected a different slot in his hotbar, whose item should be hidden instead.
+                // The server still handles the packet, so the selected slot stays in sync.
+                int hotbarSlot = ((ServerboundSetCarriedItemPacket) packet).getSlot();
+                BukkitExecutor.sync(() -> this.renderer.hideHeldItem(hotbarSlot));
+                return false;
+            }
+
+            if (packet instanceof ServerboundTeleportToEntityPacket) {
+                // Spectators can open a menu for teleporting to other players with their number keys.
+                return true;
+            }
+
+            if (packet instanceof ServerboundSetCreativeModeSlotPacket) {
+                // Players in creative mode set items in their inventory directly.
+                // As some of their items are hidden on their side, they could remove them by mistake.
                 return true;
             }
 
             // The viewer should not interact with the world behind the menu.
             // Block interactions are predicted by the viewer, and must be acknowledged in order to be reverted.
 
-            if (packet instanceof ServerboundInteractPacket)
+            if (packet instanceof ServerboundInteractPacket) {
+                // The viewer clicked an entity, such as the entities that receive his clicks.
+                ServerboundInteractPacket interactPacket = (ServerboundInteractPacket) packet;
+                this.listener.onClick(!(${INTERACT_PACKET_IS_ATTACK}));
                 return true;
+            }
 
             if (packet instanceof ServerboundUseItemOnPacket) {
                 acknowledgeBlockChange(((ServerboundUseItemOnPacket) packet).${USE_ITEM_PACKET_SEQUENCE_METHOD});
-                BukkitExecutor.sync(() -> this.listener.onClick(true));
+                this.listener.onClick(true);
                 return true;
             }
 
             if (packet instanceof ServerboundUseItemPacket) {
                 acknowledgeBlockChange(((ServerboundUseItemPacket) packet).${USE_ITEM_PACKET_SEQUENCE_METHOD});
-                BukkitExecutor.sync(() -> this.listener.onClick(true));
+                this.listener.onClick(true);
                 return true;
             }
 
@@ -460,11 +1155,16 @@ public class NMSHologramMenusImpl implements NMSHologramMenus {
                 switch (playerActionPacket.getAction()) {
                     case START_DESTROY_BLOCK:
                         // The viewer clicked on a block that is behind the menu.
-                        BukkitExecutor.sync(() -> this.listener.onClick(false));
+                        this.listener.onClick(false);
                         // fallthrough
                     case ABORT_DESTROY_BLOCK:
                     case STOP_DESTROY_BLOCK:
                         acknowledgeBlockChange(playerActionPacket.getSequence());
+                        return true;
+                    case DROP_ITEM:
+                    case DROP_ALL_ITEMS:
+                    case SWAP_ITEM_WITH_OFFHAND:
+                        // The items in the hands of the viewer are hidden on his side, and should not be touched.
                         return true;
                     default:
                         return false;

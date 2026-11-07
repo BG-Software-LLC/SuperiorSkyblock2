@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.api.menu.layout.HologramMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedDialogMenuLayout;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedHologramMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedInventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.parser.MenuParser;
@@ -912,6 +913,11 @@ public interface MenusManager {
      * Create a new pattern builder for building a hologram based menu.
      */
     <V extends MenuView<V, ?>> HologramMenuLayout.Builder<V> createHologramLayoutBuilder();
+
+    /**
+     * Create a new pattern builder for building a hologram paged-based menu.
+     */
+    <V extends PagedMenuView<V, ?, E>, E> PagedHologramMenuLayout.Builder<V, E> createHologramPagedLayoutBuilder();
 
     /**
      * Create a new pattern builder for building a paged-based menu.

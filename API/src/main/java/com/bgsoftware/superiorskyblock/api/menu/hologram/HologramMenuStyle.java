@@ -94,9 +94,103 @@ public interface HologramMenuStyle {
     String getHoveredCursorText();
 
     /**
+     * Get the item that is used as the cursor of the menu, instead of {@link #getCursorText()}.
+     */
+    @Nullable
+    ItemStack getCursorItem();
+
+    /**
+     * Get the item that is used as the cursor of the menu when it is on a button,
+     * when {@link #getCursorItem()} is set.
+     */
+    @Nullable
+    ItemStack getHoveredCursorItem();
+
+    /**
      * Get the scale of the cursor of the menu.
+     * For items, this is the size of the item.
      */
     float getCursorScale();
+
+    /**
+     * Get the scale of the cursor of the menu when it is on a button.
+     */
+    float getHoveredCursorScale();
+
+    /**
+     * Get whether the text of the cursor has a shadow.
+     */
+    boolean isCursorShadowed();
+
+    /**
+     * Get how far right the text of the cursor is drawn from the point it clicks, multiplied by its scale.
+     * Used to put the tip of an arrow on that point.
+     */
+    float getCursorOffsetX();
+
+    /**
+     * Get how far up the text of the cursor is drawn from the point it clicks, multiplied by its scale.
+     */
+    float getCursorOffsetY();
+
+    /**
+     * Get how far can the cursor go past the edges of the menu, when it is limited to the menu.
+     */
+    float getCursorMenuMargin();
+
+    /**
+     * Get how far the cursor stays from the edges of the screen, multiplied by its scale.
+     */
+    float getCursorScreenMargin();
+
+    /**
+     * Get the time, in milliseconds, that must pass between two clicks.
+     */
+    long getClickDelay();
+
+    /**
+     * Get the speed of the cursor of the menu.
+     * At a speed of 1, the cursor stays where the player looks at; higher speeds move it further
+     * for the same turn of the head of the player.
+     */
+    float getCursorSpeed();
+
+    /**
+     * Get whether the cursor can only move over the menu.
+     * Otherwise, the cursor can move over the entire screen of the player.
+     */
+    boolean isCursorLimitedToMenu();
+
+    /**
+     * Get the vertical field of view of players, in degrees.
+     * The server cannot know the real one, so this value is used to find the edges of the screen of players.
+     */
+    float getScreenFov();
+
+    /**
+     * Get the ratio between the width and the height of the screen of players.
+     * The server cannot know the real one, so this value is used to find the edges of the screen of players.
+     */
+    float getScreenAspectRatio();
+
+    /**
+     * Get whether the crosshair of the player is hidden while the menu is open.
+     * This is done by putting the player in spectator mode on his side only, which also hides his hand and
+     * his hotbar. Spectators do not report right clicks in the air, so only left clicks are detected.
+     */
+    boolean isCrosshairHidden();
+
+    /**
+     * Get how many ticks it takes for the objects of paged menus to slide when changing pages.
+     * If 0, pages are changed without an animation.
+     */
+    int getPageAnimationDuration();
+
+    /**
+     * Get how far the objects of paged menus slide when changing pages.
+     * Objects shrink while sliding, so they disappear when sliding out and appear when sliding in.
+     */
+    float getPageAnimationDistance();
 
     /**
      * Get whether tooltips are shown when the cursor is on a button.
@@ -112,6 +206,11 @@ public interface HologramMenuStyle {
      * Get the color of the background of the tooltips of the menu.
      */
     int getTooltipColor();
+
+    /**
+     * Get the distance between the cursor and the tooltip that is shown above it.
+     */
+    float getTooltipOffset();
 
     /**
      * Get the appearance of buttons that do not have one of their own.
@@ -159,13 +258,47 @@ public interface HologramMenuStyle {
 
         Builder setHoveredCursorText(String hoveredCursorText);
 
+        Builder setCursorItem(@Nullable ItemStack cursorItem);
+
+        Builder setHoveredCursorItem(@Nullable ItemStack hoveredCursorItem);
+
         Builder setCursorScale(float cursorScale);
+
+        Builder setHoveredCursorScale(float hoveredCursorScale);
+
+        Builder setCursorShadowed(boolean cursorShadowed);
+
+        Builder setCursorOffsetX(float cursorOffsetX);
+
+        Builder setCursorOffsetY(float cursorOffsetY);
+
+        Builder setCursorMenuMargin(float cursorMenuMargin);
+
+        Builder setCursorScreenMargin(float cursorScreenMargin);
+
+        Builder setClickDelay(long clickDelay);
+
+        Builder setCursorSpeed(float cursorSpeed);
+
+        Builder setCursorLimitedToMenu(boolean cursorLimitedToMenu);
+
+        Builder setScreenFov(float screenFov);
+
+        Builder setScreenAspectRatio(float screenAspectRatio);
+
+        Builder setCrosshairHidden(boolean crosshairHidden);
+
+        Builder setPageAnimationDuration(int pageAnimationDuration);
+
+        Builder setPageAnimationDistance(float pageAnimationDistance);
 
         Builder setTooltipEnabled(boolean tooltipEnabled);
 
         Builder setTooltipScale(float tooltipScale);
 
         Builder setTooltipColor(int argb);
+
+        Builder setTooltipOffset(float tooltipOffset);
 
         Builder setDefaultButton(HologramButton defaultButton);
 
