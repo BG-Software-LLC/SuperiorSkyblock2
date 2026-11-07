@@ -271,8 +271,8 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         }
     }
 
-    @Override
     @Deprecated
+    @Override
     public RecordResult recordEntitySpawn(EntityType entityType, Location location) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null");
         Preconditions.checkNotNull(location, "location parameter cannot be null");
@@ -342,8 +342,8 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         return recordResult;
     }
 
-    @Override
     @Deprecated
+    @Override
     public RecordResult recordEntityDespawn(EntityType entityType, Location location) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null");
         Preconditions.checkNotNull(location, "location parameter cannot be null");
@@ -383,6 +383,22 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         return RecordResult.SUCCESS;
     }
 
+    private boolean canEntityBeTracked(@Nullable EntityType entityType) {
+        boolean isEntityLimits = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class);
+        boolean isCountEntitiesAsBlocks = plugin.getSettings().isCountEntitiesAsBlocks();
+
+        if (!isEntityLimits && !isCountEntitiesAsBlocks) {
+            return false;
+        }
+
+        // It could be a custom entity that has a limit.
+        if (entityType == null) {
+            return true;
+        }
+
+        return BukkitEntities.canHaveLimit(entityType) || BukkitEntities.canHaveBlock(entityType);
+    }
+
     @Nullable
     private EntityType getEntityType(Key entityKey) {
         EntityType entityType;
@@ -394,15 +410,6 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         }
 
         return entityType;
-    }
-
-    private boolean canEntityBeTracked(EntityType entityType) {
-        boolean canHaveLimit = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)
-                && BukkitEntities.canHaveLimit(entityType);
-        boolean canHaveBlock = plugin.getSettings().isCountEntitiesAsBlocks()
-                && BukkitEntities.canHaveBlock(entityType);
-
-        return canHaveLimit || canHaveBlock;
     }
 
 }
