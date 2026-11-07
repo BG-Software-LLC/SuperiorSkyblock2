@@ -53,6 +53,17 @@ public class ButtonClickContextImpl<V extends MenuView<V, ?>> implements ButtonC
         return buttonClickContext;
     }
 
+    public static <V extends MenuView<V, ?>> ButtonClickContextImpl<V> obtain(
+            V menuView, Player player, int clickedSlot, ClickType clickType) {
+        ButtonClickContextImpl<V> buttonClickContext = POOL.obtain();
+        buttonClickContext.menuView = menuView;
+        buttonClickContext.clickedSlot = clickedSlot;
+        buttonClickContext.player = player;
+        buttonClickContext.clickedButton = menuView.getMenu().getLayout().getButton(clickedSlot);
+        buttonClickContext.clickType = clickType;
+        return buttonClickContext;
+    }
+
     @Override
     public Player getPlayer() {
         return this.player;

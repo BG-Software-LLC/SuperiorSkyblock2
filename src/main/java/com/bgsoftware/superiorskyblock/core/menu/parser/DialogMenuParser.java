@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.parser;
 
+import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogBodyElement;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogMenuType;
@@ -44,20 +45,7 @@ public class DialogMenuParser {
             for (String key : cfg.getConfigurationSection("buttons").getKeys(false)) {
                 char buttonId = key.charAt(0);
 
-                ConfigurationSection buttonSection = cfg.getConfigurationSection("buttons." + key);
-
-                AbstractMenuTemplateButton.AbstractBuilder<V> buttonBuilder = new DummyButton.Builder<>();
-
-                buttonBuilder.setButtonDialog(DialogButton.newBuilder()
-                        .setLabel(Formatters.COLOR_FORMATTER.format(buttonSection.getString("label", key)))
-                        .build());
-
-                buttonBuilder.setClickCommands(cfg.getStringList("commands." + buttonId));
-                buttonBuilder.setClickSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + buttonId)));
-                buttonBuilder.setRequiredPermission(cfg.getString("permissions." + buttonId + ".permission"));
-                buttonBuilder.setLackPermissionsSound(MenuParserUtils.getSound(cfg.getConfigurationSection("permissions." + buttonId + ".no-access-sound")));
-
-                menuLayoutBuilder.setButton(slot, buttonBuilder.build());
+                menuLayoutBuilder.setButton(slot, parseLabeledButton(cfg, key));
 
                 menuSlotsMap.addSlot(buttonId, slot);
 
@@ -71,6 +59,27 @@ public class DialogMenuParser {
     public static <V extends PagedMenuView<V, ?, E>, E> MenuSlotsMap parsePagedMenuPatternInternal(
             String callerName, YamlConfiguration cfg, DialogMenuLayout.Builder<V> menuLayoutBuilder) {
         throw new UnsupportedOperationException("Dialog menus do not support paged-menus currently");
+    }
+
+    private static <V extends MenuView<V, ?>> MenuTemplateButton<V> parseLabeledButton(YamlConfiguration cfg, String key) {
+        char buttonId = key.charAt(0);
+        ConfigurationSection buttonSection = cfg.getConfigurationSection("buttons." + key);
+        AbstractMenuTemplateButton.AbstractBuilder<V> buttonBuilder = new DummyButton.Builder<>();
+        buttonBuilder.setButtonDialog(DialogButton.newBuilder()
+                .setLabel(Formatters.COLOR_FORMATTER.format(buttonSection.getString("label", key)))
+                .build());
+        parseButtonActions(cfg, buttonId, buttonBuilder);
+        return buttonBuilder.build();
+    }
+
+    /**
+     * Parse what happens when clicking a button, which is configured the same way in all types of menus.
+     */
+    static void parseButtonActions(YamlConfiguration cfg, char buttonId, MenuTemplateButton.Builder<?> buttonBuilder) {
+        buttonBuilder.setClickCommands(cfg.getStringList("commands." + buttonId));
+        buttonBuilder.setClickSound(MenuParserUtils.getSound(cfg.getConfigurationSection("sounds." + buttonId)));
+        buttonBuilder.setRequiredPermission(cfg.getString("permissions." + buttonId + ".permission"));
+        buttonBuilder.setLackPermissionsSound(MenuParserUtils.getSound(cfg.getConfigurationSection("permissions." + buttonId + ".no-access-sound")));
     }
 
     private static DialogMenuType readDialogMenuType(YamlConfiguration cfg, String callerName) {

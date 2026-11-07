@@ -16,8 +16,10 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.PagedHologramMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.PagedInventoryMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularDialogMenuLayoutImpl;
+import com.bgsoftware.superiorskyblock.core.menu.layout.RegularHologramMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.layout.RegularInventoryMenuLayoutImpl;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -47,9 +49,13 @@ public class MenuParserImpl implements MenuParser {
     public <V extends MenuView<V, ?>> MenuParseResult<V> parseMenu(String callerName, YamlConfiguration cfg) throws MenuParseException {
         String menuType = cfg.getString("type", "CHEST");
         boolean isDialog = menuType.equalsIgnoreCase("DIALOG");
+        boolean isHologram = menuType.equalsIgnoreCase("HOLOGRAM");
+
+        if (isHologram && !plugin.getNMSHologramMenus().isPresent())
+            throw new MenuParseException("Hologram menus are not supported in your server version");
 
         AbstractMenuLayout.Builder<V> menuLayoutBuilder = isDialog ? new RegularDialogMenuLayoutImpl.Builder<>() :
-                new RegularInventoryMenuLayoutImpl.Builder<>();
+                isHologram ? new RegularHologramMenuLayoutImpl.Builder<>() : new RegularInventoryMenuLayoutImpl.Builder<>();
 
         menuLayoutBuilder.setTitle(Formatters.COLOR_FORMATTER.format(cfg.getString("title", "")));
 
@@ -61,6 +67,9 @@ public class MenuParserImpl implements MenuParser {
         if (isDialog) {
             RegularDialogMenuLayoutImpl.Builder<V> dialogMenuLayoutBuilder = (RegularDialogMenuLayoutImpl.Builder<V>) menuLayoutBuilder;
             menuSlotsMap = DialogMenuParser.parseRegularMenuPatternInternal(callerName, cfg, dialogMenuLayoutBuilder);
+        } else if (isHologram) {
+            RegularHologramMenuLayoutImpl.Builder<V> hologramMenuLayoutBuilder = (RegularHologramMenuLayoutImpl.Builder<V>) menuLayoutBuilder;
+            menuSlotsMap = HologramMenuParser.parseRegularMenuPatternInternal(callerName, cfg, hologramMenuLayoutBuilder);
         } else {
             RegularInventoryMenuLayoutImpl.Builder<V> inventoryMenuLayoutBuilder = (RegularInventoryMenuLayoutImpl.Builder<V>) menuLayoutBuilder;
             inventoryMenuLayoutBuilder.setInventoryType(MenuParserUtils.getMinecraftEnum(InventoryType.class, menuType));
@@ -75,9 +84,13 @@ public class MenuParserImpl implements MenuParser {
             String callerName, YamlConfiguration cfg, PagedMenuTemplateButton.Builder<V, E> pagedButtonBuilder) throws MenuParseException {
         String menuType = cfg.getString("type", "CHEST");
         boolean isDialog = menuType.equalsIgnoreCase("DIALOG");
+        boolean isHologram = menuType.equalsIgnoreCase("HOLOGRAM");
+
+        if (isHologram && !plugin.getNMSHologramMenus().isPresent())
+            throw new MenuParseException("Hologram menus are not supported in your server version");
 
         AbstractMenuLayout.Builder<V> menuLayoutBuilder = isDialog ? new PagedDialogMenuLayoutImpl.Builder<>() :
-                new PagedInventoryMenuLayoutImpl.Builder<>();
+                isHologram ? new PagedHologramMenuLayoutImpl.Builder<>() : new PagedInventoryMenuLayoutImpl.Builder<>();
 
         menuLayoutBuilder.setTitle(Formatters.COLOR_FORMATTER.format(cfg.getString("title", "")));
 
@@ -90,6 +103,15 @@ public class MenuParserImpl implements MenuParser {
             PagedDialogMenuLayoutImpl.Builder<V, E> dialogMenuLayoutBuilder = (PagedDialogMenuLayoutImpl.Builder<V, E>) menuLayoutBuilder;
 
             menuSlotsMap = DialogMenuParser.parsePagedMenuPatternInternal(callerName, cfg, dialogMenuLayoutBuilder);
+        } else if (isHologram) {
+            PagedHologramMenuLayoutImpl.Builder<V, E> hologramMenuLayoutBuilder = (PagedHologramMenuLayoutImpl.Builder<V, E>) menuLayoutBuilder;
+
+            menuSlotsMap = HologramMenuParser.parsePagedMenuPatternInternal(callerName, cfg, hologramMenuLayoutBuilder);
+
+            hologramMenuLayoutBuilder.setPreviousPageSlots(parseButtonSlots(cfg, "previous-page", menuSlotsMap));
+            hologramMenuLayoutBuilder.setCurrentPageSlots(parseButtonSlots(cfg, "current-page", menuSlotsMap));
+            hologramMenuLayoutBuilder.setNextPageSlots(parseButtonSlots(cfg, "next-page", menuSlotsMap));
+            hologramMenuLayoutBuilder.setPagedObjectSlots(parseButtonSlots(cfg, "slots", menuSlotsMap), pagedButtonBuilder);
         } else {
             PagedInventoryMenuLayoutImpl.Builder<V, E> inventoryMenuLayoutBuilder = (PagedInventoryMenuLayoutImpl.Builder<V, E>) menuLayoutBuilder;
 
