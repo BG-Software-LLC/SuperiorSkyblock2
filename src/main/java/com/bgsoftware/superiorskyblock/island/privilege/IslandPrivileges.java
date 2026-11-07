@@ -9,9 +9,9 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -79,7 +79,7 @@ public class IslandPrivileges {
     public static final IslandPrivilege WITHDRAW_MONEY = register("WITHDRAW_MONEY", IslandPrivilege.Type.COMMAND);
 
     // Privileges from configurations
-    @Nullable
+    public static List<IslandPrivilege> LECTERN_INTERACT_PRIVILEGES;
     public static List<IslandPrivilege> VAULT_INTERACT_PRIVILEGES;
 
     private static String ALL_PRIVILEGE_NAMES;
@@ -100,14 +100,10 @@ public class IslandPrivileges {
     private static void onSettingsUpdate() {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-        List<IslandPrivilege> islandPrivileges = new ArrayList<>();
-        for (BlockCategory blockCategory : plugin.getSettings().getBlockCategoriesMap().getCategories(Keys.ofMaterialAndData("VAULT"))) {
-            if (blockCategory.getInteractPrivilege() != null) {
-                islandPrivileges.add(blockCategory.getInteractPrivilege());
-            }
-        }
-
-        VAULT_INTERACT_PRIVILEGES = Collections.unmodifiableList(islandPrivileges);
+        LECTERN_INTERACT_PRIVILEGES = Collections.unmodifiableList(ProtectionHelper.getBlockPrivileges(plugin.getSettings()
+                .getBlockCategoriesMap().getCategories(ConstantKeys.LECTERN), BlockCategory::getInteractPrivilege));
+        VAULT_INTERACT_PRIVILEGES = Collections.unmodifiableList(ProtectionHelper.getBlockPrivileges(plugin.getSettings()
+                .getBlockCategoriesMap().getCategories(ConstantKeys.VAULT), BlockCategory::getInteractPrivilege));
     }
 
     public static String getPrivilegesNames() {
@@ -119,6 +115,18 @@ public class IslandPrivileges {
         }
 
         return ALL_PRIVILEGE_NAMES;
+    }
+
+    @Nullable
+    public static IslandPrivilege getSafe(@Nullable String name) {
+        if (name != null) {
+            try {
+                return IslandPrivilege.getByName(name);
+            } catch (NullPointerException ignored) {
+            }
+        }
+
+        return null;
     }
 
     @NotNull

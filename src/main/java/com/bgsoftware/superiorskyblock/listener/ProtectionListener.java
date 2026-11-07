@@ -76,6 +76,8 @@ public class ProtectionListener extends AbstractGameEventListener {
     @Nullable
     private static final EntityType LEASH_KNOT = EnumHelper.getEnum(EntityType.class, "LEASH_KNOT");
     @Nullable
+    private static final EntityType SULFUR_CUBE = EnumHelper.getEnum(EntityType.class, "SULFUR_CUBE");
+    @Nullable
     private static final EntityType TRIDENT = EnumHelper.getEnum(EntityType.class, "TRIDENT");
     @Nullable
     private static final EntityType WIND_CHARGE = EnumHelper.getEnum(EntityType.class, "WIND_CHARGE");
@@ -342,6 +344,20 @@ public class ProtectionListener extends AbstractGameEventListener {
         }
     }
 
+    private void onPlayerTakeLecternBook(GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> e) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+
+        InteractionResult interactionResult;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
+                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), IslandPrivileges.LECTERN_INTERACT_PRIVILEGES);
+        }
+
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+            e.setCancelled();
+        }
+    }
+
     private void onChorusFruitConsume(GameEvent<GameEventArgs.PlayerItemConsumeEvent> e) {
         if (CHORUS_FRUIT == null || e.getArgs().consumedItem.getType() != CHORUS_FRUIT) {
             return;
@@ -378,6 +394,24 @@ public class ProtectionListener extends AbstractGameEventListener {
         }
 
         InteractionResult interactionResult = this.regionManagerService.get().handleEntityDamage(damager, entity);
+
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+            e.setCancelled();
+        }
+    }
+
+    private void onPlayerAttackEntity(GameEvent<GameEventArgs.PlayerAttackEntityEvent> e) {
+        Entity entity = e.getArgs().entity;
+        Player player = e.getArgs().player;
+
+        // Sulfur cubes that hold a block are immune to attacks: they are only knocked back, and no damage event
+        // is called for them. Therefore, we check attacking sulfur cubes before the attack happens.
+        if (entity == null || entity.getType() != SULFUR_CUBE) {
+            return;
+        }
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        InteractionResult interactionResult = this.regionManagerService.get().handleEntityDamage(player, entity);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -815,8 +849,10 @@ public class ProtectionListener extends AbstractGameEventListener {
         registerCallback(GameEventType.ENTITY_BLOCK_FORM_EVENT, GameEventPriority.NORMAL, this::onFrostWalker);
         registerCallback(GameEventType.PLAYER_EMPTY_BUCKET_EVENT, GameEventPriority.NORMAL, this::onBucketEmpty);
         registerCallback(GameEventType.PLAYER_FILL_BUCKET_EVENT, GameEventPriority.NORMAL, this::onBucketFill);
+        registerCallback(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, GameEventPriority.NORMAL, this::onPlayerTakeLecternBook);
         registerCallback(GameEventType.PLAYER_ITEM_CONSUME_EVENT, GameEventPriority.NORMAL, this::onChorusFruitConsume);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.NORMAL, this::onEntityAttack);
+        registerCallback(GameEventType.PLAYER_ATTACK_ENTITY_EVENT, GameEventPriority.NORMAL, this::onPlayerAttackEntity);
         registerCallback(GameEventType.PLAYER_SHEAR_ENTITY_EVENT, GameEventPriority.NORMAL, this::onEntityShearing);
         registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.NORMAL, this::onHangingBreak);
         registerCallback(GameEventType.HANGING_PLACE_EVENT, GameEventPriority.NORMAL, this::onHangingPlace);
