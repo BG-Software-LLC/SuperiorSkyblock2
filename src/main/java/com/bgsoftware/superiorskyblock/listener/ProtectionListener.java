@@ -572,6 +572,8 @@ public class ProtectionListener extends AbstractGameEventListener {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().bukkitEvent.getPlayer());
 
         List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityInteractPrivileges((Entity) inventoryHolder);
+        if (islandPrivileges.isEmpty())
+            return;
 
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -659,30 +661,35 @@ public class ProtectionListener extends AbstractGameEventListener {
             return;
         }
 
-        EntityType entityType = entity.getType();
-
         InteractionResult interactionResult;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = entity.getLocation(wrapper.getHandle());
+        if (entity instanceof Egg) {
+            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntitySpawnPrivileges(entity);
+            if (islandPrivileges.isEmpty())
+                return;
 
-            if (entity instanceof Egg) {
-                List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntitySpawnPrivileges(entity);
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location entityLocation = entity.getLocation(wrapper.getHandle());
                 interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
                         entityLocation, islandPrivileges);
-            } else {
-                IslandPrivilege islandPrivilege;
-                if (entity instanceof FishHook && !ServerVersion.isLegacy()) {
-                    islandPrivilege = IslandPrivileges.FISH;
-                } else if (entityType == TRIDENT) {
-                    islandPrivilege = IslandPrivileges.PICKUP_DROPS;
-                } else if (entity instanceof EnderPearl) {
-                    islandPrivilege = IslandPrivileges.ENDER_PEARL;
-                } else if (entityType == WIND_CHARGE) {
-                    islandPrivilege = IslandPrivileges.WIND_CHARGE;
-                } else {
-                    return;
-                }
+            }
+        } else {
+            EntityType entityType = entity.getType();
 
+            IslandPrivilege islandPrivilege;
+            if (entity instanceof FishHook && !ServerVersion.isLegacy()) {
+                islandPrivilege = IslandPrivileges.FISH;
+            } else if (entityType == TRIDENT) {
+                islandPrivilege = IslandPrivileges.PICKUP_DROPS;
+            } else if (entity instanceof EnderPearl) {
+                islandPrivilege = IslandPrivileges.ENDER_PEARL;
+            } else if (entityType == WIND_CHARGE) {
+                islandPrivilege = IslandPrivileges.WIND_CHARGE;
+            } else {
+                return;
+            }
+
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location entityLocation = entity.getLocation(wrapper.getHandle());
                 interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
                         entityLocation, islandPrivilege);
             }
@@ -720,6 +727,8 @@ public class ProtectionListener extends AbstractGameEventListener {
         SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(entity);
 
         List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityDamagePrivileges(hitEntity);
+        if (islandPrivileges.isEmpty())
+            return true;
 
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -758,6 +767,9 @@ public class ProtectionListener extends AbstractGameEventListener {
         } else {
             return false;
         }
+
+        if (islandPrivileges.isEmpty())
+            return true;
 
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -812,6 +824,9 @@ public class ProtectionListener extends AbstractGameEventListener {
                 } else {
                     islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(Keys.of(block));
                 }
+
+                if (islandPrivileges.isEmpty())
+                    continue;
 
                 interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
                         blockLocation, islandPrivileges);
