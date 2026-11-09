@@ -45,10 +45,13 @@ import ${CRAFTBUKKIT_PACKAGE}.CraftChunk;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractNMSChunks implements NMSChunks {
@@ -239,15 +242,50 @@ public abstract class AbstractNMSChunks implements NMSChunks {
             LevelChunkSection levelChunkSection = chunkSections[i];
             if (levelChunkSection != null && !NMSUtilsVersioned.isLevelChunkSectionEmpty(levelChunkSection)) {
                 int sectionBottomY = level.getSectionYFromSectionIndex(i) << 4;
-                for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
-                    BlockState blockState = levelChunkSection.getBlockState(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                    calculateChunkInternal(blockState, blockPos.getX(), blockPos.getY(), blockPos.getZ(), chunkPosition,
-                            sectionBottomY, blockCounts, spawnersLocations);
+
+                // Count the section per block state through its palette instead of reading its 4096 positions.
+                // Only states whose key depends on the location (spawners, custom key parsers) are counted per position.
+                Set<BlockState> positionalStates = Collections.newSetFromMap(new IdentityHashMap<>());
+                levelChunkSection.getStates().count((blockState, amount) -> {
+                    if (!countBlockState(blockState, amount, blockCounts))
+                        positionalStates.add(blockState);
+                });
+
+                if (!positionalStates.isEmpty()) {
+                    for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
+                        BlockState blockState = levelChunkSection.getBlockState(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+                        if (positionalStates.contains(blockState)) {
+                            calculateChunkInternal(blockState, blockPos.getX(), blockPos.getY(), blockPos.getZ(), chunkPosition,
+                                    sectionBottomY, blockCounts, spawnersLocations);
+                        }
+                    }
                 }
             }
         }
 
         return new CalculatedChunk.Blocks(chunkPosition, blockCounts, spawnersLocations);
+    }
+
+    /**
+     * Adds {@code amount} blocks of {@code blockState} to {@code blockCounts} when their key does not depend on
+     * their location. Returns false, without counting, when the blocks must go through calculateChunkInternal.
+     */
+    private boolean countBlockState(BlockState blockState, int amount, KeyMap<Counter> blockCounts) {
+        Block block = blockState.getBlock();
+
+        if (block == Blocks.AIR)
+            return true;
+
+        if (block == Blocks.SPAWNER)
+            return false;
+
+        Key blockKey = KeyBlocksCache.getBlockKey(block);
+        if (plugin.getKeys().hasCustomMaterialKeyParser(blockKey))
+            return false;
+
+        int blockAmount = NMSUtils.isDoubleBlock(block, blockState) ? amount * 2 : amount;
+        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
+        return true;
     }
 
     protected CalculatedChunk.Entities calculatedChunk(ChunkPosition chunkPosition, LevelChunk levelChunk) {

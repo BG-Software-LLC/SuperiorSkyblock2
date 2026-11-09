@@ -71,6 +71,15 @@ public class KeysManagerImpl extends Manager implements KeysManager {
                 customKeyParser -> customKeyParser.getCustomKey(location));
     }
 
+    /**
+     * Whether {@link #convertKey(Key, Location)} may return another key than {@code originalKey}, depending on the
+     * location. When it returns false, the location does not matter and {@code originalKey} is returned as is.
+     */
+    public boolean hasCustomMaterialKeyParser(Key originalKey) {
+        List<CustomKeyParser> customKeyParsers = this.customMaterialKeyParsers.get(originalKey);
+        return customKeyParsers != null && !customKeyParsers.isEmpty();
+    }
+
     public Key convertKey(Key originalKey, Entity entity) {
         return getFirstCustomKey(originalKey, this.customEntityTypeKeyParsers.get(originalKey),
                 customKeyParser -> customKeyParser.getCustomKey(entity));
