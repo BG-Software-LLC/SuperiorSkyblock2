@@ -127,26 +127,12 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
     }
 
     public static void convertToSections(YamlConfiguration config, File file) {
-        boolean converted = false;
-
-        ConfigurationSection tameableSection = config.getConfigurationSection("builtin-categories.TAMEABLE");
-        if (tameableSection != null) {
-            if (!config.isConfigurationSection("builtin-categories.TAMED")) {
-                for (String path : tameableSection.getKeys(true)) {
-                    if (!tameableSection.isConfigurationSection(path)) {
-                        config.set("builtin-categories.TAMED." + path, tameableSection.get(path));
-                    }
-                }
-            }
-
-            config.set("builtin-categories.TAMEABLE", null);
-            converted = true;
-        }
-
-        if (!converted && config.isConfigurationSection("builtin-categories")
+        if (config.isConfigurationSection("builtin-categories")
                 && config.isConfigurationSection("custom-categories")) {
             return;
         }
+
+        boolean converted = false;
 
         for (String categoryName : config.getKeys(false)) {
             if (categoryName.equalsIgnoreCase("builtin-categories")
