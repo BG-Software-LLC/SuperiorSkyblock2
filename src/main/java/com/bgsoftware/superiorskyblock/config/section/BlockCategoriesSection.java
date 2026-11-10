@@ -162,7 +162,7 @@ public class BlockCategoriesSection extends BaseCategoriesMapper {
 
             for (String block : defaultCategoriesSection.getStringList(categoryName + ".blocks")) {
                 if (!blocks.contains(block) && EnumHelper.getEnum(Material.class, block) != null) {
-                    Log.warn("Potentially missing interactable block ", block);
+                    Log.warnFromFile("block-categories.yml","Potentially missing interactable block ", block);
                 }
             }
         }

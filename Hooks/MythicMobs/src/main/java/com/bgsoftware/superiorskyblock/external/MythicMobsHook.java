@@ -62,8 +62,8 @@ public class MythicMobsHook {
 
             // Same lookup as BukkitEntities#getCategories(Entity), so the warning matches the real protection.
             if (!hasDamagePrivilege(plugin.getSettings().getEntityCategoriesMapping().getCategories(mythicKey))) {
-                Log.warn("The MythicMobs mob MYTHIC_MOBS:", mythicType, " is not in an entity category ",
-                        "with a DAMAGE action, so visitors can damage it on islands");
+                Log.warnFromFile("entity-categories.yml", "The MythicMobs mob MYTHIC_MOBS:", mythicType,
+                        " is not in an entity category with a DAMAGE action, so visitors can damage it on islands");
             }
         }
     }
