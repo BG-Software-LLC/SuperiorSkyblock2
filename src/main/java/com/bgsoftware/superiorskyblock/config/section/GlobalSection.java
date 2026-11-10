@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
-import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;

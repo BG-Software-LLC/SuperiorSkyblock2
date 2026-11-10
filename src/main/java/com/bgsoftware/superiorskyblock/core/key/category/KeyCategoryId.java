@@ -17,7 +17,7 @@ public class KeyCategoryId implements Enumerable {
     private final String name;
     private final int ordinal;
 
-    protected KeyCategoryId(String name) {
+    private KeyCategoryId(String name) {
         this.name = name.toUpperCase(Locale.ENGLISH);
         Preconditions.checkState(cache.computeIfAbsent(this.name, n -> this) == this);
         this.ordinal = ordinalCounter++;

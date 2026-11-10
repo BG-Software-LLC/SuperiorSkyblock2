@@ -148,7 +148,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             Location blockLocation = block.getLocation(wrapper.getHandle());
 
             return handleInteractionInternal(superiorPlayer, blockLocation, islandPrivileges, 0,
-                    true, true);
+                    true, true, null, true, true);
         }
     }
 

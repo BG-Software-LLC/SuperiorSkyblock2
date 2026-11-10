@@ -811,7 +811,7 @@ public interface SettingsManager {
     /**
      * Custom entity categories to be used by the plugin.
      *
-     * @deprecated See {@link #getBlockCategoriesMapping()} ()}
+     * @deprecated See {@link #getEntityCategoriesMapping()}
      */
     @Deprecated
     Map<String, KeySet> getEntityCategories();

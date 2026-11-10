@@ -271,6 +271,9 @@ public class ProtectionHelper {
                         requiredFlags.computeIfAbsent(action, a -> new LinkedList<>()).add(islandFlag);
                 }
             }
+
+            requiredPrivileges.replaceAll((action, privileges) -> Collections.unmodifiableList(privileges));
+            requiredFlags.replaceAll((action, flags) -> Collections.unmodifiableList(flags));
         }
 
     }
