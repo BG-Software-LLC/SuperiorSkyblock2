@@ -28,7 +28,7 @@ import java.util.Locale;
 
 public class EntityCategoriesSection extends BaseCategoriesMapper {
 
-    public static final String[] IGNORED_SECTIONS = new String[]{"custom-categories",
+    public static final String[] IGNORED_SECTIONS = new String[]{"custom-categories", "builtin-categories.ALL.actions",
             "builtin-categories.TAMED.actions", "builtin-categories.VEHICLE.actions",
             "builtin-categories.MONSTER.actions", "builtin-categories.ANIMAL.actions"};
 
