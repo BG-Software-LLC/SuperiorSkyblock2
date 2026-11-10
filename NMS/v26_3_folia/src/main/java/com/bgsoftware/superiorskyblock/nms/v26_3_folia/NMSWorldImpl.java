@@ -1,11 +1,11 @@
-package com.bgsoftware.superiorskyblock.nms.v26_2_folia;
+package com.bgsoftware.superiorskyblock.nms.v26_3_folia;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.nms.v26_2.NMSUtils;
-import com.bgsoftware.superiorskyblock.nms.v26_2_folia.spawners.TickingSpawnerBlockEntityNotifier;
-import com.bgsoftware.superiorskyblock.nms.v26_2.world.CollectingNeighborUpdaterTracker;
-import com.bgsoftware.superiorskyblock.nms.v26_2_folia.world.BlockLevelTicksTracker;
+import com.bgsoftware.superiorskyblock.nms.v26_3.NMSUtils;
+import com.bgsoftware.superiorskyblock.nms.v26_3_folia.spawners.TickingSpawnerBlockEntityNotifier;
+import com.bgsoftware.superiorskyblock.nms.v26_3.world.CollectingNeighborUpdaterTracker;
+import com.bgsoftware.superiorskyblock.nms.v26_3_folia.world.BlockLevelTicksTracker;
 import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import io.papermc.paper.threadedregions.RegionizedWorldData;
 import io.papermc.paper.threadedregions.TickRegionScheduler;
@@ -16,7 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
 import java.util.concurrent.CompletableFuture;
-import com.bgsoftware.superiorskyblock.nms.v26_2_folia.world.FoliaWorldLoader;
+import com.bgsoftware.superiorskyblock.nms.v26_3_folia.world.FoliaWorldLoader;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntFunction;
 
-public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v26_2.NMSWorldImpl implements Listener {
+public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v26_3.NMSWorldImpl implements Listener {
 
     private static final Field BLOCK_TICKS = field("blockLevelTicks");
     private static final Field NEIGHBOR_UPDATER = field("neighborUpdater");

@@ -3,7 +3,7 @@
  * Copyright (C) Bukkit, Spigot and Paper contributors.
  * Licensed under the GNU General Public License, version 3.
  */
-package com.bgsoftware.superiorskyblock.nms.v26_2_folia.world;
+package com.bgsoftware.superiorskyblock.nms.v26_3_folia.world;
 
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;

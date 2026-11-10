@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v26_2_folia.world;
+package com.bgsoftware.superiorskyblock.nms.v26_3_folia.world;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +19,6 @@ public class BlockLevelTicksTracker extends LevelTicks<Block> {
     @Override
     public void tick(long gameTime, int maxAllowedTicks, BiConsumer<BlockPos, Block> ticker) {
         super.tick(gameTime, maxAllowedTicks,
-                com.bgsoftware.superiorskyblock.nms.v26_2.world.BlockLevelTicksTracker.captureTicks(this.serverLevel, ticker));
+                com.bgsoftware.superiorskyblock.nms.v26_3.world.BlockLevelTicksTracker.captureTicks(this.serverLevel, ticker));
     }
 }

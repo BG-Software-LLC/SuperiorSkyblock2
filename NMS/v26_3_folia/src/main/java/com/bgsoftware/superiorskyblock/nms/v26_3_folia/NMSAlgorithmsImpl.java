@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v26_2_folia;
+package com.bgsoftware.superiorskyblock.nms.v26_3_folia;
 
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import io.papermc.paper.threadedregions.RegionizedServer;
@@ -16,7 +16,7 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v26_2.NMSAlgorithmsImpl {
+public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v26_3.NMSAlgorithmsImpl {
 
     @Override
     public double getCurrentTps() {

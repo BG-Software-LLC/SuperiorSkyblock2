@@ -1,10 +1,10 @@
-package com.bgsoftware.superiorskyblock.nms.v26_2_folia;
+package com.bgsoftware.superiorskyblock.nms.v26_3_folia;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.nms.v26_2.crops.CropsTickingMethod;
+import com.bgsoftware.superiorskyblock.nms.v26_3.crops.CropsTickingMethod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
@@ -25,7 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v26_2.NMSChunksImpl implements Listener {
+public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v26_3.NMSChunksImpl implements Listener {
 
     private final Map<ChunkKey, CropsTicker> tickingChunks = new ConcurrentHashMap<>();
     private final AtomicBoolean registered = new AtomicBoolean();

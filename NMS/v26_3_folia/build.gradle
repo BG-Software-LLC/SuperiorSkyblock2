@@ -13,22 +13,6 @@ paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArt
 group 'NMS:v26_3_folia'
 
 def paperNms = project(':NMS:v26_3')
-def nmsPackage = 'com.bgsoftware.superiorskyblock.nms'
-def nmsPackagePath = nmsPackage.replace('.', '/')
-def generateFoliaSources = tasks.register('generateFoliaSources', Sync) {
-    filteringCharset = 'UTF-8'
-    into(layout.buildDirectory.dir('generated/sources/folia'))
-    from(project(':NMS:v26_2_folia').layout.projectDirectory.dir("src/main/java/${nmsPackagePath}/v26_2_folia")) {
-        include '**/*.java'
-        into("${nmsPackagePath}/v26_3_folia")
-        filter { String line ->
-            line.replace("${nmsPackage}.v26_2_folia", "${nmsPackage}.v26_3_folia")
-                    .replace("${nmsPackage}.v26_2.", "${nmsPackage}.v26_3.")
-        }
-    }
-}
-
-sourceSets.main.java.srcDir(generateFoliaSources)
 
 dependencies {
     paperweight.foliaDevBundle("26.3.build.6-alpha")

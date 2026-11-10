@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
 import com.bgsoftware.superiorskyblock.core.PluginLoadingStage;
 import com.bgsoftware.superiorskyblock.core.PluginReloadReason;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
@@ -505,6 +506,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         NMSConfiguration configuration = NMSConfiguration.forPlugin(this);
         if (!taskScheduler.isFolia())
             return configuration;
+        if (!ServerVersion.isEquals(ServerVersion.v26_3))
+            throw new NMSLoadException("Folia support requires Minecraft 26.3.");
         return new NMSConfiguration() {
             @Override
             public String getNMSResourcePathForVersion(String version) {

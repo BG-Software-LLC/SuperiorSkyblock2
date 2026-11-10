@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon;
+package com.bgsoftware.superiorskyblock.nms.v26_3_folia.dragon;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.nms.v26_2.dragon.SpikesCache;
+import com.bgsoftware.superiorskyblock.nms.v26_3.dragon.SpikesCache;
 import com.bgsoftware.superiorskyblock.service.dragon.IslandEndCrystals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.advancements.triggers.CriteriaTriggers;

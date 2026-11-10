@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon;
+package com.bgsoftware.superiorskyblock.nms.v26_3_folia.dragon;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

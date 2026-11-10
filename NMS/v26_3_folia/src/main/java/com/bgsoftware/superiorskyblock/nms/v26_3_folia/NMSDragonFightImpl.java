@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v26_2_folia;
+package com.bgsoftware.superiorskyblock.nms.v26_3_folia;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -8,10 +8,10 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
-import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.DragonFightState;
-import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.DragonNavigation;
-import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.IslandDragonFight;
-import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.WorldDragonFight;
+import com.bgsoftware.superiorskyblock.nms.v26_3_folia.dragon.DragonFightState;
+import com.bgsoftware.superiorskyblock.nms.v26_3_folia.dragon.DragonNavigation;
+import com.bgsoftware.superiorskyblock.nms.v26_3_folia.dragon.IslandDragonFight;
+import com.bgsoftware.superiorskyblock.nms.v26_3_folia.dragon.WorldDragonFight;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
