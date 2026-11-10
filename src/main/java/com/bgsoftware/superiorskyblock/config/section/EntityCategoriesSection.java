@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.category.BaseKeyCategory;
 import com.bgsoftware.superiorskyblock.core.key.category.BuiltinKeyCategories;
 import com.bgsoftware.superiorskyblock.core.key.category.FixedKeyCategory;
 import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
@@ -84,21 +85,32 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
             }
 
             KeySet skippedEntities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, categorySection.getStringList("skipped-entities"));
-            KeyCategory category;
+            BaseKeyCategory category;
 
             if (BuiltinKeyCategories.ALL.equals(key)) {
                 category = new PredicateKeyCategory(key.getName(), element -> !skippedEntities.contains(element));
             } else {
-                category = createBuiltinCategory(categorySection, key, (FixedKeyCategory) builtinCategory, skippedEntities);
+                category = createBuiltinCategory(key, (FixedKeyCategory) builtinCategory, skippedEntities);
             }
+
+            category.setRequirement(KeyCategory.Action.SPAWN,
+                    getOrRegisterPrivilege(categorySection.getString("actions.SPAWN")));
+            category.setRequirement(KeyCategory.Action.DAMAGE,
+                    getOrRegisterPrivilege(categorySection.getString("actions.DAMAGE")));
+            category.setRequirement(KeyCategory.Action.INTERACT,
+                    getOrRegisterPrivilege(categorySection.getString("actions.INTERACT")));
+            category.setRequirement(KeyCategory.Action.SPAWNER_SPAWN,
+                    getOrRegisterFlag(categorySection.getString("actions.SPAWNER_SPAWN")));
+            category.setRequirement(KeyCategory.Action.NATURAL_SPAWN,
+                    getOrRegisterFlag(categorySection.getString("actions.NATURAL_SPAWN")));
 
             categories.put(key, category);
         }
 
     }
 
-    private static FixedKeyCategory createBuiltinCategory(ConfigurationSection section, KeyCategoryId key,
-                                                          FixedKeyCategory builtinCategory, KeySet skippedEntities) {
+    private static FixedKeyCategory createBuiltinCategory(KeyCategoryId key, FixedKeyCategory builtinCategory,
+                                                          KeySet skippedEntities) {
         KeySet entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
         for (Key entity : builtinCategory.getKeys()) {
             if (!skippedEntities.contains(entity)) {
@@ -106,14 +118,7 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
             }
         }
 
-        FixedKeyCategory category = new FixedKeyCategory(key.getName(), entities);
-        category.setRequirement(KeyCategory.Action.SPAWN, getOrRegisterPrivilege(section.getString("actions.SPAWN")));
-        category.setRequirement(KeyCategory.Action.DAMAGE, getOrRegisterPrivilege(section.getString("actions.DAMAGE")));
-        category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(section.getString("actions.INTERACT")));
-        category.setRequirement(KeyCategory.Action.SPAWNER_SPAWN, getOrRegisterFlag(section.getString("actions.SPAWNER_SPAWN")));
-        category.setRequirement(KeyCategory.Action.NATURAL_SPAWN, getOrRegisterFlag(section.getString("actions.NATURAL_SPAWN")));
-
-        return category;
+        return new FixedKeyCategory(key.getName(), entities);
     }
 
     @Override
