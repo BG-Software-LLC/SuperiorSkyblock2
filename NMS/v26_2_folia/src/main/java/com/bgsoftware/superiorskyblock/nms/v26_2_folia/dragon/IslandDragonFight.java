@@ -320,7 +320,7 @@ public final class IslandDragonFight extends EnderDragonFight {
     @Override
     public void resetSpikeCrystals() {
         for (EndCrystal crystal : getSpikeCrystals()) {
-            crystal.setInvulnerable(false);
+            crystal.getBukkitEntity().setInvulnerable(false);
             crystal.setBeamTarget(null);
             crystal.getBukkitEntity().getPersistentDataContainer().remove(crystalKey(plugin));
         }
@@ -363,7 +363,7 @@ public final class IslandDragonFight extends EnderDragonFight {
 
         for (EndCrystal crystal : crystals) {
             crystal.setBeamTarget(beamPosition());
-            crystal.setInvulnerable(true);
+            crystal.getBukkitEntity().setInvulnerable(true);
             crystal.getBukkitEntity().getPersistentDataContainer().set(crystalKey(plugin),
                     org.bukkit.persistence.PersistentDataType.STRING, island.getUniqueId().toString());
         }

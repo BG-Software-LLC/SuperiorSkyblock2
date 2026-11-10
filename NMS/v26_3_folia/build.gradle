@@ -1,0 +1,48 @@
+plugins {
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.getMOJANG_PRODUCTION()
+
+group 'NMS:v26_3_folia'
+
+def paperNms = project(':NMS:v26_3')
+def nmsPackage = 'com.bgsoftware.superiorskyblock.nms'
+def nmsPackagePath = nmsPackage.replace('.', '/')
+def generateFoliaSources = tasks.register('generateFoliaSources', Sync) {
+    filteringCharset = 'UTF-8'
+    into(layout.buildDirectory.dir('generated/sources/folia'))
+    from(project(':NMS:v26_2_folia').layout.projectDirectory.dir("src/main/java/${nmsPackagePath}/v26_2_folia")) {
+        include '**/*.java'
+        into("${nmsPackagePath}/v26_3_folia")
+        filter { String line ->
+            line.replace("${nmsPackage}.v26_2_folia", "${nmsPackage}.v26_3_folia")
+                    .replace("${nmsPackage}.v26_2.", "${nmsPackage}.v26_3.")
+        }
+    }
+}
+
+sourceSets.main.java.srcDir(generateFoliaSources)
+
+dependencies {
+    paperweight.foliaDevBundle("26.3.build.6-alpha")
+    compileOnly paperNms
+    compileOnly project(":NMS:Spigot-1_20_3")
+    compileOnly project(":NMS:Paper-1_20_3")
+    compileOnly project(":API")
+    compileOnly project(":")
+}
+
+shadowJar {
+    from paperNms.sourceSets.main.output
+}
+
+if (project.hasProperty('nms.compile_v26_3') && !Boolean.valueOf(project.findProperty('nms.compile_v26_3').toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
