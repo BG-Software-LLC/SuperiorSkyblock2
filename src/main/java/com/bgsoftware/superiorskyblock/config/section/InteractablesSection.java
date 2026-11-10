@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@Deprecated
 public class InteractablesSection extends SettingsContainerHolder implements SettingsManager.Interactables {
 
     private static final Material FARMLAND = EnumHelper.getEnum(Material.class, "FARMLAND", "SOIL");
@@ -96,7 +97,6 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
     }
 
     @Override
-    @Deprecated
     public Set<Key> getInteractables() {
         KeySet keySet = KeySets.createHashSet(KeyIndicator.MATERIAL);
 
@@ -110,9 +110,8 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
         return Collections.unmodifiableSet(keySet);
     }
 
-    @Override
     @Nullable
-    @Deprecated
+    @Override
     public Set<Key> getInteractables(IslandPrivilege islandPrivilege) {
         for (KeyCategory blockCategory : getContainer().blockCategories.getCategories()) {
             if (blockCategory instanceof FixedKeyCategory &&
@@ -124,12 +123,12 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
         return null;
     }
 
-    @Override
     @Nullable
-    @Deprecated
+    @Override
     public IslandPrivilege getRequiredPrivilege(Key key) {
         for (KeyCategory blockCategory : getContainer().blockCategories.getCategories()) {
             IslandPrivilege requiredPrivilege = blockCategory.getRequiredPrivilege(KeyCategory.Action.INTERACT);
+
             if (requiredPrivilege != null && blockCategory.isListed(key)) {
                 return requiredPrivilege;
             }

@@ -49,8 +49,9 @@ public class IslandPlayerDetector implements PlayerDetector {
         List<UUID> players = this.original.detect(serverLevel, entitySelector, blockPos, maxDistance, requireLineOfSight);
         List<IslandPrivilege> privileges = this.requiredPrivileges.get();
 
-        if (privileges.isEmpty() || players.isEmpty())
+        if (privileges.isEmpty() || players.isEmpty()) {
             return players;
+        }
 
         List<UUID> finalPlayers = new LinkedList<>();
 

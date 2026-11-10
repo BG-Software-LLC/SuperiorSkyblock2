@@ -30,16 +30,9 @@
 # populated automatically based on the server version.
 # You can use 'skipped-entities' to exclude specific entities from a built-in category.
 builtin-categories:
-  TAMED:
+  ALL:
     skipped-entities: [ ]
-    actions:
-      DAMAGE: TAMED_ANIMAL_DAMAGE
-
-  VEHICLE:
-    skipped-entities: [ ]
-    actions:
-      SPAWN: MINECART_PLACE
-      DAMAGE: MINECART_DAMAGE
+    actions: [ ]
 
   ANIMAL:
     skipped-entities: [ ]
@@ -56,6 +49,17 @@ builtin-categories:
       DAMAGE: MONSTER_DAMAGE
       SPAWNER_SPAWN: SPAWNER_MONSTER_SPAWN
       NATURAL_SPAWN: NATURAL_MONSTER_SPAWN
+
+  TAMED:
+    skipped-entities: [ ]
+    actions:
+      DAMAGE: TAMED_ANIMAL_DAMAGE
+
+  VEHICLE:
+    skipped-entities: [ ]
+    actions:
+      SPAWN: MINECART_PLACE
+      DAMAGE: MINECART_DAMAGE
 
 # Custom categories.
 # These categories can be freely modified or removed. You can also create your own.

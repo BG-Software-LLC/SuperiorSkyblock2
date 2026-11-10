@@ -180,6 +180,7 @@ public class ProtectionHelper {
 
         List<T> requirements = new LinkedList<>(keyBasedCollector.apply(Keys.of(entity)));
         requirements.add(extraRequirement);
+
         return Collections.unmodifiableList(requirements);
     }
 
@@ -239,6 +240,7 @@ public class ProtectionHelper {
                 stamp[0] = cachesMap.stamp();
                 return map.get(key);
             });
+
             if (cache != null) {
                 return cache;
             }
@@ -246,11 +248,13 @@ public class ProtectionHelper {
 
         return cachesMap.writeAndGet(map -> {
             RequirementsCache cache = cachesMap.stamp() == stamp[0] ? null : map.get(key);
+
             if (cache == null) {
                 cache = new RequirementsCache(key, isBlock ? plugin.getSettings().getBlockCategoriesMapping() :
                         plugin.getSettings().getEntityCategoriesMapping());
                 map.put(key, cache);
             }
+
             return cache;
         });
     }
@@ -264,11 +268,14 @@ public class ProtectionHelper {
             for (KeyCategory category : mapper.getCategories(key)) {
                 for (KeyCategory.Action action : KeyCategory.Action.values()) {
                     IslandPrivilege islandPrivilege = category.getRequiredPrivilege(action);
-                    if (islandPrivilege != null)
+                    if (islandPrivilege != null) {
                         requiredPrivileges.computeIfAbsent(action, a -> new LinkedList<>()).add(islandPrivilege);
+                    }
+
                     IslandFlag islandFlag = category.getRequiredFlag(action);
-                    if (islandFlag != null)
+                    if (islandFlag != null) {
                         requiredFlags.computeIfAbsent(action, a -> new LinkedList<>()).add(islandFlag);
+                    }
                 }
             }
 

@@ -1467,21 +1467,18 @@ public interface SettingsManager {
         /**
          * Get all the interactables from the interactables file.
          */
-        @Deprecated
         Set<Key> getInteractables();
 
         /**
          * Get all the interactables for a specific {@link IslandPrivilege}
          */
         @Nullable
-        @Deprecated
         Set<Key> getInteractables(IslandPrivilege islandPrivilege);
 
         /**
          * Get the required {@link IslandPrivilege} for a specific key.
          */
         @Nullable
-        @Deprecated
         IslandPrivilege getRequiredPrivilege(Key key);
 
     }

@@ -59,7 +59,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class RegionManagerServiceImpl implements RegionManagerService, IService {
 
@@ -343,9 +342,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
         }
 
-        Optional<SuperiorPlayer> damagerSource = BukkitEntities.getPlayerSource(damager).map(plugin.getPlayers()::getSuperiorPlayer);
+        SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(damager);
 
-        if (!damagerSource.isPresent()) {
+        if (superiorPlayer == null) {
             return InteractionResult.SUCCESS;
         }
 
@@ -358,7 +357,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location entityLocation = entity.getLocation(wrapper.getHandle());
 
-            InteractionResult interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation,
+            InteractionResult interactionResult = handleInteractionInternal(superiorPlayer, entityLocation,
                     islandPrivileges, 0, true, false);
 
             if (interactionResult != InteractionResult.SUCCESS && damager instanceof Arrow && entity.getFireTicks() > 0) {

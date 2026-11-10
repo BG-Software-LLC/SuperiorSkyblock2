@@ -37,7 +37,7 @@ public class KeyCategoryId implements Enumerable {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override

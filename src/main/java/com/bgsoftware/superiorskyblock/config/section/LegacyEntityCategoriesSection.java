@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -67,26 +68,31 @@ public class LegacyEntityCategoriesSection implements SettingsManager.EntityCate
         }
 
         @Override
+        @Nullable
         public IslandPrivilege getSpawnPrivilege() {
             return getRequiredPrivilege(Action.SPAWN);
         }
 
         @Override
+        @Nullable
         public IslandPrivilege getDamagePrivilege() {
             return getRequiredPrivilege(Action.DAMAGE);
         }
 
         @Override
+        @Nullable
         public IslandPrivilege getInteractPrivilege() {
             return getRequiredPrivilege(Action.INTERACT);
         }
 
         @Override
+        @Nullable
         public IslandFlag getSpawnerSpawningIslandFlag() {
             return getRequiredFlag(Action.SPAWNER_SPAWN);
         }
 
         @Override
+        @Nullable
         public IslandFlag getNaturalSpawningIslandFlag() {
             return getRequiredFlag(Action.NATURAL_SPAWN);
         }
@@ -102,11 +108,13 @@ public class LegacyEntityCategoriesSection implements SettingsManager.EntityCate
         }
 
         @Override
+        @Nullable
         public IslandPrivilege getRequiredPrivilege(Action action) {
             return this.category.getRequiredPrivilege(action);
         }
 
         @Override
+        @Nullable
         public IslandFlag getRequiredFlag(Action action) {
             return this.category.getRequiredFlag(action);
         }

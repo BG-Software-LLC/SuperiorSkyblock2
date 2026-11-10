@@ -32,8 +32,8 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
             "builtin-categories.TAMED.actions", "builtin-categories.VEHICLE.actions",
             "builtin-categories.MONSTER.actions", "builtin-categories.ANIMAL.actions"};
 
-    public EntityCategoriesSection(YamlConfiguration cfg) {
-        super(cfg, KeyIndicator.ENTITY_TYPE);
+    public EntityCategoriesSection(YamlConfiguration config) {
+        super(config, KeyIndicator.ENTITY_TYPE);
 
         // Cache all the known values
         for (EntityType entityType : EntityType.values()) {
@@ -48,6 +48,7 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
         KeySet entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, section.getStringList("entities"));
 
         FixedKeyCategory category = new FixedKeyCategory(key.getName(), entities);
+
         category.setRequirement(KeyCategory.Action.SPAWN, getOrRegisterPrivilege(section.getString("actions.SPAWN")));
         category.setRequirement(KeyCategory.Action.DAMAGE, getOrRegisterPrivilege(section.getString("actions.DAMAGE")));
         category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(section.getString("actions.INTERACT")));
@@ -60,17 +61,20 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
     @Override
     protected void loadBuiltinCategories(ConfigurationSection section, EnumerateMap<KeyCategoryId, KeyCategory> categories) {
         categories.put(BuiltinKeyCategories.ALL, BuiltinKeyCategories.createAllCategory());
+
         for (KeyCategoryId key : BuiltinKeyCategories.ENTITY_CATEGORIES) {
             categories.put(key, BuiltinKeyCategories.createEntitiesCategory(key));
         }
 
         ConfigurationSection categoriesSection = section.getConfigurationSection("builtin-categories");
+
         if (categoriesSection == null) {
             return;
         }
 
         for (String categoryName : categoriesSection.getKeys(false)) {
             KeyCategoryId key = KeyCategoryId.getByName(categoryName.toUpperCase(Locale.ENGLISH));
+
             KeyCategory builtinCategory;
             // In this stage, only built-in categories are in `categories` so we can test against that map.
             if (key == null || (builtinCategory = categories.get(key)) == null) {
@@ -90,35 +94,25 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
             if (BuiltinKeyCategories.ALL.equals(key)) {
                 category = new PredicateKeyCategory(key.getName(), element -> !skippedEntities.contains(element));
             } else {
-                category = createBuiltinCategory(key, (FixedKeyCategory) builtinCategory, skippedEntities);
+                KeySet entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
+
+                for (Key entity : ((FixedKeyCategory) builtinCategory).getKeys()) {
+                    if (!skippedEntities.contains(entity)) {
+                        entities.add(entity);
+                    }
+                }
+
+                category = new FixedKeyCategory(key.getName(), entities);
             }
 
-            category.setRequirement(KeyCategory.Action.SPAWN,
-                    getOrRegisterPrivilege(categorySection.getString("actions.SPAWN")));
-            category.setRequirement(KeyCategory.Action.DAMAGE,
-                    getOrRegisterPrivilege(categorySection.getString("actions.DAMAGE")));
-            category.setRequirement(KeyCategory.Action.INTERACT,
-                    getOrRegisterPrivilege(categorySection.getString("actions.INTERACT")));
-            category.setRequirement(KeyCategory.Action.SPAWNER_SPAWN,
-                    getOrRegisterFlag(categorySection.getString("actions.SPAWNER_SPAWN")));
-            category.setRequirement(KeyCategory.Action.NATURAL_SPAWN,
-                    getOrRegisterFlag(categorySection.getString("actions.NATURAL_SPAWN")));
+            category.setRequirement(KeyCategory.Action.SPAWN, getOrRegisterPrivilege(section.getString("actions.SPAWN")));
+            category.setRequirement(KeyCategory.Action.DAMAGE, getOrRegisterPrivilege(section.getString("actions.DAMAGE")));
+            category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(section.getString("actions.INTERACT")));
+            category.setRequirement(KeyCategory.Action.SPAWNER_SPAWN, getOrRegisterFlag(section.getString("actions.SPAWNER_SPAWN")));
+            category.setRequirement(KeyCategory.Action.NATURAL_SPAWN, getOrRegisterFlag(section.getString("actions.NATURAL_SPAWN")));
 
             categories.put(key, category);
         }
-
-    }
-
-    private static FixedKeyCategory createBuiltinCategory(KeyCategoryId key, FixedKeyCategory builtinCategory,
-                                                          KeySet skippedEntities) {
-        KeySet entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
-        for (Key entity : builtinCategory.getKeys()) {
-            if (!skippedEntities.contains(entity)) {
-                entities.add(entity);
-            }
-        }
-
-        return new FixedKeyCategory(key.getName(), entities);
     }
 
     @Override
@@ -133,7 +127,6 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
         }
 
         boolean converted = false;
-
         for (String categoryName : config.getKeys(false)) {
             if (categoryName.equalsIgnoreCase("builtin-categories")
                     || categoryName.equalsIgnoreCase("custom-categories")) {
@@ -169,17 +162,20 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
     }
 
     public static void removeInvalidEntities(YamlConfiguration config, File file) {
-        if (!config.isConfigurationSection("custom-categories")) {
+        ConfigurationSection categoriesSection = config.getConfigurationSection("custom-categories");
+
+        if (categoriesSection == null) {
             return;
         }
 
         boolean removed = false;
-        for (String categoryName : config.getConfigurationSection("custom-categories").getKeys(false)) {
-            List<String> entities = config.getStringList("custom-categories." + categoryName + ".entities");
+        for (String categoryName : categoriesSection.getKeys(false)) {
+            List<String> entities = categoriesSection.getStringList(categoryName + ".entities");
 
             Iterator<String> iterator = entities.iterator();
             while (iterator.hasNext()) {
                 String entity = iterator.next().split(":")[0];
+
                 if (EnumHelper.getEnum(EntityType.class, entity) == null) {
                     iterator.remove();
                     removed = true;
@@ -187,9 +183,9 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
             }
 
             if (entities.isEmpty()) {
-                config.set("custom-categories." + categoryName, null);
+                categoriesSection.set(categoryName, null);
             } else {
-                config.set("custom-categories." + categoryName + ".entities", entities);
+                categoriesSection.set(categoryName + ".entities", entities);
             }
         }
 

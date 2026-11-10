@@ -42,8 +42,8 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
         }
     };
 
-    protected BaseCategoriesMapper(YamlConfiguration cfg, KeyIndicator keyIndicator) {
-        this.categoriesByName = loadInternal(cfg);
+    protected BaseCategoriesMapper(YamlConfiguration config, KeyIndicator keyIndicator) {
+        this.categoriesByName = loadInternal(config);
         this.categoriesList = this.categoriesByName.isEmpty() ? Collections.emptyList() :
                 Collections.unmodifiableList(new LinkedList<>(categoriesByName.values()));
         this.keyToCategory = convertKeyToCategoryInternal(this.categoriesList, keyIndicator);
@@ -57,9 +57,11 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
     @Override
     public final List<KeyCategory> getCategories(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
+
         this.keyToCategoryLock.readLock().lock();
         try {
             TrackedCategories categories = this.keyToCategory.getRaw(key, null);
+
             if (categories != null && categories.trackedAll) {
                 return categories.view;
             }
@@ -73,12 +75,15 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
 
             if (categories == null) {
                 categories = new TrackedCategories();
+
                 Key globalKey = ((BaseKey<?>) key).toGlobalKey();
                 TrackedCategories globalCategories = globalKey.equals(key) ? null : this.keyToCategory.getRaw(globalKey, null);
+
                 if (globalCategories != null) {
                     categories.categories.addAll(globalCategories.categories);
                     categories.categories.remove(allCategory.get());
                 }
+
                 this.keyToCategory.put(key, categories);
             }
 
@@ -86,6 +91,7 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
                 if (allCategory.get().isListed(key)) {
                     categories.categories.add(allCategory.get());
                 }
+
                 categories.trackedAll = true;
             }
 
@@ -98,11 +104,15 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
     @Nullable
     public final KeyCategory getCategoryByName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null");
+
         KeyCategoryId key = KeyCategoryId.getByName(name.toUpperCase(Locale.ENGLISH));
+
         return key == null ? null : getCategoryByKey(key);
     }
 
     public final KeyCategory getCategoryByKey(KeyCategoryId key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null");
+
         return this.categoriesByName.get(key);
     }
 
@@ -114,7 +124,6 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
 
     protected abstract String getFileName();
 
-
     private KeyMap<TrackedCategories> convertKeyToCategoryInternal(Collection<KeyCategory> categories, KeyIndicator keyIndicator) {
         KeyMap<TrackedCategories> keyToCategory = KeyMaps.createHashMap(keyIndicator);
 
@@ -122,10 +131,12 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
             if (category instanceof FixedKeyCategory) {
                 for (Key key : ((FixedKeyCategory) category).getKeys()) {
                     TrackedCategories trackedCategories = keyToCategory.getRaw(key, null);
+
                     if (trackedCategories == null) {
                         trackedCategories = new TrackedCategories();
                         keyToCategory.put(key, trackedCategories);
                     }
+
                     trackedCategories.categories.add(category);
                 }
             }
@@ -134,6 +145,7 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
         keyToCategory.forEach((key, trackedCategories) -> {
             Key globalKey = ((BaseKey<?>) key).toGlobalKey();
             TrackedCategories globalCategories = globalKey.equals(key) ? null : keyToCategory.getRaw(globalKey, null);
+
             if (globalCategories != null) {
                 for (KeyCategory globalCategory : globalCategories.categories) {
                     if (!trackedCategories.categories.contains(globalCategory)) {
@@ -157,6 +169,7 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
 
     private void loadCustomCategories(YamlConfiguration config, EnumerateMap<KeyCategoryId, KeyCategory> categories) {
         ConfigurationSection categoriesSection = config.getConfigurationSection("custom-categories");
+
         if (categoriesSection == null) {
             return;
         }
@@ -182,6 +195,7 @@ public abstract class BaseCategoriesMapper implements SettingsManager.Categories
             }
 
             KeyCategory category = parseCustomCategory(categorySection, key);
+
             if (category != null) {
                 categories.put(key, category);
             }

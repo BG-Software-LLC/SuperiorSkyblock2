@@ -39,12 +39,14 @@ public abstract class BaseKeyCategory implements KeyCategory {
         }
     }
 
+    @Nullable
     @Override
     public IslandPrivilege getRequiredPrivilege(Action action) {
         Either<IslandPrivilege, IslandFlag> result = this.requirements.get(action);
         return result != null && result.isLeft() ? result.getLeft() : null;
     }
 
+    @Nullable
     @Override
     public IslandFlag getRequiredFlag(Action action) {
         Either<IslandPrivilege, IslandFlag> result = this.requirements.get(action);

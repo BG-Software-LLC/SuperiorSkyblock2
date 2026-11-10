@@ -689,18 +689,18 @@ public class SettingsContainer {
         }
     }
 
-    private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
+    private List<ClearAction> loadClearActions(List<String> names) {
         List<ClearAction> clearActions = new LinkedList<>();
 
-        clearActionsNames.forEach(clearAction -> {
+        for (String name : names) {
             try {
-                clearActions.add(ClearAction.getByName(clearAction));
+                clearActions.add(ClearAction.getByName(name));
             } catch (NullPointerException error) {
-                Log.warnFromFile("config.yml", "Invalid clear action ", clearAction + ", skipping...");
+                Log.warnFromFile("config.yml", "Invalid clear action ", name + ", skipping...");
             }
-        });
+        }
 
-        return Collections.unmodifiableList(clearActions);
+        return clearActions.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(clearActions);
     }
 
     private BlockCategoriesSection loadBlockCategories(SuperiorSkyblockPlugin plugin) {

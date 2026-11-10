@@ -82,12 +82,15 @@ public class BuiltinKeyCategories {
 
     private static FixedKeyCategory createEntitiesCategory(KeyCategoryId key, Predicate<Class<? extends Entity>> predicate) {
         KeySet entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
+
         for (EntityType entityType : EntityType.values()) {
             Class<? extends Entity> entityClass = entityType.getEntityClass();
+
             if (entityClass != null && predicate.test(entityClass)) {
                 entities.add(Keys.of(entityType));
             }
         }
+
         return entities.isEmpty() ? new FixedKeyCategory(key.getName(), KeySets.createEmptySet()) :
                 new FixedKeyCategory(key.getName(), entities);
     }
