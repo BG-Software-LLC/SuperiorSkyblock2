@@ -51,10 +51,12 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class NMSChunksImpl implements NMSChunks {
@@ -138,6 +140,100 @@ public class NMSChunksImpl implements NMSChunks {
         return chunkSection instanceof EmptyCounterChunkSection && ((EmptyCounterChunkSection) chunkSection).isEmpty();
     }
 
+    private void calculateChunkSection(ChunkSection chunkSection, ChunkPosition chunkPosition, World bukkitWorld,
+                                       KeyMap<Counter> blockCounts, List<Location> spawnersLocations) {
+        // The palette of a 1.12 section cannot be read per block state, so the states are counted from the section's
+        // positions instead. Their keys are then resolved once per block state and not once per block.
+        // Only states whose key depends on the location (spawners, custom key parsers) are handled per position.
+        Map<IBlockData, Counter> sectionStates = new IdentityHashMap<>();
+        for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
+            IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+            if (blockData.getBlock() != Blocks.AIR) {
+                Counter counter = sectionStates.get(blockData);
+                if (counter == null)
+                    sectionStates.put(blockData, counter = new Counter(0));
+                counter.inc(1);
+            }
+        }
+
+        Set<IBlockData> positionalStates = null;
+        for (Map.Entry<IBlockData, Counter> entry : sectionStates.entrySet()) {
+            if (!countBlockData(entry.getKey(), entry.getValue().get(), blockCounts)) {
+                if (positionalStates == null)
+                    positionalStates = Collections.newSetFromMap(new IdentityHashMap<>());
+                positionalStates.add(entry.getKey());
+            }
+        }
+
+        if (positionalStates != null) {
+            for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
+                IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                if (positionalStates.contains(blockData)) {
+                    calculateBlockData(blockData, bp.getX(), bp.getY(), bp.getZ(), chunkPosition, bukkitWorld,
+                            chunkSection.getYPosition(), blockCounts, spawnersLocations);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds {@code amount} blocks of {@code blockData} to {@code blockCounts} when their key does not depend on
+     * their location. Returns false, without counting, when the blocks must go through calculateBlockData.
+     */
+    private boolean countBlockData(IBlockData blockData, int amount, KeyMap<Counter> blockCounts) {
+        Block block = blockData.getBlock();
+
+        if (block == Blocks.MOB_SPAWNER)
+            return false;
+
+        int blockAmount = amount;
+
+        if (block instanceof BlockDoubleStep) {
+            blockAmount = amount * 2;
+            blockData = toRegularSlab(block, blockData);
+        }
+
+        Key blockKey = KeyBlocksCache.getBlockKey(blockData);
+        if (plugin.getKeys().hasCustomMaterialKeyParser(blockKey))
+            return false;
+
+        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
+        return true;
+    }
+
+    private static void calculateBlockData(IBlockData blockData, int x, int y, int z, ChunkPosition chunkPosition,
+                                           World bukkitWorld, int sectionBottomY, KeyMap<Counter> blockCounts,
+                                           List<Location> spawnersLocations) {
+        Block block = blockData.getBlock();
+
+        if (block == Blocks.AIR)
+            return;
+
+        Location location = new Location(bukkitWorld,
+                (chunkPosition.getX() << 4) + x,
+                sectionBottomY + y,
+                (chunkPosition.getZ() << 4) + z);
+
+        int blockAmount = 1;
+
+        if (block instanceof BlockDoubleStep) {
+            blockAmount = 2;
+            blockData = toRegularSlab(block, blockData);
+        }
+
+        Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockData), location);
+        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
+        if (block == Blocks.MOB_SPAWNER) {
+            spawnersLocations.add(location);
+        }
+    }
+
+    private static IBlockData toRegularSlab(Block doubleSlab, IBlockData blockData) {
+        MinecraftKey blockKey = Block.REGISTRY.b(doubleSlab);
+        return Block.REGISTRY.get(new MinecraftKey(blockKey.getKey().replace("double_", ""))).getBlockData()
+                .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
+    }
+
     @Override
     public CompletableFuture<List<CalculatedChunk.Blocks>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                                            Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache) {
@@ -172,32 +268,7 @@ public class NMSChunksImpl implements NMSChunks {
 
                 for (ChunkSection chunkSection : chunk.getSections()) {
                     if (chunkSection != null && chunkSection != Chunk.a && !isChunkSectionEmpty(chunkSection)) {
-                        for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
-                            IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                            Block block = blockData.getBlock();
-                            if (block != Blocks.AIR) {
-                                Location location = new Location(bukkitWorld,
-                                        (chunkPosition.getX() << 4) + bp.getX(),
-                                        chunkSection.getYPosition() + bp.getY(),
-                                        (chunkPosition.getZ() << 4) + bp.getZ());
-                                int blockAmount = 1;
-
-                                if (block instanceof BlockDoubleStep) {
-                                    blockAmount = 2;
-                                    // Converts the block data to a regular slab
-                                    MinecraftKey blockKey = Block.REGISTRY.b(block);
-                                    blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.getKey()
-                                                    .replace("double_", ""))).getBlockData()
-                                            .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
-                                }
-
-                                Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockData), location);
-                                blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
-                                if (block == Blocks.MOB_SPAWNER) {
-                                    spawnersLocations.add(location);
-                                }
-                            }
-                        }
+                        calculateChunkSection(chunkSection, chunkPosition, bukkitWorld, blockCounts, spawnersLocations);
                     }
                 }
 
