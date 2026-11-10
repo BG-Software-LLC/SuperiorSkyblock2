@@ -53,7 +53,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
         if (!registered) {
             registered = true;
-            SuperiorSkyblockAPI.getBlockValues().registerKeyParser(new CustomKeyParser() {
+            SuperiorSkyblockAPI.getKeys().registerCustomMaterialKeyParser(new CustomKeyParser() {
 
                 private final SystemManager systemManager = WildStackerAPI.getWildStacker().getSystemManager();
 

@@ -33,9 +33,12 @@ import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,6 +50,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
@@ -369,6 +373,19 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         return this.onTeleportCallback;
     }
 
+    @Override
+    public List<Location> getEntityLocations(EntityType entityType, Location location) {
+        Location min = this.data.offset.applyToLocation(location);
+        List<Location> entityLocations = new LinkedList<>();
+
+        for (SchematicEntity entity : this.data.entities) {
+            if (entity.getEntityType() == entityType)
+                entityLocations.add(entity.getLocation(min));
+        }
+
+        return entityLocations;
+    }
+
     public SuperiorSchematic copy(String newName) {
         return new SuperiorSchematic(newName, this.data, this.cachedCounts);
     }
@@ -382,12 +399,46 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         this.affectedChunks = new LinkedList<>(affectedChunks);
         // We spawn the entities with a delay, waiting for players to teleport to the island first.
         this.onTeleportCallback = () -> {
-            BukkitExecutor.sync(() -> {
-                for (SchematicEntity entity : data.entities) {
-                    entity.spawnEntity(min);
-                }
-            }, 20L);
+            if (BukkitExecutor.isFolia()) {
+                scheduleRegionEntitySpawns(min);
+            } else {
+                BukkitExecutor.sync(() -> spawnEntities(min, data.entities, entity -> entity.isAlreadySpawned(min)), 20L);
+            }
         };
+    }
+
+    private void scheduleRegionEntitySpawns(Location min) {
+        World world = min.getWorld();
+        Map<ChunkPosition, List<SchematicEntity>> entitiesByChunk = new HashMap<>();
+        for (SchematicEntity entity : data.entities) {
+            Location location = entity.getLocation(min);
+            ChunkPosition chunk = ChunkPosition.of(world, location.getBlockX() >> 4, location.getBlockZ() >> 4, false);
+            entitiesByChunk.computeIfAbsent(chunk, ignored -> new ArrayList<>()).add(entity);
+        }
+
+        entitiesByChunk.forEach((chunk, entities) -> {
+            Location chunkLocation = new Location(world, chunk.getX() << 4, 0, chunk.getZ() << 4);
+            BukkitExecutor.sync(chunkLocation, () -> {
+                List<Entity> chunkEntities = Arrays.asList(world.getChunkAt(chunk.getX(), chunk.getZ()).getEntities());
+                spawnEntities(min, entities, entity -> entity.isAlreadySpawned(min, chunkEntities));
+            }, 20L);
+        });
+    }
+
+    private static void spawnEntities(Location min, List<SchematicEntity> entities, Predicate<SchematicEntity> alreadySpawned) {
+        // Entities of the schematic may still exist from an earlier paste, for example outside the
+        // protected area after the world of the island was reset, or when the spot of a disbanded
+        // island is reused. We check all the entities before spawning any of them, so entities of the
+        // schematic that share the same block do not prevent each other from spawning.
+        List<SchematicEntity> entitiesToSpawn = new ArrayList<>();
+        for (SchematicEntity entity : entities) {
+            if (!alreadySpawned.test(entity))
+                entitiesToSpawn.add(entity);
+        }
+
+        for (SchematicEntity entity : entitiesToSpawn) {
+            entity.spawnEntity(min);
+        }
     }
 
     private void finishCallback() {

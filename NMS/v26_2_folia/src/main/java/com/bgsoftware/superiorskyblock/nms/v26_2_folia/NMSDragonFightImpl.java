@@ -1,17 +1,23 @@
 package com.bgsoftware.superiorskyblock.nms.v26_2_folia;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
-import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.IslandDragonFight;
+import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.DragonFightState;
 import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.DragonNavigation;
+import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.IslandDragonFight;
 import com.bgsoftware.superiorskyblock.nms.v26_2_folia.dragon.WorldDragonFight;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -20,7 +26,6 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEnderDragon;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EnderCrystal;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,8 +36,11 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -70,6 +78,92 @@ public final class NMSDragonFightImpl implements NMSDragonFight, Listener {
         if (previous != null)
             previous.close(true);
         request(island, location.clone(), key, true, null, false);
+    }
+
+    @Override
+    public void restoreKilledDragonBattle(Island island, Location location) {
+        World world = location.getWorld();
+        if (world == null)
+            return;
+
+        BattleKey key = new BattleKey(world.getUID(), island.getUniqueId());
+        if (fights.containsKey(key))
+            return;
+
+        Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+        if (dimension == null)
+            return;
+
+        Location portal = location.clone();
+        if (island.getPersistentDataContainer().get(DragonFightState.key(dimension), PersistentDataType.STRING) != null) {
+            request(island, portal, key, false, null, true);
+            return;
+        }
+        if (!island.wasSchematicGenerated(dimension))
+            return;
+
+        Object request = new Object();
+        if (requests.putIfAbsent(key, request) != null)
+            return;
+
+        Location probe = portal.clone().add(1, 0, 0);
+        world.getChunkAtAsync(probe.getBlockX() >> 4, probe.getBlockZ() >> 4, true)
+                .thenCompose(chunk -> BukkitExecutor.submit(probe, () -> findActivePortalHeights(probe)))
+                .thenCompose(heights -> heights.isEmpty() ? CompletableFuture.completedFuture(null) :
+                        world.getChunkAtAsync(portal.getBlockX() >> 4, portal.getBlockZ() >> 4, true)
+                                .thenCompose(chunk -> BukkitExecutor.submit(portal, () -> findPodiumHeight(portal, heights))))
+                .whenComplete((portalY, error) -> {
+                    if (error != null || portalY == null) {
+                        if (requests.remove(key, request) && error != null)
+                            plugin.getLogger().log(Level.SEVERE, "Failed to locate an island dragon exit portal", error);
+                        return;
+                    }
+                    portal.setY(portalY);
+                    BukkitExecutor.sync(portal, () -> prepareArena(island, portal, key, false, null,
+                            true, request, dimension, true), 1L);
+                });
+    }
+
+    private List<Integer> findActivePortalHeights(Location probe) {
+        ServerLevel level = ((CraftWorld) probe.getWorld()).getHandle();
+        LevelChunk chunk = level.getChunkIfLoaded(probe.getBlockX() >> 4, probe.getBlockZ() >> 4);
+        if (chunk == null)
+            return List.of();
+
+        return chunk.getBlockEntities().entrySet().stream()
+                .filter(entry -> entry.getValue() instanceof TheEndPortalBlockEntity)
+                .map(Map.Entry::getKey)
+                .filter(position -> position.getX() == probe.getBlockX() && position.getZ() == probe.getBlockZ())
+                .map(BlockPos::getY).sorted(Comparator.comparingInt(y -> Math.abs(y - probe.getBlockY())))
+                .toList();
+    }
+
+    @Nullable
+    private Integer findPodiumHeight(Location portal, List<Integer> heights) {
+        ServerLevel level = ((CraftWorld) portal.getWorld()).getHandle();
+        LevelChunk chunk = level.getChunkIfLoaded(portal.getBlockX() >> 4, portal.getBlockZ() >> 4);
+        if (chunk == null)
+            return null;
+
+        for (int height : heights) {
+            BlockPos center = new BlockPos(portal.getBlockX(), height, portal.getBlockZ());
+            if (chunk.getBlockState(center).is(Blocks.BEDROCK) && chunk.getBlockState(center.above(3)).is(Blocks.BEDROCK))
+                return height;
+        }
+        return null;
+    }
+
+    @Override
+    public void replaceEnderDragon(Island island, EnderDragon dragon) {
+        BukkitExecutor.sync(dragon, () -> {
+            if (!dragon.isValid() || plugin.getGrid().getIslandAt(dragon.getLocation()) != island)
+                return;
+
+            BattleKey key = new BattleKey(dragon.getWorld().getUID(), island.getUniqueId());
+            IslandDragonFight fight = fights.get(key);
+            if (fight != null)
+                fight.replaceDragon(dragon);
+        }, 1L);
     }
 
     @Override
@@ -160,9 +254,8 @@ public final class NMSDragonFightImpl implements NMSDragonFight, Listener {
             return;
         Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(location.getWorld());
         Location portal = portal(island, dimension);
-        if (portal != null && island.getPersistentDataContainer().get("folia-dragon:" + dimension.getName(),
-                com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType.STRING) != null)
-            request(island, portal, key, false, null, false);
+        if (portal != null)
+            restoreKilledDragonBattle(island, portal);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -172,7 +265,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight, Listener {
                 DragonNavigation.freeze(dragon, plugin);
             BukkitExecutor.sync(dragon, () -> restoreDragon(dragon), 1L);
         } else if (event.getEntity() instanceof EnderCrystal crystal && crystal.getPersistentDataContainer()
-                .has(IslandDragonFight.crystalKey(plugin), PersistentDataType.STRING)) {
+                .has(IslandDragonFight.crystalKey(plugin), org.bukkit.persistence.PersistentDataType.STRING)) {
             BukkitExecutor.sync(crystal, () -> restoreCrystal(crystal), 1L);
         }
     }
@@ -204,6 +297,9 @@ public final class NMSDragonFightImpl implements NMSDragonFight, Listener {
     }
 
     private void restoreDragon(EnderDragon dragon) {
+        if (!dragon.isValid())
+            return;
+
         World world = dragon.getWorld();
         if (!(((CraftWorld) world).getHandle().getDragonFight() instanceof WorldDragonFight))
             return;
@@ -219,8 +315,10 @@ public final class NMSDragonFightImpl implements NMSDragonFight, Listener {
             existing.attach(((CraftEnderDragon) dragon).getHandle());
             return;
         }
-        if (requests.containsKey(key))
+        if (requests.containsKey(key)) {
+            BukkitExecutor.sync(dragon, () -> restoreDragon(dragon), 20L);
             return;
+        }
         Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
         Location portal = portal(island, dimension);
         if (portal != null)
@@ -240,13 +338,19 @@ public final class NMSDragonFightImpl implements NMSDragonFight, Listener {
 
     private void request(Island island, Location portal, BattleKey key, boolean fresh, EnderDragon existing, boolean respawn) {
         Object request = new Object();
-        requests.put(key, request);
+        if (fresh) {
+            requests.put(key, request);
+        } else if (fights.containsKey(key) || requests.putIfAbsent(key, request) != null) {
+            return;
+        }
         Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(portal.getWorld());
-        BukkitExecutor.sync(portal, () -> prepareArena(island, portal, key, fresh, existing, respawn, request, dimension), 1L);
+        boolean previouslyKilled = existing != null && existing.getScoreboardTags().contains(IslandDragonFight.PREVIOUSLY_KILLED_TAG);
+        BukkitExecutor.sync(portal, () -> prepareArena(island, portal, key, fresh, existing,
+                respawn, request, dimension, previouslyKilled), 1L);
     }
 
     private void prepareArena(Island island, Location portal, BattleKey key, boolean fresh, EnderDragon existing,
-                              boolean respawn, Object request, Dimension dimension) {
+                              boolean respawn, Object request, Dimension dimension, boolean previouslyKilled) {
         if (requests.get(key) != request)
             return;
         IslandDragonFight.loadArena(plugin, portal, () -> requests.get(key) == request).whenComplete((arena, error) -> {
@@ -256,13 +360,14 @@ public final class NMSDragonFightImpl implements NMSDragonFight, Listener {
                 return;
             }
             BukkitExecutor.sync(portal, () -> {
-                if (!requests.remove(key, request)) {
+                if (!requests.remove(key, request) || !fresh && fights.containsKey(key) ||
+                        plugin.getGrid().getIslandByUUID(island.getUniqueId()) != island) {
                     arena.close();
                     return;
                 }
                 try {
                     IslandDragonFight fight = new IslandDragonFight(plugin, island, dimension, portal, arena, fresh,
-                            existing == null ? null : existing.getUniqueId(), idle -> {
+                            existing == null ? null : existing.getUniqueId(), previouslyKilled, idle -> {
                         if (fights.remove(key, idle))
                             idle.close(false);
                     });

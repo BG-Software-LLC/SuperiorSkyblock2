@@ -212,7 +212,8 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
 
         try {
             Log.debug(Debug.CHUNK_CALCULATION_ENTITIES, island.getOwner().getName());
-            CompletableFutureList<List<CalculatedChunk.Entities>> chunkEntities = new CompletableFutureList<>(-1);
+            CompletableFutureList<List<CalculatedChunk.Entities>> chunkEntities = new CompletableFutureList<>(
+                    plugin.getSettings().getRecalcTaskTimeout());
 
             IslandUtils.getChunkCoords(island, IslandChunkFlags.ONLY_PROTECTED | IslandChunkFlags.NO_EMPTY_CHUNKS)
                     .forEach(((worldInfo, worldChunks) -> {
@@ -227,7 +228,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                     KeyMap<Integer> recalculatedEntityCounts = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
                     AtomicBoolean failed = new AtomicBoolean();
 
-                    chunkEntities.forEachCompleted(worldCalculatedChunk -> worldCalculatedChunk.forEach(calculatedChunk -> {
+                    boolean completed = chunkEntities.forEachCompleted(worldCalculatedChunk -> worldCalculatedChunk.forEach(calculatedChunk -> {
                         Log.debugResult(Debug.CHUNK_CALCULATION_ENTITIES, "Chunk Finished", calculatedChunk.getPosition());
                         calculatedChunk.getEntityCounts().forEach((entity, count) -> {
                             if (canTrackEntity(entity))
@@ -238,7 +239,7 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                         failed.set(true);
                     });
 
-                    if (failed.get())
+                    if (!completed || failed.get())
                         return;
 
                     recalculatedEntityCounts.forEach((entity, count) ->

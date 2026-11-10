@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -54,6 +55,11 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
     @Override
     public Runnable onTeleportCallback() {
         return this.baseSchematic.onTeleportCallback();
+    }
+
+    @Override
+    public List<Location> getEntityLocations(EntityType entityType, Location location) {
+        return this.baseSchematic.getEntityLocations(entityType, location);
     }
 
     @Override

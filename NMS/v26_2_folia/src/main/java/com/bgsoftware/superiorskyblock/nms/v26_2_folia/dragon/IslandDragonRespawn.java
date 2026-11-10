@@ -29,10 +29,7 @@ public final class IslandDragonRespawn {
                     level.levelEvent(LevelEvent.ANIMATION_DRAGON_SUMMON_ROAR, beam, 0);
                 }
             }
-            case SUMMONING_PILLARS -> {
-                if (time % 40 == 0)
-                    fight.setRespawnStage(DragonRespawnStage.SUMMONING_DRAGON);
-            }
+            case SUMMONING_PILLARS -> fight.summonPillars(crystals, time);
             case SUMMONING_DRAGON -> {
                 if (time >= 100) {
                     fight.setRespawnStage(DragonRespawnStage.END);

@@ -16,12 +16,14 @@ import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.gameevent.vibrations.VibrationSystem;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.redstone.NeighborUpdater;
 import net.minecraft.world.ticks.LevelTicks;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.type.HangingSign;
@@ -98,6 +100,13 @@ public class NMSWorldImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.Ab
         ServerLevel serverLevel = ((CraftWorld) world).getHandle();
         COLLECTING_NEIGHBOR_UPDATER.set(serverLevel, new CollectingNeighborUpdaterTracker(serverLevel));
         BLOCK_TICKS.set(serverLevel, new BlockLevelTicksTracker(serverLevel));
+        // Chunks that are already loaded (such as spawn chunks) registered their block tick containers
+        // in the replaced LevelTicks, therefore we register them again in the new one.
+        for (Chunk chunk : world.getLoadedChunks()) {
+            LevelChunk levelChunk = serverLevel.getChunkSource().getChunk(chunk.getX(), chunk.getZ(), false);
+            if (levelChunk != null)
+                levelChunk.registerTickContainerInLevel(serverLevel);
+        }
     }
 
 }

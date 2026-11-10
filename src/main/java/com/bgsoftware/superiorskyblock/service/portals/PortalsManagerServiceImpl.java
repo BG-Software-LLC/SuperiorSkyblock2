@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
+import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.PortalType;
@@ -36,8 +37,8 @@ import org.bukkit.entity.Player;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class PortalsManagerServiceImpl implements PortalsManagerService, IService {
@@ -320,7 +321,6 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                         BigDecimal originalLevel = island.getRawLevel();
 
                         schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
-                            generatingSchematicsIslands.remove(island.getUniqueId());
                             island.setSchematicGenerate(destination);
 
                             SettingsManager.Worlds.DimensionConfig destinationConfig = plugin.getSettings().getWorlds().getDimensionConfig(destination);
@@ -354,6 +354,13 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
                             } else {
                                 EntityTeleports.teleport(entity, homeLocation);
                             }
+
+                            Runnable onTeleportCallback = schematic instanceof BaseSchematic ?
+                                    ((BaseSchematic) schematic).onTeleportCallback() : null;
+                            if (onTeleportCallback != null)
+                                onTeleportCallback.run();
+
+                            generatingSchematicsIslands.remove(island.getUniqueId());
                         }, error -> failSchematicGeneration(island, superiorPlayer, error));
                     } catch (Throwable error) {
                         failSchematicGeneration(island, superiorPlayer, error);

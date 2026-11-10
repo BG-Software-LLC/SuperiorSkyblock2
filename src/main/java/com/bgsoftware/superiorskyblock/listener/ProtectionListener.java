@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -81,6 +80,8 @@ public class ProtectionListener extends AbstractGameEventListener {
     private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
     @Nullable
     private static final Material SULFUR_SPIKE = EnumHelper.getEnum(Material.class, "SULFUR_SPIKE");
+    @Nullable
+    private static final EntityType SULFUR_CUBE_TYPE = EnumHelper.getEnum(EntityType.class, "SULFUR_CUBE");
 
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -326,6 +327,18 @@ public class ProtectionListener extends AbstractGameEventListener {
             e.setCancelled();
     }
 
+    private void onPlayerTakeLecternBook(GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> e) {
+        IslandPrivilege pickupLecternBookPrivilege = IslandPrivileges.CONFIG_LECTERN_BOOK;
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+        InteractionResult interactionResult;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            interactionResult = this.protectionManager.get().handleCustomInteraction(
+                    superiorPlayer, e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), pickupLecternBookPrivilege);
+        }
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+            e.setCancelled();
+    }
+
     private void onBucketDispense(GameEvent<GameEventArgs.BlockDispenseEvent> e) {
         Material itemType = e.getArgs().dispensedItem.getType();
 
@@ -372,6 +385,21 @@ public class ProtectionListener extends AbstractGameEventListener {
                 .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
         InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(damager, entity);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, damagerSource, true))
+            e.setCancelled();
+    }
+
+    private void onPlayerAttackEntity(GameEvent<GameEventArgs.PlayerAttackEntityEvent> e) {
+        Entity entity = e.getArgs().entity;
+
+        // Sulfur cubes that hold a block are immune to attacks: they are only knocked back, and no damage event
+        // is called for them. Therefore, we check attacking sulfur cubes before the attack happens.
+        if (entity == null || entity.getType() != SULFUR_CUBE_TYPE)
+            return;
+
+        Player player = e.getArgs().player;
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(player, entity);
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled();
     }
 
@@ -634,8 +662,7 @@ public class ProtectionListener extends AbstractGameEventListener {
                     EntityType entityType = entity.getType();
 
                     if (hitBlockType == TARGET) {
-                        islandPrivilege = plugin.getSettings().getInteractablesMap()
-                                .getRequiredPrivilege(ConstantKeys.TARGET);
+                        islandPrivilege = IslandPrivileges.CONFIG_TARGET_INTERACT;
                     } else if (hitBlockType == CHORUS_FLOWER || hitBlockType == DECORATED_POT || (entityType == TRIDENT
                             && (hitBlockType == POINTED_DRIPSTONE || hitBlockType == SULFUR_SPIKE))) {
                         islandPrivilege = IslandPrivileges.BREAK;
@@ -730,9 +757,11 @@ public class ProtectionListener extends AbstractGameEventListener {
         registerCallback(GameEventType.ENTITY_BLOCK_FORM_EVENT, GameEventPriority.NORMAL, this::onFrostWalker);
         registerCallback(GameEventType.PLAYER_EMPTY_BUCKET_EVENT, GameEventPriority.NORMAL, this::onBucketEmpty);
         registerCallback(GameEventType.PLAYER_FILL_BUCKET_EVENT, GameEventPriority.NORMAL, this::onBucketFill);
+        registerCallback(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, GameEventPriority.NORMAL, this::onPlayerTakeLecternBook);
         registerCallback(GameEventType.BLOCK_DISPENSE_EVENT, GameEventPriority.NORMAL, this::onBucketDispense);
         registerCallback(GameEventType.PLAYER_ITEM_CONSUME_EVENT, GameEventPriority.NORMAL, this::onChorusFruitConsume);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.NORMAL, this::onEntityAttack);
+        registerCallback(GameEventType.PLAYER_ATTACK_ENTITY_EVENT, GameEventPriority.NORMAL, this::onPlayerAttackEntity);
         registerCallback(GameEventType.PLAYER_SHEAR_ENTITY_EVENT, GameEventPriority.NORMAL, this::onEntityShearing);
         registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.NORMAL, this::onHangingBreak);
         registerCallback(GameEventType.HANGING_PLACE_EVENT, GameEventPriority.NORMAL, this::onHangingPlace);
