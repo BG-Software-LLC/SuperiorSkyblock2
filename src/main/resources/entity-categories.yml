@@ -32,7 +32,7 @@
 builtin-categories:
   ALL:
     skipped-entities: [ ]
-    actions: [ ]
+    actions: { }
 
   ANIMAL:
     skipped-entities: [ ]
