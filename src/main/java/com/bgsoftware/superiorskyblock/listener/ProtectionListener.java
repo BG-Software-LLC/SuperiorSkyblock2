@@ -658,6 +658,9 @@ public class ProtectionListener extends AbstractGameEventListener {
                     }
                 } else {
                     hitBlock = e.getArgs().hitBlock;
+                    if (hitBlock == null)
+                        return;
+                    
                     Material hitBlockType = hitBlock == null ? null : hitBlock.getType();
                     EntityType entityType = entity.getType();
 
