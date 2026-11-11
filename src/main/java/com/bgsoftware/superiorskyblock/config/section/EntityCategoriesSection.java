@@ -1,163 +1,208 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
-import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.category.BaseKeyCategory;
+import com.bgsoftware.superiorskyblock.core.key.category.BuiltinKeyCategories;
+import com.bgsoftware.superiorskyblock.core.key.category.FixedKeyCategory;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
+import com.bgsoftware.superiorskyblock.core.key.category.PredicateKeyCategory;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.world.entity.BuiltinEntityCategory;
-import com.bgsoftware.superiorskyblock.world.entity.EntityCategoryImpl;
-import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-public class EntityCategoriesSection implements SettingsManager.EntityCategories {
+public class EntityCategoriesSection extends BaseCategoriesMapper {
 
-    private final Map<String, EntityCategory> nameToCategory;
-    private final KeyMap<List<EntityCategory>> entityToCategory;
+    public static final String[] IGNORED_SECTIONS = new String[]{"custom-categories", "builtin-categories.ALL.actions",
+            "builtin-categories.TAMED.actions", "builtin-categories.VEHICLE.actions",
+            "builtin-categories.MONSTER.actions", "builtin-categories.ANIMAL.actions"};
 
-    private final LazyReference<List<EntityCategory>> entityCategories = new LazyReference<List<EntityCategory>>() {
-        @Override
-        protected List<EntityCategory> create() {
-            return nameToCategory.isEmpty() ? Collections.emptyList() :
-                    Collections.unmodifiableList(new LinkedList<>(nameToCategory.values()));
+    public EntityCategoriesSection(YamlConfiguration config) {
+        super(config, KeyIndicator.ENTITY_TYPE);
+
+        // Cache all the known values
+        for (EntityType entityType : EntityType.values()) {
+            getCategories(Keys.of(entityType));
         }
-    };
 
-    public EntityCategoriesSection(YamlConfiguration cfg) {
-        this.nameToCategory = loadInternal(cfg);
-        this.entityToCategory = convertEntityToCategoryInternal(this.nameToCategory.values());
     }
 
-    public static void removeInvalidEntityKeys(YamlConfiguration cfg, File file) {
-        boolean removed = false;
-        for (String categoryName : cfg.getKeys(false)) {
-            if (EnumHelper.getEnum(BuiltinEntityCategory.class, categoryName) == null) {
-                List<String> entities = cfg.getStringList(categoryName + ".entities");
-                Iterator<String> iterator = entities.iterator();
-                while (iterator.hasNext()) {
-                    EntityType entityType = EnumHelper.getEnum(EntityType.class, iterator.next());
-                    if (entityType == null) {
-                        iterator.remove();
-                        removed = true;
+    @Override
+    @Nullable
+    protected KeyCategory parseCustomCategory(ConfigurationSection section, KeyCategoryId key) {
+        KeySet entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, section.getStringList("entities"));
+
+        FixedKeyCategory category = new FixedKeyCategory(key.getName(), entities);
+
+        category.setRequirement(KeyCategory.Action.SPAWN, getOrRegisterPrivilege(section.getString("actions.SPAWN")));
+        category.setRequirement(KeyCategory.Action.DAMAGE, getOrRegisterPrivilege(section.getString("actions.DAMAGE")));
+        category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(section.getString("actions.INTERACT")));
+        category.setRequirement(KeyCategory.Action.SPAWNER_SPAWN, getOrRegisterFlag(section.getString("actions.SPAWNER_SPAWN")));
+        category.setRequirement(KeyCategory.Action.NATURAL_SPAWN, getOrRegisterFlag(section.getString("actions.NATURAL_SPAWN")));
+
+        return category;
+    }
+
+    @Override
+    protected void loadBuiltinCategories(ConfigurationSection section, EnumerateMap<KeyCategoryId, KeyCategory> categories) {
+        categories.put(BuiltinKeyCategories.ALL, BuiltinKeyCategories.createAllCategory());
+
+        for (KeyCategoryId key : BuiltinKeyCategories.ENTITY_CATEGORIES) {
+            categories.put(key, BuiltinKeyCategories.createEntitiesCategory(key));
+        }
+
+        ConfigurationSection categoriesSection = section.getConfigurationSection("builtin-categories");
+
+        if (categoriesSection == null) {
+            return;
+        }
+
+        for (String categoryName : categoriesSection.getKeys(false)) {
+            KeyCategoryId key = KeyCategoryId.getByName(categoryName.toUpperCase(Locale.ENGLISH));
+
+            KeyCategory builtinCategory;
+            // In this stage, only built-in categories are in `categories` so we can test against that map.
+            if (key == null || (builtinCategory = categories.get(key)) == null) {
+                Log.warnFromFile(getFileName(), "Invalid builtin category ", categoryName, ", skipping...");
+                continue;
+            }
+
+            ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
+
+            if (categorySection == null) {
+                continue;
+            }
+
+            KeySet skippedEntities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, categorySection.getStringList("skipped-entities"));
+            BaseKeyCategory category;
+
+            if (BuiltinKeyCategories.ALL.equals(key)) {
+                category = new PredicateKeyCategory(key.getName(), element -> !skippedEntities.contains(element));
+            } else {
+                KeySet entities = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
+
+                for (Key entity : ((FixedKeyCategory) builtinCategory).getKeys()) {
+                    if (!skippedEntities.contains(entity)) {
+                        entities.add(entity);
                     }
                 }
-                if (entities.isEmpty()) {
-                    cfg.set(categoryName, null);
-                } else {
-                    cfg.set(categoryName + ".entities", entities);
+
+                category = new FixedKeyCategory(key.getName(), entities);
+            }
+
+            category.setRequirement(KeyCategory.Action.SPAWN, getOrRegisterPrivilege(section.getString("actions.SPAWN")));
+            category.setRequirement(KeyCategory.Action.DAMAGE, getOrRegisterPrivilege(section.getString("actions.DAMAGE")));
+            category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(section.getString("actions.INTERACT")));
+            category.setRequirement(KeyCategory.Action.SPAWNER_SPAWN, getOrRegisterFlag(section.getString("actions.SPAWNER_SPAWN")));
+            category.setRequirement(KeyCategory.Action.NATURAL_SPAWN, getOrRegisterFlag(section.getString("actions.NATURAL_SPAWN")));
+
+            categories.put(key, category);
+        }
+    }
+
+    @Override
+    protected String getFileName() {
+        return "entity-categories.yml";
+    }
+
+    public static void convertToSections(YamlConfiguration config, File file) {
+        if (config.isConfigurationSection("builtin-categories")
+                && config.isConfigurationSection("custom-categories")) {
+            return;
+        }
+
+        boolean converted = false;
+        for (String categoryName : config.getKeys(false)) {
+            if (categoryName.equalsIgnoreCase("builtin-categories")
+                    || categoryName.equalsIgnoreCase("custom-categories")) {
+                continue;
+            }
+
+            ConfigurationSection categorySection = config.getConfigurationSection(categoryName);
+
+            if (categorySection == null) {
+                continue;
+            }
+
+            if (categoryName.equalsIgnoreCase("VEHICLE")
+                    || categoryName.equalsIgnoreCase("MONSTER") || categoryName.equalsIgnoreCase("ANIMAL")) {
+                config.set("builtin-categories." + categoryName, categorySection);
+            } else if (categoryName.equalsIgnoreCase("TAMEABLE")) {
+                config.set("builtin-categories.TAMED", categorySection);
+            } else {
+                config.set("custom-categories." + categoryName, categorySection);
+            }
+
+            config.set(categoryName, null);
+            converted = true;
+        }
+
+        if (converted) {
+            try {
+                config.save(file);
+            } catch (Exception error) {
+                Log.errorFromFile(error, "entity-categories.yml", "An unexpected error occurred while saving file:");
+            }
+        }
+    }
+
+    public static void removeInvalidEntities(YamlConfiguration config, File file) {
+        ConfigurationSection categoriesSection = config.getConfigurationSection("custom-categories");
+
+        if (categoriesSection == null) {
+            return;
+        }
+
+        boolean removed = false;
+        for (String categoryName : categoriesSection.getKeys(false)) {
+            List<String> entities = categoriesSection.getStringList(categoryName + ".entities");
+
+            Iterator<String> iterator = entities.iterator();
+            while (iterator.hasNext()) {
+                String entity = iterator.next().split(":")[0];
+
+                if (EnumHelper.getEnum(EntityType.class, entity) == null) {
+                    iterator.remove();
+                    removed = true;
                 }
+            }
+
+            if (entities.isEmpty()) {
+                categoriesSection.set(categoryName, null);
+            } else {
+                categoriesSection.set(categoryName + ".entities", entities);
             }
         }
 
         if (removed) {
             try {
-                cfg.save(file);
-            } catch (IOException ignored) {
+                config.save(file);
+            } catch (Exception error) {
+                Log.error(error, file, "An unexpected error occurred while saving config file:");
             }
         }
-
-    }
-
-    private static Map<String, EntityCategory> loadInternal(YamlConfiguration cfg) {
-        Map<String, EntityCategory> entityCategories = new HashMap<>();
-
-        for (String categoryName : cfg.getKeys(false)) {
-            String key = categoryName.toLowerCase(Locale.ENGLISH);
-
-            if (entityCategories.containsKey(categoryName)) {
-                Log.warnFromFile("entity-categories.yml", "Duplicate entity category ", categoryName, " - skipping...");
-                continue;
-            }
-
-            ConfigurationSection section = cfg.getConfigurationSection(categoryName);
-
-            BuiltinEntityCategory builtinEntityCategory = EnumHelper.getEnum(BuiltinEntityCategory.class,
-                    categoryName.toUpperCase(Locale.ENGLISH));
-
-            KeySet entities = builtinEntityCategory != null ? builtinEntityCategory.getEntities() :
-                    KeySets.createHashSet(KeyIndicator.ENTITY_TYPE, section.getStringList("entities"));
-
-            IslandPrivilege spawnPrivilege = getOrRegisterPrivilege(section.getString("actions.SPAWN"));
-            IslandPrivilege damagePrivilege = getOrRegisterPrivilege(section.getString("actions.DAMAGE"));
-            IslandPrivilege interactPrivilege = getOrRegisterPrivilege(section.getString("actions.INTERACT"));
-            IslandFlag spawnerSpawnFlag = getOrRegisterFlag(section.getString("actions.SPAWNER_SPAWN"));
-            IslandFlag naturalSpawnFlag = getOrRegisterFlag(section.getString("actions.NATURAL_SPAWN"));
-
-            entityCategories.put(key, new EntityCategoryImpl(categoryName, entities, spawnPrivilege, damagePrivilege,
-                    interactPrivilege, spawnerSpawnFlag, naturalSpawnFlag));
-        }
-
-        // Add rest of built-in entity categories
-        for (BuiltinEntityCategory builtinEntityCategory : BuiltinEntityCategory.values()) {
-            if (!entityCategories.containsKey(builtinEntityCategory.name())) {
-                entityCategories.put(builtinEntityCategory.name(), new EntityCategoryImpl(builtinEntityCategory.name(),
-                        builtinEntityCategory.getEntities(), null, null,
-                        null, null, null));
-            }
-        }
-
-        return Collections.unmodifiableMap(entityCategories);
-    }
-
-    private static KeyMap<List<EntityCategory>> convertEntityToCategoryInternal(Collection<EntityCategory> entityCategories) {
-        KeyMap<List<EntityCategory>> categories = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
-        for (EntityCategory entityCategory : entityCategories) {
-            for (Key key : entityCategory.getEntities()) {
-                categories.computeIfAbsent(key, k -> new LinkedList<>()).add(entityCategory);
-            }
-        }
-        if (categories.isEmpty())
-            return KeyMaps.createEmptyMap();
-
-        // Convert keyMap to unmodifiable.
-        KeyMap<List<EntityCategory>> categoriesUnmodifiable = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
-        categories.forEach((key, value) -> categoriesUnmodifiable.put(key, Collections.unmodifiableList(value)));
-        return KeyMaps.unmodifiableKeyMap(categoriesUnmodifiable);
-    }
-
-    @Override
-    public List<EntityCategory> getCategories() {
-        return this.entityCategories.get();
-    }
-
-    @Override
-    public List<EntityCategory> getCategories(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null");
-        return this.entityToCategory.getOrDefault(key, Collections.emptyList());
-    }
-
-    @Override
-    public EntityCategory getCategoryByName(String name) {
-        Preconditions.checkNotNull(name, "name parameter cannot be null");
-        return this.nameToCategory.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Nullable
     private static IslandPrivilege getOrRegisterPrivilege(@Nullable String name) {
-        if (name == null)
+        if (name == null) {
             return null;
+        }
 
         try {
             return IslandPrivilege.getByName(name);
@@ -169,8 +214,9 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
 
     @Nullable
     private static IslandFlag getOrRegisterFlag(@Nullable String name) {
-        if (name == null)
+        if (name == null) {
             return null;
+        }
 
         try {
             return IslandFlag.getByName(name);

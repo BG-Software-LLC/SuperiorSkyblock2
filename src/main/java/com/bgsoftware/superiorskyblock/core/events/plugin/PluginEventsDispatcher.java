@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.Bukkit;
@@ -46,6 +47,7 @@ public class PluginEventsDispatcher extends EventsDispatcher<
         Message.registerListeners(this);
         SSuperiorPlayer.registerListeners(this);
         WorldsProvider_Default.registerListeners(this);
+        ProtectionHelper.registerListeners(this);
         IslandPrivileges.registerListeners(this);
         Dimensions.registerListeners(this);
         CommandsManagerImpl.registerListeners(this);

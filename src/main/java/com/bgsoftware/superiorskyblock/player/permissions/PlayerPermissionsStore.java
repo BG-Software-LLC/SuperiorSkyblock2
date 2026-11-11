@@ -3,12 +3,14 @@ package com.bgsoftware.superiorskyblock.player.permissions;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.core.key.category.BuiltinKeyCategories;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,8 +42,20 @@ public class PlayerPermissionsStore {
 
     public void refreshCache(Player player) {
         // We want to refresh cache for common permissions
-        hasBypassPermission(player, IslandPrivileges.BUILD);
-        hasBypassPermission(player, IslandPrivileges.BREAK);
+
+        KeyCategory allCategory = Objects.requireNonNull(plugin.getSettings().getBlockCategoriesMapping()
+                .getCategoryByKey(BuiltinKeyCategories.ALL));
+
+        IslandPrivilege breakPrivilege = allCategory.getRequiredPrivilege(KeyCategory.Action.BREAK);
+        if (breakPrivilege != null) {
+            hasBypassPermission(player, breakPrivilege);
+        }
+
+        IslandPrivilege placePrivilege = allCategory.getRequiredPrivilege(KeyCategory.Action.PLACE);
+        if (placePrivilege != null) {
+            hasBypassPermission(player, placePrivilege);
+        }
+
         hasCustomPermission(player, "superior.admin.bypass.*");
     }
 

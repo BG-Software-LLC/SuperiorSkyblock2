@@ -7,19 +7,24 @@ import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.section.AFKIntegrationsSection;
+import com.bgsoftware.superiorskyblock.config.section.BlockCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.DatabaseSection;
 import com.bgsoftware.superiorskyblock.config.section.DefaultContainersSection;
 import com.bgsoftware.superiorskyblock.config.section.DefaultValuesSection;
+import com.bgsoftware.superiorskyblock.config.section.EntityCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.GlobalSection;
+import com.bgsoftware.superiorskyblock.config.section.InteractablesSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandChestsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandNamesSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandPreviewsSection;
 import com.bgsoftware.superiorskyblock.config.section.IslandRolesSection;
+import com.bgsoftware.superiorskyblock.config.section.LegacyEntityCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.SpawnSection;
 import com.bgsoftware.superiorskyblock.config.section.StackedBlocksSection;
 import com.bgsoftware.superiorskyblock.config.section.VisitorsSignSection;
@@ -28,9 +33,11 @@ import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.key.category.FixedKeyCategory;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -71,6 +78,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     private final DefaultContainersSection defaultContainers = new DefaultContainersSection();
     private final IslandChestsSection islandChests = new IslandChestsSection();
     private final IslandPreviewsSection islandPreviews = new IslandPreviewsSection();
+    @SuppressWarnings("deprecation")
+    private final InteractablesSection interactables = new InteractablesSection();
 
     public SettingsManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -80,21 +89,31 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     public void loadData() throws ManagerLoadException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
-        if (!file.exists())
+        if (!file.exists()) {
             plugin.saveResource("config.yml", false);
+        }
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if (convertData(cfg)) {
+        boolean shouldSaveFile = convertData(cfg);
+
+        if (convertEntityCategories(plugin, cfg)) {
+            shouldSaveFile = true;
+        }
+
+        convertInteractablesData(plugin);
+
+        if (convertBlockCategories(plugin, cfg)) {
+            shouldSaveFile = true;
+        }
+
+        if (shouldSaveFile) {
             try {
                 cfg.save(file);
             } catch (Exception error) {
                 Log.error(error, file, "An unexpected error occurred while loading config file:");
             }
         }
-
-        convertInteractables(plugin, cfg);
-        convertEntityCategories(plugin, cfg);
 
         try {
             cfg.syncWithConfig(file, plugin.getResource("config.yml"), IGNORED_SECTIONS);
@@ -226,20 +245,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
-    public List<String> getInteractables() {
-        List<String> interactables = new LinkedList<>();
-        for (Key key : getInteractablesMap().getInteractables()) {
-            interactables.add(key.toString());
-        }
-        return interactables.isEmpty() ? Collections.emptyList() : interactables;
-    }
-
-    @Override
-    public Interactables getInteractablesMap() {
-        return this.global.getInteractablesMap();
-    }
-
-    @Override
     public Collection<Key> getSafeBlocks() {
         return this.global.getSafeBlocks();
     }
@@ -295,6 +300,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public boolean isDisbandInventoryClear() {
         List<ClearAction> clearActions = this.global.getClearActionsOnDisband();
         return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
@@ -326,6 +332,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public boolean isClearOnJoin() {
         List<ClearAction> clearActions = this.global.getClearActionsOnJoin();
         return clearActions.contains(ClearActions.ENDER_CHEST) && clearActions.contains(ClearActions.INVENTORY);
@@ -597,8 +604,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
     public Set<Key> getValuableBlocks() {
-        return this.global.getValuableBlocks();
+        KeyCategory blockCategory = this.getBlockCategoriesMapping().getCategoryByName("VALUABLE_BLOCKS");
+        return blockCategory instanceof FixedKeyCategory ?
+                ((FixedKeyCategory) blockCategory).getKeys() : Collections.emptySet();
     }
 
     @Override
@@ -724,17 +734,54 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     @Override
+    @Deprecated
+    public List<String> getInteractables() {
+        List<String> interactables = new LinkedList<>();
+
+        for (KeyCategory blockCategory : getBlockCategoriesMapping().getCategories()) {
+            if (blockCategory instanceof FixedKeyCategory &&
+                    blockCategory.getRequiredPrivilege(KeyCategory.Action.INTERACT) != null) {
+                for (Key key : ((FixedKeyCategory) blockCategory).getKeys()) {
+                    interactables.add(key.toString());
+                }
+            }
+        }
+
+        return interactables.isEmpty() ? Collections.emptyList() : interactables;
+    }
+
+    @Override
+    @Deprecated
+    public Interactables getInteractablesMap() {
+        return this.interactables;
+    }
+
+    @Override
+    @Deprecated
     public Map<String, KeySet> getEntityCategories() {
         Map<String, KeySet> categories = new HashMap<>();
+
         for (EntityCategory entityCategory : getEntityCategoriesMap().getCategories()) {
             categories.put(entityCategory.getName(), entityCategory.getEntities());
         }
+
         return categories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(categories);
     }
 
     @Override
+    @Deprecated
     public EntityCategories getEntityCategoriesMap() {
-        return this.global.getEntityCategoriesMap();
+        return new LegacyEntityCategoriesSection(getEntityCategoriesMapping());
+    }
+
+    @Override
+    public EntityCategoriesSection getEntityCategoriesMapping() {
+        return this.global.getEntityCategoriesMapping();
+    }
+
+    @Override
+    public BlockCategoriesSection getBlockCategoriesMapping() {
+        return this.global.getBlockCategoriesMapping();
     }
 
     public void updateValue(String path, Object value) throws IOException {
@@ -773,6 +820,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         this.defaultContainers.setContainer(container);
         this.islandChests.setContainer(container);
         this.islandPreviews.setContainer(container);
+        this.interactables.setContainer(container);
 
         PluginEventsFactory.callSettingsUpdateEvent();
     }
@@ -1024,57 +1072,138 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         return false;
     }
 
-    private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
-        if (!cfg.isList("interactables"))
-            return;
-
-        File file = new File(plugin.getDataFolder(), "interactables.yml");
-
-        if (!file.exists())
-            plugin.saveResource("interactables.yml", false);
-
-        CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
-
-        commentedConfig.set("interactables", cfg.getStringList("interactables"));
-
-        try {
-            commentedConfig.save(file);
-            cfg.set("interactables", null);
-        } catch (Exception error) {
-            Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+    private boolean convertEntityCategories(SuperiorSkyblockPlugin plugin, YamlConfiguration config) {
+        if (!config.isConfigurationSection("entity-categories")) {
+            return false;
         }
 
-    }
+        File entityCategoriesFile = new File(plugin.getDataFolder(), "entity-categories.yml");
 
-    private void convertEntityCategories(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
-        if (!cfg.isConfigurationSection("entity-categories"))
-            return;
-
-        File file = new File(plugin.getDataFolder(), "entity-categories.yml");
-
-        if (!file.exists())
+        if (!entityCategoriesFile.exists()) {
             plugin.saveResource("entity-categories.yml", false);
+        }
 
-        CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
+        CommentedConfiguration entityCategoriesConfig = CommentedConfiguration.loadConfiguration(entityCategoriesFile);
 
-        for (String categoryName : cfg.getConfigurationSection("entity-categories").getKeys(false)) {
-            List<String> entities = cfg.getStringList("entity-categories." + categoryName);
+        for (String categoryName : config.getConfigurationSection("entity-categories").getKeys(false)) {
+            List<String> entities = config.getStringList("entity-categories." + categoryName);
+
             if (!entities.isEmpty()) {
                 categoryName = categoryName.toUpperCase(Locale.ENGLISH);
-                commentedConfig.set(categoryName + ".entities", entities);
-                commentedConfig.set(categoryName + ".actions.SPAWN", categoryName + "_SPAWN");
-                commentedConfig.set(categoryName + ".actions.DAMAGE", categoryName + "_DAMAGE");
-                commentedConfig.set(categoryName + ".actions.SPAWNER_SPAWN", "SPAWNER_" + categoryName + "_SPAWN");
-                commentedConfig.set(categoryName + ".actions.NATURAL_SPAWN", "NATURAL_" + categoryName + "_SPAWN");
+                entityCategoriesConfig.set("custom-categories." + categoryName + ".entities", entities);
+                entityCategoriesConfig.set("custom-categories." + categoryName + ".actions.SPAWN", categoryName + "_SPAWN");
+                entityCategoriesConfig.set("custom-categories." + categoryName + ".actions.DAMAGE", categoryName + "_DAMAGE");
+                entityCategoriesConfig.set("custom-categories." + categoryName + ".actions.SPAWNER_SPAWN", "SPAWNER_" + categoryName + "_SPAWN");
+                entityCategoriesConfig.set("custom-categories." + categoryName + ".actions.NATURAL_SPAWN", "NATURAL_" + categoryName + "_SPAWN");
             }
         }
 
         try {
-            commentedConfig.save(file);
-            cfg.set("entity-categories", null);
+            entityCategoriesConfig.save(entityCategoriesFile);
+            config.set("entity-categories", null);
         } catch (Exception error) {
-            Log.errorFromFile(error, file.getName(), "An unexpected error occurred while saving file:");
+            Log.errorFromFile(error, entityCategoriesFile.getName(), "An unexpected error occurred while saving file:");
         }
+
+        return true;
+    }
+
+    private void convertInteractablesData(SuperiorSkyblockPlugin plugin) {
+        File interactablesFile = new File(plugin.getDataFolder(), "interactables.yml");
+
+        if (!interactablesFile.exists()) {
+            return;
+        }
+
+        CommentedConfiguration interactablesConfig = CommentedConfiguration.loadConfiguration(interactablesFile);
+
+        if (interactablesConfig.getKeys(false).size() != 1 || !interactablesConfig.isList("interactables")) {
+            return;
+        }
+
+        // noinspection deprecation
+        InteractablesSection.convertInteractables(interactablesConfig);
+
+        try {
+            interactablesConfig.save(interactablesFile);
+        } catch (Exception error) {
+            Log.errorFromFile(error, interactablesFile.getName(), "An unexpected error occurred while saving file:");
+        }
+    }
+
+    private boolean convertBlockCategories(SuperiorSkyblockPlugin plugin, YamlConfiguration config) {
+        File interactablesFile = new File(plugin.getDataFolder(), "interactables.yml");
+        File blockCategoriesFile = new File(plugin.getDataFolder(), "block-categories.yml");
+
+        if (blockCategoriesFile.exists()) {
+            return false;
+        }
+
+        YamlConfiguration interactablesConfig;
+
+        if (interactablesFile.exists()) {
+            interactablesConfig = CommentedConfiguration.loadConfiguration(interactablesFile);
+        } else if (config.isList("interactables")) {
+            interactablesConfig = new YamlConfiguration();
+            interactablesConfig.set("interactables", config.getStringList("interactables"));
+            // noinspection deprecation
+            InteractablesSection.convertInteractables(interactablesConfig);
+        } else if (config.isList("valuable-blocks")) {
+            interactablesConfig = new YamlConfiguration();
+        } else {
+            return false;
+        }
+
+        CommentedConfiguration blockCategoriesConfig = CommentedConfiguration.loadConfiguration(plugin.getResource("block-categories.yml"));
+
+        ConfigurationSection customCategories = blockCategoriesConfig.getConfigurationSection("custom-categories");
+
+        if (customCategories == null) {
+            customCategories = blockCategoriesConfig.createSection("custom-categories");
+        }
+
+        if (!interactablesConfig.getKeys(false).isEmpty()) {
+            for (String categoryName : customCategories.getKeys(false)) {
+                if (customCategories.isList(categoryName + ".blocks")) {
+                    customCategories.set(categoryName + ".blocks", null);
+                }
+            }
+        }
+
+        if (config.isList("valuable-blocks")) {
+            customCategories.set("VALUABLE_BLOCKS.blocks", config.getStringList("valuable-blocks"));
+            customCategories.set("VALUABLE_BLOCKS.actions.BREAK", "VALUABLE_BREAK");
+        }
+
+        for (String islandPrivilegeName : interactablesConfig.getKeys(false)) {
+            customCategories.set(islandPrivilegeName + ".blocks", interactablesConfig.getStringList(islandPrivilegeName));
+            customCategories.set(islandPrivilegeName + ".actions.INTERACT", islandPrivilegeName);
+
+            if (islandPrivilegeName.equalsIgnoreCase("SPAWNER_BREAK")) {
+                customCategories.set(islandPrivilegeName + ".actions.BREAK", islandPrivilegeName);
+            }
+        }
+
+        for (String categoryName : customCategories.getKeys(false)) {
+            if (!customCategories.isList(categoryName + ".blocks")) {
+                blockCategoriesConfig.set("custom-categories." + categoryName, null);
+            }
+        }
+
+        try {
+            blockCategoriesConfig.save(blockCategoriesFile);
+
+            if (interactablesFile.exists() && !interactablesFile.renameTo(new File(plugin.getDataFolder(), "interactables.yml.old"))) {
+                Log.warnFromFile(interactablesFile.getName(), "Could not rename the file to interactables.yml.old");
+            }
+
+            config.set("interactables", null);
+            config.set("valuable-blocks", null);
+        } catch (Exception error) {
+            Log.errorFromFile(error, blockCategoriesFile.getName(), "An unexpected error occurred while saving file:");
+        }
+
+        return true;
     }
 
 }

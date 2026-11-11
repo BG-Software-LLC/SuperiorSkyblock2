@@ -4,9 +4,10 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.trial;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.key.category.BuiltinKeyCategories;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.world.entity.BuiltinEntityCategory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.trialspawner.PlayerDetector;
@@ -23,35 +24,51 @@ public class IslandPlayerDetector implements PlayerDetector {
 
     private final Island island;
     private final PlayerDetector original;
-    private final Supplier<IslandPrivilege> requiredPrivilege;
+    private final Supplier<List<IslandPrivilege>> requiredPrivileges;
 
     public static IslandPlayerDetector trialVaultPlayerDetector(Island island, PlayerDetector original) {
-        return new IslandPlayerDetector(island, original, () -> IslandPrivileges.CONFIG_VAULT_INTERACT);
+        return new IslandPlayerDetector(island, original, () -> IslandPrivileges.VAULT_INTERACT_PRIVILEGES);
     }
 
     public static IslandPlayerDetector trialSpawnerPlayerDetector(Island island, PlayerDetector original) {
-        return new IslandPlayerDetector(island, original, () -> BuiltinEntityCategory.MONSTER.getEntityCategory().getDamagePrivilege());
+        return new IslandPlayerDetector(island, original, () -> {
+            IslandPrivilege islandPrivilege = plugin.getSettings().getEntityCategoriesMapping()
+                    .getCategoryByKey(BuiltinKeyCategories.MONSTER).getRequiredPrivilege(KeyCategory.Action.DAMAGE);
+            return islandPrivilege == null ? Collections.emptyList() : Collections.singletonList(islandPrivilege);
+        });
     }
 
-    private IslandPlayerDetector(Island island, PlayerDetector original, Supplier<IslandPrivilege> requiredPrivilege) {
+    private IslandPlayerDetector(Island island, PlayerDetector original, Supplier<List<IslandPrivilege>> requiredPrivileges) {
         this.island = island;
         this.original = original;
-        this.requiredPrivilege = requiredPrivilege;
+        this.requiredPrivileges = requiredPrivileges;
     }
 
     @Override
     public List<UUID> detect(ServerLevel serverLevel, EntitySelector entitySelector, BlockPos blockPos, double maxDistance, boolean requireLineOfSight) {
         List<UUID> players = this.original.detect(serverLevel, entitySelector, blockPos, maxDistance, requireLineOfSight);
-        IslandPrivilege requiredPrivilege = this.requiredPrivilege.get();
-        if (requiredPrivilege != null && !players.isEmpty()) {
-            players = new LinkedList<>(players);
-            players.removeIf(uuid -> {
-                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
-                return !island.hasPermission(superiorPlayer, requiredPrivilege);
-            });
-            players = Collections.unmodifiableList(players);
+        List<IslandPrivilege> privileges = this.requiredPrivileges.get();
+
+        if (privileges.isEmpty() || players.isEmpty()) {
+            return players;
         }
-        return players;
+
+        List<UUID> finalPlayers = new LinkedList<>();
+
+        outerLoop:
+        for (UUID uuid : players) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
+
+            for (IslandPrivilege privilege : privileges) {
+                if (privilege != null && !island.hasPermission(superiorPlayer, privilege)) {
+                    continue outerLoop;
+                }
+            }
+
+            finalPlayers.add(uuid);
+        }
+
+        return finalPlayers.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(finalPlayers);
     }
 
 }

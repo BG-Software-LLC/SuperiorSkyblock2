@@ -3,14 +3,14 @@ package com.bgsoftware.superiorskyblock.api.entity;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 
-public interface EntityCategory {
-
-    /**
-     * Get the name of the entity category.
-     */
-    String getName();
+/**
+ * @deprecated See {@link KeyCategory}.
+ */
+@Deprecated
+public interface EntityCategory extends KeyCategory {
 
     /**
      * Get the entities this category contains.

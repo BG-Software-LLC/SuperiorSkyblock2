@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
-import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -15,7 +14,6 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class GlobalSection extends SettingsContainerHolder {
 
@@ -81,10 +79,6 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public List<String> getSignWarp() {
         return getContainer().signWarp;
-    }
-
-    public SettingsManager.Interactables getInteractablesMap() {
-        return getContainer().interactables;
     }
 
     public Collection<Key> getSafeBlocks() {
@@ -351,10 +345,6 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().commandAliases;
     }
 
-    public Set<Key> getValuableBlocks() {
-        return getContainer().valuableBlocks;
-    }
-
     public boolean isTabCompleteHideVanished() {
         return getContainer().tabCompleteHideVanished;
     }
@@ -439,8 +429,12 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().cacheSchematics;
     }
 
-    public SettingsManager.EntityCategories getEntityCategoriesMap() {
+    public EntityCategoriesSection getEntityCategoriesMapping() {
         return getContainer().entityCategories;
+    }
+
+    public BlockCategoriesSection getBlockCategoriesMapping() {
+        return getContainer().blockCategories;
     }
 
 }

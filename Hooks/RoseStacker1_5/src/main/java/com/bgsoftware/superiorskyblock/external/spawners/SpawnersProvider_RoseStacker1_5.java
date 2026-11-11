@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.external.spawners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -102,9 +102,9 @@ public class SpawnersProvider_RoseStacker1_5 implements SpawnersProvider_AutoDet
             if (spawnedType == null)
                 return;
 
-            List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(spawnedType));
-            for (EntityCategory entityCategory : entityCategories) {
-                IslandFlag islandFlag = entityCategory.getSpawnerSpawningIslandFlag();
+            List<KeyCategory> entityCategories = plugin.getSettings().getEntityCategoriesMapping().getCategories(Keys.of(spawnedType));
+            for (KeyCategory entityCategory : entityCategories) {
+                IslandFlag islandFlag = entityCategory.getRequiredFlag(KeyCategory.Action.SPAWNER_SPAWN);
                 if (islandFlag != null && !island.hasSettingsEnabled(islandFlag)) {
                     e.setCancelled(true);
                     return;
