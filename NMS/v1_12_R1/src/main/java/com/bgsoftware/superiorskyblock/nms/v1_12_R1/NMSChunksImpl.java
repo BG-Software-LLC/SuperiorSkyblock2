@@ -149,9 +149,7 @@ public class NMSChunksImpl implements NMSChunks {
         for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
             IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
             if (blockData.getBlock() != Blocks.AIR) {
-                Counter counter = sectionStates.get(blockData);
-                if (counter == null)
-                    sectionStates.put(blockData, counter = new Counter(0));
+                Counter counter = sectionStates.computeIfAbsent(blockData, k -> new Counter(0));
                 counter.inc(1);
             }
         }

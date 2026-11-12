@@ -33,6 +33,7 @@ import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.ChunkSection;
+import net.minecraft.server.v1_16_R3.DataPaletteBlock;
 import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.EntityHuman;
 import net.minecraft.server.v1_16_R3.EntityTypes;
@@ -443,15 +444,17 @@ public class NMSChunksImpl implements NMSChunks {
         KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         List<Location> spawnersLocations = new LinkedList<>();
 
+        // Count the section per block state through its palette instead of reading its 4096 positions.
+        // Only states whose key depends on the location (spawners, custom key parsers) are counted per position.
+        Set<IBlockData> positionalStates = Collections.newSetFromMap(new IdentityHashMap<>());
+        DataPaletteBlock.a<IBlockData> countConsumer = (blockData, amount) -> {
+            if (!countBlockData(blockData, amount, blockCounts))
+                positionalStates.add(blockData);
+        };
+
         for (ChunkSection chunkSection : chunkSections) {
             if (chunkSection != null && !chunkSection.c()) {
-                // Count the section per block state through its palette instead of reading its 4096 positions.
-                // Only states whose key depends on the location (spawners, custom key parsers) are counted per position.
-                Set<IBlockData> positionalStates = Collections.newSetFromMap(new IdentityHashMap<>());
-                chunkSection.getBlocks().a((blockData, amount) -> {
-                    if (!countBlockData(blockData, amount, blockCounts))
-                        positionalStates.add(blockData);
-                });
+                chunkSection.getBlocks().a(countConsumer);
 
                 if (!positionalStates.isEmpty()) {
                     for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
@@ -461,6 +464,7 @@ public class NMSChunksImpl implements NMSChunks {
                                     chunkSection.getYPosition(), blockCounts, spawnersLocations);
                         }
                     }
+                    positionalStates.clear();
                 }
             }
         }
@@ -473,6 +477,9 @@ public class NMSChunksImpl implements NMSChunks {
      * their location. Returns false, without counting, when the blocks must go through calculateBlockData.
      */
     private boolean countBlockData(IBlockData blockData, int amount, KeyMap<Counter> blockCounts) {
+        if (blockData == null)
+            return true;
+
         Block block = blockData.getBlock();
 
         if (block == Blocks.AIR)

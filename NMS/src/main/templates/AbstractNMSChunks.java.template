@@ -37,6 +37,7 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -238,18 +239,20 @@ public abstract class AbstractNMSChunks implements NMSChunks {
         KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         List<Location> spawnersLocations = new LinkedList<>();
 
+        // Count the section per block state through its palette instead of reading its 4096 positions.
+        // Only states whose key depends on the location (spawners, custom key parsers) are counted per position.
+        Set<BlockState> positionalStates = Collections.newSetFromMap(new IdentityHashMap<>());
+        PalettedContainer.CountConsumer<BlockState> countConsumer = (blockState, amount) -> {
+            if (!countBlockState(blockState, amount, blockCounts))
+                positionalStates.add(blockState);
+        };
+
         for (int i = 0; i < chunkSections.length; ++i) {
             LevelChunkSection levelChunkSection = chunkSections[i];
             if (levelChunkSection != null && !NMSUtilsVersioned.isLevelChunkSectionEmpty(levelChunkSection)) {
                 int sectionBottomY = level.getSectionYFromSectionIndex(i) << 4;
 
-                // Count the section per block state through its palette instead of reading its 4096 positions.
-                // Only states whose key depends on the location (spawners, custom key parsers) are counted per position.
-                Set<BlockState> positionalStates = Collections.newSetFromMap(new IdentityHashMap<>());
-                levelChunkSection.getStates().count((blockState, amount) -> {
-                    if (!countBlockState(blockState, amount, blockCounts))
-                        positionalStates.add(blockState);
-                });
+                levelChunkSection.getStates().count(countConsumer);
 
                 if (!positionalStates.isEmpty()) {
                     for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
@@ -259,6 +262,7 @@ public abstract class AbstractNMSChunks implements NMSChunks {
                                     sectionBottomY, blockCounts, spawnersLocations);
                         }
                     }
+                    positionalStates.clear();
                 }
             }
         }
@@ -271,6 +275,9 @@ public abstract class AbstractNMSChunks implements NMSChunks {
      * their location. Returns false, without counting, when the blocks must go through calculateChunkInternal.
      */
     private boolean countBlockState(BlockState blockState, int amount, KeyMap<Counter> blockCounts) {
+        if (blockState == null)
+            return true;
+
         Block block = blockState.getBlock();
 
         if (block == Blocks.AIR)
