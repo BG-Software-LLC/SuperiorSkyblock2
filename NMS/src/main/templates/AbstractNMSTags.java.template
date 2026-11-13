@@ -72,6 +72,14 @@ public abstract class AbstractNMSTags implements NMSTags {
 
     @Override
     public void spawnEntity(org.bukkit.entity.EntityType entityType, Location location, CompoundTag entityTag) {
+        if (com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor.isFolia() &&
+                !com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor.isOwned(location)) {
+            Location spawnLocation = location.clone();
+            com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor.sync(spawnLocation,
+                    () -> spawnEntity(entityType, spawnLocation, entityTag));
+            return;
+        }
+
         net.minecraft.nbt.CompoundTag compoundTag = (net.minecraft.nbt.CompoundTag) entityTag.toNBT();
 
         if (compoundTag == null)

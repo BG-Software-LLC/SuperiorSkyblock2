@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.service.world.RecordResult;
@@ -16,6 +17,8 @@ import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.SpawnerKey;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.BlockLimitReservations;
+import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.service.IService;
@@ -32,6 +35,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
 
 import java.util.EnumMap;
+import java.util.UUID;
 
 public class WorldRecordServiceImpl implements WorldRecordService, IService {
 
@@ -97,6 +101,8 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         int blockPlaceFlags = IslandBlockFlags.UPDATE_LAST_TIME_STATUS |
                 (saveBlockCounts ? IslandBlockFlags.SAVE_BLOCK_COUNTS : 0);
         island.handleBlocksPlace(blockCounts, blockPlaceFlags);
+        if (BukkitExecutor.isFolia())
+            blockCounts.forEach((key, amount) -> BlockLimitReservations.recorded(island, key, location, amount));
 
         if (dirtyChunks) {
             island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
@@ -135,6 +141,8 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             int blockPlaceFlags = IslandBlockFlags.UPDATE_LAST_TIME_STATUS;
             if (saveBlockCounts) blockPlaceFlags |= IslandBlockFlags.SAVE_BLOCK_COUNTS;
             island.handleBlockPlace(blockKey, blockCount, blockPlaceFlags);
+            if (BukkitExecutor.isFolia())
+                BlockLimitReservations.recorded(island, blockKey, blockLocation, blockCount);
         }
 
         if (dirtyChunks) {
@@ -233,7 +241,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             int chunkX = block.getX() >> 4;
             int chunkZ = block.getZ() >> 4;
 
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync(block.getLocation(), () -> {
                 if (dirtyChunks && world.isChunkLoaded(chunkX, chunkZ)) {
                     if (plugin.getNMSChunks().isChunkEmpty(block.getChunk())) {
                         island.markChunkEmpty(world, chunkX, chunkZ, true);
@@ -269,7 +277,8 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            return recordEntitySpawnInternal(Keys.of(entity), entity.getLocation(wrapper.getHandle()));
+            return recordEntitySpawnInternal(Keys.of(entity), entity.getLocation(wrapper.getHandle()),
+                    BukkitExecutor.isFolia() ? entity.getUniqueId() : null);
         }
     }
 
@@ -284,7 +293,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
-        return recordEntitySpawnInternal(Keys.of(entityType), location);
+        return recordEntitySpawnInternal(Keys.of(entityType), location, null);
     }
 
     @Override
@@ -297,17 +306,22 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
-        return recordEntitySpawnInternal(entityKey, location);
+        return recordEntitySpawnInternal(entityKey, location, null);
     }
 
-    private RecordResult recordEntitySpawnInternal(Key entityKey, Location location) {
+    private RecordResult recordEntitySpawnInternal(Key entityKey, Location location, @Nullable UUID entityId) {
         Island island = plugin.getGrid().getIslandAt(location);
 
         if (island == null) {
             return RecordResult.NOT_IN_ISLAND;
         }
 
-        island.getEntitiesTracker().trackEntity(entityKey, 1);
+        IslandEntitiesTrackerAlgorithm entitiesTracker = island.getEntitiesTracker();
+        if (entityId != null && entitiesTracker instanceof DefaultIslandEntitiesTrackerAlgorithm) {
+            ((DefaultIslandEntitiesTrackerAlgorithm) entitiesTracker).trackEntity(entityId, entityKey, 1);
+        } else {
+            entitiesTracker.trackEntity(entityKey, 1);
+        }
         // TODO: Create method for Island, similar to handleBlockPlace?
         IslandsDatabaseBridge.saveEntityCounts(island);
 

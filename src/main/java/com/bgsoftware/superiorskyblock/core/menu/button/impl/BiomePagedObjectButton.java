@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
@@ -49,7 +50,7 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
 
         GameSoundImpl.playSound(player, pagedObject.getAccessSound());
 
-        pagedObject.getAccessCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+        pagedObject.getAccessCommands().forEach(command -> CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", inventoryViewer.getName())));
 
         menuView.getIsland().setBiome(menuView.getDimension(), event.getArgs().biome);
@@ -57,13 +58,13 @@ public class BiomePagedObjectButton extends AbstractPagedMenuButton<MenuBiomes.V
                 Formatters.CAPITALIZED_FORMATTER.format(event.getArgs().biome.name()),
                 Formatters.CAPITALIZED_FORMATTER.format(menuView.getDimension().getName()));
 
-        BukkitExecutor.sync(menuView::closeView, 1L);
+        BukkitExecutor.sync(menuView.getInventoryViewer().asPlayer(), menuView::closeView, 1L);
     }
 
     @Override
     public void onButtonClickLackPermission(ButtonClickContext<MenuBiomes.View> context) {
         super.onButtonClickLackPermission(context);
-        pagedObject.getNoAccessCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+        pagedObject.getNoAccessCommands().forEach(command -> CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", menuView.getInventoryViewer().getName())));
     }
 

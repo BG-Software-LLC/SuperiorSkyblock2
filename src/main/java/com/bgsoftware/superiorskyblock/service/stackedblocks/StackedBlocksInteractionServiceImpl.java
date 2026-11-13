@@ -22,6 +22,10 @@ import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.BlockLimitReservations;
+import com.bgsoftware.superiorskyblock.player.inventory.FoliaInventoryReturns;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
@@ -181,13 +185,18 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
     }
 
     private InteractionResult checkBlockStackInternal(SuperiorPlayer superiorPlayer, Block block, @Nullable ItemStack itemStack) {
+        return checkStackedBlockInteraction(plugin, superiorPlayer, Keys.of(block), block.getType(),
+                block.getWorld().getName(), itemStack, null);
+    }
+
+    public static InteractionResult checkStackedBlockInteraction(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer,
+                                                                  Key blockKey, Material blockType, String worldName,
+                                                                  @Nullable ItemStack itemStack, @Nullable Boolean permission) {
         if (!superiorPlayer.hasBlocksStackerEnabled())
             return InteractionResult.PLAYER_STACKED_BLOCKS_DISABLED;
 
-        if (plugin.getSettings().getStackedBlocks().getDisabledWorlds().contains(block.getWorld().getName()))
+        if (plugin.getSettings().getStackedBlocks().getDisabledWorlds().contains(worldName))
             return InteractionResult.DISABLED_WORLD;
-
-        Key blockKey = Keys.of(block);
 
         if (itemStack != null) {
             if (itemStack.hasItemMeta() && (itemStack.getItemMeta().hasDisplayName() || itemStack.getItemMeta().hasLore()))
@@ -198,10 +207,10 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
                 return InteractionResult.PLAYER_HOLDING_DIFFERENT_ITEM;
         }
 
-        Material blockType = block.getType();
-
-        if (!superiorPlayer.hasPermission("superior.island.stacker.*") &&
-                !superiorPlayer.hasPermission("superior.island.stacker." + blockType))
+        boolean hasPermission = permission != null ? permission :
+                superiorPlayer.hasPermission("superior.island.stacker.*") ||
+                        superiorPlayer.hasPermission("superior.island.stacker." + blockType);
+        if (!hasPermission)
             return InteractionResult.PLAYER_MISSING_PERMISSION;
 
         Key newBlockKey = BLOCK_KEY_TRANSFORMER.getOrDefault(blockKey, blockKey);
@@ -212,6 +221,40 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
             return InteractionResult.STACKED_BLOCK_NOT_WHITELISTED;
 
         return InteractionResult.SUCCESS;
+    }
+
+    public void depositReservedItems(SuperiorPlayer superiorPlayer, Location location, Key expectedBlock,
+                                     ItemStack[] contents, boolean permission, FoliaInventoryReturns.Reservation reservation) {
+        BukkitExecutor.submit(location, () -> {
+            if (!plugin.getSettings().getStackedBlocks().isEnabled() || !plugin.getGrid().isIslandsWorld(location.getWorld()))
+                return null;
+            Block block = location.getBlock();
+            Key blockKey = Keys.of(block);
+            if (!blockKey.equals(expectedBlock))
+                return null;
+            boolean[] eligible = new boolean[contents.length];
+            int amount = 0;
+            for (int slot = 0; slot < contents.length; slot++) {
+                ItemStack item = contents[slot];
+                if (item != null && item.getType() != Material.AIR &&
+                        checkStackedBlockInteraction(plugin, superiorPlayer, blockKey, block.getType(),
+                                location.getWorld().getName(), item, permission) == InteractionResult.SUCCESS) {
+                    eligible[slot] = true;
+                    amount += item.getAmount();
+                }
+            }
+            if (amount > 0) {
+                InteractionResult result = handleBlockStackInternal(superiorPlayer, block, location, amount,
+                        Either.right(deposited -> reservation.consume(deposited, eligible)), true);
+                if (result == InteractionResult.SUCCESS)
+                    plugin.getNMSWorld().playPlaceSound(location);
+            }
+            return null;
+        }).whenComplete((ignored, error) -> {
+            if (error != null)
+                Log.error(error, "Unable to deposit reserved stacked blocks");
+            reservation.finish();
+        });
     }
 
     private InteractionResult handleBlockStackInternal(SuperiorPlayer superiorPlayer, Block stackedBlock,
@@ -226,7 +269,15 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
     private InteractionResult handleBlockStackInternal(SuperiorPlayer superiorPlayer, Block stackedBlock,
                                                        Location stackedBlockLocation, int amountToDeposit,
                                                        Either<EquipmentSlot, OnItemRemovalCallback> removalData) {
+        return handleBlockStackInternal(superiorPlayer, stackedBlock, stackedBlockLocation, amountToDeposit, removalData, false);
+    }
+
+    private InteractionResult handleBlockStackInternal(SuperiorPlayer superiorPlayer, Block stackedBlock,
+                                                       Location stackedBlockLocation, int amountToDeposit,
+                                                       Either<EquipmentSlot, OnItemRemovalCallback> removalData,
+                                                       boolean commitBeforeNotifications) {
         Player onlinePlayer = superiorPlayer.asPlayer();
+        boolean consumeBeforeNotifications = commitBeforeNotifications || BukkitExecutor.isFolia();
 
         int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(stackedBlockLocation);
         Key blockKey = plugin.getStackedBlocks().getStackedBlockKey(stackedBlockLocation);
@@ -273,35 +324,71 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
             return InteractionResult.NOT_ENOUGH_BLOCKS;
         }
 
-        int newStackedBlockAmount = blockAmount + amountToDeposit;
-
-        if (onlinePlayer != null && !PluginEventsFactory.callBlockStackEvent(stackedBlock, onlinePlayer, blockAmount, newStackedBlockAmount)) {
-            // Event cancelled ⇒ nothing deposited, request refund
+        BlockLimitReservations.Reservation limitReservation = BukkitExecutor.isFolia() && island != null ?
+                BlockLimitReservations.reserveStacked(island, blockKey, amountToDeposit) : null;
+        if (BukkitExecutor.isFolia() && island != null && limitReservation == null) {
             removalData.ifRight(cb -> cb.accept(0));
-            return InteractionResult.EVENT_CANCELLED;
+            return InteractionResult.NOT_ENOUGH_BLOCKS;
         }
+        if (limitReservation != null)
+            amountToDeposit = limitReservation.getAmount();
 
-        if (!plugin.getStackedBlocks().setStackedBlock(stackedBlockLocation, blockKey, newStackedBlockAmount)) {
-            // Failed to persist/update ⇒ request refund
-            removalData.ifRight(cb -> cb.accept(0));
-            return InteractionResult.GLITCHED_STACKED_BLOCK;
-        }
+        try {
+            int newStackedBlockAmount = blockAmount + amountToDeposit;
 
-        if (island != null)
-            island.handleBlockPlace(blockKey, amountToDeposit);
-
-        plugin.getProviders().notifyStackedBlocksListeners(onlinePlayer == null ? superiorPlayer.asOfflinePlayer() : onlinePlayer,
-                stackedBlock, IStackedBlocksListener.Action.BLOCK_PLACE);
-
-        final int finalAmountToDeposit = amountToDeposit;
-
-        removalData.ifRight(itemRemovalCallback -> itemRemovalCallback.accept(finalAmountToDeposit)).ifLeft(usedHand -> {
-            if (onlinePlayer != null && onlinePlayer.getGameMode() != GameMode.CREATIVE) {
-                BukkitItems.removeHandItem(onlinePlayer, PlayerHand.of(usedHand), finalAmountToDeposit);
+            if (onlinePlayer != null && !PluginEventsFactory.callBlockStackEvent(stackedBlock, onlinePlayer, blockAmount, newStackedBlockAmount)) {
+                // Event cancelled ⇒ nothing deposited, request refund
+                removalData.ifRight(cb -> cb.accept(0));
+                return InteractionResult.EVENT_CANCELLED;
             }
-        });
 
-        return InteractionResult.SUCCESS;
+            if (consumeBeforeNotifications && plugin.getStackedBlocks().getStackedBlockAmount(stackedBlockLocation) != blockAmount) {
+                removalData.ifRight(cb -> cb.accept(0));
+                return InteractionResult.EVENT_CANCELLED;
+            }
+
+            try {
+                if (!plugin.getStackedBlocks().setStackedBlock(stackedBlockLocation, blockKey, newStackedBlockAmount)) {
+                    // Failed to persist/update ⇒ request refund
+                    removalData.ifRight(cb -> cb.accept(0));
+                    return InteractionResult.GLITCHED_STACKED_BLOCK;
+                }
+            } catch (RuntimeException | Error error) {
+                if (BukkitExecutor.isFolia() &&
+                        plugin.getStackedBlocks().getStackedBlockAmount(stackedBlockLocation) == newStackedBlockAmount &&
+                        blockKey.equals(plugin.getStackedBlocks().getStackedBlockKey(stackedBlockLocation))) {
+                    consumeDepositedItems(onlinePlayer, removalData, amountToDeposit);
+                    if (island != null)
+                        island.handleBlockPlace(blockKey, amountToDeposit);
+                }
+                throw error;
+            }
+
+            if (consumeBeforeNotifications)
+                consumeDepositedItems(onlinePlayer, removalData, amountToDeposit);
+
+            if (island != null)
+                island.handleBlockPlace(blockKey, amountToDeposit);
+
+            plugin.getProviders().notifyStackedBlocksListeners(onlinePlayer == null ? superiorPlayer.asOfflinePlayer() : onlinePlayer,
+                    stackedBlock, IStackedBlocksListener.Action.BLOCK_PLACE);
+
+            if (!consumeBeforeNotifications)
+                consumeDepositedItems(onlinePlayer, removalData, amountToDeposit);
+
+            return InteractionResult.SUCCESS;
+        } finally {
+            if (limitReservation != null)
+                limitReservation.close();
+        }
+    }
+
+    private void consumeDepositedItems(@Nullable Player player,
+                                       Either<EquipmentSlot, OnItemRemovalCallback> removalData, int amount) {
+        removalData.ifRight(itemRemovalCallback -> itemRemovalCallback.accept(amount)).ifLeft(usedHand -> {
+            if (player != null && player.getGameMode() != GameMode.CREATIVE)
+                BukkitItems.removeHandItem(player, PlayerHand.of(usedHand), amount);
+        });
     }
 
     private static KeyMap<Key> createBlockKeyTransformer() {

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -21,15 +22,19 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class CmdRankup implements IPermissibleCommand {
 
@@ -88,10 +93,33 @@ public class CmdRankup implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        if (BukkitExecutor.isFolia()) {
+            Player player = superiorPlayer.asPlayer();
+            if (player == null)
+                return;
+            RankupQueue.submit(island, superiorPlayer, () -> BukkitExecutor.submit(player, () -> {
+                if (!player.isOnline() || !island.equals(superiorPlayer.getIsland()))
+                    return CompletableFuture.<Void>completedFuture(null);
+                if (!superiorPlayer.hasPermission(getPrivilege())) {
+                    getPermissionLackMessage().send(superiorPlayer, island.getRequiredPlayerRole(getPrivilege()));
+                    return CompletableFuture.<Void>completedFuture(null);
+                }
+                return executeRankup(plugin, superiorPlayer, island, args);
+            }).thenCompose(future -> future)).exceptionally(error -> {
+                ((ModuleLogger) BuiltinModules.UPGRADES.getLogger()).e("An unexpected error occurred while upgrading an island", error);
+                return null;
+            });
+        } else {
+            executeRankup(plugin, superiorPlayer, island, args);
+        }
+    }
+
+    private CompletableFuture<Void> executeRankup(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer,
+                                                   Island island, String[] args) {
         Upgrade upgrade = CommandArguments.getUpgrade(plugin, superiorPlayer, args[1]);
 
         if (upgrade == null)
-            return;
+            return CompletableFuture.completedFuture(null);
 
         UpgradeLevel currentLevel = island.getUpgradeLevel(upgrade);
         UpgradeLevel nextLevel = upgrade.getUpgradeLevel(currentLevel.getLevel() + 1);
@@ -100,7 +128,7 @@ public class CmdRankup implements IPermissibleCommand {
 
         if (!permission.isEmpty() && !superiorPlayer.hasPermission(permission)) {
             Message.NO_UPGRADE_PERMISSION.send(superiorPlayer);
-            return;
+            return CompletableFuture.completedFuture(null);
         }
 
         boolean hasNextLevel;
@@ -132,6 +160,9 @@ public class CmdRankup implements IPermissibleCommand {
                     hasNextLevel = false;
 
                 } else {
+                    if (BukkitExecutor.isFolia())
+                        return executeUpgrade(superiorPlayer, island, currentLevel, upgradeCosts, event.getArgs().commands);
+
                     upgradeCosts.forEach(upgradeCost -> upgradeCost.withdrawCost(superiorPlayer));
 
                     for (String command : event.getArgs().commands) {
@@ -140,7 +171,7 @@ public class CmdRankup implements IPermissibleCommand {
                                 .replace("%leader%", island.getOwner().getName()));
 
                         try {
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
+                            CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand);
                         } catch (Throwable error) {
                             ModuleLogger logger = (ModuleLogger) BuiltinModules.UPGRADES.getLogger();
                             logger.e("An unexpected error occurred while executing command:\n" + parsedCommand, error);
@@ -152,6 +183,36 @@ public class CmdRankup implements IPermissibleCommand {
             }
         }
 
+        playSound(superiorPlayer, currentLevel, hasNextLevel);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    private CompletableFuture<Void> executeUpgrade(SuperiorPlayer superiorPlayer, Island island,
+                                                    UpgradeLevel currentLevel, List<UpgradeCost> upgradeCosts,
+                                                    List<String> commands) {
+        Player player = superiorPlayer.asPlayer();
+        CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
+        for (UpgradeCost upgradeCost : new ArrayList<>(upgradeCosts)) {
+            future = future.thenCompose(ignored -> BukkitExecutor.submit(player,
+                    () -> upgradeCost.withdrawCostAsync(superiorPlayer)).thenCompose(withdrawal -> withdrawal));
+        }
+        for (String command : new ArrayList<>(commands)) {
+            future = future.thenCompose(ignored -> RankupQueue.parseCommand(superiorPlayer,
+                            () -> placeholdersService.get().parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
+                                    .replace("%player%", superiorPlayer.getName())
+                                    .replace("%leader%", island.getOwner().getName()))))
+                    .thenCompose(parsedCommand -> CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand)
+                            .handle((result, error) -> {
+                                if (error != null)
+                                    ((ModuleLogger) BuiltinModules.UPGRADES.getLogger()).e(
+                                            "An unexpected error occurred while executing command:\n" + parsedCommand, error);
+                                return null;
+                            }));
+        }
+        return future.thenRun(() -> playSound(superiorPlayer, currentLevel, true));
+    }
+
+    private void playSound(SuperiorPlayer superiorPlayer, UpgradeLevel currentLevel, boolean hasNextLevel) {
         SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) currentLevel).getItemData();
         if (itemData != null) {
             GameSound sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;

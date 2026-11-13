@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
@@ -40,6 +41,9 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +66,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
+    private final Map<ChunkPos, Location> appliedChunks = new HashMap<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<Vec2> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
     private final Set<ChunkPos> lightenChunksPositions = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
@@ -173,7 +178,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }
 
     @Override
-    public void applyBlocks(Chunk bukkitChunk) {
+    public synchronized void applyBlocks(Chunk bukkitChunk) {
         Preconditions.checkState(this.serverLevel != null, "Cannot call WorldEditSession#applyBlocks on partial initialized session");
 
         int chunkX = bukkitChunk.getX();
@@ -181,6 +186,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         LevelChunk levelChunk = serverLevel.getChunk(chunkX, chunkZ);
+
+        if (BukkitExecutor.isFolia())
+            this.appliedChunks.put(new ChunkPos(chunkX, chunkZ), new Location(bukkitChunk.getWorld(), chunkX << 4, 0, chunkZ << 4));
 
         long chunkKey = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
         ChunkData chunkData = this.chunks.remove(chunkKey);
@@ -247,6 +255,53 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }
 
     @Override
+    public CompletableFuture<Void> finishAsync(Island island) {
+        if (!BukkitExecutor.isFolia()) {
+            return WorldEditSession.super.finishAsync(island);
+        }
+
+        ServerLevel level = this.serverLevel;
+        Map<ChunkPos, List<Pair<BlockPos, BlockState>>> updates = new HashMap<>();
+        Map<ChunkPos, List<Pair<BlockPos, CompoundTag>>> entities = new HashMap<>();
+        Set<ChunkPos> affectedChunks = new HashSet<>(this.appliedChunks.keySet());
+        this.blocksToUpdate.forEach(data -> updates.computeIfAbsent(new ChunkPos(data.getKey().getX() >> 4, data.getKey().getZ() >> 4),
+                ignored -> new ArrayList<>()).add(data));
+        this.blockEntities.forEach(data -> entities.computeIfAbsent(new ChunkPos(data.getKey().getX() >> 4, data.getKey().getZ() >> 4),
+                ignored -> new ArrayList<>()).add(data));
+        List<CompletableFuture<Void>> futures = new ArrayList<>(affectedChunks.size());
+
+        for (ChunkPos chunkPos : affectedChunks) {
+            Location location = this.appliedChunks.get(chunkPos);
+            futures.add(BukkitExecutor.submit(location, () -> {
+                updates.getOrDefault(chunkPos, Collections.emptyList()).forEach(data ->
+                        level.setBlock(data.getKey(), data.getValue(), 3));
+                entities.getOrDefault(chunkPos, Collections.emptyList()).forEach(data -> {
+                    net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) data.getValue().toNBT();
+                    if (tag == null)
+                        return;
+                    BlockPos blockPos = data.getKey();
+                    tag.putInt("x", blockPos.getX());
+                    tag.putInt("y", blockPos.getY());
+                    tag.putInt("z", blockPos.getZ());
+                    NMSUtilsVersioned.rewriteSignLines(tag);
+                    BlockEntity blockEntity = level.getBlockEntity(blockPos);
+                    if (blockEntity != null)
+                        NMSUtilsVersioned.loadBlockEntity(blockEntity, tag);
+                });
+                if (plugin.getSettings().isLightsUpdate() && isStarLightInterface &&
+                        this.lightenChunksPositions.contains(chunkPos)) {
+                    NMSUtilsVersioned.relightChunks(level.getChunkSource().getLightEngine(),
+                            Collections.singleton(chunkPos));
+                }
+                return null;
+            }));
+        }
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .whenComplete((ignored, error) -> release());
+    }
+
+    @Override
     public Data readData(Location baseLocation) {
         return new WorldEditSessionDataImpl(baseLocation, this.chunks, this.blocksToUpdate, this.blockEntities, this.lightenChunks);
     }
@@ -273,6 +328,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     @Override
     public void release() {
         this.chunks.clear();
+        this.appliedChunks.clear();
         this.blocksToUpdate.clear();
         this.blockEntities.clear();
         this.lightenChunks.clear();
@@ -284,7 +340,29 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }
 
     public ChunkData createChunkData(LevelChunkSection[] chunkSections, Map<Heightmap.Types, Heightmap> heightmaps, List<BlockPos> lights) {
-        return new ChunkData(chunkSections, heightmaps, lights);
+        if (!BukkitExecutor.isFolia())
+            return new ChunkData(chunkSections, heightmaps, lights);
+
+        LevelChunkSection[] sections = new LevelChunkSection[chunkSections.length];
+        NMSUtilsVersioned.createChunkSections(this.serverLevel, this.levelHeightAccessor, sections, this.dimension);
+        for (int i = 0; i < sections.length; ++i) {
+            LevelChunkSection source = chunkSections[i];
+            if (source == null || NMSUtilsVersioned.isLevelChunkSectionEmpty(source))
+                continue;
+            for (BlockPos pos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
+                sections[i].setBlockState(pos.getX(), pos.getY(), pos.getZ(),
+                        source.getBlockState(pos.getX(), pos.getY(), pos.getZ()), false);
+            }
+        }
+        ProtoChunk chunk = NMSUtilsVersioned.createProtoChunk(new ChunkPos(0, 0), sections,
+                this.levelHeightAccessor, this.serverLevel);
+        Map<Heightmap.Types, Heightmap> copiedHeightmaps = new EnumMap<>(Heightmap.Types.class);
+        heightmaps.forEach((type, source) -> {
+            Heightmap heightmap = new Heightmap(chunk, type);
+            heightmap.setRawData(chunk, type, source.getRawData());
+            copiedHeightmaps.put(type, heightmap);
+        });
+        return new ChunkData(sections, copiedHeightmaps, lights);
     }
 
     private static LevelHeightAccessor createLevelHeightAccessor(int minY, int height) {

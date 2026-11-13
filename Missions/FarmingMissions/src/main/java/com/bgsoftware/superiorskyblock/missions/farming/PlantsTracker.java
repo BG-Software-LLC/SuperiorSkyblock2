@@ -33,9 +33,7 @@ public class PlantsTracker {
     }
 
     public void track(World world, int x, int y, int z, UUID placer) {
-        loadRawData(world);
-        plantsTracker.computeIfAbsent(world.getName(), s -> new PlantsTrackingComponent(world))
-                .track(x, y, z, placer);
+        getComponent(world, true).track(x, y, z, placer);
     }
 
     public void untrack(Block block) {
@@ -43,8 +41,7 @@ public class PlantsTracker {
     }
 
     public void untrack(World world, int x, int y, int z) {
-        loadRawData(world);
-        PlantsTrackingComponent trackingComponent = this.plantsTracker.get(world.getName());
+        PlantsTrackingComponent trackingComponent = getComponent(world, false);
         if (trackingComponent != null)
             trackingComponent.untrack(x, y, z);
     }
@@ -57,36 +54,62 @@ public class PlantsTracker {
 
     @Nullable
     public UUID getPlacer(World world, int x, int y, int z) {
-        loadRawData(world);
-        PlantsTrackingComponent trackingComponent = this.plantsTracker.get(world.getName());
+        PlantsTrackingComponent trackingComponent = getComponent(world, false);
         return trackingComponent == null ? null : trackingComponent.getPlacer(x, y, z);
     }
 
     public void load(String worldName, long chunkKey, List<Integer> blocks, UUID placer) {
-        if (this.rawData == null)
-            this.rawData = new HashMap<>();
-        TrackedPlantsData trackedPlantsData = this.rawData.computeIfAbsent(worldName, w -> new TrackedPlantsData());
-        blocks.forEach(block -> trackedPlantsData.track(chunkKey, block, placer));
-    }
-
-    public void loadLegacy(String worldName, BlockPosition plant, UUID placer) {
-        if (this.legacyRawData == null)
-            this.legacyRawData = new HashMap<>();
-        this.legacyRawData.computeIfAbsent(worldName, w -> new LinkedHashMap<>())
-                .computeIfAbsent(placer, i -> new LinkedList<>()).add(plant);
-    }
-
-    public void save(ConfigurationSection section) {
-        if (!this.saved) {
-            saveInternal(section);
-            this.saved = true;
+        synchronized (this.plantsTracker) {
+            if (this.rawData == null)
+                this.rawData = new HashMap<>();
+            TrackedPlantsData data = this.rawData.computeIfAbsent(worldName, world -> new TrackedPlantsData());
+            blocks.forEach(block -> data.track(chunkKey, block, placer));
         }
     }
 
-    private void saveInternal(ConfigurationSection section) {
+    public void loadLegacy(String worldName, BlockPosition plant, UUID placer) {
+        synchronized (this.plantsTracker) {
+            if (this.legacyRawData == null)
+                this.legacyRawData = new HashMap<>();
+            this.legacyRawData.computeIfAbsent(worldName, world -> new LinkedHashMap<>())
+                    .computeIfAbsent(placer, player -> new LinkedList<>()).add(plant);
+        }
+    }
+
+    public void save(ConfigurationSection section) {
+        Map<String, PlantsTrackingComponent> components;
+        Map<String, TrackedPlantsData> raw;
+        Map<String, Map<UUID, List<BlockPosition>>> legacy = new HashMap<>();
+        synchronized (this.plantsTracker) {
+            if (this.saved)
+                return;
+            this.saved = true;
+            components = new HashMap<>(this.plantsTracker);
+            raw = this.rawData == null ? new HashMap<>() : new HashMap<>(this.rawData);
+            if (this.legacyRawData != null) {
+                this.legacyRawData.forEach((world, players) -> {
+                    Map<UUID, List<BlockPosition>> copy = new LinkedHashMap<>();
+                    players.forEach((player, plants) -> copy.put(player, new LinkedList<>(plants)));
+                    legacy.put(world, copy);
+                });
+            }
+        }
+        try {
+            saveInternal(section, components, raw, legacy);
+        } catch (RuntimeException | Error error) {
+            synchronized (this.plantsTracker) {
+                this.saved = false;
+            }
+            throw error;
+        }
+    }
+
+    private void saveInternal(ConfigurationSection section, Map<String, PlantsTrackingComponent> components,
+                              Map<String, TrackedPlantsData> raw,
+                              Map<String, Map<UUID, List<BlockPosition>>> legacy) {
         MutableBoolean savedData = new MutableBoolean(false);
 
-        this.plantsTracker.forEach((worldName, component) -> {
+        components.forEach((worldName, component) -> {
             component.getPlants().forEach((chunkKey, blocks) -> {
                 blocks.forEach((block, placer) -> {
                     String path = "placed-plants." + placer + "." + worldName + "." + chunkKey;
@@ -98,8 +121,8 @@ public class PlantsTracker {
             });
         });
 
-        if (this.rawData != null) {
-            this.rawData.forEach((worldName, worldData) -> {
+        if (!raw.isEmpty()) {
+            raw.forEach((worldName, worldData) -> {
                 worldData.getPlants().forEach((chunkKey, blocks) -> {
                     blocks.forEach((block, placer) -> {
                         String path = "placed-plants." + placer + "." + worldName + "." + chunkKey;
@@ -112,8 +135,8 @@ public class PlantsTracker {
             });
         }
 
-        if (this.legacyRawData != null) {
-            this.legacyRawData.forEach((worldName, worldData) -> {
+        if (!legacy.isEmpty()) {
+            legacy.forEach((worldName, worldData) -> {
                 worldData.forEach((placer, plants) -> {
                     plants.forEach(plant -> {
                         String plantKey = worldName + ";" + plant.getX() + ";" + plant.getY() + ";" + plant.getZ();
@@ -129,13 +152,30 @@ public class PlantsTracker {
         }
     }
 
-    private void loadRawData(World world) {
+    private PlantsTrackingComponent getComponent(World world, boolean create) {
         String worldName = world.getName();
+        synchronized (this.plantsTracker) {
+            if ((this.rawData == null || !this.rawData.containsKey(worldName)) &&
+                    (this.legacyRawData == null || !this.legacyRawData.containsKey(worldName))) {
+                PlantsTrackingComponent existing = this.plantsTracker.get(worldName);
+                if (existing != null || !create)
+                    return existing;
+            }
+        }
+        PlantsTrackingComponent candidate = new PlantsTrackingComponent(world);
+        synchronized (this.plantsTracker) {
+            loadRawData(worldName, candidate);
+            return create ? this.plantsTracker.computeIfAbsent(worldName, name -> candidate) :
+                    this.plantsTracker.get(worldName);
+        }
+    }
+
+    private void loadRawData(String worldName, PlantsTrackingComponent candidate) {
 
         if (this.rawData != null) {
             TrackedPlantsData rawDataForWorld = this.rawData.remove(worldName);
             if (rawDataForWorld != null) {
-                plantsTracker.put(worldName, new PlantsTrackingComponent(world, rawDataForWorld));
+                plantsTracker.put(worldName, new PlantsTrackingComponent(candidate.getWorldMinHeight(), rawDataForWorld));
 
                 if (this.rawData.isEmpty())
                     this.rawData = null;
@@ -145,7 +185,7 @@ public class PlantsTracker {
         if (this.legacyRawData != null) {
             Map<UUID, List<BlockPosition>> legacyRawDataForWorld = this.legacyRawData.remove(worldName);
             if (legacyRawDataForWorld != null) {
-                PlantsTrackingComponent plantsTrackingComponent = new PlantsTrackingComponent(world);
+                PlantsTrackingComponent plantsTrackingComponent = candidate;
                 legacyRawDataForWorld.forEach((placer, plants) -> {
                     plants.forEach(plant -> plantsTrackingComponent.track(plant.getX(), plant.getY(), plant.getZ(), placer));
                 });

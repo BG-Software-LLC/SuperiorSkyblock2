@@ -7,8 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -39,6 +37,8 @@ import org.bukkit.projectiles.ProjectileSource;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class IslandFlagsListener extends AbstractGameEventListener {
 
@@ -46,7 +46,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     @Nullable
     private static final EntityType SULFUR_CUBE_TYPE = EnumHelper.getEnum(EntityType.class, "SULFUR_CUBE");
 
-    private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
+    private final Map<Integer, ProjectileSource> originalFireballsDamager = new ConcurrentHashMap<>();
 
     private World spawnIslandWorld;
 
@@ -204,7 +204,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         }
 
         if (entity instanceof Fireball) {
-            originalFireballsDamager.put(entity.getEntityId(), ((Fireball) entity).getShooter());
+            ProjectileSource shooter = ((Fireball) entity).getShooter();
+            if (shooter != null)
+                originalFireballsDamager.put(entity.getEntityId(), shooter);
             BukkitExecutor.sync(() -> originalFireballsDamager.remove(entity.getEntityId()), 40L);
         }
     }
@@ -360,10 +362,10 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
             List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
 
-            BukkitExecutor.sync(() -> nearbyEntities.forEach(nearbyEntity -> {
+            nearbyEntities.forEach(nearbyEntity -> BukkitExecutor.sync(nearbyEntity, () -> {
                 if (nearbyEntity instanceof LivingEntity && !nearbyEntity.getUniqueId().equals(shooterPlayer.getUniqueId()))
                     ((LivingEntity) nearbyEntity).removePotionEffect(PotionEffectType.POISON);
-            }), 1L);
+            }, 1L));
         });
     }
 

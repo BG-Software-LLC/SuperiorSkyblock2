@@ -33,9 +33,12 @@ import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,8 +47,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
@@ -240,6 +245,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>(affectedChunks.size());
 
         AtomicBoolean failed = new AtomicBoolean(false);
+        AtomicBoolean finishing = new AtomicBoolean(false);
         MutableBoolean printedWarning = new MutableBoolean(false);
 
         affectedChunks.forEach(chunkPosition -> {
@@ -260,7 +266,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
                     if (cropGrowthEnabled && island.isInsideRange(chunk)) {
-                        BukkitExecutor.ensureMain(() -> plugin.getNMSChunks().startTickingChunk(island, chunk, false));
+                        BukkitExecutor.ensureMain(new Location(chunk.getWorld(), chunk.getX() << 4, 0, chunk.getZ() << 4),
+                                () -> plugin.getNMSChunks().startTickingChunk(island, chunk, false));
                     }
 
                     island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
@@ -269,29 +276,40 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                 } catch (Throwable error) {
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Loading Chunk", error);
                     failed.set(true);
-                    Profiler.end(profiler);
-                    if (onFailure != null)
-                        onFailure.accept(error);
+                    throw new CompletionException(error);
                 }
             }));
         });
 
-        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenCompleteAsync((v, error) -> {
+        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0]))
+                .thenCompose(ignored -> {
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
+                    finishing.set(true);
+                    return worldEditSession.finishAsync(island);
+                })
+                .thenCompose(ignored -> {
+                    List<CompletableFuture<Void>> postPlaceFutures = new ArrayList<>();
+                    if (island.getOwner().isOnline()) {
+                        postPlaceTasks.forEach(block -> postPlaceFutures.add(BukkitExecutor.submit(block.getLocation(), () -> {
+                            block.doPostPlace(island);
+                            return null;
+                        })));
+                    }
+                    return CompletableFuture.allOf(postPlaceFutures.toArray(new CompletableFuture[0]));
+                }).whenCompleteAsync((v, error) -> {
+            if (error != null) {
+                if (!finishing.get())
+                    worldEditSession.release();
+                Profiler.end(profiler);
+                if (onFailure != null)
+                    onFailure.accept(error);
+                return;
+            }
             if (failed.get())
                 return;
 
-            Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
-
             try {
-                Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
-                worldEditSession.finish(island);
-
-                if (island.getOwner().isOnline()) {
-                    postPlaceTasks.forEach(schematicBlock -> {
-                        schematicBlock.doPostPlace(island);
-                    });
-                }
-
                 Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
 
                 island.handleBlocksPlace(cachedCounts);
@@ -381,22 +399,46 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         this.affectedChunks = new LinkedList<>(affectedChunks);
         // We spawn the entities with a delay, waiting for players to teleport to the island first.
         this.onTeleportCallback = () -> {
-            BukkitExecutor.sync(() -> {
-                // Entities of the schematic may still exist from an earlier paste, for example outside the
-                // protected area after the world of the island was reset, or when the spot of a disbanded
-                // island is reused. We check all the entities before spawning any of them, so entities of the
-                // schematic that share the same block do not prevent each other from spawning.
-                List<SchematicEntity> entitiesToSpawn = new LinkedList<>();
-                for (SchematicEntity entity : data.entities) {
-                    if (!entity.isAlreadySpawned(min))
-                        entitiesToSpawn.add(entity);
-                }
-
-                for (SchematicEntity entity : entitiesToSpawn) {
-                    entity.spawnEntity(min);
-                }
-            }, 20L);
+            if (BukkitExecutor.isFolia()) {
+                scheduleRegionEntitySpawns(min);
+            } else {
+                BukkitExecutor.sync(() -> spawnEntities(min, data.entities, entity -> entity.isAlreadySpawned(min)), 20L);
+            }
         };
+    }
+
+    private void scheduleRegionEntitySpawns(Location min) {
+        World world = min.getWorld();
+        Map<ChunkPosition, List<SchematicEntity>> entitiesByChunk = new HashMap<>();
+        for (SchematicEntity entity : data.entities) {
+            Location location = entity.getLocation(min);
+            ChunkPosition chunk = ChunkPosition.of(world, location.getBlockX() >> 4, location.getBlockZ() >> 4, false);
+            entitiesByChunk.computeIfAbsent(chunk, ignored -> new ArrayList<>()).add(entity);
+        }
+
+        entitiesByChunk.forEach((chunk, entities) -> {
+            Location chunkLocation = new Location(world, chunk.getX() << 4, 0, chunk.getZ() << 4);
+            BukkitExecutor.sync(chunkLocation, () -> {
+                List<Entity> chunkEntities = Arrays.asList(world.getChunkAt(chunk.getX(), chunk.getZ()).getEntities());
+                spawnEntities(min, entities, entity -> entity.isAlreadySpawned(min, chunkEntities));
+            }, 20L);
+        });
+    }
+
+    private static void spawnEntities(Location min, List<SchematicEntity> entities, Predicate<SchematicEntity> alreadySpawned) {
+        // Entities of the schematic may still exist from an earlier paste, for example outside the
+        // protected area after the world of the island was reset, or when the spot of a disbanded
+        // island is reused. We check all the entities before spawning any of them, so entities of the
+        // schematic that share the same block do not prevent each other from spawning.
+        List<SchematicEntity> entitiesToSpawn = new ArrayList<>();
+        for (SchematicEntity entity : entities) {
+            if (!alreadySpawned.test(entity))
+                entitiesToSpawn.add(entity);
+        }
+
+        for (SchematicEntity entity : entitiesToSpawn) {
+            entity.spawnEntity(min);
+        }
     }
 
     private void finishCallback() {

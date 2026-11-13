@@ -60,6 +60,7 @@ import java.util.Map;
 public class MenusManagerImpl extends Manager implements MenusManager {
 
     private final Map<String, Menu<?, ?>> registeredMenus = new HashMap<>();
+    private volatile boolean initialized;
 
     public MenusManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -68,6 +69,7 @@ public class MenusManagerImpl extends Manager implements MenusManager {
     @Override
     public void loadData() {
         plugin.getProviders().getMenusProvider().initializeMenus();
+        this.initialized = true;
     }
 
     @Override
@@ -403,6 +405,8 @@ public class MenusManagerImpl extends Manager implements MenusManager {
 
     @Override
     public void refreshTopIslands(SortingType sortingType) {
+        if (!this.initialized)
+            return;
         plugin.getProviders().getMenusProvider().refreshTopIslands(sortingType);
     }
 

@@ -13,7 +13,7 @@ public class CalcTask extends BukkitRunnable {
     private static BukkitTask calcTask;
 
     private CalcTask() {
-        calcTask = runTaskTimerAsynchronously(plugin, plugin.getSettings().getCalcInterval(), plugin.getSettings().getCalcInterval());
+        calcTask = plugin.getTaskScheduler().async(this, plugin.getSettings().getCalcInterval(), plugin.getSettings().getCalcInterval());
     }
 
     public static void startTask() {

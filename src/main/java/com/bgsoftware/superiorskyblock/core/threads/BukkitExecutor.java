@@ -1,17 +1,24 @@
 package com.bgsoftware.superiorskyblock.core.threads;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.platform.TaskScheduler;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class BukkitExecutor {
 
@@ -22,9 +29,10 @@ public class BukkitExecutor {
     public static final Executor ASYNC_EXECUTOR = runnable -> ensureAsync(runnable);
 
     private static SuperiorSkyblockPlugin plugin;
-    private static State state = State.RUNNING;
+    private static volatile State state = State.RUNNING;
 
     private static final AtomicLong ACTIVE_TASKS_COUNT = new AtomicLong(0);
+    private static final Map<CompletableFuture<?>, AtomicBoolean> PENDING_SUBMISSIONS = new ConcurrentHashMap<>();
 
     private BukkitExecutor() {
 
@@ -32,6 +40,7 @@ public class BukkitExecutor {
 
     public static void init(SuperiorSkyblockPlugin plugin) {
         BukkitExecutor.plugin = plugin;
+        state = State.RUNNING;
     }
 
     @Nullable
@@ -39,7 +48,7 @@ public class BukkitExecutor {
         if (ensureNotShudown())
             return null;
 
-        if (state != State.PREPARE_SHUTDOWN && !Bukkit.isPrimaryThread()) {
+        if (state != State.PREPARE_SHUTDOWN && !scheduler().isGlobalThread()) {
             return sync(runnable);
         } else {
             runnable.run();
@@ -52,7 +61,7 @@ public class BukkitExecutor {
         if (ensureNotShudown())
             return null;
 
-        if (state != State.PREPARE_SHUTDOWN && Bukkit.isPrimaryThread()) {
+        if (state != State.PREPARE_SHUTDOWN && scheduler().isTickThread()) {
             return async(runnable);
         } else {
             runnable.run();
@@ -72,7 +81,7 @@ public class BukkitExecutor {
             runnable.run();
             return null;
         } else {
-            return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
+            return scheduler().global(runnable, delay, 0L);
         }
     }
 
@@ -84,7 +93,7 @@ public class BukkitExecutor {
             runnable.run();
             return null;
         } else {
-            return Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
+            return scheduler().async(runnable, 0L, 0L);
         }
     }
 
@@ -96,7 +105,7 @@ public class BukkitExecutor {
             runnable.run();
             return null;
         } else {
-            return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
+            return scheduler().async(runnable, delay, 0L);
         }
     }
 
@@ -104,14 +113,130 @@ public class BukkitExecutor {
         if (ensureNotShudown())
             return;
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, delay);
+        scheduler().async(runnable, delay, delay);
     }
 
     public static void timer(Runnable runnable, long delay) {
         if (ensureNotShudown())
             return;
 
-        Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, delay);
+        scheduler().global(runnable, delay, delay);
+    }
+
+    public static boolean isFolia() {
+        return scheduler().isFolia();
+    }
+
+    public static boolean isOwned(Entity entity) {
+        return scheduler().isOwned(entity);
+    }
+
+    public static boolean isOwned(Location location) {
+        return scheduler().isOwned(location);
+    }
+
+    public static BukkitTask sync(Entity entity, Runnable runnable) {
+        return sync(entity, runnable, 0L);
+    }
+
+    public static BukkitTask sync(Entity entity, Runnable runnable, long delay) {
+        return ensureNotShudown() ? null : scheduler().entity(entity, runnable, null, delay, 0L);
+    }
+
+    public static BukkitTask sync(Location location, Runnable runnable) {
+        return sync(location, runnable, 0L);
+    }
+
+    public static BukkitTask sync(Location location, Runnable runnable, long delay) {
+        return ensureNotShudown() ? null : scheduler().region(location, runnable, delay, 0L);
+    }
+
+    public static BukkitTask ensureMain(Entity entity, Runnable runnable) {
+        if (ensureNotShudown() || entity == null)
+            return null;
+        if (isOwned(entity)) {
+            runnable.run();
+            return null;
+        }
+        return sync(entity, runnable);
+    }
+
+    public static BukkitTask ensureMain(Location location, Runnable runnable) {
+        if (ensureNotShudown())
+            return null;
+        if (isOwned(location)) {
+            runnable.run();
+            return null;
+        }
+        return sync(location, runnable);
+    }
+
+    public static BukkitTask timer(Entity entity, Runnable runnable, long period) {
+        return ensureNotShudown() ? null : scheduler().entity(entity, runnable, null, period, period);
+    }
+
+    public static BukkitTask timer(Location location, Runnable runnable, long period) {
+        return ensureNotShudown() ? null : scheduler().region(location, runnable, period, period);
+    }
+
+    public static <T> CompletableFuture<T> submit(Supplier<T> supplier) {
+        return submit(null, null, supplier);
+    }
+
+    public static <T> CompletableFuture<T> submit(Entity entity, Supplier<T> supplier) {
+        if (entity == null)
+            throw new IllegalArgumentException("Entity cannot be null");
+        return submit(entity, null, supplier);
+    }
+
+    public static <T> CompletableFuture<T> submit(@Nullable Location location, Supplier<T> supplier) {
+        return submit(null, location, supplier);
+    }
+
+    private static <T> CompletableFuture<T> submit(@Nullable Entity entity, @Nullable Location location,
+                                                   Supplier<T> supplier) {
+        CompletableFuture<T> result = new CompletableFuture<>();
+        if (state != State.RUNNING) {
+            result.completeExceptionally(new IllegalStateException("Plugin is stopping"));
+            return result;
+        }
+        AtomicBoolean claimed = new AtomicBoolean();
+        PENDING_SUBMISSIONS.put(result, claimed);
+        result.whenComplete((value, error) -> PENDING_SUBMISSIONS.remove(result));
+        try {
+            Runnable task = () -> {
+                if (!claimed.compareAndSet(false, true) || result.isDone())
+                    return;
+                try {
+                    result.complete(supplier.get());
+                } catch (Throwable error) {
+                    result.completeExceptionally(error);
+                }
+            };
+            if (entity != null) {
+                if (isOwned(entity)) {
+                    task.run();
+                } else {
+                    scheduler().entity(entity, task, () -> {
+                        if (claimed.compareAndSet(false, true))
+                            result.completeExceptionally(new CancellationException("Entity retired before the task started"));
+                    }, 0L, 0L);
+                }
+            } else if (location != null) {
+                ensureMain(location, task);
+            } else {
+                ensureMain(task);
+            }
+        } catch (Throwable error) {
+            result.completeExceptionally(error);
+        }
+        if (state != State.RUNNING && claimed.compareAndSet(false, true))
+            result.completeExceptionally(new CancellationException("Plugin is stopping"));
+        return result;
+    }
+
+    private static TaskScheduler scheduler() {
+        return plugin.getTaskScheduler();
     }
 
     public static NestedTask<Void> createTask() {
@@ -142,7 +267,11 @@ public class BukkitExecutor {
         }
 
         state = State.SHUTDOWN;
-        Bukkit.getScheduler().cancelTasks(plugin);
+        PENDING_SUBMISSIONS.forEach((result, claimed) -> {
+            if (claimed.compareAndSet(false, true))
+                result.completeExceptionally(new CancellationException("Plugin stopped before the region task started"));
+        });
+        scheduler().cancelTasks();
     }
 
     private static boolean ensureNotShudown() {

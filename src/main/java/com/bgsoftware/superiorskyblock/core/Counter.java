@@ -1,27 +1,25 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class Counter {
 
-    private int value;
+    private final AtomicInteger value;
 
     public Counter(int initialValue) {
-        this.value = initialValue;
+        this.value = new AtomicInteger(initialValue);
     }
 
     public int inc(int delta) {
-        int original = this.value;
-        this.value += delta;
-        return original;
+        return this.value.getAndAdd(delta);
     }
 
     public int set(int value) {
-        int original = this.value;
-        this.value = value;
-        return original;
+        return this.value.getAndSet(value);
     }
 
     public int get() {
-        return this.value;
+        return this.value.get();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.mission;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
@@ -25,6 +26,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.threads.SerialTaskQueue;
 import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
@@ -34,6 +36,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.script.ScriptException;
@@ -47,6 +50,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class MissionsManagerImpl extends Manager implements MissionsManager {
@@ -63,6 +67,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     private final Map<String, FileClassLoader> missionTypesClassLoaders = new HashMap<>();
 
     private final MissionsContainer missionsContainer;
+    private final SerialTaskQueue<IMissionsHolder> rewardQueue = new SerialTaskQueue<>();
 
     public MissionsManagerImpl(SuperiorSkyblockPlugin plugin, MissionsContainer missionsContainer) {
         super(plugin);
@@ -267,8 +272,51 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
         }
 
-        BukkitExecutor.ensureAsync(() -> rewardMissionAsyncInternal(mission, missionData, superiorPlayer,
-                missionsHolder, checkAutoReward, forceReward, result));
+        if (BukkitExecutor.isFolia()) {
+            rewardQueue.submit(missionsHolder, () -> rewardMissionOnRegion(mission, missionData, superiorPlayer,
+                    missionsHolder, checkAutoReward, forceReward)).whenComplete((rewarded, error) -> {
+                if (error != null)
+                    Log.error(error, "An unexpected error occurred while rewarding mission ", mission.getName(), ":");
+                if (result != null)
+                    result.accept(error == null && Boolean.TRUE.equals(rewarded));
+            });
+        } else {
+            BukkitExecutor.ensureAsync(() -> rewardMissionAsyncInternal(mission, missionData, superiorPlayer,
+                    missionsHolder, checkAutoReward, forceReward, result));
+        }
+    }
+
+    private CompletableFuture<Boolean> rewardMissionOnRegion(Mission<?> mission, MissionData missionData,
+                                                             SuperiorPlayer superiorPlayer, IMissionsHolder missionsHolder,
+                                                             boolean checkAutoReward, boolean forceReward) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        if (!plugin.isEnabled()) {
+            result.complete(false);
+            return result;
+        }
+        Runnable reward = () -> {
+            try {
+                if (missionsHolder != (missionData.isIslandMission() ? superiorPlayer.getIsland() : superiorPlayer)) {
+                    result.complete(false);
+                    return;
+                }
+                result.complete(tryRewardMissionInternal(mission, missionData, superiorPlayer,
+                        missionsHolder, checkAutoReward, forceReward));
+            } catch (Throwable error) {
+                result.completeExceptionally(error);
+            }
+        };
+        try {
+            Player player = superiorPlayer.asPlayer();
+            if (player == null) {
+                plugin.getTaskScheduler().global(reward, 0L, 0L);
+            } else {
+                plugin.getTaskScheduler().entity(player, reward, () -> result.complete(false), 0L, 0L);
+            }
+        } catch (Throwable error) {
+            result.completeExceptionally(error);
+        }
+        return result;
     }
 
     private void rewardMissionAsyncInternal(Mission<?> mission, MissionData missionData, SuperiorPlayer superiorPlayer,
@@ -276,13 +324,13 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                                             @Nullable Consumer<Boolean> result) {
         boolean rewarded;
         synchronized (superiorPlayer) {
-            rewarded = tryRewardMissionLockedInternal(mission, missionData, superiorPlayer, missionsHolder, checkAutoReward, forceReward);
+            rewarded = tryRewardMissionInternal(mission, missionData, superiorPlayer, missionsHolder, checkAutoReward, forceReward);
         }
         if (result != null)
             result.accept(rewarded);
     }
 
-    private boolean tryRewardMissionLockedInternal(Mission<?> mission, MissionData missionData, SuperiorPlayer superiorPlayer,
+    private boolean tryRewardMissionInternal(Mission<?> mission, MissionData missionData, SuperiorPlayer superiorPlayer,
                                                    IMissionsHolder missionsHolder, boolean checkAutoReward, boolean forceReward) {
         if (!forceReward) {
             if (!canCompleteAgain(superiorPlayer, mission)) {
@@ -380,7 +428,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 }
 
                 for (String command : event.getArgs().commandRewards) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
+                    CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("%mission%", mission.getName())
                             .replace("%player%", superiorPlayer.getName())
                             .replace("%island%", getIslandPlaceholder(missionsHolder))

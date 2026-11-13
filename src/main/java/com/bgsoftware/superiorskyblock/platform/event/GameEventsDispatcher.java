@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.events.EventsDispatcher;
 import com.bgsoftware.superiorskyblock.listener.AbstractGameEventListener;
 
+import java.util.List;
+
 public class GameEventsDispatcher extends EventsDispatcher<
         AbstractGameEventListener,
         GameEventType<?>,
@@ -11,7 +13,7 @@ public class GameEventsDispatcher extends EventsDispatcher<
         GameEvent<?>> {
 
     @GameEventFlags
-    private int capturedEventsFlags = 0;
+    private final ThreadLocal<Integer> capturedEventsFlags = ThreadLocal.withInitial(() -> 0);
 
     public GameEventsDispatcher(SuperiorSkyblockPlugin plugin) {
         super(plugin, GameEventPriority.class, GameEventType.values());
@@ -24,12 +26,19 @@ public class GameEventsDispatcher extends EventsDispatcher<
 
     public void startCaptureEvents(@GameEventFlags int capturedEventsFlags) {
         super.startCaptureEvents();
-        this.capturedEventsFlags = capturedEventsFlags;
+        this.capturedEventsFlags.set(capturedEventsFlags);
+    }
+
+    @Override
+    public List<GameEvent<?>> stopCaptureEvents() {
+        capturedEventsFlags.remove();
+        return super.stopCaptureEvents();
     }
 
     @Override
     protected boolean filterCapturedEvent(GameEvent<?> event) {
-        return this.capturedEventsFlags == 0xFFFFFFFF || (event.getType().getFlags() & this.capturedEventsFlags) != 0;
+        int flags = this.capturedEventsFlags.get();
+        return flags == 0xFFFFFFFF || (event.getType().getFlags() & flags) != 0;
     }
 
 }

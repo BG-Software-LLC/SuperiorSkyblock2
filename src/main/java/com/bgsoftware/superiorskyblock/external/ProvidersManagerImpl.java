@@ -56,6 +56,7 @@ import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvi
 import com.bgsoftware.superiorskyblock.external.vanish.VanishProvider_Default;
 import com.bgsoftware.superiorskyblock.external.worlds.DefaultWorldLoadListener;
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
+import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Folia;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -120,6 +121,12 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         this.uiProvider = new UIProvider_Default(plugin);
         setWorldsProviderInternal(new WorldsProvider_Default(plugin));
         this.menusProvider = new MenusProvider_Default(plugin);
+    }
+
+    public void initializeWorldsProvider() {
+        if (!plugin.getTaskScheduler().isFolia() || this.isCustomWorldsProvider)
+            return;
+        setWorldsProviderInternal(new WorldsProvider_Folia(plugin));
     }
 
     @Override

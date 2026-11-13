@@ -335,7 +335,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         if (closeInventory && interactionResult != InteractionResult.SUCCESS) {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync(superiorPlayer.asPlayer(), () -> {
                 Player player = superiorPlayer.asPlayer();
                 if (player != null && player.isOnline()) {
                     Inventory openInventory = player.getOpenInventory().getTopInventory();
@@ -787,7 +787,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         if (equalIslands) {
             if (!equalWorlds) {
-                BukkitExecutor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
+                BukkitExecutor.sync(superiorPlayer.asPlayer(), () -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
                 superiorPlayer.setPlayerStatus(PlayerStatus.PORTALS_IMMUNED);
                 BukkitExecutor.sync(() -> {
                     superiorPlayer.removePlayerStatus(PlayerStatus.PORTALS_IMMUNED);
@@ -830,16 +830,16 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
         Player player = superiorPlayer.asPlayer();
         if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
-            BukkitExecutor.sync(() -> updatePlayerTimeAndWeather(player, toIsland), 1L);
+            BukkitExecutor.sync(player, () -> updatePlayerTimeAndWeather(player, toIsland), 1L);
         }
 
         if (superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()) {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync(superiorPlayer.asPlayer(), () -> {
                 if (player != null) toIsland.updateIslandFly(superiorPlayer);
             }, 5L);
         }
 
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(superiorPlayer.asPlayer(), () -> {
             toIsland.applyEffects(superiorPlayer);
             plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland);
         }, 1L);

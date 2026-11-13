@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -261,14 +262,14 @@ public class SIsland implements Island {
     private final Synchronized<EnumerateSet<Dimension>> unlockedWorlds = Synchronized.of(new EnumerateSet<>(Dimension.values()));
     private final Synchronized<EnumerateMap<Dimension, IslandBiome>> islandBiomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     @Nullable
-    private PersistentDataContainer persistentDataContainer;
+    private volatile PersistentDataContainer persistentDataContainer;
     /*
      * Island Flags
      */
     private volatile boolean beingRecalculated = false;
     private final AtomicReference<BigInteger> currentTotalBlockCounts = new AtomicReference<>(BigInteger.ZERO);
     private volatile BigInteger lastSavedBlockCounts = BigInteger.ZERO;
-    private SuperiorPlayer owner;
+    private volatile SuperiorPlayer owner;
     private String creationTimeDate;
     /*
      * Island Time-Trackers
@@ -1597,9 +1598,9 @@ public class SIsland implements Island {
             return;
 
         if (islandPrivilege == IslandPrivileges.FLY) {
-            getAllPlayersInside().forEach(this::updateIslandFly);
+            forEachPlayerInside(this::updateIslandFly);
         } else if (islandPrivilege == IslandPrivileges.VILLAGER_TRADING) {
-            getAllPlayersInside().forEach(superiorPlayer -> IslandUtils.updateTradingMenus(this, superiorPlayer));
+            forEachPlayerInside(superiorPlayer -> IslandUtils.updateTradingMenus(this, superiorPlayer));
         }
 
         IslandsDatabaseBridge.saveRolePermission(this, playerRole, islandPrivilege);
@@ -1614,7 +1615,7 @@ public class SIsland implements Island {
 
         rolePermissions.clear();
 
-        getAllPlayersInside().forEach(superiorPlayer -> {
+        forEachPlayerInside(superiorPlayer -> {
             updateIslandFly(superiorPlayer);
             IslandUtils.updateTradingMenus(this, superiorPlayer);
         });
@@ -1912,7 +1913,7 @@ public class SIsland implements Island {
     @Override
     public void updateBorder() {
         Log.debug(Debug.UPDATE_BORDER, owner.getName());
-        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this)));
+        BukkitExecutor.ensureMain(() -> forEachPlayerInside(superiorPlayer -> superiorPlayer.updateWorldBorder(this)));
     }
 
     @Override
@@ -2302,7 +2303,7 @@ public class SIsland implements Island {
                             .replace("{player-name}", islandMember.getName());
                 }
 
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), playerCommand);
+                CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(), playerCommand);
             });
         }));
     }
@@ -3488,7 +3489,7 @@ public class SIsland implements Island {
         if (level == IntValue.getNonSynced(oldPotionLevel, IslandUpgradeConstants.SYNCED_VALUE))
             return;
 
-        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+        registerTask(BukkitExecutor.ensureMain(() -> forEachPlayerInside(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             assert player != null;
             if (oldPotionLevel != null && oldPotionLevel.get() > level)
@@ -3512,7 +3513,7 @@ public class SIsland implements Island {
         if (oldEffectLevel == null)
             return;
 
-        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+        registerTask(BukkitExecutor.ensureMain(() -> forEachPlayerInside(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             if (player != null)
                 player.removePotionEffect(type);
@@ -3567,7 +3568,7 @@ public class SIsland implements Island {
     @Override
     public void applyEffects() {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
-            getAllPlayersInside().forEach(this::applyEffectsNoUpgradeCheck);
+            forEachPlayerInside(this::applyEffectsNoUpgradeCheck);
     }
 
     @Override
@@ -3580,7 +3581,7 @@ public class SIsland implements Island {
     @Override
     public void removeEffects() {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
-            getAllPlayersInside().forEach(this::removeEffectsNoUpgradeCheck);
+            forEachPlayerInside(this::removeEffectsNoUpgradeCheck);
     }
 
     @Override
@@ -4024,7 +4025,7 @@ public class SIsland implements Island {
         //Updating times / weather if necessary
         switch (settings.getName()) {
             case "ALWAYS_DAY":
-                getAllPlayersInside().forEach(superiorPlayer -> {
+                forEachPlayerInside(superiorPlayer -> {
                     Player player = superiorPlayer.asPlayer();
                     if (player != null)
                         player.setPlayerTime(0, false);
@@ -4032,7 +4033,7 @@ public class SIsland implements Island {
                 disableTime = true;
                 break;
             case "ALWAYS_MIDDLE_DAY":
-                getAllPlayersInside().forEach(superiorPlayer -> {
+                forEachPlayerInside(superiorPlayer -> {
                     Player player = superiorPlayer.asPlayer();
                     if (player != null)
                         player.setPlayerTime(6000, false);
@@ -4040,7 +4041,7 @@ public class SIsland implements Island {
                 disableTime = true;
                 break;
             case "ALWAYS_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> {
+                forEachPlayerInside(superiorPlayer -> {
                     Player player = superiorPlayer.asPlayer();
                     if (player != null)
                         player.setPlayerTime(14000, false);
@@ -4048,7 +4049,7 @@ public class SIsland implements Island {
                 disableTime = true;
                 break;
             case "ALWAYS_MIDDLE_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> {
+                forEachPlayerInside(superiorPlayer -> {
                     Player player = superiorPlayer.asPlayer();
                     if (player != null)
                         player.setPlayerTime(18000, false);
@@ -4056,7 +4057,7 @@ public class SIsland implements Island {
                 disableTime = true;
                 break;
             case "ALWAYS_SHINY":
-                getAllPlayersInside().forEach(superiorPlayer -> {
+                forEachPlayerInside(superiorPlayer -> {
                     Player player = superiorPlayer.asPlayer();
                     if (player != null)
                         player.setPlayerWeather(WeatherType.CLEAR);
@@ -4064,7 +4065,7 @@ public class SIsland implements Island {
                 disableWeather = true;
                 break;
             case "ALWAYS_RAIN":
-                getAllPlayersInside().forEach(superiorPlayer -> {
+                forEachPlayerInside(superiorPlayer -> {
                     Player player = superiorPlayer.asPlayer();
                     if (player != null)
                         player.setPlayerWeather(WeatherType.DOWNFALL);
@@ -4123,7 +4124,7 @@ public class SIsland implements Island {
             case "ALWAYS_MIDDLE_DAY":
             case "ALWAYS_NIGHT":
             case "ALWAYS_MIDDLE_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> {
+                forEachPlayerInside(superiorPlayer -> {
                     Player player = superiorPlayer.asPlayer();
                     if (player != null)
                         player.resetPlayerTime();
@@ -4131,7 +4132,7 @@ public class SIsland implements Island {
                 break;
             case "ALWAYS_RAIN":
             case "ALWAYS_SHINY":
-                getAllPlayersInside().forEach(superiorPlayer -> {
+                forEachPlayerInside(superiorPlayer -> {
                     Player player = superiorPlayer.asPlayer();
                     if (player != null)
                         player.resetPlayerWeather();
@@ -4183,22 +4184,23 @@ public class SIsland implements Island {
             }
         }
 
-        boolean teleportOnPvPEnable = plugin.getSettings().isTeleportOnPvPEnable();
+        Long playerTime = time;
+        WeatherType playerWeather = weather;
+        boolean teleportVisitors = enablePvP && plugin.getSettings().isTeleportOnPvPEnable();
 
         for (SuperiorPlayer superiorPlayer : getAllPlayersInside()) {
-            Player player = superiorPlayer.asPlayer();
-            if (player != null) {
-                if (time == null) player.resetPlayerTime();
-                else player.setPlayerTime(time, false);
+            superiorPlayer.runIfOnline(player -> {
+                if (playerTime == null) player.resetPlayerTime();
+                else player.setPlayerTime(playerTime, false);
 
-                if (weather == null) player.resetPlayerWeather();
-                else player.setPlayerWeather(weather);
+                if (playerWeather == null) player.resetPlayerWeather();
+                else player.setPlayerWeather(playerWeather);
 
-                if (enablePvP && teleportOnPvPEnable && isVisitor(superiorPlayer, false)) {
+                if (teleportVisitors && isVisitor(superiorPlayer, false)) {
                     superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
                     Message.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
                 }
-            }
+            });
         }
 
         IslandsDatabaseBridge.clearIslandFlags(this);
@@ -4652,18 +4654,18 @@ public class SIsland implements Island {
         return this.giveInterestFailed;
     }
 
+    private void forEachPlayerInside(Consumer<SuperiorPlayer> action) {
+        getAllPlayersInside().forEach(superiorPlayer ->
+                superiorPlayer.runIfOnline(player -> action.accept(superiorPlayer)));
+    }
+
     private void applyEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
-        Player player = superiorPlayer.asPlayer();
-        if (player != null) {
-            getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
-                    new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
-        }
+        superiorPlayer.runIfOnline(player -> getPotionEffects().forEach((potionEffectType, level) ->
+                player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true)));
     }
 
     private void removeEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
-        Player player = superiorPlayer.asPlayer();
-        if (player != null)
-            getPotionEffects().keySet().forEach(player::removePotionEffect);
+        superiorPlayer.runIfOnline(player -> getPotionEffects().keySet().forEach(player::removePotionEffect));
     }
 
     private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {
@@ -4700,7 +4702,7 @@ public class SIsland implements Island {
     }
 
     @Override
-    public PersistentDataContainer getPersistentDataContainer() {
+    public synchronized PersistentDataContainer getPersistentDataContainer() {
         if (persistentDataContainer == null)
             persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
         return persistentDataContainer;

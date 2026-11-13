@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -111,7 +112,7 @@ public class MenuActions {
 
         GameSoundImpl.playSound(whoClicked, creationConfig.getSound());
 
-        creationConfig.getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+        creationConfig.getCommands().forEach(command -> CommandsManagerImpl.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", clickedPlayer.getName())));
 
         Message.ISLAND_CREATE_PROCCESS_REQUEST.send(clickedPlayer);
@@ -130,7 +131,7 @@ public class MenuActions {
     }
 
     public static void simulateWarpsClick(SuperiorPlayer superiorPlayer, Island island, IslandWarp islandWarp) {
-        BukkitExecutor.sync(() -> {
+        BukkitExecutor.sync(superiorPlayer.asPlayer(), () -> {
             superiorPlayer.runIfOnline(player -> {
                 MenuView<?, ?> currentView = superiorPlayer.getOpenedView();
                 if (currentView == null) {

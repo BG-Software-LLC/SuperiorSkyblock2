@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.missions;
 
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
@@ -72,7 +73,7 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
     protected void registerListeners() {
         registerListener(this);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        BukkitExecutor.sync(() -> {
             if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
                 registerListener(new WildStackerListener());
                 this.isBarrelCheck = block -> WildStackerAPI.getWildStacker().getSystemManager().isStackedBarrel(block);
@@ -238,7 +239,7 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
         if (this.onlyNatural) {
             // We want to track block broken & placed only if this mission only progresses for natural blocks
             // We do that in a delayed tick so all other missions will check for their progress as well.
-            Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            BukkitExecutor.sync(e.getBlock().getLocation(), () -> {
                 BlocksTracker.INSTANCE.untrackBlock(BlocksTracker.TrackingType.BROKEN_BLOCKS, e.getBlock());
                 BlocksTracker.INSTANCE.trackBlock(BlocksTracker.TrackingType.PLACED_BLOCKS, e.getBlock());
             }, 1L);
@@ -264,7 +265,7 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
         if (this.onlyNatural) {
             // We want to track block broken & placed only if this mission only progresses for natural blocks
             // We do that in a delayed tick so all other missions will check for their progress as well.
-            Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            BukkitExecutor.sync(e.getBlock().getLocation(), () -> {
                 BlocksTracker.INSTANCE.untrackBlock(BlocksTracker.TrackingType.PLACED_BLOCKS, e.getBlock());
                 BlocksTracker.INSTANCE.trackBlock(BlocksTracker.TrackingType.BROKEN_BLOCKS, e.getBlock());
             }, 1L);
@@ -330,7 +331,7 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
                 if (onlyNatural) {
                     // We want to track block broken & placed only if this mission only progresses for natural blocks
                     // We do that in a delayed tick so all other missions will check for their progress as well.
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    BukkitExecutor.sync(block.getLocation(), () -> {
                         BlocksTracker.INSTANCE.untrackBlock(BlocksTracker.TrackingType.PLACED_BLOCKS, block);
                         BlocksTracker.INSTANCE.trackBlock(BlocksTracker.TrackingType.BROKEN_BLOCKS, block);
                     }, 1L);
@@ -394,7 +395,7 @@ public class BlocksMissions extends BuiltinMission<KeyDataTracker> implements Li
 
         blocksCounter.track(blockKey, amount);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> superiorPlayer.runIfOnline(_player -> {
+        BukkitExecutor.async(() -> superiorPlayer.runIfOnline(_player -> {
             if (canComplete(superiorPlayer))
                 this.plugin.getMissions().rewardMission(this, superiorPlayer, true);
         }), 2L);

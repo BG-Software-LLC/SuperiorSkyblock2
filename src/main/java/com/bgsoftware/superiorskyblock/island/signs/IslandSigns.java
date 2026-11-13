@@ -14,11 +14,13 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 
@@ -39,11 +41,12 @@ public class IslandSigns {
         if (island == null)
             return new Result(Reason.NOT_IN_ISLAND, false);
 
-        superiorPlayer.runIfOnline(player -> {
+        Player player = superiorPlayer.asPlayer();
+        if (player != null) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 warpLocation.setYaw(player.getLocation(wrapper.getHandle()).getYaw());
             }
-        });
+        }
 
         if (isWarpSign(warpLines[0])) {
             Reason reason = handleWarpSignPlace(superiorPlayer, island, warpLocation, warpLines, sendMessage);
@@ -167,15 +170,33 @@ public class IslandSigns {
             warpLines[i] = Formatters.COLOR_FORMATTER.format(warpLines[i]);
 
         Location islandVisitorsLocation = island.getVisitorsLocation((Dimension) null /* unused */);
-        Block oldWelcomeSignBlock = islandVisitorsLocation == null ? null : islandVisitorsLocation.getBlock();
-
-        if (oldWelcomeSignBlock != null && Materials.isSign(oldWelcomeSignBlock.getType())) {
-            Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
-            oldWelcomeSign.setLine(0, plugin.getSettings().getVisitorsSign().getInactive());
-            oldWelcomeSign.update();
-        }
+        Location oldWelcomeSignLocation = islandVisitorsLocation == null ? null : islandVisitorsLocation.clone();
+        Runnable deactivatePreviousSign = () -> {
+            if (oldWelcomeSignLocation == null)
+                return;
+            if (BukkitExecutor.isFolia()) {
+                Location currentVisitorsLocation = island.getVisitorsLocation((Dimension) null);
+                if (currentVisitorsLocation != null
+                        && currentVisitorsLocation.getWorld().equals(oldWelcomeSignLocation.getWorld())
+                        && currentVisitorsLocation.getBlockX() == oldWelcomeSignLocation.getBlockX()
+                        && currentVisitorsLocation.getBlockY() == oldWelcomeSignLocation.getBlockY()
+                        && currentVisitorsLocation.getBlockZ() == oldWelcomeSignLocation.getBlockZ())
+                    return;
+            }
+            Block oldWelcomeSignBlock = oldWelcomeSignLocation.getBlock();
+            if (Materials.isSign(oldWelcomeSignBlock.getType())) {
+                Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
+                oldWelcomeSign.setLine(0, plugin.getSettings().getVisitorsSign().getInactive());
+                oldWelcomeSign.update();
+            }
+        };
+        if (!BukkitExecutor.isFolia())
+            deactivatePreviousSign.run();
 
         island.setVisitorsLocation(setVisitorHomeEvent.getArgs().islandVisitorHome);
+
+        if (BukkitExecutor.isFolia() && oldWelcomeSignLocation != null)
+            BukkitExecutor.ensureMain(oldWelcomeSignLocation, deactivatePreviousSign);
 
         PluginEvent<PluginEventArgs.IslandChangeDescription> changeDescriptionEvent =
                 PluginEventsFactory.callIslandChangeDescriptionEvent(island, superiorPlayer, description);

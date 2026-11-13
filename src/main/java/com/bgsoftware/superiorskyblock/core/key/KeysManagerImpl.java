@@ -24,6 +24,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.function.Supplier;
 public class KeysManagerImpl extends Manager implements KeysManager {
 
     private final KeyMap<List<CustomKeyParser>> customMaterialKeyParsers = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
-    private final KeyMap<List<CustomKeyParser>> customEntityTypeKeyParsers = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+    private volatile KeyMap<List<CustomKeyParser>> customEntityTypeKeyParsers = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
 
     public KeysManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -57,13 +58,18 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     }
 
     @Override
-    public void registerCustomEntityTypeKeyParser(CustomKeyParser customKeyParser, Key... keys) {
+    public synchronized void registerCustomEntityTypeKeyParser(CustomKeyParser customKeyParser, Key... keys) {
         Preconditions.checkNotNull(customKeyParser, "customKeyParser parameter cannot be null.");
         Preconditions.checkNotNull(keys, "keys parameter cannot be null.");
 
+        KeyMap<List<CustomKeyParser>> updatedParsers = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
+        this.customEntityTypeKeyParsers.forEach((key, parsers) -> updatedParsers.put(key, new ArrayList<>(parsers)));
+
         for (Key key : keys) {
-            this.customEntityTypeKeyParsers.computeIfAbsent(key, unused -> new LinkedList<>()).add(customKeyParser);
+            updatedParsers.computeIfAbsent(key, unused -> new ArrayList<>()).add(customKeyParser);
         }
+
+        this.customEntityTypeKeyParsers = updatedParsers;
     }
 
     public Key convertKey(Key originalKey, Location location) {

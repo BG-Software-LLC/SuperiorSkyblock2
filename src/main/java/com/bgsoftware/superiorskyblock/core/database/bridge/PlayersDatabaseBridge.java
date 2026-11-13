@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.database.DBColumn;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,13 +20,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class PlayersDatabaseBridge {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
+    private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new HashMap<>();
     private static final LazyReference<DatabaseBridge> GLOBAL_PLAYERS_BRIDGE = new LazyReference<DatabaseBridge>() {
         @Override
         protected DatabaseBridge create() {
@@ -211,18 +211,28 @@ public class PlayersDatabaseBridge {
     }
 
     public static void markPersistentDataContainerToBeSaved(SuperiorPlayer superiorPlayer) {
-        Set<Object> varsForPersistentData = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(superiorPlayer.getUniqueId(), u -> new EnumMap<>(FutureSave.class))
-                .computeIfAbsent(FutureSave.PERSISTENT_DATA, e -> new HashSet<>());
-        if (varsForPersistentData.isEmpty())
-            varsForPersistentData.add(new Object());
+        UUID superiorPlayerUUID = superiorPlayer.getUniqueId();
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            Set<Object> varsForPersistentData = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(superiorPlayerUUID, u -> new EnumMap<>(FutureSave.class))
+                    .computeIfAbsent(FutureSave.PERSISTENT_DATA, e -> new HashSet<>());
+            if (varsForPersistentData.isEmpty())
+                varsForPersistentData.add(new Object());
+        }
     }
 
     public static boolean isModified(SuperiorPlayer superiorPlayer) {
-        return SAVE_METHODS_TO_BE_EXECUTED.containsKey(superiorPlayer.getUniqueId());
+        UUID superiorPlayerUUID = superiorPlayer.getUniqueId();
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            return SAVE_METHODS_TO_BE_EXECUTED.containsKey(superiorPlayerUUID);
+        }
     }
 
     public static void executeFutureSaves(SuperiorPlayer superiorPlayer) {
-        Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.remove(superiorPlayer.getUniqueId());
+        UUID superiorPlayerUUID = superiorPlayer.getUniqueId();
+        Map<FutureSave, Set<Object>> futureSaves;
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            futureSaves = SAVE_METHODS_TO_BE_EXECUTED.remove(superiorPlayerUUID);
+        }
         if (futureSaves != null) {
             for (Map.Entry<FutureSave, Set<Object>> futureSaveEntry : futureSaves.entrySet()) {
                 switch (futureSaveEntry.getKey()) {
@@ -239,18 +249,22 @@ public class PlayersDatabaseBridge {
     }
 
     public static void executeFutureSaves(SuperiorPlayer superiorPlayer, FutureSave futureSave) {
-        Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.get(superiorPlayer.getUniqueId());
+        UUID superiorPlayerUUID = superiorPlayer.getUniqueId();
+        Set<Object> values;
+        synchronized (SAVE_METHODS_TO_BE_EXECUTED) {
+            Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.get(superiorPlayerUUID);
 
-        if (futureSaves == null)
-            return;
+            if (futureSaves == null)
+                return;
 
-        Set<Object> values = futureSaves.remove(futureSave);
+            values = futureSaves.remove(futureSave);
 
-        if (values == null)
-            return;
+            if (values == null)
+                return;
 
-        if (futureSaves.isEmpty())
-            SAVE_METHODS_TO_BE_EXECUTED.remove(superiorPlayer.getUniqueId());
+            if (futureSaves.isEmpty())
+                SAVE_METHODS_TO_BE_EXECUTED.remove(superiorPlayerUUID);
+        }
 
         switch (futureSave) {
             case PERSISTENT_DATA: {

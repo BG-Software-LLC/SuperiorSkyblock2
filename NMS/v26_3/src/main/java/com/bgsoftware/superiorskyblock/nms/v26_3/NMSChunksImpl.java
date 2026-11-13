@@ -21,7 +21,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundChunksBiomesPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,6 +34,7 @@ import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -42,8 +46,9 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.block.CraftBiome;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.slf4j.Logger;
@@ -84,28 +89,32 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v26_3.Abs
 
                 levelChunk.markUnsaved();
 
-                BukkitExecutor.ensureMain(() -> {
-                    ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
-                    if (playersToUpdate.isEmpty() || serverLevel.getChunkSource().getChunkNow(
-                            levelChunk.getPos().getMinBlockX() >> 4, levelChunk.getPos().getMinBlockZ() >> 4) != levelChunk)
+                ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
+                ChunkPos chunkPos = levelChunk.getPos();
+                World world = serverLevel.getWorld();
+                Location chunkLocation = new Location(world, chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ());
+                BukkitExecutor.ensureMain(chunkLocation, () -> {
+                    if (playersToUpdate.isEmpty() || serverLevel.getChunkSource().getChunkNow(chunkPos.x(), chunkPos.z()) != levelChunk)
                         return;
 
-                    List<ServerPlayer> trackingPlayers = serverLevel.getChunkSource().chunkMap
-                            .getPlayers(levelChunk.getPos(), false);
+                    ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
+                    List<ServerPlayer> trackingPlayers = chunkMap.getPlayers(chunkPos, false);
                     if (trackingPlayers.isEmpty())
                         return;
 
-                    ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
-                            levelChunk, serverLevel.getLightEngine(), null, null);
+                    Packet<?> packet = BukkitExecutor.isFolia() ? ClientboundChunksBiomesPacket.forChunks(List.of(levelChunk)) :
+                            new ClientboundLevelChunkWithLightPacket(levelChunk, serverLevel.getLightEngine(), null, null);
+                    for (ServerPlayer serverPlayer : trackingPlayers) {
+                        Player player = serverPlayer.getBukkitEntity();
+                        if (!playersToUpdate.contains(player))
+                            continue;
 
-                    playersToUpdate.forEach(player -> {
-                        if (!player.isOnline() || player.getWorld() != serverLevel.getWorld())
-                            return;
-
-                        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                        if (trackingPlayers.contains(serverPlayer))
-                            serverPlayer.connection.send(mapChunkPacket);
-                    });
+                        BukkitExecutor.ensureMain(player, () -> {
+                            if (player.isOnline() && player.getWorld() == world &&
+                                    chunkMap.isChunkTracked(serverPlayer, chunkPos.x(), chunkPos.z()))
+                                serverPlayer.connection.send(packet);
+                        });
+                    }
                 });
             }
 

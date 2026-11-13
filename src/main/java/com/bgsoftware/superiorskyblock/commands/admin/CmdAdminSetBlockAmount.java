@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -75,10 +76,11 @@ public class CmdAdminSetBlockAmount implements ISuperiorCommand {
 
         int amount = arguments.getNumber();
 
-        plugin.getStackedBlocks().setStackedBlock(location.getBlock(), amount);
-
         String formattedLocation = args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5];
-        Message.CHANGED_BLOCK_AMOUNT.send(sender, formattedLocation, amount);
+        BukkitExecutor.ensureMain(location, () -> {
+            plugin.getStackedBlocks().setStackedBlock(location.getBlock(), amount);
+            Message.CHANGED_BLOCK_AMOUNT.send(sender, formattedLocation, amount);
+        });
     }
 
     @Override

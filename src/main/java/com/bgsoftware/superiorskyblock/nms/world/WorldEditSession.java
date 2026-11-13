@@ -4,11 +4,14 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPool;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface WorldEditSession extends ObjectsPool.Releasable {
 
@@ -19,6 +22,18 @@ public interface WorldEditSession extends ObjectsPool.Releasable {
     void applyBlocks(Chunk chunk);
 
     void finish(Island island);
+
+    default CompletableFuture<Void> finishAsync(Island island) {
+        AtomicBoolean started = new AtomicBoolean();
+        return BukkitExecutor.<Void>submit(() -> {
+            started.set(true);
+            finish(island);
+            return null;
+        }).whenComplete((ignored, error) -> {
+            if (error != null && !started.get())
+                release();
+        });
+    }
 
     Data readData(Location baseLocation);
 

@@ -48,6 +48,7 @@ import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.island.preview.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.listener.IslandPreviewListener;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
@@ -74,6 +75,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -81,8 +83,8 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     private static final Function<Island, UUID> ISLAND_OWNERS_MAPPER = island -> island.getOwner().getUniqueId();
 
-    private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
-    private final Set<UUID> customWorlds = Sets.newHashSet();
+    private final Set<UUID> pendingCreationTasks = ConcurrentHashMap.newKeySet();
+    private final Set<UUID> customWorlds = ConcurrentHashMap.newKeySet();
 
     private final LazyReference<DragonBattleService> dragonBattleService = new LazyReference<DragonBattleService>() {
         @Override
@@ -97,7 +99,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     private DatabaseBridge databaseBridge;
     private IslandCreationAlgorithm islandCreationAlgorithm;
 
-    private Island spawnIsland;
+    private volatile Island spawnIsland;
     private BlockPosition lastIsland;
     @Nullable
     private UUID serverUUID;
@@ -236,7 +238,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkArgument(schematic != null, "Cannot create an island with an invalid schematic.");
 
         try {
-            if (!Bukkit.isPrimaryThread()) {
+            if (!plugin.getTaskScheduler().isGlobalThread()) {
                 BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset));
             } else {
                 createIslandInternalAsync(builder, biome, offset, schematic, spawnOffset);
@@ -433,7 +435,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             superiorPlayer.teleportWithResult(previewLocation, result -> {
                 if (result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
                     this.islandPreviews.startIslandPreview(new SIslandPreview(superiorPlayer, previewLocation, schematic, islandName, superiorPlayer.asPlayer().getGameMode()));
-                    BukkitExecutor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(plugin.getSettings().getIslandPreviews().getGameMode())));
+                    BukkitExecutor.ensureMain(superiorPlayer.asPlayer(), () -> superiorPlayer.runIfOnline(player -> player.setGameMode(plugin.getSettings().getIslandPreviews().getGameMode())));
                     Message.ISLAND_PREVIEW_START.send(superiorPlayer, schematic.getName());
                 }
             });
@@ -442,15 +444,21 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public void cancelIslandPreview(SuperiorPlayer superiorPlayer) {
+        cancelIslandPreview(superiorPlayer, true);
+    }
+
+    public void cancelIslandPreview(SuperiorPlayer superiorPlayer, boolean teleport) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
         IslandPreview islandPreview = this.islandPreviews.endIslandPreview(superiorPlayer);
         if (islandPreview != null) {
             superiorPlayer.runIfOnline(player -> {
-                BukkitExecutor.ensureMain(() -> superiorPlayer.teleportWithResult(plugin.getGrid().getSpawnIsland(), teleportResult -> {
-                    if (teleportResult == PlayerTeleportAlgorithm.TeleportResult.SUCCESS && superiorPlayer.isOnline())
-                        player.setGameMode(islandPreview.getPreviousGameMode());
-                }));
+                if (teleport) {
+                    BukkitExecutor.ensureMain(player, () -> superiorPlayer.teleportWithResult(plugin.getGrid().getSpawnIsland(), teleportResult -> {
+                        if (teleportResult == PlayerTeleportAlgorithm.TeleportResult.SUCCESS && superiorPlayer.isOnline())
+                            player.setGameMode(islandPreview.getPreviousGameMode());
+                    }));
+                }
                 PlayerChat.remove(player);
             });
         }
@@ -458,7 +466,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public void cancelAllIslandPreviews() {
-        if (!Bukkit.isPrimaryThread()) {
+        if (!plugin.getTaskScheduler().isGlobalThread()) {
             BukkitExecutor.sync(this::cancelAllIslandPreviewsSync);
         } else {
             cancelAllIslandPreviewsSync();
@@ -466,13 +474,19 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     private void cancelAllIslandPreviewsSync() {
-        if (!Bukkit.isPrimaryThread()) {
+        if (!plugin.getTaskScheduler().isGlobalThread()) {
             Log.warn("Trying to cancel all island previews asynchronous. Stack trace:");
             new Exception().printStackTrace();
         }
 
         this.islandPreviews.getActivePreviews().forEach(islandPreview -> {
             SuperiorPlayer superiorPlayer = islandPreview.getPlayer();
+            if (BukkitExecutor.isFolia()) {
+                IslandPreviewListener.saveForRestore(superiorPlayer, islandPreview.getPreviousGameMode());
+                this.islandPreviews.endIslandPreview(superiorPlayer);
+                superiorPlayer.runIfOnline(player -> IslandPreviewListener.restoreOnJoin(plugin, superiorPlayer, player));
+                return;
+            }
             superiorPlayer.runIfOnline(player -> {
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
                 // We don't wait for the teleport to happen, as this method is called when the server is disabled.
@@ -495,7 +509,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         Log.debug(Debug.DELETE_ISLAND, island.getOwner().getName());
 
-        island.getAllPlayersInside().forEach(superiorPlayer -> {
+        island.getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.runIfOnline(player -> {
             MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
             if (openedView != null)
                 openedView.closeView();
@@ -504,7 +518,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
-        });
+        }));
 
         this.islandsContainer.removeIsland(island);
 

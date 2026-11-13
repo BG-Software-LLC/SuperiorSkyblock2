@@ -32,7 +32,15 @@ public class SchematicEntity {
         if (world == null)
             return false;
 
-        for (Entity nearbyEntity : world.getNearbyEntities(location, 1, 1, 1)) {
+        return hasEntityAt(location, world.getNearbyEntities(location, 1, 1, 1));
+    }
+
+    public boolean isAlreadySpawned(Location min, Iterable<Entity> chunkEntities) {
+        return hasEntityAt(offset.applyToLocation(min), chunkEntities);
+    }
+
+    private boolean hasEntityAt(Location location, Iterable<Entity> nearbyEntities) {
+        for (Entity nearbyEntity : nearbyEntities) {
             if (nearbyEntity.getType() != entityType)
                 continue;
 

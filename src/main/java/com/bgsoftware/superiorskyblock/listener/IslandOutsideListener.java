@@ -117,7 +117,7 @@ public class IslandOutsideListener extends AbstractGameEventListener {
 
         if (delayTeleport) {
             // If we don't delay the teleport, it will not occur due to the cancellation of PlayerMoveEvent
-            BukkitExecutor.sync(() -> handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, forceTeleport), 1L);
+            BukkitExecutor.sync(superiorPlayer.asPlayer(), () -> handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, forceTeleport), 1L);
         } else {
             handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, forceTeleport);
         }

@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.platform.TaskScheduler;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
@@ -33,6 +34,10 @@ import java.util.UUID;
 public class SuperiorSkyblockAPI {
 
     private static SuperiorSkyblock plugin;
+
+    public static TaskScheduler getScheduler() {
+        return plugin.getTaskScheduler();
+    }
 
     /**
      * Private constructor to prevent people from creating an instance of this class.

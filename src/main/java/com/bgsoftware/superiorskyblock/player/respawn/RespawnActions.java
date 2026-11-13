@@ -92,7 +92,7 @@ public class RespawnActions {
 
     private static void onTeleportCallback(SuperiorPlayer superiorPlayer, Island island, PlayerTeleportAlgorithm.TeleportResult result) {
         if (result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
-            BukkitExecutor.sync(() -> {
+            BukkitExecutor.sync(superiorPlayer.asPlayer(), () -> {
                 if (superiorPlayer.isOnline())
                     superiorPlayer.updateWorldBorder(island);
             }, 2L);

@@ -32,7 +32,7 @@ public class CacheBankLogs implements IBankLogs {
     @Override
     public List<BankTransaction> getTransactions(UUID playerUUID) {
         Synchronized<List<BankTransaction>> transactions = this.transactionsByPlayers.get(playerUUID);
-        return transactions == null ? Collections.emptyList() : transactions.readAndGet(Collections::unmodifiableList);
+        return transactions == null ? Collections.emptyList() : transactions.readAndGet(list -> Collections.unmodifiableList(new LinkedList<>(list)));
     }
 
     @Override

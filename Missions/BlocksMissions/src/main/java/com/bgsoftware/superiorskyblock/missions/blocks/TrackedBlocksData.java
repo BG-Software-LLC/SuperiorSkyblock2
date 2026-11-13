@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.IntSupplier;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TrackedBlocksData {
 
-    private final Map<Long, ChunkBitSet> TRACKED_BLOCKS = new HashMap<>();
-    private final Map<Long, ChunkBitSet> TRACKED_BLOCKS_VIEW = Collections.unmodifiableMap(TRACKED_BLOCKS);
+    private final Map<Long, ChunkBitSet> TRACKED_BLOCKS = new ConcurrentHashMap<>();
 
     public TrackedBlocksData(ConfigurationSection section) {
         for (String chunkKey : section.getKeys(false)) {
@@ -47,7 +47,9 @@ public class TrackedBlocksData {
     }
 
     public Map<Long, ChunkBitSet> getBlocks() {
-        return TRACKED_BLOCKS_VIEW;
+        Map<Long, ChunkBitSet> snapshot = new HashMap<>();
+        TRACKED_BLOCKS.forEach((chunkKey, blocks) -> snapshot.put(chunkKey, blocks.copy()));
+        return Collections.unmodifiableMap(snapshot);
     }
 
 }
