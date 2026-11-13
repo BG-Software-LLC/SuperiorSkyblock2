@@ -388,19 +388,83 @@ public class ProtectionListener extends AbstractGameEventListener {
             e.setCancelled();
     }
 
-    private void onPlayerAttackEntity(GameEvent<GameEventArgs.PlayerAttackEntityEvent> e) {
+    private void onPrePlayerAttackSulfurCube(GameEvent<GameEventArgs.PrePlayerAttackEntityEvent> e) {
         Entity entity = e.getArgs().entity;
 
         // Sulfur cubes that hold a block are immune to attacks: they are only knocked back, and no damage event
         // is called for them. Therefore, we check attacking sulfur cubes before the attack happens.
-        if (entity == null || entity.getType() != SULFUR_CUBE_TYPE)
+        if (entity == null || entity.getType() != SULFUR_CUBE_TYPE || !plugin.getNMSEntities().hasSulfurCubeAbsorbedBlock(entity)) {
             return;
+        }
 
         Player player = e.getArgs().player;
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-        InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(player, entity);
-        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
-            e.setCancelled();
+
+        List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+
+        if (entityCategories.isEmpty()) {
+            return;
+        }
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location location = entity.getLocation(wrapper.getHandle());
+
+            for (EntityCategory entityCategory : entityCategories) {
+                IslandPrivilege islandPrivilege = entityCategory.getInteractPrivilege();
+
+                if (islandPrivilege != null) {
+                    InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(
+                            superiorPlayer, location, islandPrivilege);
+
+                    if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+                        e.setCancelled();
+                    }
+                }
+            }
+        }
+    }
+
+    private void onPlayerCollideWithSulfurCube(GameEvent<GameEventArgs.EntityCollideWithEntityEvent> e) {
+        Entity sulfurCube = null;
+        Player player = null;
+
+        for (Entity entity : e.getArgs().entities) {
+            if (entity.getType() == SULFUR_CUBE_TYPE) {
+                sulfurCube = entity;
+            } else if (entity.getType() == EntityType.PLAYER) {
+                player = (Player) entity;
+            }
+        }
+
+        if (player == null || sulfurCube == null || !plugin.getNMSEntities().hasSulfurCubeAbsorbedBlock(sulfurCube)) {
+            return;
+        }
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+
+        List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(sulfurCube));
+
+        if (entityCategories.isEmpty()) {
+            return;
+        }
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location location = sulfurCube.getLocation(wrapper.getHandle());
+
+            for (EntityCategory entityCategory : entityCategories) {
+                IslandPrivilege islandPrivilege = entityCategory.getInteractPrivilege();
+
+                if (islandPrivilege != null) {
+                    InteractionResult interactionResult = this.protectionManager.get().handleCustomInteraction(
+                            superiorPlayer, location, islandPrivilege);
+
+                    if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+                        e.setCancelled();
+                    }
+                }
+            }
+        }
     }
 
     private void onEntityShearing(GameEvent<GameEventArgs.PlayerShearEntityEvent> e) {
@@ -760,7 +824,8 @@ public class ProtectionListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_DISPENSE_EVENT, GameEventPriority.NORMAL, this::onBucketDispense);
         registerCallback(GameEventType.PLAYER_ITEM_CONSUME_EVENT, GameEventPriority.NORMAL, this::onChorusFruitConsume);
         registerCallback(GameEventType.ENTITY_DAMAGE_EVENT, GameEventPriority.NORMAL, this::onEntityAttack);
-        registerCallback(GameEventType.PLAYER_ATTACK_ENTITY_EVENT, GameEventPriority.NORMAL, this::onPlayerAttackEntity);
+        registerCallback(GameEventType.PRE_PLAYER_ATTACK_ENTITY_EVENT, GameEventPriority.NORMAL, this::onPrePlayerAttackSulfurCube);
+        registerCallback(GameEventType.ENTITY_COLLIDE_WITH_ENTITY_EVENT, GameEventPriority.NORMAL, this::onPlayerCollideWithSulfurCube);
         registerCallback(GameEventType.PLAYER_SHEAR_ENTITY_EVENT, GameEventPriority.NORMAL, this::onEntityShearing);
         registerCallback(GameEventType.HANGING_BREAK_EVENT, GameEventPriority.NORMAL, this::onHangingBreak);
         registerCallback(GameEventType.HANGING_PLACE_EVENT, GameEventPriority.NORMAL, this::onHangingPlace);

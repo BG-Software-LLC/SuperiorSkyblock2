@@ -338,9 +338,15 @@ public class GameEventArgs implements IEventArgs {
     }
 
 
-    public static class PlayerAttackEntityEvent extends PlayerEvent {
+    public static class PrePlayerAttackEntityEvent extends PlayerEvent {
 
         public Entity entity;
+
+    }
+
+    public static class EntityCollideWithEntityEvent extends GameEventArgs {
+
+        public List<Entity> entities;
 
     }
 

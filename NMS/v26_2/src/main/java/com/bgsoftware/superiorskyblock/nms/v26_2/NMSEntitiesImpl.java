@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PortalProcessor;
 import org.bukkit.craftbukkit.entity.CraftMinecartFurnace;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.minecart.PoweredMinecart;
 
 public class NMSEntitiesImpl extends com.bgsoftware.superiorskyblock.nms.v26_2.AbstractNMSEntities {
@@ -19,6 +20,15 @@ public class NMSEntitiesImpl extends com.bgsoftware.superiorskyblock.nms.v26_2.A
     protected int getPortalTicks(Entity entity) {
         PortalProcessor portalProcessor = entity.portalProcess;
         return portalProcessor == null ? 0 : portalProcessor.getPortalTime();
+    }
+
+    @Override
+    public boolean hasSulfurCubeAbsorbedBlock(org.bukkit.entity.Entity entity) {
+        if (!(entity instanceof SulfurCube sulfurCube)) {
+            return false;
+        }
+
+        return !sulfurCube.getEquipped().isEmpty();
     }
 
 }

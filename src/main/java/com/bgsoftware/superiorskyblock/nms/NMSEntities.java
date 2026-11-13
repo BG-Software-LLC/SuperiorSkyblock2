@@ -21,4 +21,9 @@ public interface NMSEntities {
         return false;
     }
 
+    default boolean hasSulfurCubeAbsorbedBlock(Entity entity) {
+        // Not implemented for most versions
+        return false;
+    }
+
 }

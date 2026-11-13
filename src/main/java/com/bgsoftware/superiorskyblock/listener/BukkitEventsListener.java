@@ -220,7 +220,13 @@ public class BukkitEventsListener implements Listener {
         if (SULFUR_CUBE_TYPE != null) {
             try {
                 Class prePlayerAttackEntityEventClass = Class.forName("io.papermc.paper.event.player.PrePlayerAttackEntityEvent");
-                createEventListener(GameEventType.PLAYER_ATTACK_ENTITY_EVENT, prePlayerAttackEntityEventClass, new PrePlayerAttackEntityEventFunction());
+                createEventListener(GameEventType.PRE_PLAYER_ATTACK_ENTITY_EVENT, prePlayerAttackEntityEventClass, new PrePlayerAttackEntityEventFunction());
+            } catch (ClassNotFoundException ignored) {
+            }
+
+            try {
+                Class entityCollideWithEntityEventClass = Class.forName("io.papermc.paper.event.entity.EntityCollideWithEntityEvent");
+                createEventListener(GameEventType.ENTITY_COLLIDE_WITH_ENTITY_EVENT, entityCollideWithEntityEventClass, new EntityCollideWithEntityEventFunction());
             } catch (ClassNotFoundException ignored) {
             }
         }
@@ -978,18 +984,32 @@ public class BukkitEventsListener implements Listener {
         }
     }
 
-    private static class PrePlayerAttackEntityEventFunction implements GameEventCreator<GameEventArgs.PlayerAttackEntityEvent, Event> {
+    private static class PrePlayerAttackEntityEventFunction implements GameEventCreator<GameEventArgs.PrePlayerAttackEntityEvent, Event> {
 
         private static final ReflectMethod<Entity> GET_ATTACKED_METHOD = new ReflectMethod<>(
                 new ClassInfo("io.papermc.paper.event.player.PrePlayerAttackEntityEvent", ClassInfo.PackageType.UNKNOWN),
                 "getAttacked", new ClassInfo[0]);
 
         @Override
-        public GameEvent<GameEventArgs.PlayerAttackEntityEvent> execute(GameEventType<GameEventArgs.PlayerAttackEntityEvent> eventType, GameEventPriority priority, Event e) {
-            GameEventArgs.PlayerAttackEntityEvent playerAttackEntityEvent = new GameEventArgs.PlayerAttackEntityEvent();
-            playerAttackEntityEvent.player = ((PlayerEvent) e).getPlayer();
-            playerAttackEntityEvent.entity = GET_ATTACKED_METHOD.invoke(e);
-            return eventType.createEvent(playerAttackEntityEvent);
+        public GameEvent<GameEventArgs.PrePlayerAttackEntityEvent> execute(GameEventType<GameEventArgs.PrePlayerAttackEntityEvent> eventType, GameEventPriority priority, Event e) {
+            GameEventArgs.PrePlayerAttackEntityEvent prePlayerAttackEntityEvent = new GameEventArgs.PrePlayerAttackEntityEvent();
+            prePlayerAttackEntityEvent.player = ((PlayerEvent) e).getPlayer();
+            prePlayerAttackEntityEvent.entity = GET_ATTACKED_METHOD.invoke(e);
+            return eventType.createEvent(prePlayerAttackEntityEvent);
+        }
+    }
+
+    private static class EntityCollideWithEntityEventFunction implements GameEventCreator<GameEventArgs.EntityCollideWithEntityEvent, Event> {
+
+        private static final ReflectMethod<List<Entity>> GET_ENTITIES_METHOD = new ReflectMethod<>(
+                new ClassInfo("io.papermc.paper.event.entity.EntityCollideWithEntityEvent", ClassInfo.PackageType.UNKNOWN),
+                "getEntities", new ClassInfo[0]);
+
+        @Override
+        public GameEvent<GameEventArgs.EntityCollideWithEntityEvent> execute(GameEventType<GameEventArgs.EntityCollideWithEntityEvent> eventType, GameEventPriority priority, Event e) {
+            GameEventArgs.EntityCollideWithEntityEvent playerPushSulfurCubeEvent = new GameEventArgs.EntityCollideWithEntityEvent();
+            playerPushSulfurCubeEvent.entities = GET_ENTITIES_METHOD.invoke(e);
+            return eventType.createEvent(playerPushSulfurCubeEvent);
         }
     }
 
