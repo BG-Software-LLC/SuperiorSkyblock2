@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuViewButton;
 import com.bgsoftware.superiorskyblock.api.menu.dialog.DialogButton;
+import com.bgsoftware.superiorskyblock.api.menu.hologram.HologramButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.core.Either;
@@ -21,6 +22,8 @@ public abstract class AbstractMenuTemplateButton<V extends MenuView<V, ?>> imple
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Either<TemplateItem, DialogButton> buttonData;
+    @Nullable
+    private final HologramButton hologramButton;
     private final GameSound clickSound;
     private final List<String> commands;
     private final String requiredPermission;
@@ -29,6 +32,7 @@ public abstract class AbstractMenuTemplateButton<V extends MenuView<V, ?>> imple
 
     public AbstractMenuTemplateButton(AbstractBuilder<V> builder, Class<?> viewButtonType) {
         this.buttonData = builder.buttonData;
+        this.hologramButton = builder.hologramButton;
         this.clickSound = builder.clickSound;
         this.commands = builder.commands == null ? Collections.emptyList() : Collections.unmodifiableList(builder.commands);
         this.requiredPermission = builder.requiredPermission;
@@ -47,6 +51,12 @@ public abstract class AbstractMenuTemplateButton<V extends MenuView<V, ?>> imple
     @Override
     public DialogButton getButtonDialog() {
         return this.buttonData == null || this.buttonData.isLeft() ? null : this.buttonData.getRight();
+    }
+
+    @Nullable
+    @Override
+    public HologramButton getButtonHologram() {
+        return this.hologramButton;
     }
 
     @Nullable
@@ -96,6 +106,8 @@ public abstract class AbstractMenuTemplateButton<V extends MenuView<V, ?>> imple
     public <B extends MenuTemplateButton.Builder<?>> B applyToBuilder(B buttonBuilder) {
         if (((AbstractBuilder<?>) buttonBuilder).buttonData == null)
             ((AbstractBuilder<?>) buttonBuilder).buttonData = this.buttonData;
+        if (((AbstractBuilder<?>) buttonBuilder).hologramButton == null)
+            ((AbstractBuilder<?>) buttonBuilder).hologramButton = this.hologramButton;
 
         if (this.clickSound != null)
             buttonBuilder.setClickSound(this.clickSound);
@@ -127,6 +139,7 @@ public abstract class AbstractMenuTemplateButton<V extends MenuView<V, ?>> imple
     public static abstract class AbstractBuilder<V extends MenuView<V, ?>> implements MenuTemplateButton.Builder<V> {
 
         protected Either<TemplateItem, DialogButton> buttonData = null;
+        protected HologramButton hologramButton = null;
         protected GameSound clickSound = null;
         protected List<String> commands = null;
         protected String requiredPermission = null;
@@ -149,6 +162,12 @@ public abstract class AbstractMenuTemplateButton<V extends MenuView<V, ?>> imple
         @Override
         public Builder<V> setButtonDialog(DialogButton buttonDialog) {
             this.buttonData = Either.right(buttonDialog);
+            return this;
+        }
+
+        @Override
+        public Builder<V> setButtonHologram(@Nullable HologramButton buttonHologram) {
+            this.hologramButton = buttonHologram;
             return this;
         }
 
