@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island.upgrade;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
@@ -32,6 +33,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -62,6 +64,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final Value<OptionalInt> coopLimit;
     private final Value<OptionalInt> borderSize;
     private final Value<KeyMap<Integer>> blockLimits;
+    private final Value<Map<String, Integer>> entityCategoryLimits;
     private final Value<KeyMap<Integer>> entityLimits;
     private final Value<EnumerateMap<Dimension, Map<Key, Integer>>> generatorRates;
     private final Value<Map<PotionEffectType, Integer>> islandEffects;
@@ -74,7 +77,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     public SUpgradeLevel(int level, List<UpgradeCost> costs, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
                          Value<OptionalDouble> cropGrowth, Value<OptionalDouble> spawnerRates, Value<OptionalDouble> mobDrops,
                          Value<OptionalInt> teamLimit, Value<OptionalInt> warpsLimit, Value<OptionalInt> coopLimit,
-                         Value<OptionalInt> borderSize, Value<KeyMap<Integer>> blockLimits,
+                         Value<OptionalInt> borderSize, Value<KeyMap<Integer>> blockLimits, Value<Map<String, Integer>> entityCategoryLimits,
                          Value<KeyMap<Integer>> entityLimits, Value<EnumerateMap<Dimension, Map<Key, Integer>>> generatorRates,
                          Value<Map<PotionEffectType, Integer>> islandEffects, Value<Optional<BigDecimal>> bankLimit,
                          Value<Int2IntMapView> roleLimits) {
@@ -91,6 +94,7 @@ public class SUpgradeLevel implements UpgradeLevel {
         this.coopLimit = coopLimit;
         this.borderSize = borderSize;
         this.blockLimits = blockLimits;
+        this.entityCategoryLimits = entityCategoryLimits;
         this.entityLimits = entityLimits;
         this.generatorRates = generatorRates;
         this.islandEffects = islandEffects;
@@ -191,6 +195,35 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public Map<Key, Integer> getBlockLimits() {
         return Collections.unmodifiableMap(blockLimits.get());
+    }
+
+    @Override
+    public int getEntityCategoryLimit(EntityCategory entityCategory) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+
+        String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
+
+        return this.entityCategoryLimits.get().getOrDefault(entityCategoryName, IslandUpgradeConstants.NO_LIMIT_VALUE);
+    }
+
+    @Override
+    public Map<EntityCategory, Integer> getEntityCategoryLimits() {
+        Map<String, Integer> entityCategoryLimits = this.entityCategoryLimits.get();
+
+        if (entityCategoryLimits.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<EntityCategory, Integer> entityCategoryLimitsConverted = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entityCategoryLimits.entrySet()) {
+            EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entry.getKey());
+
+            if (entityCategory != null) {
+                entityCategoryLimitsConverted.put(entityCategory, entry.getValue());
+            }
+        }
+
+        return entityCategoryLimitsConverted.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityCategoryLimitsConverted);
     }
 
     @Override
@@ -331,6 +364,25 @@ public class SUpgradeLevel implements UpgradeLevel {
                 Map.Entry::getKey,
                 entry -> IntValue.syncedFixed(entry.getValue()))
         );
+    }
+
+    public Map<EntityCategory, IntValue> getEntityCategoryLimitsUpgradeValue() {
+        Map<String, Integer> entityCategoryLimits = this.entityCategoryLimits.get();
+
+        if (entityCategoryLimits.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<EntityCategory, IntValue> entityCategoryLimitsConverted = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entityCategoryLimits.entrySet()) {
+            EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entry.getKey());
+
+            if (entityCategory != null) {
+                entityCategoryLimitsConverted.put(entityCategory, IntValue.syncedFixed(entry.getValue()));
+            }
+        }
+
+        return entityCategoryLimitsConverted.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityCategoryLimitsConverted);
     }
 
     public Map<Key, IntValue> getEntityLimitsUpgradeValue() {

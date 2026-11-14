@@ -99,6 +99,9 @@ CHANGED_CROP_GROWTH_ALL: '&e&lUpgrades | &7Der Kulturpflanzenwachstumsmultiplika
 CHANGED_CROP_GROWTH_NAME: '&e&lUpgrades | &7Der Kulturpflanzenwachstumsmultiplikator
   von {0} wurde erfolgreich aktualisiert.'
 CHANGED_DISCORD: '&e&lIsland | &7Die Inseldisharmonie wurde erfolgreich in {0} geändert.'
+CHANGED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}''s island.'
+CHANGED_ENTITY_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for all the islands.'
+CHANGED_ENTITY_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}.'
 CHANGED_ENTITY_LIMIT: '&e&lUpgrades | &7Das Limit von {0} Entitys für die Insel von
   {1} wurde erfolgreich aktualisiert.'
 CHANGED_ENTITY_LIMIT_ALL: '&e&lUpgrades | &7Das Limit von {0} Entitys für alle Inseln
@@ -169,6 +172,7 @@ COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: Discord...
 COMMAND_ARGUMENT_EFFECT: Trank-Effekt
 COMMAND_ARGUMENT_EMAIL: E-Mail
+COMMAND_ARGUMENT_ENTITY_CATEGORY: 'entity-category'
 COMMAND_ARGUMENT_ENTITY: Entität
 COMMAND_ARGUMENT_ISLAND_NAME: Inselname
 COMMAND_ARGUMENT_ISLAND_ROLE: Inselrolle
@@ -218,6 +222,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH: Erhöht den Multiplikator für das Pf
   für die Insel eines anderen Spielers.
 COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: Einen Inseleffekt für die Insel eines anderen
   Spielers hinzufügen.
+COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_CATEGORY_LIMIT: 'Increase entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: Entity-Limit für die Insel eines anderen
   Spielers erhöhen.
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Prozentsatz eines Materials für den Kopfsteinpflaster-Generator
@@ -268,6 +273,7 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: Berechnet den Wert einer Insel neu.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Alle Konfigurationen und Aufgaben des Plugins neu
   laden.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Entferne ein Blocklimit von einer Insel.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Alle Bewertungen eines Spielers entfernen.
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
@@ -290,6 +296,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Bestimme die Anzahl der Inselauflösunge
   Spielers.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Lege die Inseleffektstufe der Insel eines anderen
   Spielers fest.
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_CATEGORY_LIMIT: 'Set entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Entity-Limit für die Insel eines anderen
   Spielers festlegen.
 COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
@@ -501,6 +508,7 @@ INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lError | &7Ungültige Wirkung {0}.'
 INVALID_ENTITY: '&c&lError | &7Ungültige Entität {0}.'
+INVALID_ENTITY_CATEGORY: '&c&lError | &7Invalid entity category {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
 INVALID_ISLAND: '&c&lError | &7Du hast keine Insel.'
@@ -590,6 +598,10 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lInsel | &7Entity Grenze:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lInsel | &7 {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Entity Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lInsel | &7Generator Preise ({1}):
   {0}
@@ -868,6 +880,7 @@ RATE_REMOVE_ALL_ISLANDS: '&e&lInsel | &7Alle Bewertungen aller Inseln wurden erf
   entfernt.'
 RATE_SUCCESS: '&e&lInsel | &7Du hast diese Insel mit {0} Sternen bewertet!'
 REACHED_BLOCK_LIMIT: '&e&lUpgrades | &7Du hast das Limit der Insel für {0} Block erreicht.'
+REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'
 RECALC_ALREADY_RUNNING: '&c&lError | &7Deine Insel wird bereits neu berechnet.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lFehler | &7Diese Insel wird bereits neu berechnet.'

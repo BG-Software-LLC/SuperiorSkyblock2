@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.upgrades;
 
+import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
@@ -99,6 +100,18 @@ public interface UpgradeLevel {
      * Get all the block limits for this level.
      */
     Map<Key, Integer> getBlockLimits();
+
+    /**
+     * Get the limit of an entity category for this level.
+     *
+     * @param entityCategory The entity category to check.
+     */
+    int getEntityCategoryLimit(EntityCategory entityCategory);
+
+    /**
+     * Get all the entity category limits for this level.
+     */
+    Map<EntityCategory, Integer> getEntityCategoryLimits();
 
     /**
      * Get the limit of an entity for this level.
