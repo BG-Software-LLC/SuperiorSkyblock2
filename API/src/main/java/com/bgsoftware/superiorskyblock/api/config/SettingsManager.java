@@ -771,6 +771,12 @@ public interface SettingsManager {
     BigInteger getBlockCountsSaveThreshold();
 
     /**
+     * Whether to also count certain entities as blocks.
+     * Config-path: count-entities-as-blocks
+     */
+    boolean isCountEntitiesAsBlocks();
+
+    /**
      * Support for chat-signing in 1.19+.
      * Config-path: chat-signing-support
      */

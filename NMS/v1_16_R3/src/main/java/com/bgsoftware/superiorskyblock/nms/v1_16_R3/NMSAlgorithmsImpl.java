@@ -25,7 +25,6 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityFallingBlock;
-import net.minecraft.server.v1_16_R3.EntityMinecartAbstract;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IInventory;
@@ -43,7 +42,6 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftFallingBlock;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecart;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
@@ -169,13 +167,6 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public Key getBlockKey(int combinedId) {
         Block block = Block.getByCombinedId(combinedId).getBlock();
-        return KeyBlocksCache.getBlockKey(block);
-    }
-
-    @Override
-    public Key getMinecartBlock(org.bukkit.entity.Minecart bukkitMinecart) {
-        EntityMinecartAbstract minecart = ((CraftMinecart) bukkitMinecart).getHandle();
-        Block block = minecart.getDisplayBlock().getBlock();
         return KeyBlocksCache.getBlockKey(block);
     }
 
