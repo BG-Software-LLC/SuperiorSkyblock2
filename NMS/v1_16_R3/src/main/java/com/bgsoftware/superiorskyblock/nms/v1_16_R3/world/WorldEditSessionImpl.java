@@ -78,6 +78,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }).get();
 
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectHashMap();
+    private final Long2ObjectMapView.AbsentConsumer<ChunkData> chunkDataCreator = ChunkData::new;
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkCoordIntPair> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
@@ -155,7 +156,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         if (blockEntityData != null)
             blockEntities.add(new Pair<>(blockPosition, blockEntityData));
 
-        ChunkData chunkData = this.chunks.computeIfAbsent(chunkCoord.pair(), ChunkData::new);
+        ChunkData chunkData = this.chunks.computeIfAbsent(chunkCoord.pair(), this.chunkDataCreator);
 
         if (plugin.getSettings().isLightsUpdate() && !isStarLightInterface && blockData.f() > 0)
             chunkData.lights.add(blockPosition);

@@ -61,6 +61,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
     }).get();
 
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
+    private final Long2ObjectMapView.AbsentConsumer<ChunkData> chunkDataCreator = packedPos ->
+            new ChunkData(new ChunkPos(ChunkPos.getX(packedPos), ChunkPos.getZ(packedPos)));
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<Vec2> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
@@ -84,7 +86,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         @Override
         public void prepareChunkAccess(int chunkX, int chunkZ) {
             long packedPos = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
-            chunkData = chunks.computeIfAbsent(packedPos, pos -> new ChunkData(new ChunkPos(chunkX, chunkZ)));
+            chunkData = chunks.computeIfAbsent(packedPos, chunkDataCreator);
         }
 
         @Override

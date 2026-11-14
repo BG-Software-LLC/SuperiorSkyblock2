@@ -460,7 +460,12 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     public boolean isAFK(Player player) {
-        return AFKProvidersList.stream().anyMatch(afkProvider -> afkProvider.isAFK(player));
+        for (AFKProvider afkProvider : AFKProvidersList) {
+            if (afkProvider.isAFK(player))
+                return true;
+        }
+
+        return false;
     }
 
     public boolean shouldListenToSpawnerChanges() {
@@ -686,7 +691,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
                 ShopsProvider.findAvailableProvider() : ShopsProvider.getShopsProvider(pricesProviderName));
 
         shopsProvider.flatMap(provider -> provider.createInstance(plugin)
-                .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, provider, shopsBridge)))
+                        .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, provider, shopsBridge)))
                 .ifPresent(this::setPricesProvider);
     }
 

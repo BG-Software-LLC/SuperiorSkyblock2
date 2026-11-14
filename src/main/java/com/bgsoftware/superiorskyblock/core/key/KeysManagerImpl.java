@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class KeysManagerImpl extends Manager implements KeysManager {
@@ -67,8 +66,16 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     }
 
     public Key convertKey(Key originalKey, Location location) {
-        return getFirstCustomKey(originalKey, this.customMaterialKeyParsers.get(originalKey),
-                customKeyParser -> customKeyParser.getCustomKey(location));
+        List<CustomKeyParser> customKeyParsers = this.customMaterialKeyParsers.get(originalKey);
+        if (customKeyParsers != null) {
+            for (CustomKeyParser customKeyParser : customKeyParsers) {
+                Key key = customKeyParser.getCustomKey(location);
+                if (isConvertedKey(originalKey, key))
+                    return key;
+            }
+        }
+
+        return originalKey;
     }
 
     /**
@@ -81,28 +88,33 @@ public class KeysManagerImpl extends Manager implements KeysManager {
     }
 
     public Key convertKey(Key originalKey, Entity entity) {
-        return getFirstCustomKey(originalKey, this.customEntityTypeKeyParsers.get(originalKey),
-                customKeyParser -> customKeyParser.getCustomKey(entity));
-    }
-
-    public Key convertKey(Key originalKey, ItemStack itemStack) {
-        return getFirstCustomKey(originalKey, this.customMaterialKeyParsers.get(originalKey),
-                customKeyParser -> customKeyParser.getCustomKey(itemStack, originalKey));
-    }
-
-    private Key getFirstCustomKey(Key originalKey, @Nullable List<CustomKeyParser> customKeyParsers,
-                                  Function<CustomKeyParser, Key> customKeyFunction) {
+        List<CustomKeyParser> customKeyParsers = this.customEntityTypeKeyParsers.get(originalKey);
         if (customKeyParsers != null) {
             for (CustomKeyParser customKeyParser : customKeyParsers) {
-                Key key = customKeyFunction.apply(customKeyParser);
-
-                if (key != null && !key.equals(originalKey)) {
+                Key key = customKeyParser.getCustomKey(entity);
+                if (isConvertedKey(originalKey, key))
                     return key;
-                }
             }
         }
 
         return originalKey;
+    }
+
+    public Key convertKey(Key originalKey, ItemStack itemStack) {
+        List<CustomKeyParser> customKeyParsers = this.customMaterialKeyParsers.get(originalKey);
+        if (customKeyParsers != null) {
+            for (CustomKeyParser customKeyParser : customKeyParsers) {
+                Key key = customKeyParser.getCustomKey(itemStack, originalKey);
+                if (isConvertedKey(originalKey, key))
+                    return key;
+            }
+        }
+
+        return originalKey;
+    }
+
+    private static boolean isConvertedKey(Key originalKey, @Nullable Key key) {
+        return key != null && !key.equals(originalKey);
     }
 
     @Nullable

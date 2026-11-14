@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
@@ -33,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 public class BukkitEntities {
 
@@ -53,12 +53,19 @@ public class BukkitEntities {
 
     }
 
-    public static boolean isEquipment(LivingEntity livingEntity, ItemStack itemStack) {
-        List<ItemStack> entityEquipment = entityContent.writeAndGet(entityContent ->
+    public static List<ItemStack> getEntityEquipment(LivingEntity livingEntity) {
+        return entityContent.writeAndGet(entityContent ->
                 entityContent.computeIfAbsent(livingEntity.getEntityId(), u -> cacheEntityEquipmentInternal(livingEntity)));
+    }
 
-        return entityEquipment.stream().anyMatch(equipmentItem -> equipmentItem != null &&
-                equipmentItem.getType() == itemStack.getType());
+    public static boolean isEquipment(List<ItemStack> entityEquipment, ItemStack itemStack) {
+        Material itemType = itemStack.getType();
+        for (ItemStack equipmentItem : entityEquipment) {
+            if (equipmentItem != null && equipmentItem.getType() == itemType)
+                return true;
+        }
+
+        return false;
     }
 
     public static void cacheEntityEquipment(LivingEntity livingEntity) {
@@ -113,16 +120,23 @@ public class BukkitEntities {
         entityContent.write(entityContent -> entityContent.remove(livingEntity.getEntityId()));
     }
 
-    public static Optional<Player> getPlayerSource(Entity damager) {
+    @Nullable
+    public static Player getPlayerSource(@Nullable Entity damager) {
         if (damager instanceof Projectile) {
             ProjectileSource shooter = ((Projectile) damager).getShooter();
             if (shooter instanceof Player)
-                return Optional.of((Player) shooter);
+                return (Player) shooter;
         } else if (damager instanceof Player) {
-            return Optional.of((Player) damager);
+            return (Player) damager;
         }
 
-        return Optional.empty();
+        return null;
+    }
+
+    @Nullable
+    public static SuperiorPlayer getSuperiorPlayerSource(@Nullable Entity entity) {
+        Player player = getPlayerSource(entity);
+        return player == null ? null : plugin.getPlayers().getSuperiorPlayer(player);
     }
 
     public static boolean canHaveLimit(EntityType entityType) {

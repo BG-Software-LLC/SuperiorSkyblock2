@@ -71,8 +71,8 @@ public class MaterialKey extends BaseKey<MaterialKey> {
     }
 
     public static MaterialKey of(Material type) {
-        return GLOBAL_MATERIAL_KEYS_CACHE.computeIfAbsent(type, unused ->
-                new MaterialKey(type, (short) 0, true, MaterialKeySource.BLOCK));
+        return GLOBAL_MATERIAL_KEYS_CACHE.computeIfAbsent(type, materialType ->
+                new MaterialKey(materialType, (short) 0, true, MaterialKeySource.BLOCK));
     }
 
     protected MaterialKey(Material type, short durability, boolean isGlobalType, MaterialKeySource materialKeySource) {

@@ -58,7 +58,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
-import java.util.Optional;
 
 public class RegionManagerServiceImpl implements RegionManagerService, IService {
 
@@ -358,26 +357,27 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(entity.getWorld()))
             return InteractionResult.SUCCESS;
 
-        Optional<SuperiorPlayer> damagerSource = BukkitEntities.getPlayerSource(damager).map(plugin.getPlayers()::getSuperiorPlayer);
-
-        if (!damagerSource.isPresent())
+        List<EntityCategory> entityCategories = BukkitEntities.getCategories(entity);
+        if (entityCategories.isEmpty())
             return InteractionResult.SUCCESS;
 
-        List<EntityCategory> entityCategories = BukkitEntities.getCategories(entity);
-        if (!entityCategories.isEmpty()) {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                Location entityLocation = entity.getLocation(wrapper.getHandle());
+        SuperiorPlayer damagerPlayer = BukkitEntities.getSuperiorPlayerSource(damager);
 
-                InteractionResult interactionResult;
-                for (EntityCategory entityCategory : entityCategories) {
-                    if (entityCategory.getDamagePrivilege() != null) {
-                        interactionResult = handleInteractionInternal(damagerSource.get(), entityLocation,
-                                entityCategory.getDamagePrivilege(), 0, true, false);
-                        if (interactionResult != InteractionResult.SUCCESS) {
-                            if (damager instanceof Arrow && entity.getFireTicks() > 0)
-                                entity.setFireTicks(0);
-                            return interactionResult;
-                        }
+        if (damagerPlayer == null)
+            return InteractionResult.SUCCESS;
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = entity.getLocation(wrapper.getHandle());
+
+            InteractionResult interactionResult;
+            for (EntityCategory entityCategory : entityCategories) {
+                if (entityCategory.getDamagePrivilege() != null) {
+                    interactionResult = handleInteractionInternal(damagerPlayer, entityLocation,
+                            entityCategory.getDamagePrivilege(), 0, true, false);
+                    if (interactionResult != InteractionResult.SUCCESS) {
+                        if (damager instanceof Arrow && entity.getFireTicks() > 0)
+                            entity.setFireTicks(0);
+                        return interactionResult;
                     }
                 }
             }

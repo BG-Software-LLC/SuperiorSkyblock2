@@ -381,9 +381,11 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (damager == null || entity instanceof Player)
             return;
 
-        SuperiorPlayer damagerSource = BukkitEntities.getPlayerSource(damager)
-                .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
         InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(damager, entity);
+        if (interactionResult == InteractionResult.SUCCESS)
+            return;
+
+        SuperiorPlayer damagerSource = BukkitEntities.getSuperiorPlayerSource(damager);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, damagerSource, true))
             e.setCancelled();
     }
@@ -411,11 +413,13 @@ public class ProtectionListener extends AbstractGameEventListener {
     }
 
     private void onHangingBreak(GameEvent<GameEventArgs.HangingBreakEvent> e) {
-        BukkitEntities.getPlayerSource(e.getArgs().remover).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(superiorPlayer -> {
-            InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(e.getArgs().remover, e.getArgs().entity);
-            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
-                e.setCancelled();
-        });
+        SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(e.getArgs().remover);
+        if (superiorPlayer == null)
+            return;
+
+        InteractionResult interactionResult = this.protectionManager.get().handleEntityDamage(e.getArgs().remover, e.getArgs().entity);
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
+            e.setCancelled();
     }
 
     private void onHangingPlace(GameEvent<GameEventArgs.HangingPlaceEvent> e) {
@@ -585,123 +589,127 @@ public class ProtectionListener extends AbstractGameEventListener {
 
     private void onPlayerLaunchProjectile(GameEvent<GameEventArgs.ProjectileLaunchEvent> e) {
         Entity entity = e.getArgs().entity;
-        BukkitEntities.getPlayerSource(entity).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(launcherPlayer -> {
-            EntityType entityType = entity.getType();
+        SuperiorPlayer launcherPlayer = BukkitEntities.getSuperiorPlayerSource(entity);
+        if (launcherPlayer == null)
+            return;
 
-            InteractionResult interactionResult;
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                Location entityLocation = entity.getLocation(wrapper.getHandle());
+        EntityType entityType = entity.getType();
 
-                if (entity instanceof Egg) {
-                    List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
-                    for (EntityCategory entityCategory : entityCategories) {
-                        if (entityCategory.getSpawnPrivilege() != null) {
-                            interactionResult = this.protectionManager.get().handleCustomInteraction(launcherPlayer,
-                                    entityLocation, entityCategory.getSpawnPrivilege());
-                            if (ProtectionHelper.shouldPreventInteraction(interactionResult, launcherPlayer, true)) {
-                                e.setCancelled();
-                                return;
-                            }
+        InteractionResult interactionResult;
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = entity.getLocation(wrapper.getHandle());
+
+            if (entity instanceof Egg) {
+                List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+                for (EntityCategory entityCategory : entityCategories) {
+                    if (entityCategory.getSpawnPrivilege() != null) {
+                        interactionResult = this.protectionManager.get().handleCustomInteraction(launcherPlayer,
+                                entityLocation, entityCategory.getSpawnPrivilege());
+                        if (ProtectionHelper.shouldPreventInteraction(interactionResult, launcherPlayer, true)) {
+                            e.setCancelled();
+                            return;
                         }
                     }
                 }
-
-                IslandPrivilege islandPrivilege;
-                if (entity instanceof FishHook && !ServerVersion.isLegacy()) {
-                    islandPrivilege = IslandPrivileges.FISH;
-                } else if (entityType == TRIDENT) {
-                    islandPrivilege = IslandPrivileges.PICKUP_DROPS;
-                } else if (entity instanceof EnderPearl) {
-                    islandPrivilege = IslandPrivileges.ENDER_PEARL;
-                } else if (entityType == WIND_CHARGE) {
-                    islandPrivilege = IslandPrivileges.WIND_CHARGE;
-                } else {
-                    return;
-                }
-
-                interactionResult = this.protectionManager.get().handleCustomInteraction(launcherPlayer,
-                        entityLocation, islandPrivilege);
             }
 
-            if (ProtectionHelper.shouldPreventInteraction(interactionResult, launcherPlayer, true))
-                e.setCancelled();
-        });
+            IslandPrivilege islandPrivilege;
+            if (entity instanceof FishHook && !ServerVersion.isLegacy()) {
+                islandPrivilege = IslandPrivileges.FISH;
+            } else if (entityType == TRIDENT) {
+                islandPrivilege = IslandPrivileges.PICKUP_DROPS;
+            } else if (entity instanceof EnderPearl) {
+                islandPrivilege = IslandPrivileges.ENDER_PEARL;
+            } else if (entityType == WIND_CHARGE) {
+                islandPrivilege = IslandPrivileges.WIND_CHARGE;
+            } else {
+                return;
+            }
+
+            interactionResult = this.protectionManager.get().handleCustomInteraction(launcherPlayer,
+                    entityLocation, islandPrivilege);
+        }
+
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, launcherPlayer, true))
+            e.setCancelled();
     }
 
     private void onProjectileHit(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
         Entity entity = e.getArgs().entity;
-        BukkitEntities.getPlayerSource(entity).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(shooterPlayer -> {
-            Location location;
-            IslandPrivilege islandPrivilege;
-            Block hitBlock;
-            InteractionResult interactionResult;
+        SuperiorPlayer shooterPlayer = BukkitEntities.getSuperiorPlayerSource(entity);
+        if (shooterPlayer == null)
+            return;
 
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                if (entity instanceof FishHook) {
-                    Entity hitEntity = e.getArgs().hitEntity;
-                    if (hitEntity == null)
-                        return;
+        Location location;
+        IslandPrivilege islandPrivilege;
+        Block hitBlock;
+        InteractionResult interactionResult;
 
-                    hitBlock = null;
-                    location = hitEntity.getLocation(wrapper.getHandle());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (entity instanceof FishHook) {
+                Entity hitEntity = e.getArgs().hitEntity;
+                if (hitEntity == null)
+                    return;
 
-                    List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
-                    interactionResult = InteractionResult.SUCCESS;
+                hitBlock = null;
+                location = hitEntity.getLocation(wrapper.getHandle());
 
-                    for (EntityCategory entityCategory : entityCategories) {
-                        if (entityCategory.getDamagePrivilege() != null) {
-                            interactionResult = this.protectionManager.get().handleCustomInteraction(
-                                    shooterPlayer, location, entityCategory.getDamagePrivilege());
-                            if (interactionResult != InteractionResult.SUCCESS)
-                                break;
+                List<EntityCategory> entityCategories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
+                interactionResult = InteractionResult.SUCCESS;
+
+                for (EntityCategory entityCategory : entityCategories) {
+                    if (entityCategory.getDamagePrivilege() != null) {
+                        interactionResult = this.protectionManager.get().handleCustomInteraction(
+                                shooterPlayer, location, entityCategory.getDamagePrivilege());
+                        if (interactionResult != InteractionResult.SUCCESS)
+                            break;
+                    }
+                }
+            } else {
+                hitBlock = e.getArgs().hitBlock;
+                if (hitBlock == null)
+                    return;
+
+                Material hitBlockType = hitBlock.getType();
+                EntityType entityType = entity.getType();
+
+                if (hitBlockType == TARGET) {
+                    islandPrivilege = IslandPrivileges.CONFIG_TARGET_INTERACT;
+                } else if (hitBlockType == CHORUS_FLOWER || hitBlockType == DECORATED_POT || (entityType == TRIDENT
+                        && (hitBlockType == POINTED_DRIPSTONE || hitBlockType == SULFUR_SPIKE))) {
+                    islandPrivilege = IslandPrivileges.BREAK;
+                } else {
+                    islandPrivilege = null;
+                }
+
+                if (islandPrivilege == null) {
+                    return;
+                }
+
+                location = hitBlock.getLocation(wrapper.getHandle());
+
+                interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer, location, islandPrivilege);
+            }
+        }
+
+        if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooterPlayer, true)) {
+            if (PROJECTILE_HIT_EVENT_IS_CANCELLABLE) {
+                e.setCancelled();
+            } else {
+                // Support for 1.8 and 1.12, where this event was not Cancellable.
+                entity.remove();
+                if (hitBlock != null) {
+                    ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
+                    hitBlock.setType(Material.AIR);
+                    BukkitExecutor.sync(() -> {
+                        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                            cachedBlock.setBlock(hitBlock.getLocation(wrapper.getHandle()));
                         }
-                    }
-                } else {
-                    hitBlock = e.getArgs().hitBlock;
-                    if (hitBlock == null)
-                        return;
-                    
-                    Material hitBlockType = hitBlock.getType();
-                    EntityType entityType = entity.getType();
-
-                    if (hitBlockType == TARGET) {
-                        islandPrivilege = IslandPrivileges.CONFIG_TARGET_INTERACT;
-                    } else if (hitBlockType == CHORUS_FLOWER || hitBlockType == DECORATED_POT || (entityType == TRIDENT
-                            && (hitBlockType == POINTED_DRIPSTONE || hitBlockType == SULFUR_SPIKE))) {
-                        islandPrivilege = IslandPrivileges.BREAK;
-                    } else {
-                        islandPrivilege = null;
-                    }
-
-                    if (islandPrivilege == null) {
-                        return;
-                    }
-
-                    location = hitBlock.getLocation(wrapper.getHandle());
-
-                    interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer, location, islandPrivilege);
+                        cachedBlock.release();
+                    }, 1L);
                 }
             }
-
-            if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooterPlayer, true)) {
-                if (PROJECTILE_HIT_EVENT_IS_CANCELLABLE) {
-                    e.setCancelled();
-                } else {
-                    // Support for 1.8 and 1.12, where this event was not Cancellable.
-                    entity.remove();
-                    if (hitBlock != null) {
-                        ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
-                        hitBlock.setType(Material.AIR);
-                        BukkitExecutor.sync(() -> {
-                            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                                cachedBlock.setBlock(hitBlock.getLocation(wrapper.getHandle()));
-                            }
-                            cachedBlock.release();
-                        }, 1L);
-                    }
-                }
-            }
-        });
+        }
     }
 
     private void onSoftExplodeEvent(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
@@ -710,27 +718,29 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         Entity entity = e.getArgs().entity;
 
-        BukkitEntities.getPlayerSource(entity).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(shooterPlayer -> {
-            Iterator<Block> blocksIterator = e.getArgs().blocks.iterator();
-            while (blocksIterator.hasNext()) {
-                Block block = blocksIterator.next();
-                Material blockType = block.getType();
+        SuperiorPlayer shooterPlayer = BukkitEntities.getSuperiorPlayerSource(entity);
+        if (shooterPlayer == null)
+            return;
 
-                IslandPrivilege islandPrivilege = blockType == CHORUS_FLOWER || blockType == DECORATED_POT ?
-                        IslandPrivileges.BREAK : plugin.getSettings().getInteractablesMap().getRequiredPrivilege(Keys.of(block));
+        Iterator<Block> blocksIterator = e.getArgs().blocks.iterator();
+        while (blocksIterator.hasNext()) {
+            Block block = blocksIterator.next();
+            Material blockType = block.getType();
 
-                if (islandPrivilege == null)
-                    continue;
+            IslandPrivilege islandPrivilege = blockType == CHORUS_FLOWER || blockType == DECORATED_POT ?
+                    IslandPrivileges.BREAK : plugin.getSettings().getInteractablesMap().getRequiredPrivilege(Keys.of(block));
 
-                InteractionResult interactionResult;
-                try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer,
-                            block.getLocation(wrapper.getHandle()), islandPrivilege);
-                }
-                if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooterPlayer, true))
-                    blocksIterator.remove();
+            if (islandPrivilege == null)
+                continue;
+
+            InteractionResult interactionResult;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                interactionResult = this.protectionManager.get().handleCustomInteraction(shooterPlayer,
+                        block.getLocation(wrapper.getHandle()), islandPrivilege);
             }
-        });
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, shooterPlayer, true))
+                blocksIterator.remove();
+        }
 
     }
 
