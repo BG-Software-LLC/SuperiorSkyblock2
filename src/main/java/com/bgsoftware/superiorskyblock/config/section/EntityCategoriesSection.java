@@ -105,11 +105,11 @@ public class EntityCategoriesSection extends BaseCategoriesMapper {
                 category = new FixedKeyCategory(key.getName(), entities);
             }
 
-            category.setRequirement(KeyCategory.Action.SPAWN, getOrRegisterPrivilege(section.getString("actions.SPAWN")));
-            category.setRequirement(KeyCategory.Action.DAMAGE, getOrRegisterPrivilege(section.getString("actions.DAMAGE")));
-            category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(section.getString("actions.INTERACT")));
-            category.setRequirement(KeyCategory.Action.SPAWNER_SPAWN, getOrRegisterFlag(section.getString("actions.SPAWNER_SPAWN")));
-            category.setRequirement(KeyCategory.Action.NATURAL_SPAWN, getOrRegisterFlag(section.getString("actions.NATURAL_SPAWN")));
+            category.setRequirement(KeyCategory.Action.SPAWN, getOrRegisterPrivilege(categorySection.getString("actions.SPAWN")));
+            category.setRequirement(KeyCategory.Action.DAMAGE, getOrRegisterPrivilege(categorySection.getString("actions.DAMAGE")));
+            category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(categorySection.getString("actions.INTERACT")));
+            category.setRequirement(KeyCategory.Action.SPAWNER_SPAWN, getOrRegisterFlag(categorySection.getString("actions.SPAWNER_SPAWN")));
+            category.setRequirement(KeyCategory.Action.NATURAL_SPAWN, getOrRegisterFlag(categorySection.getString("actions.NATURAL_SPAWN")));
 
             categories.put(key, category);
         }
