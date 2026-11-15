@@ -197,7 +197,10 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private void onExplosionPrimeMonitor(GameEvent<GameEventArgs.ExplosionPrimeEvent> e) {
-        if (!END_CRYSTAL_EXPLOSION_REMOVER_IS_PLAYER || shouldIgnoreWorldEvents(e.getArgs().entity.getWorld()))
+        Entity entity = e.getArgs().entity;
+        // Only end crystal explosions are looked up when hanging entities break.
+        if (!END_CRYSTAL_EXPLOSION_REMOVER_IS_PLAYER || entity.getType() != EntityType.ENDER_CRYSTAL ||
+                shouldIgnoreWorldEvents(entity.getWorld()))
             return;
 
         GameEventArgs.ExplosionPrimeEvent explosion = e.getArgs();
@@ -215,8 +218,6 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             return false;
 
         GameEventArgs.ExplosionPrimeEvent explosion = explosionsInProgress.get(explosionsInProgress.size() - 1);
-        if (explosion.entity.getType() != EntityType.ENDER_CRYSTAL)
-            return false;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location explosionLocation = explosion.entity.getLocation(wrapper.getHandle());

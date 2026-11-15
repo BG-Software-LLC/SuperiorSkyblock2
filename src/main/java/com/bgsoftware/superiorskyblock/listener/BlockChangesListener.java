@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
@@ -69,6 +70,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private static final BlockFace[] COPPER_GOLEM_FACES = {
             BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+
+    // A recorded bed is remembered until its other half is gone. A piston removes the other half when its arm
+    // finishes moving, 2 ticks after BlockPistonExtendEvent.
+    private static final long RECORDED_BED_TTL = 10L;
 
     @WorldRecordFlags
     private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
@@ -245,8 +250,15 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (Materials.isBed(oldState.getType())) {
             Location blockLocation = block.getLocation();
             Location bedLocation = WorldBlocks.getBedFootLocation(oldState, blockLocation);
-            if (blockLocation.equals(bedLocation))
+            if (blockLocation.equals(bedLocation)) {
                 handleBedChange(oldState, true);
+            } else if (bedLocation != null && !bedChanges.containsKey(bedLocation) &&
+                    bedLocation.getBlock().getType() != oldState.getType()) {
+                // The foot was removed without an event (commands, plugins), so the bed is recorded through its head.
+                BedChange bedChange = new BedChange(oldState.getType(), Keys.of(oldState));
+                bedChanges.put(bedLocation, bedChange);
+                recordBedBreak(bedLocation, bedChange);
+            }
             if (!Materials.isAir(block.getType())) {
                 Location newBedLocation = WorldBlocks.getBedFootLocation(block.getState(), blockLocation);
                 if (!Materials.isBed(block.getType()) || blockLocation.equals(newBedLocation)) {
@@ -351,7 +363,9 @@ public class BlockChangesListener extends AbstractGameEventListener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
 
-            if (!oldBlockKey.equals(ConstantKeys.AIR)) {
+            if (Materials.isBed(block.getType())) {
+                handleBedChange(block.getState(), true);
+            } else if (!oldBlockKey.equals(ConstantKeys.AIR)) {
                 this.worldRecordService.get().recordBlockBreak(oldBlockKey, blockLocation,
                         plugin.getNMSWorld().getDefaultAmount(block),
                         REGULAR_RECORD_FLAGS);
@@ -408,7 +422,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
                         recordBedBreak(bedLocation, capturedChange);
                 }, 1L);
             }
-            BukkitExecutor.sync(() -> bedChanges.remove(bedLocation, capturedChange), 2L);
+            BukkitExecutor.sync(() -> {
+                if (!capturedChange.recorded)
+                    bedChanges.remove(bedLocation, capturedChange);
+            }, 2L);
         }
 
         if (broken)
@@ -420,6 +437,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
             return;
 
         bedChange.recorded = true;
+        BukkitExecutor.sync(() -> bedChanges.remove(bedLocation, bedChange), RECORDED_BED_TTL);
         this.worldRecordService.get().recordBlockBreak(bedChange.key, bedLocation, 1, REGULAR_RECORD_FLAGS);
     }
 
@@ -433,7 +451,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void captureBed(Block block) {
-        if (!Materials.isBed(block.getType()) || !plugin.getGrid().isIslandsWorld(block.getWorld()))
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()) || !Materials.isBed(block.getType()))
             return;
 
         handleBedChange(block.getState(), false);
@@ -574,7 +592,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         for (Block block : e.getArgs().blocks) {
             if (plugin.getNMSWorld().getPistonReaction(block) == PistonPushReaction.DESTROY) {
-                this.worldRecordService.get().recordBlockBreak(block, 1, REGULAR_RECORD_FLAGS);
+                if (Materials.isBed(block.getType()))
+                    handleBedChange(block.getState(), true);
+                else
+                    this.worldRecordService.get().recordBlockBreak(block, 1, REGULAR_RECORD_FLAGS);
             }
         }
     }
@@ -766,7 +787,9 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_UPDATE_SHAPE_EVENT, GameEventPriority.MONITOR, this::onBlockShapeUpdate);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.MONITOR, this::onSpawnerChange);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.MONITOR, this::onBedInteract);
-        registerCallback(GameEventType.BLOCK_PHYSICS_EVENT, GameEventPriority.MONITOR, this::onBedPhysics);
+        // Since 1.19, beds are recorded through the shape updates of their foot (CollectingNeighborUpdaterTracker).
+        if (ServerVersion.isLessThan(ServerVersion.v1_19) && plugin.getSettings().isPhysicsListener())
+            registerCallback(GameEventType.BLOCK_PHYSICS_EVENT, GameEventPriority.MONITOR, this::onBedPhysics);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.MONITOR, this::onEntityChangeBlock);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onBlockBreak);
         registerCallback(GameEventType.PLAYER_FILL_BUCKET_EVENT, GameEventPriority.MONITOR, this::onBucketFill);
