@@ -342,15 +342,15 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             return InteractionResult.SUCCESS;
         }
 
-        SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(damager);
-
-        if (superiorPlayer == null) {
-            return InteractionResult.SUCCESS;
-        }
-
         List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntityDamagePrivileges(entity);
 
         if (islandPrivileges.isEmpty()) {
+            return InteractionResult.SUCCESS;
+        }
+
+        SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(damager);
+
+        if (superiorPlayer == null) {
             return InteractionResult.SUCCESS;
         }
 

@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -67,7 +68,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventMultiDestruction(pistonBlock.getLocation(wrapper.getHandle()), e.getArgs().blocks,
-                    block -> block.getRelative(e.getArgs().direction)))
+                    e.getArgs().direction))
                 e.setCancelled();
         }
     }
@@ -82,7 +83,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventMultiDestruction(pistonBlock.getLocation(wrapper.getHandle()), e.getArgs().blocks,
-                    block -> block.getRelative(e.getArgs().direction)))
+                    e.getArgs().direction))
                 e.setCancelled();
         }
     }
@@ -132,7 +133,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
     }
 
     private boolean preventMultiDestruction(Location islandLocation, List<Block> blockList,
-                                            @Nullable Function<Block, Block> blockTransform) {
+                                            @Nullable BlockFace moveDirection) {
         Island island = plugin.getGrid().getIslandAt(islandLocation);
 
         if (island == null)
@@ -140,8 +141,8 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             for (Block block : blockList) {
-                if (blockTransform != null)
-                    block = blockTransform.apply(block);
+                if (moveDirection != null)
+                    block = block.getRelative(moveDirection);
                 if (!island.isInsideRange(block.getLocation(wrapper.getHandle())))
                     return true;
             }

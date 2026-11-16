@@ -423,13 +423,13 @@ public class ProtectionListener extends AbstractGameEventListener {
             return;
         }
 
-        SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(damager);
+        InteractionResult interactionResult = this.regionManagerService.get().handleEntityDamage(damager, entity);
 
-        if (superiorPlayer == null) {
+        if (interactionResult == InteractionResult.SUCCESS) {
             return;
         }
 
-        InteractionResult interactionResult = this.regionManagerService.get().handleEntityDamage(damager, entity);
+        SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(damager);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -681,21 +681,25 @@ public class ProtectionListener extends AbstractGameEventListener {
             return;
         }
 
+        EntityType entityType = entity.getType();
+
         InteractionResult interactionResult;
-        if (entity instanceof Egg) {
-            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntitySpawnPrivileges(entity);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location entityLocation = entity.getLocation(wrapper.getHandle());
 
-            if (islandPrivileges.isEmpty()) {
-                return;
-            }
+            if (entity instanceof Egg) {
+                List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntitySpawnPrivileges(entity);
 
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                Location entityLocation = entity.getLocation(wrapper.getHandle());
-                interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                        entityLocation, islandPrivileges);
+                if (!islandPrivileges.isEmpty()) {
+                    interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
+                            entityLocation, islandPrivileges);
+
+                    if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+                        e.setCancelled();
+                        return;
+                    }
+                }
             }
-        } else {
-            EntityType entityType = entity.getType();
 
             IslandPrivilege islandPrivilege;
             if (entity instanceof FishHook && !ServerVersion.isLegacy()) {
@@ -710,11 +714,8 @@ public class ProtectionListener extends AbstractGameEventListener {
                 return;
             }
 
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                Location entityLocation = entity.getLocation(wrapper.getHandle());
-                interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                        entityLocation, islandPrivilege);
-            }
+            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
+                    entityLocation, islandPrivilege);
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -771,29 +772,31 @@ public class ProtectionListener extends AbstractGameEventListener {
         return true;
     }
 
-    private boolean handleProjectileHitBlock(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
+    private void handleProjectileHitBlock(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
         Block hitBlock = e.getArgs().hitBlock;
 
         if (hitBlock == null) {
-            return false;
+            return;
         }
 
-        Material hitBlockType = hitBlock.getType();
         Entity entity = e.getArgs().entity;
         SuperiorPlayer superiorPlayer = BukkitEntities.getSuperiorPlayerSource(entity);
+
+        Material hitBlockType = hitBlock.getType();
+        EntityType entityType = entity.getType();
 
         List<IslandPrivilege> islandPrivileges;
         if (hitBlockType == TARGET) {
             islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(Keys.of(hitBlock));
-        } else if (hitBlockType == CHORUS_FLOWER || hitBlockType == DECORATED_POT || (entity.getType() == TRIDENT
+        } else if (hitBlockType == CHORUS_FLOWER || hitBlockType == DECORATED_POT || (entityType == TRIDENT
                 && (hitBlockType == POINTED_DRIPSTONE || hitBlockType == SULFUR_SPIKE))) {
             islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(Keys.of(hitBlock));
         } else {
-            return false;
+            return;
         }
 
         if (islandPrivileges.isEmpty()) {
-            return true;
+            return;
         }
 
         InteractionResult interactionResult;
@@ -819,8 +822,6 @@ public class ProtectionListener extends AbstractGameEventListener {
                 }, 1L);
             }
         }
-
-        return true;
     }
 
     private void onSoftExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
@@ -839,27 +840,25 @@ public class ProtectionListener extends AbstractGameEventListener {
             Block block = blocksIterator.next();
             Material blockType = block.getType();
 
+            List<IslandPrivilege> islandPrivileges;
+            if (blockType == CHORUS_FLOWER || blockType == DECORATED_POT) {
+                islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(Keys.of(block));
+            } else {
+                islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(Keys.of(block));
+            }
+
+            if (islandPrivileges.isEmpty()) {
+                continue;
+            }
+
             InteractionResult interactionResult;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                Location blockLocation = block.getLocation(wrapper.getHandle());
-
-                List<IslandPrivilege> islandPrivileges;
-                if (blockType == CHORUS_FLOWER || blockType == DECORATED_POT) {
-                    islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(Keys.of(block));
-                } else {
-                    islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(Keys.of(block));
-                }
-
-                if (islandPrivileges.isEmpty()) {
-                    continue;
-                }
-
                 interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                        blockLocation, islandPrivileges);
+                        block.getLocation(wrapper.getHandle()), islandPrivileges);
+            }
 
-                if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
-                    blocksIterator.remove();
-                }
+            if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+                blocksIterator.remove();
             }
         }
 
