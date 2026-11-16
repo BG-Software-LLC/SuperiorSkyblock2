@@ -95,13 +95,15 @@ public class CmdAdminAddRoleLimit implements IAdminIslandCommand {
                 continue;
             }
 
-            if (currentLimit + limit < 0) {
+            int newLimit = currentLimit + limit;
+
+            if (newLimit < 0) {
                 isInvalid = true;
                 continue;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeRoleLimit> event = PluginEventsFactory.callIslandChangeRoleLimitEvent(
-                    island, sender, playerRole, currentLimit + limit);
+                    island, sender, playerRole, newLimit);
             if (!event.isCancelled()) {
                 island.setRoleLimit(playerRole, event.getArgs().roleLimit);
                 changedIsland = island;

@@ -85,13 +85,15 @@ public class CmdAdminAddCoopLimit implements IAdminIslandCommand {
                 continue;
             }
 
-            if (currentLimit + limit < 0) {
+            int newLimit = currentLimit + limit;
+
+            if (newLimit < 0) {
                 isInvalid = true;
                 continue;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeCoopLimit> event = PluginEventsFactory.callIslandChangeCoopLimitEvent(
-                    island, sender, currentLimit + limit);
+                    island, sender, newLimit);
             if (!event.isCancelled()) {
                 island.setCoopLimit(event.getArgs().coopLimit);
                 changedIsland = island;

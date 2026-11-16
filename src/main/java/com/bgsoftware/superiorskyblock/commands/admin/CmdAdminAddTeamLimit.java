@@ -85,13 +85,15 @@ public class CmdAdminAddTeamLimit implements IAdminIslandCommand {
                 continue;
             }
 
-            if (currentLimit + limit < 0) {
+            int newLimit = currentLimit + limit;
+
+            if (newLimit < 0) {
                 isInvalid = true;
                 continue;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeMembersLimit> event = PluginEventsFactory.callIslandChangeMembersLimitEvent(
-                    island, sender, currentLimit + limit);
+                    island, sender, newLimit);
             if (!event.isCancelled()) {
                 island.setTeamLimit(event.getArgs().membersLimit);
                 changedIsland = island;

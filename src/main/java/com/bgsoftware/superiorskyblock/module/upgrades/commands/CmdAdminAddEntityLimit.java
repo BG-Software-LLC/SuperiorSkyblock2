@@ -92,13 +92,15 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
                 continue;
             }
 
-            if (currentLimit + limit < 0) {
+            int newLimit = currentLimit + limit;
+
+            if (newLimit < 0) {
                 isInvalid = true;
                 continue;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeEntityLimit> event = PluginEventsFactory.callIslandChangeEntityLimitEvent(
-                    island, sender, key, currentLimit + limit);
+                    island, sender, key, newLimit);
             if (!event.isCancelled()) {
                 island.setEntityLimit(key, event.getArgs().entityLimit);
                 changedIsland = island;

@@ -83,19 +83,19 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            int currentSize = island.getEffectiveIslandSize();
-            if (currentSize + size < 1) {
+            int newSize = island.getEffectiveIslandSize() + size;
+            if (newSize < 1) {
                 isInvalid = true;
                 continue;
             }
 
-            if (currentSize + size > plugin.getSettings().getMaxIslandSize()) {
+            if (newSize > plugin.getSettings().getMaxIslandSize()) {
                 isBiggerThanMax = true;
                 continue;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeBorderSize> event = PluginEventsFactory.callIslandChangeBorderSizeEvent(
-                    island, sender, currentSize + size);
+                    island, sender, newSize);
             if (!event.isCancelled()) {
                 island.setIslandSize(event.getArgs().borderSize);
                 changedIsland = island;

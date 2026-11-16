@@ -85,13 +85,15 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
                 continue;
             }
 
-            if (currentLimit + limit < 0) {
+            int newLimit = currentLimit + limit;
+
+            if (newLimit < 0) {
                 isInvalid = true;
                 continue;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeWarpsLimit> event = PluginEventsFactory.callIslandChangeWarpsLimitEvent(
-                    island, sender, currentLimit + limit);
+                    island, sender, newLimit);
             if (!event.isCancelled()) {
                 island.setWarpsLimit(event.getArgs().warpsLimit);
                 changedIsland = island;

@@ -92,13 +92,15 @@ public class CmdAdminAddBlockLimit implements IAdminIslandCommand {
                 continue;
             }
 
-            if (currentLimit + limit < 0) {
+            int newLimit = currentLimit + limit;
+
+            if (newLimit < 0) {
                 isInvalid = true;
                 continue;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeBlockLimit> event = PluginEventsFactory.callIslandChangeBlockLimitEvent(
-                    island, sender, key, currentLimit + limit);
+                    island, sender, key, newLimit);
             if (!event.isCancelled()) {
                 island.setBlockLimit(key, event.getArgs().blockLimit);
                 changedIsland = island;
