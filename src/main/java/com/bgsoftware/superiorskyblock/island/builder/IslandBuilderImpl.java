@@ -406,7 +406,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public Island.Builder setPlayerPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
-        this.playerPermissions.computeIfAbsent(superiorPlayer, p -> new PlayerPrivilegeNode(superiorPlayer, null))
+        this.playerPermissions.computeIfAbsent(superiorPlayer, player -> new PlayerPrivilegeNode(player, null))
                 .loadPrivilege(islandPrivilege, (byte) (value ? 1 : 0));
         return this;
     }

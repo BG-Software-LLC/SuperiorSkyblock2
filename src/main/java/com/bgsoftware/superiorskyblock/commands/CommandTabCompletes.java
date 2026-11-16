@@ -143,7 +143,7 @@ public class CommandTabCompletes {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
                 .filter(var -> var.contains(lowerArgument))
-                .build(Stream.of(tabVariables).map(i -> i + ""));
+                .build(tabVariables.mapToObj(i -> i + ""));
     }
 
     public static List<String> getSchematics(SuperiorSkyblockPlugin plugin, String argument) {

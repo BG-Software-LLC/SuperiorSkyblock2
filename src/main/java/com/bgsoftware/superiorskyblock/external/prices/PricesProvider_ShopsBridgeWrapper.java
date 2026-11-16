@@ -17,10 +17,13 @@ import org.bukkit.inventory.ItemStack;
 import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class PricesProvider_ShopsBridgeWrapper implements PricesProvider {
 
     private final KeyMap<BigDecimal> cachedPrices = KeyMap.createConcurrentKeyMap();
+    private final Function<Key, BigDecimal> priceLoader = this::getPriceFromShopsBridge;
+
     private final SuperiorSkyblockPlugin plugin;
     private final IShopsBridge shopsBridge;
 
@@ -33,7 +36,7 @@ public class PricesProvider_ShopsBridgeWrapper implements PricesProvider {
     @Override
     public BigDecimal getPrice(Key key) {
         try {
-            return this.cachedPrices.computeIfAbsent(key, this::getPriceFromShopsBridge);
+            return this.cachedPrices.computeIfAbsent(key, this.priceLoader);
         } catch (Throwable error) {
             Log.error(error, "Failed to load prices for item " + key);
             return BigDecimal.ZERO;

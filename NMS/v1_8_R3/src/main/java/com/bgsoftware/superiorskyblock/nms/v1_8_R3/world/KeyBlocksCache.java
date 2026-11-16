@@ -19,14 +19,16 @@ public class KeyBlocksCache {
     }
 
     public static Key getBlockKey(IBlockData blockData) {
-        return BLOCK_TO_KEY.computeIfAbsent(blockData, unused -> {
-            Block block = blockData.getBlock();
-            Material blockType = CraftMagicNumbers.getMaterial(block);
-            if (blockType == null)
-                return null;
-            byte data = (byte) block.toLegacyData(blockData);
-            return Keys.of(blockType, data);
-        });
+        return BLOCK_TO_KEY.computeIfAbsent(blockData, KeyBlocksCache::createBlockKeyInternal);
+    }
+
+    private static Key createBlockKeyInternal(IBlockData blockData) {
+        Block block = blockData.getBlock();
+        Material blockType = CraftMagicNumbers.getMaterial(block);
+        if (blockType == null)
+            return null;
+        byte data = (byte) block.toLegacyData(blockData);
+        return Keys.of(blockType, data);
     }
 
     public static void cacheAllBlocks() {

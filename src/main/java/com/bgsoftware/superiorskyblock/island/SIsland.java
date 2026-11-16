@@ -158,6 +158,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -168,6 +169,24 @@ public class SIsland implements Island {
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final UUID[] EMPTY_IGNORED_MEMBERS = new UUID[0];
     private static final Object[] EMPTY_MESSAGE_ARGS = new Object[0];
+    // Non-capturing functions for playersInside, used by anyPlayerInsideMatches and countPlayersInside.
+    private static final BiFunction<SortedSet<SuperiorPlayer>, Predicate<SuperiorPlayer>, Boolean> ANY_PLAYER_MATCHES =
+            (playersInside, predicate) -> {
+                for (SuperiorPlayer superiorPlayer : playersInside) {
+                    if (predicate.test(superiorPlayer))
+                        return true;
+                }
+                return false;
+            };
+    private static final BiFunction<SortedSet<SuperiorPlayer>, Predicate<SuperiorPlayer>, Integer> COUNT_PLAYERS_MATCHES =
+            (playersInside, predicate) -> {
+                int count = 0;
+                for (SuperiorPlayer superiorPlayer : playersInside) {
+                    if (predicate.test(superiorPlayer))
+                        ++count;
+                }
+                return count;
+            };
 
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -521,27 +540,14 @@ public class SIsland implements Island {
     public boolean anyPlayerInsideMatches(Predicate<SuperiorPlayer> predicate) {
         Preconditions.checkNotNull(predicate, "predicate parameter cannot be null.");
 
-        return playersInside.readAndGet(playersInside -> {
-            for (SuperiorPlayer superiorPlayer : playersInside) {
-                if (predicate.test(superiorPlayer))
-                    return true;
-            }
-            return false;
-        });
+        return playersInside.readAndGet(predicate, ANY_PLAYER_MATCHES);
     }
 
     @Override
     public int countPlayersInside(Predicate<SuperiorPlayer> predicate) {
         Preconditions.checkNotNull(predicate, "predicate parameter cannot be null.");
 
-        return playersInside.readAndGet(playersInside -> {
-            int count = 0;
-            for (SuperiorPlayer superiorPlayer : playersInside) {
-                if (predicate.test(superiorPlayer))
-                    ++count;
-            }
-            return count;
-        });
+        return playersInside.readAndGet(predicate, COUNT_PLAYERS_MATCHES);
     }
 
     @Override
@@ -1678,7 +1684,8 @@ public class SIsland implements Island {
     @Override
     public PrivilegeNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return playerPermissions.getOrDefault(superiorPlayer, new PlayerPrivilegeNode(superiorPlayer, this));
+        PlayerPrivilegeNode permissionNode = playerPermissions.get(superiorPlayer);
+        return permissionNode != null ? permissionNode : new PlayerPrivilegeNode(superiorPlayer, this);
     }
 
     @Override
@@ -1690,14 +1697,21 @@ public class SIsland implements Island {
         if (playerRoleId != null)
             return plugin.getRoles().getPlayerRoleFromId(playerRoleId);
 
-        return plugin.getRoles().getRoles().stream()
-                .filter(_playerRole -> {
-                    if (!plugin.getSettings().isCoopMembers() && _playerRole == SPlayerRole.coopRole())
-                        return false;
+        // Called twice for every privilege check, so it uses a plain loop instead of a stream.
+        boolean coopMembers = plugin.getSettings().isCoopMembers();
+        PlayerRole coopRole = SPlayerRole.coopRole();
+        PlayerRole requiredRole = null;
 
-                    return ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege);
-                })
-                .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.lastRole());
+        for (PlayerRole playerRole : plugin.getRoles().getRoles()) {
+            if (!coopMembers && playerRole == coopRole)
+                continue;
+
+            if ((requiredRole == null || playerRole.getWeight() < requiredRole.getWeight()) &&
+                    ((SPlayerRole) playerRole).getDefaultPermissions().hasPermission(islandPrivilege))
+                requiredRole = playerRole;
+        }
+
+        return requiredRole == null ? SPlayerRole.lastRole() : requiredRole;
     }
 
     /*
@@ -2550,13 +2564,12 @@ public class SIsland implements Island {
     private BlockChangeResult handleBlockPlaceInternal(Key key, @Size BigInteger amount, @IslandBlockFlags int flags) {
         boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
 
-        boolean trackedBlock = accessBlocksTracker(rawBlocks,
-                blocksTracker -> blocksTracker.trackBlock(key, amount));
+        boolean trackedBlock = trackOrUntrackBlock(rawBlocks, true, key, amount);
 
         if (!trackedBlock)
             return BlockChangeResult.MISSING_BLOCK_VALUE;
 
-        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.updateAndGet(count -> count.add(amount));
+        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.accumulateAndGet(amount, BigInteger::add);
 
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
@@ -2569,13 +2582,13 @@ public class SIsland implements Island {
         boolean updateLastTimeStatus = (flags & IslandBlockFlags.UPDATE_LAST_TIME_STATUS) != 0;
 
         if (blockWorth.compareTo(BigDecimal.ZERO) != 0) {
-            islandWorth.updateAndGet(islandWorth -> islandWorth.add(blockWorth.multiply(new BigDecimal(amount))));
+            islandWorth.accumulateAndGet(blockWorth.multiply(new BigDecimal(amount)), BigDecimal::add);
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         }
 
         if (blockLevel.compareTo(BigDecimal.ZERO) != 0) {
-            islandLevel.updateAndGet(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
+            islandLevel.accumulateAndGet(blockLevel.multiply(new BigDecimal(amount)), BigDecimal::add);
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
         }
@@ -2761,13 +2774,12 @@ public class SIsland implements Island {
 
         boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
 
-        boolean untrackedBlocks = accessBlocksTracker(rawBlocks,
-                blocksTracker -> blocksTracker.untrackBlock(key, amountBig));
+        boolean untrackedBlocks = trackOrUntrackBlock(rawBlocks, false, key, amountBig);
 
         if (!untrackedBlocks)
             return BlockChangeResult.MISSING_BLOCK_VALUE;
 
-        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.updateAndGet(count -> count.subtract(amountBig));
+        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.accumulateAndGet(amountBig, BigInteger::subtract);
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
@@ -2779,13 +2791,13 @@ public class SIsland implements Island {
         boolean updateLastTimeStatus = (flags & IslandBlockFlags.UPDATE_LAST_TIME_STATUS) != 0;
 
         if (blockWorth.compareTo(BigDecimal.ZERO) != 0) {
-            this.islandWorth.updateAndGet(islandWorth -> islandWorth.subtract(blockWorth.multiply(new BigDecimal(amount))));
+            this.islandWorth.accumulateAndGet(blockWorth.multiply(new BigDecimal(amount)), BigDecimal::subtract);
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         }
 
         if (blockLevel.compareTo(BigDecimal.ZERO) != 0) {
-            this.islandLevel.updateAndGet(islandLevel -> islandLevel.subtract(blockLevel.multiply(new BigDecimal(amount))));
+            this.islandLevel.accumulateAndGet(blockLevel.multiply(new BigDecimal(amount)), BigDecimal::subtract);
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
         }
@@ -4321,8 +4333,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_GENERATOR_RATE, owner.getName(), key, dimension);
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
+        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(dimension, EnumerateMap::get);
 
         if (worldGeneratorRates == null)
             return;
@@ -4347,8 +4358,7 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
+        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(dimension, EnumerateMap::get);
 
         if (worldGeneratorRates == null)
             return 0;
@@ -4367,8 +4377,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
+        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(dimension, EnumerateMap::get);
 
         if (worldGeneratorRates == null)
             return Collections.emptyMap();
@@ -4389,8 +4398,7 @@ public class SIsland implements Island {
     public Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
+        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(dimension, EnumerateMap::get);
 
         if (worldGeneratorRates == null)
             return Collections.emptyMap();
@@ -4406,8 +4414,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.CLEAR_GENERATOR_RATES, owner.getName(), dimension.getName());
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
+        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(dimension, EnumerateMap::get);
         if (worldGeneratorRates != null && !worldGeneratorRates.isEmpty()) {
             worldGeneratorRates.clear();
             IslandsDatabaseBridge.clearGeneratorRates(this, dimension);
@@ -4432,14 +4439,16 @@ public class SIsland implements Island {
 
         Log.debug(Debug.GENERATE_BLOCK, owner.getName(), location, dimension.getName(), optimizeDefaultBlock);
 
-        int totalGeneratorAmounts = getGeneratorTotalAmount(dimension);
+        // Calculating the total from the same map, instead of calling getGeneratorTotalAmount which builds it again.
+        Map<String, Integer> generatorAmounts = getGeneratorAmounts(dimension);
+        int totalGeneratorAmounts = 0;
+        for (int generatorAmount : generatorAmounts.values())
+            totalGeneratorAmounts += generatorAmount;
 
         if (totalGeneratorAmounts == 0) {
             Log.debugResult(Debug.GENERATE_BLOCK, "Return No Generator Rates", "null");
             return null;
         }
-
-        Map<String, Integer> generatorAmounts = getGeneratorAmounts(dimension);
 
         GeneratorType generatorType = GeneratorType.fromDimension(dimension);
         Key defaultBlockKey = generatorType.getDefaultBlock();
@@ -5400,9 +5409,23 @@ public class SIsland implements Island {
         }
     }
 
+    // Same as accessBlocksTracker, for a single block change. It is called for every block placed or broken,
+    // so it avoids allocating a capturing lambda.
+    private boolean trackOrUntrackBlock(boolean rawBlocks, boolean track, Key key, BigInteger amount) {
+        if (rawBlocks)
+            this.blocksTracker.setLoadingDataMode(true);
+
+        try {
+            return track ? this.blocksTracker.trackBlock(key, amount) : this.blocksTracker.untrackBlock(key, amount);
+        } finally {
+            if (rawBlocks)
+                this.blocksTracker.setLoadingDataMode(false);
+        }
+    }
+
     private BukkitTask registerTask(@Nullable BukkitTask bukkitTask) {
         if (bukkitTask != null) {
-            this.activeTasks.write(activeTasks -> activeTasks.add(bukkitTask));
+            this.activeTasks.write(bukkitTask, Set::add);
         }
         return bukkitTask;
     }

@@ -347,19 +347,24 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             return;
         }
 
-        BukkitEntities.getPlayerSource(entity).ifPresent(shooterPlayer -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                if (!preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.PVP))
-                    return;
-            }
+        Player shooterPlayer = BukkitEntities.getPlayerSource(entity);
+        if (shooterPlayer == null) {
+            return;
+        }
 
-            List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (!preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.PVP))
+                return;
+        }
 
-            BukkitExecutor.sync(() -> nearbyEntities.forEach(nearbyEntity -> {
+        List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
+
+        BukkitExecutor.sync(() -> {
+            for (Entity nearbyEntity : nearbyEntities) {
                 if (nearbyEntity instanceof LivingEntity && !nearbyEntity.getUniqueId().equals(shooterPlayer.getUniqueId()))
                     ((LivingEntity) nearbyEntity).removePotionEffect(PotionEffectType.POISON);
-            }), 1L);
-        });
+            }
+        }, 1L);
     }
 
     /* INTERNAL */

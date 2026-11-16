@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -81,12 +83,30 @@ public class Synchronized<T> {
         }
     }
 
+    public <A, R> R readAndGet(A arg, BiFunction<T, A, R> function) {
+        try {
+            lock.readLock().lock();
+            return function.apply(value, arg);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
     public void write(Consumer<T> consumer) {
         try {
             lock.writeLock().lock();
             consumer.accept(value);
         } finally {
             this.stamp.incrementAndGet();
+            lock.writeLock().unlock();
+        }
+    }
+
+    public <A> void write(A arg, BiConsumer<T, A> consumer) {
+        try {
+            lock.writeLock().lock();
+            consumer.accept(value, arg);
+        } finally {
             lock.writeLock().unlock();
         }
     }

@@ -203,10 +203,19 @@ public final class StatisticsMissions extends BuiltinMission<Void> implements Li
         if (statistic == null)
             return false;
 
+        String statisticName = statistic.name();
+        boolean isSubstatistic = statistic.isSubstatistic();
+
         for (Requirements requirement : requiredStatistics.keySet()) {
-            if (requirement.contains(statistic.name()) || (statistic.isSubstatistic() &&
-                    requirement.stream().anyMatch(line -> line.contains(statistic.name()))))
+            if (requirement.contains(statisticName))
                 return true;
+
+            if (isSubstatistic) {
+                for (String line : requirement) {
+                    if (line.contains(statisticName))
+                        return true;
+                }
+            }
         }
 
         return false;
