@@ -1676,6 +1676,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public int getExactBlockLimitRaw(Key key) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
     public Key getBlockLimitKey(Key key) {
         return key;
     }
@@ -1727,6 +1732,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getEntityLimitRaw(Key key) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public int getExactEntityLimitRaw(Key key) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 

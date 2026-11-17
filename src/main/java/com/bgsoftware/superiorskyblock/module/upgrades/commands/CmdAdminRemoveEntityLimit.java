@@ -71,7 +71,7 @@ public class CmdAdminRemoveEntityLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (island.getEntityLimitRaw(key) != IslandUpgradeConstants.SYNCED_VALUE) {
+            if (island.getExactEntityLimitRaw(key) != IslandUpgradeConstants.SYNCED_VALUE) {
                 if (!PluginEventsFactory.callIslandRemoveEntityLimitEvent(island, sender, key)) {
                     continue;
                 }

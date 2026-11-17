@@ -1509,6 +1509,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getExactBlockLimitRaw(Key key) {
+        return this.handle.getExactBlockLimitRaw(key);
+    }
+
+    @Override
     public Key getBlockLimitKey(Key key) {
         return this.handle.getBlockLimitKey(key);
     }
@@ -1561,6 +1566,11 @@ public class DelegateIsland implements Island {
     @Override
     public int getEntityLimitRaw(Key key) {
         return this.handle.getEntityLimitRaw(key);
+    }
+
+    @Override
+    public int getExactEntityLimitRaw(Key key) {
+        return this.handle.getExactEntityLimitRaw(key);
     }
 
     @Override

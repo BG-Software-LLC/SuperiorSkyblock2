@@ -2167,6 +2167,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the block limit of a block that was set using a command.
+     * Like {@link #getBlockLimit(Key)}, a key with data that has no limit uses its global key.
+     * See {@link #getExactBlockLimitRaw(Key)}.
      *
      * @param key The block's key to check.
      * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
@@ -2182,6 +2184,17 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param key The block's key to check.
      */
     int getExactBlockLimit(Key key);
+
+    /**
+     * Get the block limit of a block that was set using a command.
+     * Unlike {@link #getBlockLimitRaw(Key)}, this method checks only the exact block
+     * that is given as a parameter, like {@link #getExactBlockLimit(Key)}.
+     *
+     * @param key The block's key to check.
+     * @return The custom limit, or -2 if the block has no custom limit.
+     * A custom limit of -1 means no limit.
+     */
+    int getExactBlockLimitRaw(Key key);
 
     /**
      * Get the block key used as a limit for another block key.
@@ -2267,12 +2280,25 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the entity limit of an entity that was set using a command.
+     * Like {@link #getEntityLimit(Key)}, a key with data that has no limit uses its global key.
+     * See {@link #getExactEntityLimitRaw(Key)}.
      *
      * @param key The key of the entity to check.
      * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
      * A custom limit of -1 means no limit.
      */
     int getEntityLimitRaw(Key key);
+
+    /**
+     * Get the entity limit of an entity that was set using a command.
+     * Unlike {@link #getEntityLimitRaw(Key)}, this method checks only the exact entity
+     * that is given as a parameter.
+     *
+     * @param key The key of the entity to check.
+     * @return The custom limit, or -2 if the entity has no custom limit.
+     * A custom limit of -1 means no limit.
+     */
+    int getExactEntityLimitRaw(Key key);
 
     /**
      * Set the entity limit of an entity.

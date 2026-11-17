@@ -71,7 +71,7 @@ public class CmdAdminRemoveBlockLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (island.getBlockLimitRaw(key) != IslandUpgradeConstants.SYNCED_VALUE) {
+            if (island.getExactBlockLimitRaw(key) != IslandUpgradeConstants.SYNCED_VALUE) {
                 if (!PluginEventsFactory.callIslandRemoveBlockLimitEvent(island, sender, key)) {
                     continue;
                 }

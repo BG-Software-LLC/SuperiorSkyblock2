@@ -3355,6 +3355,13 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getExactBlockLimitRaw(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.blockLimits.getRaw(key, null), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
     public Key getBlockLimitKey(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
@@ -3386,7 +3393,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_BLOCK_LIMIT, owner.getName(), key);
 
-        IntValue oldBlockLimit = this.blockLimits.get(key);
+        IntValue oldBlockLimit = this.blockLimits.getRaw(key, null);
 
         if (oldBlockLimit == null || oldBlockLimit.isSynced()) {
             return;
@@ -3511,6 +3518,13 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getExactEntityLimitRaw(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.entityLimits.getRaw(key, null), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
     public void setEntityLimit(EntityType entityType, int limit) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
 
@@ -3541,7 +3555,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_ENTITY_LIMIT, owner.getName(), key);
 
-        IntValue oldEntityLimit = this.entityLimits.get(key);
+        IntValue oldEntityLimit = this.entityLimits.getRaw(key, null);
 
         if (oldEntityLimit == null || oldEntityLimit.isSynced()) {
             return;
