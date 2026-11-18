@@ -7,20 +7,24 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SIslandChest implements IslandChest {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
     private final Island island;
     private final int index;
-    private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(
-            this, 9, plugin.getSettings().getIslandChests().getChestTitle());
+    private String title = plugin.getSettings().getIslandChests().getChestTitle();
+    private Inventory inventory = plugin.getProviders().getUIProvider().createInventory(this, 9, title);
     private int contentsUpdateCounter = 0;
 
     public SIslandChest(Island island, int index) {
@@ -30,8 +34,8 @@ public class SIslandChest implements IslandChest {
 
     public static SIslandChest createChest(Island island, int index, ItemStack[] contents) {
         SIslandChest islandChest = new SIslandChest(island, index);
-        islandChest.inventory = plugin.getProviders().getUIProvider().createInventory(
-                islandChest, contents.length, plugin.getSettings().getIslandChests().getChestTitle());
+        islandChest.inventory = plugin.getProviders().getUIProvider().createInventory(islandChest, contents.length,
+                plugin.getSettings().getIslandChests().getChestTitle());
         islandChest.inventory.setContents(contents);
         return islandChest;
     }
@@ -53,14 +57,20 @@ public class SIslandChest implements IslandChest {
 
     @Override
     public void setRows(int rows) {
+        Preconditions.checkArgument(rows >= 1 && rows <= 6, "rows parameter must be between 1 and 6.");
+
         BukkitExecutor.ensureMain(() -> {
             try {
                 updateFlag.set(true);
                 ItemStack[] oldContents = inventory.getContents();
                 Inventory oldInventory = inventory;
-                inventory = plugin.getProviders().getUIProvider().createInventory(this, 9 * rows, plugin.getSettings().getIslandChests().getChestTitle());
+
+                List<HumanEntity> viewers = new LinkedList<>(oldInventory.getViewers());
+
+                inventory = plugin.getProviders().getUIProvider().createInventory(this, 9 * rows, title);
                 inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
-                inventory.getViewers().forEach(humanEntity -> {
+
+                viewers.forEach(humanEntity -> {
                     if (humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))
                         humanEntity.openInventory(inventory);
                 });
@@ -79,6 +89,18 @@ public class SIslandChest implements IslandChest {
     public void openChest(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         superiorPlayer.runIfOnline(player -> player.openInventory(getInventory()));
+    }
+
+    @Override
+    public void updateTitle() {
+        String defaultTitle = plugin.getSettings().getIslandChests().getChestTitle();
+
+        if (this.title.equals(defaultTitle)) {
+            return;
+        }
+
+        plugin.getNMSAlgorithms().setTitle(this.inventory, defaultTitle);
+        this.title = defaultTitle;
     }
 
     @Override

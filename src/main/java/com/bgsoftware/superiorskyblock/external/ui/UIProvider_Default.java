@@ -97,6 +97,11 @@ public class UIProvider_Default extends BaseUIProvider {
         return Bukkit.createInventory(inventoryHolder, inventoryType, title);
     }
 
+    @Override
+    public Object parseInventoryTitle(String title) {
+        return title;
+    }
+
     private class ActionBarComponent extends BaseMessageComponent {
 
         private ActionBarComponent(String message) {

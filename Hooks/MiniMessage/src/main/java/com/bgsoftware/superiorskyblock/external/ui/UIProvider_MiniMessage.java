@@ -125,6 +125,11 @@ public class UIProvider_MiniMessage extends BaseUIProvider {
         return Bukkit.createInventory(inventoryHolder, size, deserializeWithoutItalic(title));
     }
 
+    @Override
+    public Object parseInventoryTitle(String title) {
+        return deserializeWithoutItalic(title);
+    }
+
     private static Component deserializeWithoutItalic(String message) {
         Component component = deserialize(message, message.indexOf(ChatColor.COLOR_CHAR) >= 0);
         if (component.decoration(TextDecoration.ITALIC) == TextDecoration.State.NOT_SET) {

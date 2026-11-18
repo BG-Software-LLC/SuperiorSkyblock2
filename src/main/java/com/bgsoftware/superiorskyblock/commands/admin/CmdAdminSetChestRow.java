@@ -66,15 +66,22 @@ public class CmdAdminSetChestRow implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Integer> pageArguments = CommandArguments.getPage(sender, args[3]);
 
-        if (!pageArguments.isSucceed())
+        if (!pageArguments.isSucceed()) {
             return;
+        }
 
         int page = pageArguments.getNumber();
 
+        if (page < 1) {
+            Message.INVALID_PAGE.send(sender, args[3]);
+            return;
+        }
+
         NumberArgument<Integer> rowsArguments = CommandArguments.getRows(sender, args[4]);
 
-        if (!rowsArguments.isSucceed())
+        if (!rowsArguments.isSucceed()) {
             return;
+        }
 
         int rows = rowsArguments.getNumber();
 
@@ -85,12 +92,13 @@ public class CmdAdminSetChestRow implements IAdminIslandCommand {
 
         islands.forEach(island -> island.setChestRows(page - 1, rows));
 
-        if (islands.size() > 1)
+        if (islands.size() > 1) {
             Message.CHANGED_CHEST_SIZE_ALL.send(sender, page, rows);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_CHEST_SIZE_NAME.send(sender, page, rows, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_CHEST_SIZE.send(sender, page, rows, targetPlayer.getName());
+        }
     }
 
     @Override
