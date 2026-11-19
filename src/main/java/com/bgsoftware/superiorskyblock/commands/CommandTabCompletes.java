@@ -199,6 +199,13 @@ public class CommandTabCompletes {
                 });
     }
 
+    public static List<String> getEntityCategories(SuperiorSkyblockPlugin plugin, String argument) {
+        String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
+        return new SequentialListBuilder<String>().build(plugin.getSettings().getEntityCategoriesMap().getCategories().stream()
+                .filter(entityCategory -> entityCategory.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .map(entityCategory -> entityCategory.getName().toLowerCase(Locale.ENGLISH)));
+    }
+
     public static List<String> getEntitiesForLimit(String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>().build(Stream.of(EntityType.values())

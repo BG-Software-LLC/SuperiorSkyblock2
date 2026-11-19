@@ -25,6 +25,7 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
                 Value.syncedSupplied(() -> OptionalInt.of(plugin.getSettings().getDefaultValues().getCoopLimit())),
                 Value.syncedSupplied(() -> OptionalInt.of(plugin.getSettings().getDefaultValues().getIslandSize())),
                 Value.syncedSupplied(() -> (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits()),
+                Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getEntityCategoryLimits()),
                 Value.syncedSupplied(() -> (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits()),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getRealGeneratorsMap()),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandEffects()),
