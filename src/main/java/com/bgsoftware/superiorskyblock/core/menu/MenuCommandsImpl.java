@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.MenuCommands;
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
+import com.bgsoftware.superiorskyblock.api.menu.layout.HologramMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.InventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -11,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContextImpl;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
+import com.bgsoftware.superiorskyblock.core.menu.hologram.HologramMenuWrapper;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IPlayerMenuView;
 import org.bukkit.Bukkit;
@@ -59,6 +61,10 @@ public class MenuCommandsImpl implements MenuCommands {
             Player player = context.getPlayer();
             runCommandInternal(menuView, command, player, Bukkit.getConsoleSender(),
                     menuView::closeView, player::closeInventory);
+        } else if (menuLayout instanceof HologramMenuLayout) {
+            HologramMenuWrapper<?> hologramMenu = ((AbstractMenuView<?, ?>) menuView).getHologramMenu();
+            runCommandInternal(menuView, command, context.getPlayer(), Bukkit.getConsoleSender(),
+                    menuView::closeView, () -> hologramMenu.close(true));
         } else {
             DialogWrapper<?> dialog = ((AbstractMenuView<?, ?>) menuView).getDialog();
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(context.getPlayer());

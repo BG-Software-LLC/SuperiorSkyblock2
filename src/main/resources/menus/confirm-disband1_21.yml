@@ -5,28 +5,117 @@
 ##                                                  ##
 ######################################################
 
-title: '&c&lConfirm Disband'
+title: '&c&lDisband Island'
 previous-menu: true
-type: DIALOG
-
-dialog-type: CONFIRMATION
+type: HOLOGRAM
 
 confirm: '@'
 cancel: '^'
 
+# The appearance of the menu. Every key in this section is optional.
+# Sizes are in blocks. Colors are '#AARRGGBB' or '#RRGGBB', and must be inside quotes.
+hologram:
+  distance: 3.0
+  # Hides the crosshair of the player while the menu is open. This is done by putting him in spectator mode
+  # on his side only, which also hides his hand and his hotbar, and stops right clicks from being detected.
+  hide-crosshair: true
+  background:
+    color: '#D0141418'
+    width: 3.4
+    padding: 0.25
+  title:
+    scale: 1.1
+    height: 0.4
+  body:
+    scale: 0.7
+    line-height: 0.24
+  spacing:
+    sections: 0.15
+    buttons: 0.2
+  cursor:
+    # ARROW (the cursor of a mouse), CROSSHAIR (a plus sign), TEXT (any text) or ITEM (any item).
+    type: ARROW
+    # The colors of ARROW and CROSSHAIR cursors, and their colors when they are on a button.
+    color: '&7'
+    hovered-color: '&f'
+    # TEXT cursors use these instead:
+    #text: '&7>'
+    #hovered-text: '&f>'
+    # ITEM cursors use these instead, and their scale is their size in blocks:
+    #item:
+    #  type: FEATHER
+    #hovered-item:
+    #  type: BLAZE_ROD
+    scale: 0.75
+    # The size of the cursor when it is on a button.
+    hovered-scale: 0.75
+    shadow: true
+    # How far the cursor is drawn from the point that clicks, multiplied by its scale.
+    # By default, the tip of an arrow is on that point, and other types are centered on it.
+    #offset-x: 0.025
+    #offset-y: -0.1
+    # How far the cursor can go past the edges of the menu (area: MENU),
+    # and how far it stays from the edges of the screen (area: SCREEN), multiplied by its scale.
+    menu-margin: 0.2
+    screen-margin: 0.1
+    # The time in milliseconds that must pass between two clicks.
+    click-delay: 250
+    # How fast the cursor moves when turning the head. At 1, it stays where the player looks.
+    speed: 1.5
+    # Where the cursor can move: SCREEN lets it reach the edges of the screen, MENU keeps it on the menu.
+    area: SCREEN
+    # The server cannot know the field of view and the shape of the screens of players.
+    # These are used to find the edges of their screens, and default to Minecraft's 70 degrees on a 16:9 screen.
+    screen-fov: 70
+    screen-aspect-ratio: 1.778
+  tooltip:
+    scale: 0.5
+    color: '#E0100010'
+    # The distance between the cursor and the tooltip above it.
+    offset: 0.15
+  # The default appearance of the buttons. Each button can override any of these.
+  buttons:
+    width: 1.45
+    height: 0.42
+    color: '#FF2A2A2A'
+    hovered-color: '#FF3A3A3A'
+    label-scale: 0.75
+    item-scale: 0.3
+
 body:
-  - type: item
-    description: |
-      Are you sure you want to delete your island?
-      &cThis action cannot be undone!
-    show-decorations: false
-    show-tooltip: false
-    item:
-      type: PLAYER_HEAD
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTdmOWM2ZmVmMmFkOTZiM2E1NDY1NjQyYmE5NTQ2NzFiZTFjNDU0M2UyZTI1ZTU2YWVmMGE0N2Q1ZjFmIn19fQ=='
+  - '&7Are you sure you want to'
+  - '&7delete your island?'
+  - '&cThis action cannot be undone!'
+
+# Each line is a row of buttons.
+pattern:
+  - '@ ^'
 
 buttons:
   '@':
-    label: '&aConfirm'
+    label: '&a&lConfirm'
+    hovered-color: '#FF1F5A24'
+    item:
+      type: PLAYER_HEAD
+      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzc0NzJkNjA4ODIxZjQ1YTg4MDUzNzZlYzBjNmZmY2I3ODExNzgyOWVhNWY5NjAwNDFjMmEwOWQxMGUwNGNiNCJ9fX0='
+    tooltip:
+      - '&cYour island and everything'
+      - '&con it will be deleted.'
   '^':
-    label: '&cCancel'
+    label: '&c&lCancel'
+    hovered-color: '#FF6A1A1A'
+    item:
+      type: PLAYER_HEAD
+      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjk1M2IxMmEwOTQ2YjYyOWI0YzA4ODlkNDFmZDI2ZWQyNmZiNzI5ZDRkNTE0YjU5NzI3MTI0YzM3YmI3MGQ4ZCJ9fX0='
+    tooltip:
+      - '&7Keep your island.'
+
+sounds:
+  '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '^':
+    type: BLOCK_ANVIL_PLACE
+    volume: 0.2
+    pitch: 0.2
