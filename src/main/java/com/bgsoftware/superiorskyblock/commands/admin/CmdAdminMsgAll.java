@@ -64,10 +64,13 @@ public class CmdAdminMsgAll implements IAdminIslandCommand {
 
         islands.forEach(island -> island.sendMessage(message));
 
-        if (targetPlayer == null)
-            Message.GLOBAL_MESSAGE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
-        else
+        if (islands.size() > 1) {
+            Message.GLOBAL_MESSAGE_SENT_ALL.send(sender);
+        } else if (targetPlayer == null) {
+            Message.GLOBAL_MESSAGE_SENT_NAME.send(sender, islands.get(0).getName());
+        } else {
             Message.GLOBAL_MESSAGE_SENT.send(sender, targetPlayer.getName());
+        }
     }
 
 }
