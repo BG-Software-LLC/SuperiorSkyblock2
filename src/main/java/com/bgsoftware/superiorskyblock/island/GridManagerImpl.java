@@ -788,11 +788,10 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
 
         String dimensionName = world.getName().toUpperCase(Locale.ENGLISH);
-        try {
-            Dimension.register(dimensionName, world.getEnvironment());
-        } catch (Exception error) {
-            throw new IllegalArgumentException("Dimension with the name " + dimensionName + " already exists.");
-        }
+        Preconditions.checkArgument(Dimension.getByNameOrNull(dimensionName) == null,
+                "Dimension with the name " + dimensionName + " already exists.");
+
+        Dimension.register(dimensionName, world.getEnvironment());
 
         customWorlds.add(world.getUID());
     }

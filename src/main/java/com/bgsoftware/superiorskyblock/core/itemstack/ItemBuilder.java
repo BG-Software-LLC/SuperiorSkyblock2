@@ -257,9 +257,9 @@ public class ItemBuilder {
 
         if (BukkitItems.isValidAndSpawnEgg(this.itemStack)) {
             if (ServerVersion.isLegacy()) {
-                try {
+                if (BukkitItems.SPAWN_EGG_META_SUPPORT) {
                     ((SpawnEggMeta) this.itemMeta).setSpawnedType(entityType);
-                } catch (NoClassDefFoundError error) {
+                } else {
                     this.itemStack.setDurability(entityType.getTypeId());
                 }
             } else {

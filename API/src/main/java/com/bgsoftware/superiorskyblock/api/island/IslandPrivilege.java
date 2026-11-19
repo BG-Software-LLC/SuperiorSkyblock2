@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 
@@ -60,13 +61,21 @@ public class IslandPrivilege implements Enumerable {
      * @param name The name to check.
      */
     public static IslandPrivilege getByName(String name) {
+        IslandPrivilege islandPrivilege = getByNameOrNull(name);
+
+        return Preconditions.checkNotNull(islandPrivilege, "Couldn't find an IslandPrivilege with the name " + name + ".");
+    }
+
+    /**
+     * Get an island privilege by its name, or null if it doesn't exist
+     *
+     * @param name The name to check.
+     */
+    @Nullable
+    public static IslandPrivilege getByNameOrNull(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        IslandPrivilege islandPrivilege = islandPrivileges.get(name.toUpperCase(Locale.ENGLISH));
-
-        Preconditions.checkNotNull(islandPrivilege, "Couldn't find an IslandPrivilege with the name " + name + ".");
-
-        return islandPrivilege;
+        return islandPrivileges.get(name.toUpperCase(Locale.ENGLISH));
     }
 
     /**

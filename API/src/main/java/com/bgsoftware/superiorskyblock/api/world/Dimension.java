@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.world;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 import org.bukkit.World;
@@ -49,13 +50,21 @@ public class Dimension implements Enumerable {
      * @param name The name to check.
      */
     public static Dimension getByName(String name) {
+        Dimension dimension = getByNameOrNull(name);
+
+        return Preconditions.checkNotNull(dimension, "Couldn't find a Dimension with the name " + name + ".");
+    }
+
+    /**
+     * Get a dimension by its name, or null if it doesn't exist.
+     *
+     * @param name The name to check.
+     */
+    @Nullable
+    public static Dimension getByNameOrNull(@Nullable String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        Dimension dimension = dimensions.get(name.toUpperCase(Locale.ENGLISH));
-
-        Preconditions.checkNotNull(dimension, "Couldn't find a Dimension with the name " + name + ".");
-
-        return dimension;
+        return dimensions.get(name.toUpperCase(Locale.ENGLISH));
     }
 
     /**

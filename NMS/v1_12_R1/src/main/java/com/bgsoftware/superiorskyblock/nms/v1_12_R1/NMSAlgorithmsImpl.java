@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -44,6 +45,9 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
+
+    private static final ReflectField<Object> MINECRAFT_SERVER_TPS1 = new ReflectField<>(
+            MinecraftServer.class, Object.class, "tps1");
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
@@ -181,12 +185,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public double getCurrentTps() {
-        try {
+        if (MINECRAFT_SERVER_TPS1.isValid())
             return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
-        }
+
+        //noinspection removal
+        return MinecraftServer.getServer().recentTps[0];
     }
 
     @Override

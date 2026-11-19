@@ -177,11 +177,13 @@ public class Keys {
             return Keys.ofSpawner(data);
         }
 
-        try {
-            return Keys.of(material, Short.parseShort(data));
-        } catch (NumberFormatException e) {
+        // All the short values are valid data, so the data is parsed as an int and checked to be a short.
+        // This also catches data that is not a number, as the default value is not a short either.
+        int durability = Text.parseInt(data, Integer.MIN_VALUE);
+        if (durability < Short.MIN_VALUE || durability > Short.MAX_VALUE)
             return MaterialKey.of(material, data, MaterialKeySource.BLOCK);
-        }
+
+        return Keys.of(material, (short) durability);
     }
 
     /* Spawner keys */

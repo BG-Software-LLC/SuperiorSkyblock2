@@ -159,12 +159,12 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
         if (name == null)
             return null;
 
-        try {
-            return IslandPrivilege.getByName(name);
-        } catch (NullPointerException error) {
-            IslandPrivilege.register(name);
-            return IslandPrivilege.getByName(name);
-        }
+        IslandPrivilege islandPrivilege = IslandPrivilege.getByNameOrNull(name);
+        if (islandPrivilege != null)
+            return islandPrivilege;
+
+        IslandPrivilege.register(name);
+        return IslandPrivilege.getByName(name);
     }
 
     @Nullable
@@ -172,12 +172,12 @@ public class EntityCategoriesSection implements SettingsManager.EntityCategories
         if (name == null)
             return null;
 
-        try {
-            return IslandFlag.getByName(name);
-        } catch (NullPointerException error) {
-            IslandFlag.register(name);
-            return IslandFlag.getByName(name);
-        }
+        IslandFlag islandFlag = IslandFlag.getByNameOrNull(name);
+        if (islandFlag != null)
+            return islandFlag;
+
+        IslandFlag.register(name);
+        return IslandFlag.getByName(name);
     }
 
 }

@@ -43,6 +43,10 @@ public class NMSUtils {
 
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newConcurrentMap();
 
+    // These fields of World don't exist in some forks of 1.8, such as Taco.
+    public static final boolean HAS_WORLD_TILE_ENTITY_LIST_FIELD = new ReflectField<>(World.class, List.class, "tileEntityList").isValid();
+    public static final boolean HAS_WORLD_H_FIELD = new ReflectField<>(World.class, List.class, "h").isValid();
+
     public static final ObjectsPool<ObjectsPools.Wrapper<BlockPosition.MutableBlockPosition>> BLOCK_POS_POOL =
             ObjectsPools.createNewPool(() -> new BlockPosition.MutableBlockPosition(0, 0, 0));
 
