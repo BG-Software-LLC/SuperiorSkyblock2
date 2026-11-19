@@ -135,6 +135,9 @@ public class Keys {
         // Therefore, this code is duplicated from the above method, but
         // creates the baseKey directly, not from ItemStack.
         Key baseKey = MaterialKey.of(material, data, MaterialKeySource.ITEM);
+        if (material != Material.AIR && !material.isLegacy() && !material.isItem()) {
+            return baseKey;
+        }
 
         try {
             // Now we try to convert the key.
