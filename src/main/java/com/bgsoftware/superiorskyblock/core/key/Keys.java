@@ -24,6 +24,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Method;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -135,7 +137,7 @@ public class Keys {
         // Therefore, this code is duplicated from the above method, but
         // creates the baseKey directly, not from ItemStack.
         Key baseKey = MaterialKey.of(material, data, MaterialKeySource.ITEM);
-        if (material == Material.AIR || material.isLegacy() || !material.isItem()) {
+        if (ItemConversion.SKIPPED_MATERIALS.contains(material)) {
             return baseKey;
         }
 
@@ -218,6 +220,29 @@ public class Keys {
                 .map(EntityTypeKey::of).orElse(null);
 
         return SpawnerKey.of(entityTypeKey);
+    }
+
+    private static class ItemConversion {
+
+        static final EnumSet<Material> SKIPPED_MATERIALS = findSkippedMaterials();
+
+        private static EnumSet<Material> findSkippedMaterials() {
+            EnumSet<Material> skipped = EnumSet.of(Material.AIR);
+            // The shared code compiles against Bukkit 1.8. Resolve these methods once on modern servers.
+            try {
+                Method isLegacy = Material.class.getMethod("isLegacy");
+                Method isItem = Material.class.getMethod("isItem");
+                for (Material material : Material.values()) {
+                    if (material != Material.AIR && ((boolean) isLegacy.invoke(material) || !(boolean) isItem.invoke(material))) {
+                        skipped.add(material);
+                    }
+                }
+            } catch (ReflectiveOperationException error) {
+                throw new IllegalStateException("Cannot determine which materials support item conversion", error);
+            }
+            return skipped;
+        }
+
     }
 
 }
