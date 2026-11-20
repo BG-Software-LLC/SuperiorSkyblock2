@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.stackedblocks.StackedBlocksInteractionService;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordFlags;
@@ -13,13 +14,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.key.category.BuiltinKeyCategories;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_Dev999;
 import com.bgsoftware.superiorskyblock.external.slimefun.ProtectionModule_RC13;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServiceHelper;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
@@ -35,6 +37,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Collections;
+import java.util.List;
 
 public class SlimefunHook {
 
@@ -89,34 +94,50 @@ public class SlimefunHook {
     }
 
     private static boolean checkPermission(OfflinePlayer offlinePlayer, Location location, String protectableAction) {
-        Island island = plugin.getGrid().getIslandAt(location);
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
-
-        if (!plugin.getGrid().isIslandsWorld(location.getWorld()))
+        if (!plugin.getGrid().isIslandsWorld(location.getWorld())) {
             return true;
-
-        if (protectableAction.equals("PVP") || protectableAction.equals("ATTACK_PLAYER"))
-            return island != null && island.hasSettingsEnabled(IslandFlags.PVP);
-
-        IslandPrivilege islandPrivilege;
-
-        switch (protectableAction) {
-            case "BREAK_BLOCK":
-                islandPrivilege = IslandPrivileges.BREAK;
-                break;
-            case "PLACE_BLOCK":
-                islandPrivilege = IslandPrivileges.BUILD;
-                break;
-            case "ACCESS_INVENTORIES":
-            case "INTERACT_BLOCK":
-                islandPrivilege = plugin.getSettings().getInteractablesMap().getRequiredPrivilege(ConstantKeys.CHEST);
-                break;
-            default:
-                islandPrivilege = IslandPrivileges.BREAK;
-                break;
         }
 
-        return island != null && islandPrivilege != null && island.hasPermission(superiorPlayer, islandPrivilege);
+        Island island = plugin.getGrid().getIslandAt(location);
+
+        if (island == null) {
+            return false;
+        }
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
+
+        if (protectableAction.equals("PVP") || protectableAction.equals("ATTACK_PLAYER")) {
+            return island.hasSettingsEnabled(IslandFlags.PVP);
+        }
+
+        List<IslandPrivilege> islandPrivileges;
+        switch (protectableAction) {
+            case "ACCESS_INVENTORIES":
+            case "INTERACT_BLOCK": {
+                islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(ConstantKeys.CHEST);
+                break;
+            }
+            case "PLACE_BLOCK": {
+                IslandPrivilege placePrivilege = plugin.getSettings().getBlockCategoriesMapping()
+                        .getCategoryByKey(BuiltinKeyCategories.ALL).getRequiredPrivilege(KeyCategory.Action.PLACE);
+                islandPrivileges = placePrivilege == null ? Collections.emptyList() : Collections.singletonList(placePrivilege);
+                break;
+            }
+            default: {
+                IslandPrivilege breakPrivilege = plugin.getSettings().getBlockCategoriesMapping()
+                        .getCategoryByKey(BuiltinKeyCategories.ALL).getRequiredPrivilege(KeyCategory.Action.BREAK);
+                islandPrivileges = breakPrivilege == null ? Collections.emptyList() : Collections.singletonList(breakPrivilege);
+                break;
+            }
+        }
+
+        for (IslandPrivilege islandPrivilege : islandPrivileges) {
+            if (!island.hasPermission(superiorPlayer, islandPrivilege)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static class AndroidMineListener implements Listener {
