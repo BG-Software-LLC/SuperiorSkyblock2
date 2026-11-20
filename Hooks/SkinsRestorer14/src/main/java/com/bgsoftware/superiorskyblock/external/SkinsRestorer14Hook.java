@@ -22,6 +22,8 @@ public class SkinsRestorer14Hook {
 
     private static final ReflectMethod<Object> SKINS_RESTORER_GET_SKIN = new ReflectMethod<>(SkinsRestorerAPI.class, "getSkinData", String.class);
 
+    private static final boolean DIRECT_GET_SKIN_DATA = new ReflectMethod<>(SkinsRestorerAPI.class, "getSkinData", IProperty.class).isValid();
+
     private static SuperiorSkyblockPlugin plugin;
 
     public static boolean isCompatible() {
@@ -65,9 +67,9 @@ public class SkinsRestorer14Hook {
 
     private static Property getSkin(SuperiorPlayer superiorPlayer) {
         IProperty property;
-        try {
+        if (DIRECT_GET_SKIN_DATA) {
             property = SkinsRestorerAPI.getApi().getSkinData(superiorPlayer.getName());
-        } catch (Throwable ex) {
+        } else {
             property = (IProperty) SKINS_RESTORER_GET_SKIN.invoke(SkinsRestorerAPI.getApi(), superiorPlayer.getName());
         }
 

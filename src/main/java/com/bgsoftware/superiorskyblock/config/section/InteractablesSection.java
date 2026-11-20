@@ -130,7 +130,7 @@ public class InteractablesSection implements SettingsManager.Interactables {
         islandPrivileges.addAll(this.privilegeToInteractables.keySet());
 
         boolean copyHeaderComment = true;
-        for(IslandPrivilege islandPrivilege : islandPrivileges) {
+        for (IslandPrivilege islandPrivilege : islandPrivileges) {
             Set<String> keys = new TreeSet<>(String::compareTo);
             this.privilegeToInteractables.get(islandPrivilege).forEach(key -> keys.add(key.toString()));
             cfg.set(islandPrivilege.getName(), new LinkedList<>(keys));
@@ -156,7 +156,7 @@ public class InteractablesSection implements SettingsManager.Interactables {
             Key blockKey = Key.ofMaterialAndData(blockType);
 
             IslandPrivilege islandPrivilege;
-            try {
+            if (blockKey instanceof MaterialKey) {
                 Material material = ((MaterialKey) blockKey).getMaterial();
 
                 if (Materials.isChest(material)) {
@@ -177,8 +177,7 @@ public class InteractablesSection implements SettingsManager.Interactables {
                 } else {
                     islandPrivilege = PRIVILEGE_INTERACT.get();
                 }
-
-            } catch (Throwable ignored) {
+            } else {
                 // In the case this is a custom block or something, default to INTERACT privilege.
                 islandPrivilege = PRIVILEGE_INTERACT.get();
             }
@@ -198,12 +197,7 @@ public class InteractablesSection implements SettingsManager.Interactables {
 
     private static void loadInternal(YamlConfiguration cfg, Map<IslandPrivilege, KeySet> interactablesMap) {
         for (String islandPrivilegeName : cfg.getKeys(false)) {
-            try {
-                IslandPrivilege.register(islandPrivilegeName);
-            } catch (IllegalStateException ignored) {
-            }
-
-            IslandPrivilege islandPrivilege = IslandPrivilege.getByName(islandPrivilegeName);
+            IslandPrivilege islandPrivilege = getOrRegisterPrivilege(islandPrivilegeName);
             KeySet keys = KeySets.createHashSet(KeyIndicator.MATERIAL, cfg.getStringList(islandPrivilegeName));
             interactablesMap.put(islandPrivilege, keys);
         }
@@ -213,14 +207,18 @@ public class InteractablesSection implements SettingsManager.Interactables {
         return new LazyReference<IslandPrivilege>() {
             @Override
             protected IslandPrivilege create() {
-                try {
-                    IslandPrivilege.register(name);
-                } catch (IllegalStateException ignored) {
-                }
-
-                return IslandPrivilege.getByName(name);
+                return getOrRegisterPrivilege(name);
             }
         };
+    }
+
+    private static IslandPrivilege getOrRegisterPrivilege(String name) {
+        IslandPrivilege islandPrivilege = IslandPrivilege.getByNameOrNull(name);
+        if (islandPrivilege != null)
+            return islandPrivilege;
+
+        IslandPrivilege.register(name);
+        return IslandPrivilege.getByName(name);
     }
 
 }

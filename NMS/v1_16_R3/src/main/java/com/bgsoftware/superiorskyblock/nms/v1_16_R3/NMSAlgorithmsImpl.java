@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -65,6 +66,9 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
+
+    private static final ReflectField<Object> MINECRAFT_SERVER_TPS1 = new ReflectField<>(
+            MinecraftServer.class, Object.class, "tps1");
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -235,12 +239,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public double getCurrentTps() {
-        try {
+        if (MINECRAFT_SERVER_TPS1.isValid())
             return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
-        }
+
+        //noinspection removal
+        return MinecraftServer.getServer().recentTps[0];
     }
 
     @Override

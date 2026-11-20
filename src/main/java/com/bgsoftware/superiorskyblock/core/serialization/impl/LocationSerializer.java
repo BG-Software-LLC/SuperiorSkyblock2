@@ -51,8 +51,8 @@ public class LocationSerializer implements ISerializer<Location, String> {
             double z = Double.parseDouble(sections[3]);
             if (center && !sections[3].contains(".")) z += 0.5;
 
-            float yaw = sections.length > 5 ? Float.parseFloat(sections[4]) : 0;
-            float pitch = sections.length > 6 ? Float.parseFloat(sections[5]) : 0;
+            float yaw = sections.length > 4 ? Float.parseFloat(sections[4]) : 0;
+            float pitch = sections.length > 5 ? Float.parseFloat(sections[5]) : 0;
 
             return new LazyWorldLocation(sections[0], x, y, z, yaw, pitch);
         } catch (Exception error) {

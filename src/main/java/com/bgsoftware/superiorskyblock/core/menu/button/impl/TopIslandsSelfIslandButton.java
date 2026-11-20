@@ -124,7 +124,7 @@ public class TopIslandsSelfIslandButton extends AbstractMenuViewButton<MenuTopIs
                     List<SuperiorPlayer> members = new LinkedList<>(island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader()));
                     String memberFormat = line.split("\\{4}:")[1];
                     if (members.isEmpty()) {
-                        lore.add(memberFormat.replace("{}", IslandUtils.DEFAULT_NONE_VALUE));
+                        newLore.add(memberFormat.replace("{}", IslandUtils.DEFAULT_NONE_VALUE));
                     } else {
                         if (plugin.getSettings().getTopIslandMembersSorting() != TopIslandMembersSorting.NAMES)
                             members.sort(plugin.getSettings().getTopIslandMembersSorting().getComparator());

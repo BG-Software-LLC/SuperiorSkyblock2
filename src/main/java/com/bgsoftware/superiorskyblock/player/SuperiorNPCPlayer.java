@@ -58,7 +58,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     @Override
     public void release() {
         this.npc = null;
-
+        POOL.release(this);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     @Override
     public void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
-        if(teleportResult != null)
+        if (teleportResult != null)
             teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
     }
 
@@ -232,7 +232,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     @Override
     public void teleportWithResult(Island island, Dimension dimension, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
-        if(teleportResult != null)
+        if (teleportResult != null)
             teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
     }
 
@@ -244,7 +244,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
 
     @Override
     public void teleportWithResult(Island island, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
-        if(teleportResult != null)
+        if (teleportResult != null)
             teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
     }
 

@@ -113,7 +113,7 @@ public class SpawnIsland implements Island {
         DEFAULT_SPAWN_FLAGS_CACHE = new UnparsedEnumerateSet<IslandFlag>(IslandFlag.values()) {
             @Override
             protected IslandFlag parseName(String name) {
-                return IslandFlag.getByName(name);
+                return IslandFlag.getByNameOrNull(name);
             }
 
             @Override
@@ -126,7 +126,7 @@ public class SpawnIsland implements Island {
         DEFAULT_SPAWN_PRIVILEGES_CACHE = new UnparsedEnumerateSet<IslandPrivilege>(IslandPrivilege.values()) {
             @Override
             protected IslandPrivilege parseName(String name) {
-                return IslandPrivilege.getByName(name);
+                return IslandPrivilege.getByNameOrNull(name);
             }
 
             @Override

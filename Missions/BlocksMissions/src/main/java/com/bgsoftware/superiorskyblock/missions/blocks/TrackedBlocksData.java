@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.IntSupplier;
 
 public class TrackedBlocksData {
 
@@ -34,16 +32,14 @@ public class TrackedBlocksData {
         TRACKED_BLOCKS.computeIfAbsent(chunkKey, key -> new ChunkBitSet()).set(block);
     }
 
-    public boolean untrack(long chunkKey, IntSupplier block) {
-        return Optional.ofNullable(TRACKED_BLOCKS.get(chunkKey))
-                .map(bitSet -> bitSet.clear(block.getAsInt()))
-                .orElse(false);
+    public boolean untrack(long chunkKey, int block) {
+        ChunkBitSet bitSet = TRACKED_BLOCKS.get(chunkKey);
+        return bitSet != null && bitSet.clear(block);
     }
 
-    public boolean contains(long chunkKey, IntSupplier block) {
-        return Optional.ofNullable(TRACKED_BLOCKS.get(chunkKey))
-                .map(bitSet -> bitSet.get(block.getAsInt()))
-                .orElse(false);
+    public boolean contains(long chunkKey, int block) {
+        ChunkBitSet bitSet = TRACKED_BLOCKS.get(chunkKey);
+        return bitSet != null && bitSet.get(block);
     }
 
     public Map<Long, ChunkBitSet> getBlocks() {

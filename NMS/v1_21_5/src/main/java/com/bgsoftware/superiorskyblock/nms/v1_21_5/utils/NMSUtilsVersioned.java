@@ -362,16 +362,30 @@ public class NMSUtilsVersioned {
         return compoundTag.getLongOr(key, def);
     }
 
+    private static Component parseSignLine(String line) {
+        String trimmedLine = line.trim();
+
+        if (!trimmedLine.isEmpty()) {
+            char firstChar = trimmedLine.charAt(0);
+            // JSON text components start with one of these characters, other lines are plain text.
+            if (firstChar != '{' && firstChar != '[' && firstChar != '"')
+                return CraftChatMessage.fromString(line)[0];
+        }
+
+        try {
+            return CraftChatMessage.fromJSON(line);
+        } catch (JsonParseException error) {
+            // Plain text lines that start like JSON, such as "[Shop]".
+            return CraftChatMessage.fromString(line)[0];
+        }
+    }
+
     private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {
         blockEntityCompound.getCompound(key).ifPresent(textCompound -> {
             ListTag messages = textCompound.getListOrEmpty("messages");
             List<Component> textLines = new ArrayList<>();
             for (net.minecraft.nbt.Tag lineTag : messages) {
-                try {
-                    textLines.add(CraftChatMessage.fromJSON(lineTag.asString().orElseThrow()));
-                } catch (JsonParseException error) {
-                    textLines.add(CraftChatMessage.fromString(lineTag.asString().orElseThrow())[0]);
-                }
+                textLines.add(parseSignLine(lineTag.asString().orElseThrow()));
             }
 
             while (textLines.size() < 4)

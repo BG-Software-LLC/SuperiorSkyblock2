@@ -21,11 +21,8 @@ public enum PluginLoadingStage {
     }
 
     public PluginLoadingStage next() {
-        try {
-            return PluginLoadingStage.values()[this.ordinal() + 1];
-        } catch (ArrayIndexOutOfBoundsException error) {
-            return this;
-        }
+        PluginLoadingStage[] stages = PluginLoadingStage.values();
+        return this.ordinal() + 1 < stages.length ? stages[this.ordinal() + 1] : this;
     }
 
 }

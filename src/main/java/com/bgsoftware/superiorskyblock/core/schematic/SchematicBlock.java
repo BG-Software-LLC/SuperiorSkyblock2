@@ -89,8 +89,10 @@ public class SchematicBlock {
         String id = this.tileEntityData.getString("id").orElse(null);
 
         if (id == null) {
-            Log.warn("Weird tile-entity data detected: " + this.tileEntityData.getValue());
-            throw new RuntimeException("Detected tile-entity data with no 'id' key.");
+            // Place the block without its tile-entity data rather than failing the whole schematic.
+            Log.warn("Weird tile-entity data detected, skipping it: " + this.tileEntityData.getValue());
+            this.tileEntityData = null;
+            return;
         }
 
         if (isSignId(id)) {

@@ -25,6 +25,7 @@ import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.handlers.SystemManager;
 import com.bgsoftware.wildstacker.api.objects.StackedBarrel;
+import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -42,6 +43,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_AutoDetect, StackedBlocksSnapshotProvider {
+
+    private static final boolean BARRELS_ITEMS_SUPPORT = isBarrelsItemsSupported();
 
     private static boolean registered = false;
 
@@ -80,12 +83,12 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
     public Collection<Pair<Key, Integer>> getBlocks(World world, int chunkX, int chunkZ) {
         try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
             return WildStackerSnapshotsContainer.accessStackedSnapshot(chunkPosition, stackedSnapshot -> {
-                try {
+                if (BARRELS_ITEMS_SUPPORT) {
                     return stackedSnapshot.getAllBarrelsItems().values().stream()
                             .filter(entry -> entry.getValue() != null)
                             .map(entry -> new Pair<>(Key.of(entry.getValue()), entry.getKey()))
                             .collect(Collectors.toSet());
-                } catch (Throwable ex) {
+                } else {
                     return stackedSnapshot.getAllBarrels().values().stream()
                             .map(entry -> new Pair<>(Key.of(entry.getValue(), (short) 0), entry.getKey()))
                             .collect(Collectors.toSet());
@@ -205,7 +208,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location location = block.getLocation(wrapper.getHandle());
 
-                if(!WildStackerAPI.getWildStacker().getSystemManager().isStackedBarrel(location))
+                if (!WildStackerAPI.getWildStacker().getSystemManager().isStackedBarrel(location))
                     return;
 
                 stackedBarrel = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
@@ -233,6 +236,15 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
     private static Key getBarrelKey(StackedBarrel barrel) {
         ItemStack barrelItem = barrel.getBarrelItem(1);
         return ServerVersion.isLegacy() ? Key.of(barrelItem) : Key.of(barrelItem.getType());
+    }
+
+    private static boolean isBarrelsItemsSupported() {
+        try {
+            StackedSnapshot.class.getMethod("getAllBarrelsItems");
+            return true;
+        } catch (NoSuchMethodException error) {
+            return false;
+        }
     }
 
 }

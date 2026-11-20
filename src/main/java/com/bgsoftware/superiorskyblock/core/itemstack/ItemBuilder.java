@@ -166,16 +166,16 @@ public class ItemBuilder {
         firstLine = Formatters.COLOR_FORMATTER.format(firstLine);
         newLore.add(firstLine);
 
-        for (String line : listLine) {
-            newLore.add(ChatColor.getLastColors(firstLine) + Formatters.COLOR_FORMATTER.format(line));
-        }
+        String firstLineColors = ChatColor.getLastColors(firstLine);
 
-        if (newLore.size() > 10) {
-            for (int i = 10; i < newLore.size(); i++) {
-                newLore.remove(newLore.get(i));
+        // Show at most 10 lines; if there are more, cut there and end with "...".
+        for (String line : listLine) {
+            if (newLore.size() == 10) {
+                newLore.add(firstLineColors + "...");
+                break;
             }
 
-            newLore.add(ChatColor.getLastColors(firstLine) + "...");
+            newLore.add(firstLineColors + Formatters.COLOR_FORMATTER.format(line));
         }
 
         this.lore = newLore;
@@ -257,9 +257,9 @@ public class ItemBuilder {
 
         if (BukkitItems.isValidAndSpawnEgg(this.itemStack)) {
             if (ServerVersion.isLegacy()) {
-                try {
+                if (BukkitItems.SPAWN_EGG_META_SUPPORT) {
                     ((SpawnEggMeta) this.itemMeta).setSpawnedType(entityType);
-                } catch (NoClassDefFoundError error) {
+                } else {
                     this.itemStack.setDurability(entityType.getTypeId());
                 }
             } else {

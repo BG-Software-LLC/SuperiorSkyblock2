@@ -408,13 +408,14 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
     @Nullable
     private static Dimension getDimensionSafe(String dimensionName) {
-        try {
-            return Dimension.getByName(dimensionName);
-        } catch (Exception e) {
+        Dimension dimension = Dimension.getByNameOrNull(dimensionName);
+
+        if (dimension == null) {
             Log.warnFromFile("biomes.yml", "Couldn't convert '" + dimensionName +
                     "' into an Dimension, skipping...");
-            return null;
         }
+
+        return dimension;
     }
 
 }

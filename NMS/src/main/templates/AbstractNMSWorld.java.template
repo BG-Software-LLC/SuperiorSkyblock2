@@ -81,6 +81,8 @@ public abstract class AbstractNMSWorld implements NMSWorld {
             CustomChunkGenerator.class, ChunkGenerator.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
     private static final ReflectField<Integer> NOISE_GENERATOR_SETTINGS_SEA_LEVEL = new ReflectField<Integer>(
             NoiseGeneratorSettings.class, Integer.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
+    private static final ReflectField<ServerLevel> WORLD_BORDER_WORLD = new ReflectField<>(WorldBorder.class,
+            ServerLevel.class, "world");
 
     protected final SuperiorSkyblockPlugin plugin;
 
@@ -178,10 +180,8 @@ public abstract class AbstractNMSWorld implements NMSWorld {
             Location center = island.getCenter(dimension);
 
             worldBorder = new WorldBorder();
-            try {
+            if (WORLD_BORDER_WORLD.isValid())
                 worldBorder.world = serverLevel;
-            } catch (Throwable ignored) {
-            }
             worldBorder.setWarningBlocks(0);
             worldBorder.setCenter(center.getX(), center.getZ());
 

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
@@ -17,6 +18,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class CropsTickingTileEntity extends TileEntity implements ITickable {
+
+    private static final ReflectMethod<Void> TILE_ENTITY_SET_CURRENT_CHUNK = new ReflectMethod<>(
+            TileEntity.class, "setCurrentChunk", Chunk.class);
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -36,10 +40,8 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
         ChunkCoordIntPair chunkCoord = chunk.getPos();
         setLocation(chunk.getWorld(), new BlockPosition(chunkCoord.x << 4, 1, chunkCoord.z << 4));
 
-        try {
-            // Not a method of Spigot - fixes https://github.com/OmerBenGera/SuperiorSkyblock2/issues/5
+        if (TILE_ENTITY_SET_CURRENT_CHUNK.isValid()) {
             setCurrentChunk(chunk);
-        } catch (Throwable ignored) {
         }
 
         assert world != null;

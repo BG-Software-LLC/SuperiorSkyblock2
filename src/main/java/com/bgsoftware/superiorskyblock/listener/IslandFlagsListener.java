@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
@@ -48,21 +49,27 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private final Int2ObjectMapView<ProjectileSource> originalFireballsDamager = CollectionsFactory.createInt2ObjectArrayMap();
 
-    private World spawnIslandWorld;
+    @Nullable
+    private static volatile World spawnIslandWorld;
 
     public IslandFlagsListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
         this.registerListeners();
     }
 
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SPAWN_UPDATE_EVENT, IslandFlagsListener::onSpawnUpdate);
+    }
+
     /* INTERNAL EVENTS */
 
-    private void onSpawnUpdate() {
+    private static void onSpawnUpdate() {
         // We want to optimize island checks only for island worlds
         // However, if the spawn world is not an islands world, we want to check it as well.
+        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(
                 plugin.getSettings().getWorlds().getDefaultWorldDimension());
-        this.spawnIslandWorld = spawnLocation.getWorld();
+        spawnIslandWorld = spawnLocation.getWorld();
     }
 
     /* ENTITY SPAWNING */
@@ -352,19 +359,24 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             return;
         }
 
-        BukkitEntities.getPlayerSource(entity).ifPresent(shooterPlayer -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                if (!preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.PVP))
-                    return;
-            }
+        Player shooterPlayer = BukkitEntities.getPlayerSource(entity);
+        if (shooterPlayer == null) {
+            return;
+        }
 
-            List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            if (!preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.PVP))
+                return;
+        }
 
-            BukkitExecutor.sync(() -> nearbyEntities.forEach(nearbyEntity -> {
+        List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
+
+        BukkitExecutor.sync(() -> {
+            for (Entity nearbyEntity : nearbyEntities) {
                 if (nearbyEntity instanceof LivingEntity && !nearbyEntity.getUniqueId().equals(shooterPlayer.getUniqueId()))
                     ((LivingEntity) nearbyEntity).removePotionEffect(PotionEffectType.POISON);
-            }), 1L);
-        });
+            }
+        }, 1L);
     }
 
     /* INTERNAL */
@@ -393,11 +405,10 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_IGNITE_EVENT, GameEventPriority.LOWEST, this::onBlockIgnite);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.LOWEST, this::onEndermanGrief);
         registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.LOWEST, this::onPoisonAttack);
-        plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SPAWN_UPDATE_EVENT, this::onSpawnUpdate);
     }
 
     private boolean shouldIgnoreWorldEvents(@Nullable World world) {
-        return world == null || (world != this.spawnIslandWorld && !plugin.getGrid().isIslandsWorld(world));
+        return world == null || (world != spawnIslandWorld && !plugin.getGrid().isIslandsWorld(world));
     }
 
     private static EnumSet<CreatureSpawnEvent.SpawnReason> initializeNaturalSpawnReasons() {
