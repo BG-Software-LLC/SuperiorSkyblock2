@@ -41,6 +41,8 @@ public class BukkitEntities {
     @Nullable
     private static final EntityType ZOMBIE_NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "ZOMBIE_NAUTILUS");
 
+    private static final boolean ABSTRACT_HORSE_SUPPORT = isAbstractHorseSupported();
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Synchronized<Int2ObjectMapView<List<ItemStack>>> entityContent =
@@ -92,22 +94,19 @@ public class BukkitEntities {
                 entityEquipment.add(horseInventory.getArmor());
         }
 
-        try {
-            if (livingEntity instanceof AbstractHorse) {
-                AbstractHorseInventory horseInventory = ((AbstractHorse) livingEntity).getInventory();
-                horseInventory.forEach(itemStack -> {
-                    if (itemStack != null)
-                        entityEquipment.add(itemStack);
-                });
+        if (ABSTRACT_HORSE_SUPPORT && livingEntity instanceof AbstractHorse) {
+            AbstractHorseInventory horseInventory = ((AbstractHorse) livingEntity).getInventory();
+            horseInventory.forEach(itemStack -> {
+                if (itemStack != null)
+                    entityEquipment.add(itemStack);
+            });
 
-                entityEquipment.add(new ItemStack(Material.CHEST));
+            entityEquipment.add(new ItemStack(Material.CHEST));
 
-                if (horseInventory.getSaddle() != null)
-                    entityEquipment.add(horseInventory.getSaddle());
-                if (horseInventory instanceof HorseInventory && ((HorseInventory) horseInventory).getArmor() != null)
-                    entityEquipment.add(((HorseInventory) horseInventory).getArmor());
-            }
-        } catch (Throwable ignored) {
+            if (horseInventory.getSaddle() != null)
+                entityEquipment.add(horseInventory.getSaddle());
+            if (horseInventory instanceof HorseInventory && ((HorseInventory) horseInventory).getArmor() != null)
+                entityEquipment.add(((HorseInventory) horseInventory).getArmor());
         }
 
         return entityEquipment.isEmpty() ? Collections.emptyList() : entityEquipment;
@@ -170,6 +169,15 @@ public class BukkitEntities {
 
     public static boolean isNautilus(EntityType entityType) {
         return entityType == NAUTILUS_TYPE || entityType == ZOMBIE_NAUTILUS_TYPE;
+    }
+
+    private static boolean isAbstractHorseSupported() {
+        try {
+            Class.forName("org.bukkit.entity.AbstractHorse");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
     }
 
 }

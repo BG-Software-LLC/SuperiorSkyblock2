@@ -114,7 +114,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         WORLD_PERMISSIONS_CACHE = new UnparsedEnumerateSet<IslandPrivilege>(IslandPrivilege.values()) {
             @Override
             protected IslandPrivilege parseName(String name) {
-                return IslandPrivilege.getByName(name);
+                return IslandPrivilege.getByNameOrNull(name);
             }
 
             @Override

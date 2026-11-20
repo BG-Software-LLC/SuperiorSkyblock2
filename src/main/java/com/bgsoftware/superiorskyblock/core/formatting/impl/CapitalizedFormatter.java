@@ -21,12 +21,14 @@ public class CapitalizedFormatter implements IFormatter<String> {
     public String format(String value) {
         StringBuilder formattedKey = new StringBuilder();
 
-        try {
-            String[] split = value.split(":");
-            //Checking if the type is <TYPE>:<INTEGER>
-            Integer.parseInt(split[1]);
-            value = split[0];
-        } catch (Throwable ignored) {
+        //Checking if the type is <TYPE>:<INTEGER>
+        int separatorIndex = value.indexOf(':');
+        if (separatorIndex != -1) {
+            int nextSeparatorIndex = value.indexOf(':', separatorIndex + 1);
+            String data = nextSeparatorIndex == -1 ? value.substring(separatorIndex + 1) :
+                    value.substring(separatorIndex + 1, nextSeparatorIndex);
+            if (Text.isInt(data))
+                value = value.substring(0, separatorIndex);
         }
 
         value = value.replace(":", "_-_");

@@ -82,6 +82,9 @@ public class NMSChunksImpl implements NMSChunks {
             BiomeStorage.class, BiomeBase[].class, "h");
     private static final ReflectField<Collection<Entity>[]> ENTITY_SLICE_ARRAY = new ReflectField<>(
             Chunk.class, null, "entitySlices");
+    // Spigot and Paper keep the entity slices of chunks as lists, while some forks keep vanilla's EntitySlice.
+    private static final boolean ENTITY_SLICES_LISTS = new ReflectField<>(
+            Chunk.class, List[].class, "entitySlices").isValid();
 
     private static boolean creatingFakeEntities = false;
 
@@ -529,10 +532,10 @@ public class NMSChunksImpl implements NMSChunks {
         Collection<Entity>[] entitySlices = null;
         Function<Void, Collection<Entity>> entitySliceCreationFunction = null;
 
-        try {
+        if (ENTITY_SLICES_LISTS) {
             entitySlices = chunk.entitySlices;
             entitySliceCreationFunction = v -> new UnsafeList<>();
-        } catch (Throwable ex) {
+        } else {
             try {
                 entitySlices = ENTITY_SLICE_ARRAY.get(chunk);
                 entitySliceCreationFunction = v -> new net.minecraft.server.v1_16_R3.EntitySlice<>(Entity.class);

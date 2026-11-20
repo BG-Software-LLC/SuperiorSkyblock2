@@ -32,6 +32,8 @@ public class BukkitItems {
     @Nullable
     private static final Material END_CRYSTAL_ITEM_TYPE = EnumHelper.getEnum(Material.class, "END_CRYSTAL");
 
+    public static final boolean SPAWN_EGG_META_SUPPORT = isSpawnEggMetaSupported();
+
     private BukkitItems() {
 
     }
@@ -113,12 +115,11 @@ public class BukkitItems {
         }
 
         if (ServerVersion.isLegacy()) {
-            try {
-                SpawnEggMeta spawnEggMeta = (SpawnEggMeta) itemStack.getItemMeta();
-                return spawnEggMeta.getSpawnedType() == null ? EntityType.PIG : spawnEggMeta.getSpawnedType();
-            } catch (NoClassDefFoundError error) {
+            if (!SPAWN_EGG_META_SUPPORT)
                 return EntityType.fromId(itemStack.getDurability());
-            }
+
+            SpawnEggMeta spawnEggMeta = (SpawnEggMeta) itemStack.getItemMeta();
+            return spawnEggMeta.getSpawnedType() == null ? EntityType.PIG : spawnEggMeta.getSpawnedType();
         } else {
             return EntityType.fromName(itemStack.getType().name().replace("_SPAWN_EGG", ""));
         }
@@ -151,6 +152,15 @@ public class BukkitItems {
         }
 
         return itemType == Material.ARMOR_STAND || isValidAndSpawnEgg(itemType);
+    }
+
+    private static boolean isSpawnEggMetaSupported() {
+        try {
+            Class.forName("org.bukkit.inventory.meta.SpawnEggMeta");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
     }
 
 }

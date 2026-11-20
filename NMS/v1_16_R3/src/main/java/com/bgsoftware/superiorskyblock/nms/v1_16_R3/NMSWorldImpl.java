@@ -68,6 +68,8 @@ public class NMSWorldImpl implements NMSWorld {
 
     private static final ReflectMethod<Float> SOUND_VOLUME = new ReflectMethod<>(SoundEffectType.class, "a");
     private static final ReflectMethod<Float> SOUND_PITCH = new ReflectMethod<>(SoundEffectType.class, "b");
+    private static final ReflectMethod<Integer> WORLD_GET_MIN_HEIGHT = new ReflectMethod<>(
+            org.bukkit.World.class, "getMinHeight");
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
             Object.class, "chunkPacketBlockController").removeFinal();
 
@@ -333,11 +335,7 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public int getMinHeight(org.bukkit.World world) {
-        try {
-            return world.getMinHeight();
-        } catch (Throwable error) {
-            return 0;
-        }
+        return WORLD_GET_MIN_HEIGHT.isValid() ? world.getMinHeight() : 0;
     }
 
     @Override

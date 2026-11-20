@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 public class TimingsWrapper implements ITimings {
 
-    private static final ReflectMethod<Timing> START_TIMING = new ReflectMethod<>(Timing.class, "startTiming");
+    private static final ReflectMethod<Timing> START_TIMING = new ReflectMethod<>(Timing.class, "startTiming", Timing.class);
 
     @Nullable
     private final Timing handle;
@@ -45,10 +45,10 @@ public class TimingsWrapper implements ITimings {
     @Override
     public void startTiming() {
         if (this.handle != null) {
-            try {
-                this.handle.startTiming();
-            } catch (Throwable error) {
+            if (START_TIMING.isValid()) {
                 START_TIMING.invoke(this.handle);
+            } else {
+                this.handle.startTiming();
             }
         }
     }

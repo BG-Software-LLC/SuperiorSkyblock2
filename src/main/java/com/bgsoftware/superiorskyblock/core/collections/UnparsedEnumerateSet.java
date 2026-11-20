@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.collections;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 
 import java.util.Collection;
@@ -18,11 +19,10 @@ public abstract class UnparsedEnumerateSet<K extends Enumerable> extends Enumera
     public boolean addName(String name) {
         if (name == null)
             return false;
-        try {
-            return add(parseName(name));
-        } catch (Throwable ignored) {
-            return unparsedNames.add(normalizeName(name));
-        }
+        K key = parseName(name);
+
+        // Names that are not registered yet are kept, so they can be matched once they are registered.
+        return key == null ? unparsedNames.add(normalizeName(name)) : add(key);
     }
 
     @Override
@@ -45,6 +45,7 @@ public abstract class UnparsedEnumerateSet<K extends Enumerable> extends Enumera
         return name.toUpperCase(Locale.ENGLISH);
     }
 
+    @Nullable
     protected abstract K parseName(String name);
 
     protected abstract String getName(K key);

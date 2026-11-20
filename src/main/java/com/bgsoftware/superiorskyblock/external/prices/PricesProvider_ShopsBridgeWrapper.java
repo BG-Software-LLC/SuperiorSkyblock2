@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Material;
@@ -55,16 +57,29 @@ public class PricesProvider_ShopsBridgeWrapper implements PricesProvider {
     }
 
     private BigDecimal getPriceFromShopsBridge(Key key) {
+        Material material = EnumHelper.getEnum(Material.class, key.getGlobalKey().toUpperCase(Locale.ENGLISH));
+        if (material == null)
+            return BigDecimal.ZERO;
+
+        String subKey = key.getSubKey();
         ItemStack itemStack;
 
         try {
-            Material material = Material.valueOf(key.getGlobalKey().toUpperCase(Locale.ENGLISH));
             if (material == Materials.SPAWNER.toBukkitType()) {
-                EntityType entityType = EntityType.valueOf(key.getSubKey().toUpperCase(Locale.ENGLISH));
+                EntityType entityType = subKey == null ? null :
+                        EnumHelper.getEnum(EntityType.class, subKey.toUpperCase(Locale.ENGLISH));
+                if (entityType == null)
+                    return BigDecimal.ZERO;
+
                 itemStack = new ItemBuilder(material).withEntityType(entityType).build();
             } else {
-                short durability = Short.parseShort(key.getSubKey());
-                itemStack = new ItemStack(material, 1, durability);
+                // All the short values are valid durabilities, so the sub-key is parsed as an int and checked
+                // to be a short. This also catches sub-keys that are not numbers, as the default is not a short.
+                int durability = Text.parseInt(subKey, Integer.MIN_VALUE);
+                if (durability < Short.MIN_VALUE || durability > Short.MAX_VALUE)
+                    return BigDecimal.ZERO;
+
+                itemStack = new ItemStack(material, 1, (short) durability);
             }
         } catch (Throwable error) {
             return BigDecimal.ZERO;

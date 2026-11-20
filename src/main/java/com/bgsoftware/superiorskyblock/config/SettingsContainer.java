@@ -612,10 +612,11 @@ public class SettingsContainer {
         deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
         List<RespawnAction> playerRespawnActions = new LinkedList<>();
         config.getStringList("player-respawn").forEach(respawnAction -> {
-            try {
-                playerRespawnActions.add(RespawnAction.getByName(respawnAction));
-            } catch (NullPointerException error) {
+            RespawnAction playerRespawnAction = RespawnAction.getByNameOrNull(respawnAction);
+            if (playerRespawnAction == null) {
                 Log.warnFromFile("config.yml", "Invalid respawn action ", respawnAction + ", skipping...");
+            } else {
+                playerRespawnActions.add(playerRespawnAction);
             }
         });
         this.playerRespawnActions = Collections.unmodifiableList(playerRespawnActions);
@@ -646,10 +647,9 @@ public class SettingsContainer {
                 continue;
             }
 
-            try {
+            // Dimensions are already registered when the plugin is reloaded.
+            if (Dimension.getByNameOrNull(dimensionName) == null)
                 Dimension.register(dimensionName, environment);
-            } catch (IllegalStateException ignored) {
-            }
         }
     }
 
@@ -689,17 +689,16 @@ public class SettingsContainer {
         }
     }
 
-    private List<ClearAction> loadClearActions(List<String> names) {
+    private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
         List<ClearAction> clearActions = new LinkedList<>();
-
-        for (String name : names) {
-            try {
-                clearActions.add(ClearAction.getByName(name));
-            } catch (NullPointerException error) {
-                Log.warnFromFile("config.yml", "Invalid clear action ", name + ", skipping...");
+        for(String clearAction : clearActionsNames) {
+            ClearAction loadedClearAction = ClearAction.getByNameOrNull(clearAction);
+            if (loadedClearAction == null) {
+                Log.warnFromFile("config.yml", "Invalid clear action ", clearAction + ", skipping...");
+            } else {
+                clearActions.add(loadedClearAction);
             }
         }
-
         return clearActions.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(clearActions);
     }
 
