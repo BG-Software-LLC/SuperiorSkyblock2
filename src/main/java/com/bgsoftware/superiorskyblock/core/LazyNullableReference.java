@@ -13,8 +13,8 @@ public abstract class LazyNullableReference<E> {
     @Nullable
     public E get() {
         if (!this.computed) {
-            this.computed = true;
             this.instance = create();
+            this.computed = true;
         }
 
         return this.instance;

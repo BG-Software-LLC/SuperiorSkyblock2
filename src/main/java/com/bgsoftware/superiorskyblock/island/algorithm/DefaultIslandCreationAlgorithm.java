@@ -90,11 +90,13 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
                 plugin.getSettings().getMaxIslandSize(),
                 builder.owner.getUniqueId(),
                 builder.uuid
-        ).add(0.5, 0, 0.5);
+        );
+
+        Location pasteLocation = islandLocation.clone().add(0, -1, 0);
 
         Log.debugResult(Debug.CREATE_ISLAND, "Next Island Position", islandLocation);
 
-        Island island = builder.setCenter(islandLocation).build();
+        Island island = builder.setCenter(islandLocation.add(0.5, 0, 0.5)).build();
 
         island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
@@ -108,9 +110,9 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
         // Clone location as pasteSchematic uses the same location in later scheduled tasks
-        Location location = islandLocation.clone().add(0, -1, 0);
 
-        schematic.pasteSchematic(island, location, () -> {
+
+        schematic.pasteSchematic(island, pasteLocation, () -> {
             plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
                     builder.owner.getUniqueId(), builder.uuid);
             completableFuture.complete(new IslandCreationResult(IslandCreationResult.Status.SUCCESS, island, islandLocation, event.getArgs().canTeleport));

@@ -71,12 +71,12 @@ public class IslandOutsideListener extends AbstractGameEventListener {
 
         try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain();
              ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location location = entity.getLocation(wrapper.getHandle());
+            Location vehicleLocation = vehicle.getLocation(wrapper.getHandle());
             Island island = WorldBlocks.findIslandWithHint(
-                    location,
-                    blockPosition.set(location),
+                    vehicleLocation,
+                    blockPosition.set(vehicleLocation),
                     e.getArgs().islandResolver.get());
-            if (island != null && !island.isInsideRange(blockPosition, 1D))
+            if (island == null || !island.isInsideRange(blockPosition, 1D))
                 e.setCancelled();
         }
     }

@@ -196,6 +196,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
         if (superiorPlayer instanceof SuperiorNPCPlayer) {
             ((SuperiorNPCPlayer) superiorPlayer).release();
+            e.getArgs().superiorPlayerResolver.reset();
             return;
         }
 

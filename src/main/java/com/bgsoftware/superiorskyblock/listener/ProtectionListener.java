@@ -584,9 +584,12 @@ public class ProtectionListener extends AbstractGameEventListener {
         if (!(rider instanceof Player))
             return;
 
+        Entity vehicle = e.getArgs().vehicle;
+        Island island = WorldBlocks.findIslandWithHint(e.getArgs().vehicle, e.getArgs().islandResolver.get());
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) rider);
-        InteractionResult interactionResult = this.protectionManager.get().handleEntityRide(superiorPlayer,
-                e.getArgs().vehicle, e.getArgs().islandResolver.get());
+        InteractionResult interactionResult = this.protectionManager.get().handleEntityRide(
+                superiorPlayer, vehicle, island);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             e.setCancelled();
     }

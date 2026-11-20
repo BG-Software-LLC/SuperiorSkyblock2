@@ -1495,7 +1495,8 @@ public class SIsland implements Island {
     }
 
     private boolean isIslandWorld(World world) {
-        return plugin.getGrid().isIslandsWorld(world);
+        Dimension worldDimension = plugin.getGrid().getIslandsWorldDimension(world);
+        return worldDimension != null && plugin.getGrid().getIslandsWorld(this, worldDimension) == world;
     }
 
     private boolean isIslandWorld(@Nullable String worldName) {
@@ -1569,24 +1570,34 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
 
         return sender instanceof ConsoleCommandSender ||
-                hasPermissionInternal(plugin.getPlayers().getSuperiorPlayer(sender), islandPrivilege);
+                hasPermissionInternal(plugin.getPlayers().getSuperiorPlayer(sender), islandPrivilege, true);
     }
 
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
+        return hasPermission(superiorPlayer, islandPrivilege, true);
+    }
+
+    @Override
+    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean checkBypassMode) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
 
-        return hasPermissionInternal(superiorPlayer, islandPrivilege);
+        return hasPermissionInternal(superiorPlayer, islandPrivilege, checkBypassMode);
     }
 
-    private boolean hasPermissionInternal(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
-        if (superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasBypassPermission(islandPrivilege) ||
-                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*"))
-            return true;
+    private boolean hasPermissionInternal(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean checkBypassMode) {
+        if (checkBypassMode) {
+            if (superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasBypassPermission(islandPrivilege) ||
+                    superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*"))
+                return true;
+        }
 
         PermissionNode permissionNode = playerPermissions.get(superiorPlayer);
-        return permissionNode != null && permissionNode.hasPermission(islandPrivilege);
+        if (permissionNode == null) {
+            permissionNode = PlayerPrivilegeNode.MutablePlayerPermissionNode.SHARED.update(superiorPlayer, this);
+        }
+        return permissionNode.hasPermission(islandPrivilege);
     }
 
     @Override
@@ -2929,7 +2940,8 @@ public class SIsland implements Island {
     @Override
     public boolean isChunkDirty(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        Preconditions.checkArgument(isInside(world, chunkX, chunkZ),
+                "Chunk must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
             return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
         }
@@ -2943,8 +2955,9 @@ public class SIsland implements Island {
 
     @Override
     public boolean isChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ) {
-        Preconditions.checkArgument(worldInfo != null && isInside(chunkX, chunkZ),
-                "Chunk must be within the island boundaries.");
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ),
+                "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
         }
@@ -2953,6 +2966,8 @@ public class SIsland implements Island {
     @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        Preconditions.checkArgument(isInside(world, chunkX, chunkZ),
+                "Chunk {" + world.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markDirty(chunkPosition, save);
         }
@@ -2961,7 +2976,8 @@ public class SIsland implements Island {
     @Override
     public void markChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
-        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ),
+                "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markDirty(chunkPosition, save);
         }
@@ -2970,6 +2986,8 @@ public class SIsland implements Island {
     @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        Preconditions.checkArgument(isInside(world, chunkX, chunkZ),
+                "Chunk {" + world.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markEmpty(chunkPosition, save);
         }
@@ -2977,7 +2995,9 @@ public class SIsland implements Island {
 
     @Override
     public void markChunkEmpty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
-        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ),
+                "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markEmpty(chunkPosition, save);
         }

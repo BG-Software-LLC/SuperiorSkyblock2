@@ -97,11 +97,13 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
             return;
 
-        if (checkPreventEntitySpawn(e, island, isSpawnerSpawning) || checkPreventEggLay(entity, island))
+        if (checkPreventEntitySpawn(e, island, isSpawnerSpawning, isNaturalSpawning) ||
+                (isChickenEgg && checkPreventEggLay(entity, island)))
             e.setCancelled();
     }
 
-    private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Island island, boolean isSpawnerSpawning) {
+    private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Island island,
+                                            boolean isSpawnerSpawning, boolean isNaturalSpawning) {
         if (isSpawnerSpawning) {
             List<EntityCategory> entityCategories = BukkitEntities.getCategories(e.getArgs().entity);
             IslandFlag islandFlag;
@@ -111,7 +113,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
                     return true;
                 }
             }
-        } else {
+        } else if (isNaturalSpawning) {
             List<EntityCategory> entityCategories = BukkitEntities.getCategories(e.getArgs().entity);
             IslandFlag islandFlag;
             for (EntityCategory entityCategory : entityCategories) {

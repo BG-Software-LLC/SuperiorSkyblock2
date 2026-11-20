@@ -282,7 +282,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     }
 
     public RecordResult recordEntitySpawn(Entity entity, @Nullable Island island) {
-        return recordEntitySpawnInternal(entity, null, false);
+        return recordEntitySpawnInternal(entity, island, false);
     }
 
     @Override

@@ -25,6 +25,7 @@ public class IslandPreviewListener extends AbstractGameEventListener {
 
         if (superiorPlayer instanceof SuperiorNPCPlayer) {
             ((SuperiorNPCPlayer) superiorPlayer).release();
+            e.getArgs().superiorPlayerResolver.reset();
             return;
         }
 

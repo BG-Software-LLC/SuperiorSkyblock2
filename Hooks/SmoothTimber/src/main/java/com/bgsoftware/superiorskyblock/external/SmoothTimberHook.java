@@ -44,7 +44,7 @@ public class SmoothTimberHook {
             Island island = plugin.getGrid().getIslandAt(e.getTreeLocation());
             if (island != null) {
                 try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
-                    e.getBlockLocations().removeIf(location -> island.isInsideRange(blockPosition.set(location)));
+                    e.getBlockLocations().removeIf(location -> !island.isInsideRange(blockPosition.set(location)));
                 }
             }
         }

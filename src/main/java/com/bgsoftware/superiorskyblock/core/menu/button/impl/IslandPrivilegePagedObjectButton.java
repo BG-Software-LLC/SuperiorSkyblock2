@@ -218,7 +218,7 @@ public class IslandPrivilegePagedObjectButton extends AbstractPagedMenuButton<Me
 
             SuperiorPlayer permissiblePlayer = (SuperiorPlayer) button.menuView.getPermissionHolder();
 
-            boolean currentPermissionState = island.hasPermission(permissiblePlayer, islandPrivilege);
+            boolean currentPermissionState = island.hasPermission(clickedPlayer, islandPrivilege, false);
             boolean newPermissionState = !currentPermissionState;
 
             String permissionHolderName = permissiblePlayer.getName();

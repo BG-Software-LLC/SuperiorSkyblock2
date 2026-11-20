@@ -142,7 +142,8 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
     private static void regenerateSchematicInternal(Island island, Dimension dimension, Schematic schematic) {
         Location centerLocation = island.getCenter(dimension);
-        Location schematicPlacementLocation = centerLocation.add(0, -1, 0);
+        Location schematicPlacementLocation = new Location(centerLocation.getWorld(), centerLocation.getBlockX(),
+                centerLocation.getBlockY() - 1, centerLocation.getBlockZ());
 
         schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
             island.setSchematicGenerate(dimension);

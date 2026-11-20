@@ -93,8 +93,11 @@ public class SignsListener extends AbstractGameEventListener {
     private void onSignBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
         Block block = e.getArgs().block;
 
-        Island island = e.getArgs().islandResolver.get();
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
 
+        Island island = e.getArgs().islandResolver.get();
         if (!isValidIsland(island))
             return;
 

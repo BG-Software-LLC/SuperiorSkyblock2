@@ -508,9 +508,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
                     if (blockIsland == null)
                         blockIsland = island;
 
-                    this.worldRecordService.get().recordBlockBreak(
-                            e.getArgs().keyResolver.get(),
-                            blockLocation, island,
+                    this.worldRecordService.get().recordBlockBreak(Keys.of(block), blockLocation, island,
                             1, REGULAR_RECORD_FLAGS);
                 }
             }
@@ -569,10 +567,8 @@ public class BlockChangesListener extends AbstractGameEventListener {
             if (toBlock.getType() != Material.COBBLESTONE) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                     // Do not save block counts
-                    this.worldRecordService.get().recordBlockPlace(
-                            Keys.of(toBlock),
-                            toBlock.getLocation(wrapper.getHandle()),
-                            e.getArgs().islandResolver.get(),
+                    this.worldRecordService.get().recordBlockPlace(Keys.of(toBlock),
+                            toBlock.getLocation(wrapper.getHandle()), island,
                             1, null, WorldRecordFlags.DIRTY_CHUNKS);
                 }
             }
@@ -639,8 +635,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
             if (alreadySpongeAbosrbCalled.contains(blockLocation))
                 return;
 
-            worldRecordService.get().recordBlockPlace(
-                    e.getArgs().keyResolver.get(),
+            worldRecordService.get().recordBlockPlace(ConstantKeys.WET_SPONGE,
                     blockLocation,
                     e.getArgs().islandResolver.get(), 1,
                     block.getState(), WorldRecordFlags.SAVE_BLOCK_COUNT);

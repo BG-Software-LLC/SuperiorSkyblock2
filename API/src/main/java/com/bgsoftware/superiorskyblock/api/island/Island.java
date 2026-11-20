@@ -1049,6 +1049,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege);
 
     /**
+     * Check if a player has a permission.
+     *
+     * @param superiorPlayer  The player to check.
+     * @param islandPrivilege The permission to check.
+     */
+    boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean checkBypassMode);
+
+    /**
      * Check if a role has a permission.
      *
      * @param playerRole      The role to check.
@@ -1266,6 +1274,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * The current biome of the island.
+     *
      * @deprecated See {@link #getBiome(Dimension)}
      */
     @Deprecated
@@ -1278,6 +1287,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Change the biome of the island's area.
+     *
      * @deprecated See {@link #setBiome(Dimension, Biome)}
      */
     @Deprecated

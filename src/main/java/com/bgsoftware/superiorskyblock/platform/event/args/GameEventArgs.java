@@ -105,7 +105,12 @@ public class GameEventArgs implements IEventArgs {
 
     public static class EntityMoveEvent extends EntityEvent {
 
-        public final LazyNullableReference<Island> fromIslandResolver = islandResolver;
+        public final LazyNullableReference<Island> fromIslandResolver = new LazyNullableReference<Island>() {
+            @Override
+            protected Island create() {
+                return plugin.getGrid().getIslandAt(from);
+            }
+        };
         public final LazyNullableReference<Island> toIslandResolver = new LazyNullableReference<Island>() {
             @Override
             protected Island create() {

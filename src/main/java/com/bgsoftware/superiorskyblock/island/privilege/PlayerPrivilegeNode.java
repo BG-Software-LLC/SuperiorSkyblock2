@@ -11,7 +11,7 @@ import com.google.common.base.Preconditions;
 
 public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
 
-    protected final SuperiorPlayer superiorPlayer;
+    protected SuperiorPlayer superiorPlayer;
     protected Island island;
 
     public PlayerPrivilegeNode(SuperiorPlayer superiorPlayer, Island island) {
@@ -66,7 +66,7 @@ public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
         privileges.put(islandPrivilege, PrivilegeStatus.of(status));
     }
 
-    private PlayerRole resolvePlayerRole() {
+    protected PlayerRole resolvePlayerRole() {
         return island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() :
                 island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
     }
@@ -86,6 +86,37 @@ public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
         @Override
         public boolean hasPermission(IslandPrivilege islandPrivilege) {
             return false;
+        }
+
+        @Override
+        public void setPermission(IslandPrivilege permission, boolean value) {
+            // Do nothing.
+        }
+
+    }
+
+    public static class MutablePlayerPermissionNode extends PlayerPrivilegeNode {
+
+        public static final MutablePlayerPermissionNode SHARED = new MutablePlayerPermissionNode();
+
+        public MutablePlayerPermissionNode() {
+            super(null, null);
+        }
+
+        public MutablePlayerPermissionNode update(SuperiorPlayer superiorPlayer, Island island) {
+            this.superiorPlayer = superiorPlayer;
+            this.island = island;
+            return this;
+        }
+
+        @Override
+        public boolean hasPermission(IslandPrivilege islandPrivilege) {
+            PlayerRole playerRole = resolvePlayerRole();
+
+            if (island.hasPermission(playerRole, IslandPrivileges.ALL))
+                return true;
+
+            return island.hasPermission(playerRole, islandPrivilege);
         }
 
         @Override

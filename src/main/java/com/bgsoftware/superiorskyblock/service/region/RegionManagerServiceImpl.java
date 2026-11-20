@@ -534,11 +534,20 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
         Preconditions.checkNotNull(item, "item cannot be null");
 
-        return handleInteractionInternal(superiorPlayer, item, IslandPrivileges.PICKUP_DROPS, MAX_PICKUP_DISTANCE, null, true);
+        return handlePlayerPickupItemInternal(superiorPlayer, item, null, true);
     }
 
     public InteractionResult handlePlayerPickupItem(SuperiorPlayer superiorPlayer, Item item, @Nullable Island island) {
-        return handleInteractionInternal(superiorPlayer, item, IslandPrivileges.PICKUP_DROPS, MAX_PICKUP_DISTANCE, island, false);
+        return handlePlayerPickupItemInternal(superiorPlayer, item, island, false);
+    }
+
+    private InteractionResult handlePlayerPickupItemInternal(SuperiorPlayer superiorPlayer, Item item,
+                                                             @Nullable Island island, boolean lookupIsland) {
+        if (plugin.getNMSPlayers().wasThrownByPlayer(item, superiorPlayer)) {
+            return InteractionResult.SUCCESS;
+        }
+
+        return handleInteractionInternal(superiorPlayer, item, IslandPrivileges.PICKUP_DROPS, MAX_PICKUP_DISTANCE, island, lookupIsland);
     }
 
     @Override

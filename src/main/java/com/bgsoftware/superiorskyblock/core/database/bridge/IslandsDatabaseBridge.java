@@ -778,6 +778,22 @@ public class IslandsDatabaseBridge {
 
         insertIslandBanks(island);
         insertIslandSettings(island);
+        insertIslandWarps(island);
+        insertIslandVisitorHome(island);
+    }
+
+    private static void insertIslandWarps(Island island) {
+        for (WarpCategory warpCategory : island.getWarpCategories().values()) {
+            saveWarpCategory(island, warpCategory);
+            for (IslandWarp islandWarp : warpCategory.getWarps())
+                saveWarp(island, islandWarp);
+        }
+    }
+
+    private static void insertIslandVisitorHome(Island island) {
+        WorldPosition visitorsPosition = island.getVisitorsPosition(null /* unused */);
+        if (visitorsPosition != null)
+            saveVisitorLocation(island, plugin.getSettings().getWorlds().getDefaultWorldDimension(), visitorsPosition);
     }
 
     public static void insertIslandBanks(Island island) {

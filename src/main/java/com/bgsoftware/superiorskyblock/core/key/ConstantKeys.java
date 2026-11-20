@@ -49,6 +49,7 @@ public class ConstantKeys {
             .map(Keys::of).orElse(null);
     public static final Key TNT = Keys.of(Material.TNT);
     public static final Key WATER = Keys.of(Material.WATER);
+    public static final Key WET_SPONGE = Keys.of(EnumHelper.getEnum(Material.class, "WET_SPONGE", "SPONGE"));
     public static final Key WITHER_SKELETON_SKULL = initializeWitherSkeletonSkullKey();
 
     public static final Key ENTITY_MINECART_COMMAND = Keys.of(EntityType.MINECART_COMMAND);
