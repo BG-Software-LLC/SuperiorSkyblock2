@@ -689,15 +689,15 @@ public class ProtectionListener extends AbstractGameEventListener {
 
             if (entity instanceof Egg) {
                 List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntitySpawnPrivileges(entity);
+                if(islandPrivileges.isEmpty())
+                    return;
 
-                if (!islandPrivileges.isEmpty()) {
-                    interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                            entityLocation, islandPrivileges);
+                interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
+                        entityLocation, islandPrivileges);
 
-                    if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
-                        e.setCancelled();
-                        return;
-                    }
+                if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
+                    e.setCancelled();
+                    return;
                 }
             }
 
