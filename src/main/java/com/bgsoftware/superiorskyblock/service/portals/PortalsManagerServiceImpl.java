@@ -308,7 +308,7 @@ public class PortalsManagerServiceImpl implements PortalsManagerService, IServic
             IslandWorlds.accessIslandWorldAsync(island, destination, true, islandWorldResult -> {
                 islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
                     Location centerLocation = island.getCenter(destination);
-                    Location schematicPlacementLocation = centerLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
+                    Location schematicPlacementLocation = centerLocation.clone().add(0, -1, 0);
 
                     BigDecimal originalWorth = island.getRawWorth();
                     BigDecimal originalLevel = island.getRawLevel();

@@ -72,10 +72,7 @@ public class PortalsListener extends AbstractGameEventListener {
 
         World world = portalLocation.getWorld();
 
-        Island island;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
-        }
+        Island island = e.getArgs().islandResolver.get();
 
         if (island == null) {
             if (plugin.getGrid().isIslandsWorld(world))
@@ -147,7 +144,7 @@ public class PortalsListener extends AbstractGameEventListener {
             return;
         }
 
-        Island island = plugin.getGrid().getIslandAt(e.getArgs().from);
+        Island island = e.getArgs().fromIslandResolver.get();
         if (island == null) {
             if (plugin.getGrid().isIslandsWorld(e.getArgs().from.getWorld()))
                 e.setCancelled();
@@ -177,7 +174,7 @@ public class PortalsListener extends AbstractGameEventListener {
         if (to == null || to.getWorld() == null || from == null || from.getWorld() == null)
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getArgs().from);
+        Island island = e.getArgs().fromIslandResolver.get();
         if (island == null)
             return;
 

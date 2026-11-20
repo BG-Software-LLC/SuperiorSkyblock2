@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.profiler.Profiler;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
-import org.bukkit.block.BlockFace;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -91,11 +90,11 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
                 plugin.getSettings().getMaxIslandSize(),
                 builder.owner.getUniqueId(),
                 builder.uuid
-        );
+        ).add(0.5, 0, 0.5);
 
         Log.debugResult(Debug.CREATE_ISLAND, "Next Island Position", islandLocation);
 
-        Island island = builder.setCenter(islandLocation.add(0.5, 0, 0.5)).build();
+        Island island = builder.setCenter(islandLocation).build();
 
         island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
@@ -109,7 +108,7 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
         // Clone location as pasteSchematic uses the same location in later scheduled tasks
-        Location location = islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
+        Location location = islandLocation.clone().add(0, -1, 0);
 
         schematic.pasteSchematic(island, location, () -> {
             plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,

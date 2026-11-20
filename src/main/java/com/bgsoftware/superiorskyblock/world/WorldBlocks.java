@@ -1,10 +1,14 @@
 package com.bgsoftware.superiorskyblock.world;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.MutableBlockPosition;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import org.bukkit.Bukkit;
@@ -14,6 +18,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 
 public class WorldBlocks {
 
@@ -87,6 +92,33 @@ public class WorldBlocks {
 
         return new LazyWorldLocation(chunkPosition.getWorldName(),
                 realWorldChunkX + x, y, realWorldChunkZ + z, 0, 0);
+    }
+
+    public static Island findIslandWithHint(Block block, @Nullable Island hintIsland) {
+        try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain();
+             ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return findIslandWithHint(block.getLocation(wrapper.getHandle()), blockPosition.set(block), hintIsland);
+        }
+    }
+
+    public static Island findIslandWithHint(Entity entity, @Nullable Island hintIsland) {
+        try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain();
+             ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location location = entity.getLocation(wrapper.getHandle());
+            return findIslandWithHint(location, blockPosition.set(location), hintIsland);
+        }
+    }
+
+    /**
+     * This method is used when we have a hint for the island that the block might be in.
+     * This way we optimize an Island call by just checking if {@param blockPosition} is inside the island.
+     */
+    public static Island findIslandWithHint(Location location, BlockPosition blockPosition, @Nullable Island hintIsland) {
+        if (hintIsland != null && hintIsland.isInside(blockPosition)) {
+            return hintIsland;
+        }
+
+        return plugin.getGrid().getIslandAt(location);
     }
 
 }

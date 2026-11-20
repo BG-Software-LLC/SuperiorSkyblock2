@@ -54,8 +54,7 @@ public abstract class AbstractMenuView<V extends MenuView<V, A>, A extends ViewA
         refreshing = true;
         previousMove = false;
 
-        updateTitleArgs();
-
+        // AbstractMenu#refreshView updates the title args itself.
         ((AbstractMenu) menu).refreshView(this).whenComplete((view, error) -> {
             if (error != null) {
                 ((Throwable) error).printStackTrace();

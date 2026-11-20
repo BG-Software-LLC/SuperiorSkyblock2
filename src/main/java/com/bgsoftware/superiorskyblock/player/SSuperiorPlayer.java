@@ -19,9 +19,9 @@ import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.CachedResult;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -32,6 +32,7 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -70,6 +71,8 @@ import java.util.function.Function;
 public class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    public static final CachedResult<Player, SuperiorPlayer> CACHED_PLAYER_RESULT = CachedResult.create();
 
     private static PvPWorldsCache pvpWorldsCache = null;
 
@@ -143,13 +146,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
      *   General Methods
      */
 
-    private static HitActionResult checkPvPAllow(SuperiorPlayer player, boolean target) {
+    private static HitActionResult checkPvPAllow(SuperiorPlayer superiorPlayer, @Nullable Player player, boolean target) {
         // Checks for online status
-        if (!player.isOnline())
+        if (player == null)
             return target ? HitActionResult.TARGET_NOT_ONLINE : HitActionResult.NOT_ONLINE;
 
         // Checks for pvp warm-up
-        if (player.hasPlayerStatus(PlayerStatus.PVP_IMMUNED))
+        if (superiorPlayer.hasPlayerStatus(PlayerStatus.PVP_IMMUNED))
             return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
 
         // We do not care about spawn island when spawn protection is disabled,
@@ -167,10 +170,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
             if (!standingIsland.hasSettingsEnabled(IslandFlags.PVP))
                 return target ? HitActionResult.TARGET_ISLAND_PVP_DISABLE : HitActionResult.ISLAND_PVP_DISABLE;
 
-            if (!plugin.getSettings().isCoopDamage() && standingIsland.isCoop(player)) {
+            if (!plugin.getSettings().isCoopDamage() && standingIsland.isCoop(superiorPlayer)) {
                 // Checks for coop damage
                 return target ? HitActionResult.TARGET_COOP_DAMAGE : HitActionResult.COOP_DAMAGE;
-            } else if (!plugin.getSettings().isVisitorsDamage() && standingIsland.isVisitor(player, true)) {
+            } else if (!plugin.getSettings().isVisitorsDamage() && standingIsland.isVisitor(superiorPlayer, true)) {
                 // Checks for visitors damage
                 return target ? HitActionResult.TARGET_VISITOR_DAMAGE : HitActionResult.VISITOR_DAMAGE;
             }
@@ -265,6 +268,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public Player asPlayer() {
+        return CACHED_PLAYER_RESULT.getOrCompute(this, this::lookupPlayerInternal);
+    }
+
+    private Player lookupPlayerInternal() {
         return Bukkit.getPlayer(uuid);
     }
 
@@ -407,7 +414,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         if (equals(otherPlayer))
             return HitActionResult.SUCCESS;
 
-        World world = getWorld();
+        Player player = asPlayer();
+        World world = player == null ? null : player.getWorld();
 
         // Checks for island teammates pvp
         Island island = getIsland();
@@ -416,14 +424,15 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
         // Checks if this player can bypass all pvp restrictions
         {
-            HitActionResult selfResult = checkPvPAllow(this, false);
+            HitActionResult selfResult = checkPvPAllow(this, player, false);
             if (selfResult != HitActionResult.SUCCESS)
                 return selfResult;
         }
 
         // Checks if target player can bypass all pvp restrictions
         {
-            HitActionResult targetResult = checkPvPAllow(otherPlayer, true);
+            Player otherPlayerBukkit = otherPlayer.asPlayer();
+            HitActionResult targetResult = checkPvPAllow(otherPlayer, otherPlayerBukkit, true);
             if (targetResult != HitActionResult.SUCCESS)
                 return targetResult;
         }
@@ -461,7 +470,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
-        if(teleportResult == null) {
+        if (teleportResult == null) {
             teleportWithResult(location, null);
         } else {
             teleportWithResult(location, result ->
@@ -495,7 +504,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
-        if(teleportResult == null) {
+        if (teleportResult == null) {
             teleportWithResult(island, null);
         } else {
             teleportWithResult(island, result ->
@@ -510,7 +519,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, Dimension dimension, @Nullable Consumer<Boolean> teleportResult) {
-        if(teleportResult == null) {
+        if (teleportResult == null) {
             teleportWithResult(island, dimension, null);
         } else {
             teleportWithResult(island, dimension, result ->

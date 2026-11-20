@@ -70,6 +70,11 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
 
+        return recordBlockPlace(blockKey, blockLocation, island, blockCount, oldBlockState, flags);
+    }
+
+    public RecordResult recordBlockPlace(Key blockKey, Location blockLocation, @Nullable Island island, int blockCount,
+                                         @Nullable BlockState oldBlockState, @WorldRecordFlags int flags) {
         if (island == null)
             return RecordResult.NOT_IN_ISLAND;
 
@@ -165,6 +170,11 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
 
         Island island = plugin.getGrid().getIslandAt(blockLocation);
 
+        return recordBlockBreak(blockKey, blockLocation, island, blockCount, flags);
+    }
+
+    public RecordResult recordBlockBreak(Key blockKey, Location blockLocation, @Nullable Island island,
+                                         int blockCount, @WorldRecordFlags int flags) {
         if (island == null)
             return RecordResult.NOT_IN_ISLAND;
 
@@ -179,10 +189,23 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         Preconditions.checkNotNull(location, "location cannot be null");
         Preconditions.checkArgument(location.getWorld() != null, "location's world cannot be null");
 
+        return recordMultiBlocksBreakInternal(blockCounts, location, flags, null, true);
+    }
+
+    public RecordResult recordMultiBlocksBreak(KeyMap<Integer> blockCounts, Location location, @Nullable Island island,
+                                               @WorldRecordFlags int flags) {
+        return recordMultiBlocksBreakInternal(blockCounts, location, flags, island, false);
+    }
+
+    private RecordResult recordMultiBlocksBreakInternal(KeyMap<Integer> blockCounts, Location location,
+                                                        @WorldRecordFlags int flags, @Nullable Island island, boolean lookupIsland) {
         if (blockCounts.isEmpty())
             return RecordResult.SUCCESS;
 
-        Island island = plugin.getGrid().getIslandAt(location);
+        if (lookupIsland) {
+            island = plugin.getGrid().getIslandAt(location);
+        }
+
         if (island == null)
             return RecordResult.NOT_IN_ISLAND;
 
@@ -255,22 +278,11 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     @Override
     public RecordResult recordEntitySpawn(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null");
+        return recordEntitySpawnInternal(entity, null, true);
+    }
 
-        if (entity.isDead()) {
-            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
-        }
-
-        if (BukkitEntities.canBypassEntityLimit(entity)) {
-            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
-        }
-
-        if (!isEntityLimitsEnabled() || !BukkitEntities.canHaveLimit(entity.getType())) {
-            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
-        }
-
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            return recordEntitySpawnInternal(Keys.of(entity), entity.getLocation(wrapper.getHandle()));
-        }
+    public RecordResult recordEntitySpawn(Entity entity, @Nullable Island island) {
+        return recordEntitySpawnInternal(entity, null, false);
     }
 
     @Override
@@ -284,7 +296,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
-        return recordEntitySpawnInternal(Keys.of(entityType), location);
+        return recordEntitySpawnInternal(Keys.of(entityType), location, null, true);
     }
 
     @Override
@@ -297,11 +309,31 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
-        return recordEntitySpawnInternal(entityKey, location);
+        return recordEntitySpawnInternal(entityKey, location, null, true);
     }
 
-    private RecordResult recordEntitySpawnInternal(Key entityKey, Location location) {
-        Island island = plugin.getGrid().getIslandAt(location);
+    private RecordResult recordEntitySpawnInternal(Entity entity, @Nullable Island island, boolean lookupIsland) {
+        if (entity.isDead()) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
+
+        if (BukkitEntities.canBypassEntityLimit(entity)) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
+
+        if (!isEntityLimitsEnabled() || !BukkitEntities.canHaveLimit(entity.getType())) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return recordEntitySpawnInternal(Keys.of(entity), entity.getLocation(wrapper.getHandle()), island, lookupIsland);
+        }
+    }
+
+    private RecordResult recordEntitySpawnInternal(Key entityKey, Location location, @Nullable Island island, boolean lookupIsland) {
+        if (lookupIsland) {
+            island = plugin.getGrid().getIslandAt(location);
+        }
 
         if (island == null) {
             return RecordResult.NOT_IN_ISLAND;
@@ -318,18 +350,52 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
     @Override
     public RecordResult recordEntityDespawn(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null");
+        return recordEntityDespawnInternal(entity, null, true);
+    }
+
+    public RecordResult recordEntityDespawn(Entity entity, @Nullable Island island) {
+        return recordEntityDespawnInternal(entity, island, false);
+    }
+
+    @Override
+    @Deprecated
+    public RecordResult recordEntityDespawn(EntityType entityType, Location location) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null");
+        Preconditions.checkNotNull(location, "location parameter cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
+
+        if (!BukkitEntities.canHaveLimit(entityType)) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
+
+        return recordEntityDespawnInternal(Keys.of(entityType), location, null, true);
+    }
+
+    @Override
+    public RecordResult recordEntityDespawn(Key entityKey, Location location) {
+        Preconditions.checkNotNull(entityKey, "entityKey parameter cannot be null");
+        Preconditions.checkNotNull(location, "location parameter cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
+
+        return recordEntityDespawnInternal(entityKey, location, null, true);
+    }
+
+    private RecordResult recordEntityDespawnInternal(Entity entity, @Nullable Island island, boolean lookupIsland) {
+        if (!isEntityLimitsEnabled()) {
+            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
+        }
 
         if (BukkitEntities.canBypassEntityLimit(entity)) {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
-        if (!isEntityLimitsEnabled() || !BukkitEntities.canHaveLimit(entity.getType())) {
+        if (!BukkitEntities.canHaveLimit(entity.getType())) {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
         RecordResult recordResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            recordResult = recordEntityDespawnInternal(Keys.of(entity), entity.getLocation(wrapper.getHandle()));
+            recordResult = recordEntityDespawnInternal(Keys.of(entity), entity.getLocation(wrapper.getHandle()), island, lookupIsland);
         }
 
         if (recordResult != RecordResult.SUCCESS) {
@@ -346,35 +412,14 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
         return RecordResult.SUCCESS;
     }
 
-    @Override
-    @Deprecated
-    public RecordResult recordEntityDespawn(EntityType entityType, Location location) {
-        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null");
-        Preconditions.checkNotNull(location, "location parameter cannot be null");
-        Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
-
-        if (!isEntityLimitsEnabled() || !BukkitEntities.canHaveLimit(entityType)) {
-            return RecordResult.ENTITY_CANNOT_BE_TRACKED;
-        }
-
-        return recordEntityDespawnInternal(Keys.of(entityType), location);
-    }
-
-    @Override
-    public RecordResult recordEntityDespawn(Key entityKey, Location location) {
-        Preconditions.checkNotNull(entityKey, "entityKey parameter cannot be null");
-        Preconditions.checkNotNull(location, "location parameter cannot be null");
-        Preconditions.checkArgument(location.getWorld() != null, "location's world parameter cannot be null");
-
+    private RecordResult recordEntityDespawnInternal(Key entityKey, Location location, @Nullable Island island, boolean lookupIsland) {
         if (!isEntityLimitsEnabled()) {
             return RecordResult.ENTITY_CANNOT_BE_TRACKED;
         }
 
-        return recordEntityDespawnInternal(entityKey, location);
-    }
-
-    private RecordResult recordEntityDespawnInternal(Key entityKey, Location location) {
-        Island island = plugin.getGrid().getIslandAt(location);
+        if (lookupIsland) {
+            island = plugin.getGrid().getIslandAt(location);
+        }
 
         if (island == null) {
             return RecordResult.NOT_IN_ISLAND;

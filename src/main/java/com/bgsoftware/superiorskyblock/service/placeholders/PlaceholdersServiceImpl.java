@@ -954,6 +954,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
         Function<Island, String> function;
         Matcher matcher;
+        // Whether one of the patterns below matched; the matcher is not run again after the chain.
+        boolean matched = true;
 
         if ((matcher = TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN.matcher(loweredPlaceholderValue)).matches()) {
             function = targetIsland -> sortingType.getValue(targetIsland)
@@ -974,12 +976,13 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             function = targetIsland -> parsePlaceholdersForIsland(targetIsland, superiorPlayer,
                     customPlaceholder).orElse(null);
         } else {
+            matched = false;
             function = targetIsland -> targetIsland.getName().isEmpty() ?
                     targetIsland.getOwner().getName() : targetIsland.getName();
         }
 
         // Positions start from 1, so 0 also stands for an invalid position.
-        int targetPosition = Text.parseInt(matcher.matches() ? matcher.group(1) : placeholderValue, 0);
+        int targetPosition = Text.parseInt(matched ? matcher.group(1) : placeholderValue, 0);
 
         if (targetPosition < 1) {
             return Optional.empty();

@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.service.world.WorldRecordService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
-import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
@@ -33,7 +32,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -88,20 +86,29 @@ public class ChunksListener extends AbstractGameEventListener {
     private void handleChunkUnload(Chunk chunk) {
         plugin.getStackedBlocks().removeStackedBlockHolograms(chunk);
 
+        boolean cropsGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
+        boolean isChunkEmpty = plugin.getNMSChunks().isChunkEmptyIfLoaded(chunk);
+
+        if (!cropsGrowthEnabled && isChunkEmpty)
+            return;
+
         List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+        if (chunkIslands.isEmpty())
+            return;
+
         chunkIslands.forEach(island -> {
             if (!island.isSpawn())
-                handleIslandChunkUnload(island, chunk);
+                handleIslandChunkUnload(island, chunk, cropsGrowthEnabled, isChunkEmpty);
         });
     }
 
-    private void handleIslandChunkUnload(Island island, Chunk chunk) {
-        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
+    private void handleIslandChunkUnload(Island island, Chunk chunk, boolean cropsGrowthEnabled, boolean isChunkEmpty) {
+        if (cropsGrowthEnabled)
             plugin.getNMSChunks().startTickingChunk(island, chunk, true);
 
         // The chunk is being unloaded, therefore we must not load it again while checking it.
         // If it cannot be accessed anymore, it is marked as dirty so its blocks are still calculated.
-        if (!plugin.getNMSChunks().isChunkEmptyIfLoaded(chunk))
+        if (!isChunkEmpty)
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
     }
 
@@ -111,32 +118,38 @@ public class ChunksListener extends AbstractGameEventListener {
             return;
 
         List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
-        chunkIslands.forEach(island -> {
-            if (!island.isSpawn()) {
-                try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
-                    handleIslandChunkLoad(island, chunk, chunkPosition, isNewChunk);
+        if (chunkIslands.isEmpty())
+            return;
+
+        plugin.getNMSChunks().injectChunkSections(chunk);
+
+        boolean isChunkEmpty = plugin.getNMSChunks().isChunkEmpty(chunk);
+
+        boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
+
+        try (ChunkPosition chunkPosition = ChunkPosition.of(chunk)) {
+            Dimension dimension = plugin.getGrid().getIslandsWorldDimension(chunk.getWorld());
+            for (Island island : chunkIslands) {
+                if (!island.isSpawn()) {
+                    handleIslandChunkLoad(island, chunk, dimension, chunkPosition, isNewChunk, isChunkEmpty, cropGrowthEnabled);
                 }
             }
-        });
+        }
     }
 
-    private void handleIslandChunkLoad(Island island, Chunk chunk, ChunkPosition chunkPosition, boolean isNewChunk) {
-        World world = chunk.getWorld();
-        Dimension dimension = plugin.getGrid().getIslandsWorldDimension(world);
-
+    private void handleIslandChunkLoad(Island island, Chunk chunk, Dimension dimension, ChunkPosition chunkPosition,
+                                       boolean isNewChunk, boolean isChunkEmpty, boolean cropGrowthEnabled) {
         if (isNewChunk) {
             Biome biome = island.getBiome(dimension);
             // We want to update the biome for new island chunks.
             if (biome != IslandUtils.getDefaultWorldBiome(dimension)) {
                 List<Player> playersToUpdate;
                 try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
-                    playersToUpdate = strategy.getPlayers(WorldInfo.of(world));
+                    playersToUpdate = strategy.getPlayers(chunkPosition.getWorldsInfo());
                 }
                 plugin.getNMSChunks().setBiome(Collections.singletonList(chunkPosition), biome, playersToUpdate);
             }
         }
-
-        plugin.getNMSChunks().injectChunkSections(chunk);
 
         IslandCache islandCache = island.getCache();
 
@@ -144,11 +157,12 @@ public class ChunksListener extends AbstractGameEventListener {
                 k -> new LinkedHashSet<>());
         pendingLoadedChunksForIsland.add(chunk);
 
-        boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
-        if (cropGrowthEnabled && island.isInsideRange(chunk))
+        if (cropGrowthEnabled && island.isInsideRange(chunk.getX(), chunk.getZ()))
             plugin.getNMSChunks().startTickingChunk(island, chunk, false);
 
-        if (!plugin.getNMSChunks().isChunkEmpty(chunk))
+        World world = chunkPosition.getWorld();
+
+        if (!isChunkEmpty)
             island.markChunkDirty(world, chunk.getX(), chunk.getZ(), true);
 
         BlockPosition islandCenter = island.getCenterPosition();

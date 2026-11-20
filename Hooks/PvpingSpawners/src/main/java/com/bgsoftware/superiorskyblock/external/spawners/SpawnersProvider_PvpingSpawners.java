@@ -50,7 +50,7 @@ public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMeta
             Island island;
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location spawnerLocation = e.getSpawner().getLocation(wrapper.getHandle());
-                island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation(spawnerLocation));
+                island = plugin.getGrid().getIslandAt(spawnerLocation);
                 if (island != null)
                     island.handleBlockPlace(spawnerLocation.getBlock(), e.getSpawnerAmount());
             }

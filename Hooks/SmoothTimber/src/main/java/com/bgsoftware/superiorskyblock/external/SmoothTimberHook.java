@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.MutableBlockPosition;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.syntaxphoenix.spigot.smoothtimber.event.AsyncPlayerChopTreeEvent;
@@ -41,8 +42,11 @@ public class SmoothTimberHook {
             }
 
             Island island = plugin.getGrid().getIslandAt(e.getTreeLocation());
-            if (island != null)
-                e.getBlockLocations().removeIf(location -> !island.isInsideRange(location));
+            if (island != null) {
+                try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
+                    e.getBlockLocations().removeIf(location -> island.isInsideRange(blockPosition.set(location)));
+                }
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -20,14 +20,11 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 public class CmdAdminResetWorld implements IAdminIslandCommand {
 
@@ -118,7 +115,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
     private static void resetChunksInternal(Island island, World world, Dimension dimension) {
         boolean isDefaultDimension = dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension();
 
-        try(IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
+        try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
             // Sending the players that are in that world to the main island.
             // If the world that will be reset is the normal world, they will be teleported to spawn.
             Island teleportIsland = isDefaultDimension ? plugin.getGrid().getSpawnIsland() : island;
@@ -145,7 +142,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
     private static void regenerateSchematicInternal(Island island, Dimension dimension, Schematic schematic) {
         Location centerLocation = island.getCenter(dimension);
-        Location schematicPlacementLocation = centerLocation.getBlock().getRelative(BlockFace.DOWN).getLocation();
+        Location schematicPlacementLocation = centerLocation.add(0, -1, 0);
 
         schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
             island.setSchematicGenerate(dimension);

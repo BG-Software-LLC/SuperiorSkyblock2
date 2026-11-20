@@ -1,22 +1,26 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.spawners;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
 
-import java.util.function.IntFunction;
+import java.lang.ref.WeakReference;
 
 public class TickingSpawnerBlockEntityNotifier implements TickingBlockEntity {
 
     private final SpawnerBlockEntity spawnerBlockEntity;
     private final TickingBlockEntity tickingBlockEntity;
-    private final IntFunction<Integer> delayChangeCallback;
+    private final WeakReference<Island> island;
+    private final NMSWorld.DelayChangeCallback delayChangeCallback;
 
     public TickingSpawnerBlockEntityNotifier(SpawnerBlockEntity spawnerBlockEntity, TickingBlockEntity tickingBlockEntity,
-                                             IntFunction<Integer> delayChangeCallback) {
+                                             Island island, NMSWorld.DelayChangeCallback delayChangeCallback) {
         this.spawnerBlockEntity = spawnerBlockEntity;
         this.tickingBlockEntity = tickingBlockEntity;
+        this.island = new WeakReference<>(island);
         this.delayChangeCallback = delayChangeCallback;
         updateDelay();
     }
@@ -50,8 +54,11 @@ public class TickingSpawnerBlockEntityNotifier implements TickingBlockEntity {
     }
 
     public void updateDelay() {
-        BaseSpawner baseSpawner = spawnerBlockEntity.getSpawner();
-        baseSpawner.spawnDelay = delayChangeCallback.apply(baseSpawner.spawnDelay);
+        Island island = this.island.get();
+        if (island != null) {
+            BaseSpawner baseSpawner = spawnerBlockEntity.getSpawner();
+            baseSpawner.spawnDelay = delayChangeCallback.apply(island, baseSpawner.spawnDelay);
+        }
     }
 
 }

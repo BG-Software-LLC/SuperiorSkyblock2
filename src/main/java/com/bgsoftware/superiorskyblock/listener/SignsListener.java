@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.world.SignType;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -60,7 +61,7 @@ public class SignsListener extends AbstractGameEventListener {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
             signLines = lines.clone();
 
-            result = IslandSigns.handleSignPlace(superiorPlayer, warpLocation, signLines, true);
+            result = IslandSigns.handleSignPlace(superiorPlayer, warpLocation, e.getArgs().islandResolver.get(), signLines, true);
         }
         switch (result.getReason()) {
             case NOT_IN_ISLAND:
@@ -92,19 +93,12 @@ public class SignsListener extends AbstractGameEventListener {
     private void onSignBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
         Block block = e.getArgs().block;
 
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
-            return;
-
-        Island island;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(block.getLocation(wrapper.getHandle()));
-        }
+        Island island = e.getArgs().islandResolver.get();
 
         if (!isValidIsland(island))
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         IslandSigns.Result result = handleBlockBreak(island, block, superiorPlayer);
         if (result.isCancelEvent())
@@ -121,11 +115,7 @@ public class SignsListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
             return;
 
-        Island island;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
-        }
-
+        Island island = e.getArgs().islandResolver.get();
         if (!isValidIsland(island))
             return;
 
@@ -177,7 +167,8 @@ public class SignsListener extends AbstractGameEventListener {
             }
 
             if (isSignGonnaBreak) {
-                return IslandSigns.handleSignBreak(null, superiorPlayer, (Sign) blockState);
+                Island signIsland = WorldBlocks.findIslandWithHint(faceBlock, island);
+                return IslandSigns.handleSignBreak(signIsland, superiorPlayer, (Sign) blockState);
             }
         }
 

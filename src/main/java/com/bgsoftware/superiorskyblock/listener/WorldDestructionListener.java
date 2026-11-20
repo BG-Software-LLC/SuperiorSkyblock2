@@ -3,11 +3,13 @@ package com.bgsoftware.superiorskyblock.listener;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.core.MutableBlockPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -32,9 +34,9 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
         Island island = plugin.getGrid().getIslandAt(location);
         if (island != null) {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
                 e.getArgs().blocks.removeIf(blockState ->
-                        !island.isInsideRange(blockState.getLocation(wrapper.getHandle())));
+                        !island.isInsideRange(blockPosition.set(blockState.getX(), blockState.getY(), blockState.getZ())));
             }
         }
     }
@@ -48,9 +50,12 @@ public class WorldDestructionListener extends AbstractGameEventListener {
             return;
         }
 
+        Island blockIsland = e.getArgs().islandResolver.get();
+        Island spreadIsland = WorldBlocks.findIslandWithHint(e.getArgs().source, blockIsland);
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventDestruction(e.getArgs().source.getLocation(wrapper.getHandle())) ||
-                    preventDestruction(block.getLocation(wrapper.getHandle())))
+            if (preventDestruction(e.getArgs().source.getLocation(wrapper.getHandle()), spreadIsland) ||
+                    preventDestruction(block.getLocation(wrapper.getHandle()), blockIsland))
                 e.setCancelled();
         }
     }
@@ -63,11 +68,9 @@ public class WorldDestructionListener extends AbstractGameEventListener {
             return;
         }
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventMultiDestruction(pistonBlock.getLocation(wrapper.getHandle()), e.getArgs().blocks,
-                    e.getArgs().direction))
-                e.setCancelled();
-        }
+        Island island = e.getArgs().islandResolver.get();
+        if (preventMultiDestruction(e.getArgs().blocks, island, e.getArgs().direction))
+            e.setCancelled();
     }
 
     public void onPistonRetract(GameEvent<GameEventArgs.PistonRetractEvent> e) {
@@ -78,11 +81,9 @@ public class WorldDestructionListener extends AbstractGameEventListener {
             return;
         }
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventMultiDestruction(pistonBlock.getLocation(wrapper.getHandle()), e.getArgs().blocks,
-                    e.getArgs().direction))
-                e.setCancelled();
-        }
+        Island island = e.getArgs().islandResolver.get();
+        if (preventMultiDestruction(e.getArgs().blocks, island, e.getArgs().direction))
+            e.setCancelled();
     }
 
     private void onBlockFlow(GameEvent<GameEventArgs.BlockFromToEvent> e) {
@@ -93,32 +94,36 @@ public class WorldDestructionListener extends AbstractGameEventListener {
             return;
         }
 
+        Island island = WorldBlocks.findIslandWithHint(block, e.getArgs().islandResolver.get());
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
-            if (preventDestruction(blockLocation))
+            if (preventDestruction(blockLocation, island))
                 e.setCancelled();
         }
     }
 
     /* INTERNAL */
 
-    private boolean preventDestruction(Location location) {
-        Island island = plugin.getGrid().getIslandAt(location);
-        return island == null || !island.isInsideRange(location);
-    }
-
-    private boolean preventMultiDestruction(Location islandLocation, List<Block> blockList,
-                                            @Nullable BlockFace moveDirection) {
-        Island island = plugin.getGrid().getIslandAt(islandLocation);
-
+    private boolean preventDestruction(Location location, @Nullable Island island) {
         if (island == null)
             return true;
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+        try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
+            return !island.isInsideRange(blockPosition.set(location));
+        }
+    }
+
+    private boolean preventMultiDestruction(List<Block> blockList, @Nullable Island island, @Nullable BlockFace moveDirection) {
+        if (island == null)
+            return true;
+
+        try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
             for (Block block : blockList) {
-                if (moveDirection != null)
-                    block = block.getRelative(moveDirection);
-                if (!island.isInsideRange(block.getLocation(wrapper.getHandle())))
+                int x = moveDirection == null ? block.getX() : block.getX() + moveDirection.getModX();
+                int y = moveDirection == null ? block.getY() : block.getY() + moveDirection.getModY();
+                int z = moveDirection == null ? block.getZ() : block.getZ() + moveDirection.getModZ();
+                if (!island.isInsideRange(blockPosition.set(x, y, z)))
                     return true;
             }
         }

@@ -7,14 +7,15 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import com.bgsoftware.superiorskyblock.service.world.WorldRecordServiceImpl;
 import org.bukkit.entity.Entity;
 
 public class EntityTrackingListener extends AbstractGameEventListener {
 
-    private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
+    private final LazyReference<WorldRecordServiceImpl> worldRecordService = new LazyReference<WorldRecordServiceImpl>() {
         @Override
-        protected WorldRecordService create() {
-            return plugin.getServices().getService(WorldRecordService.class);
+        protected WorldRecordServiceImpl create() {
+            return (WorldRecordServiceImpl) plugin.getServices().getService(WorldRecordService.class);
         }
     };
 
@@ -26,23 +27,13 @@ public class EntityTrackingListener extends AbstractGameEventListener {
     private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
         Entity entity = e.getArgs().entity;
 
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld())) {
-            return;
-        }
-
-        this.worldRecordService.get().recordEntitySpawn(entity);
+        this.worldRecordService.get().recordEntitySpawn(entity, e.getArgs().islandResolver.get());
     }
 
     private void onEntityDeath(GameEvent<GameEventArgs.EntityDeathEvent> e) {
         Entity entity = e.getArgs().entity;
 
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld())) {
-            return;
-        }
-
-        this.worldRecordService.get().recordEntityDespawn(entity);
+        this.worldRecordService.get().recordEntityDespawn(entity, e.getArgs().islandResolver.get());
     }
 
     /* INTERNAL */

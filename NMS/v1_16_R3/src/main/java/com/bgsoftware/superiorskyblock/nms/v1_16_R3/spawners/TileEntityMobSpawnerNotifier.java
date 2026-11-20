@@ -1,11 +1,13 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.spawners;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import net.minecraft.server.v1_16_R3.MobSpawnerAbstract;
 import net.minecraft.server.v1_16_R3.TileEntityMobSpawner;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
-import java.util.function.IntFunction;
 
 public class TileEntityMobSpawnerNotifier extends TileEntityMobSpawner {
 
@@ -28,10 +30,12 @@ public class TileEntityMobSpawnerNotifier extends TileEntityMobSpawner {
     }
 
     private final TileEntityMobSpawner tileEntityMobSpawner;
-    private final IntFunction<Integer> delayChangeCallback;
+    private final WeakReference<Island> island;
+    private final NMSWorld.DelayChangeCallback delayChangeCallback;
 
-    public TileEntityMobSpawnerNotifier(TileEntityMobSpawner tileEntityMobSpawner, IntFunction<Integer> delayChangeCallback) {
+    public TileEntityMobSpawnerNotifier(TileEntityMobSpawner tileEntityMobSpawner, Island island, NMSWorld.DelayChangeCallback delayChangeCallback) {
         this.tileEntityMobSpawner = tileEntityMobSpawner;
+        this.island = new WeakReference<>(island);
         this.delayChangeCallback = delayChangeCallback;
         this.position = tileEntityMobSpawner.getPosition();
         this.world = tileEntityMobSpawner.getWorld();
@@ -53,8 +57,11 @@ public class TileEntityMobSpawnerNotifier extends TileEntityMobSpawner {
     }
 
     public void updateDelay() {
-        MobSpawnerAbstract mobSpawnerAbstract = tileEntityMobSpawner.getSpawner();
-        mobSpawnerAbstract.spawnDelay = delayChangeCallback.apply(mobSpawnerAbstract.spawnDelay);
+        Island island = this.island.get();
+        if (island != null) {
+            MobSpawnerAbstract mobSpawnerAbstract = tileEntityMobSpawner.getSpawner();
+            mobSpawnerAbstract.spawnDelay = delayChangeCallback.apply(island, mobSpawnerAbstract.spawnDelay);
+        }
     }
 
 }

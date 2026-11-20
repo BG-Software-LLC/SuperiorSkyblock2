@@ -24,7 +24,7 @@ public interface NMSWorld {
 
     boolean canPlayerSuffocate(ChunkSnapshot chunkSnapshot, int x, int y, int z);
 
-    void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback);
+    void listenSpawner(Location location, Island island, DelayChangeCallback delayChangeCallback);
 
     default void replaceTrialBlockPlayerDetector(Island island, Location location) {
         // Does not exist.
@@ -85,5 +85,11 @@ public interface NMSWorld {
     WorldEditSession createPartialEditSession(Dimension dimension);
 
     ChunkReader createChunkReader(Chunk chunk);
+
+    interface DelayChangeCallback {
+
+        int apply(Island island, int delay);
+
+    }
 
 }

@@ -979,6 +979,9 @@ public enum Message {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
             if (!PluginEventsFactory.callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
                 return;
+            // Same as PlayerLocales#getLocale, without resolving the player again.
+            send(sender, superiorPlayer.getUserLocale(), args);
+            return;
         }
 
         send(sender, PlayerLocales.getLocale(sender), args);

@@ -19,7 +19,6 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.IntFunction;
 
 public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
@@ -49,7 +48,7 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
         // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
         BukkitExecutor.sync(() -> {
             if (block.getType() == Materials.SPAWNER.toBukkitType())
-                plugin.getNMSWorld().listenSpawner(location, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
+                plugin.getNMSWorld().listenSpawner(location, island, this::calculateNewSpawnerDelay);
         }, 20L);
     }
 
@@ -72,26 +71,31 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onChunkLoad(ChunkLoadEvent e) {
-            List<Island> chunkIslands = plugin.getGrid().getIslandsAt(e.getChunk());
-            chunkIslands.forEach(island -> handleIslandChunkLoad(island, e.getChunk()));
-        }
+            Chunk chunk = e.getChunk();
 
-        private void handleIslandChunkLoad(Island island, Chunk chunk) {
             List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(chunk);
 
             if (blockEntities.isEmpty())
                 return;
 
-            IntFunction<Integer> delayChangeCallback = spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay);
-
             // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
             // Block entities that are not spawners will not be touched.
             BukkitExecutor.sync(() -> {
                 if (chunk.isLoaded()) {
-                    for (Location blockEntity : blockEntities)
-                        plugin.getNMSWorld().listenSpawner(blockEntity, delayChangeCallback);
+                    onChunkLoadInternal(chunk, blockEntities);
                 }
             }, 20L);
+        }
+
+        private void onChunkLoadInternal(Chunk chunk, List<Location> blockEntities) {
+            List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+            if (chunkIslands.isEmpty())
+                return;
+
+            for (Island island : chunkIslands) {
+                for (Location blockEntity : blockEntities)
+                    plugin.getNMSWorld().listenSpawner(blockEntity, island, UpgradeTypeSpawnerRates.this::calculateNewSpawnerDelay);
+            }
         }
 
     }

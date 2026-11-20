@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.service.IService;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
+import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
 import org.bukkit.GameMode;
@@ -41,10 +42,10 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
 
     private static final KeyMap<Key> BLOCK_KEY_TRANSFORMER = createBlockKeyTransformer();
 
-    private final LazyReference<RegionManagerService> regionManagerService = new LazyReference<RegionManagerService>() {
+    private final LazyReference<RegionManagerServiceImpl> regionManagerService = new LazyReference<RegionManagerServiceImpl>() {
         @Override
-        protected RegionManagerService create() {
-            return plugin.getServices().getService(RegionManagerService.class);
+        protected RegionManagerServiceImpl create() {
+            return (RegionManagerServiceImpl) plugin.getServices().getService(RegionManagerService.class);
         }
     };
     private final SuperiorSkyblockPlugin plugin;
@@ -64,6 +65,15 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         Preconditions.checkNotNull(block, "block cannot be null");
         Preconditions.checkNotNull(usedHand, "usedHand cannot be null");
 
+        return handleStackedBlockPlaceInternal(superiorPlayer, block, usedHand, null, true);
+    }
+
+    public InteractionResult handleStackedBlockPlace(SuperiorPlayer superiorPlayer, Block block, EquipmentSlot usedHand, @Nullable Island island) {
+        return handleStackedBlockPlaceInternal(superiorPlayer, block, usedHand, island, false);
+    }
+
+    private InteractionResult handleStackedBlockPlaceInternal(SuperiorPlayer superiorPlayer, Block block, EquipmentSlot usedHand,
+                                                              @Nullable Island island, boolean lookupIsland) {
         if (!plugin.getSettings().getStackedBlocks().isEnabled())
             return InteractionResult.STACKED_BLOCKS_DISABLED;
 
@@ -80,7 +90,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
 
         int amountToDeposit = onlinePlayer == null ? 1 : handItem == null ? 1 : onlinePlayer.isSneaking() ? handItem.getAmount() : 1;
 
-        return handleBlockStackInternal(superiorPlayer, block, amountToDeposit, Either.left(usedHand));
+        return handleBlockStackInternal(superiorPlayer, block, island, lookupIsland, amountToDeposit, Either.left(usedHand));
     }
 
     @Override
@@ -90,6 +100,18 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         Preconditions.checkNotNull(block, "block cannot be null");
         Preconditions.checkNotNull(itemRemovalCallback, "itemRemovalCallback cannot be null");
 
+        return handleStackedBlockPlaceInternal(superiorPlayer, block, amountToDeposit, itemRemovalCallback, null, true);
+    }
+
+    public InteractionResult handleStackedBlockPlace(SuperiorPlayer superiorPlayer, Block block,
+                                                     int amountToDeposit, OnItemRemovalCallback itemRemovalCallback,
+                                                     @Nullable Island island) {
+        return handleStackedBlockPlaceInternal(superiorPlayer, block, amountToDeposit, itemRemovalCallback, island, false);
+    }
+
+    private InteractionResult handleStackedBlockPlaceInternal(SuperiorPlayer superiorPlayer, Block block,
+                                                              int amountToDeposit, OnItemRemovalCallback itemRemovalCallback,
+                                                              @Nullable Island island, boolean lookupIsland) {
         if (!plugin.getSettings().getStackedBlocks().isEnabled())
             return InteractionResult.STACKED_BLOCKS_DISABLED;
 
@@ -101,7 +123,7 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
         if (interactionResult != InteractionResult.SUCCESS)
             return interactionResult;
 
-        return handleBlockStackInternal(superiorPlayer, block, amountToDeposit, Either.right(itemRemovalCallback));
+        return handleBlockStackInternal(superiorPlayer, block, island, lookupIsland, amountToDeposit, Either.right(itemRemovalCallback));
     }
 
     @Override
@@ -121,6 +143,17 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
     public InteractionResult handleStackedBlockBreak(Block block, @Nullable SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(block, "block cannot be null");
 
+        return handleStackedBlockBreakInternal(block, Keys.of(block), superiorPlayer, null, true);
+    }
+
+    public InteractionResult handleStackedBlockBreak(Block block, Key blockKey, @Nullable Island island,
+                                                     @Nullable SuperiorPlayer superiorPlayer) {
+        return handleStackedBlockBreakInternal(block, blockKey, superiorPlayer, island, false);
+    }
+
+    private InteractionResult handleStackedBlockBreakInternal(Block block, Key blockKey,
+                                                              @Nullable SuperiorPlayer superiorPlayer,
+                                                              @Nullable Island island, boolean lookupIsland) {
         // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return InteractionResult.DISABLED_WORLD;
@@ -132,10 +165,13 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
             if (blockAmount <= 1)
                 return InteractionResult.NOT_STACKED_BLOCK;
 
-            Island island = plugin.getGrid().getIslandAt(blockLocation);
+            if (lookupIsland) {
+                island = plugin.getGrid().getIslandAt(blockLocation);
+            }
+
             if (superiorPlayer != null && island != null) {
                 com.bgsoftware.superiorskyblock.api.service.region.InteractionResult interactionResult =
-                        this.regionManagerService.get().handleBlockBreak(superiorPlayer, block);
+                        this.regionManagerService.get().handleBlockBreak(superiorPlayer, block, blockKey, island);
                 if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
                     return InteractionResult.STACKED_BLOCK_PROTECTED;
             }
@@ -215,15 +251,16 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
     }
 
     private InteractionResult handleBlockStackInternal(SuperiorPlayer superiorPlayer, Block stackedBlock,
-                                                       int amountToDeposit,
+                                                       @Nullable Island island, boolean lookupIsland, int amountToDeposit,
                                                        Either<EquipmentSlot, OnItemRemovalCallback> removalData) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            return handleBlockStackInternal(superiorPlayer, stackedBlock, stackedBlock.getLocation(wrapper.getHandle()),
-                    amountToDeposit, removalData);
+            return handleBlockStackInternal(superiorPlayer, stackedBlock, island, lookupIsland,
+                    stackedBlock.getLocation(wrapper.getHandle()), amountToDeposit, removalData);
         }
     }
 
     private InteractionResult handleBlockStackInternal(SuperiorPlayer superiorPlayer, Block stackedBlock,
+                                                       @Nullable Island island, boolean lookupIsland,
                                                        Location stackedBlockLocation, int amountToDeposit,
                                                        Either<EquipmentSlot, OnItemRemovalCallback> removalData) {
         Player onlinePlayer = superiorPlayer.asPlayer();
@@ -244,7 +281,10 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
             return InteractionResult.NOT_ENOUGH_BLOCKS;
         }
 
-        Island island = plugin.getGrid().getIslandAt(stackedBlockLocation);
+        if (lookupIsland) {
+            island = plugin.getGrid().getIslandAt(stackedBlockLocation);
+        }
+
         if (island != null) {
             // We ensure we do not exceed island's block limit
             BigInteger amountToDepositBig = BigInteger.valueOf(amountToDeposit);

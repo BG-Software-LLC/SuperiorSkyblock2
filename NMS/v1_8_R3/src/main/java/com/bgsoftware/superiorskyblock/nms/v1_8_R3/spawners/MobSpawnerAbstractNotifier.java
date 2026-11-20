@@ -1,20 +1,24 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3.spawners;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.MobSpawnerAbstract;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.World;
 
-import java.util.function.IntFunction;
+import java.lang.ref.WeakReference;
 
 public class MobSpawnerAbstractNotifier extends MobSpawnerAbstract {
 
     private final MobSpawnerAbstract mobSpawnerAbstract;
-    private final IntFunction<Integer> delayChangeCallback;
+    private final WeakReference<Island> island;
+    private final NMSWorld.DelayChangeCallback delayChangeCallback;
 
-    public MobSpawnerAbstractNotifier(MobSpawnerAbstract mobSpawnerAbstract, IntFunction<Integer> delayChangeCallback) {
+    public MobSpawnerAbstractNotifier(MobSpawnerAbstract mobSpawnerAbstract, Island island, NMSWorld.DelayChangeCallback delayChangeCallback) {
         this.mobSpawnerAbstract = mobSpawnerAbstract;
+        this.island = new WeakReference<>(island);
         this.delayChangeCallback = delayChangeCallback;
 
         // Copy data from original spawner to this
@@ -82,7 +86,9 @@ public class MobSpawnerAbstractNotifier extends MobSpawnerAbstract {
     }
 
     public void updateDelay() {
-        mobSpawnerAbstract.spawnDelay = delayChangeCallback.apply(mobSpawnerAbstract.spawnDelay);
+        Island island = this.island.get();
+        if (island != null)
+            mobSpawnerAbstract.spawnDelay = delayChangeCallback.apply(island, mobSpawnerAbstract.spawnDelay);
     }
 
 }

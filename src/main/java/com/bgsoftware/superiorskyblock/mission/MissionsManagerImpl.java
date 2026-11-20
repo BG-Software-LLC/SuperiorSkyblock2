@@ -299,7 +299,9 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                 return false;
             }
 
-            if (!canComplete(superiorPlayer, mission)) {
+            // Same as canComplete, without checking canCompleteAgain a second time.
+            if (!hasAllRequiredMissions(superiorPlayer, mission) || !canPassAllChecks(superiorPlayer, mission) ||
+                    mission.getProgress(superiorPlayer) < 1.0) {
                 return false;
             }
 
@@ -310,11 +312,10 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     return false;
                 }
 
+                // canCompleteAgain was already checked above.
                 if (!shouldAutoReward) {
-                    if (canCompleteAgain(superiorPlayer, mission)) {
-                        Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
-                        return false;
-                    }
+                    Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                    return false;
                 }
             }
         }

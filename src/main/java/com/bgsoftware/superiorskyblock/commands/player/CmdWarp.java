@@ -102,8 +102,11 @@ public class CmdWarp implements ISuperiorCommand {
                     plugin.getMenus().openWarpCategories(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), targetIsland);
                     break;
                 case 2:
-                    IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[1]);
-                    targetIsland = arguments.getIsland();
+                    // Without a warp name, args[1] was already resolved as the target island above.
+                    if (targetWarpName != null) {
+                        IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[1]);
+                        targetIsland = arguments.getIsland();
+                    }
                     if (targetIsland != null) {
                         plugin.getMenus().openWarpCategories(superiorPlayer, MenuViewWrapper.fromView(superiorPlayer.getOpenedView()), targetIsland);
                     }

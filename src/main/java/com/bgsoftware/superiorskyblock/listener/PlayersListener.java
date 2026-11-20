@@ -37,6 +37,7 @@ import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
 import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
+import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -56,10 +57,10 @@ import java.util.Locale;
 
 public class PlayersListener extends AbstractGameEventListener {
 
-    private final LazyReference<RegionManagerService> regionManagerService = new LazyReference<RegionManagerService>() {
+    private final LazyReference<RegionManagerServiceImpl> regionManagerService = new LazyReference<RegionManagerServiceImpl>() {
         @Override
-        protected RegionManagerService create() {
-            return plugin.getServices().getService(RegionManagerService.class);
+        protected RegionManagerServiceImpl create() {
+            return (RegionManagerServiceImpl) plugin.getServices().getService(RegionManagerService.class);
         }
     };
     private final LazyReference<DragonBattleServiceImpl> dragonBattleService = new LazyReference<DragonBattleServiceImpl>() {
@@ -118,8 +119,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
     private void onPlayerJoin(GameEvent<GameEventArgs.PlayerJoinEvent> e) {
         Player player = e.getArgs().player;
-
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         if (superiorPlayer instanceof SuperiorNPCPlayer) {
             ((SuperiorNPCPlayer) superiorPlayer).release();
@@ -192,7 +192,7 @@ public class PlayersListener extends AbstractGameEventListener {
         // Pending requests of dangerous commands should not be executed after the player left.
         plugin.getCommands().cancelDangerousRequests(player.getUniqueId());
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         if (superiorPlayer instanceof SuperiorNPCPlayer) {
             ((SuperiorNPCPlayer) superiorPlayer).release();
@@ -241,9 +241,9 @@ public class PlayersListener extends AbstractGameEventListener {
     private void onPlayerGameModeChange(GameEvent<GameEventArgs.PlayerGamemodeChangeEvent> e) {
         Player player = e.getArgs().player;
         if (e.getArgs().newGamemode == GameMode.SPECTATOR) {
-            IslandNotifications.notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(player));
+            IslandNotifications.notifyPlayerQuit(e.getArgs().superiorPlayerResolver.get());
         } else if (player.getGameMode() == GameMode.SPECTATOR) {
-            IslandNotifications.notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(player));
+            IslandNotifications.notifyPlayerJoin(e.getArgs().superiorPlayerResolver.get());
         }
     }
 
@@ -265,8 +265,9 @@ public class PlayersListener extends AbstractGameEventListener {
         if (superiorPlayer.hasPlayerStatus(PlayerStatus.VOID_TELEPORT))
             return;
 
-        MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(
-                superiorPlayer, e.getArgs().from, e.getArgs().to);
+        MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(superiorPlayer,
+                e.getArgs().from, e.getArgs().fromIslandResolver.get(),
+                e.getArgs().to, e.getArgs().toIslandResolver.get());
         switch (moveResult) {
             case VOID_TELEPORT:
             case SUCCESS:
@@ -297,8 +298,9 @@ public class PlayersListener extends AbstractGameEventListener {
             return;
         }
 
-        MoveResult moveResult = this.regionManagerService.get().handlePlayerTeleport(
-                superiorPlayer, e.getArgs().from, e.getArgs().to);
+        MoveResult moveResult = this.regionManagerService.get().handlePlayerTeleport(superiorPlayer,
+                e.getArgs().from, e.getArgs().fromIslandResolver.get(),
+                e.getArgs().to, e.getArgs().toIslandResolver.get());
         if (moveResult != MoveResult.SUCCESS)
             e.setCancelled();
     }
@@ -315,7 +317,7 @@ public class PlayersListener extends AbstractGameEventListener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             island = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
         }
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         if (island != null && superiorPlayer.hasIslandFlyEnabled() && !player.getAllowFlight() &&
                 island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
@@ -355,10 +357,7 @@ public class PlayersListener extends AbstractGameEventListener {
                     !plugin.getGrid().isIslandsWorld(player.getWorld()))
                 return;
 
-            Island island;
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                island = plugin.getGrid().getIslandAt(player.getLocation(wrapper.getHandle()));
-            }
+            Island island = e.getArgs().islandResolver.get();
 
             if (island != null) {
                 if (island.isSpawn() ? (plugin.getSettings().getSpawn().isProtected() && !plugin.getSettings().getSpawn().isPlayersDamage()) :
@@ -412,7 +411,7 @@ public class PlayersListener extends AbstractGameEventListener {
     }
 
     private void onPlayerChat(GameEvent<GameEventArgs.PlayerChatEvent> e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         if (superiorPlayer.getChatState() == ChatStates.LOCAL_CHAT) {
             Island island;
@@ -459,13 +458,12 @@ public class PlayersListener extends AbstractGameEventListener {
         if (action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_BLOCK)
             return;
 
-        Player player = e.getArgs().player;
         ItemStack usedItem = e.getArgs().usedItem;
 
         if (usedItem == null || usedItem.getType() != Materials.GOLDEN_AXE.toBukkitType())
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         if (!superiorPlayer.hasSchematicModeEnabled())
             return;
@@ -543,7 +541,7 @@ public class PlayersListener extends AbstractGameEventListener {
 
             Island respawnAtIsland = plugin.getGrid().getIslandAt(respawnLocation);
             if (respawnAtIsland != null) {
-                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+                SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
                 superiorPlayer.updateWorldBorder(respawnAtIsland);
                 // Respawning does not go through the island enter handling.
                 this.dragonBattleService.get().restoreKilledEnderDragonBattle(respawnAtIsland, respawnLocation.getWorld());

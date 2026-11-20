@@ -49,6 +49,7 @@ import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.MutableBlockPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -85,6 +86,7 @@ import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
+import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.cache.IslandCacheImpl;
 import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
@@ -1369,7 +1371,7 @@ public class SIsland implements Island {
     @Override
     public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ, double extraRadius) {
         Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
-        return isIslandWorld(worldInfo) && isInside(chunkX, chunkZ, extraRadius);
+        return isIslandWorld(worldInfo.getName()) && isInside(chunkX, chunkZ, extraRadius);
     }
 
     @Override
@@ -1469,7 +1471,7 @@ public class SIsland implements Island {
     @Override
     public boolean isInsideRange(WorldInfo worldInfo, int chunkX, int chunkZ, double extraRadius) {
         Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
-        return isIslandWorld(worldInfo) && isInsideRange(chunkX, chunkZ, extraRadius);
+        return isIslandWorld(worldInfo.getName()) && isInsideRange(chunkX, chunkZ, extraRadius);
     }
 
     @Override
@@ -1488,15 +1490,12 @@ public class SIsland implements Island {
     }
 
     private boolean isIslandWorld(Location location) {
-        return isIslandWorld(LazyWorldLocation.getWorldName(location));
+        World bukkitWorld = location.getWorld();
+        return bukkitWorld != null ? isIslandWorld(bukkitWorld) : isIslandWorld(LazyWorldLocation.getWorldName(location));
     }
 
-    private boolean isIslandWorld(@Nullable World world) {
-        return world != null && isIslandWorld(world.getName());
-    }
-
-    private boolean isIslandWorld(@Nullable WorldInfo worldInfo) {
-        return worldInfo != null && isIslandWorld(worldInfo.getName());
+    private boolean isIslandWorld(World world) {
+        return plugin.getGrid().isIslandsWorld(world);
     }
 
     private boolean isIslandWorld(@Nullable String worldName) {
@@ -1569,7 +1568,8 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(sender, "sender parameter cannot be null.");
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
 
-        return sender instanceof ConsoleCommandSender || hasPermission(plugin.getPlayers().getSuperiorPlayer(sender), islandPrivilege);
+        return sender instanceof ConsoleCommandSender ||
+                hasPermissionInternal(plugin.getPlayers().getSuperiorPlayer(sender), islandPrivilege);
     }
 
     @Override
@@ -1577,10 +1577,16 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
 
-        PermissionNode playerNode = getPermissionNode(superiorPlayer);
-        return superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasBypassPermission(islandPrivilege) ||
-                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*") ||
-                (playerNode != null && playerNode.hasPermission(islandPrivilege));
+        return hasPermissionInternal(superiorPlayer, islandPrivilege);
+    }
+
+    private boolean hasPermissionInternal(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
+        if (superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasBypassPermission(islandPrivilege) ||
+                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*"))
+            return true;
+
+        PermissionNode permissionNode = playerPermissions.get(superiorPlayer);
+        return permissionNode != null && permissionNode.hasPermission(islandPrivilege);
     }
 
     @Override
@@ -1646,7 +1652,7 @@ public class SIsland implements Island {
                 superiorPlayer.getName(), islandPrivilege, value);
 
         PlayerPrivilegeNode privilegeNode = playerPermissions.computeIfAbsent(superiorPlayer,
-                s -> new PlayerPrivilegeNode(superiorPlayer, this));
+                s -> new PlayerPrivilegeNode(s, this));
 
         privilegeNode.setPermission(islandPrivilege, value);
 
@@ -1691,8 +1697,7 @@ public class SIsland implements Island {
     @Override
     public PrivilegeNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        PlayerPrivilegeNode permissionNode = playerPermissions.get(superiorPlayer);
-        return permissionNode != null ? permissionNode : new PlayerPrivilegeNode(superiorPlayer, this);
+        return playerPermissions.computeIfAbsent(superiorPlayer, s -> new PlayerPrivilegeNode(s, this));
     }
 
     @Override
@@ -2571,21 +2576,30 @@ public class SIsland implements Island {
     private BlockChangeResult handleBlockPlaceInternal(Key key, @Size BigInteger amount, @IslandBlockFlags int flags) {
         boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
 
-        boolean trackedBlock = trackOrUntrackBlock(rawBlocks, true, key, amount);
+        BlockValue blockValue;
+        long cachedStamp = BlockValuesManagerImpl.CACHED_BLOCK_VALUE_RESULT.startCache();
+        try {
+            boolean trackedBlock = trackOrUntrackBlock(rawBlocks, true, key, amount);
 
-        if (!trackedBlock)
-            return BlockChangeResult.MISSING_BLOCK_VALUE;
+            if (!trackedBlock)
+                return BlockChangeResult.MISSING_BLOCK_VALUE;
+
+            blockValue = plugin.getBlockValues().getBlockValue(key);
+        } finally {
+            BlockValuesManagerImpl.CACHED_BLOCK_VALUE_RESULT.endCache(cachedStamp);
+        }
 
         BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.accumulateAndGet(amount, BigInteger::add);
 
-        BigDecimal oldWorth = getWorth();
-        BigDecimal oldLevel = getIslandLevel();
+        boolean saveBlockCounts = (flags & IslandBlockFlags.SAVE_BLOCK_COUNTS) != 0;
 
-        BlockValue blockValue = plugin.getBlockValues().getBlockValue(key);
+        BigDecimal oldWorth = saveBlockCounts ? getWorth() : null;
+        BigDecimal oldLevel = saveBlockCounts ? getIslandLevel() : null;
+
+
         BigDecimal blockWorth = blockValue.getWorth();
         BigDecimal blockLevel = blockValue.getLevel();
 
-        boolean saveBlockCounts = (flags & IslandBlockFlags.SAVE_BLOCK_COUNTS) != 0;
         boolean updateLastTimeStatus = (flags & IslandBlockFlags.UPDATE_LAST_TIME_STATUS) != 0;
 
         if (blockWorth.compareTo(BigDecimal.ZERO) != 0) {
@@ -2781,20 +2795,29 @@ public class SIsland implements Island {
 
         boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
 
-        boolean untrackedBlocks = trackOrUntrackBlock(rawBlocks, false, key, amountBig);
+        BlockValue blockValue;
+        long cachedStamp = BlockValuesManagerImpl.CACHED_BLOCK_VALUE_RESULT.startCache();
+        try {
+            boolean untrackedBlocks = trackOrUntrackBlock(rawBlocks, false, key, amountBig);
 
-        if (!untrackedBlocks)
-            return BlockChangeResult.MISSING_BLOCK_VALUE;
+            if (!untrackedBlocks)
+                return BlockChangeResult.MISSING_BLOCK_VALUE;
+
+            blockValue = plugin.getBlockValues().getBlockValue(key);
+        } finally {
+            BlockValuesManagerImpl.CACHED_BLOCK_VALUE_RESULT.endCache(cachedStamp);
+        }
 
         BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.accumulateAndGet(amountBig, BigInteger::subtract);
 
-        BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
+        boolean saveBlockCounts = (flags & IslandBlockFlags.SAVE_BLOCK_COUNTS) != 0;
 
-        BlockValue blockValue = plugin.getBlockValues().getBlockValue(key);
+        BigDecimal oldWorth = saveBlockCounts ? getWorth() : null;
+        BigDecimal oldLevel = saveBlockCounts ? getIslandLevel() : null;
+
         BigDecimal blockWorth = blockValue.getWorth();
         BigDecimal blockLevel = blockValue.getLevel();
 
-        boolean saveBlockCounts = (flags & IslandBlockFlags.SAVE_BLOCK_COUNTS) != 0;
         boolean updateLastTimeStatus = (flags & IslandBlockFlags.UPDATE_LAST_TIME_STATUS) != 0;
 
         if (blockWorth.compareTo(BigDecimal.ZERO) != 0) {
@@ -2907,7 +2930,9 @@ public class SIsland implements Island {
     public boolean isChunkDirty(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        return this.isChunkDirty(world.getName(), chunkX, chunkZ);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
+            return this.dirtyChunksContainer.isMarkedDirty(chunkPosition);
+        }
     }
 
     @Override
@@ -2928,7 +2953,9 @@ public class SIsland implements Island {
     @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        markChunkDirty(WorldInfo.of(world), chunkX, chunkZ, save);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markDirty(chunkPosition, save);
+        }
     }
 
     @Override
@@ -2943,7 +2970,9 @@ public class SIsland implements Island {
     @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        markChunkEmpty(WorldInfo.of(world), chunkX, chunkZ, save);
+        try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
+            this.dirtyChunksContainer.markEmpty(chunkPosition, save);
+        }
     }
 
     @Override
@@ -4844,11 +4873,14 @@ public class SIsland implements Island {
 
         superiorPlayer.setTeleportTask(null);
 
-        if (!isInsideRange(location) || !WorldBlocks.isSafeBlock(location.getBlock())) {
-            Message.UNSAFE_WARP.send(superiorPlayer);
-            if (plugin.getSettings().getDeleteUnsafeWarps())
-                deleteWarp(islandWarp.getName());
-            return;
+        // `location` is know to be an islands world, we can skip islands world check again
+        try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
+            if (!isInsideRange(blockPosition.set(location)) || !WorldBlocks.isSafeBlock(location.getBlock())) {
+                Message.UNSAFE_WARP.send(superiorPlayer);
+                if (plugin.getSettings().getDeleteUnsafeWarps())
+                    deleteWarp(islandWarp.getName());
+                return;
+            }
         }
 
         superiorPlayer.teleportWithResult(location, result -> {

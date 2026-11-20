@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
-import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -18,6 +17,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -75,37 +75,48 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     /* ENTITY SPAWNING */
 
     private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
+        Entity entity = e.getArgs().entity;
+
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(e.getArgs().entity.getWorld()))
+        if (shouldIgnoreWorldEvents(entity.getWorld()))
             return;
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location location = e.getArgs().entity.getLocation(wrapper.getHandle());
+        CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
+        boolean isSpawnerSpawning = spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER ||
+                spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG;
+        boolean isNaturalSpawning = !isSpawnerSpawning && NATURAL_SPAWN_REASONS.contains(spawnReason);
+        boolean isChickenEgg = !isSpawnerSpawning && entity instanceof Item && ((Item) entity).getItemStack().getType() == Material.EGG;
 
-            if (checkPreventEntitySpawn(e, location) || checkPreventEggLay(e, location))
-                e.setCancelled();
-        }
+        if (!isSpawnerSpawning && !isNaturalSpawning && !isChickenEgg)
+            return;
+
+        Island island = e.getArgs().islandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        if (checkPreventEntitySpawn(e, island, isSpawnerSpawning) || checkPreventEggLay(entity, island))
+            e.setCancelled();
     }
 
-    private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Location entityLocation) {
-        CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
-
-        if (spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER ||
-                spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {
+    private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Island island, boolean isSpawnerSpawning) {
+        if (isSpawnerSpawning) {
             List<EntityCategory> entityCategories = BukkitEntities.getCategories(e.getArgs().entity);
             IslandFlag islandFlag;
             for (EntityCategory entityCategory : entityCategories) {
                 islandFlag = entityCategory.getSpawnerSpawningIslandFlag();
-                if (islandFlag != null && preventAction(entityLocation, islandFlag)) {
+                if (islandFlag != null && !island.hasSettingsEnabled(islandFlag)) {
                     return true;
                 }
             }
-        } else if (NATURAL_SPAWN_REASONS.contains(spawnReason)) {
+        } else {
             List<EntityCategory> entityCategories = BukkitEntities.getCategories(e.getArgs().entity);
             IslandFlag islandFlag;
             for (EntityCategory entityCategory : entityCategories) {
                 islandFlag = entityCategory.getNaturalSpawningIslandFlag();
-                if (islandFlag != null && preventAction(entityLocation, islandFlag)) {
+                if (islandFlag != null && !island.hasSettingsEnabled(islandFlag)) {
                     return true;
                 }
             }
@@ -114,16 +125,8 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         return false;
     }
 
-    private boolean checkPreventEggLay(GameEvent<GameEventArgs.EntitySpawnEvent> e, Location entityLocation) {
-        if (!(e.getArgs().entity instanceof Item))
-            return false;
-
-        Item item = (Item) e.getArgs().entity;
-
-        if (item.getItemStack().getType() != Material.EGG)
-            return false;
-
-        if (preventAction(entityLocation, IslandFlags.EGG_LAY)) {
+    private boolean checkPreventEggLay(Entity item, Island island) {
+        if (!island.hasSettingsEnabled(IslandFlags.EGG_LAY)) {
             for (Entity entity : item.getNearbyEntities(1, 1, 1)) {
                 if (entity instanceof Chicken) {
                     return true;
@@ -144,31 +147,34 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             return;
         }
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location entityLocation = entity.getLocation(wrapper.getHandle());
+        Island island = e.getArgs().islandResolver.get();
+        if (island == null)
+            return;
 
-            HangingBreakEvent.RemoveCause removeCause = e.getArgs().removeCause;
-            Entity remover = e.getArgs().remover;
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
 
-            if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION) {
-                if (remover instanceof Player) {
-                    // Explosion was set by TNT.
-                    if (preventAction(entityLocation, IslandFlags.TNT_EXPLOSION)) {
-                        e.setCancelled();
-                        return;
-                    }
-                } else if (remover instanceof Ghast) {
-                    // Explosion was set by TNT.
-                    if (preventAction(entityLocation, IslandFlags.GHAST_FIREBALL)) {
-                        e.setCancelled();
-                        return;
-                    }
+        HangingBreakEvent.RemoveCause removeCause = e.getArgs().removeCause;
+        Entity remover = e.getArgs().remover;
+
+        if (removeCause == HangingBreakEvent.RemoveCause.EXPLOSION) {
+            if (remover instanceof Player) {
+                // Explosion was set by TNT.
+                if (!island.hasSettingsEnabled(IslandFlags.TNT_EXPLOSION)) {
+                    e.setCancelled();
+                    return;
+                }
+            } else if (remover instanceof Ghast) {
+                // Explosion was set by TNT.
+                if (!island.hasSettingsEnabled(IslandFlags.GHAST_FIREBALL)) {
+                    e.setCancelled();
+                    return;
                 }
             }
+        }
 
-            if (preventEntityExplosion(remover, entityLocation)) {
-                e.setCancelled();
-            }
+        if (preventEntityExplosion(remover, island)) {
+            e.setCancelled();
         }
     }
 
@@ -179,27 +185,37 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (shouldIgnoreWorldEvents(entity.getWorld()))
             return;
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventEntityExplosion(entity, entity.getLocation(wrapper.getHandle())))
-                e.getArgs().blocks.clear();
-        }
+        Island island = e.getArgs().islandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        if (preventEntityExplosion(entity, island))
+            e.getArgs().blocks.clear();
     }
 
     private void onEntityChangeBlock(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
         Block block = e.getArgs().block;
 
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld()))
-            return;
-
         // Sulfur cubes are only checked for their explosions, not when changing blocks (trampling farmland).
         if (e.getArgs().entity.getType() == SULFUR_CUBE_TYPE)
             return;
 
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventEntityExplosion(e.getArgs().entity, block.getLocation(wrapper.getHandle())))
-                e.setCancelled();
-        }
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld()))
+            return;
+
+        Island island = e.getArgs().blockIslandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        if (preventEntityExplosion(e.getArgs().entity, island))
+            e.setCancelled();
     }
 
     private void onFireballDamage(GameEvent<GameEventArgs.EntityDamageEvent> e) {
@@ -210,13 +226,190 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             return;
         }
 
-        if (entity instanceof Fireball) {
-            originalFireballsDamager.put(entity.getEntityId(), ((Fireball) entity).getShooter());
-            BukkitExecutor.sync(() -> originalFireballsDamager.remove(entity.getEntityId()), 40L);
-        }
+        if (!(entity instanceof Fireball))
+            return;
+
+        Island island = e.getArgs().islandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        originalFireballsDamager.put(entity.getEntityId(), ((Fireball) entity).getShooter());
+        BukkitExecutor.sync(() -> originalFireballsDamager.remove(entity.getEntityId()), 40L);
     }
 
-    public boolean preventEntityExplosion(Entity source, Location explodeLocation) {
+    /* GENERAL EVENTS */
+
+    private void onBlockFlow(GameEvent<GameEventArgs.BlockFromToEvent> e) {
+        Block block = e.getArgs().block;
+        Block toBlock = e.getArgs().toBlock;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(toBlock.getWorld())) {
+            return;
+        }
+
+        Island island = WorldBlocks.findIslandWithHint(toBlock, e.getArgs().islandResolver.get());
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        IslandFlag islandFlag = plugin.getNMSWorld().isWaterLogged(block) ?
+                IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
+
+        if (!island.hasSettingsEnabled(islandFlag))
+            e.setCancelled();
+    }
+
+    private void onCropsGrowth(GameEvent<GameEventArgs.BlockGrowEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld())) {
+            return;
+        }
+
+        Island island = e.getArgs().islandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        if (!island.hasSettingsEnabled(IslandFlags.CROPS_GROWTH))
+            e.setCancelled();
+    }
+
+    private void onTreeGrowth(GameEvent<GameEventArgs.StructureGrowEvent> e) {
+        Location location = e.getArgs().location;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(location.getWorld())) {
+            return;
+        }
+
+        if (preventAction(location, IslandFlags.TREE_GROWTH))
+            e.setCancelled();
+    }
+
+    private void onFireSpread(GameEvent<GameEventArgs.BlockBurnEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld())) {
+            return;
+        }
+
+        Island island = e.getArgs().islandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        if (!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
+            e.setCancelled();
+    }
+
+    private void onBlockIgnite(GameEvent<GameEventArgs.BlockIgniteEvent> e) {
+        if (e.getArgs().igniteCause != BlockIgniteEvent.IgniteCause.SPREAD)
+            return;
+
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld())) {
+            return;
+        }
+
+        Island island = e.getArgs().islandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        if (!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
+            e.setCancelled();
+    }
+
+    private void onEndermanGrief(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
+        if (!(e.getArgs().entity instanceof Enderman))
+            return;
+
+        Block block = e.getArgs().block;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(block.getWorld())) {
+            return;
+        }
+
+        Island island = e.getArgs().blockIslandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        if (!island.hasSettingsEnabled(IslandFlags.ENDERMAN_GRIEF))
+            e.setCancelled();
+    }
+
+    private void onPoisonAttack(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
+        Entity entity = e.getArgs().entity;
+        EntityType entityType = entity.getType();
+
+        if (entityType != EntityType.SPLASH_POTION)
+            return;
+
+        // We only check island flags in relevant worlds
+        if (shouldIgnoreWorldEvents(entity.getWorld())) {
+            return;
+        }
+
+        Player shooterPlayer = BukkitEntities.getPlayerSource(entity);
+        if (shooterPlayer == null) {
+            return;
+        }
+
+        Island island = e.getArgs().islandResolver.get();
+        if (island == null)
+            return;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return;
+
+        if (island.hasSettingsEnabled(IslandFlags.PVP))
+            return;
+
+        List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
+
+        BukkitExecutor.sync(() -> {
+            for (Entity nearbyEntity : nearbyEntities) {
+                if (nearbyEntity instanceof LivingEntity && !nearbyEntity.getUniqueId().equals(shooterPlayer.getUniqueId()))
+                    ((LivingEntity) nearbyEntity).removePotionEffect(PotionEffectType.POISON);
+            }
+        }, 1L);
+    }
+
+    /* INTERNAL */
+
+    private boolean preventAction(Location location, IslandFlag islandFlag) {
+        Island island = plugin.getGrid().getIslandAt(location);
+        if (island == null)
+            return false;
+
+        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
+            return false;
+
+        return !island.hasSettingsEnabled(islandFlag);
+    }
+
+    private boolean preventEntityExplosion(Entity source, Island island) {
         IslandFlag islandFlag;
 
         EntityType entityType = source.getType();
@@ -250,144 +443,6 @@ public class IslandFlagsListener extends AbstractGameEventListener {
                 return false;
             }
         }
-
-        return preventAction(explodeLocation, islandFlag);
-    }
-
-    /* GENERAL EVENTS */
-
-    private void onBlockFlow(GameEvent<GameEventArgs.BlockFromToEvent> e) {
-        Block block = e.getArgs().block;
-        Block toBlock = e.getArgs().toBlock;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(toBlock.getWorld())) {
-            return;
-        }
-
-        IslandFlag islandFlag = plugin.getNMSWorld().isWaterLogged(block) ?
-                IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(toBlock.getLocation(wrapper.getHandle()), islandFlag))
-                e.setCancelled();
-        }
-    }
-
-    private void onCropsGrowth(GameEvent<GameEventArgs.BlockGrowEvent> e) {
-        Block block = e.getArgs().block;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld())) {
-            return;
-        }
-
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.CROPS_GROWTH))
-                e.setCancelled();
-        }
-    }
-
-    private void onTreeGrowth(GameEvent<GameEventArgs.StructureGrowEvent> e) {
-        Location location = e.getArgs().location;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(location.getWorld())) {
-            return;
-        }
-
-        if (preventAction(location, IslandFlags.TREE_GROWTH))
-            e.setCancelled();
-    }
-
-    private void onFireSpread(GameEvent<GameEventArgs.BlockBurnEvent> e) {
-        Block block = e.getArgs().block;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld())) {
-            return;
-        }
-
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
-                e.setCancelled();
-        }
-    }
-
-    private void onBlockIgnite(GameEvent<GameEventArgs.BlockIgniteEvent> e) {
-        if (e.getArgs().igniteCause != BlockIgniteEvent.IgniteCause.SPREAD)
-            return;
-
-        Block block = e.getArgs().block;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld())) {
-            return;
-        }
-
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.FIRE_SPREAD))
-                e.setCancelled();
-        }
-    }
-
-    private void onEndermanGrief(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
-        if (!(e.getArgs().entity instanceof Enderman))
-            return;
-
-        Block block = e.getArgs().block;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld())) {
-            return;
-        }
-
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventAction(block.getLocation(wrapper.getHandle()), IslandFlags.ENDERMAN_GRIEF))
-                e.setCancelled();
-        }
-    }
-
-    private void onPoisonAttack(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
-        Entity entity = e.getArgs().entity;
-        EntityType entityType = entity.getType();
-
-        if (entityType != EntityType.SPLASH_POTION)
-            return;
-
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(entity.getWorld())) {
-            return;
-        }
-
-        Player shooterPlayer = BukkitEntities.getPlayerSource(entity);
-        if (shooterPlayer == null) {
-            return;
-        }
-
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (!preventAction(entity.getLocation(wrapper.getHandle()), IslandFlags.PVP))
-                return;
-        }
-
-        List<Entity> nearbyEntities = entity.getNearbyEntities(2, 2, 2);
-
-        BukkitExecutor.sync(() -> {
-            for (Entity nearbyEntity : nearbyEntities) {
-                if (nearbyEntity instanceof LivingEntity && !nearbyEntity.getUniqueId().equals(shooterPlayer.getUniqueId()))
-                    ((LivingEntity) nearbyEntity).removePotionEffect(PotionEffectType.POISON);
-            }
-        }, 1L);
-    }
-
-    /* INTERNAL */
-
-    private boolean preventAction(Location location, IslandFlag islandFlag) {
-        Island island = plugin.getGrid().getIslandAt(location);
-        if (island == null)
-            return false;
-
-        if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
-            return false;
 
         return !island.hasSettingsEnabled(islandFlag);
     }

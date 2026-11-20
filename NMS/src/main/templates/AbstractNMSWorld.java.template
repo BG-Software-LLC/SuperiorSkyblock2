@@ -127,7 +127,7 @@ public abstract class AbstractNMSWorld implements NMSWorld {
     }
 
     @Override
-    public void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback) {
+    public void listenSpawner(Location location, Island island, DelayChangeCallback delayChangeCallback) {
         SpawnerBlockEntity spawnerBlockEntity = NMSUtils.getBlockEntityAt(location, SpawnerBlockEntity.class);
         if (spawnerBlockEntity == null)
             return;
@@ -143,7 +143,8 @@ public abstract class AbstractNMSWorld implements NMSWorld {
             if (tickingBlockEntity.getPos().equals(spawnerBlockEntity.getBlockPos()) &&
                     !(tickingBlockEntity instanceof TickingSpawnerBlockEntityNotifier)) {
                 blockEntityTickersIterator.remove();
-                tickersToAdd.add(new TickingSpawnerBlockEntityNotifier(spawnerBlockEntity, tickingBlockEntity, delayChangeCallback));
+                tickersToAdd.add(new TickingSpawnerBlockEntityNotifier(
+                        spawnerBlockEntity, tickingBlockEntity, island, delayChangeCallback));
             }
         }
 
@@ -315,7 +316,7 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
         Component[] newLines;
 
-        IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, strippedLines, false);
+        IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, island, strippedLines, false);
         if (result.isCancelEvent()) {
             newLines = CraftSign.sanitizeLines(strippedLines);
         } else {

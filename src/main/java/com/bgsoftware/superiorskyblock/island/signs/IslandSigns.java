@@ -30,12 +30,11 @@ public class IslandSigns {
 
     }
 
-    public static Result handleSignPlace(SuperiorPlayer superiorPlayer, Location warpLocation, String[] warpLines,
-                                         boolean sendMessage) {
+    public static Result handleSignPlace(SuperiorPlayer superiorPlayer, Location warpLocation, @Nullable Island island,
+                                         String[] warpLines, boolean sendMessage) {
         // Adjust to the middle of the block
         warpLocation.add(0.5, 0, 0.5);
 
-        Island island = plugin.getGrid().getIslandAt(warpLocation);
         if (island == null)
             return new Result(Reason.NOT_IN_ISLAND, false);
 
@@ -56,14 +55,11 @@ public class IslandSigns {
     }
 
     public static Result handleSignBreak(@Nullable Island island, @Nullable SuperiorPlayer superiorPlayer, Sign sign) {
+        if (island == null)
+            return new Result(Reason.NOT_IN_ISLAND, false);
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location signLocation = sign.getLocation(wrapper.getHandle());
-
-            if (island == null) {
-                island = plugin.getGrid().getIslandAt(signLocation);
-                if (island == null)
-                    return new Result(Reason.NOT_IN_ISLAND, false);
-            }
 
             IslandWarp islandWarp = island.getWarp(signLocation);
 

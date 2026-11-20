@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.CachedResult;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
@@ -36,6 +37,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BukkitEntities {
+
+    public static final CachedResult<SuperiorPlayer, Entity> CACHED_SUPERIOR_PLAYER_SOURCE = CachedResult.create();
 
     @Nullable
     private static final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
@@ -134,6 +137,10 @@ public class BukkitEntities {
 
     @Nullable
     public static SuperiorPlayer getSuperiorPlayerSource(@Nullable Entity entity) {
+        return CACHED_SUPERIOR_PLAYER_SOURCE.getOrCompute(entity, BukkitEntities::lookupSuperiorPlayerSourceInternal);
+    }
+
+    private static SuperiorPlayer lookupSuperiorPlayerSourceInternal(@Nullable Entity entity) {
         Player player = getPlayerSource(entity);
         return player == null ? null : plugin.getPlayers().getSuperiorPlayer(player);
     }

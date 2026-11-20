@@ -175,7 +175,7 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onItemPickup(PlayerPickupItemEvent e) {
         ItemStack itemStack = e.getItem().getItemStack();
-        handleItemPickup(e.getPlayer(), e.getItem().getItemStack());
+        handleItemPickup(e.getPlayer(), itemStack);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

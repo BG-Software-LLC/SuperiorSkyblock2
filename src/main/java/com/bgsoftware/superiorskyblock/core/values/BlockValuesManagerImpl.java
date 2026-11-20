@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.core.CachedResult;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.key.BaseKey;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
@@ -30,6 +31,8 @@ import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 public class BlockValuesManagerImpl extends Manager implements BlockValuesManager {
+
+    public static final CachedResult<BlockValue, Key> CACHED_BLOCK_VALUE_RESULT = CachedResult.create();
 
     private static final Map<String, BigDecimal> CACHED_BIG_DECIMALS;
 
@@ -99,7 +102,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
     public BlockValue getBlockValue(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return getBlockValue(key, true);
+        return CACHED_BLOCK_VALUE_RESULT.getOrCompute(key, k -> getBlockValue(k, true));
     }
 
     private BlockValue getBlockValue(Key key, boolean checkPrices) {

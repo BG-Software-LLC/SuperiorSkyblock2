@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
-import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -51,14 +50,12 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
     }
 
     public void teleportInternal(Player player, Island island, Dimension dimension, CompletableFuture<TeleportResult> result) {
-        Location homeLocation = island.getIslandHome(dimension);
-
-        Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
-                island.getUniqueId());
-
         Log.debug(Debug.TELEPORT_PLAYER, player.getName(), island.getOwner().getName(), dimension);
 
-        EntityTeleports.findIslandSafeLocation(island, dimension).whenComplete((safeSpot, error) -> {
+        // The island world is already loaded at this point, so the safe spot is searched for directly.
+        // findIslandSafeLocation also checks that the island has a home location.
+        CompletableFuture<Location> safeSpotFuture = new CompletableFuture<>();
+        safeSpotFuture.whenComplete((safeSpot, error) -> {
             if (error != null) {
                 Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", null);
                 result.completeExceptionally(error);
@@ -78,6 +75,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                 });
             }
         });
+        EntityTeleports.findIslandSafeLocation(island, dimension, safeSpotFuture);
     }
 
 }

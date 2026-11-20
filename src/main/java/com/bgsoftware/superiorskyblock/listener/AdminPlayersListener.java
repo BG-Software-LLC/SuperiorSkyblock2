@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -28,14 +29,16 @@ public class AdminPlayersListener extends AbstractGameEventListener {
     }
 
     private void onPlayerJoin(GameEvent<GameEventArgs.PlayerJoinEvent> e) {
-        Player player = e.getArgs().player;
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         // Notifies me when a server uses one of my plugins.
-        if (player.getUniqueId().equals(DEVELOPER_UUID)) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> Message.CUSTOM.send(player,
+        if (superiorPlayer.getUniqueId().equals(DEVELOPER_UUID)) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> Message.CUSTOM.send(superiorPlayer,
                     "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
                             plugin.getDescription().getVersion() + buildName, true), 5L);
         }
+
+        Player player = e.getArgs().player;
 
         // Notifies operators about new updates
         if (player.isOp() && plugin.getUpdater().isOutdated()) {

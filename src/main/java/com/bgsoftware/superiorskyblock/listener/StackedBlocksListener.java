@@ -23,8 +23,10 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksInteractionServiceImpl;
 import com.bgsoftware.superiorskyblock.service.stackedblocks.StackedBlocksServiceHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -53,10 +55,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
     private final Map<CreatureSpawnEvent.SpawnReason, List<BlockOffset>> ENTITY_TEMPLATE_OFFSETS = buildEntityTemplateOffsetsMap();
 
-    private final LazyReference<StackedBlocksInteractionService> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionService>() {
+    private final LazyReference<StackedBlocksInteractionServiceImpl> stackedBlocksInteractionService = new LazyReference<StackedBlocksInteractionServiceImpl>() {
         @Override
-        protected StackedBlocksInteractionService create() {
-            return plugin.getServices().getService(StackedBlocksInteractionService.class);
+        protected StackedBlocksInteractionServiceImpl create() {
+            return (StackedBlocksInteractionServiceImpl) plugin.getServices().getService(StackedBlocksInteractionService.class);
         }
     };
 
@@ -78,13 +80,12 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     private void onStackedBlockPlace(GameEvent<GameEventArgs.BlockPlaceEvent> e) {
         Block block = e.getArgs().block;
 
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+        Block againstBlock = e.getArgs().againstBlock;
+        if (againstBlock.equals(block))
             return;
 
-        Block againstBlock = e.getArgs().againstBlock;
-
-        if (againstBlock.equals(block))
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
 
         if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1)
@@ -103,10 +104,11 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         if (inHand.hasItemMeta() && (inHand.getItemMeta().hasDisplayName() || inHand.getItemMeta().hasLore()))
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
+        Island againstBlockIsland = WorldBlocks.findIslandWithHint(againstBlock, e.getArgs().islandResolver.get());
 
         InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockPlace(
-                superiorPlayer, againstBlock, usedHand.getEquipmentSlot());
+                superiorPlayer, againstBlock, usedHand.getEquipmentSlot(), againstBlockIsland);
         if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
             e.setCancelled();
     }
@@ -117,7 +119,6 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
         boolean cancelled = false;
 
-        Player player = e.getArgs().player;
         Block clickedBlock = e.getArgs().clickedBlock;
         PlayerHand usedHand = e.getArgs().usedHand;
         ItemStack usedItem = e.getArgs().usedItem;
@@ -125,18 +126,20 @@ public class StackedBlocksListener extends AbstractGameEventListener {
         Material clickedBlockType = clickedBlock.getType();
 
         if (clickedBlockType == Material.DRAGON_EGG) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+            SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
             if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) {
                 e.setCancelled();
-                if (usedItem == null)
-                    this.stackedBlocksInteractionService.get().handleStackedBlockBreak(clickedBlock, superiorPlayer);
+                if (usedItem == null) {
+                    this.stackedBlocksInteractionService.get().handleStackedBlockBreak(clickedBlock,
+                            e.getArgs().blockKeyResolver.get(), e.getArgs().blockIslandResolver.get(), superiorPlayer);
+                }
                 cancelled = true;
             }
 
             if (usedItem != null) {
-                InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
-                        .handleStackedBlockPlace(superiorPlayer, clickedBlock, usedHand.getEquipmentSlot());
+                InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockPlace(
+                        superiorPlayer, clickedBlock, usedHand.getEquipmentSlot(), e.getArgs().blockIslandResolver.get());
                 if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
                     e.setCancelled();
                     cancelled = true;
@@ -154,9 +157,9 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     /* UNSTACK LISTENERS */
 
     private void onStackedBlockBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
-        InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
-                .handleStackedBlockBreak(e.getArgs().block, superiorPlayer);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
+        InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockBreak(
+                e.getArgs().block, e.getArgs().keyResolver.get(), e.getArgs().islandResolver.get(), superiorPlayer);
         if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
             e.setCancelled();
     }
@@ -184,9 +187,9 @@ public class StackedBlocksListener extends AbstractGameEventListener {
             if (offHandItem != null && offHandItem.getType() == clickedBlock.getType())
                 return false;
 
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-            InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
-                    .handleStackedBlockBreak(clickedBlock, superiorPlayer);
+            SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
+            InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockBreak(
+                    clickedBlock, e.getArgs().blockKeyResolver.get(), e.getArgs().blockIslandResolver.get(), superiorPlayer);
             if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
                 e.setCancelled();
                 return true;
@@ -198,7 +201,10 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
     private void onStackedBlockBreakByEntity(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
         InteractionResult interactionResult = this.stackedBlocksInteractionService.get()
-                .handleStackedBlockBreak(e.getArgs().block, null);
+                .handleStackedBlockBreak(e.getArgs().block,
+                        Keys.of(e.getArgs().block),
+                        e.getArgs().blockIslandResolver.get(),
+                        null);
         if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
             e.setCancelled();
     }
@@ -232,7 +238,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 Location location = block.getLocation(wrapper.getHandle());
 
-                Island island = plugin.getGrid().getIslandAt(location);
+                Island island = WorldBlocks.findIslandWithHint(block, e.getArgs().islandResolver.get());
                 if (island != null)
                     island.handleBlockBreak(block, amount);
 

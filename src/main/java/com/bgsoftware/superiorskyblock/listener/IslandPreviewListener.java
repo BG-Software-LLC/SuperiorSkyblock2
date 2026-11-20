@@ -21,8 +21,7 @@ public class IslandPreviewListener extends AbstractGameEventListener {
     }
 
     private void onPlayerQuit(GameEvent<GameEventArgs.PlayerQuitEvent> e) {
-        Player player = e.getArgs().player;
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         if (superiorPlayer instanceof SuperiorNPCPlayer) {
             ((SuperiorNPCPlayer) superiorPlayer).release();
@@ -35,6 +34,7 @@ public class IslandPreviewListener extends AbstractGameEventListener {
             plugin.getGrid().cancelIslandPreview(superiorPlayer);
             /* cancelIslandPreview changes the GameMode and teleports the player later.
             In this case tho, we want the things to be instant - no async, no nothing. */
+            Player player = e.getArgs().player;
             player.setGameMode(gameMode);
             player.teleport(plugin.getGrid().getSpawnIsland().getCenter(
                     plugin.getSettings().getWorlds().getDefaultWorldDimension()));

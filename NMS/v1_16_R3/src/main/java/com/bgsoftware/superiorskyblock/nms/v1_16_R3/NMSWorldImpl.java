@@ -118,7 +118,7 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback) {
+    public void listenSpawner(Location location, Island island, DelayChangeCallback delayChangeCallback) {
         TileEntityMobSpawner mobSpawner = NMSUtils.getTileEntityAt(location, TileEntityMobSpawner.class);
         if (mobSpawner == null || mobSpawner instanceof TileEntityMobSpawnerNotifier)
             return;
@@ -126,7 +126,7 @@ public class NMSWorldImpl implements NMSWorld {
         World world = mobSpawner.getWorld();
 
         TileEntityMobSpawnerNotifier tileEntityMobSpawnerNotifier =
-                new TileEntityMobSpawnerNotifier(mobSpawner, delayChangeCallback);
+                new TileEntityMobSpawnerNotifier(mobSpawner, island, delayChangeCallback);
 
         world.removeTileEntity(mobSpawner.getPosition());
         world.setTileEntity(mobSpawner.getPosition(), tileEntityMobSpawnerNotifier);
@@ -285,7 +285,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         IChatBaseComponent[] newLines;
 
-        IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, strippedLines, false);
+        IslandSigns.Result result = IslandSigns.handleSignPlace(island.getOwner(), location, island, strippedLines, false);
         if (result.isCancelEvent()) {
             newLines = CraftSign.sanitizeLines(strippedLines);
         } else {

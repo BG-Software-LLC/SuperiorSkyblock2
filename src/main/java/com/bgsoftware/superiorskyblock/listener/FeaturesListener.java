@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
+import com.bgsoftware.superiorskyblock.service.region.RegionManagerServiceImpl;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -62,10 +63,10 @@ public class FeaturesListener extends AbstractGameEventListener {
     @Nullable
     private static final Material SCULK_SHRIEKER = EnumHelper.getEnum(Material.class, "SCULK_SHRIEKER");
 
-    private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
+    private final LazyReference<RegionManagerServiceImpl> protectionManager = new LazyReference<RegionManagerServiceImpl>() {
         @Override
-        protected RegionManagerService create() {
-            return plugin.getServices().getService(RegionManagerService.class);
+        protected RegionManagerServiceImpl create() {
+            return (RegionManagerServiceImpl) plugin.getServices().getService(RegionManagerService.class);
         }
     };
 
@@ -134,20 +135,18 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) != 1)
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-        InteractionResult interactionResult = this.protectionManager.get().handleBlockBreak(superiorPlayer, clickedBlock);
+        Island island = e.getArgs().blockIslandResolver.get();
+
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
+        InteractionResult interactionResult = this.protectionManager.get().handleBlockBreak(
+                superiorPlayer, clickedBlock, e.getArgs().blockKeyResolver.get(), island);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             return;
 
-        Island island;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(clickedBlock.getLocation(wrapper.getHandle()));
-        }
         if (island == null)
             return;
 
         e.setCancelled();
-
 
         ItemStack inHandItem = handItem.clone();
         inHandItem.setAmount(inHandItem.getAmount() - 1);
@@ -174,7 +173,7 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(player.getWorld()))
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         if (superiorPlayer.hasBypassModeEnabled())
             return;
@@ -200,8 +199,7 @@ public class FeaturesListener extends AbstractGameEventListener {
     /* PREVIEW BLOCKED COMMANDS */
 
     private void onPlayerCommandWhilePreview(GameEvent<GameEventArgs.PlayerCommandEvent> e) {
-        Player player = e.getArgs().player;
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
 
         if (superiorPlayer.hasBypassModeEnabled())
             return;
@@ -224,20 +222,21 @@ public class FeaturesListener extends AbstractGameEventListener {
 
     private void onChunkLoad(GameEvent<GameEventArgs.ChunkLoadEvent> e) {
         Chunk chunk = e.getArgs().chunk;
-        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
-        chunkIslands.forEach(island -> handleIslandChunkLoad(island, chunk));
-    }
 
-    private void handleIslandChunkLoad(Island island, Chunk chunk) {
         List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(chunk);
 
         if (blockEntities.isEmpty())
             return;
 
-        blockEntities.forEach(blockEntity -> {
+        List<Island> chunkIslands = plugin.getGrid().getIslandsAt(chunk);
+        chunkIslands.forEach(island -> handleIslandChunkLoad(island, blockEntities));
+    }
+
+    private void handleIslandChunkLoad(Island island, List<Location> blockEntities) {
+        for (Location blockEntity : blockEntities) {
             plugin.getNMSWorld().replaceSculkSensorListener(island, blockEntity);
             plugin.getNMSWorld().replaceTrialBlockPlayerDetector(island, blockEntity);
-        });
+        }
     }
 
     /* VAULTS & TRIAL SPAWNERS */
@@ -249,14 +248,13 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (blockType != VAULT && blockType != TRIAL_SPAWNER)
             return;
 
+        Island island = e.getArgs().islandResolver.get();
+
+        if (island == null)
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
-
-            Island island = plugin.getGrid().getIslandAt(blockLocation);
-
-            if (island == null)
-                return;
-
             plugin.getNMSWorld().replaceTrialBlockPlayerDetector(island, blockLocation);
         }
     }
@@ -270,14 +268,13 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (blockType != SCULK_SENSOR)
             return;
 
+        Island island = e.getArgs().islandResolver.get();
+
+        if (island == null)
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
-
-            Island island = plugin.getGrid().getIslandAt(blockLocation);
-
-            if (island == null)
-                return;
-
             plugin.getNMSWorld().replaceSculkSensorListener(island, blockLocation);
         }
     }
@@ -289,12 +286,13 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (action != Action.PHYSICAL || clickedBlock.getType() != SCULK_SHRIEKER)
             return;
 
+        SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
+
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
             Location blockLocation = clickedBlock.getLocation(wrapper.getHandle());
             interactionResult = protectionManager.get().handleCustomInteraction(superiorPlayer,
-                    blockLocation, IslandPrivileges.SCULK_SENSOR);
+                    blockLocation, e.getArgs().blockIslandResolver.get(), IslandPrivileges.SCULK_SENSOR);
         }
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, null, false))
             e.setCancelled();
