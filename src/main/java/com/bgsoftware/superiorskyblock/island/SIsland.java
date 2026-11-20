@@ -727,10 +727,7 @@ public class SIsland implements Island {
         // Remove player from being cooped, invited and its ratings.
         removeCoop(superiorPlayer);
         revokeInvite(superiorPlayer);
-
-        if (!plugin.getSettings().isRateOwnIsland()) {
-            removeRating(superiorPlayer);
-        }
+        removeRating(superiorPlayer);
 
         superiorPlayer.setIsland(this);
 
@@ -997,7 +994,7 @@ public class SIsland implements Island {
         Log.debug(Debug.CLEAR_ROLE_LIMITS, this.owner.getName());
 
         List<PlayerRole> customRoleLimits = this.roleLimits.writeAndGet(roleLimits -> {
-            List<PlayerRole> rolesToSync = new ArrayList<>();
+            List<PlayerRole> rolesToSync = new LinkedList<>();
 
             Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
             while (iterator.hasNext()) {
@@ -3418,7 +3415,7 @@ public class SIsland implements Island {
     public void clearBlockLimits() {
         Log.debug(Debug.CLEAR_BLOCK_LIMITS, owner.getName());
 
-        List<Key> customBlockLimits = new ArrayList<>();
+        List<Key> customBlockLimits = new LinkedList<>();
 
         this.blockLimits.forEach((key, limitValue) -> {
             if (!limitValue.isSynced()) {
@@ -3580,7 +3577,7 @@ public class SIsland implements Island {
     public void clearEntitiesLimits() {
         Log.debug(Debug.CLEAR_ENTITY_LIMITS, owner.getName());
 
-        List<Key> customEntityLimits = new ArrayList<>();
+        List<Key> customEntityLimits = new LinkedList<>();
 
         this.entityLimits.forEach((key, limitValue) -> {
             if (!limitValue.isSynced()) {
@@ -3987,8 +3984,11 @@ public class SIsland implements Island {
 
     @Override
     public WarpCategory getWarpCategory(int slot) {
-        return warpCategories.values().stream().filter(warpCategory -> warpCategory.getSlot() == slot)
-                .findAny().orElse(null);
+        for (WarpCategory warpCategory : warpCategories.values()) {
+            if (warpCategory.getSlot() == slot)
+                return warpCategory;
+        }
+        return null;
     }
 
     @Override
@@ -4713,7 +4713,7 @@ public class SIsland implements Island {
             return;
         }
 
-        List<Key> customGeneratorAmounts = new ArrayList<>();
+        List<Key> customGeneratorAmounts = new LinkedList<>();
 
         dimensionGeneratorAmounts.forEach((key, amountValue) -> {
             if (!amountValue.isSynced()) {
@@ -4779,9 +4779,9 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        int generatorTotalAmount = getGeneratorTotalAmount(dimension);
+        long generatorTotalAmount = IslandUtils.getGeneratorTotalAmount(getGeneratorAmountsAsKeys(dimension));
 
-        return generatorTotalAmount == 0 ? 0 : (getGeneratorAmount(key, dimension) * 100) / generatorTotalAmount;
+        return generatorTotalAmount == 0 ? 0 : (int) ((getGeneratorAmount(key, dimension) * 100L) / generatorTotalAmount);
     }
 
     @Override
@@ -4789,9 +4789,9 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        int generatorTotalAmount = getGeneratorTotalAmount(dimension);
+        long generatorTotalAmount = IslandUtils.getGeneratorTotalAmount(getGeneratorAmountsAsKeys(dimension));
 
-        return generatorTotalAmount == 0 ? 0 : (getExactGeneratorAmount(key, dimension) * 100) / generatorTotalAmount;
+        return generatorTotalAmount == 0 ? 0 : (int) ((getExactGeneratorAmount(key, dimension) * 100L) / generatorTotalAmount);
     }
 
     @Override
@@ -4960,10 +4960,7 @@ public class SIsland implements Island {
         // Calculating the total from the same map, instead of calling getGeneratorTotalAmount which builds it again.
         Map<Key, Integer> dimensionGeneratorAmounts = getGeneratorAmountsAsKeys(dimension);
 
-        int generatorTotalAmount = 0;
-        for (int generatorAmount : dimensionGeneratorAmounts.values()) {
-            generatorTotalAmount += generatorAmount;
-        }
+        long generatorTotalAmount = IslandUtils.getGeneratorTotalAmount(dimensionGeneratorAmounts);
 
         if (generatorTotalAmount == 0) {
             Log.debugResult(Debug.GENERATE_BLOCK, "Return No Generator Rates", "null");
@@ -4977,8 +4974,8 @@ public class SIsland implements Island {
         if (dimensionGeneratorAmounts.size() == 1 && dimensionGeneratorAmounts.values().iterator().next() > 0) {
             newStateKey = dimensionGeneratorAmounts.keySet().iterator().next();
         } else {
-            int generatedIndex = ThreadLocalRandom.current().nextInt(generatorTotalAmount);
-            int currentIndex = 0;
+            long generatedIndex = ThreadLocalRandom.current().nextLong(generatorTotalAmount);
+            long currentIndex = 0;
 
             for (Map.Entry<Key, Integer> entry : dimensionGeneratorAmounts.entrySet()) {
                 currentIndex += entry.getValue();

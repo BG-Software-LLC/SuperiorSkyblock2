@@ -83,13 +83,15 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
                 continue;
             }
 
-            if (currentLimit.add(limit).compareTo(BigDecimal.ZERO) < 0) {
+            BigDecimal newLimit = currentLimit.add(limit);
+
+            if (newLimit.compareTo(BigDecimal.ZERO) < 0) {
                 isInvalid = true;
                 continue;
             }
 
             PluginEvent<PluginEventArgs.IslandChangeBankLimit> event = PluginEventsFactory.callIslandChangeBankLimitEvent(
-                    island, sender, currentLimit.add(limit));
+                    island, sender, newLimit);
             if (!event.isCancelled()) {
                 island.setBankLimit(event.getArgs().bankLimit);
                 changedIsland = island;

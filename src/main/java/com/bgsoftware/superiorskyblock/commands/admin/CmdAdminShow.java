@@ -203,7 +203,7 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
                         Key key = entry.getKey();
                         lineDataMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
-                                Formatters.CAPITALIZED_FORMATTER.format(key.toString()),
+                                Formatters.CAPITALIZED_FORMATTER.format(key.toString()) + (Text.isInt(key.getSubKey()) ? ":" + key.getSubKey() : ""),
                                 Formatters.NUMBER_FORMATTER.format(IslandUtils.getGeneratorPercentageDecimal(island, key, dimension)),
                                 island.getGeneratorAmount(key, dimension))
                         );

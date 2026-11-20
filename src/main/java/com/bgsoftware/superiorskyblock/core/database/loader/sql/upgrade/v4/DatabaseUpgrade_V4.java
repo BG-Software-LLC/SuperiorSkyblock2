@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -26,7 +26,7 @@ public class DatabaseUpgrade_V4 implements Runnable {
 
     @Override
     public void run() {
-        List<IDatabaseTransaction> databaseTransactions = new ArrayList<>();
+        List<IDatabaseTransaction> databaseTransactions = new LinkedList<>();
 
         updateIslandsSettingsSyncedValue(databaseTransactions);
         deleteSyncedRecords(databaseTransactions, "islands_block_limits");
