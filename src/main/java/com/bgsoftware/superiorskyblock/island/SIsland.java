@@ -695,7 +695,7 @@ public class SIsland implements Island {
         List<PlayerRole> rolesToFilter = Arrays.asList(playerRoles);
         List<SuperiorPlayer> membersBuilder = this.members.readAndGet(members ->
                 new SequentialListBuilder<SuperiorPlayer>().mutable().filter(superiorPlayer ->
-                                rolesToFilter.contains(superiorPlayer.getPlayerRole())).build(members));
+                        rolesToFilter.contains(superiorPlayer.getPlayerRole())).build(members));
 
 
         if (rolesToFilter.contains(SPlayerRole.lastRole())) {
@@ -1715,7 +1715,11 @@ public class SIsland implements Island {
 
     private boolean isIslandWorld(World world) {
         Dimension worldDimension = plugin.getGrid().getIslandsWorldDimension(world);
-        return worldDimension != null && plugin.getGrid().getIslandsWorld(this, worldDimension) == world;
+        if (worldDimension == null)
+            return false;
+
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, worldDimension);
+        return worldInfo != null ? worldInfo.getName().equals(world.getName()) : isIslandWorld(world.getName());
     }
 
     private boolean isIslandWorld(@Nullable String worldName) {
@@ -1813,10 +1817,8 @@ public class SIsland implements Island {
         }
 
         PermissionNode permissionNode = playerPermissions.get(superiorPlayer);
-        if (permissionNode == null) {
-            permissionNode = PlayerPrivilegeNode.MutablePlayerPermissionNode.SHARED.update(superiorPlayer, this);
-        }
-        return permissionNode.hasPermission(islandPrivilege);
+        return permissionNode != null ? permissionNode.hasPermission(islandPrivilege) :
+                PlayerPrivilegeNode.checkRoleBasedPermission(superiorPlayer, this, islandPrivilege);
     }
 
     @Override

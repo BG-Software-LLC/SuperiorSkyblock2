@@ -6,12 +6,12 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.google.common.base.Preconditions;
 
 public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
 
-    protected SuperiorPlayer superiorPlayer;
+    protected final SuperiorPlayer superiorPlayer;
     protected Island island;
 
     public PlayerPrivilegeNode(SuperiorPlayer superiorPlayer, Island island) {
@@ -44,17 +44,11 @@ public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
         if (allStatus == PrivilegeStatus.ENABLED)
             return true;
 
-        PrivilegeStatus status = privileges.getOrDefault(islandPrivilege, PrivilegeStatus.DEFAULT);
-        if (status != PrivilegeStatus.DEFAULT && allStatus != PrivilegeStatus.DEFAULT)
-            return status == PrivilegeStatus.ENABLED;
+        PrivilegeStatus privilegeStatus = privileges.getOrDefault(islandPrivilege, PrivilegeStatus.DEFAULT);
+        if (privilegeStatus != PrivilegeStatus.DEFAULT && allStatus != PrivilegeStatus.DEFAULT)
+            return privilegeStatus == PrivilegeStatus.ENABLED;
 
-        PlayerRole playerRole = resolvePlayerRole();
-
-        if (allStatus == PrivilegeStatus.DEFAULT && island.hasPermission(playerRole, IslandPrivileges.ALL))
-            return true;
-
-        return status == PrivilegeStatus.DEFAULT ? island.hasPermission(playerRole, islandPrivilege)
-                : status == PrivilegeStatus.ENABLED;
+        return checkRoleBasedPermission(superiorPlayer, island, islandPrivilege, allStatus, privilegeStatus);
     }
 
     @Override
@@ -66,9 +60,21 @@ public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
         privileges.put(islandPrivilege, PrivilegeStatus.of(status));
     }
 
-    protected PlayerRole resolvePlayerRole() {
-        return island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() :
-                island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
+    public static boolean checkRoleBasedPermission(SuperiorPlayer superiorPlayer, Island island,
+                                                   IslandPrivilege islandPrivilege) {
+        return checkRoleBasedPermission(superiorPlayer, island, islandPrivilege, PrivilegeStatus.DEFAULT, PrivilegeStatus.DEFAULT);
+    }
+
+    private static boolean checkRoleBasedPermission(SuperiorPlayer superiorPlayer, Island island,
+                                                    IslandPrivilege islandPrivilege, PrivilegeStatus allStatus,
+                                                    PrivilegeStatus privilegeStatus) {
+        PlayerRole playerRole = IslandUtils.getPlayerRole(island, superiorPlayer);
+
+        if (allStatus == PrivilegeStatus.DEFAULT && island.hasPermission(playerRole, IslandPrivileges.ALL))
+            return true;
+
+        return privilegeStatus == PrivilegeStatus.DEFAULT ? island.hasPermission(playerRole, islandPrivilege)
+                : privilegeStatus == PrivilegeStatus.ENABLED;
     }
 
     public static class EmptyPlayerPermissionNode extends PlayerPrivilegeNode {
@@ -86,37 +92,6 @@ public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
         @Override
         public boolean hasPermission(IslandPrivilege islandPrivilege) {
             return false;
-        }
-
-        @Override
-        public void setPermission(IslandPrivilege permission, boolean value) {
-            // Do nothing.
-        }
-
-    }
-
-    public static class MutablePlayerPermissionNode extends PlayerPrivilegeNode {
-
-        public static final MutablePlayerPermissionNode SHARED = new MutablePlayerPermissionNode();
-
-        public MutablePlayerPermissionNode() {
-            super(null, null);
-        }
-
-        public MutablePlayerPermissionNode update(SuperiorPlayer superiorPlayer, Island island) {
-            this.superiorPlayer = superiorPlayer;
-            this.island = island;
-            return this;
-        }
-
-        @Override
-        public boolean hasPermission(IslandPrivilege islandPrivilege) {
-            PlayerRole playerRole = resolvePlayerRole();
-
-            if (island.hasPermission(playerRole, IslandPrivileges.ALL))
-                return true;
-
-            return island.hasPermission(playerRole, islandPrivilege);
         }
 
         @Override

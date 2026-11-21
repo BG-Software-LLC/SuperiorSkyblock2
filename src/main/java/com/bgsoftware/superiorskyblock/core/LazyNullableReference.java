@@ -20,6 +20,11 @@ public abstract class LazyNullableReference<E> {
         return this.instance;
     }
 
+    /* Workaround for non-capturing lambdas */
+    public <T> E get(T unused) {
+        return get();
+    }
+
     @Nullable
     protected abstract E create();
 
