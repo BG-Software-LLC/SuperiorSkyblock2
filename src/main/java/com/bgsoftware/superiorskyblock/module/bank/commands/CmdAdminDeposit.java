@@ -2,11 +2,14 @@ package com.bgsoftware.superiorskyblock.module.bank.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -67,12 +70,13 @@ public class CmdAdminDeposit implements IAdminIslandCommand {
         if (amount == null)
             return;
 
-        islands.forEach(island -> island.getIslandBank().depositAdminMoney(sender, amount));
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            BankTransaction transaction = island.getIslandBank().depositAdminMoney(sender, amount);
+            return transaction.getAction() == BankAction.DEPOSIT_COMPLETED ? ChangeResult.APPLIED :
+                    ChangeResult.cancelled(transaction.getFailureReason());
+        });
 
-        if (targetPlayer == null)
-            Message.ADMIN_DEPOSIT_MONEY_NAME.send(sender, Formatters.NUMBER_FORMATTER.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");
-        else
-            Message.ADMIN_DEPOSIT_MONEY.send(sender, Formatters.NUMBER_FORMATTER.format(amount), targetPlayer.getName());
+        change.sendSummary(sender, args[1]);
     }
 
 }

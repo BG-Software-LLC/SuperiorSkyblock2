@@ -4,11 +4,11 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -72,40 +72,18 @@ public class CmdAdminAddMobDrops implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
-        boolean isInvalid = false;
-        Island changedIsland = null;
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            double newMultiplier = island.getMobDropsMultiplier() + multiplier;
 
-        for (Island island : islands) {
-            double currentMultiplier = island.getMobDropsMultiplier();
-            if (currentMultiplier + multiplier < 1) {
-                isInvalid = true;
-                continue;
+            if (newMultiplier < 1) {
+                return ChangeResult.BELOW_MINIMUM;
             }
 
-            PluginEvent<PluginEventArgs.IslandChangeMobDrops> event = PluginEventsFactory.callIslandChangeMobDropsEvent(
-                    island, sender, currentMultiplier + multiplier);
-            if (!event.isCancelled()) {
-                island.setMobDropsMultiplier(event.getArgs().mobDrops);
-                changedIsland = island;
-                ++islandsChangedCount;
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandChangeMobDropsEvent(island, sender, newMultiplier),
+                    eventArgs -> eventArgs.island.setMobDropsMultiplier(eventArgs.mobDrops));
+        });
 
-        if (islandsChangedCount <= 0) {
-            if (isInvalid) {
-                Message.INVALID_MULTIPLIER.send(sender, multiplier);
-            }
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_MOB_DROPS_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_MOB_DROPS_NAME.send(sender, changedIsland.getName());
-        } else {
-            Message.CHANGED_MOB_DROPS.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args[1]);
     }
 
 }

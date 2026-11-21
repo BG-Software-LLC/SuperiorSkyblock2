@@ -4,10 +4,10 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -70,27 +70,11 @@ public class CmdAdminSetBankLimit implements IAdminIslandCommand {
             return;
         }
 
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> ChangeResult.ifAllowed(
+                PluginEventsFactory.callIslandChangeBankLimitEvent(island, sender, limit),
+                eventArgs -> eventArgs.island.setBankLimit(eventArgs.bankLimit)));
 
-        for (Island island : islands) {
-            PluginEvent<PluginEventArgs.IslandChangeBankLimit> event = PluginEventsFactory.callIslandChangeBankLimitEvent(island, sender, limit);
-            if (!event.isCancelled()) {
-                island.setBankLimit(event.getArgs().bankLimit);
-                ++islandsChangedCount;
-            }
-        }
-
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_BANK_LIMIT_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_BANK_LIMIT_NAME.send(sender, islands.get(0).getName());
-        } else {
-            Message.CHANGED_BANK_LIMIT.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args[1]);
     }
 
 }

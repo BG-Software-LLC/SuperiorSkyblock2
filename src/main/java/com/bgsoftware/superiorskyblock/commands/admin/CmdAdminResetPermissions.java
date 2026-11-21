@@ -4,6 +4,8 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -59,24 +61,11 @@ public class CmdAdminResetPermissions implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> ChangeResult.ifAllowed(
+                PluginEventsFactory.callIslandClearRolesPrivilegesEvent(island, sender),
+                island, Island::resetPermissions));
 
-        for (Island island : islands) {
-            if (PluginEventsFactory.callIslandClearRolesPrivilegesEvent(island, sender)) {
-                ++islandsChangedCount;
-                island.resetPermissions();
-            }
-        }
-
-        if (islandsChangedCount <= 0)
-            return;
-
-        if (islands.size() != 1)
-            Message.PERMISSIONS_RESET_ALL.send(sender);
-        else if (targetPlayer == null)
-            Message.PERMISSIONS_RESET_NAME.send(sender, islands.get(0).getName());
-        else
-            Message.PERMISSIONS_RESET.send(sender, targetPlayer.getName());
+        change.sendSummary(sender, args[1]);
     }
 
 }

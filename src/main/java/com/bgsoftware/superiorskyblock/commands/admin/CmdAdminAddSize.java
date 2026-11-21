@@ -4,11 +4,11 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -77,50 +77,24 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
             return;
         }
 
-        boolean isInvalid = false;
-        boolean isBiggerThanMax = false;
-        Island changedIsland = null;
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
             int newSize = island.getEffectiveIslandSize() + size;
+
             if (newSize < 1) {
-                isInvalid = true;
-                continue;
+                return ChangeResult.BELOW_MINIMUM;
             }
 
             if (newSize > plugin.getSettings().getMaxIslandSize()) {
-                isBiggerThanMax = true;
-                continue;
+                return ChangeResult.ABOVE_MAXIMUM;
             }
 
-            PluginEvent<PluginEventArgs.IslandChangeBorderSize> event = PluginEventsFactory.callIslandChangeBorderSizeEvent(
-                    island, sender, newSize);
-            if (!event.isCancelled()) {
-                island.setIslandSize(event.getArgs().borderSize);
-                changedIsland = island;
-                ++islandsChangedCount;
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandChangeBorderSizeEvent(island, sender, newSize),
+                    eventArgs -> eventArgs.island.setIslandSize(eventArgs.borderSize));
+        });
 
-        if (islandsChangedCount <= 0) {
-            if (isInvalid) {
-                Message.INVALID_SIZE.send(sender, size);
-            } else if (isBiggerThanMax) {
-                Message.SIZE_BIGGER_MAX.send(sender);
-            }
-            return;
-        }
+        change.sendSummary(sender, args[1]);
 
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_ISLAND_SIZE_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_ISLAND_SIZE_NAME.send(sender, changedIsland.getName());
-        } else {
-            Message.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
-        }
-
-        if (plugin.getSettings().isBuildOutsideIsland()) {
+        if (change.hasApplied() && plugin.getSettings().isBuildOutsideIsland()) {
             Message.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
         }
     }

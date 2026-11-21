@@ -4,10 +4,10 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
@@ -71,50 +71,23 @@ public class CmdAdminAddBankLimit implements IAdminIslandCommand {
             return;
         }
 
-        boolean isUnlimited = false;
-        boolean isInvalid = false;
-        Island changedIsland = null;
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
             BigDecimal currentLimit = island.getBankLimit();
             if (currentLimit.compareTo(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE) <= 0) {
-                isUnlimited = true;
-                continue;
+                return ChangeResult.UNLIMITED;
             }
 
             BigDecimal newLimit = currentLimit.add(limit);
 
             if (newLimit.compareTo(BigDecimal.ZERO) < 0) {
-                isInvalid = true;
-                continue;
+                return ChangeResult.BELOW_MINIMUM;
             }
 
-            PluginEvent<PluginEventArgs.IslandChangeBankLimit> event = PluginEventsFactory.callIslandChangeBankLimitEvent(
-                    island, sender, newLimit);
-            if (!event.isCancelled()) {
-                island.setBankLimit(event.getArgs().bankLimit);
-                changedIsland = island;
-                ++islandsChangedCount;
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandChangeBankLimitEvent(island, sender, newLimit),
+                    eventArgs -> eventArgs.island.setBankLimit(eventArgs.bankLimit));
+        });
 
-        if (islandsChangedCount <= 0) {
-            if (isUnlimited) {
-                Message.LIMIT_IS_UNLIMITED.send(sender);
-            } else if (isInvalid) {
-                Message.INVALID_LIMIT.send(sender, limit);
-            }
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_BANK_LIMIT_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_BANK_LIMIT_NAME.send(sender, changedIsland.getName());
-        } else {
-            Message.CHANGED_BANK_LIMIT.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args[1]);
     }
 
 }

@@ -4,6 +4,8 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -62,29 +64,16 @@ public class CmdAdminRemoveRatings implements IAdminIslandCommand {
         boolean removingAllRatings = targetPlayer == null;
         Collection<Island> iterIslands = removingAllRatings ? islands : plugin.getGrid().getIslands();
 
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(iterIslands, island -> {
+            if (removingAllRatings)
+                return ChangeResult.ifAllowed(PluginEventsFactory.callIslandClearRatingsEvent(island, sender),
+                        island, Island::removeRatings);
 
-        for (Island island : iterIslands) {
-            if (removingAllRatings) {
-                if (PluginEventsFactory.callIslandClearRatingsEvent(island, sender)) {
-                    ++islandsChangedCount;
-                    island.removeRatings();
-                }
-            } else if (PluginEventsFactory.callIslandRemoveRatingEvent(island, sender, targetPlayer)) {
-                ++islandsChangedCount;
-                island.removeRating(targetPlayer);
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandRemoveRatingEvent(island, sender, targetPlayer),
+                    island, targetPlayer, Island::removeRating);
+        });
 
-        if (islandsChangedCount <= 0)
-            return;
-
-        if (!removingAllRatings)
-            Message.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
-        else if (islands.size() == 1)
-            Message.RATE_REMOVE_ALL.send(sender, islands.get(0).getName());
-        else
-            Message.RATE_REMOVE_ALL_ISLANDS.send(sender);
+        change.sendSummary(sender, args[1]);
     }
 
 }

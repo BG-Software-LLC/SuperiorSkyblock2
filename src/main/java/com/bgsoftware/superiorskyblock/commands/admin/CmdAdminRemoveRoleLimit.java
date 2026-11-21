@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -71,31 +73,16 @@ public class CmdAdminRemoveRoleLimit implements IAdminIslandCommand {
             return;
         }
 
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
-            if (island.getRoleLimitRaw(playerRole) != IslandUpgradeConstants.SYNCED_VALUE) {
-                if (!PluginEventsFactory.callIslandRemoveRoleLimitEvent(island, sender, playerRole)) {
-                    continue;
-                }
-
-                island.removeRoleLimit(playerRole);
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.getRoleLimitRaw(playerRole) == IslandUpgradeConstants.SYNCED_VALUE) {
+                return ChangeResult.APPLIED;
             }
 
-            ++islandsChangedCount;
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandRemoveRoleLimitEvent(island, sender, playerRole),
+                    island, playerRole, Island::removeRoleLimit);
+        });
 
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_ROLE_LIMIT_ALL.send(sender, playerRole);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_ROLE_LIMIT_NAME.send(sender, playerRole, islands.get(0).getName());
-        } else {
-            Message.CHANGED_ROLE_LIMIT.send(sender, playerRole, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args[1]);
     }
 
     @Override

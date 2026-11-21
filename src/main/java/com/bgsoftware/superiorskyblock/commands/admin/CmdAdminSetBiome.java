@@ -5,10 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
@@ -81,17 +82,12 @@ public class CmdAdminSetBiome implements IAdminIslandCommand {
                 return;
         }
 
-        islands.forEach(island -> island.setBiome(dimension, biome));
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            island.setBiome(dimension, biome);
+            return ChangeResult.APPLIED;
+        });
 
-        if (islands.size() > 1)
-            Message.CHANGED_BIOME_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()),
-                    Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
-        else if (targetPlayer == null)
-            Message.CHANGED_BIOME_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()),
-                    islands.get(0).getName(), Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
-        else
-            Message.CHANGED_BIOME_OTHER.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()),
-                    targetPlayer.getName(), Formatters.CAPITALIZED_FORMATTER.format(dimension.getName()));
+        change.sendSummary(sender, args[1]);
     }
 
     @Override
