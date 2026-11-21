@@ -7,10 +7,16 @@ plugins {
 group 'SuperiorSkyblock'
 version = "2026.3"
 
+// Read lazily so a new BUILD_NUMBER on every CI run does not invalidate the configuration cache.
+String baseVersion = version.toString()
+
 project.ext {
     targetFolder = file("target/")
-    buildVersion = System.getenv("BUILD_NUMBER") == null || Boolean.parseBoolean(System.getenv("STABLE_BUILD")) ?
-            version : version + "-b" + System.getenv("BUILD_NUMBER")
+    buildVersion = providers.environmentVariable("BUILD_NUMBER")
+            .zip(providers.environmentVariable("STABLE_BUILD").orElse("false")) { String buildNumber, String stableBuild ->
+                Boolean.parseBoolean(stableBuild) ? baseVersion : baseVersion + "-b" + buildNumber
+            }
+            .orElse(baseVersion)
 }
 
 allprojects {
@@ -86,11 +92,11 @@ dependencies {
 }
 
 processResources {
-    def pluginVersion = rootProject.buildVersion.toString()
+    def pluginVersion = rootProject.buildVersion
     inputs.property('pluginVersion', pluginVersion)
     filesMatching('plugin.yml') {
         filter { String line ->
-            line.replace('${project.version}', pluginVersion)
+            line.replace('${project.version}', pluginVersion.get())
         }
     }
 }
@@ -178,11 +184,13 @@ tasks.register('cleanTarget', Delete) {
 tasks.register('collectArtifacts', Sync) {
     group = 'build'
 
-    def pluginJarName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
-    def apiJarName = rootProject.name + "-API.jar"
+    def rootName = rootProject.name
+    def pluginJarName = rootProject.buildVersion.map { rootName + "-" + it + ".jar" }
+    def apiJarName = rootName + "-API.jar"
+    inputs.property('pluginJarName', pluginJarName)
 
     from(tasks.named('shadowJar').flatMap { it.archiveFile }) {
-        rename { pluginJarName }
+        rename { pluginJarName.get() }
     }
 
     from(project(':API').tasks.named('shadowJar').flatMap { it.archiveFile }) {
