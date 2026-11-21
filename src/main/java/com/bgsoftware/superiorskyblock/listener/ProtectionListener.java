@@ -53,6 +53,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 public class ProtectionListener extends AbstractGameEventListener {
 
@@ -104,7 +105,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void onBlockPlace(GameEvent<GameEventArgs.BlockPlaceEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handleBlockPlace(superiorPlayer,
-                e.getArgs().block, e.getArgs().keyResolver.get(), e.getArgs().islandResolver.get());
+                e.getArgs().block, e.getArgs().keyResolver.get(), e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -130,7 +131,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         handleBlockInteract(e, e.getArgs().superiorPlayerResolver.get(), e.getArgs().action,
                 e.getArgs().clickedBlock, e.getArgs().blockKeyResolver.get(),
-                e.getArgs().usedHand, e.getArgs().usedItem, e.getArgs().blockIslandResolver.get());
+                e.getArgs().usedHand, e.getArgs().usedItem, e.getArgs().blockIslandResolver::get);
     }
 
     private boolean handleBlockFertilize(GameEvent<GameEventArgs.PlayerInteractEvent> e) {
@@ -144,7 +145,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handleBlockFertilize(superiorPlayer,
-                e.getArgs().clickedBlock, e.getArgs().blockIslandResolver.get());
+                e.getArgs().clickedBlock, e.getArgs().blockIslandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -165,7 +166,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handleBlockPlace(superiorPlayer,
-                e.getArgs().clickedBlock, e.getArgs().blockKeyResolver.get(), e.getArgs().blockIslandResolver.get());
+                e.getArgs().clickedBlock, e.getArgs().blockKeyResolver.get(), e.getArgs().blockIslandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -188,8 +189,8 @@ public class ProtectionListener extends AbstractGameEventListener {
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), e.getArgs().blockIslandResolver.get(),
-                    IslandPrivileges.BRUSH);
+                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), IslandPrivileges.BRUSH,
+                    e.getArgs().blockIslandResolver::get);
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -229,8 +230,8 @@ public class ProtectionListener extends AbstractGameEventListener {
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), e.getArgs().blockIslandResolver.get(),
-                    islandPrivileges);
+                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), islandPrivileges,
+                    e.getArgs().blockIslandResolver::get);
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -253,10 +254,10 @@ public class ProtectionListener extends AbstractGameEventListener {
         InteractionResult interactionResult;
         if (entity.getType() == LEASH_KNOT) {
             interactionResult = this.regionManagerService.get().handleEntityLeash(superiorPlayer, entity,
-                    e.getArgs().entityIslandResolver.get());
+                    e.getArgs().entityIslandResolver::get);
         } else {
             interactionResult = this.regionManagerService.get().handleEntityInteract(superiorPlayer, entity,
-                    e.getArgs().usedItem, e.getArgs().entityIslandResolver.get());
+                    e.getArgs().usedItem, e.getArgs().entityIslandResolver::get);
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -270,13 +271,13 @@ public class ProtectionListener extends AbstractGameEventListener {
     private boolean handleBlockInteract(GameEvent<?> e, SuperiorPlayer superiorPlayer, Action action,
                                         @Nullable Block clickedBlock, @Nullable Key clickedBlockKey,
                                         @Nullable PlayerHand usedHand, @Nullable ItemStack usedItem,
-                                        @Nullable Island island) {
+                                        Function<Location, Island> islandSupplier) {
         if (clickedBlock == null) {
             return false;
         }
 
         InteractionResult interactionResult = this.regionManagerService.get().handleBlockInteract(superiorPlayer,
-                clickedBlock, clickedBlockKey, action, usedItem, island);
+                clickedBlock, clickedBlockKey, action, usedItem, islandSupplier);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer,
                 usedItem != null || usedHand != PlayerHand.OFF_HAND)) {
@@ -305,14 +306,10 @@ public class ProtectionListener extends AbstractGameEventListener {
             return;
         }
 
-        Island island;
-        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            island = plugin.getGrid().getIslandAt(clickedBlock.getLocation(wrapper.getHandle()));
-        }
-
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) projectileSource);
 
-        if (handleBlockInteract(e, superiorPlayer, Action.PHYSICAL, clickedBlock, Keys.of(clickedBlock), null, null, island)) {
+        if (handleBlockInteract(e, superiorPlayer, Action.PHYSICAL, clickedBlock, Keys.of(clickedBlock),
+                null, null, plugin.getGrid()::getIslandAt)) {
             // We want to remove the projectile as well when it is not possible to interact
             entity.remove();
         }
@@ -321,7 +318,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void onBlockBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handleBlockBreak(superiorPlayer,
-                e.getArgs().block, e.getArgs().keyResolver.get(), e.getArgs().islandResolver.get());
+                e.getArgs().block, e.getArgs().keyResolver.get(), e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -337,7 +334,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) entity);
         InteractionResult interactionResult = this.regionManagerService.get().handleBlockPlace(superiorPlayer,
-                e.getArgs().block, e.getArgs().keyResolver.get(), e.getArgs().islandResolver.get());
+                e.getArgs().block, e.getArgs().keyResolver.get(), e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, false)) {
             e.setCancelled();
@@ -366,18 +363,17 @@ public class ProtectionListener extends AbstractGameEventListener {
             return;
         }
 
-        Island island = e.getArgs().islandResolver.get();
-
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = e.getArgs().clickedBlock.getLocation(wrapper.getHandle());
-            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    blockLocation, island, islandPrivileges);
+            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer, blockLocation,
+                    islandPrivileges, e.getArgs().islandResolver::get);
         }
 
-        if (interactionResult == InteractionResult.SUCCESS && !superiorPlayer.hasBypassModeEnabled() &&
-                island != null && island.isBeingRecalculated()) {
-            interactionResult = InteractionResult.ISLAND_RECALCULATE;
+        if (interactionResult == InteractionResult.SUCCESS && !superiorPlayer.hasBypassModeEnabled()) {
+            Island island = e.getArgs().islandResolver.get();
+            if (island != null && island.isBeingRecalculated())
+                interactionResult = InteractionResult.ISLAND_RECALCULATE;
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -389,7 +385,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         Block clickedBlock = e.getArgs().clickedBlock;
         InteractionResult interactionResult = this.regionManagerService.get().handleBlockBreak(superiorPlayer,
-                clickedBlock, Keys.of(clickedBlock), e.getArgs().islandResolver.get());
+                clickedBlock, Keys.of(clickedBlock), e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -443,7 +439,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         long cacheStamp = BukkitEntities.CACHED_SUPERIOR_PLAYER_SOURCE.startCache();
         try {
             interactionResult = this.regionManagerService.get().handleEntityDamage(damager, entity,
-                    e.getArgs().islandResolver.get());
+                    e.getArgs().islandResolver::get);
 
             if (interactionResult == InteractionResult.SUCCESS) {
                 return;
@@ -475,7 +471,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         long cacheStamp = BukkitEntities.CACHED_SUPERIOR_PLAYER_SOURCE.startCache();
         try {
             interactionResult = this.regionManagerService.get().handleEntityDamage(player, entity,
-                    e.getArgs().islandResolver.get());
+                    e.getArgs().islandResolver::get);
 
             if (interactionResult == InteractionResult.SUCCESS) {
                 return;
@@ -495,7 +491,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void onEntityShearing(GameEvent<GameEventArgs.PlayerShearEntityEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handleEntityShear(superiorPlayer,
-                e.getArgs().entity, e.getArgs().islandResolver.get());
+                e.getArgs().entity, e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -512,7 +508,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         long cacheStamp = BukkitEntities.CACHED_SUPERIOR_PLAYER_SOURCE.startCache();
         try {
             interactionResult = this.regionManagerService.get().handleEntityDamage(remover, entity,
-                    e.getArgs().islandResolver.get());
+                    e.getArgs().islandResolver::get);
 
             if (interactionResult == InteractionResult.SUCCESS) {
                 return;
@@ -546,7 +542,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    entity.getLocation(wrapper.getHandle()), e.getArgs().islandResolver.get(), islandPrivileges);
+                    entity.getLocation(wrapper.getHandle()), islandPrivileges, e.getArgs().islandResolver::get);
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -563,7 +559,7 @@ public class ProtectionListener extends AbstractGameEventListener {
         }
 
         InteractionResult interactionResult = this.regionManagerService.get().handleEntityDamage(target, entity,
-                e.getArgs().islandResolver.get());
+                e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, null, false)) {
             e.setCancelled();
@@ -595,7 +591,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void onPlayerLeash(GameEvent<GameEventArgs.PlayerLeashEntityEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handleEntityLeash(superiorPlayer,
-                e.getArgs().entity, e.getArgs().islandResolver.get());
+                e.getArgs().entity, e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -605,7 +601,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void onPlayerUnleash(GameEvent<GameEventArgs.PlayerUnleashEntityEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handleEntityLeash(superiorPlayer,
-                e.getArgs().entity, e.getArgs().islandResolver.get());
+                e.getArgs().entity, e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -622,11 +618,10 @@ public class ProtectionListener extends AbstractGameEventListener {
         }
 
         Entity vehicle = e.getArgs().vehicle;
-        Island island = WorldBlocks.findIslandWithHint(vehicle, e.getArgs().islandResolver.get());
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) entity);
         InteractionResult interactionResult = this.regionManagerService.get().handleEntityRide(superiorPlayer,
-                vehicle, island);
+                vehicle, l -> WorldBlocks.findIslandWithHint(l, e.getArgs().islandResolver.get()));
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -686,9 +681,9 @@ public class ProtectionListener extends AbstractGameEventListener {
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location vehicleLocation = e.getArgs().target.getLocation(wrapper.getHandle());
-            Island island = WorldBlocks.findIslandWithHint(e.getArgs().target, e.getArgs().islandResolver.get());
-            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    vehicleLocation, island, IslandPrivileges.MINECART_ENTER);
+            interactionResult = this.regionManagerService.get().handleCustomInteraction(
+                    superiorPlayer, vehicleLocation, IslandPrivileges.MINECART_ENTER,
+                    l -> WorldBlocks.findIslandWithHint(l, e.getArgs().islandResolver.get()));
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, false)) {
@@ -701,7 +696,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void onPlayerDropItem(GameEvent<GameEventArgs.PlayerDropItemEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handlePlayerDropItem(superiorPlayer,
-                e.getArgs().droppedItem, e.getArgs().islandResolver.get());
+                e.getArgs().droppedItem, e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -711,7 +706,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void onPlayerPickupItem(GameEvent<GameEventArgs.PlayerPickupItemEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handlePlayerPickupItem(superiorPlayer,
-                e.getArgs().pickedUpItem, e.getArgs().islandResolver.get());
+                e.getArgs().pickedUpItem, e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -721,7 +716,7 @@ public class ProtectionListener extends AbstractGameEventListener {
     private void onPlayerPickupArrow(GameEvent<GameEventArgs.PlayerPickupArrowEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.regionManagerService.get().handlePlayerPickupItem(superiorPlayer,
-                e.getArgs().pickedUpItem, e.getArgs().islandResolver.get());
+                e.getArgs().pickedUpItem, e.getArgs().islandResolver::get);
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
@@ -751,7 +746,7 @@ public class ProtectionListener extends AbstractGameEventListener {
                     return;
 
                 interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                        entityLocation, e.getArgs().islandResolver.get(), islandPrivileges);
+                        entityLocation, islandPrivileges, e.getArgs().islandResolver::get);
 
                 if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
                     e.setCancelled();
@@ -772,8 +767,8 @@ public class ProtectionListener extends AbstractGameEventListener {
                 return;
             }
 
-            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    entityLocation, e.getArgs().islandResolver.get(), islandPrivilege);
+            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer, entityLocation,
+                    islandPrivilege, e.getArgs().islandResolver::get);
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -813,9 +808,10 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Island island = WorldBlocks.findIslandWithHint(hitEntity, e.getArgs().islandResolver.get());
-            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    hitEntity.getLocation(wrapper.getHandle()), island, islandPrivileges);
+            Location entityLocation = hitEntity.getLocation(wrapper.getHandle());
+            interactionResult = this.regionManagerService.get().handleCustomInteraction(
+                    superiorPlayer, entityLocation, islandPrivileges,
+                    l -> WorldBlocks.findIslandWithHint(l, e.getArgs().islandResolver.get()));
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -857,9 +853,10 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Island island = WorldBlocks.findIslandWithHint(hitBlock, e.getArgs().islandResolver.get());
-            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    hitBlock.getLocation(wrapper.getHandle()), island, islandPrivileges);
+            Location blockLocation = hitBlock.getLocation(wrapper.getHandle());
+            interactionResult = this.regionManagerService.get().handleCustomInteraction(
+                    superiorPlayer, blockLocation, islandPrivileges,
+                    l -> WorldBlocks.findIslandWithHint(l, e.getArgs().islandResolver.get()));
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
@@ -912,9 +909,10 @@ public class ProtectionListener extends AbstractGameEventListener {
 
                 InteractionResult interactionResult;
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    Island island = WorldBlocks.findIslandWithHint(block, e.getArgs().islandResolver.get());
-                    interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                            block.getLocation(wrapper.getHandle()), island, islandPrivileges);
+                    Location blockLocation = block.getLocation(wrapper.getHandle());
+                    interactionResult = this.regionManagerService.get().handleCustomInteraction(
+                            superiorPlayer, blockLocation, islandPrivileges,
+                            l -> WorldBlocks.findIslandWithHint(l, e.getArgs().islandResolver.get()));
                 }
 
                 if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {

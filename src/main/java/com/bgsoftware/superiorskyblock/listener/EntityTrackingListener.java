@@ -27,13 +27,13 @@ public class EntityTrackingListener extends AbstractGameEventListener {
     private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
         Entity entity = e.getArgs().entity;
 
-        this.worldRecordService.get().recordEntitySpawn(entity, e.getArgs().islandResolver.get());
+        this.worldRecordService.get().recordEntitySpawn(entity, e.getArgs().islandResolver::get);
     }
 
     private void onEntityDeath(GameEvent<GameEventArgs.EntityDeathEvent> e) {
         Entity entity = e.getArgs().entity;
 
-        this.worldRecordService.get().recordEntityDespawn(entity, e.getArgs().islandResolver.get());
+        this.worldRecordService.get().recordEntityDespawn(entity, e.getArgs().islandResolver::get);
     }
 
     /* INTERNAL */

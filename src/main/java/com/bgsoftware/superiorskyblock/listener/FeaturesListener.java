@@ -135,14 +135,13 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) != 1)
             return;
 
-        Island island = e.getArgs().blockIslandResolver.get();
-
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.protectionManager.get().handleBlockBreak(
-                superiorPlayer, clickedBlock, e.getArgs().blockKeyResolver.get(), island);
+                superiorPlayer, clickedBlock, e.getArgs().blockKeyResolver.get(), e.getArgs().blockIslandResolver::get);
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             return;
 
+        Island island = e.getArgs().blockIslandResolver.get();
         if (island == null)
             return;
 
@@ -292,7 +291,7 @@ public class FeaturesListener extends AbstractGameEventListener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = clickedBlock.getLocation(wrapper.getHandle());
             interactionResult = protectionManager.get().handleCustomInteraction(superiorPlayer,
-                    blockLocation, e.getArgs().blockIslandResolver.get(), IslandPrivileges.SCULK_SENSOR);
+                    blockLocation, IslandPrivileges.SCULK_SENSOR, e.getArgs().blockIslandResolver::get);
         }
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, null, false))
             e.setCancelled();

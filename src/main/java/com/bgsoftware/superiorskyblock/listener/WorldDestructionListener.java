@@ -17,7 +17,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class WorldDestructionListener extends AbstractGameEventListener {
 
@@ -97,7 +96,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
             return;
         }
 
-        Island island = WorldBlocks.findIslandWithHint(block, e.getArgs().islandResolver.get());
+        Island island = e.getArgs().toIslandResolver.get();
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());

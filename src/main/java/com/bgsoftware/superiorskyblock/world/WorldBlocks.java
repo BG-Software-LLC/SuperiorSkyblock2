@@ -95,16 +95,19 @@ public class WorldBlocks {
     }
 
     public static Island findIslandWithHint(Block block, @Nullable Island hintIsland) {
-        try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain();
-             ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            return findIslandWithHint(block.getLocation(wrapper.getHandle()), blockPosition.set(block), hintIsland);
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return findIslandWithHint(block.getLocation(wrapper.getHandle()), hintIsland);
         }
     }
 
     public static Island findIslandWithHint(Entity entity, @Nullable Island hintIsland) {
-        try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain();
-             ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            Location location = entity.getLocation(wrapper.getHandle());
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            return findIslandWithHint(entity.getLocation(wrapper.getHandle()), hintIsland);
+        }
+    }
+
+    public static Island findIslandWithHint(Location location, @Nullable Island hintIsland) {
+        try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
             return findIslandWithHint(location, blockPosition.set(location), hintIsland);
         }
     }

@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -40,6 +41,12 @@ public class GameEventArgs implements IEventArgs {
 
     public static class BlockFromToEvent extends BlockEvent {
 
+        public final LazyNullableReference<Island> toIslandResolver = new LazyNullableReference<Island>() {
+            @Override
+            protected Island create() {
+                return WorldBlocks.findIslandWithHint(toBlock, islandResolver.get());
+            }
+        };
         public Block toBlock;
 
     }

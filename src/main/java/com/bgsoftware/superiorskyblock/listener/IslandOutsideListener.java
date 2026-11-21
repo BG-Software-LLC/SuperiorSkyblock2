@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.listener;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Computed;
 import com.bgsoftware.superiorskyblock.core.MutableBlockPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -17,6 +17,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import java.util.function.Function;
 
 public class IslandOutsideListener extends AbstractGameEventListener {
 
@@ -100,10 +102,8 @@ public class IslandOutsideListener extends AbstractGameEventListener {
 
         if (entity instanceof Player) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) entity);
-            if (handlePlayerMove(superiorPlayer,
-                    from, e.getArgs().fromIslandResolver.get(),
-                    to, e.getArgs().toIslandResolver.get(),
-                    true, false))
+            if (handlePlayerMove(superiorPlayer, from, e.getArgs().fromIslandResolver::get,
+                    to, e.getArgs().toIslandResolver::get, true, false))
                 e.setCancelled();
         } else {
             Entity passenger = entity.getPassenger();
@@ -112,19 +112,19 @@ public class IslandOutsideListener extends AbstractGameEventListener {
             if (superiorPlayer == null)
                 return;
 
-            handlePlayerMove(superiorPlayer,
-                    from, e.getArgs().fromIslandResolver.get(),
-                    to, e.getArgs().toIslandResolver.get(),
-                    false, true);
+            handlePlayerMove(superiorPlayer, from, e.getArgs().fromIslandResolver::get,
+                    to, e.getArgs().toIslandResolver::get, false, true);
         }
     }
 
-    private boolean handlePlayerMove(SuperiorPlayer superiorPlayer, Location from, @Nullable Island fromIsland,
-                                     Location to, @Nullable Island toIsland,
+    private boolean handlePlayerMove(SuperiorPlayer superiorPlayer,
+                                     Location from, Function<Location, Island> fromIslandSupplier,
+                                     Location to, Function<Location, Island> toIslandSupplier,
                                      boolean delayTeleport, boolean forceTeleport) {
         if (superiorPlayer.hasBypassModeEnabled())
             return false;
 
+        Island toIsland = toIslandSupplier.apply(to);
         if (toIsland != null) {
             try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
                 if (toIsland.isInsideRange(blockPosition.set(to), 1D))
@@ -134,27 +134,36 @@ public class IslandOutsideListener extends AbstractGameEventListener {
 
         if (delayTeleport) {
             // If we don't delay the teleport, it will not occur due to the cancellation of PlayerMoveEvent
-            BukkitExecutor.sync(() -> handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, fromIsland, forceTeleport), 1L);
+            BukkitExecutor.sync(() -> handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, fromIslandSupplier, forceTeleport), 1L);
         } else {
-            handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, fromIsland, forceTeleport);
+            handlePlayerMoveOutsideIslandTeleport(superiorPlayer, from, fromIslandSupplier, forceTeleport);
         }
 
         return true;
     }
 
-    private void handlePlayerMoveOutsideIslandTeleport(SuperiorPlayer superiorPlayer, Location from, @Nullable Island fromIsland, boolean forceTeleport) {
+    private void handlePlayerMoveOutsideIslandTeleport(SuperiorPlayer superiorPlayer, Location from,
+                                                       Function<Location, Island> fromIslandSupplier,
+                                                       boolean forceTeleport) {
+        Computed<Island> computedFromIsland = new Computed<>();
+
         Player player = superiorPlayer.asPlayer();
 
         // We don't teleport in case we're inside the island, we just cancel the event.
         // However, if the player is in vehicle, we want to eject him and teleport.
-        if (!forceTeleport && fromIsland != null && !player.isInsideVehicle()) {
-            try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
-                if (fromIsland.isInsideRange(blockPosition.set(from)))
-                    return;
+        if (!forceTeleport) {
+            Island fromIsland = computedFromIsland.tryCompute(from, fromIslandSupplier);
+            if (fromIsland != null && !player.isInsideVehicle()) {
+                try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain()) {
+                    if (fromIsland.isInsideRange(blockPosition.set(from)))
+                        return;
+                }
             }
         }
 
         player.eject();
+
+        Island fromIsland = computedFromIsland.tryCompute(from, fromIslandSupplier);
 
         if (fromIsland != null) {
             superiorPlayer.teleportWithResult(fromIsland, result -> {

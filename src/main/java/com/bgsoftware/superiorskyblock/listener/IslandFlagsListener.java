@@ -248,7 +248,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             return;
         }
 
-        Island island = WorldBlocks.findIslandWithHint(toBlock, e.getArgs().islandResolver.get());
+        Island island = e.getArgs().toIslandResolver.get();
         if (island == null)
             return;
 

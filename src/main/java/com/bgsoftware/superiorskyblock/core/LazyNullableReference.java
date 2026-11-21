@@ -20,7 +20,7 @@ public abstract class LazyNullableReference<E> {
         return this.instance;
     }
 
-    /* Workaround for non-capturing lambdas */
+    /* Called when the ::get method is used in a lambda with a parameter */
     public <T> E get(T unused) {
         return get();
     }

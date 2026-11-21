@@ -267,8 +267,8 @@ public class PlayersListener extends AbstractGameEventListener {
             return;
 
         MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(superiorPlayer,
-                e.getArgs().from, e.getArgs().fromIslandResolver.get(),
-                e.getArgs().to, e.getArgs().toIslandResolver.get());
+                e.getArgs().from, e.getArgs().fromIslandResolver::get,
+                e.getArgs().to, e.getArgs().toIslandResolver::get);
         switch (moveResult) {
             case VOID_TELEPORT:
             case SUCCESS:
@@ -300,8 +300,8 @@ public class PlayersListener extends AbstractGameEventListener {
         }
 
         MoveResult moveResult = this.regionManagerService.get().handlePlayerTeleport(superiorPlayer,
-                e.getArgs().from, e.getArgs().fromIslandResolver.get(),
-                e.getArgs().to, e.getArgs().toIslandResolver.get());
+                e.getArgs().from, e.getArgs().fromIslandResolver::get,
+                e.getArgs().to, e.getArgs().toIslandResolver::get);
         if (moveResult != MoveResult.SUCCESS)
             e.setCancelled();
     }
