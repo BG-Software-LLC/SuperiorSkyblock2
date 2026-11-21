@@ -212,10 +212,10 @@ public class ProtectionHelper {
         }
 
         for (Key block : allBlocks) {
-            blockPrivilegesCache.put(block, new RequirementsCache(block, plugin.getSettings().getBlockCategoriesMapping()));
+            blockPrivilegesCache.put(block, new RequirementsCache(block, plugin.getSettings().getBlockCategoriesMapping(), true));
         }
         for (Key entity : allEntities) {
-            entityPrivilegesCache.put(entity, new RequirementsCache(entity, plugin.getSettings().getEntityCategoriesMapping()));
+            entityPrivilegesCache.put(entity, new RequirementsCache(entity, plugin.getSettings().getEntityCategoriesMapping(), false));
         }
 
         BLOCK_PRIVILEGES_CACHE.set(blockPrivilegesCache);
@@ -251,7 +251,7 @@ public class ProtectionHelper {
 
             if (cache == null) {
                 cache = new RequirementsCache(key, isBlock ? plugin.getSettings().getBlockCategoriesMapping() :
-                        plugin.getSettings().getEntityCategoriesMapping());
+                        plugin.getSettings().getEntityCategoriesMapping(), isBlock);
                 map.put(key, cache);
             }
 
@@ -264,8 +264,12 @@ public class ProtectionHelper {
         private final EnumMap<KeyCategory.Action, List<IslandPrivilege>> requiredPrivileges = new EnumMap<>(KeyCategory.Action.class);
         private final EnumMap<KeyCategory.Action, List<IslandFlag>> requiredFlags = new EnumMap<>(KeyCategory.Action.class);
 
-        RequirementsCache(Key key, SettingsManager.CategoriesMapper mapper) {
+        RequirementsCache(Key key, SettingsManager.CategoriesMapper mapper, boolean isBlock) {
             for (KeyCategory category : mapper.getCategories(key)) {
+                if (!isBlock && category.getName().equals(BuiltinKeyCategories.TAMED.getName())) {
+                    continue;
+                }
+
                 for (KeyCategory.Action action : KeyCategory.Action.values()) {
                     IslandPrivilege islandPrivilege = category.getRequiredPrivilege(action);
                     if (islandPrivilege != null) {
