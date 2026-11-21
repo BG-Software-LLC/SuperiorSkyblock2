@@ -4,11 +4,12 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
@@ -71,31 +72,16 @@ public class CmdAdminRemoveEffect implements IAdminIslandCommand {
             return;
         }
 
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
-            if (island.getPotionEffectLevelRaw(effectType) != IslandUpgradeConstants.SYNCED_VALUE) {
-                if (!PluginEventsFactory.callIslandRemoveEffectEvent(island, sender, effectType)) {
-                    continue;
-                }
-
-                island.removePotionEffect(effectType);
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.getPotionEffectLevelRaw(effectType) == IslandUpgradeConstants.SYNCED_VALUE) {
+                return ChangeResult.APPLIED;
             }
 
-            ++islandsChangedCount;
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandRemoveEffectEvent(island, sender, effectType),
+                    island, effectType, Island::removePotionEffect);
+        });
 
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_ISLAND_EFFECT_LEVEL_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()));
-        } else if (targetPlayer == null) {
-            Message.CHANGED_ISLAND_EFFECT_LEVEL_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()), islands.get(0).getName());
-        } else {
-            Message.CHANGED_ISLAND_EFFECT_LEVEL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()), targetPlayer.getName());
-        }
+        change.sendSummary(sender, args[1]);
     }
 
     @Override

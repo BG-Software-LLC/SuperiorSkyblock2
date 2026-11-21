@@ -14,8 +14,6 @@
 
 ADMIN_ADD_PLAYER: '&e&lAda | &7Oyuncu {0} başarıyla {1}''in adasına eklendi.'
 ADMIN_ADD_PLAYER_NAME: '&e&lAda | &7Oyuncu {0} başarıyla {1} adasına eklendi.'
-ADMIN_DEPOSIT_MONEY: '&e&lBanka | &7{1}''in ada bankasına ${0} yatırdın.'
-ADMIN_DEPOSIT_MONEY_NAME: '&e&lBanka | &7{1} adasının bankasına ${0} yatırdın.'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Geliştiren: Ome_R'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Yönetici Komutları Listesi [{0}/{1}]:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
@@ -41,9 +39,6 @@ BLOCK_LEVEL: '&e&lSeviye | &7{0} bloğunun seviyesi {1}.'
 BLOCK_LEVEL_WORTHLESS: '&e&lSeviye | &7{0} bloğu değersiz.'
 BLOCK_VALUE: '&e&lDeğer | &7{0} bloğunun değeri {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lDeğer | &7{0} bloğu değersiz.'
-BONUS_SYNC_ALL: '&e&lAda | &7Ada bonusu tüm adalarla başarıyla senkronize edildi.'
-BONUS_SYNC_NAME: '&e&lAda | &7Ada bonusu {0} ile başarıyla senkronize edildi.'
-BONUS_SYNC: '&e&lAda | &7Ada bonusu {0}''ın adasıyla başarıyla senkronize edildi.'
 BORDER_PLAYER_COLOR_NAME_BLUE: Mavi
 BORDER_PLAYER_COLOR_NAME_RED: Kırmızı
 BORDER_PLAYER_COLOR_NAME_GREEN: Yeşil
@@ -53,103 +48,23 @@ BUILD_OUTSIDE_ISLAND: '&c&lHata | &7Koruma menzilinin dışında inşa edemezsin
 CANNOT_SET_ROLE: '&c&lHata | &7Oyuncunun rolünü {0} olarak ayarlayamazsın.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lHata | &7Sadece senden daha düşük ada rolüne
   sahip rollerin izinlerini değiştirebilirsin.'
-CHANGED_BANK_LIMIT: '&e&lYükseltmeler | &7{0}''ın adasının banka limiti başarıyla
-  güncellendi.'
-CHANGED_BANK_LIMIT_ALL: '&e&lYükseltmeler | &7Tüm adaların banka limiti başarıyla
-  güncellendi.'
-CHANGED_BANK_LIMIT_NAME: '&e&lYükseltmeler | &7{0} adasının banka limiti başarıyla
-  güncellendi.'
 CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension.'
-CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension for all the islands.'
-CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
-CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBloklar | &7{0} konumundaki blok miktarı başarıyla {1}
   olarak değiştirildi.'
-CHANGED_BLOCK_LIMIT: '&e&lYükseltmeler | &7{0} Bloğunun {1}''in adası için limiti
-  başarıyla güncellendi.'
-CHANGED_BLOCK_LIMIT_ALL: '&e&lYükseltmeler | &7{0} Bloğunun tüm adalar için limiti
-  başarıyla güncellendi.'
-CHANGED_BLOCK_LIMIT_NAME: '&e&lYükseltmeler | &7{0} Bloğunun {1} adası için limiti
-  başarıyla güncellendi.'
-CHANGED_BONUS_LEVEL: '&e&lIsland | &7Successfully updated the level bonus of {0}''s island.'
-CHANGED_BONUS_LEVEL_ALL: '&e&lIsland | &7Successfully updated the level bonus of all the islands.'
-CHANGED_BONUS_LEVEL_NAME: '&e&lIsland | &7Successfully updated the level bonus of {0}.'
-CHANGED_BONUS_WORTH: '&e&lIsland | &7Successfully updated the worth bonus of {0}''s island.'
-CHANGED_BONUS_WORTH_ALL: '&e&lIsland | &7Successfully updated the worth bonus of all the islands.'
-CHANGED_BONUS_WORTH_NAME: '&e&lIsland | &7Successfully updated the worth bonus of {0}.'
-CHANGED_CHEST_SIZE: '&e&lSandık | &7{2}''in adası için #{0} sayfasının satırları başarıyla
-  {1} olarak güncellendi.'
-CHANGED_CHEST_SIZE_ALL: '&e&lSandık | &7Tüm adalar için #{0} sayfasının satırları
-  başarıyla {1} olarak güncellendi.'
-CHANGED_CHEST_SIZE_NAME: '&e&lSandık | &7{2} adası için #{0} sayfasının satırları
-  başarıyla {1} olarak güncellendi.'
-CHANGED_COOP_LIMIT: '&e&lYükseltmeler | &7{0}''ın adasının co-op oyuncu limiti başarıyla
-  güncellendi.'
-CHANGED_COOP_LIMIT_ALL: '&e&lYükseltmeler | &7Tüm adaların co-op oyuncu limiti başarıyla
-  güncellendi.'
-CHANGED_COOP_LIMIT_NAME: '&e&lYükseltmeler | &7{0} adasının co-op oyuncu limiti başarıyla
-  güncellendi.'
-CHANGED_CROP_GROWTH: '&e&lYükseltmeler | &7{0}''ın adasının bitki büyüme çarpanı başarıyla
-  güncellendi.'
-CHANGED_CROP_GROWTH_ALL: '&e&lYükseltmeler | &7Tüm adaların bitki büyüme çarpanı başarıyla
-  güncellendi.'
-CHANGED_CROP_GROWTH_NAME: '&e&lYükseltmeler | &7{0} adasının bitki büyüme çarpanı
-  başarıyla güncellendi.'
 CHANGED_DISCORD: '&e&lAda | &7Ada discordu başarıyla {0} olarak değiştirildi.'
-CHANGED_ENTITY_LIMIT: '&e&lYükseltmeler | &7{0} varlıklarının {1}''in adası için limiti
-  başarıyla güncellendi.'
-CHANGED_ENTITY_LIMIT_ALL: '&e&lYükseltmeler | &7{0} varlıklarının tüm adalar için
-  limiti başarıyla güncellendi.'
-CHANGED_ENTITY_LIMIT_NAME: '&e&lYükseltmeler | &7{0} varlıklarının {1} adası için
-  limiti başarıyla güncellendi.'
-CHANGED_ISLAND_EFFECT_LEVEL: '&e&lYükseltmeler | &7{0} ada etkisinin {1}''in adası
-  için seviyesi başarıyla güncellendi.'
-CHANGED_ISLAND_EFFECT_LEVEL_ALL: '&e&lYükseltmeler | &7{0} ada etkisinin tüm adalar
-  için seviyesi başarıyla güncellendi.'
-CHANGED_ISLAND_EFFECT_LEVEL_NAME: '&e&lYükseltmeler | &7{0} ada etkisinin {1} adası
-  için seviyesi başarıyla güncellendi.'
-CHANGED_ISLAND_SIZE: '&e&lYükseltmeler | &7{0}''ın adasının boyutu başarıyla güncellendi.'
-CHANGED_ISLAND_SIZE_ALL: '&e&lYükseltmeler | &7Tüm adaların boyutu başarıyla güncellendi.'
-CHANGED_ISLAND_SIZE_NAME: '&e&lYükseltmeler | &7{0} adasının boyutu başarıyla güncellendi.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oOyuncular adalarının dışında inşa edebildiği
   için ada boyutunun bir etkisi yoktur. Bu özelliği yapılandırma dosyasından kapatırsan
   ada boyutu tekrar etkili olacaktır.'
 CHANGED_LANGUAGE: '&e&lDil | &7Kişisel dilin başarıyla İngilizce olarak değiştirildi.'
-CHANGED_MOB_DROPS: '&e&lYükseltmeler | &7{0}''ın adasının mob düşürme çarpanı başarıyla
-  güncellendi.'
-CHANGED_MOB_DROPS_ALL: '&e&lYükseltmeler | &7Tüm adaların mob düşürme çarpanı başarıyla
-  güncellendi.'
-CHANGED_MOB_DROPS_NAME: '&e&lYükseltmeler | &7{0} adasının mob düşürme çarpanı başarıyla
-  güncellendi.'
 CHANGED_NAME: '&e&lAda | &7Adanın adını {0}&7 olarak değiştirdin.'
 CHANGED_NAME_OTHER: '&e&lAda | &7{0} adasının adını {1}&7 olarak değiştirdin.'
 CHANGED_NAME_OTHER_NAME: '&e&lAda | &7{0}&7 adının adını {1}&7 olarak değiştirdin.'
 CHANGED_PAYPAL: '&e&lAda | &7Ada paypalı başarıyla {0} olarak değiştirildi.'
-CHANGED_ROLE_LIMIT: '&e&lYükseltmeler | &7{0} rolünün {1}''in adası için limiti başarıyla
-  güncellendi.'
-CHANGED_ROLE_LIMIT_ALL: '&e&lYükseltmeler | &7{0} rolünün tüm adalar için limiti başarıyla
-  güncellendi.'
-CHANGED_ROLE_LIMIT_NAME: '&e&lYükseltmeler | &7{0} rolünün {1} adası için limiti başarıyla
-  güncellendi.'
-CHANGED_SPAWNER_RATES: '&e&lYükseltmeler | &7{0}''ın adasının spawner oranları çarpanı
-  başarıyla güncellendi.'
-CHANGED_SPAWNER_RATES_ALL: '&e&lYükseltmeler | &7Tüm adaların spawner oranları çarpanı
-  başarıyla güncellendi.'
-CHANGED_SPAWNER_RATES_NAME: '&e&lYükseltmeler | &7{0} adasının spawner oranları çarpanı
-  başarıyla güncellendi.'
-CHANGED_TEAM_LIMIT: '&e&lYükseltmeler | &7{0}''ın adasının takım limiti başarıyla
-  güncellendi.'
-CHANGED_TEAM_LIMIT_ALL: '&e&lYükseltmeler | &7Tüm adaların takım limiti başarıyla
-  güncellendi.'
-CHANGED_TEAM_LIMIT_NAME: '&e&lYükseltmeler | &7{0} adasının takım limiti başarıyla
-  güncellendi.'
 CHANGED_TELEPORT_LOCATION: '&e&lAda | &7Işınlanma konumu başarıyla güncellendi.'
-CHANGED_WARPS_LIMIT: '&e&lYükseltmeler | &7{0}''ın adasının ışınlanma limiti başarıyla
-  güncellendi.'
-CHANGED_WARPS_LIMIT_ALL: '&e&lYükseltmeler | &7Tüm adaların ışınlanma limiti başarıyla
-  güncellendi.'
-CHANGED_WARPS_LIMIT_NAME: '&e&lYükseltmeler | &7{0} adasının ışınlanma limiti başarıyla
-  güncellendi.'
+CHANGE_SKIP_REASON_ABOVE_MAXIMUM: 'the new value would be above the maximum'
+CHANGE_SKIP_REASON_BELOW_MINIMUM: 'the new value would be below the minimum'
+CHANGE_SKIP_REASON_CANCELLED: 'cancelled by another plugin'
+CHANGE_SKIP_REASON_UNLIMITED: 'the limit is unlimited'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
@@ -412,13 +327,9 @@ DEPOSIT_ERROR: '&c&lHata | &7{0}.'
 DESTROY_OUTSIDE_ISLAND: '&c&lHata | &7Koruma menzilinin dışında kıramazsın.'
 DISBAND_ANNOUNCEMENT: '&e&lAda | &7Adan {0} tarafından dağıtıldı.'
 DISBAND_GIVE: '&e&lAda | &7{0} dağıtma hakkı aldın.'
-DISBAND_GIVE_ALL: '&e&lAda | &7Tüm oyunculara {0} dağıtma hakkı verdin.'
-DISBAND_GIVE_OTHER: '&e&lAda | &7{1}''e {0} dağıtma hakkı verdin.'
 DISBAND_ISLAND_BALANCE_REFUND: '&7&oAdan dağıtıldı ve ada bankasından hesabına ${0}
   dolar iade edildi.'
 DISBAND_SET: '&e&lAda | &7Dağıtma sayın {0} olarak ayarlandı.'
-DISBAND_SET_ALL: '&e&lAda | &7Tüm oyuncuların dağıtma sayısını {0} olarak ayarladın.'
-DISBAND_SET_OTHER: '&e&lAda | &7{0}''ın dağıtma sayısını {1} olarak ayarladın.'
 DISBANDED_ISLAND: '&e&lAda | &7Adanı dağıttın.'
 DISBANDED_ISLAND_OTHER: '&e&lAda | &7{0}''ın adasını dağıttın.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&lAda | &7{0} adasını dağıttın.'
@@ -438,26 +349,8 @@ FORMAT_HOURS_NAME: saat
 FORMAT_HOUR_NAME: saat
 FORMAT_DAYS_NAME: gün
 FORMAT_DAY_NAME: gün
-GENERATOR_CLEARED: '&e&lAda | &7{0}''ın adası için jeneratör miktarları başarıyla
-  temizlendi.'
-GENERATOR_CLEARED_NAME: '&e&lAda | &7{0} adasının jeneratör miktarları başarıyla temizlendi.'
-GENERATOR_CLEARED_ALL: '&e&lAda | &7Tüm adalar için jeneratör miktarları başarıyla
-  temizlendi.'
 GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
 GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
-GENERATOR_UPDATED: '&e&lAda | &7{0}''ın jeneratör miktarı başarıyla {1}''in adasına
-  güncellendi.'
-GENERATOR_UPDATED_NAME: '&e&lAda | &7{0}''ın jeneratör miktarı başarıyla {1} adasına
-  güncellendi.'
-GENERATOR_UPDATED_ALL: '&e&lAda | &7{0}''ın jeneratör miktarı tüm adalar için başarıyla
-  güncellendi.'
-GLOBAL_COMMAND_EXECUTED: '&e&lAda | &7Komut {0}''ın ada üyelerinde başarıyla çalıştırıldı!'
-GLOBAL_COMMAND_EXECUTED_NAME: '&e&lAda | &7Komut {0} adasının üyelerinde başarıyla
-  çalıştırıldı!'
-GLOBAL_MESSAGE_SENT: '&e&lAda | &7{0}''ın ada üyelerine mesaj başarıyla gönderildi!'
-GLOBAL_MESSAGE_SENT_NAME: '&e&lAda | &7{0} adasının üyelerine mesaj başarıyla gönderildi!'
-GLOBAL_TITLE_SENT: '&e&lAda | &7{0}''ın ada üyelerine başlık başarıyla gönderildi!'
-GLOBAL_TITLE_SENT_NAME: '&e&lAda | &7{0} adasının üyelerine başlık başarıyla gönderildi!'
 GOT_BANNED: '&e&lAda | &7{0}''ın adasından YASAKLANDIN.'
 GOT_DEMOTED: '&e&lAda | &7Adanda {0} olarak rütbe düşürüldün.'
 GOT_EXPELLED: '&e&lAda | &7&o{0} tarafından adadan kovuldun.'
@@ -528,6 +421,12 @@ INVALID_WORLD: '&c&lHata | &7Geçersiz dünya {0}.'
 INVITE_ANNOUNCEMENT: '&e&lAda | &7{0}, {1}''i adaya davet etti.'
 INVITE_BANNED_PLAYER: '&c&lHata | &7Bu oyuncu adadan yasaklandı ve davet edilemez.'
 INVITE_TO_FULL_ISLAND: '&c&lHata | &7Adana daha fazla üye davet edemezsin.'
+ISLANDS_CHANGE_SKIPPED:
+  0:
+    text: '&c&lError | &7Skipped {0} island(s): {1}. &8(Hover to see them)'
+    tooltip: '&7{3}'
+ISLANDS_CHANGE_SKIPPED_CONSOLE: '&c&lError | &7Skipped {0} island(s): {1}: {2}'
+ISLANDS_CHANGE_SUMMARY: '&e&lCommands | &7Applied &e{0}&7 to {1}/{2} islands.'
 ISLAND_ALREADY_CLOSED: '&c&lHata | &7Ada zaten halka kapalı.'
 ISLAND_ALREADY_EXIST: '&c&lHata | &7Bu adla bir ada zaten var.'
 ISLAND_ALREADY_OPENED: '&c&lHata | &7Ada zaten halka açık.'
@@ -670,12 +569,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lAda | &7Adandan ayrıldın.'
 LEFT_ISLAND_COOP: '&e&lAda | &7Artık {0}''ın adasında co-op üyesi değilsin.'
 LEFT_ISLAND_COOP_NAME: '&e&lAda | &7Artık {0} adasında co-op üyesi değilsin.'
-LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
-LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
-LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the
-  island {1}!'
-LOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7The world {0} is now locked for {1}''s island!'
 MATERIAL_NOT_SOLID: '&c&lHata | &7Katı bir materyal sağlamalısın.'
 MAXIMUM_LEVEL: '&c&lHata | &7Bu yükseltme için maksimum seviye {0}.'
 MESSAGE_SENT: '&e&lAda | &7{0}''e mesaj başarıyla gönderildi!'
@@ -772,9 +666,6 @@ PANEL_TOGGLE_OFF: |-
 PANEL_TOGGLE_ON: |-
   &e&lPanel | &7Ada paneli &aAÇIK&7.
   &e&lPanel | &7/is çalıştırmak paneli senin için açacak.
-PERMISSION_CHANGED: '&e&lAda | &7{1}''in adasının {0} izni başarıyla güncellendi.'
-PERMISSION_CHANGED_NAME: '&e&lAda | &7{1} adasının {0} izni başarıyla güncellendi.'
-PERMISSION_CHANGED_ALL: '&e&lAda | &7Tüm adalar için {0} izni başarıyla güncellendi.'
 PERSISTENT_DATA_EMPTY: '&c&lHata | &7Sorgun için veri bulunamadı.'
 PERSISTENT_DATA_MODIFY: '&e&lVeri | &7{0} için veri {1} ile {2} olarak başarıyla ayarlandı.'
 PERSISTENT_DATA_SHOW: '&e&lVeri | &7{0} verisi: &f{{1}}'
@@ -782,15 +673,18 @@ PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
 PERSISTENT_DATA_SHOW_SPACER: '&f, '
 PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
 PERSISTENT_DATA_REMOVED: '&e&lVeri | &7{0} için {1} yolundan veri başarıyla kaldırıldı.'
-PERMISSIONS_RESET: '&e&lIsland | &7Successfully reset all the permissions of {0}''s island to default values!'
-PERMISSIONS_RESET_ALL: '&e&lIsland | &7Successfully reset all the permissions of all the islands to default values!'
-PERMISSIONS_RESET_NAME: '&e&lIsland | &7Successfully reset all the permissions of the island {0} to default values!'
 PERMISSIONS_RESET_PLAYER: '&e&lAda | &7{0} için tüm izinler varsayılan değerlere başarıyla
   sıfırlandı!'
 PERMISSIONS_RESET_ROLES: '&e&lAda | &7Adanın tüm izinleri varsayılan değerlere başarıyla
   sıfırlandı!'
 PLACEHOLDER_NO: Hayır
 PLACEHOLDER_YES: Evet
+PLAYERS_CHANGE_SKIPPED:
+  0:
+    text: '&c&lError | &7Skipped {0} player(s): {1}. &8(Hover to see them)'
+    tooltip: '&7{3}'
+PLAYERS_CHANGE_SKIPPED_CONSOLE: '&c&lError | &7Skipped {0} player(s): {1}: {2}'
+PLAYERS_CHANGE_SUMMARY: '&e&lCommands | &7Applied &e{0}&7 to {1}/{2} players.'
 PLAYER_ALREADY_BANNED: '&c&lHata | &7Bu oyuncu zaten yasaklı.'
 PLAYER_ALREADY_COOP: '&c&lHata | &7Bu oyuncu zaten co-op.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lHata | &7Bu oyuncu zaten bir adada.'
@@ -809,19 +703,11 @@ PURGE_CLEAR: '&e&lAda | &7Temizlenecek tüm sıralanmış adalar başarıyla tem
 PURGED_ISLANDS: |-
   &e&lAda | &7Sunucu yeniden başladığında {0} ada temizlenecek.
   &e&lAda | &7İstediğin zaman /is admin purge cancel kullanarak iptal edebilirsin.'
-RANKUP_SUCCESS: '&e&lAda | &7{1}''in adası için {0} yükseltmesinin seviyesi başarıyla
-  güncellendi.'
-RANKUP_SUCCESS_ALL: '&e&lAda | &7Tüm adalar için {0} yükseltmesinin seviyesi başarıyla
-  güncellendi.'
-RANKUP_SUCCESS_NAME: '&e&lAda | &7{1} adası için {0} yükseltmesinin seviyesi başarıyla
-  güncellendi.'
 RATE_ALREADY_GIVEN: '&c&lError | &7You already rated this island.'
 RATE_ANNOUNCEMENT: '&e&lAda | &7{0} adanı 5 üzerinden {1} olarak değerlendirdi!.'
 RATE_CHANGE_OTHER: '&e&lAda | &7{0}''ın değerlendirmesini {1} olarak değiştirdin.'
 RATE_OWN_ISLAND: '&c&lHata | &7Kendi adanı değerlendiremezsin.'
 RATE_REMOVE_ALL: '&e&lAda | &7{0}''ın tüm değerlendirmeleri başarıyla kaldırıldı.'
-RATE_REMOVE_ALL_ISLANDS: '&e&lAda | &7Tüm adaların tüm değerlendirmeleri başarıyla
-  kaldırıldı.'
 RATE_SUCCESS: '&e&lAda | &7Bu adayı {0} yıldızla değerlendirdin!'
 REACHED_BLOCK_LIMIT: '&e&lYükseltmeler | &7Ada için {0} Bloğu limitine ulaştın.'
 REACHED_ENTITY_LIMIT: '&e&lYükseltmeler | &7Varlık {0} için adanın limitine ulaştın.'
@@ -834,9 +720,6 @@ RECALC_PROCCESS_REQUEST: '&e&lAda | &7İsteğiniz işleniyor...'
 RELOAD_COMPLETED: '&e&lAda | &7Yeniden yükleme tamamlandı!'
 RELOAD_PROCCESS_REQUEST: '&e&lAda | &7Yapılandırmalar yeniden yükleniyor...'
 REVOKE_INVITE_ANNOUNCEMENT: '&e&lAda | &7{0}, {1}''e adaya olan davetini geri çekti.'
-RESET_WORLD_SUCCEED: '&e&lAda | &7{1}''in adası için {0} dünyası başarıyla sıfırlandı.'
-RESET_WORLD_SUCCEED_ALL: '&e&lAda | &7Tüm adalar için {0} dünyası başarıyla sıfırlandı.'
-RESET_WORLD_SUCCEED_NAME: '&e&lAda | &7{1} adası için {0} dünyası başarıyla sıfırlandı.'
 SAME_NAME_CHANGE: '&c&lHata | &7Mevcut ada adından farklı bir ad girmelisin.'
 SCHEMATIC_LEFT_SELECT: '&e&lŞematikler | &7Konum #2 ({0}) seçildi.'
 SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
@@ -848,20 +731,9 @@ SCHEMATIC_READY_TO_CREATE: |-
 SCHEMATIC_RIGHT_SELECT: '&e&lŞematikler | &7Konum #1 ({0}) seçildi.'
 SCHEMATIC_SAVED: '&e&lŞematikler | &7Şematik başarıyla kaydedildi!'
 SELF_ROLE_CHANGE: '&c&lHata | &7Kendi rolünü değiştiremezsin.'
-SET_UPGRADE_LEVEL: '&e&lYükseltmeler | &7{1}''in adası için {0} seviyesi başarıyla
-  güncellendi.'
-SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
-SET_UPGRADE_LEVEL_NAME: '&e&lYükseltmeler | &7{1} adası için {0} seviyesi başarıyla
-  güncellendi.'
 SET_WARP: '&e&lAda | &7{0} konumunda yeni bir ışınlanma noktası başarıyla oluşturuldu.'
 SET_WARP_OUTSIDE: '&c&lHata | &7Adanın dışında ışınlanma noktası ayarlayamazsın.'
-SETTINGS_RESET: '&e&lIsland | &7Successfully reset all the settings of {0}''s island to default values!'
-SETTINGS_RESET_ALL: '&e&lIsland | &7Successfully reset all the settings of all the islands to default values!'
-SETTINGS_RESET_NAME: '&e&lIsland | &7Successfully reset all the settings of the island {0} to default values!'
 SETTINGS_RESET_SELF: '&e&lIsland | &7Successfully reset all the settings of the island to default values!'
-SETTINGS_UPDATED: '&e&lAda | &7{1}''in adası için {0} ayarları başarıyla güncellendi.'
-SETTINGS_UPDATED_NAME: '&e&lAda | &7{1} adası için {0} ayarları başarıyla güncellendi.'
-SETTINGS_UPDATED_ALL: '&e&lAda | &7Tüm adalar için {0} ayarları başarıyla güncellendi.'
 SIZE_BIGGER_MAX: '&c&lHata | &7Maksimum ada boyutundan daha büyük bir boyut ayarlayamazsın.'
 SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
 SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
@@ -869,12 +741,6 @@ SPAWN_TELEPORT_SUCCESS: '&e&lDoğuş | &7{0} başarıyla doğuşa ışınlandı.
 SPAWN_SET_SUCCESS: '&e&lDoğuş | &7Doğuş konumu {0} olarak başarıyla güncellendi.'
 SPY_LOCAL_CHAT_FORMAT: '&7[Spy] &6[{0}] {1}&f: &7{2}'
 SPY_TEAM_CHAT_FORMAT: '&7[Casus] &e[{0}] {1}&f: &7{2}'
-SYNC_UPGRADES: '&e&lYükseltmeler | &7{0}''ın adasının tüm yükseltme değerleri başarıyla
-  senkronize edildi.'
-SYNC_UPGRADES_ALL: '&e&lYükseltmeler | &7Tüm adaların tüm yükseltme değerleri başarıyla
-  senkronize edildi.'
-SYNC_UPGRADES_NAME: '&e&lYükseltmeler | &7{0} adasının tüm yükseltme değerleri başarıyla
-  senkronize edildi.'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lHata | &7Adanın içinde değilsin.'
 TELEPORT_OUTSIDE_ISLAND: '&c&lHata | &7Koruma menzilinin dışına ışınlanamazsın.'
@@ -919,11 +785,6 @@ UNCOOP_AUTO_ANNOUNCEMENT: '&e&lAda | &7Çevrimiçi ada üyesi yok ve bu yüzden 
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lAda | &7{0} oyundan ayrıldı ve artık co-op üyesi değil.'
 UNIGNORED_ISLAND: '&e&lAda | &7{0}''ın adası artık en iyi adalardan yoksayılmıyor.'
 UNIGNORED_ISLAND_NAME: '&e&lAda | &7{0} adası artık en iyi adalardan yoksayılmıyor.'
-UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now unlocked for all
-  islands!'
-UNLOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now unlocked for
-  the island {1}!'
-UNLOCK_WORLD_ANNOUNCEMENT: '&e&lDünyalar | &7{0} dünyan artık kilitli değil!'
 UNSAFE_WARP: '&e&lAda | &7&oBu ışınlanma güvensiz görünüyor. Lütfen başka bir ışınlanmayı
   dene.'
 UPDATED_PERMISSION: '&e&lAda | &7{0} için izinler güncellendi.'

@@ -9,6 +9,8 @@ import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -16,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -91,28 +92,17 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
         if (dimension == null)
             return;
 
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> ChangeResult.ifAllowed(
+                PluginEventsFactory.callIslandWorldResetEvent(island, sender, dimension),
+                island, dimension, CmdAdminResetWorld::resetWorldInternal));
 
-        for (Island island : islands) {
-            if (!PluginEventsFactory.callIslandWorldResetEvent(island, sender, dimension))
-                continue;
+        change.sendSummary(sender, args[1]);
+    }
 
-            ++islandsChangedCount;
-
-            IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
-                islandWorldResult.ifLeft(world -> resetChunksInternal(island, world, dimension));
-            });
-        }
-
-        if (islandsChangedCount <= 0)
-            return;
-
-        if (islandsChangedCount > 1)
-            Message.RESET_WORLD_SUCCEED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
-        else if (targetPlayer == null)
-            Message.RESET_WORLD_SUCCEED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]), islands.get(0).getName());
-        else
-            Message.RESET_WORLD_SUCCEED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]), targetPlayer.getName());
+    private static void resetWorldInternal(Island island, Dimension dimension) {
+        IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
+            islandWorldResult.ifLeft(world -> resetChunksInternal(island, world, dimension));
+        });
     }
 
     private static void resetChunksInternal(Island island, World world, Dimension dimension) {

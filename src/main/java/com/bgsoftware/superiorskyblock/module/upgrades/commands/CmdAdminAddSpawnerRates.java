@@ -4,11 +4,11 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -72,40 +72,18 @@ public class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
-        boolean isInvalid = false;
-        Island changedIsland = null;
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            double newMultiplier = island.getSpawnerRatesMultiplier() + multiplier;
 
-        for (Island island : islands) {
-            double currentMultiplier = island.getSpawnerRatesMultiplier();
-            if (currentMultiplier + multiplier < 1) {
-                isInvalid = true;
-                continue;
+            if (newMultiplier < 1) {
+                return ChangeResult.BELOW_MINIMUM;
             }
 
-            PluginEvent<PluginEventArgs.IslandChangeSpawnerRates> event = PluginEventsFactory.callIslandChangeSpawnerRatesEvent(
-                    island, sender, currentMultiplier + multiplier);
-            if (!event.isCancelled()) {
-                island.setSpawnerRatesMultiplier(event.getArgs().spawnerRates);
-                changedIsland = island;
-                ++islandsChangedCount;
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandChangeSpawnerRatesEvent(island, sender, newMultiplier),
+                    eventArgs -> eventArgs.island.setSpawnerRatesMultiplier(eventArgs.spawnerRates));
+        });
 
-        if (islandsChangedCount <= 0) {
-            if (isInvalid) {
-                Message.INVALID_MULTIPLIER.send(sender, multiplier);
-            }
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_SPAWNER_RATES_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_SPAWNER_RATES_NAME.send(sender, changedIsland.getName());
-        } else {
-            Message.CHANGED_SPAWNER_RATES.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args[1]);
     }
 
 }
