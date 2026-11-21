@@ -381,12 +381,17 @@ public class ProtectionListener extends AbstractGameEventListener {
     }
 
     private void onPlayerTakeLecternBook(GameEvent<GameEventArgs.PlayerTakeLecternBookEvent> e) {
+        List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockTakeBookPrivileges(Keys.of(e.getArgs().clickedBlock));
+        if (islandPrivileges.isEmpty()) {
+            return;
+        }
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
 
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), IslandPrivileges.LECTERN_INTERACT_PRIVILEGES);
+                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), islandPrivileges);
         }
 
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {

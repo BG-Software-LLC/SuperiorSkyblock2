@@ -48,7 +48,9 @@ public interface KeyCategory {
 
         SPAWNER_SPAWN,
 
-        NATURAL_SPAWN
+        NATURAL_SPAWN,
+
+        TAKE_BOOK
 
     }
 

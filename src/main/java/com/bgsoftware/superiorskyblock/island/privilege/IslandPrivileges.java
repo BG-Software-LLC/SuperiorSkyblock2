@@ -77,7 +77,6 @@ public class IslandPrivileges {
     public static final IslandPrivilege WITHDRAW_MONEY = register("WITHDRAW_MONEY", IslandPrivilege.Type.COMMAND);
 
     // Privileges from configurations
-    public static List<IslandPrivilege> LECTERN_INTERACT_PRIVILEGES;
     public static List<IslandPrivilege> VAULT_INTERACT_PRIVILEGES;
 
     private static String ALL_PRIVILEGE_NAMES;
@@ -96,8 +95,6 @@ public class IslandPrivileges {
     }
 
     private static void onSettingsUpdate() {
-        LECTERN_INTERACT_PRIVILEGES = ConstantKeys.LECTERN == null ? Collections.emptyList() :
-                ProtectionHelper.getBlockInteractPrivileges(ConstantKeys.LECTERN);
         VAULT_INTERACT_PRIVILEGES = ConstantKeys.VAULT == null ? Collections.emptyList() :
                 ProtectionHelper.getBlockInteractPrivileges(ConstantKeys.VAULT);
     }

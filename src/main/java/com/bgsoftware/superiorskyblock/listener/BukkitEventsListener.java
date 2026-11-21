@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventCallback;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.NMSDialogs;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
@@ -257,12 +256,10 @@ public class BukkitEventsListener implements Listener {
         } catch (Exception ignored) {
         }
 
-        if (!IslandPrivileges.LECTERN_INTERACT_PRIVILEGES.isEmpty()) {
-            try {
-                Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
-                createEventListener(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, org.bukkit.event.player.PlayerTakeLecternBookEvent.class, new PlayerTakeLecternBookEventFunctions());
-            } catch (ClassNotFoundException ignored) {
-            }
+        try {
+            Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
+            createEventListener(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, org.bukkit.event.player.PlayerTakeLecternBookEvent.class, new PlayerTakeLecternBookEventFunctions());
+        } catch (ClassNotFoundException ignored) {
         }
 
         try {

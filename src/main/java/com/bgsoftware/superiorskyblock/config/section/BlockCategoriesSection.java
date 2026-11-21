@@ -50,6 +50,7 @@ public class BlockCategoriesSection extends BaseCategoriesMapper {
         category.setRequirement(KeyCategory.Action.PLACE, getOrRegisterPrivilege(section.getString("actions.PLACE")));
         category.setRequirement(KeyCategory.Action.BREAK, getOrRegisterPrivilege(section.getString("actions.BREAK")));
         category.setRequirement(KeyCategory.Action.INTERACT, getOrRegisterPrivilege(section.getString("actions.INTERACT")));
+        category.setRequirement(KeyCategory.Action.TAKE_BOOK, getTakeBookPrivilege(section));
 
         return category;
     }
@@ -88,6 +89,7 @@ public class BlockCategoriesSection extends BaseCategoriesMapper {
                     getOrRegisterPrivilege(categorySection.getString("actions.BREAK")));
             category.setRequirement(KeyCategory.Action.INTERACT,
                     getOrRegisterPrivilege(categorySection.getString("actions.INTERACT")));
+            category.setRequirement(KeyCategory.Action.TAKE_BOOK, getTakeBookPrivilege(categorySection));
 
             categories.put(key, category);
         }
@@ -166,6 +168,12 @@ public class BlockCategoriesSection extends BaseCategoriesMapper {
                 }
             }
         }
+    }
+
+    @Nullable
+    private static IslandPrivilege getTakeBookPrivilege(ConfigurationSection section) {
+        String name = section.getString("actions.TAKE_BOOK", section.getString("actions.INTERACT"));
+        return name == null || name.isEmpty() ? null : getOrRegisterPrivilege(name);
     }
 
     @Nullable

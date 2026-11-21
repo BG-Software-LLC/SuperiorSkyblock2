@@ -111,6 +111,10 @@ public class ProtectionHelper {
         return getBlockRequirements(key).requiredPrivileges.getOrDefault(KeyCategory.Action.INTERACT, Collections.emptyList());
     }
 
+    public static List<IslandPrivilege> getBlockTakeBookPrivileges(Key key) {
+        return getBlockRequirements(key).requiredPrivileges.getOrDefault(KeyCategory.Action.TAKE_BOOK, Collections.emptyList());
+    }
+
     public static List<IslandPrivilege> getBlockBreakPrivileges(Key key) {
         return getBlockRequirements(key).requiredPrivileges.getOrDefault(KeyCategory.Action.BREAK, Collections.emptyList());
     }

@@ -1178,6 +1178,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         for (String islandPrivilegeName : interactablesConfig.getKeys(false)) {
             customCategories.set(islandPrivilegeName + ".blocks", interactablesConfig.getStringList(islandPrivilegeName));
             customCategories.set(islandPrivilegeName + ".actions.INTERACT", islandPrivilegeName);
+            customCategories.set(islandPrivilegeName + ".actions.TAKE_BOOK", null);
 
             if (islandPrivilegeName.equalsIgnoreCase("SPAWNER_BREAK")) {
                 customCategories.set(islandPrivilegeName + ".actions.BREAK", islandPrivilegeName);

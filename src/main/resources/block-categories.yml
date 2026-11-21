@@ -17,6 +17,9 @@
 #     BREAK: <ISLAND_PRIVILEGE>
 #     # The privilege required to interact with the blocks.
 #     INTERACT: <ISLAND_PRIVILEGE>
+#     # The privilege required to take a book from a lectern.
+#     # Defaults to INTERACT when omitted; use '' to require no privilege.
+#     TAKE_BOOK: <ISLAND_PRIVILEGE>
 # Important: Blocks can belong to multiple categories at the same time. In that case, the
 # corresponding action may require a privilege from each category.
 
@@ -332,7 +335,8 @@ custom-categories:
     blocks:
       - LECTERN
     actions:
-      INTERACT: PICKUP_LECTERN_BOOK
+      INTERACT: READ_LECTERN_BOOK
+      TAKE_BOOK: PICKUP_LECTERN_BOOK
 
   SIGNS:
     blocks:
