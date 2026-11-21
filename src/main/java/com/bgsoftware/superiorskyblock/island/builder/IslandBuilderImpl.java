@@ -565,7 +565,7 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     public void setBlockCategoryLimitRaw(KeyCategoryId id, int limit) {
-        this.blockCategoryLimits.put(id, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+        this.blockCategoryLimits.put(id, limit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
     }
 
     @Override
@@ -583,7 +583,7 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     public void setEntityCategoryLimitRaw(KeyCategoryId id, int limit) {
-        this.entityCategoryLimits.put(id, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+        this.entityCategoryLimits.put(id, limit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
     }
 
     @Override

@@ -1727,6 +1727,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public int getBlockCategoryLimitRaw(KeyCategory blockCategory) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
     public Map<KeyCategory, Integer> getBlockCategoryLimits() {
         return Collections.emptyMap();
     }
@@ -1763,6 +1768,11 @@ public class SpawnIsland implements Island {
 
     @Override
     public int getEntityCategoryLimit(KeyCategory entityCategory) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public int getEntityCategoryLimitRaw(KeyCategory entityCategory) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 

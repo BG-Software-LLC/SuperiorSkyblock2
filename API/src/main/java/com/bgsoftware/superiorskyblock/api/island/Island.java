@@ -2246,34 +2246,47 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the block category limit of a block category.
      *
      * @param blockCategory The block category to check.
+     * @return The limit, or -1 if there is no limit.
      */
     int getBlockCategoryLimit(KeyCategory blockCategory);
 
     /**
+     * Get the block category limit of a block category that was set using a command.
+     *
+     * @param blockCategory The block category to check.
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
+     */
+    int getBlockCategoryLimitRaw(KeyCategory blockCategory);
+
+    /**
      * Get all the block category limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<KeyCategory, Integer> getBlockCategoryLimits();
 
     /**
      * Get all the custom block category limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<KeyCategory, Integer> getCustomBlockCategoryLimits();
 
     /**
-     * Clear all the block category limits from the island.
+     * Clear all the custom block category limits of the island.
      */
     void clearBlockCategoryLimits();
 
     /**
      * Set the block category limit of a block category.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
      * @param blockCategory The block category to set the limit to.
-     * @param limit          The limit to set.
+     * @param limit         The limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setBlockCategoryLimit(KeyCategory blockCategory, int limit);
 
     /**
-     * Remove the block category limit of a block category.
+     * Remove the custom limit of a block category.
      *
      * @param blockCategory The block category to remove it's limit.
      */
@@ -2292,7 +2305,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Limits lower than 0 mean there is no limit, so they are never reached.
      *
      * @param blockCategory The block category to check.
-     * @param amount         Amount of blocks to be placed.
+     * @param amount        Amount of blocks to be placed.
      */
     boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, int amount);
 
@@ -2419,34 +2432,47 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Get the entity category limit of an entity category.
      *
      * @param entityCategory The entity category to check.
+     * @return The limit, or -1 if there is no limit.
      */
     int getEntityCategoryLimit(KeyCategory entityCategory);
 
     /**
+     * Get the entity category limit of an entity category that was set using a command.
+     *
+     * @param entityCategory The entity category to check.
+     * @return The custom limit, or -2 if there is no custom limit and the limit comes from upgrades.
+     * A custom limit of -1 means no limit.
+     */
+    int getEntityCategoryLimitRaw(KeyCategory entityCategory);
+
+    /**
      * Get all the entity category limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<KeyCategory, Integer> getEntityCategoryLimits();
 
     /**
      * Get all the custom entity category limits for the island.
+     * A limit of -1 means no limit.
      */
     Map<KeyCategory, Integer> getCustomEntityCategoryLimits();
 
     /**
-     * Clear all the entity category limits from the island.
+     * Clear all the custom entity category limits of the island.
      */
     void clearEntityCategoryLimits();
 
     /**
      * Set the entity category limit of an entity category.
+     * The limit is saved as a custom limit, which is used instead of the limit from upgrades.
      *
      * @param entityCategory The entity category to set the limit to.
-     * @param limit          The limit to set.
+     * @param limit          The limit to set. Use -1 for no limit; any lower value is set as -1.
      */
     void setEntityCategoryLimit(KeyCategory entityCategory, int limit);
 
     /**
-     * Remove the entity category limit of an entity category.
+     * Remove the custom limit of an entity category.
      *
      * @param entityCategory The entity category to remove it's limit.
      */

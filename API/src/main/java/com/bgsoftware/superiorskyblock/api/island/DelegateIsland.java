@@ -1560,6 +1560,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getBlockCategoryLimitRaw(KeyCategory blockCategory) {
+        return this.handle.getBlockCategoryLimitRaw(blockCategory);
+    }
+
+    @Override
     public Map<KeyCategory, Integer> getBlockCategoryLimits() {
         return this.handle.getBlockCategoryLimits();
     }
@@ -1597,6 +1602,11 @@ public class DelegateIsland implements Island {
     @Override
     public int getEntityCategoryLimit(KeyCategory entityCategory) {
         return this.handle.getEntityCategoryLimit(entityCategory);
+    }
+
+    @Override
+    public int getEntityCategoryLimitRaw(KeyCategory entityCategory) {
+        return this.handle.getEntityCategoryLimitRaw(entityCategory);
     }
 
     @Override

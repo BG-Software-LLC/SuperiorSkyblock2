@@ -3493,6 +3493,15 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getBlockCategoryLimitRaw(KeyCategory blockCategory) {
+        Preconditions.checkNotNull(blockCategory, "blockCategory parameter cannot be null.");
+
+        KeyCategoryId id = KeyCategoryId.of(blockCategory);
+
+        return IntValue.getNonSynced(id == null ? null : this.blockCategoryLimits.get(id), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
     public Map<KeyCategory, Integer> getBlockCategoryLimits() {
         return this.blockCategoryLimits.toCategoriesMap(plugin.getSettings().getBlockCategoriesMapping(), false);
     }
@@ -3506,11 +3515,26 @@ public class SIsland implements Island {
     public void clearBlockCategoryLimits() {
         Log.debug(Debug.CLEAR_BLOCK_CATEGORY_LIMITS, owner.getName());
 
-        if (this.blockCategoryLimits.isEmpty())
-            return;
+        List<KeyCategoryId> customBlockCategoryLimits = new LinkedList<>();
 
-        this.blockCategoryLimits.clear();
+        this.blockCategoryLimits.forEach((id, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customBlockCategoryLimits.add(id);
+            }
+        });
+
+        if (customBlockCategoryLimits.isEmpty()) {
+            return;
+        }
+
+        customBlockCategoryLimits.forEach(this.blockCategoryLimits::remove);
         IslandsDatabaseBridge.clearBlockCategoryLimits(this);
+
+        for (KeyCategoryId id : customBlockCategoryLimits) {
+            syncBlockCategoryLimit(DefaultUpgradeLevel.getInstance(), id);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncBlockCategoryLimit((SUpgradeLevel) getUpgradeLevel(upgrade), id));
+        }
     }
 
     @Override
@@ -3520,14 +3544,16 @@ public class SIsland implements Island {
         KeyCategoryId id = KeyCategoryId.of(blockCategory);
         Preconditions.checkArgument(id != null, "Invalid block category: " + blockCategory.getName());
 
-        int finalLimit = Math.max(-1, limit);
+        int finalLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, limit);
 
         Log.debug(Debug.SET_BLOCK_CATEGORY_LIMIT, owner.getName(), blockCategory.getName(), finalLimit);
 
         IntValue oldLimit = this.blockCategoryLimits.put(id, IntValue.fixed(finalLimit));
 
-        if (finalLimit == IntValue.getNonSynced(oldLimit, IslandUpgradeConstants.SYNCED_VALUE))
+        if (oldLimit != null && !oldLimit.isSynced() &&
+                finalLimit == IntValue.getNonSynced(oldLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
+        }
 
         IslandsDatabaseBridge.saveBlockCategoryLimit(this, id, finalLimit);
     }
@@ -3541,12 +3567,18 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_BLOCK_CATEGORY_LIMIT, owner.getName(), blockCategory.getName());
 
-        IntValue oldLimit = this.blockCategoryLimits.remove(id);
+        IntValue oldLimit = this.blockCategoryLimits.get(id);
 
-        if (oldLimit == null)
+        if (oldLimit == null || oldLimit.isSynced()) {
             return;
+        }
 
+        this.blockCategoryLimits.remove(id);
         IslandsDatabaseBridge.removeBlockCategoryLimit(this, id);
+
+        syncBlockCategoryLimit(DefaultUpgradeLevel.getInstance(), id);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncBlockCategoryLimit((SUpgradeLevel) getUpgradeLevel(upgrade), id));
     }
 
     @Override
@@ -3555,14 +3587,15 @@ public class SIsland implements Island {
     }
 
     @Override
-    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, int amount) {
+    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, @Size int amount) {
         Preconditions.checkNotNull(blockCategory, "blockCategory parameter cannot be null.");
         Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
 
         int limit = getBlockCategoryLimit(blockCategory);
 
-        if (limit < 0)
+        if (limit < 0) {
             return false;
+        }
 
         return getBlocksTracker().getBlockCategoryCount(blockCategory).add(BigInteger.valueOf(amount))
                 .compareTo(BigInteger.valueOf(limit)) > 0;
@@ -3748,6 +3781,15 @@ public class SIsland implements Island {
     }
 
     @Override
+    public int getEntityCategoryLimitRaw(KeyCategory entityCategory) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+
+        KeyCategoryId id = KeyCategoryId.of(entityCategory);
+
+        return IntValue.getNonSynced(id == null ? null : this.entityCategoryLimits.get(id), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
     public Map<KeyCategory, Integer> getEntityCategoryLimits() {
         return this.entityCategoryLimits.toCategoriesMap(plugin.getSettings().getEntityCategoriesMapping(), false);
     }
@@ -3761,11 +3803,26 @@ public class SIsland implements Island {
     public void clearEntityCategoryLimits() {
         Log.debug(Debug.CLEAR_ENTITY_CATEGORY_LIMITS, owner.getName());
 
-        if (this.entityCategoryLimits.isEmpty())
-            return;
+        List<KeyCategoryId> customEntityCategoryLimits = new LinkedList<>();
 
-        this.entityCategoryLimits.clear();
+        this.entityCategoryLimits.forEach((id, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customEntityCategoryLimits.add(id);
+            }
+        });
+
+        if (customEntityCategoryLimits.isEmpty()) {
+            return;
+        }
+
+        customEntityCategoryLimits.forEach(this.entityCategoryLimits::remove);
         IslandsDatabaseBridge.clearEntityCategoryLimits(this);
+
+        for (KeyCategoryId id : customEntityCategoryLimits) {
+            syncEntityCategoryLimit(DefaultUpgradeLevel.getInstance(), id);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncEntityCategoryLimit((SUpgradeLevel) getUpgradeLevel(upgrade), id));
+        }
     }
 
     @Override
@@ -3775,14 +3832,16 @@ public class SIsland implements Island {
         KeyCategoryId id = KeyCategoryId.of(entityCategory);
         Preconditions.checkArgument(id != null, "Invalid entity category: " + entityCategory.getName());
 
-        int finalLimit = Math.max(-1, limit);
+        int finalLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, limit);
 
         Log.debug(Debug.SET_ENTITY_CATEGORY_LIMIT, owner.getName(), entityCategory.getName(), finalLimit);
 
         IntValue oldLimit = this.entityCategoryLimits.put(id, IntValue.fixed(finalLimit));
 
-        if (finalLimit == IntValue.getNonSynced(oldLimit, IslandUpgradeConstants.SYNCED_VALUE))
+        if (oldLimit != null && !oldLimit.isSynced() &&
+                finalLimit == IntValue.getNonSynced(oldLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
+        }
 
         IslandsDatabaseBridge.saveEntityCategoryLimit(this, id, finalLimit);
     }
@@ -3796,12 +3855,18 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_ENTITY_CATEGORY_LIMIT, owner.getName(), entityCategory.getName());
 
-        IntValue oldLimit = this.entityCategoryLimits.remove(id);
+        IntValue oldLimit = this.entityCategoryLimits.get(id);
 
-        if (oldLimit == null)
+        if (oldLimit == null || oldLimit.isSynced()) {
             return;
+        }
 
+        this.entityCategoryLimits.remove(id);
         IslandsDatabaseBridge.removeEntityCategoryLimit(this, id);
+
+        syncEntityCategoryLimit(DefaultUpgradeLevel.getInstance(), id);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncEntityCategoryLimit((SUpgradeLevel) getUpgradeLevel(upgrade), id));
     }
 
     @Override
@@ -3810,14 +3875,15 @@ public class SIsland implements Island {
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, @Size int amount) {
         Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
         Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
 
         int limit = getEntityCategoryLimit(entityCategory);
 
-        if (limit < 0)
+        if (limit < 0) {
             return CompletableFuture.completedFuture(false);
+        }
 
         return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCategoryCount(entityCategory) + amount > limit);
     }
@@ -5853,7 +5919,15 @@ public class SIsland implements Island {
             }
         });
 
-        blockCategoryLimits.removeIf(limit -> overrideCustom || limit.isSynced());
+        if (overrideCustom) {
+            this.blockCategoryLimits.forEach((id, blockCategoryLimit) -> {
+                if (!blockCategoryLimit.isSynced()) {
+                    IslandsDatabaseBridge.removeBlockCategoryLimit(this, id);
+                }
+            });
+        }
+
+        this.blockCategoryLimits.removeIf(blockCategoryLimit -> overrideCustom || blockCategoryLimit.isSynced());
 
         this.entityLimits.forEach((key, entityLimit) -> {
             if (overrideCustom && !entityLimit.isSynced()) {
@@ -5865,7 +5939,15 @@ public class SIsland implements Island {
             }
         });
 
-        entityCategoryLimits.removeIf(limit -> overrideCustom || limit.isSynced());
+        if (overrideCustom) {
+            this.entityCategoryLimits.forEach((id, entityCategoryLimit) -> {
+                if (!entityCategoryLimit.isSynced()) {
+                    IslandsDatabaseBridge.removeEntityCategoryLimit(this, id);
+                }
+            });
+        }
+
+        this.entityCategoryLimits.removeIf(entityCategoryLimit -> overrideCustom || entityCategoryLimit.isSynced());
 
         this.roleLimits.write(roleLimits -> {
             Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
@@ -6018,6 +6100,7 @@ public class SIsland implements Island {
 
         for (Map.Entry<KeyCategoryId, IntValue> entry : upgradeLevel.getBlockCategoryLimitsUpgradeValue().entrySet()) {
             IntValue currentValue = this.blockCategoryLimits.get(entry.getKey());
+
             if (currentValue == null || overrideCustom || currentValue.isSynced()) {
                 if (entry.getValue().get() < 0) {
                     this.blockCategoryLimits.remove(entry.getKey());
@@ -6041,6 +6124,7 @@ public class SIsland implements Island {
 
         for (Map.Entry<KeyCategoryId, IntValue> entry : upgradeLevel.getEntityCategoryLimitsUpgradeValue().entrySet()) {
             IntValue currentValue = this.entityCategoryLimits.get(entry.getKey());
+
             if (currentValue == null || overrideCustom || currentValue.isSynced()) {
                 if (entry.getValue().get() < 0) {
                     this.entityCategoryLimits.remove(entry.getKey());
@@ -6136,6 +6220,18 @@ public class SIsland implements Island {
         }
     }
 
+    private void syncBlockCategoryLimit(SUpgradeLevel upgradeLevel, KeyCategoryId id) {
+        IntValue blockCategoryLimit = upgradeLevel.getBlockCategoryLimitsUpgradeValue().get(id);
+
+        if (blockCategoryLimit != null) {
+            if (blockCategoryLimit.get() < 0) {
+                this.blockCategoryLimits.remove(id);
+            } else {
+                this.blockCategoryLimits.put(id, blockCategoryLimit);
+            }
+        }
+    }
+
     private void syncEntityLimit(SUpgradeLevel upgradeLevel, Key key) {
         IntValue entityLimit = upgradeLevel.getEntityLimitsUpgradeValue().get(key);
 
@@ -6144,6 +6240,18 @@ public class SIsland implements Island {
                 this.entityLimits.remove(key);
             } else {
                 this.entityLimits.put(key, entityLimit);
+            }
+        }
+    }
+
+    private void syncEntityCategoryLimit(SUpgradeLevel upgradeLevel, KeyCategoryId id) {
+        IntValue entityCategoryLimit = upgradeLevel.getEntityCategoryLimitsUpgradeValue().get(id);
+
+        if (entityCategoryLimit != null) {
+            if (entityCategoryLimit.get() < 0) {
+                this.entityCategoryLimits.remove(id);
+            } else {
+                this.entityCategoryLimits.put(id, entityCategoryLimit);
             }
         }
     }

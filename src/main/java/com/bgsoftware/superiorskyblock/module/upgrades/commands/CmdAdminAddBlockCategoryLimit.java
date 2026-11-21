@@ -74,36 +74,55 @@ public class CmdAdminAddBlockCategoryLimit implements IAdminIslandCommand {
             return;
         }
 
-        NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[4]);
+        NumberArgument<Integer> arguments = CommandArguments.getAdditionalLimit(sender, args[4]);
         if (!arguments.isSucceed()) {
             return;
         }
 
         int limit = arguments.getNumber();
 
+        boolean isUnlimited = false;
+        boolean isInvalid = false;
+        Island changedIsland = null;
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
             int currentLimit = island.getBlockCategoryLimit(blockCategory);
-            int newLimit = currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE ? limit : currentLimit + limit;
+            if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
+                isUnlimited = true;
+                continue;
+            }
+
+            int newLimit = currentLimit + limit;
+
+            if (newLimit < 0) {
+                isInvalid = true;
+                continue;
+            }
 
             PluginEvent<PluginEventArgs.IslandChangeBlockCategoryLimit> event = PluginEventsFactory.callIslandChangeBlockCategoryLimitEvent(
                     island, sender, blockCategory, newLimit);
 
             if (!event.isCancelled()) {
                 island.setBlockCategoryLimit(blockCategory, event.getArgs().blockCategoryLimit);
+                changedIsland = island;
                 ++islandsChangedCount;
             }
         }
 
         if (islandsChangedCount <= 0) {
+            if (isUnlimited) {
+                Message.LIMIT_IS_UNLIMITED.send(sender);
+            } else if (isInvalid) {
+                Message.INVALID_LIMIT.send(sender, limit);
+            }
             return;
         }
 
         if (islandsChangedCount > 1) {
             Message.CHANGED_BLOCK_CATEGORY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(blockCategory.getName()));
         } else if (targetPlayer == null) {
-            Message.CHANGED_BLOCK_CATEGORY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(blockCategory.getName()), islands.get(0).getName());
+            Message.CHANGED_BLOCK_CATEGORY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(blockCategory.getName()), changedIsland.getName());
         } else {
             Message.CHANGED_BLOCK_CATEGORY_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(blockCategory.getName()), targetPlayer.getName());
         }

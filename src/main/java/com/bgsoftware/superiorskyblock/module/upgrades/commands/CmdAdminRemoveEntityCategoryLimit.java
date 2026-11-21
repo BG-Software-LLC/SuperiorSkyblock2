@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -73,10 +74,15 @@ public class CmdAdminRemoveEntityCategoryLimit implements IAdminIslandCommand {
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (PluginEventsFactory.callIslandRemoveEntityCategoryLimitEvent(island, sender, entityCategory)) {
-                ++islandsChangedCount;
+            if (island.getEntityCategoryLimitRaw(entityCategory) != IslandUpgradeConstants.SYNCED_VALUE) {
+                if (!PluginEventsFactory.callIslandRemoveEntityCategoryLimitEvent(island, sender, entityCategory)) {
+                    continue;
+                }
+
                 island.removeEntityCategoryLimit(entityCategory);
             }
+
+            ++islandsChangedCount;
         }
 
         if (islandsChangedCount <= 0) {
