@@ -1,27 +1,29 @@
 package com.bgsoftware.superiorskyblock.world.schematic.impl;
 
-import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.LinkedList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,15 +35,13 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
 
     private static final ReflectMethod<Object> GET_BLOCK_TYPE = new ReflectMethod<>(BaseBlock.class, "getBlockType");
     private static final ReflectMethod<Integer> GET_INTERNAL_ID = new ReflectMethod<>(BaseBlock.class, "getInternalId");
-    private static final ReflectMethod<Material> ADAPT = new ReflectMethod<>(
-            new ClassInfo("com.sk89q.worldedit.bukkit.BukkitAdapter", ClassInfo.PackageType.UNKNOWN),
-            "adapt",
-            new ClassInfo("com.sk89q.worldedit.world.block.BlockTypes", ClassInfo.PackageType.UNKNOWN));
+    private static ReflectMethod<Material> ADAPT;
 
     private static final ReflectMethod<Integer> GET_ID = new ReflectMethod<>(BaseBlock.class, "getId");
     private static final ReflectMethod<Integer> GET_DATA = new ReflectMethod<>(BaseBlock.class, "getData");
 
     private final com.boydti.fawe.object.schematic.Schematic schematic;
+    private List<ChunkPosition> affectedChunks = Collections.emptyList();
 
     static {
         try {
@@ -49,6 +49,14 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
             AT = new ReflectMethod<>(blockVectorClass, "at", int.class, int.class, int.class);
             PASTE = new ReflectMethod<>(com.boydti.fawe.object.schematic.Schematic.class,
                     "paste", World.class, blockVectorClass, boolean.class, boolean.class, Transform.class);
+        } catch (ClassNotFoundException ignored) {
+
+        }
+        
+        try {
+            Class<?> bukkitAdapterClass = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter");
+            Class<?> blockTypesClass = Class.forName("com.sk89q.worldedit.world.block.BlockTypes");
+            ADAPT = new ReflectMethod<>(bukkitAdapterClass, "adapt", blockTypesClass);
         } catch (ClassNotFoundException ignored) {
 
         }
@@ -61,20 +69,36 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     }
 
     @Override
-    public void pasteSchematic(Island island, Location location, Runnable callback) {
-        pasteSchematic(island, location, callback, null);
-    }
-
-    @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         try {
             Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
+
+            Clipboard clipboard = schematic.getClipboard();
+            if (clipboard != null) {
+                Vector min = clipboard.getMinimumPoint();
+                Vector max = clipboard.getMaximumPoint();
+                Vector origin = clipboard.getOrigin();
+
+                int targetMinX = location.getBlockX() + (min.getBlockX() - origin.getBlockX());
+                int targetMinZ = location.getBlockZ() + (min.getBlockZ() - origin.getBlockZ());
+                int targetMaxX = location.getBlockX() + (max.getBlockX() - origin.getBlockX());
+                int targetMaxZ = location.getBlockZ() + (max.getBlockZ() - origin.getBlockZ());
+
+                List<ChunkPosition> affected = new LinkedList<>();
+                org.bukkit.World world = location.getWorld();
+                for (int x = targetMinX >> 4; x <= targetMaxX >> 4; x++) {
+                    for (int z = targetMinZ >> 4; z <= targetMaxZ >> 4; z++) {
+                        affected.add(ChunkPosition.of(world, x, z, false));
+                    }
+                }
+                this.affectedChunks = affected;
+            }
 
             Object _point = AT.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());
             EditSession editSession = PASTE.invoke(schematic, new BukkitWorld(location.getWorld()), _point, false, true, null);
 
             if (editSession == null) {
-                com.sk89q.worldedit.Vector point = new com.sk89q.worldedit.Vector(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+                Vector point = new Vector(location.getBlockX(), location.getBlockY(), location.getBlockZ());
                 editSession = schematic.paste(new BukkitWorld(location.getWorld()), point, true, true, null);
             }
 
@@ -105,7 +129,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public List<ChunkPosition> getAffectedChunks() {
-        return Collections.emptyList();
+        return this.affectedChunks;
     }
 
     @Override
@@ -138,7 +162,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     private void readBlock(Object baseBlock) {
         Key key;
 
-        if (ADAPT.isValid() && GET_BLOCK_TYPE.isValid() && GET_INTERNAL_ID.isValid()) {
+        if (ADAPT != null && ADAPT.isValid() && GET_BLOCK_TYPE.isValid() && GET_INTERNAL_ID.isValid()) {
             Material material = ADAPT.invoke(null, GET_BLOCK_TYPE.invoke(baseBlock));
             int data = GET_INTERNAL_ID.invokeWithDef(baseBlock, 0);
             key = Keys.of(material, (byte) data);

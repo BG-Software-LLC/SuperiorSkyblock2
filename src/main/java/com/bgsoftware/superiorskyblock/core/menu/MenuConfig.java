@@ -81,6 +81,19 @@ public class MenuConfig {
             return this.biome;
         }
 
+        @Override
+        @Nullable
+        public Float getSpawnYaw() {
+            return this.template == null ? null : this.template.getSpawnYaw();
+        }
+
+        @Override
+        @Nullable
+        public Float getSpawnPitch() {
+            return this.template == null ? null : this.template.getSpawnPitch();
+        }
+
+
         private static Biome getBiomeInternal(@Nullable IslandCreationButton.Template template) {
             if (template != null) {
                 Biome biome = template.getBiome();
