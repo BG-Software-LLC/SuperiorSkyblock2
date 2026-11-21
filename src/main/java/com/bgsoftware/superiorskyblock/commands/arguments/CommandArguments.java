@@ -392,12 +392,7 @@ public class CommandArguments {
     }
 
     public static IslandPrivilege getIslandPrivilege(CommandSender sender, String argument) {
-        IslandPrivilege islandPrivilege = null;
-
-        try {
-            islandPrivilege = IslandPrivilege.getByName(argument);
-        } catch (NullPointerException ignored) {
-        }
+        IslandPrivilege islandPrivilege = IslandPrivilege.getByNameOrNull(argument);
 
         if (islandPrivilege == null) {
             Message.INVALID_ISLAND_PERMISSION.send(sender, argument, IslandPrivileges.getPrivilegesNames());
@@ -419,12 +414,7 @@ public class CommandArguments {
     }
 
     public static IslandFlag getIslandFlag(CommandSender sender, String argument) {
-        IslandFlag islandFlag = null;
-
-        try {
-            islandFlag = IslandFlag.getByName(argument);
-        } catch (NullPointerException ignored) {
-        }
+        IslandFlag islandFlag = IslandFlag.getByNameOrNull(argument);
 
         if (islandFlag == null) {
             Message.INVALID_SETTINGS.send(sender, argument, IslandFlags.getFlagsNames());
@@ -434,12 +424,7 @@ public class CommandArguments {
     }
 
     public static Dimension getDimension(CommandSender sender, String argument) {
-        Dimension dimension = null;
-
-        try {
-            dimension = Dimension.getByName(argument.toUpperCase(Locale.ENGLISH));
-        } catch (Exception ignored) {
-        }
+        Dimension dimension = Dimension.getByNameOrNull(argument);
 
         if (dimension == null)
             Message.INVALID_ENVIRONMENT.send(sender, argument);

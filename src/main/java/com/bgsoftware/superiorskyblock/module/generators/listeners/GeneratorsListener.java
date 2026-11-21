@@ -19,9 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 
-import java.util.Optional;
-
-@SuppressWarnings("unused")
 public class GeneratorsListener implements Listener {
 
     private static final Material BASALT_MATERIAL = EnumHelper.getEnum(Material.class, "BASALT");
@@ -57,8 +54,7 @@ public class GeneratorsListener implements Listener {
                 dimension = Dimensions.fromEnvironment(World.Environment.NETHER);
             } else {
                 World blockWorld = blockLocation.getWorld();
-                dimension = Optional.ofNullable(plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld))
-                        .orElseGet(() -> Dimensions.fromEnvironment(blockWorld.getEnvironment()));
+                dimension = getDimension(blockWorld);
             }
 
             Key generatedBlock = island.generateBlock(blockLocation, dimension, true);
@@ -100,8 +96,7 @@ public class GeneratorsListener implements Listener {
             if (BuiltinModules.GENERATORS.getConfiguration().isMatchGeneratorWorld()) {
                 dimension = Dimensions.fromEnvironment(generatorType == GeneratorType.BASALT ? World.Environment.NETHER : World.Environment.NORMAL);
             } else {
-                dimension = Optional.ofNullable(plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld))
-                        .orElseGet(() -> Dimensions.fromEnvironment(blockWorld.getEnvironment()));
+                dimension = getDimension(blockWorld);
             }
 
             Key generatedBlock = island.generateBlock(blockLocation, dimension, true);
@@ -111,5 +106,9 @@ public class GeneratorsListener implements Listener {
         }
     }
 
+    private Dimension getDimension(World blockWorld) {
+        Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(blockWorld);
+        return dimension != null ? dimension : Dimensions.fromEnvironment(blockWorld.getEnvironment());
+    }
 
 }

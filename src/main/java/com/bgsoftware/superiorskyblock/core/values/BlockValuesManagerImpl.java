@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 
 public class BlockValuesManagerImpl extends Manager implements BlockValuesManager {
 
@@ -50,6 +51,8 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
 
         CACHED_BIG_DECIMALS = mapBuilder.build();
     }
+
+    private static final Pattern NUMBER_FORMULA_PATTERN = Pattern.compile("[+-]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?");
 
     private static final Bindings bindings = createBindings();
 
@@ -208,16 +211,15 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     }
 
     private BigDecimal convertWorthToLevel(BigDecimal value) {
+        String islandLevelFormula = plugin.getSettings().getIslandLevelFormula();
+
         // If the formula contains no mathematical operations or the placeholder for the worth value,
         // we can directly create the BigDecimal instance from it.
-        try {
-            return fastBigDecimalFromString(plugin.getSettings().getIslandLevelFormula());
-        } catch (NumberFormatException ignored) {
-        }
+        if (NUMBER_FORMULA_PATTERN.matcher(islandLevelFormula).matches())
+            return fastBigDecimalFromString(islandLevelFormula);
 
         try {
-            Object evaluated = plugin.getScriptEngine().eval(plugin.getSettings().getIslandLevelFormula()
-                    .replace("{}", value.toString()), bindings);
+            Object evaluated = plugin.getScriptEngine().eval(islandLevelFormula.replace("{}", value.toString()), bindings);
 
             // Checking for division by 0
             if (evaluated.equals(Double.POSITIVE_INFINITY) || evaluated.equals(Double.NEGATIVE_INFINITY))

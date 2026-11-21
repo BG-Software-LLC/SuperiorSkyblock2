@@ -19,6 +19,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.IntFunction;
 
 public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
@@ -81,13 +82,14 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
             if (blockEntities.isEmpty())
                 return;
 
+            IntFunction<Integer> delayChangeCallback = spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay);
+
             // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
             // Block entities that are not spawners will not be touched.
             BukkitExecutor.sync(() -> {
                 if (chunk.isLoaded()) {
-                    blockEntities.forEach(blockEntity -> {
-                        plugin.getNMSWorld().listenSpawner(blockEntity, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
-                    });
+                    for (Location blockEntity : blockEntities)
+                        plugin.getNMSWorld().listenSpawner(blockEntity, delayChangeCallback);
                 }
             }, 20L);
         }

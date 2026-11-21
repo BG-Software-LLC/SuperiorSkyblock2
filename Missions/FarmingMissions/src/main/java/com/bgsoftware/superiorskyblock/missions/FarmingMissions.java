@@ -49,6 +49,8 @@ import java.util.UUID;
 
 public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implements Listener {
 
+    private static final boolean BLOCK_DATA_SUPPORT = isBlockDataSupported();
+
     private static final BlockFace[] STEM_NEARBY_BLOCKS = new BlockFace[]{
             BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH
     };
@@ -350,12 +352,21 @@ public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implem
     }
 
     private int getBlockAge(BlockState newState) {
-        try {
-            BlockData blockData = newState.getBlockData();
-            return blockData instanceof Ageable ? ((Ageable) blockData).getAge() : 0;
-        } catch (Throwable error) {
+        if (!BLOCK_DATA_SUPPORT) {
             // noinspection deprecation
             return newState.getRawData();
+        }
+
+        BlockData blockData = newState.getBlockData();
+        return blockData instanceof Ageable ? ((Ageable) blockData).getAge() : 0;
+    }
+
+    private static boolean isBlockDataSupported() {
+        try {
+            BlockState.class.getMethod("getBlockData");
+            return true;
+        } catch (NoSuchMethodException error) {
+            return false;
         }
     }
 

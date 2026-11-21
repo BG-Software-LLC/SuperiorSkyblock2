@@ -135,11 +135,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
         private final LazyReference<IslandFlag> islandFlag = new LazyReference<IslandFlag>() {
             @Override
             protected IslandFlag create() {
-                try {
-                    return IslandFlag.getByName(IslandFlagInfo.this.islandFlagName);
-                } catch (Exception error) {
-                    return null;
-                }
+                return IslandFlag.getByNameOrNull(IslandFlagInfo.this.islandFlagName);
             }
         };
 

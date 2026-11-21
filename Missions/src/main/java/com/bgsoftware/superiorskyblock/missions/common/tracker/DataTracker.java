@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.missions.common.requirements.IRequirement
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 public abstract class DataTracker<K, R extends IRequirements<K>> {
 
@@ -27,7 +26,8 @@ public abstract class DataTracker<K, R extends IRequirements<K>> {
     }
 
     public int getCount(K blockKey) {
-        return Optional.ofNullable(this.trackedData.get(blockKey)).map(Counter::get).orElse(0);
+        Counter counter = this.trackedData.get(blockKey);
+        return counter == null ? 0 : counter.get();
     }
 
     public int getGlobalCounter() {
@@ -38,9 +38,10 @@ public abstract class DataTracker<K, R extends IRequirements<K>> {
         if (blocks.isContainsAll())
             return getGlobalCounter();
 
-        Counter blocksCount = new Counter(0);
-        blocks.forEach(block -> blocksCount.inc(getCount(block)));
-        return blocksCount.get();
+        int blocksCount = 0;
+        for (K block : blocks)
+            blocksCount += getCount(block);
+        return blocksCount;
     }
 
     public void clear() {

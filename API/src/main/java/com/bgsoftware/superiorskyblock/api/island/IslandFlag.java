@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 
@@ -39,13 +40,21 @@ public class IslandFlag implements Enumerable {
      * @param name The name to check.
      */
     public static IslandFlag getByName(String name) {
+        IslandFlag islandFlag = getByNameOrNull(name);
+
+        return Preconditions.checkNotNull(islandFlag, "Couldn't find an IslandFlag with the name " + name + ".");
+    }
+
+    /**
+     * Get an island flag by its name, or null if it doesn't exist.
+     *
+     * @param name The name to check.
+     */
+    @Nullable
+    public static IslandFlag getByNameOrNull(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        IslandFlag islandFlag = islandFlags.get(name.toUpperCase(Locale.ENGLISH));
-
-        Preconditions.checkNotNull(islandFlag, "Couldn't find an IslandFlag with the name " + name + ".");
-
-        return islandFlag;
+        return islandFlags.get(name.toUpperCase(Locale.ENGLISH));
     }
 
     /**

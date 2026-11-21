@@ -19,20 +19,20 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.WorldPosition;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.service.IService;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -209,31 +210,35 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("description", (island, superiorPlayer) ->
                             island.getDescription())
                     .put("discord", (island, superiorPlayer) ->
-                            island.hasPermission(superiorPlayer, IslandPrivileges.DISCORD_SHOW) ? island.getDiscord() : IslandUtils.DEFAULT_NONE_VALUE)
+                            superiorPlayer == null ? null :
+                                    island.hasPermission(superiorPlayer, IslandPrivileges.DISCORD_SHOW) ? island.getDiscord() : IslandUtils.DEFAULT_NONE_VALUE)
                     .put("discord_all", (island, superiorPlayer) ->
                             island.getDiscord())
                     .put("drops_multiplier", (island, superiorPlayer) ->
                             String.valueOf(island.getMobDropsMultiplier()))
-                    .put("exists", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island != null, getLocale(superiorPlayer)))
                     .put("home", (island, superiorPlayer) -> {
                         WorldInfo worldInfo = getDefaultWorldInfo(island);
-                        return Formatters.LOCATION_FORMATTER.format(island.getIslandHomePosition(worldInfo.getDimension()).toLocation(worldInfo));
+                        WorldPosition homePosition = island.getIslandHomePosition(worldInfo.getDimension());
+                        return homePosition == null ? null : Formatters.LOCATION_FORMATTER.format(homePosition.toLocation(worldInfo));
                     })
                     .put("home_x", (island, superiorPlayer) ->
-                            String.valueOf(island.getIslandHomePosition(getDefaultWorldDimension()).getX()))
+                            formatCoordinate(island.getIslandHomePosition(getDefaultWorldDimension()), WorldPosition::getX))
                     .put("home_y", (island, superiorPlayer) ->
-                            String.valueOf(island.getIslandHomePosition(getDefaultWorldDimension()).getY()))
+                            formatCoordinate(island.getIslandHomePosition(getDefaultWorldDimension()), WorldPosition::getY))
                     .put("home_z", (island, superiorPlayer) ->
-                            String.valueOf(island.getIslandHomePosition(getDefaultWorldDimension()).getZ()))
+                            formatCoordinate(island.getIslandHomePosition(getDefaultWorldDimension()), WorldPosition::getZ))
                     .put("is_coop", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isCoop(superiorPlayer), superiorPlayer.getUserLocale()))
+                            superiorPlayer == null ? null :
+                                    Formatters.BOOLEAN_FORMATTER.format(island.isCoop(superiorPlayer), superiorPlayer.getUserLocale()))
                     .put("is_leader", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.getOwner().equals(superiorPlayer), superiorPlayer.getUserLocale()))
+                            superiorPlayer == null ? null :
+                                    Formatters.BOOLEAN_FORMATTER.format(island.getOwner().equals(superiorPlayer), superiorPlayer.getUserLocale()))
                     .put("is_member", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isMember(superiorPlayer), superiorPlayer.getUserLocale()))
+                            superiorPlayer == null ? null :
+                                    Formatters.BOOLEAN_FORMATTER.format(island.isMember(superiorPlayer), superiorPlayer.getUserLocale()))
                     .put("is_visitor", (island, superiorPlayer) ->
-                            Formatters.BOOLEAN_FORMATTER.format(island.isVisitor(superiorPlayer, true), superiorPlayer.getUserLocale()))
+                            superiorPlayer == null ? null :
+                                    Formatters.BOOLEAN_FORMATTER.format(island.isVisitor(superiorPlayer, true), superiorPlayer.getUserLocale()))
                     .put("last_time_updated", (island, superiorPlayer) ->
                             Formatters.TIME_FORMATTER.format(Duration.ofSeconds(island.getLastTimeUpdate()), getLocale(superiorPlayer)))
                     .put("leader", (island, superiorPlayer) ->
@@ -259,7 +264,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     .put("name_stripped", (island, superiorPlayer) ->
                             island.getStrippedName())
                     .put("paypal", (island, superiorPlayer) ->
-                            island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : IslandUtils.DEFAULT_NONE_VALUE)
+                            superiorPlayer == null ? null :
+                                    island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : IslandUtils.DEFAULT_NONE_VALUE)
                     .put("paypal_all", (island, superiorPlayer) ->
                             island.getPaypal())
                     .put("players_count", (island, superiorPlayer) ->
@@ -350,14 +356,15 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             Formatters.COMMA_FORMATTER.format(island.getIslandVisitors(false).stream().map(SuperiorPlayer::getName)))
                     .put("visitors_location", (island, superiorPlayer) -> {
                         WorldInfo worldInfo = getDefaultWorldInfo(island);
-                        return Formatters.LOCATION_FORMATTER.format(island.getVisitorsPosition(null /*unused*/).toLocation(worldInfo));
+                        WorldPosition visitorsPosition = island.getVisitorsPosition(null /*unused*/);
+                        return visitorsPosition == null ? null : Formatters.LOCATION_FORMATTER.format(visitorsPosition.toLocation(worldInfo));
                     })
                     .put("visitors_location_x", (island, superiorPlayer) ->
-                            String.valueOf(island.getVisitorsPosition(getDefaultWorldDimension()).getX()))
+                            formatCoordinate(island.getVisitorsPosition(getDefaultWorldDimension()), WorldPosition::getX))
                     .put("visitors_location_y", (island, superiorPlayer) ->
-                            String.valueOf(island.getVisitorsPosition(getDefaultWorldDimension()).getY()))
+                            formatCoordinate(island.getVisitorsPosition(getDefaultWorldDimension()), WorldPosition::getY))
                     .put("visitors_location_z", (island, superiorPlayer) ->
-                            String.valueOf(island.getVisitorsPosition(getDefaultWorldDimension()).getZ()))
+                            formatCoordinate(island.getVisitorsPosition(getDefaultWorldDimension()), WorldPosition::getZ))
                     .put("warps", (island, superiorPlayer) ->
                             String.valueOf(island.getIslandWarps().size()))
                     .put("warps_limit", (island, superiorPlayer) ->
@@ -387,6 +394,14 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                             String.valueOf(island.getCenterPosition().getY())))
                     .put("z", legacyPlaceholder("superior_island_z", "superior_island_center_z", (island, superiorPlayer) ->
                             String.valueOf(island.getCenterPosition().getZ())))
+                    .build();
+
+    // Placeholders that can be parsed without an island, unlike the ones of ISLAND_PLACEHOLDER_PARSERS.
+    private static final Map<String, IslandPlaceholderParser> NULLABLE_ISLAND_PLACEHOLDER_PARSERS =
+            new ImmutableMap.Builder<String, IslandPlaceholderParser>()
+                    // Island Placeholders
+                    .put("exists", (island, superiorPlayer) ->
+                            Formatters.BOOLEAN_FORMATTER.format(island != null, getLocale(superiorPlayer)))
                     // Global Placeholders
                     .put("total_count", (island, superiorPlayer) ->
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getIslands().size()))
@@ -597,14 +612,18 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
         Matcher matcher;
 
-        try {
-            IslandPlaceholderParser islandPlaceholderParser = ISLAND_PLACEHOLDER_PARSERS.get(loweredSubPlaceholder);
+        IslandPlaceholderParser islandPlaceholderParser = NULLABLE_ISLAND_PLACEHOLDER_PARSERS.get(loweredSubPlaceholder);
 
-            if (islandPlaceholderParser != null) {
+        if (islandPlaceholderParser == null && island != null) {
+            islandPlaceholderParser = ISLAND_PLACEHOLDER_PARSERS.get(loweredSubPlaceholder);
+        }
+
+        if (islandPlaceholderParser != null) {
+            try {
                 return Optional.ofNullable(islandPlaceholderParser.apply(island, superiorPlayer));
+            } catch (NullPointerException ignored) {
+                // Safety net only: missing islands, players and positions are already handled without exceptions.
             }
-        } catch (NullPointerException ignored) {
-            // One of the island parses failed due to invalid island or superiorPlayer being sent.
         }
 
         if (island != null) {
@@ -613,7 +632,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
 
             if ((matcher = BIOME_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
-                Dimension dimension = Dimensions.getSafe(matcher.group(1));
+                Dimension dimension = Dimension.getByNameOrNull(matcher.group(1));
 
                 if (dimension == null) {
                     return Optional.empty();
@@ -806,7 +825,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
 
             if ((matcher = WORLD_ENABLED_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
-                Dimension dimension = Dimensions.getSafe(matcher.group(1));
+                Dimension dimension = Dimension.getByNameOrNull(matcher.group(1));
 
                 if (dimension == null) {
                     return Optional.empty();
@@ -816,7 +835,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
 
             if ((matcher = WORLD_GENERATED_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
-                Dimension dimension = Dimensions.getSafe(matcher.group(1));
+                Dimension dimension = Dimension.getByNameOrNull(matcher.group(1));
 
                 if (dimension == null) {
                     return Optional.empty();
@@ -826,7 +845,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
 
             if ((matcher = WORLD_UNLOCKED_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
-                Dimension dimension = Dimensions.getSafe(matcher.group(1));
+                Dimension dimension = Dimension.getByNameOrNull(matcher.group(1));
 
                 if (dimension == null) {
                     return Optional.empty();
@@ -895,7 +914,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     }
 
     private static Optional<String> handleIslandFlagPlaceholder(Island island, @Nullable SuperiorPlayer superiorPlayer, String name) {
-        IslandFlag islandFlag = IslandFlags.getSafe(name);
+        IslandFlag islandFlag = IslandFlag.getByNameOrNull(name);
 
         if (islandFlag == null) {
             return Optional.empty();
@@ -906,7 +925,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     }
 
     private static Optional<String> handleIslandPrivilegePlaceholder(Island island, @Nullable SuperiorPlayer superiorPlayer, String name) {
-        IslandPrivilege islandPrivilege = IslandPrivileges.getSafe(name);
+        IslandPrivilege islandPrivilege = IslandPrivilege.getByNameOrNull(name);
 
         // A permission check needs a player (e.g. island_top_<type>_<n>_permission_<priv> parsed without a player).
         if (islandPrivilege == null || superiorPlayer == null) {
@@ -918,7 +937,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     }
 
     private static Optional<String> handleRequiredPlayerRoleForIslandPrivilegePlaceholder(Island island, String name) {
-        IslandPrivilege islandPrivilege = IslandPrivileges.getSafe(name);
+        IslandPrivilege islandPrivilege = IslandPrivilege.getByNameOrNull(name);
 
         if (islandPrivilege == null) {
             return Optional.empty();
@@ -928,12 +947,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     }
 
     private static Optional<String> handlePlayersIndexPlaceholder(List<SuperiorPlayer> players, String position) {
-        int index = -1;
-
-        try {
-            index = Integer.parseInt(position) - 1;
-        } catch (NumberFormatException ignored) {
-        }
+        int index = Text.parseInt(position, 0) - 1;
 
         if (index < 0 || index >= players.size()) {
             return Optional.empty();
@@ -987,11 +1001,10 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                     targetIsland.getOwner().getName() : targetIsland.getName();
         }
 
-        int targetPosition;
+        // Positions start from 1, so 0 also stands for an invalid position.
+        int targetPosition = Text.parseInt(matcher.matches() ? matcher.group(1) : placeholderValue, 0);
 
-        try {
-            targetPosition = Integer.parseInt(matcher.matches() ? matcher.group(1) : placeholderValue);
-        } catch (NumberFormatException error) {
+        if (targetPosition < 1) {
             return Optional.empty();
         }
 
@@ -1030,7 +1043,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
             stringBuilder.append(sections[i]);
 
-            Dimension dimension = Dimensions.getSafe(stringBuilder.toString());
+            Dimension dimension = Dimension.getByNameOrNull(stringBuilder.toString());
 
             if (dimension != null) {
                 finalDimension = dimension;
@@ -1086,6 +1099,11 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
 
     private static WorldInfo getDefaultWorldInfo(Island island) {
         return plugin.getGrid().getIslandsWorldInfo(island, getDefaultWorldDimension());
+    }
+
+    @Nullable
+    private static String formatCoordinate(@Nullable WorldPosition position, ToDoubleFunction<WorldPosition> coordinate) {
+        return position == null ? null : String.valueOf(coordinate.applyAsDouble(position));
     }
 
     private static Dimension getDefaultWorldDimension() {

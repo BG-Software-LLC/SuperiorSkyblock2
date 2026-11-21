@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class BlocksTracker {
 
@@ -30,18 +29,19 @@ public class BlocksTracker {
     }
 
     public boolean untrackBlock(TrackingType trackingType, Block block) {
-        return ifComponentExists(trackingType, block.getWorld(), false,
-                component -> component.remove(block.getX(), block.getY(), block.getZ()));
+        BlocksTrackingComponent component = getComponentIfExists(trackingType, block.getWorld());
+        return component != null && component.remove(block.getX(), block.getY(), block.getZ());
     }
 
     public boolean isTracked(TrackingType trackingType, Block block) {
-        return ifComponentExists(trackingType, block.getWorld(), false,
-                component -> component.contains(block.getX(), block.getY(), block.getZ()));
+        BlocksTrackingComponent component = getComponentIfExists(trackingType, block.getWorld());
+        return component != null && component.contains(block.getX(), block.getY(), block.getZ());
     }
 
     public boolean isTracked(TrackingType trackingType, Location blockLocation) {
-        return ifComponentExists(trackingType, blockLocation.getWorld(), false, component ->
-                component.contains(blockLocation.getBlockX(), blockLocation.getBlockY(), blockLocation.getBlockZ()));
+        BlocksTrackingComponent component = getComponentIfExists(trackingType, blockLocation.getWorld());
+        return component != null && component.contains(blockLocation.getBlockX(),
+                blockLocation.getBlockY(), blockLocation.getBlockZ());
     }
 
     public void loadTrackedBlocks(TrackingType trackingType, String worldName, ConfigurationSection section) {
@@ -91,26 +91,29 @@ public class BlocksTracker {
 
     private BlocksTrackingComponent getComponent(TrackingType trackingType, World world) {
         BlocksTrackingComponent trackingComponent = loadRawData(trackingType, world);
-        return trackingComponent != null ? trackingComponent :
-                trackingComponentMap.computeIfAbsent(trackingType, t -> new HashMap<>())
-                        .computeIfAbsent(world.getName(), uuid -> new BlocksTrackingComponent(world));
-    }
-
-    private <R> R ifComponentExists(TrackingType trackingType, World world, R def, Function<BlocksTrackingComponent, R> function) {
-        String worldName = world.getName();
-
-        BlocksTrackingComponent trackingComponent = loadRawData(trackingType, world);
         if (trackingComponent != null)
-            return function.apply(trackingComponent);
+            return trackingComponent;
 
-        Map<String, BlocksTrackingComponent> trackingTypeComponents = trackingComponentMap.get(trackingType);
-        if (trackingTypeComponents != null) {
-            trackingComponent = trackingTypeComponents.get(worldName);
-            if (trackingComponent != null)
-                return function.apply(trackingComponent);
+        Map<String, BlocksTrackingComponent> trackingTypeComponents =
+                trackingComponentMap.computeIfAbsent(trackingType, t -> new HashMap<>());
+
+        String worldName = world.getName();
+        trackingComponent = trackingTypeComponents.get(worldName);
+        if (trackingComponent == null) {
+            trackingComponent = new BlocksTrackingComponent(world);
+            trackingTypeComponents.put(worldName, trackingComponent);
         }
 
-        return def;
+        return trackingComponent;
+    }
+
+    private BlocksTrackingComponent getComponentIfExists(TrackingType trackingType, World world) {
+        BlocksTrackingComponent trackingComponent = loadRawData(trackingType, world);
+        if (trackingComponent != null)
+            return trackingComponent;
+
+        Map<String, BlocksTrackingComponent> trackingTypeComponents = trackingComponentMap.get(trackingType);
+        return trackingTypeComponents == null ? null : trackingTypeComponents.get(world.getName());
     }
 
     private BlocksTrackingComponent loadRawData(TrackingType trackingType, World world) {
@@ -127,7 +130,7 @@ public class BlocksTracker {
                             .put(worldName, trackingComponent);
                     if (rawData.isEmpty()) {
                         this.rawData.remove(trackingType);
-                        if(this.rawData.isEmpty())
+                        if (this.rawData.isEmpty())
                             this.rawData = null;
                     }
                     return trackingComponent;

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
@@ -318,22 +319,14 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
         if (key instanceof MaterialKey)
             return new Pair<>(((MaterialKey) key).getMaterial(), ((MaterialKey) key).getDurability());
 
-        try {
-            Material blockMaterial = Material.valueOf(key.getGlobalKey());
-            short damage = 0;
+        Material blockMaterial = EnumHelper.getEnum(Material.class, key.getGlobalKey());
+        if (blockMaterial == null)
+            return new Pair<>(Material.BEDROCK, (short) 0);
 
-            if (!key.getSubKey().isEmpty()) {
-                try {
-                    damage = Short.parseShort(key.getSubKey());
-                } catch (Throwable ignored) {
-                }
-            }
+        String subKey = key.getSubKey();
+        short damage = Text.parseShort(subKey, (short) 0);
 
-            return new Pair<>(blockMaterial, damage);
-        } catch (Exception ignored) {
-        }
-
-        return new Pair<>(Material.BEDROCK, (short) 0);
+        return new Pair<>(blockMaterial, damage);
     }
 
 }

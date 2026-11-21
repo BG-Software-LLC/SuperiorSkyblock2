@@ -42,10 +42,14 @@ public class IslandPosition2ObjectMap<V> {
         Long2ObjectMapView<V> worldBackendData = this.backendMap.computeIfAbsent(worldName, n ->
                 CollectionsFactory.createLong2ObjectLinkedHashMap());
 
-        return worldBackendData.computeIfAbsent(packedPos, p -> {
-            ++IslandPosition2ObjectMap.this.size;
-            return newValue.get();
-        });
+        V value = worldBackendData.get(packedPos);
+        if (value == null) {
+            value = newValue.get();
+            worldBackendData.put(packedPos, value);
+            ++this.size;
+        }
+
+        return value;
     }
 
     @Nullable

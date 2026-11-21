@@ -209,11 +209,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         private final LazyReference<IslandPrivilege> islandPrivilege = new LazyReference<IslandPrivilege>() {
             @Override
             protected IslandPrivilege create() {
-                try {
-                    return IslandPrivilege.getByName(IslandPrivilegeInfo.this.islandPrivilegeName);
-                } catch (Exception error) {
-                    return null;
-                }
+                return IslandPrivilege.getByNameOrNull(IslandPrivilegeInfo.this.islandPrivilegeName);
             }
         };
 
@@ -340,9 +336,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
         if (permissionsSection != null) {
             for (String name : permissionsSection.getKeys(false)) {
-                try {
-                    IslandPrivilege.getByName(name);
-                } catch (Exception error) {
+                if (IslandPrivilege.getByNameOrNull(name) == null) {
                     config.set("permissions." + name, null);
                     shouldSave = true;
                 }

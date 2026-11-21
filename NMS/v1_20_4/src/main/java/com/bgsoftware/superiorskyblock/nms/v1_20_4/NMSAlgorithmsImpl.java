@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_20_4;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -19,6 +20,9 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 import java.util.Locale;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_4.AbstractNMSAlgorithms {
+
+    private static final ReflectField<Object> MINECRAFT_SERVER_TPS1 = new ReflectField<>(
+            MinecraftServer.class, Object.class, "tps1");
 
     @Override
     public String parseSignLine(String original) {
@@ -67,12 +71,11 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20
 
     @Override
     public double getCurrentTps() {
-        try {
+        if (MINECRAFT_SERVER_TPS1.isValid())
             return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
-        }
+
+        //noinspection removal
+        return MinecraftServer.getServer().recentTps[0];
     }
 
     @Override

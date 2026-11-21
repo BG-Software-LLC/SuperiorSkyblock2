@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectConstructor;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
@@ -54,6 +55,12 @@ public class NMSUtils {
 
     private static final ReflectMethod<Chunk> CHUNK_PROVIDER_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
             ChunkProviderServer.class, "getChunkAtIfCachedImmediately", int.class, int.class);
+    private static final ReflectMethod<IChunkAccess> WORLD_GET_CHUNK_IF_LOADED_IMMEDIATELY = new ReflectMethod<>(
+            World.class, "getChunkIfLoadedImmediately", int.class, int.class);
+    private static final boolean HAS_PAPER_PROTO_CHUNK_CONSTRUCTOR = new ReflectConstructor<>(ProtoChunk.class,
+            ChunkCoordIntPair.class, ChunkConverter.class, World.class).isValid();
+    private static final boolean HAS_PAPER_CHUNK_SECTION_CONSTRUCTOR = new ReflectConstructor<>(ChunkSection.class,
+            int.class, IChunkAccess.class, World.class, boolean.class).isValid();
 
     private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
@@ -94,13 +101,10 @@ public class NMSUtils {
         chunksCoords.forEach(chunkPosition -> {
             WorldServer worldServer = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 
-            IChunkAccess chunkAccess;
-
-            try {
-                chunkAccess = worldServer.getChunkIfLoadedImmediately(chunkPosition.getX(), chunkPosition.getZ());
-            } catch (Throwable ex) {
-                chunkAccess = worldServer.getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
-            }
+            // getChunkIfLoadedImmediately only exists on Paper.
+            IChunkAccess chunkAccess = WORLD_GET_CHUNK_IF_LOADED_IMMEDIATELY.isValid() ?
+                    worldServer.getChunkIfLoadedImmediately(chunkPosition.getX(), chunkPosition.getZ()) :
+                    worldServer.getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
 
             if (chunkAccess instanceof Chunk) {
                 loadedChunks.add((Chunk) chunkAccess);
@@ -213,14 +217,14 @@ public class NMSUtils {
     }
 
     public static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoord, World world) {
-        try {
+        if (HAS_PAPER_PROTO_CHUNK_CONSTRUCTOR) {
             // Paper's constructor for ProtoChunk
             return new ProtoChunk(chunkCoord, ChunkConverter.a, world);
-        } catch (Throwable ex) {
-            // Spigot's constructor for ProtoChunk
-            // noinspection deprecation
-            return new ProtoChunk(chunkCoord, ChunkConverter.a);
         }
+
+        // Spigot's constructor for ProtoChunk
+        // noinspection deprecation
+        return new ProtoChunk(chunkCoord, ChunkConverter.a);
     }
 
     public static IBlockData setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag,
@@ -264,10 +268,10 @@ public class NMSUtils {
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
         if (chunkSection == null) {
-            try {
+            if (HAS_PAPER_CHUNK_SECTION_CONSTRUCTOR) {
                 // Paper's constructor for ChunkSection for more optimized chunk sections.
                 chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk, chunk.world, true);
-            } catch (Throwable ex) {
+            } else {
                 // Spigot's constructor for ChunkSection
                 // noinspection deprecation
                 chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);

@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -31,7 +30,8 @@ public class CustomKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> {
 
     @Override
     public int size() {
-        return this.innerMap.getIfPresent().map(Map::size).orElse(0);
+        Map<Key, V> innerMap = this.innerMap.getIfPresentOrNull();
+        return innerMap == null ? 0 : innerMap.size();
     }
 
     @Override
@@ -54,7 +54,8 @@ public class CustomKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> {
     private V getInternal(Key key, boolean tryGlobal) {
         Preconditions.checkArgument(!(key instanceof LazyKey), "Cannot call getInternal on LazyKey directly.");
 
-        V value = this.innerMap.getIfPresent().map(m -> m.get(key)).orElse(null);
+        Map<Key, V> innerMap = this.innerMap.getIfPresentOrNull();
+        V value = innerMap == null ? null : innerMap.get(key);
 
         if (!tryGlobal || value != null)
             return value;
@@ -83,7 +84,8 @@ public class CustomKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> {
             return removeNoSizeCheck(((LazyKey<?>) key).getBaseKey());
         }
 
-        return this.innerMap.getIfPresent().map(m -> m.remove(key)).orElse(null);
+        Map<Key, V> innerMap = this.innerMap.getIfPresentOrNull();
+        return innerMap == null ? null : innerMap.remove(key);
     }
 
     @Override
@@ -109,10 +111,10 @@ public class CustomKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> {
             return def;
 
         if (original instanceof LazyKey) {
-            return getKey(((LazyKey<?>) original).getBaseKey());
+            return getKey(((LazyKey<?>) original).getBaseKey(), def);
         }
 
-        Map<Key, V> map = this.innerMap.getIfPresent().orElse(null);
+        Map<Key, V> map = this.innerMap.getIfPresentOrNull();
 
         if (map != null) {
             if (map.containsKey(original))
@@ -148,7 +150,8 @@ public class CustomKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V> {
             return getRawNoSizeCheck(((LazyKey<?>) key).getBaseKey(), def);
         }
 
-        return Optional.ofNullable(getInternal(key, false)).orElse(def);
+        V value = getInternal(key, false);
+        return value == null ? def : value;
     }
 
     @Override
