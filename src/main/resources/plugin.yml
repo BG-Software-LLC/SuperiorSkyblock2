@@ -208,6 +208,8 @@ permissions:
             description: Add percentage of a material for the cobblestone generator.
           superior.admin.addmobdrops:
             description: Increase the mob drops multiplier for another player's island.
+          superior.admin.addrolelimit:
+            description: Increase role limit for another player's island.
           superior.admin.addsize:
             description: Expand another player's island size.
           superior.admin.addspawnerrates:
@@ -284,10 +286,16 @@ permissions:
             description: Reload all configurations and tasks of the plugin.
           superior.admin.removeblocklimit:
             description: Remove a block limit for an island.
+          superior.admin.removeeffect:
+            description: Remove an effect for an island.
           superior.admin.removeentitylimit:
             description: Remove an entity limit for an island.
+          superior.admin.removegenerator:
+            description: Remove a material from the cobblestone generator.
           superior.admin.removeratings:
             description: Remove all ratings given by a player.
+          superior.admin.removerolelimit:
+            description: Remove a role limit for an island.
           superior.admin.resetpermissions:
             description: Reset all island permissions for a specific island.
           superior.admin.resetsettings:

@@ -13,10 +13,10 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 
 public class CmdAdminShow implements IAdminIslandCommand {
 
@@ -181,13 +182,13 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
             // Island entity limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
-                collectIslandData(superiorPlayer, locale, island::getEntitiesLimitsAsKeys, island::getCustomEntitiesLimits,
+                collectIslandLimits(superiorPlayer, locale, island::getEntitiesLimitsAsKeys, island::getExactEntityLimitRaw,
                         Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE);
             }
 
             // Island block limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
-                collectIslandData(superiorPlayer, locale, island::getBlocksLimits, island::getCustomBlocksLimits,
+                collectIslandLimits(superiorPlayer, locale, island::getBlocksLimits, island::getExactBlockLimitRaw,
                         Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS, Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE);
             }
         }
@@ -198,19 +199,19 @@ public class CmdAdminShow implements IAdminIslandCommand {
                 for (Dimension dimension : Dimension.values()) {
                     StringBuilder islandDataMessage = new StringBuilder();
 
-                    Map<Key, Integer> customGeneratorValues = island.getCustomGeneratorAmounts(dimension);
-                    for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(dimension).entrySet()) {
+                    for (Map.Entry<Key, Integer> entry : island.getGeneratorAmountsAsKeys(dimension).entrySet()) {
                         StringBuilder lineDataMessage = new StringBuilder();
 
-                        Key key = Keys.ofMaterialAndData(entry.getKey());
+                        Key key = entry.getKey();
                         lineDataMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
-                                Formatters.CAPITALIZED_FORMATTER.format(entry.getKey()),
+                                Formatters.CAPITALIZED_FORMATTER.format(key.toString()) + (Text.isInt(key.getSubKey()) ? ":" + key.getSubKey() : ""),
                                 Formatters.NUMBER_FORMATTER.format(IslandUtils.getGeneratorPercentageDecimal(island, key, dimension)),
                                 island.getGeneratorAmount(key, dimension))
                         );
 
-                        if (!customGeneratorValues.containsKey(key))
+                        if (island.getExactGeneratorAmountRaw(key, dimension) == IslandUpgradeConstants.SYNCED_VALUE) {
                             lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                        }
 
                         Text.appendWithLine(islandDataMessage, lineDataMessage);
                     }
@@ -282,6 +283,33 @@ public class CmdAdminShow implements IAdminIslandCommand {
             StringBuilder lineDataMessage = new StringBuilder();
             lineDataMessage.append(Formatters.CAPITALIZED_FORMATTER.format(formatter == null ? key.toString() : formatter.apply(key)));
             if (!islandCustomData.containsKey(key))
+                lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+            Text.appendWithLine(islandDataMessage, dataLineMessage.getMessage(locale, lineDataMessage.toString(), value));
+        });
+
+        dataMessage.sendPlayerOrConsole(superiorPlayer, islandDataMessage);
+    }
+
+    private static void collectIslandLimits(@Nullable SuperiorPlayer superiorPlayer, Locale locale,
+                                            Supplier<Map<Key, Integer>> dataFunction,
+                                            ToIntFunction<Key> exactRawFunction,
+                                            Message dataMessage, Message dataLineMessage) {
+        if (dataMessage.isEmpty(locale) || dataLineMessage.isEmpty(locale))
+            return;
+
+        Map<Key, Integer> islandData = dataFunction.get();
+
+        if (islandData.isEmpty())
+            return;
+
+        StringBuilder islandDataMessage = new StringBuilder();
+
+        islandData.forEach((key, value) -> {
+            StringBuilder lineDataMessage = new StringBuilder();
+            lineDataMessage.append(Formatters.CAPITALIZED_FORMATTER.format(key.toString()));
+            if (Text.isInt(key.getSubKey()))
+                lineDataMessage.append(":").append(key.getSubKey());
+            if (exactRawFunction.applyAsInt(key) == IslandUpgradeConstants.SYNCED_VALUE)
                 lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
             Text.appendWithLine(islandDataMessage, dataLineMessage.getMessage(locale, lineDataMessage.toString(), value));
         });
