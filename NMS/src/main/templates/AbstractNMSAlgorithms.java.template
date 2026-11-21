@@ -28,6 +28,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.${ABSTRACT_MINECART_SUBPACKAGE}.AbstractMinecart;
@@ -46,12 +47,14 @@ import ${CRAFTBUKKIT_PACKAGE}.CraftServer;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftFallingBlock;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftMinecart;
+import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
 import ${CRAFTBUKKIT_PACKAGE}.util.CraftMagicNumbers;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.world.GenericGameEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -197,6 +200,12 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
         FallingBlockEntity fallingBlock = ((CraftFallingBlock) bukkitFallingBlock).getHandle();
         Block block = fallingBlock.getBlockState().getBlock();
         return KeyBlocksCache.getBlockKey(block);
+    }
+
+    @Override
+    public boolean isLecternBook(ItemStack itemStack) {
+        // Does not exist
+        return CraftItemStack.asNMSCopy(itemStack).is(ItemTags.LECTERN_BOOKS);
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -72,6 +73,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
     @Nullable
     private static final Material GOLDEN_DANDELION = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
     @Nullable
+    private static final Material LECTERN = EnumHelper.getEnum(Material.class, "LECTERN");
+    @Nullable
     private static final Material OMINOUS_TRIAL_KEY = EnumHelper.getEnum(Material.class, "OMINOUS_TRIAL_KEY");
     @Nullable
     private static final Material SWEET_BERRY_BUSH = EnumHelper.getEnum(Material.class, "SWEET_BERRY_BUSH");
@@ -91,6 +94,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
 
     private static final int MAX_PICKUP_DISTANCE = 1;
     private static UnparsedEnumerateSet<IslandPrivilege> WORLD_PERMISSIONS_CACHE;
+    private static List<IslandPrivilege> LECTERN_PLACE_PERMISSIONS;
+    private static List<IslandPrivilege> LECTERN_BREAK_PERMISSIONS;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -123,6 +128,8 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             }
         };
         plugin.getSettings().getWorldPermissions().forEach(WORLD_PERMISSIONS_CACHE::addName);
+        LECTERN_PLACE_PERMISSIONS = ProtectionHelper.getBlockPlacePrivileges(ConstantKeys.LECTERN);
+        LECTERN_BREAK_PERMISSIONS = ProtectionHelper.getBlockBreakPrivileges(ConstantKeys.LECTERN);
     }
 
     @Override
@@ -228,6 +235,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                     && Materials.BONE_MEAL.toBukkitItem().isSimilar(usedItem)
                     && !plugin.getNMSWorld().hasBerries(block)) {
                 islandPrivileges = Collections.singletonList(IslandPrivileges.FERTILIZE);
+            } else if (action == Action.RIGHT_CLICK_BLOCK && blockType == LECTERN && usedItem != null &&
+                    plugin.getNMSAlgorithms().isLecternBook(usedItem)) {
+                islandPrivileges = LECTERN_PLACE_PERMISSIONS;
             } else {
                 islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(blockKey);
             }
@@ -533,6 +543,27 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
         }
 
         return handleInteractionInternal(superiorPlayer, location, IslandPrivileges.WIND_CHARGE,
+                0, true, true);
+    }
+
+    @Override
+    public InteractionResult handlePlayerTakeLecternBook(SuperiorPlayer superiorPlayer, Location location) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer cannot be null");
+        Preconditions.checkNotNull(location, "location cannot be null");
+        Preconditions.checkArgument(location.getWorld() != null, "location's world cannot be null");
+
+        if (LECTERN_BREAK_PERMISSIONS.isEmpty()) {
+            // No break permissions, fast fail
+            return InteractionResult.SUCCESS;
+        }
+
+        // We do not care about spawn island when spawn protection is disabled,
+        // and therefore only island worlds are relevant.
+        if (!plugin.getSettings().getSpawn().isProtected() && !plugin.getGrid().isIslandsWorld(location.getWorld())) {
+            return InteractionResult.SUCCESS;
+        }
+
+        return handleInteractionInternal(superiorPlayer, location, LECTERN_BREAK_PERMISSIONS,
                 0, true, true);
     }
 

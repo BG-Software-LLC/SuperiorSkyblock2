@@ -332,7 +332,7 @@ custom-categories:
     blocks:
       - LECTERN
     actions:
-      INTERACT: PICKUP_LECTERN_BOOK
+      INTERACT: READ_LECTERN_BOOK
 
   SIGNS:
     blocks:

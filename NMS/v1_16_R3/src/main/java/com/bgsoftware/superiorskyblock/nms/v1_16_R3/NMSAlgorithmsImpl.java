@@ -191,6 +191,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public boolean isLecternBook(ItemStack itemStack) {
+        // Does not exist
+        return false;
+    }
+
+    @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         itemMeta.setCustomModelData(customModel);
     }

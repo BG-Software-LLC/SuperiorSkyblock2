@@ -385,10 +385,9 @@ public class ProtectionListener extends AbstractGameEventListener {
 
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()), IslandPrivileges.LECTERN_INTERACT_PRIVILEGES);
+            interactionResult = this.regionManagerService.get().handlePlayerTakeLecternBook(superiorPlayer,
+                    e.getArgs().clickedBlock.getLocation(wrapper.getHandle()));
         }
-
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
             e.setCancelled();
         }
@@ -689,7 +688,7 @@ public class ProtectionListener extends AbstractGameEventListener {
 
             if (entity instanceof Egg) {
                 List<IslandPrivilege> islandPrivileges = ProtectionHelper.getEntitySpawnPrivileges(entity);
-                if(islandPrivileges.isEmpty())
+                if (islandPrivileges.isEmpty())
                     return;
 
                 interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,

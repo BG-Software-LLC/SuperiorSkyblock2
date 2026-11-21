@@ -231,7 +231,7 @@ island-roles:
       - PICKUP_AXOLOTL
       - PICKUP_DROPS
       - PICKUP_FISH
-      - PICKUP_LECTERN_BOOK
+      - READ_LECTERN_BOOK
       - SADDLE_ENTITY
       - SIGN_INTERACT
       - SCULK_SENSOR

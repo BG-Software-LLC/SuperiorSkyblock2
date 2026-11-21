@@ -35,6 +35,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -131,6 +132,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public boolean isLecternBook(ItemStack itemStack) {
+        // Does not exist
+        return false;
+    }
+
+    @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         // Doesn't exist
     }
@@ -200,6 +207,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
             return null;
         }
     }
+
     private static Enchantment initializeGlowEnchantment() {
         int enchantId = 100;
         while (Enchantment.getById(enchantId) != null)
