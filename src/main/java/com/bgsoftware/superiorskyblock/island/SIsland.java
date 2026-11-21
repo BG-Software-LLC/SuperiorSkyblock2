@@ -3466,20 +3466,39 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
 
+        BigInteger amountBig = BigInteger.valueOf(amount);
         int blockLimit = getExactBlockLimit(key);
 
-        // Checking for the specific provided key.
         if (blockLimit >= 0) {
-            return getExactBlockCountAsBigInteger(key).add(BigInteger.valueOf(amount))
-                    .compareTo(BigInteger.valueOf(blockLimit)) > 0;
+            // Checking for the specific provided key.
+            if (getExactBlockCountAsBigInteger(key).add(amountBig).compareTo(BigInteger.valueOf(blockLimit)) > 0) {
+                return true;
+            }
+        } else {
+            // Getting the global key values.
+            Key globalKey = ((BaseKey<?>) key).toGlobalKey();
+            blockLimit = getBlockLimit(globalKey);
+
+            if (blockLimit >= 0 && getBlockCountAsBigInteger(globalKey).add(amountBig)
+                    .compareTo(BigInteger.valueOf(blockLimit)) > 0) {
+                return true;
+            }
         }
 
-        // Getting the global key values.
-        key = ((BaseKey<?>) key).toGlobalKey();
-        blockLimit = getBlockLimit(key);
+        if (this.blockCategoryLimits.isEmpty()) {
+            return false;
+        }
 
-        return blockLimit >= 0 && getBlockCountAsBigInteger(key)
-                .add(BigInteger.valueOf(amount)).compareTo(BigInteger.valueOf(blockLimit)) > 0;
+        // Checking for the limits of the categories the block is listed in.
+        for (KeyCategory blockCategory : plugin.getSettings().getBlockCategoriesMapping().getCategories(key)) {
+            int categoryLimit = getBlockCategoryLimit(blockCategory);
+            if (categoryLimit >= 0 && getBlocksTracker().getBlockCategoryCount(blockCategory).add(amountBig)
+                    .compareTo(BigInteger.valueOf(categoryLimit)) > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -3579,26 +3598,6 @@ public class SIsland implements Island {
         syncBlockCategoryLimit(DefaultUpgradeLevel.getInstance(), id);
         plugin.getUpgrades().getUpgrades().forEach(upgrade ->
                 syncBlockCategoryLimit((SUpgradeLevel) getUpgradeLevel(upgrade), id));
-    }
-
-    @Override
-    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory) {
-        return hasReachedBlockCategoryLimit(blockCategory, 1);
-    }
-
-    @Override
-    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, @Size int amount) {
-        Preconditions.checkNotNull(blockCategory, "blockCategory parameter cannot be null.");
-        Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
-
-        int limit = getBlockCategoryLimit(blockCategory);
-
-        if (limit < 0) {
-            return false;
-        }
-
-        return getBlocksTracker().getBlockCategoryCount(blockCategory).add(BigInteger.valueOf(amount))
-                .compareTo(BigInteger.valueOf(limit)) > 0;
     }
 
     /*
@@ -3763,11 +3762,23 @@ public class SIsland implements Island {
 
         int entityLimit = getEntityLimit(key);
 
-        if (entityLimit < 0) {
+        if (entityLimit >= 0 && this.entitiesTracker.getEntityCount(key) + amount > entityLimit) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        if (this.entityCategoryLimits.isEmpty()) {
             return CompletableFuture.completedFuture(false);
         }
 
-        return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCount(key) + amount > entityLimit);
+        // Checking for the limits of the categories the entity is listed in.
+        for (KeyCategory entityCategory : plugin.getSettings().getEntityCategoriesMapping().getCategories(key)) {
+            int categoryLimit = getEntityCategoryLimit(entityCategory);
+            if (categoryLimit >= 0 && this.entitiesTracker.getEntityCategoryCount(entityCategory) + amount > categoryLimit) {
+                return CompletableFuture.completedFuture(true);
+            }
+        }
+
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override
@@ -3867,25 +3878,6 @@ public class SIsland implements Island {
         syncEntityCategoryLimit(DefaultUpgradeLevel.getInstance(), id);
         plugin.getUpgrades().getUpgrades().forEach(upgrade ->
                 syncEntityCategoryLimit((SUpgradeLevel) getUpgradeLevel(upgrade), id));
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory) {
-        return hasReachedEntityCategoryLimit(entityCategory, 1);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, @Size int amount) {
-        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
-        Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
-
-        int limit = getEntityCategoryLimit(entityCategory);
-
-        if (limit < 0) {
-            return CompletableFuture.completedFuture(false);
-        }
-
-        return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCategoryCount(entityCategory) + amount > limit);
     }
 
     /*

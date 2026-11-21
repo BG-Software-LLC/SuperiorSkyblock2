@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -71,16 +70,6 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             }
 
             return true;
-        }
-
-        for (KeyCategory blockCategory : plugin.getSettings().getBlockCategoriesMapping().getCategories(key)) {
-            if (island.hasReachedBlockCategoryLimit(blockCategory)) {
-                if (player != null) {
-                    Message.REACHED_BLOCK_CATEGORY_LIMIT.send(player, Formatters.CAPITALIZED_FORMATTER.format(blockCategory.getName()));
-                }
-
-                return true;
-            }
         }
 
         return false;

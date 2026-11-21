@@ -122,7 +122,6 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             Key blockKey = getBarrelKey(e.getBarrel());
             int increaseAmount = e.getBarrel().getStackAmount();
 
-            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
@@ -141,7 +140,6 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             Key blockKey = getBarrelKey(e.getTarget());
             int increaseAmount = e.getTarget().getStackAmount();
 
-            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
             } else {
@@ -192,7 +190,6 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             Key blockKey = getBarrelKey(e.getBarrel());
             int increaseAmount = e.getIncreaseAmount();
 
-            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));

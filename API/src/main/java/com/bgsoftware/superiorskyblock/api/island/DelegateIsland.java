@@ -1590,16 +1590,6 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory) {
-        return this.handle.hasReachedBlockCategoryLimit(blockCategory);
-    }
-
-    @Override
-    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, int amount) {
-        return this.handle.hasReachedBlockCategoryLimit(blockCategory, amount);
-    }
-
-    @Override
     public int getEntityCategoryLimit(KeyCategory entityCategory) {
         return this.handle.getEntityCategoryLimit(entityCategory);
     }
@@ -1632,16 +1622,6 @@ public class DelegateIsland implements Island {
     @Override
     public void removeEntityCategoryLimit(KeyCategory entityCategory) {
         this.handle.removeEntityCategoryLimit(entityCategory);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory) {
-        return this.handle.hasReachedEntityCategoryLimit(entityCategory);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, int amount) {
-        return this.handle.hasReachedEntityCategoryLimit(entityCategory, amount);
     }
 
     @Override

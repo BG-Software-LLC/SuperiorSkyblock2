@@ -2227,7 +2227,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * A method to check if a specific block has reached the limit.
-     * This method checks for the block and it's global block key.
+     * This method checks for the block and it's global block key, and for the limits of all the
+     * block categories the block is listed in.
      *
      * @param key The block's key to check.
      */
@@ -2235,7 +2236,8 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * A method to check if a specific block has reached the limit.
-     * This method checks for the block and it's global block key.
+     * This method checks for the block and it's global block key, and for the limits of all the
+     * block categories the block is listed in.
      *
      * @param key    The block's key to check.
      * @param amount Amount of the block to be placed.
@@ -2291,23 +2293,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param blockCategory The block category to remove it's limit.
      */
     void removeBlockCategoryLimit(KeyCategory blockCategory);
-
-    /**
-     * A method to check if a specific block category has reached the limit.
-     * Limits lower than 0 mean there is no limit, so they are never reached.
-     *
-     * @param blockCategory The block category to check.
-     */
-    boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory);
-
-    /**
-     * A method to check if a specific block category has reached the limit.
-     * Limits lower than 0 mean there is no limit, so they are never reached.
-     *
-     * @param blockCategory The block category to check.
-     * @param amount        Amount of blocks to be placed.
-     */
-    boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, int amount);
 
     /*
      *  Entities related methods
@@ -2400,6 +2385,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * A method to check if a specific entity has reached the limit.
+     * This method checks for the entity, and for the limits of all the entity categories the entity is listed in.
      *
      * @param entityType The entity's type to check.
      */
@@ -2407,6 +2393,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * A method to check if a specific entity has reached the limit.
+     * This method checks for the entity, and for the limits of all the entity categories the entity is listed in.
      *
      * @param key The key of the entity to check.
      */
@@ -2414,6 +2401,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * A method to check if a specific entity has reached the limit.
+     * This method checks for the entity, and for the limits of all the entity categories the entity is listed in.
      *
      * @param amount     The amount of entities that were added.
      * @param entityType The entity's type to check.
@@ -2422,6 +2410,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * A method to check if a specific entity has reached the limit.
+     * This method checks for the entity, and for the limits of all the entity categories the entity is listed in.
      *
      * @param amount The amount of entities that were added.
      * @param key    The key of the entity to check.
@@ -2477,23 +2466,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param entityCategory The entity category to remove it's limit.
      */
     void removeEntityCategoryLimit(KeyCategory entityCategory);
-
-    /**
-     * A method to check if a specific entity category has reached the limit.
-     * Limits lower than 0 mean there is no limit, so they are never reached.
-     *
-     * @param entityCategory The entity category to check.
-     */
-    CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory);
-
-    /**
-     * A method to check if a specific entity category has reached the limit.
-     * Limits lower than 0 mean there is no limit, so they are never reached.
-     *
-     * @param entityCategory The entity category to check.
-     * @param amount         The amount of entities that were added.
-     */
-    CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, int amount);
 
     /*
      *  Upgrades related methods

@@ -90,7 +90,6 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
                     e.getStack().getStackSettings().getMaxStackSize() - e.getStack().getStackSize() : e.getIncreaseAmount();
             int newBlocksCount = e.isNew() ? Math.max(1, increaseAmount - 1) : increaseAmount;
 
-            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(blockKey, newBlocksCount)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));

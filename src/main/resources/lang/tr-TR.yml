@@ -847,9 +847,7 @@ RATE_REMOVE_ALL: '&e&lAda | &7{0}''ın tüm değerlendirmeleri başarıyla kald�
 RATE_REMOVE_ALL_ISLANDS: '&e&lAda | &7Tüm adaların tüm değerlendirmeleri başarıyla
   kaldırıldı.'
 RATE_SUCCESS: '&e&lAda | &7Bu adayı {0} yıldızla değerlendirdin!'
-REACHED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the block category {0}.'
 REACHED_BLOCK_LIMIT: '&e&lYükseltmeler | &7Ada için {0} Bloğu limitine ulaştın.'
-REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lYükseltmeler | &7Varlık {0} için adanın limitine ulaştın.'
 RECALC_ALREADY_RUNNING: '&c&lHata | &7Adan zaten yeniden hesaplanıyor.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lHata | &7Bu ada zaten yeniden hesaplanıyor.'

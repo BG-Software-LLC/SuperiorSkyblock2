@@ -1757,16 +1757,6 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory) {
-        return false;
-    }
-
-    @Override
-    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, int amount) {
-        return false;
-    }
-
-    @Override
     public int getEntityCategoryLimit(KeyCategory entityCategory) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
@@ -1799,16 +1789,6 @@ public class SpawnIsland implements Island {
     @Override
     public void removeEntityCategoryLimit(KeyCategory entityCategory) {
         // Do nothing.
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory) {
-        return hasReachedEntityCategoryLimit(entityCategory, 1);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, int amount) {
-        return CompletableFuture.completedFuture(false);
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
@@ -112,16 +111,6 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             }
 
             return true;
-        }
-
-        for (KeyCategory entityCategory : plugin.getSettings().getEntityCategoriesMapping().getCategories(entityKey)) {
-            if (island.hasReachedEntityCategoryLimit(entityCategory).join()) {
-                if (player != null) {
-                    Message.REACHED_ENTITY_CATEGORY_LIMIT.send(player, Formatters.CAPITALIZED_FORMATTER.format(entityCategory.getName()));
-                }
-
-                return true;
-            }
         }
 
         return false;

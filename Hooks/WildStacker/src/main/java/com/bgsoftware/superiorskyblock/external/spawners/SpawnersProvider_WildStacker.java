@@ -96,7 +96,6 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             Key blockKey = Keys.ofSpawner(e.getSpawner().getSpawnedType());
             int increaseAmount = e.getSpawner().getStackAmount();
 
-            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
@@ -115,7 +114,6 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             Key blockKey = Keys.ofSpawner(e.getSpawner().getSpawnedType());
             int increaseAmount = e.getTarget().getStackAmount();
 
-            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (increaseAmount < 0) {
                 island.handleBlockBreak(blockKey, -increaseAmount);
             } else if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
@@ -142,7 +140,6 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             Key blockKey = Keys.ofSpawner(e.getSpawner().getSpawnedType());
             int increaseAmount = e.getIncreaseAmount();
 
-            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
