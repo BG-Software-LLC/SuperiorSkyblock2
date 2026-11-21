@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.menu.MenuBrewingStandB
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.menu.MenuDispenserBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.menu.MenuFurnaceBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.menu.MenuHopperBlockEntity;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world.BlockEntityCache;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world.KeyBlocksCache;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
@@ -33,6 +34,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.${ABSTRACT_MINECART_SUBPACKAGE}.AbstractMinecart;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -203,9 +205,14 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
     }
 
     @Override
-    public boolean isLecternBook(ItemStack itemStack) {
-        // Does not exist
-        return CraftItemStack.asNMSCopy(itemStack).is(ItemTags.LECTERN_BOOKS);
+    public boolean canPlaceBookIntoLectern(org.bukkit.block.Block lectern, ItemStack book) {
+        // Check book is actually a book a lectern can take
+        if (!CraftItemStack.asNMSCopy(book).is(ItemTags.LECTERN_BOOKS))
+            return false;
+
+        // Check lectern has no book inside it already
+        BlockState blockState = NMSUtilsVersioned.getBlockState(lectern);
+        return !blockState.getValue(LecternBlock.HAS_BOOK);
     }
 
     @Override

@@ -132,7 +132,7 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
-    public boolean isLecternBook(ItemStack itemStack) {
+    public boolean canPlaceBookIntoLectern(org.bukkit.block.Block lectern, ItemStack book) {
         // Does not exist
         return false;
     }

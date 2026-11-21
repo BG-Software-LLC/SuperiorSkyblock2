@@ -236,7 +236,7 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
                     && !plugin.getNMSWorld().hasBerries(block)) {
                 islandPrivileges = Collections.singletonList(IslandPrivileges.FERTILIZE);
             } else if (action == Action.RIGHT_CLICK_BLOCK && blockType == LECTERN && usedItem != null &&
-                    plugin.getNMSAlgorithms().isLecternBook(usedItem)) {
+                    plugin.getNMSAlgorithms().canPlaceBookIntoLectern(block, usedItem)) {
                 islandPrivileges = LECTERN_PLACE_PERMISSIONS;
             } else {
                 islandPrivileges = ProtectionHelper.getBlockInteractPrivileges(blockKey);

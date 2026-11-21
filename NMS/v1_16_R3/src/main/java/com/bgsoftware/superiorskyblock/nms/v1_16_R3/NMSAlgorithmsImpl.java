@@ -24,6 +24,7 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_16_R3.Block;
+import net.minecraft.server.v1_16_R3.BlockLectern;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityFallingBlock;
 import net.minecraft.server.v1_16_R3.EntityMinecartAbstract;
@@ -32,17 +33,19 @@ import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IInventory;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
+import net.minecraft.server.v1_16_R3.TagsItem;
 import net.minecraft.server.v1_16_R3.World;
-import org.bukkit.block.Biome;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftFallingBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecart;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
@@ -191,9 +194,14 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
-    public boolean isLecternBook(ItemStack itemStack) {
-        // Does not exist
-        return false;
+    public boolean canPlaceBookIntoLectern(org.bukkit.block.Block lectern, ItemStack book) {
+        // Check book is actually a book a lectern can take
+        if (!CraftItemStack.asNMSCopy(book).getItem().a(TagsItem.LECTERN_BOOKS))
+            return false;
+
+        // Check lectern has no book inside it already
+        IBlockData blockData = ((CraftBlock) lectern).getNMS();
+        return !blockData.get(BlockLectern.c);
     }
 
     @Override
