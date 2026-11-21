@@ -23,6 +23,8 @@ import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
@@ -433,7 +435,17 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return IslandsSerializer.serializeBlockCounts(blockCounts);
+        // These are aggregated counts, so they must be saved in the legacy array format
+        // and not with IslandsSerializer, which saves individual counts.
+        JsonArray blockCountsArray = new JsonArray();
+        blockCounts.forEach((key, amount) -> {
+            JsonObject blockCountObject = new JsonObject();
+            blockCountObject.addProperty("id", key.toString());
+            blockCountObject.addProperty("amount", amount.toString());
+            blockCountsArray.add(blockCountObject);
+        });
+
+        return blockCountsArray.toString();
     }
 
     @Override

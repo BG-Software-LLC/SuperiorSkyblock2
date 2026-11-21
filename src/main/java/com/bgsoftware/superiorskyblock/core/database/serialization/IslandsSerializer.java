@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -25,15 +26,13 @@ public class IslandsSerializer {
     }
 
     public static String serializeBlockCounts(Map<Key, BigInteger> blockCounts) {
-        JsonArray blockCountsArray = new JsonArray();
+        JsonObject blockCountsObject = new JsonObject();
         blockCounts.forEach((key, amount) -> {
-            JsonObject blockCountObject = new JsonObject();
-            blockCountObject.addProperty("id", key.toString());
-            blockCountObject.addProperty("amount", amount.toString());
-            blockCountObject.addProperty("v", 2);
-            blockCountsArray.add(blockCountObject);
+            String id = key.toString();
+            JsonElement currentAmount = blockCountsObject.get(id);
+            blockCountsObject.addProperty(id, currentAmount == null ? amount : currentAmount.getAsBigInteger().add(amount));
         });
-        return gson.toJson(blockCountsArray);
+        return gson.toJson(blockCountsObject);
     }
 
     public static String serializeEntityCounts(Map<Key, Integer> entityCounts) {

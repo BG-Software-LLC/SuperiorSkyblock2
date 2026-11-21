@@ -13,7 +13,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 /**
- * Converts legacy saved block counts (the aggregated map, without the "v" field) to individual counts.
+ * Converts legacy saved block counts (the aggregated map, stored as a JSON array) to individual counts.
  * <p>
  * The conversion is exact only if block values and limits are unchanged since the row was saved,
  * as the aggregate part that was added for specific keys is derived from the current configuration.

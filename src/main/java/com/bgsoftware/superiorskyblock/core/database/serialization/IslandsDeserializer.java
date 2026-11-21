@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -277,17 +278,32 @@ public class IslandsDeserializer {
         if (Text.isBlank(blocks))
             return;
 
-        JsonArray blockCounts = GSON.fromJson(blocks, JsonArray.class);
+        JsonElement blockCounts = GSON.fromJson(blocks, JsonElement.class);
 
-        if (blockCounts.size() > 0)
-            ((IslandBuilderImpl) builder).legacyBlockCounts = !blockCounts.get(0).getAsJsonObject().has("v");
+        if (blockCounts.isJsonObject()) {
+            // Individual counts: {"<key>": <amount>}
+            blockCounts.getAsJsonObject().entrySet().forEach(blockCountEntry -> {
+                Key blockKey = Keys.ofMaterialAndData(blockCountEntry.getKey());
+                BigInteger amount = blockCountEntry.getValue().getAsBigInteger();
+                builder.setBlockCount(blockKey, amount);
+            });
+        } else if (blockCounts.isJsonArray()) {
+            // Legacy aggregated counts: [{"id": "<key>", "amount": "<amount>"}].
+            // They are converted to individual counts when the island is loaded.
+            JsonArray legacyBlockCounts = blockCounts.getAsJsonArray();
 
-        blockCounts.forEach(blockCountElement -> {
-            JsonObject blockCountObject = blockCountElement.getAsJsonObject();
-            Key blockKey = Keys.ofMaterialAndData(blockCountObject.get("id").getAsString());
-            BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
-            builder.setBlockCount(blockKey, amount);
-        });
+            if (legacyBlockCounts.size() > 0)
+                ((IslandBuilderImpl) builder).legacyBlockCounts = true;
+
+            legacyBlockCounts.forEach(blockCountElement -> {
+                JsonObject blockCountObject = blockCountElement.getAsJsonObject();
+                Key blockKey = Keys.ofMaterialAndData(blockCountObject.get("id").getAsString());
+                BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
+                builder.setBlockCount(blockKey, amount);
+            });
+        } else {
+            Log.warn("Cannot load block counts with an invalid format: ", blocks, ", skipping...");
+        }
     }
 
     public static void deserializeEntityCounts(Island.Builder builder, String entities) {
