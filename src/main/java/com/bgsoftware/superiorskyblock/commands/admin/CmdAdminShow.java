@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 
 public class CmdAdminShow implements IAdminIslandCommand {
 
@@ -181,13 +182,13 @@ public class CmdAdminShow implements IAdminIslandCommand {
 
             // Island entity limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
-                collectIslandData(superiorPlayer, locale, island::getEntitiesLimitsAsKeys, island::getCustomEntitiesLimits,
+                collectIslandLimits(superiorPlayer, locale, island::getEntitiesLimitsAsKeys, island::getExactEntityLimitRaw,
                         Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE);
             }
 
             // Island block limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
-                collectIslandData(superiorPlayer, locale, island::getBlocksLimits, island::getCustomBlocksLimits,
+                collectIslandLimits(superiorPlayer, locale, island::getBlocksLimits, island::getExactBlockLimitRaw,
                         Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS, Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE);
             }
         }
@@ -282,6 +283,33 @@ public class CmdAdminShow implements IAdminIslandCommand {
             StringBuilder lineDataMessage = new StringBuilder();
             lineDataMessage.append(Formatters.CAPITALIZED_FORMATTER.format(formatter == null ? key.toString() : formatter.apply(key)));
             if (!islandCustomData.containsKey(key))
+                lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+            Text.appendWithLine(islandDataMessage, dataLineMessage.getMessage(locale, lineDataMessage.toString(), value));
+        });
+
+        dataMessage.sendPlayerOrConsole(superiorPlayer, islandDataMessage);
+    }
+
+    private static void collectIslandLimits(@Nullable SuperiorPlayer superiorPlayer, Locale locale,
+                                            Supplier<Map<Key, Integer>> dataFunction,
+                                            ToIntFunction<Key> exactRawFunction,
+                                            Message dataMessage, Message dataLineMessage) {
+        if (dataMessage.isEmpty(locale) || dataLineMessage.isEmpty(locale))
+            return;
+
+        Map<Key, Integer> islandData = dataFunction.get();
+
+        if (islandData.isEmpty())
+            return;
+
+        StringBuilder islandDataMessage = new StringBuilder();
+
+        islandData.forEach((key, value) -> {
+            StringBuilder lineDataMessage = new StringBuilder();
+            lineDataMessage.append(Formatters.CAPITALIZED_FORMATTER.format(key.toString()));
+            if (Text.isInt(key.getSubKey()))
+                lineDataMessage.append(":").append(key.getSubKey());
+            if (exactRawFunction.applyAsInt(key) == IslandUpgradeConstants.SYNCED_VALUE)
                 lineDataMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
             Text.appendWithLine(islandDataMessage, dataLineMessage.getMessage(locale, lineDataMessage.toString(), value));
         });

@@ -1321,10 +1321,10 @@ public class SIsland implements Island {
         List<Chunk> chunks = new LinkedList<>();
 
         for (Dimension dimension : Dimension.values()) {
-            try {
-                chunks.addAll(getAllChunks(dimension, flags));
-            } catch (NullPointerException ignored) {
-            }
+            // Dimensions that are not enabled have no world, and therefore no chunks.
+            World world = plugin.getGrid().getIslandsWorld(this, dimension);
+            if (world != null)
+                chunks.addAll(getAllChunksInternal(world, flags));
         }
 
         return Collections.unmodifiableList(chunks);
@@ -1339,7 +1339,10 @@ public class SIsland implements Island {
     public List<Chunk> getAllChunks(Dimension dimension, @IslandChunkFlags int flags) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
 
-        World world = getCenter(dimension).getWorld();
+        return getAllChunksInternal(getCenter(dimension).getWorld(), flags);
+    }
+
+    private List<Chunk> getAllChunksInternal(World world, @IslandChunkFlags int flags) {
         return new SequentialListBuilder<Chunk>().build(IslandUtils.getChunkCoords(this, WorldInfo.of(world), flags),
                 chunkPosition -> world.getChunkAt(chunkPosition.getX(), chunkPosition.getZ()));
     }
@@ -1354,10 +1357,10 @@ public class SIsland implements Island {
         List<Chunk> chunks = new LinkedList<>();
 
         for (Dimension dimension : Dimension.values()) {
-            try {
-                chunks.addAll(getLoadedChunks(dimension, flags));
-            } catch (NullPointerException ignored) {
-            }
+            // Dimensions that are not enabled have no world, and therefore no chunks.
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+            if (worldInfo != null)
+                chunks.addAll(getLoadedChunksInternal(worldInfo, flags));
         }
 
         return Collections.unmodifiableList(chunks);
@@ -1374,6 +1377,10 @@ public class SIsland implements Island {
 
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
 
+        return getLoadedChunksInternal(worldInfo, flags);
+    }
+
+    private List<Chunk> getLoadedChunksInternal(WorldInfo worldInfo, @IslandChunkFlags int flags) {
         return new SequentialListBuilder<Chunk>().filter(Objects::nonNull).build(
                 IslandUtils.getChunkCoords(this, worldInfo, flags), plugin.getNMSChunks()::getChunkIfLoaded);
     }
@@ -6121,7 +6128,7 @@ public class SIsland implements Island {
         DEFAULT_FLAGS_CACHE = new UnparsedEnumerateSet<IslandFlag>(IslandFlag.values()) {
             @Override
             protected IslandFlag parseName(String name) {
-                return IslandFlag.getByName(name);
+                return IslandFlag.getByNameOrNull(name);
             }
 
             @Override
