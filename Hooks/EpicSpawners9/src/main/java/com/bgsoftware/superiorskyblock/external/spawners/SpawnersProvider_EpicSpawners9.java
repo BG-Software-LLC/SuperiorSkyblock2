@@ -87,6 +87,7 @@ public class SpawnersProvider_EpicSpawners9 implements SpawnersProvider {
             if (increaseAmount <= 0)
                 return;
 
+            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(spawnerKey, increaseAmount)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(spawnerKey.toString()));
@@ -106,6 +107,7 @@ public class SpawnersProvider_EpicSpawners9 implements SpawnersProvider {
 
             int increaseAmount = e.getStackSize() - e.getOldStackSize();
 
+            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (increaseAmount < 0) {
                 island.handleBlockBreak(blockKey, -increaseAmount);
             } else if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {

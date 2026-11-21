@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.arguments;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -220,14 +221,26 @@ public class CommandArguments {
         return colorize ? Formatters.COLOR_FORMATTER.format(stringBuilder.substring(1)) : stringBuilder.substring(1);
     }
 
-    public static EntityCategory getEntityCategory(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
-        EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(argument);
+    @Nullable
+    public static KeyCategory getEntityCategory(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        KeyCategory entityCategory = plugin.getSettings().getEntityCategoriesMapping().getCategoryByName(argument);
 
         if (entityCategory == null) {
             Message.INVALID_ENTITY_CATEGORY.send(sender, argument);
         }
 
         return entityCategory;
+    }
+
+    @Nullable
+    public static KeyCategory getBlockCategory(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+        KeyCategory blockCategory = plugin.getSettings().getBlockCategoriesMapping().getCategoryByName(argument);
+
+        if (blockCategory == null) {
+            Message.INVALID_BLOCK_CATEGORY.send(sender, argument);
+        }
+
+        return blockCategory;
     }
 
     public static PlayerRole getPlayerRole(CommandSender sender, String argument) {

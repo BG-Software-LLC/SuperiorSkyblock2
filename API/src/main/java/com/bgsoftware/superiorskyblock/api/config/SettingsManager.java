@@ -936,8 +936,15 @@ public interface SettingsManager {
         Map<Key, Integer> getBlockLimits();
 
         /**
+         * The default block category limits for new islands.
+         * Represented by a map with keys as the upper-case block category names, and values as the limits.
+         * Config-path: default-values.block-category-limits
+         */
+        Map<String, Integer> getBlockCategoryLimits();
+
+        /**
          * The default entity category limits for new islands.
-         * Represented by a map with keys as the entity categories, and values as the limits.
+         * Represented by a map with keys as the upper-case entity category names, and values as the limits.
          * Config-path: default-values.entity-category-limits
          */
         Map<String, Integer> getEntityCategoryLimits();

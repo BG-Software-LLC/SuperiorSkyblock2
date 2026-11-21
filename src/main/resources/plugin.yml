@@ -192,6 +192,8 @@ permissions:
             description: Add a user to an island.
           superior.admin.addbanklimit:
             description: Increase the bank limit for another player's island.
+          superior.admin.addblockcategorylimit:
+            description: Increase block category limit for another player's island.
           superior.admin.addblocklimit:
             description: Increase block limit for another player's island.
           superior.admin.addbonus:
@@ -284,6 +286,8 @@ permissions:
             description: Re-calculates the worth of an island.
           superior.admin.reload:
             description: Reload all configurations and tasks of the plugin.
+          superior.admin.removeblockcategorylimit:
+            description: Remove a block category limit for an island.
           superior.admin.removeblocklimit:
             description: Remove a block limit for an island.
           superior.admin.removeentitycategorylimit:
@@ -306,6 +310,8 @@ permissions:
             description: Set the biome of an island.
           superior.admin.setblockamount:
             description: Set the block amount in a specific location.
+          superior.admin.setblockcategorylimit:
+            description: Set block category limit for another player's island.
           superior.admin.setblocklimit:
             description: Set block limit for another player's island.
           superior.admin.setchestrow:

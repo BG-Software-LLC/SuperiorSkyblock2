@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.events.args;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
@@ -105,6 +105,13 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandChangeBlockCategoryLimit extends IslandDoActionArgs {
+
+        public KeyCategory blockCategory;
+        public int blockCategoryLimit;
+
+    }
+
     public static class IslandChangeBlockLimit extends IslandDoActionArgs {
 
         public Key block;
@@ -151,7 +158,7 @@ public class PluginEventArgs {
 
     public static class IslandChangeEntityCategoryLimit extends IslandDoActionArgs {
 
-        public EntityCategory entityCategory;
+        public KeyCategory entityCategory;
         public int entityCategoryLimit;
 
     }
@@ -442,6 +449,12 @@ public class PluginEventArgs {
 
     }
 
+    public static class IslandRemoveBlockCategoryLimit extends IslandDoActionArgs {
+
+        public KeyCategory blockCategory;
+
+    }
+
     public static class IslandRemoveBlockLimit extends IslandDoActionArgs {
 
         public Key block;
@@ -456,7 +469,7 @@ public class PluginEventArgs {
 
     public static class IslandRemoveEntityCategoryLimit extends IslandDoActionArgs {
 
-        public EntityCategory entityCategory;
+        public KeyCategory entityCategory;
 
     }
 

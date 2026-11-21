@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island.algorithms;
 
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 
 import java.util.Map;
 
@@ -34,12 +34,12 @@ public class DelegateIslandEntitiesTrackerAlgorithm implements IslandEntitiesTra
     }
 
     @Override
-    public int getEntityCategoryCount(EntityCategory entityCategory) {
+    public int getEntityCategoryCount(KeyCategory entityCategory) {
         return this.handle.getEntityCategoryCount(entityCategory);
     }
 
     @Override
-    public Map<EntityCategory, Integer> getEntityCategoryCounts() {
+    public Map<KeyCategory, Integer> getEntityCategoryCounts() {
         return this.handle.getEntityCategoryCounts();
     }
 

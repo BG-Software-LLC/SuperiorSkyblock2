@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadExceptio
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2IntMapView;
@@ -273,12 +274,8 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
                 plugin.getBlockValues().addCustomBlockKey(blockKey);
             }
         }
-        Map<String, Integer> entityCategoryLimits = new ArrayMap<>();
-        if (levelSection.isConfigurationSection("entity-category-limits")) {
-            for (String entityCategoryName : levelSection.getConfigurationSection("entity-category-limits").getKeys(false)) {
-                entityCategoryLimits.put(entityCategoryName.toLowerCase(Locale.ENGLISH), levelSection.getInt("entity-category-limits." + entityCategoryName));
-            }
-        }
+        Map<String, Integer> blockCategoryLimits = readCategoryLimits(levelSection, "block-category-limits");
+        Map<String, Integer> entityCategoryLimits = readCategoryLimits(levelSection, "entity-category-limits");
         KeyMap<Integer> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
         if (levelSection.isConfigurationSection("entity-limits")) {
             for (String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
@@ -319,7 +316,7 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
         SUpgradeLevel upgradeLevel = new SUpgradeLevel(level, upgradeCosts, commands, permission, requirements,
                 cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize,
-                Value.syncedFixed(blockLimits), Value.syncedFixed(entityCategoryLimits), Value.syncedFixed(entityLimits),
+                Value.syncedFixed(blockLimits), Value.syncedFixed(blockCategoryLimits), Value.syncedFixed(entityCategoryLimits), Value.syncedFixed(entityLimits),
                 Value.syncedFixed(generatorRates), Value.syncedFixed(islandEffects), bankLimit, Value.syncedFixed(rolesLimits));
 
         upgrade.addUpgradeLevel(level, upgradeLevel);
@@ -383,6 +380,19 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
             return OptionalInt.of(section.getInt(key));
 
         return OptionalInt.empty();
+    }
+
+    private static Map<String, Integer> readCategoryLimits(ConfigurationSection levelSection, String sectionName) {
+        Map<String, Integer> limits = new ArrayMap<>();
+        ConfigurationSection section = levelSection.getConfigurationSection(sectionName);
+        if (section != null) {
+            for (String categoryName : section.getKeys(false)) {
+                String upperName = categoryName.toUpperCase(Locale.ENGLISH);
+                KeyCategoryId.getOrRegister(upperName);
+                limits.put(upperName, section.getInt(categoryName));
+            }
+        }
+        return limits;
     }
 
     private static Optional<String> readString(ConfigurationSection section, String key) {

@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -13,14 +14,17 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.mutable.MutableObject;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddBlockCategoryLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddBlockLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveBlockCategoryLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveBlockLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetBlockCategoryLimit;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetBlockLimit;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -55,7 +59,31 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return Arrays.asList(new CmdAdminAddBlockLimit(), new CmdAdminRemoveBlockLimit(), new CmdAdminSetBlockLimit());
+        return Arrays.asList(new CmdAdminAddBlockCategoryLimit(), new CmdAdminAddBlockLimit(),
+                new CmdAdminRemoveBlockCategoryLimit(), new CmdAdminRemoveBlockLimit(),
+                new CmdAdminSetBlockCategoryLimit(), new CmdAdminSetBlockLimit());
+    }
+
+    private boolean hasReachedLimit(Island island, Key key, @Nullable Player player) {
+        if (island.hasReachedBlockLimit(key)) {
+            if (player != null) {
+                Message.REACHED_BLOCK_LIMIT.send(player, Formatters.CAPITALIZED_FORMATTER.format(key.toString()));
+            }
+
+            return true;
+        }
+
+        for (KeyCategory blockCategory : plugin.getSettings().getBlockCategoriesMapping().getCategories(key)) {
+            if (island.hasReachedBlockCategoryLimit(blockCategory)) {
+                if (player != null) {
+                    Message.REACHED_BLOCK_CATEGORY_LIMIT.send(player, Formatters.CAPITALIZED_FORMATTER.format(blockCategory.getName()));
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private class BlockLimitsListener implements Listener {
@@ -71,9 +99,8 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             Key blockKey = Keys.of(e.getBlock());
 
-            if (island.hasReachedBlockLimit(blockKey)) {
+            if (hasReachedLimit(island, blockKey, e.getPlayer())) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
             }
         }
 
@@ -103,12 +130,8 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (!Materials.isMinecart(handItemType))
                 return false;
 
-            MutableObject<Key> minecraftKey = new MutableObject<>(null);
-
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(wrapper.getHandle()), minecraftKey)) {
-                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(
-                            minecraftKey.getValue().getGlobalKey()));
+                if (preventMinecartPlace(handItemType, e.getClickedBlock().getLocation(wrapper.getHandle()), e.getPlayer())) {
                     return true;
                 }
             }
@@ -143,8 +166,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             try {
                 island.handleBlockBreak(oldSpawnerKey, 1, 0);
-                if (island.hasReachedBlockLimit(newSpawnerKey)) {
-                    Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(newSpawnerKey.toString()));
+                if (hasReachedLimit(island, newSpawnerKey, e.getPlayer())) {
                     return true;
                 }
             } finally {
@@ -188,7 +210,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
         }
 
-        private boolean preventMinecartPlace(Material minecartType, Location location, @Nullable MutableObject<Key> minecraftKey) {
+        private boolean preventMinecartPlace(Material minecartType, Location location, @Nullable Player player) {
             Island island = plugin.getGrid().getIslandAt(location);
 
             if (island == null)
@@ -218,13 +240,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
                     break;
             }
 
-            if (key != null && island.hasReachedBlockLimit(key)) {
-                if (minecraftKey != null)
-                    minecraftKey.setValue(key);
-                return true;
-            }
-
-            return false;
+            return key != null && hasReachedLimit(island, key, player);
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -238,9 +254,8 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             Key blockKey = Keys.ofMaterialAndData(e.getBucket().name().replace("_BUCKET", ""));
 
-            if (island.hasReachedBlockLimit(blockKey)) {
+            if (hasReachedLimit(island, blockKey, e.getPlayer())) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
             }
         }
 
@@ -256,7 +271,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             Key blockKey = Keys.of(e.getNewState());
 
-            if (island.hasReachedBlockLimit(blockKey))
+            if (hasReachedLimit(island, blockKey, null))
                 e.setCancelled(true);
         }
 
@@ -267,7 +282,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            e.getBlocks().removeIf(blockState -> island.hasReachedBlockLimit(Keys.of(blockState)));
+            e.getBlocks().removeIf(blockState -> hasReachedLimit(island, Keys.of(blockState), null));
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -281,7 +296,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
 
             Key blockKey = Keys.of(e.getNewState());
 
-            if (island.hasReachedBlockLimit(blockKey)) {
+            if (hasReachedLimit(island, blockKey, null)) {
                 e.setCancelled(true);
             }
         }

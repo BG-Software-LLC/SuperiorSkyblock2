@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
@@ -18,6 +17,7 @@ import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -2197,21 +2197,75 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean hasReachedBlockLimit(Key key, int amount);
 
     /**
+     * Get the block category limit of a block category.
+     *
+     * @param blockCategory The block category to check.
+     */
+    int getBlockCategoryLimit(KeyCategory blockCategory);
+
+    /**
+     * Get all the block category limits for the island.
+     */
+    Map<KeyCategory, Integer> getBlockCategoryLimits();
+
+    /**
+     * Get all the custom block category limits for the island.
+     */
+    Map<KeyCategory, Integer> getCustomBlockCategoryLimits();
+
+    /**
+     * Clear all the block category limits from the island.
+     */
+    void clearBlockCategoryLimits();
+
+    /**
+     * Set the block category limit of a block category.
+     *
+     * @param blockCategory The block category to set the limit to.
+     * @param limit          The limit to set.
+     */
+    void setBlockCategoryLimit(KeyCategory blockCategory, int limit);
+
+    /**
+     * Remove the block category limit of a block category.
+     *
+     * @param blockCategory The block category to remove it's limit.
+     */
+    void removeBlockCategoryLimit(KeyCategory blockCategory);
+
+    /**
+     * A method to check if a specific block category has reached the limit.
+     * Limits lower than 0 mean there is no limit, so they are never reached.
+     *
+     * @param blockCategory The block category to check.
+     */
+    boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory);
+
+    /**
+     * A method to check if a specific block category has reached the limit.
+     * Limits lower than 0 mean there is no limit, so they are never reached.
+     *
+     * @param blockCategory The block category to check.
+     * @param amount         Amount of blocks to be placed.
+     */
+    boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, int amount);
+
+    /**
      * Get the entity category limit of an entity category.
      *
      * @param entityCategory The entity category to check.
      */
-    int getEntityCategoryLimit(EntityCategory entityCategory);
+    int getEntityCategoryLimit(KeyCategory entityCategory);
 
     /**
      * Get all the entity category limits for the island.
      */
-    Map<EntityCategory, Integer> getEntityCategoryLimits();
+    Map<KeyCategory, Integer> getEntityCategoryLimits();
 
     /**
      * Get all the custom entity category limits for the island.
      */
-    Map<EntityCategory, Integer> getCustomEntityCategoryLimits();
+    Map<KeyCategory, Integer> getCustomEntityCategoryLimits();
 
     /**
      * Clear all the entity category limits from the island.
@@ -2224,29 +2278,31 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param entityCategory The entity category to set the limit to.
      * @param limit          The limit to set.
      */
-    void setEntityCategoryLimit(EntityCategory entityCategory, int limit);
+    void setEntityCategoryLimit(KeyCategory entityCategory, int limit);
 
     /**
      * Remove the entity category limit of an entity category.
      *
      * @param entityCategory The entity category to remove it's limit.
      */
-    void removeEntityCategoryLimit(EntityCategory entityCategory);
+    void removeEntityCategoryLimit(KeyCategory entityCategory);
 
     /**
      * A method to check if a specific entity category has reached the limit.
+     * Limits lower than 0 mean there is no limit, so they are never reached.
      *
      * @param entityCategory The entity category to check.
      */
-    CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory);
+    CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory);
 
     /**
      * A method to check if a specific entity category has reached the limit.
+     * Limits lower than 0 mean there is no limit, so they are never reached.
      *
      * @param entityCategory The entity category to check.
      * @param amount         The amount of entities that were added.
      */
-    CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory, int amount);
+    CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, int amount);
 
     /**
      * Get the entity limit of an entity.
@@ -3023,9 +3079,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         Map<SuperiorPlayer, Long> getUniqueVisitors();
 
-        Builder setEntityCategoryLimit(EntityCategory entityCategory, int limit);
+        Builder setBlockCategoryLimit(KeyCategory blockCategory, int limit);
 
-        Map<EntityCategory, Integer> getEntityCategoryLimits();
+        Map<KeyCategory, Integer> getBlockCategoryLimits();
+
+        Builder setEntityCategoryLimit(KeyCategory entityCategory, int limit);
+
+        Map<KeyCategory, Integer> getEntityCategoryLimits();
 
         Builder setEntityLimit(Key entity, int limit);
 

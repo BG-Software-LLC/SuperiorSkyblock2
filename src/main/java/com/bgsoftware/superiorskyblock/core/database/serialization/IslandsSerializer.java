@@ -30,6 +30,7 @@ public class IslandsSerializer {
             JsonObject blockCountObject = new JsonObject();
             blockCountObject.addProperty("id", key.toString());
             blockCountObject.addProperty("amount", amount.toString());
+            blockCountObject.addProperty("v", 2);
             blockCountsArray.add(blockCountObject);
         });
         return gson.toJson(blockCountsArray);

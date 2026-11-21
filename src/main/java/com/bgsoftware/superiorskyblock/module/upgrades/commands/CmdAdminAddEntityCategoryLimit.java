@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -69,7 +69,7 @@ public class CmdAdminAddEntityCategoryLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        EntityCategory entityCategory = CommandArguments.getEntityCategory(plugin, sender, args[3]);
+        KeyCategory entityCategory = CommandArguments.getEntityCategory(plugin, sender, args[3]);
         if (entityCategory == null) {
             return;
         }

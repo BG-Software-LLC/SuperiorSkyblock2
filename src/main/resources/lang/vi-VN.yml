@@ -64,6 +64,9 @@ CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dime
 CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
 CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lKhối | &7Thành công thay đổi số lượng khối từ {0} thành {1}.'
+CHANGED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}''s island.'
+CHANGED_BLOCK_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for all the islands.'
+CHANGED_BLOCK_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Thay đổi thành công giới hạn khối {0} đảo của
   {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp {0} giới hạn khối của tất cả các đảo.'
@@ -140,6 +143,7 @@ COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: so-luong
 COMMAND_ARGUMENT_BIOME: quan-xa
+COMMAND_ARGUMENT_BLOCK_CATEGORY: 'block-category'
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: lenh...
 COMMAND_ARGUMENT_DIMENSION: 'dimension'
@@ -188,6 +192,7 @@ COMMAND_DESCRIPTION_ADMIN: Sử dụng các lệnh của admin.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_ADD: Thêm người vào đảo.
 COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_CATEGORY_LIMIT: 'Increase block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Tăng giới hạn khối cho đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Thêm thưởng cho người chơi.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Tăng giới hạn thành viên đảo co-op của người chơi khác.'
@@ -233,6 +238,7 @@ COMMAND_DESCRIPTION_ADMIN_PURGE: Lọc bỏ số lượng lớn đảo.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Cập nhật mức độ nâng cấp cho hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_CATEGORY_LIMIT: 'Remove a block category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Xóa giới hạn khối khỏi một hòn đảo.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
@@ -245,6 +251,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Đặt số lượng khối ở một vị trí cụ thể.'
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_CATEGORY_LIMIT: 'Set block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi
   khác.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Đặt số dòng rương của người chơi khác.'
@@ -447,6 +454,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài p
 INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_BIOME: '&c&lLỗi | &7Quần xã không chính xác {0}.'
 INVALID_BLOCK: '&c&lLỗi | &7Vị trí khối không hợp lệ {0}.'
+INVALID_BLOCK_CATEGORY: '&c&lError | &7Invalid block category {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lLỗi | &7Hiệu ứng không hợp lệ {0}.'
@@ -523,6 +531,10 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Danh sách lệnh [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng /is help {0} cho trang tiếp theo.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lĐảo | &7Giới Hạn Ngân Hàng: {0}'
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Block Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lĐảo | &7Giới Hạn Các Khối:
   {0}
@@ -783,6 +795,7 @@ RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của b�
 RATE_REMOVE_ALL: '&e&lĐánh giá | &7Thành công xóa bỏ tất cả đánh giá của đảo {0}.'
 RATE_REMOVE_ALL_ISLANDS: '&e&lĐảo | &7Thành công xóa bỏ tất cả đánh giá của tất cả các đảo.'
 RATE_SUCCESS: '&e&lĐánh giá | &7Bạn đánh giả đảo này với {0} sao!'
+REACHED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the block category {0}.'
 REACHED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
 REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'

@@ -8,15 +8,23 @@ import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.core.Either;
 
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Objects;
 
 public abstract class BaseKeyCategory implements KeyCategory {
 
     protected final String name;
+    private final KeyCategoryId id;
     protected final EnumMap<Action, Either<IslandPrivilege, IslandFlag>> requirements = new EnumMap<>(Action.class);
 
     protected BaseKeyCategory(String name) {
         this.name = name;
+        this.id = Objects.requireNonNull(KeyCategoryId.getByName(name.toUpperCase(Locale.ENGLISH)),
+                "Unregistered category " + name);
+    }
+
+    public final KeyCategoryId getId() {
+        return this.id;
     }
 
     @Override

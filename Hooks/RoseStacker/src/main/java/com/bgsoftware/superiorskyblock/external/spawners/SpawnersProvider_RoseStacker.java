@@ -70,6 +70,7 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
                 int increaseAmount = e.getStack().getStackSize() + e.getIncreaseAmount() > e.getStack().getStackSettings().getMaxStackSize() ?
                         e.getStack().getStackSettings().getMaxStackSize() - e.getStack().getStackSize() : e.getIncreaseAmount();
 
+                // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
                 if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                     e.setCancelled(true);
                 } else {

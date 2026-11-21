@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.common.annotations.Nullable;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
 
@@ -13,7 +13,7 @@ public class IslandRemoveEntityCategoryLimitEvent extends IslandEvent implements
 
     @Nullable
     private final SuperiorPlayer superiorPlayer;
-    private final EntityCategory entityCategory;
+    private final KeyCategory entityCategory;
 
     private boolean cancelled = false;
 
@@ -25,7 +25,7 @@ public class IslandRemoveEntityCategoryLimitEvent extends IslandEvent implements
      * @param island         The island that the entity category limit was removed for.
      * @param entityCategory The entity category that the limit was removed for.
      */
-    public IslandRemoveEntityCategoryLimitEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, EntityCategory entityCategory) {
+    public IslandRemoveEntityCategoryLimitEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, KeyCategory entityCategory) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.entityCategory = entityCategory;
@@ -43,7 +43,7 @@ public class IslandRemoveEntityCategoryLimitEvent extends IslandEvent implements
     /**
      * Get the entity category that the limit was removed for.
      */
-    public EntityCategory getEntityCategory() {
+    public KeyCategory getEntityCategory() {
         return entityCategory;
     }
 

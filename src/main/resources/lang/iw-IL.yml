@@ -59,6 +59,9 @@ CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dime
 CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
 CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Successfully changed the block amount at {0} to {1}.'
+CHANGED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}''s island.'
+CHANGED_BLOCK_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for all the islands.'
+CHANGED_BLOCK_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lםיגורדש | &7{1} יאל החלצהב הנכדוע {0} קולבה תלבגה.'
@@ -123,6 +126,7 @@ COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: תומכ
 COMMAND_ARGUMENT_BIOME: 'biome'
+COMMAND_ARGUMENT_BLOCK_CATEGORY: 'block-category'
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: 'command...'
 COMMAND_ARGUMENT_DIMENSION: 'dimension'
@@ -171,6 +175,7 @@ COMMAND_DESCRIPTION_ADMIN: .ןימדאה תודוקפב שמתשהל.
 COMMAND_DESCRIPTION_ADMIN_BONUS: יאל סונוב תתל.
 COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_CATEGORY_LIMIT: 'Increase block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Increase block limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Add a bonus to a player.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Increase coop players limit for another player''s island.'
@@ -213,6 +218,7 @@ COMMAND_DESCRIPTION_ADMIN_PURGE: .םייא תוקנל
 COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: יא לש יווש שדחמ בשחל.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא שדחמ ןועטל.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_CATEGORY_LIMIT: 'Remove a block category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
@@ -224,6 +230,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_CATEGORY_LIMIT: 'Set block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
@@ -411,6 +418,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאל ץוחמ םירבד �
 INVALID_AMOUNT: '&c&lהאיגש | &7{0} תיקוח אל תומכ.'
 INVALID_BIOME: '&c&lError | &7Invalid biome {0}.'
 INVALID_BLOCK: '&c&lError | &7Invalid block location {0}.'
+INVALID_BLOCK_CATEGORY: '&c&lError | &7Invalid block category {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
@@ -485,6 +493,10 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7תודוקפ תמישר [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7אבה דומעל רבעמל /is help {0} ץרה.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIsland | &7Bank Limit: {0}'
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Block Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lיא | &7םיקולב תלבגה:
   {0}
@@ -723,6 +735,7 @@ RATE_OWN_ISLAND: '&c&lהאיגש | &7ךלש יאה תא גרדל לוכי אל �
 RATE_REMOVE_ALL: '&e&lיא | &7החלצהב {0} לש םיגורידה לכ תא תקחמ.'
 RATE_REMOVE_ALL_ISLANDS: '&e&lIsland | &7Successfully removed all ratings of all the islands.'
 RATE_SUCCESS: '&e&lיא | &7םיבכוכ {0} םע הזה יאה תא תגריד!'
+REACHED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the block category {0}.'
 REACHED_BLOCK_LIMIT: '&e&lםיגורדש | &7{0} קולבה לש יאב םיקולבה תלבגמל תעגה.'
 REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'

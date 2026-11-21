@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api.island;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
@@ -14,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
@@ -1540,17 +1540,57 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public int getEntityCategoryLimit(EntityCategory entityCategory) {
+    public int getBlockCategoryLimit(KeyCategory blockCategory) {
+        return this.handle.getBlockCategoryLimit(blockCategory);
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getBlockCategoryLimits() {
+        return this.handle.getBlockCategoryLimits();
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getCustomBlockCategoryLimits() {
+        return this.handle.getCustomBlockCategoryLimits();
+    }
+
+    @Override
+    public void clearBlockCategoryLimits() {
+        this.handle.clearBlockCategoryLimits();
+    }
+
+    @Override
+    public void setBlockCategoryLimit(KeyCategory blockCategory, int limit) {
+        this.handle.setBlockCategoryLimit(blockCategory, limit);
+    }
+
+    @Override
+    public void removeBlockCategoryLimit(KeyCategory blockCategory) {
+        this.handle.removeBlockCategoryLimit(blockCategory);
+    }
+
+    @Override
+    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory) {
+        return this.handle.hasReachedBlockCategoryLimit(blockCategory);
+    }
+
+    @Override
+    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, int amount) {
+        return this.handle.hasReachedBlockCategoryLimit(blockCategory, amount);
+    }
+
+    @Override
+    public int getEntityCategoryLimit(KeyCategory entityCategory) {
         return this.handle.getEntityCategoryLimit(entityCategory);
     }
 
     @Override
-    public Map<EntityCategory, Integer> getEntityCategoryLimits() {
+    public Map<KeyCategory, Integer> getEntityCategoryLimits() {
         return this.handle.getEntityCategoryLimits();
     }
 
     @Override
-    public Map<EntityCategory, Integer> getCustomEntityCategoryLimits() {
+    public Map<KeyCategory, Integer> getCustomEntityCategoryLimits() {
         return this.handle.getCustomEntityCategoryLimits();
     }
 
@@ -1560,22 +1600,22 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    public void setEntityCategoryLimit(EntityCategory entityCategory, int limit) {
+    public void setEntityCategoryLimit(KeyCategory entityCategory, int limit) {
         this.handle.setEntityCategoryLimit(entityCategory, limit);
     }
 
     @Override
-    public void removeEntityCategoryLimit(EntityCategory entityCategory) {
+    public void removeEntityCategoryLimit(KeyCategory entityCategory) {
         this.handle.removeEntityCategoryLimit(entityCategory);
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory) {
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory) {
         return this.handle.hasReachedEntityCategoryLimit(entityCategory);
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, int amount) {
         return this.handle.hasReachedEntityCategoryLimit(entityCategory, amount);
     }
 

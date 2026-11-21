@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.island.builder;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -12,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -25,12 +25,13 @@ import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
-import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryLimits;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
@@ -56,7 +57,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -102,7 +102,9 @@ public class IslandBuilderImpl implements Island.Builder {
     public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
     public final EnumerateMap<Dimension, KeyMap<IntValue>> cobbleGeneratorValues = new EnumerateMap<>(Dimension.values());
     public final List<SIsland.UniqueVisitor> uniqueVisitors = new LinkedList<>();
-    public final Map<String, IntValue> entityCategoryLimits = new ArrayMap<>();
+    public final KeyCategoryLimits blockCategoryLimits = new KeyCategoryLimits();
+    public final KeyCategoryLimits entityCategoryLimits = new KeyCategoryLimits();
+    public boolean legacyBlockCounts = false;
     public final KeyMap<IntValue> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
@@ -556,31 +558,39 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
-    public Island.Builder setEntityCategoryLimit(EntityCategory entityCategory, int limit) {
-        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
-
-        String entityCategoryName = entityCategory.getName().toLowerCase(Locale.ENGLISH);
-        this.entityCategoryLimits.put(entityCategoryName, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
-
+    public Island.Builder setBlockCategoryLimit(KeyCategory blockCategory, int limit) {
+        Preconditions.checkNotNull(blockCategory, "blockCategory parameter cannot be null.");
+        KeyCategoryId id = KeyCategoryId.of(blockCategory);
+        Preconditions.checkArgument(id != null, "Invalid block category: " + blockCategory.getName());
+        setBlockCategoryLimitRaw(id, limit);
         return this;
     }
 
+    public void setBlockCategoryLimitRaw(KeyCategoryId id, int limit) {
+        this.blockCategoryLimits.put(id, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+    }
+
     @Override
-    public Map<EntityCategory, Integer> getEntityCategoryLimits() {
-        if (this.entityCategoryLimits.isEmpty()) {
-            return Collections.emptyMap();
-        }
+    public Map<KeyCategory, Integer> getBlockCategoryLimits() {
+        return this.blockCategoryLimits.toCategoriesMap(plugin.getSettings().getBlockCategoriesMapping(), false);
+    }
 
-        Map<EntityCategory, Integer> entityCategoryLimits = new HashMap<>();
-        for (Map.Entry<String, IntValue> entry : this.entityCategoryLimits.entrySet()) {
-            EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(entry.getKey());
+    @Override
+    public Island.Builder setEntityCategoryLimit(KeyCategory entityCategory, int limit) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+        KeyCategoryId id = KeyCategoryId.of(entityCategory);
+        Preconditions.checkArgument(id != null, "Invalid entity category: " + entityCategory.getName());
+        setEntityCategoryLimitRaw(id, limit);
+        return this;
+    }
 
-            if (entityCategory != null) {
-                entityCategoryLimits.put(entityCategory, entry.getValue().get());
-            }
-        }
+    public void setEntityCategoryLimitRaw(KeyCategoryId id, int limit) {
+        this.entityCategoryLimits.put(id, limit < 0 ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+    }
 
-        return Collections.unmodifiableMap(entityCategoryLimits);
+    @Override
+    public Map<KeyCategory, Integer> getEntityCategoryLimits() {
+        return this.entityCategoryLimits.toCategoriesMap(plugin.getSettings().getEntityCategoriesMapping(), false);
     }
 
     @Override

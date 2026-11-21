@@ -150,6 +150,12 @@ public class SQLDatabase {
                 new Column("`limit`", "INTEGER")
         );
 
+        DBSession.createTable("islands_block_category_limits",
+                new Column("island", "UUID"),
+                new Column("block_category", "UNIQUE_TEXT"),
+                new Column("`limit`", "INTEGER")
+        );
+
         DBSession.createTable("islands_entity_limits",
                 new Column("island", "UUID"),
                 new Column("entity", "UNIQUE_TEXT"),

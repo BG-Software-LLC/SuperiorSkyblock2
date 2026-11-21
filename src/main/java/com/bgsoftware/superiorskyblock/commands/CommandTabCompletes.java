@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -200,10 +201,18 @@ public class CommandTabCompletes {
     }
 
     public static List<String> getEntityCategories(SuperiorSkyblockPlugin plugin, String argument) {
+        return getCategories(plugin.getSettings().getEntityCategoriesMapping().getCategories(), argument);
+    }
+
+    public static List<String> getBlockCategories(SuperiorSkyblockPlugin plugin, String argument) {
+        return getCategories(plugin.getSettings().getBlockCategoriesMapping().getCategories(), argument);
+    }
+
+    private static List<String> getCategories(List<KeyCategory> categories, String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
-        return new SequentialListBuilder<String>().build(plugin.getSettings().getEntityCategoriesMap().getCategories().stream()
-                .filter(entityCategory -> entityCategory.getName().toLowerCase(Locale.ENGLISH).contains(lowerArgument))
-                .map(entityCategory -> entityCategory.getName().toLowerCase(Locale.ENGLISH)));
+        return new SequentialListBuilder<String>().build(categories.stream()
+                .map(category -> category.getName().toLowerCase(Locale.ENGLISH))
+                .filter(categoryName -> categoryName.contains(lowerArgument)));
     }
 
     public static List<String> getEntitiesForLimit(String argument) {

@@ -93,6 +93,7 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
                 return;
             }
 
+            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(newEntity, spawnerData.getStackSize())) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(newEntity.toString()));
@@ -114,6 +115,7 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
 
             Key key = Key.ofSpawner(e.getEntityType());
 
+            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(key, e.getQuantity())) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(key.toString()));
@@ -171,6 +173,7 @@ public class SpawnersProvider_SmartSpawner implements SpawnersProvider_AutoDetec
 
             Key key = Key.ofSpawner(spawnerData.getEntityType());
 
+            // TODO: Also check block category limits here (Island#hasReachedBlockCategoryLimit for each category of the key, see PR #3020).
             if (island.hasReachedBlockLimit(key, amount)) {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(key.toString()));

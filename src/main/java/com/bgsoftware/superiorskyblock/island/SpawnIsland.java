@@ -4,7 +4,6 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.annotations.Size;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
@@ -26,6 +25,7 @@ import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
@@ -1707,17 +1707,57 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public int getEntityCategoryLimit(EntityCategory entityCategory) {
+    public int getBlockCategoryLimit(KeyCategory blockCategory) {
         return IslandUpgradeConstants.NO_LIMIT_VALUE;
     }
 
     @Override
-    public Map<EntityCategory, Integer> getEntityCategoryLimits() {
+    public Map<KeyCategory, Integer> getBlockCategoryLimits() {
         return Collections.emptyMap();
     }
 
     @Override
-    public Map<EntityCategory, Integer> getCustomEntityCategoryLimits() {
+    public Map<KeyCategory, Integer> getCustomBlockCategoryLimits() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public void clearBlockCategoryLimits() {
+        // Do nothing.
+    }
+
+    @Override
+    public void setBlockCategoryLimit(KeyCategory blockCategory, int limit) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeBlockCategoryLimit(KeyCategory blockCategory) {
+        // Do nothing.
+    }
+
+    @Override
+    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory) {
+        return false;
+    }
+
+    @Override
+    public boolean hasReachedBlockCategoryLimit(KeyCategory blockCategory, int amount) {
+        return false;
+    }
+
+    @Override
+    public int getEntityCategoryLimit(KeyCategory entityCategory) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getEntityCategoryLimits() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getCustomEntityCategoryLimits() {
         return Collections.emptyMap();
     }
 
@@ -1727,22 +1767,22 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public void setEntityCategoryLimit(EntityCategory entityCategory, int limit) {
+    public void setEntityCategoryLimit(KeyCategory entityCategory, int limit) {
         // Do nothing.
     }
 
     @Override
-    public void removeEntityCategoryLimit(EntityCategory entityCategory) {
+    public void removeEntityCategoryLimit(KeyCategory entityCategory) {
         // Do nothing.
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory) {
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory) {
         return hasReachedEntityCategoryLimit(entityCategory, 1);
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(EntityCategory entityCategory, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityCategoryLimit(KeyCategory entityCategory, int amount) {
         return CompletableFuture.completedFuture(false);
     }
 

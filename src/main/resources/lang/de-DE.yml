@@ -68,6 +68,9 @@ CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dim
 CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Der Blockbetrag bei {0} wurde erfolgreich in
   {1} geändert.'
+CHANGED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}''s island.'
+CHANGED_BLOCK_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for all the islands.'
+CHANGED_BLOCK_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lUpgrades | &7Das {0} Blocklimit der Insel von {1} wurde
   erfolgreich aktualisiert.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lUpgrades | &7Das {0} Blocklimit aller Inseln wurde erfolgreich
@@ -166,6 +169,7 @@ COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: Betrag
 COMMAND_ARGUMENT_BIOME: biom
+COMMAND_ARGUMENT_BLOCK_CATEGORY: 'block-category'
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: Befehl...
 COMMAND_ARGUMENT_DIMENSION: 'dimension'
@@ -213,6 +217,7 @@ COMMAND_DESCRIPTION_ACCEPT: Eine Einladung von einem Spieler annehmen.
 COMMAND_DESCRIPTION_ADMIN: Verwende die Admin-Befehle.
 COMMAND_DESCRIPTION_ADMIN_ADD: Einen Benutzer zu einer Insel hinzufügen.
 COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_CATEGORY_LIMIT: 'Increase block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Blocklimit für die Insel eines anderen
   Spielers erhöhen.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Einem Spieler einen Bonus hinzufügen.
@@ -272,6 +277,7 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: Rang ein Upgrade für eine Insel auf.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Berechnet den Wert einer Insel neu.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Alle Konfigurationen und Aufgaben des Plugins neu
   laden.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_CATEGORY_LIMIT: 'Remove a block category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Entferne ein Blocklimit von einer Insel.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
@@ -284,6 +290,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Lege das Biom einer Insel fest.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Blockierungsbetrag an einem bestimmten
   Ort festlegen.
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_CATEGORY_LIMIT: 'Set block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Blocklimit für die Insel eines anderen
   Spielers festlegen.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: Lege die Brustreihen für die Insel eines
@@ -504,6 +511,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lError | &7Du kannst außerhalb der Border nicht in
 INVALID_AMOUNT: '&c&lError | &7Ungültiger Betrag {0}.'
 INVALID_BIOME: '&c&lError | &7Ungültiges Biom {0}.'
 INVALID_BLOCK: '&c&lError | &7Ungültige Blockposition {0}.'
+INVALID_BLOCK_CATEGORY: '&c&lError | &7Invalid block category {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lError | &7Ungültige Wirkung {0}.'
@@ -583,6 +591,10 @@ ISLAND_HELP_HEADER: '&e&lSkyblock &7Befehlsliste [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSkyblock &7Verwende /is help {0} für die nächste Seite.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lInsel | &7Banklimit: {0}'
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Block Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lInsel | &7Blockgrenzen:
   {0}
@@ -879,6 +891,7 @@ RATE_REMOVE_ALL: '&e&lInsel | &7Alle Bewertungen von {0} wurden erfolgreich entf
 RATE_REMOVE_ALL_ISLANDS: '&e&lInsel | &7Alle Bewertungen aller Inseln wurden erfolgreich
   entfernt.'
 RATE_SUCCESS: '&e&lInsel | &7Du hast diese Insel mit {0} Sternen bewertet!'
+REACHED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the block category {0}.'
 REACHED_BLOCK_LIMIT: '&e&lUpgrades | &7Du hast das Limit der Insel für {0} Block erreicht.'
 REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity {0}.'

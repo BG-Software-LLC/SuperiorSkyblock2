@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.service.placeholders;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -10,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.IslandPlaceholderParser;
@@ -74,6 +74,8 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("count_(.+)");
     private static final Pattern DATA_PLACEHOLDER_PATTERN = Pattern.compile("data_(.+)");
     private static final Pattern EFFECT_PLACEHOLDER_PATTERN = Pattern.compile("effect_(.+)");
+    private static final Pattern BLOCK_CATEGORY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("block_category_count_(.+)");
+    private static final Pattern BLOCK_CATEGORY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("block_category_limit_(.+)");
     private static final Pattern ENTITY_CATEGORY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("entity_category_count_(.+)");
     private static final Pattern ENTITY_CATEGORY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("entity_category_limit_(.+)");
     private static final Pattern ENTITY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("entity_count_(.+)");
@@ -641,6 +643,26 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
                 return Optional.of(Formatters.CAPITALIZED_FORMATTER.format(island.getBiome(dimension).name()));
             }
 
+            if ((matcher = BLOCK_CATEGORY_COUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
+                KeyCategory blockCategory = plugin.getSettings().getBlockCategoriesMapping().getCategoryByName(matcher.group(1));
+
+                if (blockCategory == null) {
+                    return Optional.empty();
+                }
+
+                return Optional.of(String.valueOf(island.getBlocksTracker().getBlockCategoryCount(blockCategory)));
+            }
+
+            if ((matcher = BLOCK_CATEGORY_LIMIT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
+                KeyCategory blockCategory = plugin.getSettings().getBlockCategoriesMapping().getCategoryByName(matcher.group(1));
+
+                if (blockCategory == null) {
+                    return Optional.empty();
+                }
+
+                return Optional.of(String.valueOf(island.getBlockCategoryLimit(blockCategory)));
+            }
+
             if ((matcher = BLOCK_COUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches() ||
                     (matcher = COUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
                 Key key = Keys.ofMaterialAndData(matcher.group(1));
@@ -698,7 +720,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
 
             if ((matcher = ENTITY_CATEGORY_COUNT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
-                EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(matcher.group(1));
+                KeyCategory entityCategory = plugin.getSettings().getEntityCategoriesMapping().getCategoryByName(matcher.group(1));
 
                 if (entityCategory == null) {
                     return Optional.empty();
@@ -708,7 +730,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService, IService {
             }
 
             if ((matcher = ENTITY_CATEGORY_LIMIT_PLACEHOLDER_PATTERN.matcher(loweredSubPlaceholder)).matches()) {
-                EntityCategory entityCategory = plugin.getSettings().getEntityCategoriesMap().getCategoryByName(matcher.group(1));
+                KeyCategory entityCategory = plugin.getSettings().getEntityCategoriesMapping().getCategoryByName(matcher.group(1));
 
                 if (entityCategory == null) {
                     return Optional.empty();

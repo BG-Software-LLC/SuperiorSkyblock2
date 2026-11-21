@@ -65,6 +65,9 @@ CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dim
 CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBloklar | &7{0} konumundaki blok miktarı başarıyla {1}
   olarak değiştirildi.'
+CHANGED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}''s island.'
+CHANGED_BLOCK_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for all the islands.'
+CHANGED_BLOCK_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lYükseltmeler | &7{0} Bloğunun {1}''in adası için limiti
   başarıyla güncellendi.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lYükseltmeler | &7{0} Bloğunun tüm adalar için limiti
@@ -159,6 +162,7 @@ COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: miktar
 COMMAND_ARGUMENT_BIOME: biyom
+COMMAND_ARGUMENT_BLOCK_CATEGORY: 'block-category'
 COMMAND_ARGUMENT_BORDER_COLOR: sınır-rengi
 COMMAND_ARGUMENT_COMMAND: komut...
 COMMAND_ARGUMENT_DIMENSION: 'dimension'
@@ -206,6 +210,7 @@ COMMAND_DESCRIPTION_ACCEPT: Bir oyuncudan gelen daveti kabul et.
 COMMAND_DESCRIPTION_ADMIN: Yönetici komutlarını kullan.
 COMMAND_DESCRIPTION_ADMIN_ADD: Bir adaya kullanıcı ekle.
 COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_CATEGORY_LIMIT: 'Increase block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Başka bir oyuncunun adası için blok limitini
   artır.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Bir oyuncuya bonus ekle.
@@ -262,6 +267,7 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: Bir ada için bir yükseltmeyi seviye atlat.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Bir adanın değerini yeniden hesapla.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Eklentinin tüm yapılandırmalarını ve görevlerini
   yeniden yükle.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_CATEGORY_LIMIT: 'Remove a block category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Bir adadan blok limitini kaldır.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
@@ -274,6 +280,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Eklenti için şematikler oluştur.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Bir adanın biyomunu ayarla.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Belirli bir konumdaki blok miktarını ayarla.
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_CATEGORY_LIMIT: 'Set block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Başka bir oyuncunun adası için blok limiti
   belirle.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: Başka bir oyuncunun adası için sandık satırlarını
@@ -479,6 +486,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lHata | &7Koruma menzilinin dışında etkileşime 
 INVALID_AMOUNT: '&c&lHata | &7Geçersiz miktar {0}.'
 INVALID_BIOME: '&c&lHata | &7Geçersiz biyom {0}.'
 INVALID_BLOCK: '&c&lHata | &7Geçersiz blok konumu {0}.'
+INVALID_BLOCK_CATEGORY: '&c&lError | &7Invalid block category {0}.'
 INVALID_BORDER_COLOR: '&c&lHata | &7Geçersiz sınır rengi {0}.'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lHata | &7Geçersiz efekt {0}.'
@@ -555,6 +563,10 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Komutlar Listesi [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Sonraki sayfa için /is help {0} kullan.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lAda | &7Banka Limiti: {0}'
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Block Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lAda | &7Blok Limitleri:
   {0}
@@ -828,6 +840,7 @@ RATE_REMOVE_ALL: '&e&lAda | &7{0}''ın tüm değerlendirmeleri başarıyla kald�
 RATE_REMOVE_ALL_ISLANDS: '&e&lAda | &7Tüm adaların tüm değerlendirmeleri başarıyla
   kaldırıldı.'
 RATE_SUCCESS: '&e&lAda | &7Bu adayı {0} yıldızla değerlendirdin!'
+REACHED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the block category {0}.'
 REACHED_BLOCK_LIMIT: '&e&lYükseltmeler | &7Ada için {0} Bloğu limitine ulaştın.'
 REACHED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7You have reached the island''s limit for the entity category {0}.'
 REACHED_ENTITY_LIMIT: '&e&lYükseltmeler | &7Varlık {0} için adanın limitine ulaştın.'

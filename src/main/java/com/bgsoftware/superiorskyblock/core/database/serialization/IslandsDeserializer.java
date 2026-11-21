@@ -2,13 +2,13 @@ package com.bgsoftware.superiorskyblock.core.database.serialization;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -280,6 +280,9 @@ public class IslandsDeserializer {
 
         JsonArray blockCounts = GSON.fromJson(blocks, JsonArray.class);
 
+        if (blockCounts.size() > 0)
+            ((IslandBuilderImpl) builder).legacyBlockCounts = !blockCounts.get(0).getAsJsonObject().has("v");
+
         blockCounts.forEach(blockCountElement -> {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();
             Key blockKey = Keys.ofMaterialAndData(blockCountObject.get("id").getAsString());
@@ -368,9 +371,9 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<EntityCategory> entityCategory = entityCategoryLimits.getString("entity_category").map(plugin.getSettings().getEntityCategoriesMap()::getCategoryByName);
+            Optional<String> entityCategory = entityCategoryLimits.getString("entity_category");
             if (!entityCategory.isPresent()) {
-                Log.warn("Cannot load entity category limits for invalid entities on ", uuid.get(), ", skipping...");
+                Log.warn("Cannot load entity category limits for invalid categories on ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -380,8 +383,35 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_entity_category_limits");
-            builder.setEntityCategoryLimit(entityCategory.get(), limit.get());
+            IslandBuilderImpl builder = (IslandBuilderImpl) lookupIsland(databaseCache, uuid.get(), "islands_entity_category_limits");
+            builder.setEntityCategoryLimitRaw(KeyCategoryId.getOrRegister(entityCategory.get()), limit.get());
+        });
+    }
+
+    public static void deserializeBlockCategoryLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
+        databaseBridge.loadAllObjects("islands_block_category_limits", blockCategoryLimitsRow -> {
+            DatabaseResult blockCategoryLimits = new DatabaseResult(blockCategoryLimitsRow);
+
+            Optional<UUID> uuid = blockCategoryLimits.getUUID("island");
+            if (!uuid.isPresent()) {
+                Log.warn("Cannot load block category limits for null islands, skipping...");
+                return;
+            }
+
+            Optional<String> blockCategory = blockCategoryLimits.getString("block_category");
+            if (!blockCategory.isPresent()) {
+                Log.warn("Cannot load block category limits for invalid categories on ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            Optional<Integer> limit = blockCategoryLimits.getInt("limit");
+            if (!limit.isPresent()) {
+                Log.warn("Cannot load block category limits with invalid limits for ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            IslandBuilderImpl builder = (IslandBuilderImpl) lookupIsland(databaseCache, uuid.get(), "islands_block_category_limits");
+            builder.setBlockCategoryLimitRaw(KeyCategoryId.getOrRegister(blockCategory.get()), limit.get());
         });
     }
 
