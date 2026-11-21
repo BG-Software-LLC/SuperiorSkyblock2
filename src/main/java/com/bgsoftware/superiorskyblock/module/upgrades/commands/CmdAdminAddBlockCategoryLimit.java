@@ -130,7 +130,7 @@ public class CmdAdminAddBlockCategoryLimit implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getEntityCategories(plugin, args[3]) : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getBlockCategories(plugin, args[3]) : Collections.emptyList();
     }
 
 }
