@@ -46,7 +46,7 @@ import static com.bgsoftware.superiorskyblock.core.ObjectsPools.Wrapper;
 public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTracker> implements Listener {
 
     private static final long COUNT_INVENTORY_THRESHOLD = TimeUnit.SECONDS.toMillis(1);
-    private final ObjectsPool<Wrapper<ItemProgress[]>> ITEM_PROGRESS_POOL = ObjectsPools.createNewPool(this::createProgressLookup);
+    private ObjectsPool<Wrapper<ItemProgress[]>> ITEM_PROGRESS_POOL;
 
     private final Map<KeyRequirements, Integer> requiredItems = new LinkedHashMap<>();
     private int totalRequiredAmount;
@@ -66,6 +66,8 @@ public final class ItemsMissions extends BuiltinMission<ItemsMissions.ItemsTrack
             requiredItems.put(new KeyRequirements(itemStacks), requiredAmount);
             this.totalRequiredAmount += requiredAmount;
         }
+
+        this.ITEM_PROGRESS_POOL = ObjectsPools.createNewPool(this::createProgressLookup);
     }
 
     @Override

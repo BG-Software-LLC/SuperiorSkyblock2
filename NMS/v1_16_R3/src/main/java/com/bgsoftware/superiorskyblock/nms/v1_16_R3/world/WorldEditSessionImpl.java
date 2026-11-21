@@ -64,8 +64,6 @@ import java.util.function.Supplier;
 
 public class WorldEditSessionImpl implements WorldEditSession {
 
-    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
-
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
             BiomeStorage.class, BiomeBase[].class, "h");
     private static final boolean HAS_PAPER_PROTO_CHUNK_CONSTRUCTOR = new ReflectConstructor<>(ProtoChunk.class,
@@ -83,6 +81,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
             return false;
         }
     }).get();
+
+    // Must be initialized after the static fields above.
+    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
 
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectHashMap();
     private final Long2ObjectMapView.AbsentConsumer<ChunkData> chunkDataCreator = ChunkData::new;

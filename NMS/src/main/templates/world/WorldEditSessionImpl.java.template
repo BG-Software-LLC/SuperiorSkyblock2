@@ -48,8 +48,6 @@ import java.util.function.Supplier;
 
 public class WorldEditSessionImpl implements WorldEditSession {
 
-    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
-
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final boolean isStarLightInterface = ((Supplier<Boolean>) () -> {
         try {
@@ -59,6 +57,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
             return false;
         }
     }).get();
+
+    // Must be initialized after the static fields above.
+    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
 
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
     private final Long2ObjectMapView.AbsentConsumer<ChunkData> chunkDataCreator = packedPos ->

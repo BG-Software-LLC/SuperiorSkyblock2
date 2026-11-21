@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
@@ -16,6 +15,7 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
+import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
@@ -104,23 +104,18 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     private boolean checkPreventEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e, Island island,
                                             boolean isSpawnerSpawning, boolean isNaturalSpawning) {
+        List<IslandFlag> islandFlags;
         if (isSpawnerSpawning) {
-            List<EntityCategory> entityCategories = BukkitEntities.getCategories(e.getArgs().entity);
-            IslandFlag islandFlag;
-            for (EntityCategory entityCategory : entityCategories) {
-                islandFlag = entityCategory.getSpawnerSpawningIslandFlag();
-                if (islandFlag != null && !island.hasSettingsEnabled(islandFlag)) {
-                    return true;
-                }
-            }
+            islandFlags = ProtectionHelper.getEntitySpawnerSpawningFlags(e.getArgs().entity);
         } else if (isNaturalSpawning) {
-            List<EntityCategory> entityCategories = BukkitEntities.getCategories(e.getArgs().entity);
-            IslandFlag islandFlag;
-            for (EntityCategory entityCategory : entityCategories) {
-                islandFlag = entityCategory.getNaturalSpawningIslandFlag();
-                if (islandFlag != null && !island.hasSettingsEnabled(islandFlag)) {
-                    return true;
-                }
+            islandFlags = ProtectionHelper.getEntityNaturalSpawningFlags(e.getArgs().entity);
+        } else {
+            return false;
+        }
+
+        for (IslandFlag islandFlag : islandFlags) {
+            if (!island.hasSettingsEnabled(islandFlag)) {
+                return true;
             }
         }
 

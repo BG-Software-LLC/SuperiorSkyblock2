@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.threads;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -13,12 +14,18 @@ public class Synchronized<T> {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private T value;
 
+    private final AtomicLong stamp = new AtomicLong(0);
+
     Synchronized(T value) {
         this.value = value;
     }
 
     public static <T> Synchronized<T> of(T value) {
         return new Synchronized<>(value);
+    }
+
+    public long stamp() {
+        return this.stamp.get();
     }
 
     public T get() {
@@ -43,6 +50,7 @@ public class Synchronized<T> {
             this.value = value;
             return oldValue;
         } finally {
+            this.stamp.incrementAndGet();
             lock.writeLock().unlock();
         }
     }
@@ -52,6 +60,7 @@ public class Synchronized<T> {
             lock.writeLock().lock();
             this.value = function.apply(value);
         } finally {
+            this.stamp.incrementAndGet();
             lock.writeLock().unlock();
         }
     }
@@ -88,6 +97,7 @@ public class Synchronized<T> {
             lock.writeLock().lock();
             consumer.accept(value);
         } finally {
+            this.stamp.incrementAndGet();
             lock.writeLock().unlock();
         }
     }
@@ -106,6 +116,7 @@ public class Synchronized<T> {
             lock.writeLock().lock();
             return function.apply(value);
         } finally {
+            this.stamp.incrementAndGet();
             lock.writeLock().unlock();
         }
     }

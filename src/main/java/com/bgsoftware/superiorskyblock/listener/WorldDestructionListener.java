@@ -11,10 +11,13 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class WorldDestructionListener extends AbstractGameEventListener {
 
@@ -103,6 +106,29 @@ public class WorldDestructionListener extends AbstractGameEventListener {
         }
     }
 
+    private void onBucketDispense(GameEvent<GameEventArgs.BlockDispenseEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We care about destruction of island worlds only
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld())) {
+            return;
+        }
+
+        Material itemType = e.getArgs().dispensedItem.getType();
+
+        if (!(itemType == Material.BUCKET || itemType == Material.WATER_BUCKET || itemType == Material.LAVA_BUCKET))
+            return;
+
+        Vector velocity = e.getArgs().velocity;
+
+        Location dispenseBlockLocation = new Location(block.getWorld(), velocity.getBlockX(),
+                velocity.getBlockY(), velocity.getBlockZ());
+
+        Island island = plugin.getGrid().getIslandAt(dispenseBlockLocation);
+        if (preventDestruction(dispenseBlockLocation, island))
+            e.setCancelled();
+    }
+
     /* INTERNAL */
 
     private boolean preventDestruction(Location location, @Nullable Island island) {
@@ -137,6 +163,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.NORMAL, this::onPistonExtend);
         registerCallback(GameEventType.PISTON_RETRACT_EVENT, GameEventPriority.NORMAL, this::onPistonRetract);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.NORMAL, this::onBlockFlow);
+        registerCallback(GameEventType.BLOCK_DISPENSE_EVENT, GameEventPriority.NORMAL, this::onBucketDispense);
     }
 
 }

@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
@@ -40,6 +39,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_AutoDetect, StackedBlocksSnapshotProvider {
@@ -162,12 +162,14 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
             Key blockKey = getBarrelKey(e.getBarrel());
 
-            IslandPrivilege islandPrivilege = plugin.getSettings().getValuableBlocks().contains(blockKey) ?
-                    IslandPrivileges.VALUABLE_BREAK : IslandPrivileges.BREAK;
+            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(blockKey);
 
-            if (!island.hasPermission(player, islandPrivilege)) {
-                e.setCancelled(true);
-                ProtectionHelper.sendProtectionMessage(player);
+            for (IslandPrivilege islandPrivilege : islandPrivileges) {
+                if (!island.hasPermission(player, islandPrivilege)) {
+                    e.setCancelled(true);
+                    ProtectionHelper.sendProtectionMessage(player);
+                    return;
+                }
             }
         }
 
@@ -221,13 +223,19 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             Player player = e.getPlayer();
             Key blockKey = getBarrelKey(stackedBarrel);
 
-            IslandPrivilege privilege = player.isSneaking() ? IslandPrivileges.BUILD :
-                    plugin.getSettings().getValuableBlocks().contains(blockKey) ?
-                            IslandPrivileges.VALUABLE_BREAK : IslandPrivileges.BREAK;
+            List<IslandPrivilege> islandPrivileges;
+            if (player.isSneaking()) {
+                islandPrivileges = ProtectionHelper.getBlockPlacePrivileges(blockKey);
+            } else {
+                islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(blockKey);
+            }
 
-            if (!island.hasPermission(player, privilege)) {
-                e.setCancelled(true);
-                ProtectionHelper.sendProtectionMessage(player);
+            for (IslandPrivilege islandPrivilege : islandPrivileges) {
+                if (!island.hasPermission(player, islandPrivilege)) {
+                    e.setCancelled(true);
+                    ProtectionHelper.sendProtectionMessage(player);
+                    return;
+                }
             }
         }
 

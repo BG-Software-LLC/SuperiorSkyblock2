@@ -257,7 +257,7 @@ public class BukkitEventsListener implements Listener {
         } catch (Exception ignored) {
         }
 
-        if (IslandPrivileges.CONFIG_LECTERN_BOOK != null) {
+        if (!IslandPrivileges.LECTERN_INTERACT_PRIVILEGES.isEmpty()) {
             try {
                 Class.forName("org.bukkit.event.player.PlayerTakeLecternBookEvent");
                 createEventListener(GameEventType.PLAYER_TAKE_LECTERN_BOOK_EVENT, org.bukkit.event.player.PlayerTakeLecternBookEvent.class, new PlayerTakeLecternBookEventFunctions());
