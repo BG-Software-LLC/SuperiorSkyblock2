@@ -702,6 +702,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean checkBypassMode) {
+        return this.handle.hasPermission(superiorPlayer, islandPrivilege, checkBypassMode);
+    }
+
+    @Override
     public boolean hasPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege) {
         return this.handle.hasPermission(playerRole, islandPrivilege);
     }

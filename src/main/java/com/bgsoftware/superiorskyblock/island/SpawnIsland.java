@@ -895,11 +895,16 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
+        return hasPermission(superiorPlayer, islandPrivilege, true);
+    }
+
+    @Override
+    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean checkBypassMode) {
         boolean checkForProtection = islandPrivilege != IslandPrivileges.FLY;
         return (checkForProtection && !plugin.getSettings().getSpawn().isProtected()) ||
-                superiorPlayer.hasBypassModeEnabled() ||
-                superiorPlayer.hasBypassPermission(islandPrivilege) ||
-                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*") ||
+                (checkBypassMode && (superiorPlayer.hasBypassModeEnabled() ||
+                        superiorPlayer.hasBypassPermission(islandPrivilege) ||
+                        superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*"))) ||
                 hasPermission(SPlayerRole.guestRole(), islandPrivilege);
     }
 
