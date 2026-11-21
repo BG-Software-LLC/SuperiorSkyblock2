@@ -13,11 +13,11 @@ Exemplars: `git show 42fa8f1ae` (messages), `git show c59bf2e11` (a new language
 5. `iw-IL.yml` stores Hebrew text **reversed** (visual order, for Minecraft's left-to-right rendering). When adding a key there, use English, or reversed Hebrew like the existing entries.
 
 ## Rules
-- **Admin commands that target `<player/island/*>`** report with a trio of messages:
-  - `X_ALL` when more than one island changed;
-  - `X_NAME` when an island name was given (`targetPlayer == null`; last argument `islands.get(0).getName()`);
-  - `X` otherwise (last argument `targetPlayer.getName()`).
-  - Multi-player commands use `X_ALL`/`X_OTHER` to the sender and `X` to the target. Self variants are `X_SELF`.
+- **Admin commands that target `<player/island/*>`** get no success messages of their own (no `X_ALL`/`X_NAME`/`X`/`X_OTHER` trio). `BulkChange.sendSummary` reports for every command (`commands.md`):
+  - one `ISLANDS_CHANGE_SUMMARY` / `PLAYERS_CHANGE_SUMMARY` line;
+  - one `ISLANDS_/PLAYERS_CHANGE_SKIPPED` line per skip reason (`_CONSOLE` for non-player senders, which can't hover).
+  - A new skip reason is a `CHANGE_SKIP_REASON_X` key plus a `ChangeResult` constant. Its text is lower-case with no final period, because it is inserted mid-sentence.
+  - Messages to the targets themselves (`DISBAND_SET` to the player, the text msgall sends) keep their own keys.
 - Existing servers keep their lang files, so editing an existing message's text reaches new installs only. If the old text would now be wrong (e.g. it lacks a new argument), add a new key instead.
 - To add an argument to an existing message, append the next index. Never renumber or repurpose `{0}`, `{1}`…, because custom lang files break silently. Update every lang file.
 - Don't overwrite existing translations with English.

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
@@ -20,6 +21,8 @@ import java.util.function.Function;
  * how many targets the change was applied to, and which targets were skipped and why.
  */
 public class BulkChange<T> {
+
+    private static final int MAX_LISTED_NAMES = 20;
 
     private final int targetsCount;
     private final List<String> appliedTargets = new LinkedList<>();
@@ -66,20 +69,32 @@ public class BulkChange<T> {
     }
 
     public void sendSummary(CommandSender sender, String commandLabel) {
-        int skippedCount = this.targetsCount - this.appliedTargets.size();
+        Locale locale = PlayerLocales.getLocale(sender);
 
-        this.summaryMessage.send(sender, commandLabel, this.appliedTargets.size(), this.targetsCount, skippedCount,
-                String.join(", ", this.appliedTargets), String.join("\n", this.appliedTargets));
+        if (!this.summaryMessage.isEmpty(locale)) {
+            int skippedCount = this.targetsCount - this.appliedTargets.size();
+            this.summaryMessage.send(sender, locale, commandLabel, this.appliedTargets.size(), this.targetsCount,
+                    skippedCount, joinNames(this.appliedTargets, ", ", locale),
+                    joinNames(this.appliedTargets, "\n", locale));
+        }
 
         if (this.skippedTargets.isEmpty())
             return;
 
         // Tooltips are not shown in the console, therefore it has its own message.
         Message skippedMessage = sender instanceof Player ? this.skippedMessage : this.skippedConsoleMessage;
-        Locale locale = PlayerLocales.getLocale(sender);
 
-        this.skippedTargets.forEach((result, targetNames) -> skippedMessage.send(sender, targetNames.size(),
-                result.getReason(locale), String.join(", ", targetNames), String.join("\n", targetNames)));
+        this.skippedTargets.forEach((result, targetNames) -> skippedMessage.send(sender, locale, targetNames.size(),
+                result.getReason(locale), joinNames(targetNames, ", ", locale), joinNames(targetNames, "\n", locale)));
+    }
+
+    private static String joinNames(List<String> names, String separator, Locale locale) {
+        if (names.size() <= MAX_LISTED_NAMES)
+            return String.join(separator, names);
+
+        String listedNames = String.join(separator, names.subList(0, MAX_LISTED_NAMES));
+        String moreNames = Message.CHANGE_TARGETS_MORE.getMessage(locale, names.size() - MAX_LISTED_NAMES);
+        return Text.isBlank(moreNames) ? listedNames : listedNames + separator + moreNames;
     }
 
     private static String getIslandName(Island island) {
