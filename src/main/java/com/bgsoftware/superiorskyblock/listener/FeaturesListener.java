@@ -222,6 +222,9 @@ public class FeaturesListener extends AbstractGameEventListener {
     private void onChunkLoad(GameEvent<GameEventArgs.ChunkLoadEvent> e) {
         Chunk chunk = e.getArgs().chunk;
 
+        if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
+            return;
+
         List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(chunk);
 
         if (blockEntities.isEmpty())

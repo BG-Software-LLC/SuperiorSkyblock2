@@ -27,11 +27,21 @@ public class EntityTrackingListener extends AbstractGameEventListener {
     private void onEntitySpawn(GameEvent<GameEventArgs.EntitySpawnEvent> e) {
         Entity entity = e.getArgs().entity;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld())) {
+            return;
+        }
+
         this.worldRecordService.get().recordEntitySpawn(entity, e.getArgs().islandResolver::get);
     }
 
     private void onEntityDeath(GameEvent<GameEventArgs.EntityDeathEvent> e) {
         Entity entity = e.getArgs().entity;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld())) {
+            return;
+        }
 
         this.worldRecordService.get().recordEntityDespawn(entity, e.getArgs().islandResolver::get);
     }

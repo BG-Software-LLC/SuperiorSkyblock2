@@ -72,6 +72,9 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onChunkLoad(ChunkLoadEvent e) {
             Chunk chunk = e.getChunk();
+            
+            if (!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
+                return;
 
             List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(chunk);
 

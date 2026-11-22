@@ -119,6 +119,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private void onBucketEmpty(GameEvent<GameEventArgs.PlayerEmptyBucketEvent> e) {
         Material bucket = e.getArgs().bucket;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().clickedBlock.getWorld()))
+            return;
+
         Key blockKey = BUCKET_TO_KEY_CACHE.computeIfAbsent(bucket, BlockChangesListener::getBlockKeyFromBucketMaterial);
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Block clickedBlock = e.getArgs().clickedBlock;
@@ -303,6 +307,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         Block block = e.getArgs().block;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         Key newBlockKey = e.getArgs().newType;
         Key oldBlockKey = Keys.of(block);
 
@@ -342,6 +350,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private void onBucketFill(GameEvent<GameEventArgs.PlayerFillBucketEvent> e) {
         Block clickedBlock = e.getArgs().clickedBlock;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(clickedBlock.getWorld()))
+            return;
 
         boolean isWaterLogged = plugin.getNMSWorld().isWaterLogged(clickedBlock);
         if (isWaterLogged || clickedBlock.isLiquid()) {
@@ -555,6 +567,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
     private void onBlockFade(GameEvent<GameEventArgs.BlockFadeEvent> e) {
         Block block = e.getArgs().block;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
             BlockState newState = e.getArgs().newState;
@@ -596,6 +612,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
         Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = block.getLocation(wrapper.getHandle());
