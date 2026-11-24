@@ -335,8 +335,8 @@ public class PlayersListener extends AbstractGameEventListener {
         if (!(e.getArgs().entity instanceof Player))
             return;
 
-        Player player = (Player) e.getArgs().entity;
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        Player target = (Player) e.getArgs().entity;
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(target);
 
         if (targetPlayer instanceof SuperiorNPCPlayer) {
             ((SuperiorNPCPlayer) targetPlayer).release();
@@ -355,7 +355,7 @@ public class PlayersListener extends AbstractGameEventListener {
             // We do not care about spawn island when spawn protection is disabled or player damage is enabled in spawn,
             // and therefore only island worlds are relevant.
             if ((!plugin.getSettings().getSpawn().isProtected() || plugin.getSettings().getSpawn().isPlayersDamage()) &&
-                    !plugin.getGrid().isIslandsWorld(player.getWorld()))
+                    !plugin.getGrid().isIslandsWorld(target.getWorld()))
                 return;
 
             Island island = e.getArgs().islandResolver.get();
@@ -397,9 +397,7 @@ public class PlayersListener extends AbstractGameEventListener {
         if (messageToSend != null)
             messageToSend.send(damagerPlayer);
 
-        Player target = targetPlayer.asPlayer();
-
-        if (target != null && cancelFlames && e.getArgs().damager instanceof Arrow && target.getFireTicks() > 0)
+        if (cancelFlames && e.getArgs().damager instanceof Arrow && target.getFireTicks() > 0)
             target.setFireTicks(0);
     }
 

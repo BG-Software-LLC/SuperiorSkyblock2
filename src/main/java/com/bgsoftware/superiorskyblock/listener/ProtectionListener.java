@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.region.InteractionResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Computed;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
@@ -642,12 +643,15 @@ public class ProtectionListener extends AbstractGameEventListener {
         InteractionResult interactionResult;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location vehicleLocation = ((Vehicle) inventoryHolder).getLocation(wrapper.getHandle());
+            Computed<Island> computedIsland = new Computed<>();
+            Function<Location, Island> computedIslandSupplier =
+                    l -> computedIsland.tryCompute(l, plugin.getGrid()::getIslandAt);
 
             long cacheStamp = SSuperiorPlayer.CACHED_PLAYER_RESULT.startCache();
             try {
                 if (!islandPrivileges.isEmpty()) {
                     interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                            vehicleLocation, islandPrivileges);
+                            vehicleLocation, islandPrivileges, computedIslandSupplier);
 
                     if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true)) {
                         e.setCancelled();
@@ -658,7 +662,7 @@ public class ProtectionListener extends AbstractGameEventListener {
                 IslandPrivilege islandPrivilege = inventoryHolder instanceof Animals ? IslandPrivileges.ENTITY_RIDE :
                         IslandPrivileges.MINECART_OPEN;
                 interactionResult = this.regionManagerService.get().handleCustomInteraction(superiorPlayer,
-                        vehicleLocation, islandPrivilege);
+                        vehicleLocation, islandPrivilege, computedIslandSupplier);
             } finally {
                 SSuperiorPlayer.CACHED_PLAYER_RESULT.endCache(cacheStamp);
             }

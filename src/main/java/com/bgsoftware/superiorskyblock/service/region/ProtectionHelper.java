@@ -48,6 +48,7 @@ public class ProtectionHelper {
 
     private static final Synchronized<KeyMap<RequirementsCache>> BLOCK_PRIVILEGES_CACHE = Synchronized.of(KeyMaps.createHashMap(KeyIndicator.MATERIAL));
     private static final Synchronized<KeyMap<RequirementsCache>> ENTITY_PRIVILEGES_CACHE = Synchronized.of(KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE));
+    private static KeyCategory TAMED_CATEGORY;
 
     private ProtectionHelper() {
 
@@ -167,13 +168,12 @@ public class ProtectionHelper {
     private static <T> List<T> getEntityRequirementsInternal(Entity entity,
                                                              Function<Key, List<T>> keyBasedCollector,
                                                              Function<KeyCategory, T> extraRequirementCollector) {
-        KeyCategory tamedCategory = Objects.requireNonNull(plugin.getSettings().getEntityCategoriesMapping()
-                .getCategoryByKey(BuiltinKeyCategories.TAMED));
-        if (!BukkitEntities.isTamed(entity) || !tamedCategory.isListed(Keys.of(entity.getType()))) {
+        if (TAMED_CATEGORY == null || !BukkitEntities.isTamed(entity) ||
+                !TAMED_CATEGORY.isListed(Keys.of(entity.getType()))) {
             return keyBasedCollector.apply(Keys.of(entity));
         }
 
-        T extraRequirement = extraRequirementCollector.apply(tamedCategory);
+        T extraRequirement = extraRequirementCollector.apply(TAMED_CATEGORY);
         if (extraRequirement == null) {
             return keyBasedCollector.apply(Keys.of(entity));
         }
@@ -185,6 +185,10 @@ public class ProtectionHelper {
     }
 
     private static void onSettingsUpdate() {
+        // Must be set before the caches are built, as RequirementsCache uses it to skip the tamed category.
+        TAMED_CATEGORY = Objects.requireNonNull(plugin.getSettings().getEntityCategoriesMapping()
+                .getCategoryByKey(BuiltinKeyCategories.TAMED));
+
         KeyMap<RequirementsCache> blockPrivilegesCache = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
         KeyMap<RequirementsCache> entityPrivilegesCache = KeyMaps.createHashMap(KeyIndicator.ENTITY_TYPE);
 
@@ -266,7 +270,7 @@ public class ProtectionHelper {
 
         RequirementsCache(Key key, SettingsManager.CategoriesMapper mapper, boolean isBlock) {
             for (KeyCategory category : mapper.getCategories(key)) {
-                if (!isBlock && category.getName().equals(BuiltinKeyCategories.TAMED.getName())) {
+                if (!isBlock && category == TAMED_CATEGORY) {
                     continue;
                 }
 
