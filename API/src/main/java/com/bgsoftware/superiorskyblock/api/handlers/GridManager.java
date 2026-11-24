@@ -222,6 +222,17 @@ public interface GridManager extends IDatabaseBridgeHolder {
     Island getIslandAt(@Nullable Location location);
 
     /**
+     * Get an island at an exact position in the world.
+     *
+     * @param location    The position to check.
+     * @param ignoreWorld Whether to ignore world checks in the case the world was already checked.
+     *                    The plugin may still run world checks in some scenarios, even if {@param ignoreWorld} is true.
+     * @return The island at that position. May be null.
+     */
+    @Nullable
+    Island getIslandAt(@Nullable Location location, boolean ignoreWorld);
+
+    /**
      * Get an island from a chunk.
      *
      * @param chunk The chunk to check.

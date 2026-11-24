@@ -32,7 +32,7 @@ public class EntityTrackingListener extends AbstractGameEventListener {
             return;
         }
 
-        this.worldRecordService.get().recordEntitySpawn(entity, e.getArgs().islandResolver::get);
+        this.worldRecordService.get().recordEntitySpawn(entity, l -> e.getArgs().islandResolver.get(true));
     }
 
     private void onEntityDeath(GameEvent<GameEventArgs.EntityDeathEvent> e) {
@@ -43,7 +43,7 @@ public class EntityTrackingListener extends AbstractGameEventListener {
             return;
         }
 
-        this.worldRecordService.get().recordEntityDespawn(entity, e.getArgs().islandResolver::get);
+        this.worldRecordService.get().recordEntityDespawn(entity, l -> e.getArgs().islandResolver.get(true));
     }
 
     /* INTERNAL */

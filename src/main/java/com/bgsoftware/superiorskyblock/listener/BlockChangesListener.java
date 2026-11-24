@@ -112,7 +112,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
             this.worldRecordService.get().recordBlockPlace(e.getArgs().keyResolver.get(),
                     block.getLocation(wrapper.getHandle()), plugin.getNMSWorld().getDefaultAmount(block),
                     shouldAvoidReplacedState ? null : replacedState, REGULAR_RECORD_FLAGS,
-                    e.getArgs().islandResolver::get);
+                    l -> e.getArgs().islandResolver.get(true));
         }
     }
 
@@ -127,7 +127,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Block clickedBlock = e.getArgs().clickedBlock;
             this.worldRecordService.get().recordBlockPlace(blockKey, clickedBlock.getLocation(wrapper.getHandle()),
-                    1, null, REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                    1, null, REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
         }
     }
 
@@ -164,7 +164,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordBlockPlace(Keys.of(newState), block.getLocation(wrapper.getHandle()),
-                    1, block.getState(), REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                    1, block.getState(), REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
         }
     }
 
@@ -179,7 +179,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordBlockPlace(Keys.of(newState), block.getLocation(wrapper.getHandle()),
-                    1, block.getState(), REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                    1, block.getState(), REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
         }
     }
 
@@ -216,7 +216,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordBlockPlace(spreadBlock, block.getLocation(wrapper.getHandle()),
-                    1, block.getState(), REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                    1, block.getState(), REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
         }
     }
 
@@ -236,10 +236,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
                 // New state is AIR, so this is a block break
                 Key oldStateKey = Keys.of(e.getArgs().oldState);
                 this.worldRecordService.get().recordBlockBreak(oldStateKey, blockLocation, 1,
-                        REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
             } else {
                 this.worldRecordService.get().recordBlockPlace(newStateKey, blockLocation, 1,
-                        e.getArgs().oldState, REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        e.getArgs().oldState, REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
             }
         }
     }
@@ -254,7 +254,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (minecartBlockKey != null) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 this.worldRecordService.get().recordBlockPlace(minecartBlockKey, vehicle.getLocation(wrapper.getHandle()),
-                        1, null, REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        1, null, REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
             }
         }
     }
@@ -293,9 +293,9 @@ public class BlockChangesListener extends AbstractGameEventListener {
                     Location location = clickedBlock.getLocation(wrapper.getHandle());
                     int spawnerCount = plugin.getProviders().getSpawnersProvider().getSpawner(location).getKey();
                     this.worldRecordService.get().recordBlockBreak(oldSpawnerKey, location, spawnerCount,
-                            REGULAR_RECORD_FLAGS, e.getArgs().blockIslandResolver::get);
+                            REGULAR_RECORD_FLAGS, l -> e.getArgs().blockIslandResolver.get(true));
                     this.worldRecordService.get().recordBlockPlace(newSpawnerKey, location, spawnerCount, null,
-                            REGULAR_RECORD_FLAGS, e.getArgs().blockIslandResolver::get);
+                            REGULAR_RECORD_FLAGS, l -> e.getArgs().blockIslandResolver.get(true));
                 }
             }
         }, 1L);
@@ -322,12 +322,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
             if (!oldBlockKey.equals(ConstantKeys.AIR)) {
                 this.worldRecordService.get().recordBlockBreak(oldBlockKey, blockLocation,
-                        plugin.getNMSWorld().getDefaultAmount(block), REGULAR_RECORD_FLAGS, e.getArgs().blockIslandResolver::get);
+                        plugin.getNMSWorld().getDefaultAmount(block), REGULAR_RECORD_FLAGS, l -> e.getArgs().blockIslandResolver.get(true));
             }
 
             if (!newBlockKey.equals(ConstantKeys.AIR)) {
                 this.worldRecordService.get().recordBlockPlace(newBlockKey, blockLocation, 1,
-                        null, REGULAR_RECORD_FLAGS, e.getArgs().blockIslandResolver::get);
+                        null, REGULAR_RECORD_FLAGS, l -> e.getArgs().blockIslandResolver.get(true));
             }
         }
     }
@@ -344,7 +344,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordBlockBreak(e.getArgs().keyResolver.get(),
                     block.getLocation(wrapper.getHandle()), plugin.getNMSWorld().getDefaultAmount(block),
-                    REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                    REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
         }
     }
 
@@ -360,7 +360,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
             Key blockKey = isWaterLogged ? ConstantKeys.WATER : Keys.of(clickedBlock);
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
                 this.worldRecordService.get().recordBlockBreak(blockKey, clickedBlock.getLocation(wrapper.getHandle()),
-                        1, REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        1, REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
             }
         }
     }
@@ -391,15 +391,13 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (item.getItemStack().getType() != Material.DRAGON_EGG)
             return;
 
-        Island entityIsland = e.getArgs().islandResolver.get();
-
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             for (Entity nearby : item.getNearbyEntities(2, 2, 2)) {
                 if (nearby instanceof FallingBlock) {
                     Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) nearby);
                     this.worldRecordService.get().recordBlockBreak(blockKey, nearby.getLocation(wrapper.getHandle()),
                             1, WorldRecordFlags.SAVE_BLOCK_COUNT,
-                            l -> WorldBlocks.findIslandWithHint(l, entityIsland));
+                            l -> WorldBlocks.findIslandWithHint(l, e.getArgs().islandResolver.get(true)));
                     return;
                 }
             }
@@ -413,21 +411,21 @@ public class BlockChangesListener extends AbstractGameEventListener {
             Location entityLocation = e.getArgs().entity.getLocation(wrapper.getHandle());
             if (spawnReason == CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM) {
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.IRON_BLOCK, entityLocation,
-                        4, 0, e.getArgs().islandResolver::get);
+                        4, 0, l -> e.getArgs().islandResolver.get(true));
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.CARVED_PUMPKIN, entityLocation,
-                        1, REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        1, REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
             } else if (spawnReason == CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN) {
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.SNOW_BLOCK, entityLocation,
-                        2, 0, e.getArgs().islandResolver::get);
+                        2, 0, l -> e.getArgs().islandResolver.get(true));
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.CARVED_PUMPKIN, entityLocation,
-                        1, REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        1, REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
             } else if (spawnReason == CreatureSpawnEvent.SpawnReason.BUILD_WITHER) {
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.SOUL_SAND, entityLocation,
-                        4, 0, e.getArgs().islandResolver::get);
+                        4, 0, l -> e.getArgs().islandResolver.get(true));
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.WITHER_SKELETON_SKULL, entityLocation,
-                        3, REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        3, REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
             } else if (COPPER_CHEST != null && spawnReason == BUILD_COPPERGOLEM) {
-                handleCopperGolemStructure(entityLocation, e.getArgs().islandResolver::get);
+                handleCopperGolemStructure(entityLocation, l -> e.getArgs().islandResolver.get(true));
             }
         }
 
@@ -494,7 +492,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
             return;
 
-        Island blockIsland = e.getArgs().islandResolver.get();
+        Island blockIsland = e.getArgs().islandResolver.get(true);
 
         try (MutableBlockPosition blockPosition = MutableBlockPosition.POOL.obtain();
              ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -522,7 +520,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordBlockBreak(e.getArgs().keyResolver.get(), block.getLocation(wrapper.getHandle()),
-                    1, REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                    1, REGULAR_RECORD_FLAGS, l -> e.getArgs().islandResolver.get(true));
         }
     }
 
@@ -545,7 +543,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
                 Location blockLocation = toBlock.getLocation(wrapper.getHandle());
                 // Do not save block counts
                 this.worldRecordService.get().recordBlockBreak(Keys.of(toBlock), blockLocation,
-                        1, WorldRecordFlags.DIRTY_CHUNKS, e.getArgs().toIslandResolver::get);
+                        1, WorldRecordFlags.DIRTY_CHUNKS, l -> e.getArgs().toIslandResolver.get(true));
                 return;
             }
         }
@@ -558,7 +556,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
                     Location blockLocation = toBlock.getLocation(wrapper.getHandle());
                     // Do not save block counts
                     this.worldRecordService.get().recordBlockPlace(Keys.of(toBlock), blockLocation, 1,
-                            null, WorldRecordFlags.DIRTY_CHUNKS, e.getArgs().toIslandResolver::get);
+                            null, WorldRecordFlags.DIRTY_CHUNKS, l -> e.getArgs().toIslandResolver.get(true));
                 }
             }
         });
@@ -576,10 +574,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
             BlockState newState = e.getArgs().newState;
             if (newState.getType() == Material.AIR) {
                 this.worldRecordService.get().recordBlockBreak(e.getArgs().keyResolver.get(), blockLocation,
-                        plugin.getNMSWorld().getDefaultAmount(block), REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        plugin.getNMSWorld().getDefaultAmount(block), REGULAR_RECORD_FLAGS,
+                        l -> e.getArgs().islandResolver.get(true));
             } else {
                 this.worldRecordService.get().recordBlockPlace(Keys.of(newState), blockLocation, 1,
-                        block.getState(), REGULAR_RECORD_FLAGS, e.getArgs().islandResolver::get);
+                        block.getState(), REGULAR_RECORD_FLAGS,
+                        l -> e.getArgs().islandResolver.get(true));
             }
         }
     }
@@ -606,7 +606,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             this.worldRecordService.get().recordMultiBlocksBreak(blockCounts,
                     entity.getLocation(wrapper.getHandle()), REGULAR_RECORD_FLAGS,
-                    e.getArgs().islandResolver::get);
+                    l -> e.getArgs().islandResolver.get(true));
         }
     }
 
@@ -624,7 +624,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
                 return;
 
             worldRecordService.get().recordBlockPlace(ConstantKeys.WET_SPONGE, blockLocation, 1,
-                    block.getState(), WorldRecordFlags.SAVE_BLOCK_COUNT, e.getArgs().islandResolver::get);
+                    block.getState(), WorldRecordFlags.SAVE_BLOCK_COUNT, l -> e.getArgs().islandResolver.get(true));
 
             alreadySpongeAbosrbCalled.add(blockLocation.clone());
         }

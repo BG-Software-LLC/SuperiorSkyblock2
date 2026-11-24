@@ -267,8 +267,8 @@ public class PlayersListener extends AbstractGameEventListener {
             return;
 
         MoveResult moveResult = this.regionManagerService.get().handlePlayerMove(superiorPlayer,
-                e.getArgs().from, e.getArgs().fromIslandResolver::get,
-                e.getArgs().to, e.getArgs().toIslandResolver::get);
+                e.getArgs().from, l -> e.getArgs().fromIslandResolver.get(false),
+                e.getArgs().to, l -> e.getArgs().toIslandResolver.get(false));
         switch (moveResult) {
             case VOID_TELEPORT:
             case SUCCESS:
@@ -300,8 +300,8 @@ public class PlayersListener extends AbstractGameEventListener {
         }
 
         MoveResult moveResult = this.regionManagerService.get().handlePlayerTeleport(superiorPlayer,
-                e.getArgs().from, e.getArgs().fromIslandResolver::get,
-                e.getArgs().to, e.getArgs().toIslandResolver::get);
+                e.getArgs().from, l -> e.getArgs().fromIslandResolver.get(false),
+                e.getArgs().to, l -> e.getArgs().toIslandResolver.get(false));
         if (moveResult != MoveResult.SUCCESS)
             e.setCancelled();
     }
@@ -358,7 +358,9 @@ public class PlayersListener extends AbstractGameEventListener {
                     !plugin.getGrid().isIslandsWorld(target.getWorld()))
                 return;
 
-            Island island = e.getArgs().islandResolver.get();
+            // When the spawn is protected, the check above lets any world through, so the lookup must still
+            // check the world.
+            Island island = e.getArgs().islandResolver.get(false);
 
             if (island != null) {
                 if (island.isSpawn() ? (plugin.getSettings().getSpawn().isProtected() && !plugin.getSettings().getSpawn().isPlayersDamage()) :

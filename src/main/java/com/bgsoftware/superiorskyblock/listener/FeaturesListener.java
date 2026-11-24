@@ -137,11 +137,11 @@ public class FeaturesListener extends AbstractGameEventListener {
 
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.protectionManager.get().handleBlockBreak(
-                superiorPlayer, clickedBlock, e.getArgs().blockKeyResolver.get(), e.getArgs().blockIslandResolver::get);
+                superiorPlayer, clickedBlock, e.getArgs().blockKeyResolver.get(), l -> e.getArgs().blockIslandResolver.get(true));
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, superiorPlayer, true))
             return;
 
-        Island island = e.getArgs().blockIslandResolver.get();
+        Island island = e.getArgs().blockIslandResolver.get(true);
         if (island == null)
             return;
 
@@ -250,8 +250,11 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (blockType != VAULT && blockType != TRIAL_SPAWNER)
             return;
 
-        Island island = e.getArgs().islandResolver.get();
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
 
+        Island island = e.getArgs().islandResolver.get(true);
         if (island == null)
             return;
 
@@ -270,8 +273,11 @@ public class FeaturesListener extends AbstractGameEventListener {
         if (blockType != SCULK_SENSOR)
             return;
 
-        Island island = e.getArgs().islandResolver.get();
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
 
+        Island island = e.getArgs().islandResolver.get(true);
         if (island == null)
             return;
 
@@ -294,7 +300,7 @@ public class FeaturesListener extends AbstractGameEventListener {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location blockLocation = clickedBlock.getLocation(wrapper.getHandle());
             interactionResult = protectionManager.get().handleCustomInteraction(superiorPlayer,
-                    blockLocation, IslandPrivileges.SCULK_SENSOR, e.getArgs().blockIslandResolver::get);
+                    blockLocation, IslandPrivileges.SCULK_SENSOR, l -> e.getArgs().blockIslandResolver.get(false));
         }
         if (ProtectionHelper.shouldPreventInteraction(interactionResult, null, false))
             e.setCancelled();

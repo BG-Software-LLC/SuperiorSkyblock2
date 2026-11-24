@@ -90,7 +90,7 @@ public class IslandUtils {
 
         for (int x = min.getX() >> 4; x <= max.getX() >> 4; x++) {
             for (int z = min.getZ() >> 4; z <= max.getZ() >> 4; z++) {
-                if (!noEmptyChunks || island.isChunkDirty(worldInfo.getName(), x, z)) {
+                if (!noEmptyChunks || island.isChunkDirty(worldInfo, x, z)) {
                     chunkCoords.add(ChunkPosition.of(worldInfo, x, z, false));
                 }
             }

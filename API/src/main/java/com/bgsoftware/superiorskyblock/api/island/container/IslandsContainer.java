@@ -93,6 +93,18 @@ public interface IslandsContainer {
     Island getIslandAt(Location location);
 
     /**
+     * Get an island at a location.
+     *
+     * @param location    The location to get island in.
+     * @param ignoreWorld Whether to ignore world checks in the case the world was already checked.
+     *                    The plugin may still run world checks in some scenarios, even if {@param ignoreWorld} is true.
+     */
+    @Nullable
+    default Island getIslandAt(Location location, boolean ignoreWorld) {
+        return getIslandAt(location);
+    }
+
+    /**
      * Transfer an island from a player to another one.
      * Warning: If you don't know what you're doing, do not use this method.
      * Instead, use {@link Island#transferIsland(SuperiorPlayer)}.

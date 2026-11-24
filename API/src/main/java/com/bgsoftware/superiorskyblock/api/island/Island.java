@@ -2072,7 +2072,10 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param worldName The name of the world of the chunk.
      * @param chunkX    The x-coords of the chunk.
      * @param chunkZ    The z-coords of the chunk.
+     *
+     * @deprecated See {@link #isChunkDirty(WorldInfo, int, int)}
      */
+    @Deprecated
     boolean isChunkDirty(String worldName, int chunkX, int chunkZ);
 
     /**

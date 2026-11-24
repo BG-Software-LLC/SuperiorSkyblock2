@@ -45,7 +45,11 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
     }
 
     private void onBlockRedstone(GameEvent<GameEventArgs.BlockRedstoneEvent> e) {
-        Island island = e.getArgs().islandResolver.get();
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().block.getWorld()))
+            return;
+
+        Island island = e.getArgs().islandResolver.get(true);
         if (island == null || island.isSpawn())
             return;
 
@@ -68,7 +72,11 @@ public class IslandWorldEventsListener extends AbstractGameEventListener {
         if (hologramsService.get().isHologram(entity))
             return;
 
-        Island island = e.getArgs().islandResolver.get();
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
+            return;
+
+        Island island = e.getArgs().islandResolver.get(true);
         if (island == null || island.isSpawn() || island.anyPlayerInsideMatches(ONLINE_AND_NOT_AFK))
             return;
 

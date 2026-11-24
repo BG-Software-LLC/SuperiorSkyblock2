@@ -17,7 +17,6 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
-import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -51,6 +50,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
 
     @Nullable
     private static volatile World spawnIslandWorld;
+    private static volatile boolean spawnWorldIsIslandsWorld;
 
     public IslandFlagsListener(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -69,7 +69,9 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(
                 plugin.getSettings().getWorlds().getDefaultWorldDimension());
-        spawnIslandWorld = spawnLocation.getWorld();
+        World spawnWorld = spawnLocation.getWorld();
+        spawnWorldIsIslandsWorld = spawnWorld != null && plugin.getGrid().isIslandsWorld(spawnWorld);
+        spawnIslandWorld = spawnWorld;
     }
 
     /* ENTITY SPAWNING */
@@ -78,7 +80,8 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Entity entity = e.getArgs().entity;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(entity.getWorld()))
+        World world = entity.getWorld();
+        if (shouldIgnoreWorldEvents(world))
             return;
 
         CreatureSpawnEvent.SpawnReason spawnReason = e.getArgs().spawnReason;
@@ -90,7 +93,7 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (!isSpawnerSpawning && !isNaturalSpawning && !isChickenEgg)
             return;
 
-        Island island = e.getArgs().islandResolver.get();
+        Island island = e.getArgs().islandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -140,11 +143,12 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Entity entity = e.getArgs().entity;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(entity.getWorld())) {
+        World world = entity.getWorld();
+        if (shouldIgnoreWorldEvents(world)) {
             return;
         }
 
-        Island island = e.getArgs().islandResolver.get();
+        Island island = e.getArgs().islandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -179,10 +183,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Entity entity = e.getArgs().entity;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(entity.getWorld()))
+        World world = entity.getWorld();
+        if (shouldIgnoreWorldEvents(world))
             return;
 
-        Island island = e.getArgs().islandResolver.get();
+        Island island = e.getArgs().islandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -201,10 +206,11 @@ public class IslandFlagsListener extends AbstractGameEventListener {
             return;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld()))
+        World world = block.getWorld();
+        if (shouldIgnoreWorldEvents(world))
             return;
 
-        Island island = e.getArgs().blockIslandResolver.get();
+        Island island = e.getArgs().blockIslandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -218,15 +224,16 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     private void onFireballDamage(GameEvent<GameEventArgs.EntityDamageEvent> e) {
         Entity entity = e.getArgs().entity;
 
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(entity.getWorld())) {
-            return;
-        }
-
         if (!(entity instanceof Fireball))
             return;
 
-        Island island = e.getArgs().islandResolver.get();
+        // We only check island flags in relevant worlds
+        World world = entity.getWorld();
+        if (shouldIgnoreWorldEvents(world)) {
+            return;
+        }
+
+        Island island = e.getArgs().islandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -244,11 +251,12 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Block toBlock = e.getArgs().toBlock;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(toBlock.getWorld())) {
+        World world = toBlock.getWorld();
+        if (shouldIgnoreWorldEvents(world)) {
             return;
         }
 
-        Island island = e.getArgs().toIslandResolver.get();
+        Island island = e.getArgs().toIslandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -266,11 +274,12 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Block block = e.getArgs().block;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld())) {
+        World world = block.getWorld();
+        if (shouldIgnoreWorldEvents(world)) {
             return;
         }
 
-        Island island = e.getArgs().islandResolver.get();
+        Island island = e.getArgs().islandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -297,11 +306,12 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Block block = e.getArgs().block;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld())) {
+        World world = block.getWorld();
+        if (shouldIgnoreWorldEvents(world)) {
             return;
         }
 
-        Island island = e.getArgs().islandResolver.get();
+        Island island = e.getArgs().islandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -319,11 +329,12 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Block block = e.getArgs().block;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld())) {
+        World world = block.getWorld();
+        if (shouldIgnoreWorldEvents(world)) {
             return;
         }
 
-        Island island = e.getArgs().islandResolver.get();
+        Island island = e.getArgs().islandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -341,11 +352,12 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         Block block = e.getArgs().block;
 
         // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(block.getWorld())) {
+        World world = block.getWorld();
+        if (shouldIgnoreWorldEvents(world)) {
             return;
         }
 
-        Island island = e.getArgs().blockIslandResolver.get();
+        Island island = e.getArgs().blockIslandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -363,17 +375,18 @@ public class IslandFlagsListener extends AbstractGameEventListener {
         if (entityType != EntityType.SPLASH_POTION)
             return;
 
-        // We only check island flags in relevant worlds
-        if (shouldIgnoreWorldEvents(entity.getWorld())) {
-            return;
-        }
-
         Player shooterPlayer = BukkitEntities.getPlayerSource(entity);
         if (shooterPlayer == null) {
             return;
         }
 
-        Island island = e.getArgs().islandResolver.get();
+        // We only check island flags in relevant worlds
+        World world = entity.getWorld();
+        if (shouldIgnoreWorldEvents(world)) {
+            return;
+        }
+
+        Island island = e.getArgs().islandResolver.get(canSkipWorldCheck(world));
         if (island == null)
             return;
 
@@ -460,7 +473,23 @@ public class IslandFlagsListener extends AbstractGameEventListener {
     }
 
     private boolean shouldIgnoreWorldEvents(@Nullable World world) {
-        return world == null || (world != spawnIslandWorld && !plugin.getGrid().isIslandsWorld(world));
+        if (world == null)
+            return true;
+
+        // Identity check first: with the default config the spawn is in the normal islands world, so most
+        // events are answered without calling isIslandsWorld.
+        // A spawn world that is not an islands world only holds the spawn island, so it is relevant only
+        // when the spawn is protected.
+        if (world == spawnIslandWorld)
+            return !spawnWorldIsIslandsWorld && !plugin.getSettings().getSpawn().isProtected();
+
+        return !plugin.getGrid().isIslandsWorld(world);
+    }
+
+    /* Whether the island resolvers may skip the islands-world check for a world that passed
+       shouldIgnoreWorldEvents: every such world is an islands world, except a spawn world that is not one. */
+    private static boolean canSkipWorldCheck(World world) {
+        return spawnWorldIsIslandsWorld || world != spawnIslandWorld;
     }
 
     private static EnumSet<CreatureSpawnEvent.SpawnReason> initializeNaturalSpawnReasons() {

@@ -2927,6 +2927,11 @@ public class SIsland implements Island {
             if (!trackedBlock)
                 return BlockChangeResult.MISSING_BLOCK_VALUE;
 
+            // Potential cache miss, as `DefaultIslandBlocksTrackerAlgorithm` may change `key` in the following check:
+            //      if (!ServerVersion.isLegacy() && key instanceof MaterialKey &&
+            //              ((MaterialKey) key).getMaterialKeySource() == MaterialKeySource.ITEM)
+            //          key = ((MaterialKey) key).toGlobalKey();
+            // TODO: Consider fixing it somehow
             blockValue = plugin.getBlockValues().getBlockValue(key);
         } finally {
             BlockValuesManagerImpl.CACHED_BLOCK_VALUE_RESULT.endCache(cachedStamp);

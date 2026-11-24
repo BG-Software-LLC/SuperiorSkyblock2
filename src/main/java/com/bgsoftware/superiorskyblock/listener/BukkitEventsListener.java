@@ -121,6 +121,14 @@ public class BukkitEventsListener implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
+    // The Bukkit event whose priorities are being dispatched, and the args built for its last dispatched priority.
+    // Bukkit calls the priorities of an event one after another, so the next priority reuses what these args
+    // computed. Only main-thread events of types with more than one priority are tracked.
+    @Nullable
+    private Event dispatchedEvent;
+    @Nullable
+    private IEventArgs dispatchedArgs;
+
     public BukkitEventsListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
 
@@ -360,7 +368,7 @@ public class BukkitEventsListener implements Listener {
         blockPlaceEvent.player = e.getPlayer();
         blockPlaceEvent.againstBlock = e.getBlockAgainst();
         blockPlaceEvent.replacedState = e.getBlockReplacedState();
-        blockPlaceEvent.usedHand = BukkitItems.getHand(e);
+        blockPlaceEvent.usedHand = getUsedHand(e);
         blockPlaceEvent.usedItem = getHandItem(e.getPlayer(), blockPlaceEvent.usedHand, true, e, BlockPlaceEvent::getItemInHand);
         return eventType.createEvent(blockPlaceEvent);
     }
@@ -764,7 +772,7 @@ public class BukkitEventsListener implements Listener {
         GameEventArgs.PlayerInteractEvent playerInteractEvent = new GameEventArgs.PlayerInteractEvent();
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = Action.RIGHT_CLICK_AIR;
-        playerInteractEvent.usedHand = BukkitItems.getHand(e);
+        playerInteractEvent.usedHand = getUsedHand(e);
         playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true);
         playerInteractEvent.clickedEntity = e.getRightClicked();
         return eventType.createEvent(playerInteractEvent);
@@ -774,7 +782,7 @@ public class BukkitEventsListener implements Listener {
         GameEventArgs.PlayerInteractEvent playerInteractEvent = new GameEventArgs.PlayerInteractEvent();
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = Action.RIGHT_CLICK_AIR;
-        playerInteractEvent.usedHand = BukkitItems.getHand(e);
+        playerInteractEvent.usedHand = getUsedHand(e);
         playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true);
         playerInteractEvent.clickedEntity = e.getRightClicked();
         return eventType.createEvent(playerInteractEvent);
@@ -784,7 +792,7 @@ public class BukkitEventsListener implements Listener {
         GameEventArgs.PlayerInteractEvent playerInteractEvent = new GameEventArgs.PlayerInteractEvent();
         playerInteractEvent.player = e.getPlayer();
         playerInteractEvent.action = e.getAction();
-        playerInteractEvent.usedHand = BukkitItems.getHand(e);
+        playerInteractEvent.usedHand = getUsedHand(e);
         playerInteractEvent.usedItem = getHandItem(e.getPlayer(), playerInteractEvent.usedHand, true, e, PlayerInteractEvent::getItem);
         playerInteractEvent.clickedBlock = e.getClickedBlock();
         return eventType.createEvent(playerInteractEvent);
@@ -874,8 +882,17 @@ public class BukkitEventsListener implements Listener {
                                                                                 @Nullable ApplyBukkitEventFunction<E, Args> applyBukkitEventFunction) {
         Map<GameEventPriority, List<EventCallback>> callbacks = plugin.getGameEventsDispatcher().getCallbacks(eventType);
         if (!callbacks.isEmpty()) {
-            callbacks.keySet().forEach(priority ->
-                    createEventListenerForPriority(eventType, bukkitEventClass, priority, function, applyBukkitEventFunction));
+            boolean sharedAcrossPriorities = callbacks.size() > 1;
+            GameEventPriority lastPriority = null;
+            for (GameEventPriority priority : callbacks.keySet()) {
+                if (lastPriority == null || priority.ordinal() > lastPriority.ordinal())
+                    lastPriority = priority;
+            }
+
+            for (GameEventPriority priority : callbacks.keySet()) {
+                createEventListenerForPriority(eventType, bukkitEventClass, priority, function, applyBukkitEventFunction,
+                        sharedAcrossPriorities, priority == lastPriority);
+            }
         }
     }
 
@@ -883,7 +900,9 @@ public class BukkitEventsListener implements Listener {
                                                                                            Class<E> bukkitEventClass,
                                                                                            GameEventPriority gameEventPriority,
                                                                                            GameEventCreator<Args, E> function,
-                                                                                           @Nullable ApplyBukkitEventFunction<E, Args> applyBukkitEventFunction) {
+                                                                                           @Nullable ApplyBukkitEventFunction<E, Args> applyBukkitEventFunction,
+                                                                                           boolean sharedAcrossPriorities,
+                                                                                           boolean isLastPriority) {
         EventPriority bukkitEventPriority = EventPriority.valueOf(gameEventPriority.name());
         plugin.getServer().getPluginManager().registerEvent(bukkitEventClass, this, bukkitEventPriority, (listener, event) -> {
             if (!bukkitEventClass.isAssignableFrom(event.getClass()))
@@ -901,6 +920,10 @@ public class BukkitEventsListener implements Listener {
             if (gameEvent == null)
                 return;
 
+            boolean trackDispatchedArgs = sharedAcrossPriorities && plugin.getServer().isPrimaryThread();
+            if (trackDispatchedArgs)
+                reuseArgsOfPreviousPriority(event, gameEvent.getArgs());
+
             boolean cancelledBeforeDispatch = false;
 
             if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
@@ -915,7 +938,36 @@ public class BukkitEventsListener implements Listener {
             }
             if (applyBukkitEventFunction != null)
                 applyBukkitEventFunction.apply((E) event, gameEvent);
+
+            // Do not keep the event and its args after its last priority.
+            if (trackDispatchedArgs && isLastPriority && this.dispatchedEvent == event) {
+                this.dispatchedEvent = null;
+                this.dispatchedArgs = null;
+            }
         }, plugin, false);
+    }
+
+    private void reuseArgsOfPreviousPriority(Event event, IEventArgs args) {
+        // The class check skips a Bukkit event that is turned into two kinds of game events.
+        IEventArgs previousArgs = this.dispatchedEvent == event ? this.dispatchedArgs : null;
+        if (previousArgs != null && previousArgs.getClass() == args.getClass())
+            args.reuseLocationCaches(previousArgs);
+
+        this.dispatchedEvent = event;
+        this.dispatchedArgs = args;
+    }
+
+    // The hand cannot change during an event, so a later priority reuses the hand found by the previous one.
+    @Nullable
+    private PlayerHand getUsedHand(Event event) {
+        if (event == this.dispatchedEvent) {
+            if (this.dispatchedArgs instanceof GameEventArgs.PlayerInteractEvent)
+                return ((GameEventArgs.PlayerInteractEvent) this.dispatchedArgs).usedHand;
+            if (this.dispatchedArgs instanceof GameEventArgs.BlockPlaceEvent)
+                return ((GameEventArgs.BlockPlaceEvent) this.dispatchedArgs).usedHand;
+        }
+
+        return BukkitItems.getHand(event);
     }
 
     private static ItemStack getHandItem(Player player, PlayerHand usedHand, boolean clone) {

@@ -222,6 +222,9 @@ public class RegionManagerServiceImpl implements RegionManagerService, IService 
             boolean isInteractableItem = BukkitItems.isInteractableItem(usedItem, block);
             int stackedBlockAmount = plugin.getStackedBlocks().getStackedBlockAmount(blockLocation);
 
+            // The check `plugin.getSettings().getBlockCategoriesMapping().getCategories(blockKey)` is done
+            // twice in this method: Here and when calling ProtectionHelper#getXPrivileges for blockKey.
+            // TODO: Consider optimizing this.
             if (!isInteractableItem && stackedBlockAmount <= 1 &&
                     plugin.getSettings().getBlockCategoriesMapping().getCategories(blockKey).isEmpty()) {
                 return InteractionResult.SUCCESS;

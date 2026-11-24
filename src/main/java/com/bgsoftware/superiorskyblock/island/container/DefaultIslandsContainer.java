@@ -28,7 +28,6 @@ import com.bgsoftware.superiorskyblock.island.top.metadata.IslandSortPlayerMetad
 import com.bgsoftware.superiorskyblock.island.top.metadata.IslandSortRatingMetadata;
 import com.bgsoftware.superiorskyblock.island.top.metadata.IslandSortValueMetadata;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -156,8 +155,13 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Nullable
     @Override
     public Island getIslandAt(Location location) {
+        return getIslandAt(location, false);
+    }
+
+    @Override
+    public Island getIslandAt(Location location, boolean ignoreWorld) {
         Island island = plugin.getProviders().hasCustomWorldsSupport() ?
-                customWorldsSupportIslandLookup(location) : nativeIslandLookup(location);
+                customWorldsSupportIslandLookup(location) : nativeIslandLookup(location, ignoreWorld);
         if (island == null)
             return null;
 
@@ -173,11 +177,13 @@ public class DefaultIslandsContainer implements IslandsContainer {
         return this.islandsGrid.getIslandAt(worldName, packedPos);
     }
 
-    private Island nativeIslandLookup(Location location) {
-        // We first check that the world is an islands world.
-        World world = location.getWorld();
-        if (world == null || !plugin.getGrid().isIslandsWorld(world))
-            return null;
+    private Island nativeIslandLookup(Location location, boolean ignoreWorld) {
+        if (!ignoreWorld) {
+            // We first check that the world is an islands world.
+            World world = location.getWorld();
+            if (world == null || !plugin.getGrid().isIslandsWorld(world))
+                return null;
+        }
 
         long packedPos = IslandPosition.calculatePackedPosFromLocation(location.getBlockX(), location.getBlockZ());
         return this.islandsGrid.getIslandAt(null, packedPos);

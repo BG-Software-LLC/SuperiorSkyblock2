@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
@@ -28,7 +29,8 @@ public class ConstantKeys {
     public static final Key COMMAND_BLOCK = Keys.of(EnumHelper.getEnum(Material.class, "COMMAND_BLOCK", "COMMAND"));
     public static final Key EGG_MOB_SPAWNER = Keys.ofSpawner("EGG");
     public static final Key END_PORTAL_FRAME = Keys.of(Materials.END_PORTAL_FRAME.toBukkitType());
-    public static final Key END_PORTAL_FRAME_WITH_EYE = Keys.of(Materials.END_PORTAL_FRAME.toBukkitType(), (short) 7);
+    public static final Key END_PORTAL_FRAME_WITH_EYE = MaterialKey.of(Materials.END_PORTAL_FRAME.toBukkitType(),
+            (short) 7, MaterialKeySource.BLOCK);
     public static final Key FURNACE = Keys.of(Material.FURNACE);
     public static final Key HOPPER = Keys.of(Material.HOPPER);
     @Nullable

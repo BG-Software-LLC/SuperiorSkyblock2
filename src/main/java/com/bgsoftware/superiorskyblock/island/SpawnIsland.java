@@ -84,6 +84,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -662,7 +663,7 @@ public class SpawnIsland implements Island {
     @Override
     public boolean isInside(Location location, double extraRadius) {
         World bukkitWorld = location.getWorld();
-        if (bukkitWorld == null || !bukkitWorld.equals(this.spawnWorld))
+        if (!Objects.equals(bukkitWorld, this.spawnWorld))
             return false;
 
         return this.islandArea.expandAndIntercepts(location.getX(), location.getZ(), extraRadius);

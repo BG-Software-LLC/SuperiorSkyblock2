@@ -132,14 +132,14 @@ public class StackedBlocksListener extends AbstractGameEventListener {
                 e.setCancelled();
                 if (usedItem == null) {
                     this.stackedBlocksInteractionService.get().handleStackedBlockBreak(clickedBlock,
-                            e.getArgs().blockKeyResolver.get(), superiorPlayer, e.getArgs().blockIslandResolver::get);
+                            e.getArgs().blockKeyResolver.get(), superiorPlayer, l -> e.getArgs().blockIslandResolver.get(false));
                 }
                 cancelled = true;
             }
 
             if (usedItem != null) {
                 InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockPlace(
-                        superiorPlayer, clickedBlock, usedHand.getEquipmentSlot(), e.getArgs().blockIslandResolver::get);
+                        superiorPlayer, clickedBlock, usedHand.getEquipmentSlot(), l -> e.getArgs().blockIslandResolver.get(false));
                 if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
                     e.setCancelled();
                     cancelled = true;
@@ -159,7 +159,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
     private void onStackedBlockBreak(GameEvent<GameEventArgs.BlockBreakEvent> e) {
         SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
         InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockBreak(
-                e.getArgs().block, e.getArgs().keyResolver.get(), superiorPlayer, e.getArgs().islandResolver::get);
+                e.getArgs().block, e.getArgs().keyResolver.get(), superiorPlayer, l -> e.getArgs().islandResolver.get(false));
         if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
             e.setCancelled();
     }
@@ -189,7 +189,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
             SuperiorPlayer superiorPlayer = e.getArgs().superiorPlayerResolver.get();
             InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockBreak(
-                    clickedBlock, e.getArgs().blockKeyResolver.get(), superiorPlayer, e.getArgs().blockIslandResolver::get);
+                    clickedBlock, e.getArgs().blockKeyResolver.get(), superiorPlayer, l -> e.getArgs().blockIslandResolver.get(true));
             if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult)) {
                 e.setCancelled();
                 return true;
@@ -201,7 +201,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
     private void onStackedBlockBreakByEntity(GameEvent<GameEventArgs.EntityChangeBlockEvent> e) {
         InteractionResult interactionResult = this.stackedBlocksInteractionService.get().handleStackedBlockBreak(
-                e.getArgs().block, Keys.of(e.getArgs().block), null, e.getArgs().blockIslandResolver::get);
+                e.getArgs().block, Keys.of(e.getArgs().block), null, l -> e.getArgs().blockIslandResolver.get(false));
         if (StackedBlocksServiceHelper.shouldCancelOriginalEvent(interactionResult))
             e.setCancelled();
     }

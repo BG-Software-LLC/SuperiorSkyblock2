@@ -35,6 +35,7 @@ public class IslandOutsideListener extends AbstractGameEventListener {
         if (rightClicked == null)
             return;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(rightClicked.getWorld()))
             return;
 
@@ -42,7 +43,7 @@ public class IslandOutsideListener extends AbstractGameEventListener {
         if (superiorPlayer.hasBypassModeEnabled())
             return;
 
-        Island entityIsland = e.getArgs().entityIslandResolver.get();
+        Island entityIsland = e.getArgs().entityIslandResolver.get(true);
 
         if (entityIsland != null) {
             try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
@@ -63,6 +64,7 @@ public class IslandOutsideListener extends AbstractGameEventListener {
 
         Entity vehicle = e.getArgs().vehicle;
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(vehicle.getWorld()))
             return;
 
@@ -77,7 +79,7 @@ public class IslandOutsideListener extends AbstractGameEventListener {
             Island island = WorldBlocks.findIslandWithHint(
                     vehicleLocation,
                     blockPosition.set(vehicleLocation),
-                    e.getArgs().islandResolver.get());
+                    e.getArgs().islandResolver.get(true));
             if (island == null || !island.isInsideRange(blockPosition, 1D))
                 e.setCancelled();
         }
@@ -90,6 +92,7 @@ public class IslandOutsideListener extends AbstractGameEventListener {
         Location to = e.getArgs().to;
         World destinationWorld = to.getWorld();
 
+        // We do not care about spawn island, and therefore only island worlds are relevant.
         if (!plugin.getGrid().isIslandsWorld(destinationWorld))
             return;
 
@@ -102,8 +105,8 @@ public class IslandOutsideListener extends AbstractGameEventListener {
 
         if (entity instanceof Player) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) entity);
-            if (handlePlayerMove(superiorPlayer, from, e.getArgs().fromIslandResolver::get,
-                    to, e.getArgs().toIslandResolver::get, true, false))
+            if (handlePlayerMove(superiorPlayer, from, l -> e.getArgs().fromIslandResolver.get(true),
+                    to, l -> e.getArgs().toIslandResolver.get(true), true, false))
                 e.setCancelled();
         } else {
             Entity passenger = entity.getPassenger();
@@ -112,8 +115,8 @@ public class IslandOutsideListener extends AbstractGameEventListener {
             if (superiorPlayer == null)
                 return;
 
-            handlePlayerMove(superiorPlayer, from, e.getArgs().fromIslandResolver::get,
-                    to, e.getArgs().toIslandResolver::get, false, true);
+            handlePlayerMove(superiorPlayer, from, l -> e.getArgs().fromIslandResolver.get(true),
+                    to, l -> e.getArgs().toIslandResolver.get(true), false, true);
         }
     }
 

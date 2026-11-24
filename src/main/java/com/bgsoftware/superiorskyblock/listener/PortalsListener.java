@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.Either;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -72,10 +71,12 @@ public class PortalsListener extends AbstractGameEventListener {
 
         World world = portalLocation.getWorld();
 
-        Island island = e.getArgs().islandResolver.get();
+        boolean isIslandsWorld = plugin.getGrid().isIslandsWorld(world);
+
+        Island island = e.getArgs().islandResolver.get(isIslandsWorld);
 
         if (island == null) {
-            if (plugin.getGrid().isIslandsWorld(world))
+            if (isIslandsWorld)
                 e.setCancelled();
             return;
         }
@@ -144,10 +145,17 @@ public class PortalsListener extends AbstractGameEventListener {
             return;
         }
 
-        Island island = e.getArgs().fromIslandResolver.get();
+        boolean isIslandsWorld = plugin.getGrid().isIslandsWorld(e.getArgs().from.getWorld());
+
+        Island island = e.getArgs().fromIslandResolver.get(isIslandsWorld);
         if (island == null) {
-            if (plugin.getGrid().isIslandsWorld(e.getArgs().from.getWorld()))
+            if (isIslandsWorld)
                 e.setCancelled();
+            return;
+        }
+
+        if (island.isSpawn()) {
+            e.setCancelled();
             return;
         }
 
@@ -174,9 +182,19 @@ public class PortalsListener extends AbstractGameEventListener {
         if (to == null || to.getWorld() == null || from == null || from.getWorld() == null)
             return;
 
-        Island island = e.getArgs().fromIslandResolver.get();
-        if (island == null)
+        boolean isIslandsWorld = plugin.getGrid().isIslandsWorld(e.getArgs().from.getWorld());
+
+        Island island = e.getArgs().fromIslandResolver.get(isIslandsWorld);
+        if (island == null) {
+            if (isIslandsWorld)
+                e.setCancelled();
             return;
+        }
+
+        if (island.isSpawn()) {
+            e.setCancelled();
+            return;
+        }
 
         Entity entity = e.getArgs().entity;
 
@@ -198,9 +216,6 @@ public class PortalsListener extends AbstractGameEventListener {
 
     @Nullable
     private Either<Location, EntityPortalResult> calculateDestination(Island island, @Nullable SuperiorPlayer superiorPlayer, Location fromLocation, PortalType portalType) {
-        if (island.isSpawn())
-            return Either.right(EntityPortalResult.DESTINATION_NOT_ISLAND_WORLD);
-
         Dimension portalDimension = plugin.getGrid().getIslandsWorldDimension(fromLocation.getWorld());
         if (portalDimension == null)
             return Either.right(EntityPortalResult.PORTAL_NOT_IN_ISLAND);

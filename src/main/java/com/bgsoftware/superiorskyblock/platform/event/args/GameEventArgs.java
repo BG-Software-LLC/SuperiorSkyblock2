@@ -30,6 +30,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.Objects;
 
 public class GameEventArgs implements IEventArgs {
 
@@ -41,13 +42,21 @@ public class GameEventArgs implements IEventArgs {
 
     public static class BlockFromToEvent extends BlockEvent {
 
-        public final LazyNullableReference<Island> toIslandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> toIslandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
-                return WorldBlocks.findIslandWithHint(toBlock, islandResolver.get());
+            protected Island create(Boolean ignoreWorld) {
+                return WorldBlocks.findIslandWithHint(toBlock, islandResolver.get(ignoreWorld));
             }
         };
         public Block toBlock;
+
+        @Override
+        public void reuseLocationCaches(IEventArgs previous) {
+            super.reuseLocationCaches(previous);
+            BlockFromToEvent other = (BlockFromToEvent) previous;
+            if (Objects.equals(other.toBlock, this.toBlock))
+                this.toIslandResolver.copyComputedFrom(other.toIslandResolver);
+        }
 
     }
 
@@ -67,9 +76,9 @@ public class GameEventArgs implements IEventArgs {
 
     public static class BlockPlaceEvent extends BlockEvent {
 
-        public final LazyNullableReference<SuperiorPlayer> superiorPlayerResolver = new LazyNullableReference<SuperiorPlayer>() {
+        public final LazyNullableReference<SuperiorPlayer, Void> superiorPlayerResolver = new LazyNullableReference<SuperiorPlayer, Void>() {
             @Override
-            protected SuperiorPlayer create() {
+            protected SuperiorPlayer create(Void unused) {
                 return plugin.getPlayers().getSuperiorPlayer(player);
             }
         };
@@ -89,16 +98,24 @@ public class GameEventArgs implements IEventArgs {
 
     public static class EntityChangeBlockEvent extends EntityEvent {
 
-        public final LazyNullableReference<Island> blockIslandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> blockIslandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(block.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(block.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
         public Block block;
         public Key newType;
+
+        @Override
+        public void reuseLocationCaches(IEventArgs previous) {
+            // Only the block's island: the entity can be moved between priorities.
+            EntityChangeBlockEvent other = (EntityChangeBlockEvent) previous;
+            if (Objects.equals(other.block, this.block))
+                this.blockIslandResolver.copyComputedFrom(other.blockIslandResolver);
+        }
 
     }
 
@@ -112,16 +129,16 @@ public class GameEventArgs implements IEventArgs {
 
     public static class EntityMoveEvent extends EntityEvent {
 
-        public final LazyNullableReference<Island> fromIslandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> fromIslandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
-                return plugin.getGrid().getIslandAt(from);
+            protected Island create(Boolean ignoreWorld) {
+                return plugin.getGrid().getIslandAt(from, ignoreWorld != null && ignoreWorld);
             }
         };
-        public final LazyNullableReference<Island> toIslandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> toIslandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
-                return plugin.getGrid().getIslandAt(to);
+            protected Island create(Boolean ignoreWorld) {
+                return plugin.getGrid().getIslandAt(to, ignoreWorld != null && ignoreWorld);
             }
         };
         public Location from;
@@ -182,31 +199,31 @@ public class GameEventArgs implements IEventArgs {
 
     public static class PlayerInteractEvent extends PlayerEvent {
 
-        public final LazyNullableReference<Island> blockIslandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> blockIslandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 if (clickedBlock == null)
                     return null;
 
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(clickedBlock.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(clickedBlock.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
-        public final LazyNullableReference<Key> blockKeyResolver = new LazyNullableReference<Key>() {
+        public final LazyNullableReference<Key, Void> blockKeyResolver = new LazyNullableReference<Key, Void>() {
             @Override
-            protected Key create() {
+            protected Key create(Void unused) {
                 return clickedBlock == null ? null : Keys.of(clickedBlock);
             }
         };
-        public final LazyNullableReference<Island> entityIslandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> entityIslandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 if (clickedEntity == null)
                     return null;
 
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(clickedEntity.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(clickedEntity.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
@@ -220,6 +237,14 @@ public class GameEventArgs implements IEventArgs {
         public Block clickedBlock;
         @Nullable
         public Entity clickedEntity;
+
+        @Override
+        public void reuseLocationCaches(IEventArgs previous) {
+            // Only the clicked block's island: the clicked entity can be moved between priorities.
+            PlayerInteractEvent other = (PlayerInteractEvent) previous;
+            if (this.clickedBlock != null && this.clickedBlock.equals(other.clickedBlock))
+                this.blockIslandResolver.copyComputedFrom(other.blockIslandResolver);
+        }
 
     }
 
@@ -274,9 +299,9 @@ public class GameEventArgs implements IEventArgs {
 
     public static class BlockBreakEvent extends BlockEvent {
 
-        public final LazyNullableReference<SuperiorPlayer> superiorPlayerResolver = new LazyNullableReference<SuperiorPlayer>() {
+        public final LazyNullableReference<SuperiorPlayer, Void> superiorPlayerResolver = new LazyNullableReference<SuperiorPlayer, Void>() {
             @Override
-            protected SuperiorPlayer create() {
+            protected SuperiorPlayer create(Void unused) {
                 return plugin.getPlayers().getSuperiorPlayer(player);
             }
         };
@@ -415,11 +440,11 @@ public class GameEventArgs implements IEventArgs {
 
     public static class PlayerAttackEntityEvent extends PlayerEvent {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
@@ -430,11 +455,11 @@ public class GameEventArgs implements IEventArgs {
 
     public static class PlayerShearEntityEvent extends PlayerEvent {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
@@ -445,11 +470,11 @@ public class GameEventArgs implements IEventArgs {
 
     public static class PlayerLeashEntityEvent extends PlayerEvent {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
@@ -460,11 +485,11 @@ public class GameEventArgs implements IEventArgs {
 
     public static class PlayerUnleashEntityEvent extends PlayerEvent {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
@@ -482,11 +507,11 @@ public class GameEventArgs implements IEventArgs {
 
     public static class PlayerDropItemEvent extends PlayerEvent {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(droppedItem.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(droppedItem.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
@@ -497,11 +522,11 @@ public class GameEventArgs implements IEventArgs {
 
     public static class PlayerPickupItemEvent extends PlayerEvent {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(pickedUpItem.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(pickedUpItem.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
@@ -559,21 +584,29 @@ public class GameEventArgs implements IEventArgs {
 
     private static class BlockEvent extends GameEventArgs {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(block.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(block.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
-        public final LazyNullableReference<Key> keyResolver = new LazyNullableReference<Key>() {
+        public final LazyNullableReference<Key, Void> keyResolver = new LazyNullableReference<Key, Void>() {
             @Override
-            protected Key create() {
+            protected Key create(Void unused) {
                 return Keys.of(block);
             }
         };
         public Block block;
+
+        @Override
+        public void reuseLocationCaches(IEventArgs previous) {
+            // Only the island: the block itself can be changed between priorities, so its key is not reused.
+            BlockEvent other = (BlockEvent) previous;
+            if (Objects.equals(other.block, this.block))
+                this.islandResolver.copyComputedFrom(other.islandResolver);
+        }
 
     }
 
@@ -592,11 +625,11 @@ public class GameEventArgs implements IEventArgs {
 
     private static class EntityEvent extends GameEventArgs {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
@@ -613,9 +646,9 @@ public class GameEventArgs implements IEventArgs {
 
     private static class PlayerEvent extends GameEventArgs {
 
-        public final LazyNullableReference<SuperiorPlayer> superiorPlayerResolver = new LazyNullableReference<SuperiorPlayer>() {
+        public final LazyNullableReference<SuperiorPlayer, Void> superiorPlayerResolver = new LazyNullableReference<SuperiorPlayer, Void>() {
             @Override
-            protected SuperiorPlayer create() {
+            protected SuperiorPlayer create(Void unused) {
                 return plugin.getPlayers().getSuperiorPlayer(player);
             }
         };
@@ -637,16 +670,23 @@ public class GameEventArgs implements IEventArgs {
 
     private static class PlayerBucketEvent extends PlayerEvent {
 
-        public final LazyNullableReference<Island> islandResolver = new LazyNullableReference<Island>() {
+        public final LazyNullableReference<Island, Boolean> islandResolver = new LazyNullableReference<Island, Boolean>() {
             @Override
-            protected Island create() {
+            protected Island create(Boolean ignoreWorld) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    return plugin.getGrid().getIslandAt(clickedBlock.getLocation(wrapper.getHandle()));
+                    return plugin.getGrid().getIslandAt(clickedBlock.getLocation(wrapper.getHandle()), ignoreWorld != null && ignoreWorld);
                 }
             }
         };
         public Material bucket;
         public Block clickedBlock;
+
+        @Override
+        public void reuseLocationCaches(IEventArgs previous) {
+            PlayerBucketEvent other = (PlayerBucketEvent) previous;
+            if (Objects.equals(other.clickedBlock, this.clickedBlock))
+                this.islandResolver.copyComputedFrom(other.islandResolver);
+        }
 
     }
 

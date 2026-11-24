@@ -72,6 +72,11 @@ public class DelegateIslandsContainer implements IslandsContainer {
     }
 
     @Override
+    public Island getIslandAt(Location location, boolean ignoreWorld) {
+        return this.handle.getIslandAt(location, ignoreWorld);
+    }
+
+    @Override
     @Deprecated
     public void transferIsland(UUID oldLeader, UUID newLeader) {
         this.handle.transferIsland(oldLeader, newLeader);

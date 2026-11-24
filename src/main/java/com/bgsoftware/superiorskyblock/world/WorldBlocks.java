@@ -86,14 +86,6 @@ public class WorldBlocks {
         return true;
     }
 
-    public static Location getChunkBlock(ChunkPosition chunkPosition, int x, int y, int z) {
-        int realWorldChunkX = chunkPosition.getX() << 4;
-        int realWorldChunkZ = chunkPosition.getZ() << 4;
-
-        return new LazyWorldLocation(chunkPosition.getWorldName(),
-                realWorldChunkX + x, y, realWorldChunkZ + z, 0, 0);
-    }
-
     public static Island findIslandWithHint(Block block, @Nullable Island hintIsland) {
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             return findIslandWithHint(block.getLocation(wrapper.getHandle()), hintIsland);
