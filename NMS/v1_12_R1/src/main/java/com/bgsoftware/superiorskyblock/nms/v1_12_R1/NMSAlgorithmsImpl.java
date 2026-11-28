@@ -36,6 +36,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -132,6 +133,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     public Key getFallingBlockType(FallingBlock bukkitFallingBlock) {
         EntityFallingBlock fallingBlock = ((CraftFallingBlock) bukkitFallingBlock).getHandle();
         return Optional.ofNullable(fallingBlock.getBlock()).map(KeyBlocksCache::getBlockKey).orElse(ConstantKeys.AIR);
+    }
+
+    @Override
+    public boolean canPlaceBookIntoLectern(org.bukkit.block.Block lectern, ItemStack book) {
+        // Does not exist
+        return false;
     }
 
     @Override

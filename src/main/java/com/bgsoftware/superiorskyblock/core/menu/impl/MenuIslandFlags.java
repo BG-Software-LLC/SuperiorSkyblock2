@@ -28,10 +28,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -67,7 +66,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
         YamlConfiguration cfg = menuParseResult.getConfig();
 
-        List<MenuIslandFlags.IslandFlagInfo> islandFlags = new LinkedList<>();
+        List<MenuIslandFlags.IslandFlagInfo> islandFlags = new ArrayList<>();
         Set<String> detectedFlags = new HashSet<>();
 
         Optional.ofNullable(cfg.getConfigurationSection("settings")).ifPresent(settingsSection -> {
@@ -125,7 +124,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
         @Override
         protected List<IslandFlagInfo> requestObjects() {
-            return Collections.unmodifiableList(islandFlags);
+            return islandFlags;
         }
 
     }

@@ -62,6 +62,10 @@ CHANGED_NAME_OTHER_NAME: '&e&lAda | &7{0}&7 adının adını {1}&7 olarak deği�
 CHANGED_PAYPAL: '&e&lAda | &7Ada paypalı başarıyla {0} olarak değiştirildi.'
 CHANGED_TELEPORT_LOCATION: '&e&lAda | &7Işınlanma konumu başarıyla güncellendi.'
 CHANGE_SKIP_REASON_ABOVE_MAXIMUM: 'the new value would be above the maximum'
+CHANGE_SKIP_REASON_ALREADY_CLOSED: 'the island is already closed'
+CHANGE_SKIP_REASON_ALREADY_IGNORED: 'the island is already ignored'
+CHANGE_SKIP_REASON_ALREADY_OPENED: 'the island is already opened'
+CHANGE_SKIP_REASON_ALREADY_UNIGNORED: 'the island is already un-ignored'
 CHANGE_SKIP_REASON_BELOW_MINIMUM: 'the new value would be below the minimum'
 CHANGE_SKIP_REASON_CANCELLED: 'cancelled by another plugin'
 CHANGE_SKIP_REASON_UNLIMITED: 'the limit is unlimited'
@@ -74,6 +78,7 @@ COMMAND_ARGUMENT_AMOUNT: miktar
 COMMAND_ARGUMENT_BIOME: biyom
 COMMAND_ARGUMENT_BORDER_COLOR: sınır-rengi
 COMMAND_ARGUMENT_COMMAND: komut...
+COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER: 'online-filter'
 COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: iksir-efekti
@@ -366,8 +371,6 @@ GOT_REVOKED: '&e&lAda | &7{0} adasına olan davetini geri çekti.'
 GOT_UNBANNED: '&e&lAda | &7{0}''ın adasından YASAĞIN KALDIRILDI.'
 HIT_ISLAND_MEMBER: '&c&lHata | &7Ada üyelerine vuramazsın.'
 HIT_PLAYER_IN_ISLAND: '&c&lHata | &7Adaların içindeki oyunculara vuramazsın.'
-IGNORED_ISLAND: '&e&lAda | &7{0}''ın adası artık en iyi adalardan yoksayılıyor.'
-IGNORED_ISLAND_NAME: '&e&lAda | &7{0} adası artık en iyi adalardan yoksayılıyor.'
 INTERACT_OUTSIDE_ISLAND: '&c&lHata | &7Koruma menzilinin dışında etkileşime geçemezsin.'
 INVALID_AMOUNT: '&c&lHata | &7Geçersiz miktar {0}.'
 INVALID_BIOME: '&c&lHata | &7Geçersiz biyom {0}.'
@@ -559,6 +562,7 @@ KICK_ISLAND_LEADER: '&c&lHata | &7Ada liderini atamazsın, bunun yerine /is admi
   kullan.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lHata | &7Sadece senden daha düşük ada rolüne sahip
   oyuncuları atabilirsin.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&lHata | &7Bu izni başka rollere değiştirebilmek için bu
   izne sahip olmalısın.'
 LAST_ROLE_DEMOTE: '&c&lHata | &7Bu oyuncuyu artık rütbe düşüremezsin.'
@@ -784,8 +788,6 @@ UNCOOP_ANNOUNCEMENT: '&e&lAda | &7{0}, {1}''i co-op üyeliğinden çıkardı.'
 UNCOOP_AUTO_ANNOUNCEMENT: '&e&lAda | &7Çevrimiçi ada üyesi yok ve bu yüzden otomatik
   olarak co-op üyeliğinden çıkarıldın.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lAda | &7{0} oyundan ayrıldı ve artık co-op üyesi değil.'
-UNIGNORED_ISLAND: '&e&lAda | &7{0}''ın adası artık en iyi adalardan yoksayılmıyor.'
-UNIGNORED_ISLAND_NAME: '&e&lAda | &7{0} adası artık en iyi adalardan yoksayılmıyor.'
 UNSAFE_WARP: '&e&lAda | &7&oBu ışınlanma güvensiz görünüyor. Lütfen başka bir ışınlanmayı
   dene.'
 UPDATED_PERMISSION: '&e&lAda | &7{0} için izinler güncellendi.'

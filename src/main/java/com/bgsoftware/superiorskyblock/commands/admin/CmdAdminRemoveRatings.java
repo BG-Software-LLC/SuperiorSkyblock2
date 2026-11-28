@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class CmdAdminRemoveRatings implements IAdminIslandCommand {
+
     @Override
     public List<String> getAliases() {
         return Arrays.asList("removeratings", "rratings", "rr");

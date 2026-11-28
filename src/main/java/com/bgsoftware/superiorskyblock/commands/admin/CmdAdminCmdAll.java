@@ -32,7 +32,8 @@ public class CmdAdminCmdAll implements IAdminIslandCommand {
         return "admin cmdall <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <online-filter[true/false]> <" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER.getMessage(locale) + "[true/false]> <" +
                 Message.COMMAND_ARGUMENT_COMMAND.getMessage(locale) + ">";
     }
 
@@ -64,10 +65,10 @@ public class CmdAdminCmdAll implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         String command = CommandArguments.buildLongString(args, 4, false);
-        boolean onlyOnline = Boolean.parseBoolean(args[3]);
+        boolean onlineFilter = Boolean.parseBoolean(args[3]);
 
         BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
-            island.executeCommand(command, onlyOnline);
+            island.executeCommand(command, onlineFilter);
             return ChangeResult.APPLIED;
         });
 

@@ -140,7 +140,8 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
         while (blockEntityTickersIterator.hasNext()) {
             TickingBlockEntity tickingBlockEntity = blockEntityTickersIterator.next();
-            if (tickingBlockEntity.getPos().equals(spawnerBlockEntity.getBlockPos()) &&
+            // Some forks return null positions for tickers, such as Leaf's sleeping block entities.
+            if (spawnerBlockEntity.getBlockPos().equals(tickingBlockEntity.getPos()) &&
                     !(tickingBlockEntity instanceof TickingSpawnerBlockEntityNotifier)) {
                 blockEntityTickersIterator.remove();
                 tickersToAdd.add(new TickingSpawnerBlockEntityNotifier(spawnerBlockEntity, tickingBlockEntity, delayChangeCallback));

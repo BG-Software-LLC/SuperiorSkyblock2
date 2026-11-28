@@ -1358,8 +1358,9 @@ public class SIsland implements Island {
 
         for (Dimension dimension : Dimension.values()) {
             // Dimensions that are not enabled have no world, and therefore no chunks.
+            // Lazy worlds providers may return info of worlds that are not loaded, which have no loaded chunks.
             WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-            if (worldInfo != null)
+            if (worldInfo != null && Bukkit.getWorld(worldInfo.getName()) != null)
                 chunks.addAll(getLoadedChunksInternal(worldInfo, flags));
         }
 
@@ -2446,14 +2447,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, Arrays.toString(ignoredMembers));
 
-        forEachIslandMember(ignoredMembers, false, islandMember -> {
-            String playerMessage = message;
-
-            if (!Text.isBlank(playerMessage))
-                playerMessage = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerMessage);
-
-            Message.CUSTOM.send(islandMember, playerMessage, false);
-        });
+        forEachIslandMember(ignoredMembers, false,
+                islandMember -> Message.CUSTOM.send(islandMember, message, false));
     }
 
     @Override

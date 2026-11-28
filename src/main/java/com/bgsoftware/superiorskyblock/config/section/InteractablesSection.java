@@ -60,7 +60,7 @@ public class InteractablesSection extends SettingsContainerHolder implements Set
                 if (Materials.isChest(material)) {
                     islandPrivilege = "CHEST_ACCESS";
                 } else if (material == LECTERN) {
-                    islandPrivilege = "PICKUP_LECTERN_BOOK";
+                    islandPrivilege = "READ_LECTERN_BOOK";
                 } else if (isInventoryHolder(material)) {
                     islandPrivilege = "USE";
                 } else if (Materials.isSign(material)) {

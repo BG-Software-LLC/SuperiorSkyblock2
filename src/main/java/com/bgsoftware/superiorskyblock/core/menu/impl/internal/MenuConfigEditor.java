@@ -27,6 +27,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -159,9 +160,9 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
 
         @Override
         protected List<ItemStack> requestObjects() {
-            LinkedList<ItemStack> itemStacks = new LinkedList<>();
+            List<ItemStack> itemStacks = new ArrayList<>();
             buildFromSection(itemStacks, config.getConfigurationSection(this.path));
-            return Collections.unmodifiableList(itemStacks);
+            return itemStacks;
         }
 
         private void buildFromSection(List<ItemStack> itemStacks, ConfigurationSection section) {

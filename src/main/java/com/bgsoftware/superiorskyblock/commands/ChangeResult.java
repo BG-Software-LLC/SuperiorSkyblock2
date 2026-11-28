@@ -18,6 +18,10 @@ public class ChangeResult {
     public static final ChangeResult ABOVE_MAXIMUM = new ChangeResult(Message.CHANGE_SKIP_REASON_ABOVE_MAXIMUM, null);
     public static final ChangeResult BELOW_MINIMUM = new ChangeResult(Message.CHANGE_SKIP_REASON_BELOW_MINIMUM, null);
     public static final ChangeResult UNLIMITED = new ChangeResult(Message.CHANGE_SKIP_REASON_UNLIMITED, null);
+    public static final ChangeResult ALREADY_CLOSED = new ChangeResult(Message.CHANGE_SKIP_REASON_ALREADY_CLOSED, null);
+    public static final ChangeResult ALREADY_OPENED = new ChangeResult(Message.CHANGE_SKIP_REASON_ALREADY_OPENED, null);
+    public static final ChangeResult ALREADY_IGNORED = new ChangeResult(Message.CHANGE_SKIP_REASON_ALREADY_IGNORED, null);
+    public static final ChangeResult ALREADY_UNIGNORED = new ChangeResult(Message.CHANGE_SKIP_REASON_ALREADY_UNIGNORED, null);
 
     @Nullable
     private final Message reasonMessage;

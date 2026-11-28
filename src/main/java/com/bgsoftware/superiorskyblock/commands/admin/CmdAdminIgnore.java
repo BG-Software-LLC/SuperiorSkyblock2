@@ -4,6 +4,9 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -27,7 +30,8 @@ public class CmdAdminIgnore implements IAdminIslandCommand {
     public String getUsage(java.util.Locale locale) {
         return "admin ignore <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + ">";
     }
 
     @Override
@@ -52,17 +56,26 @@ public class CmdAdminIgnore implements IAdminIslandCommand {
 
     @Override
     public boolean supportMultipleIslands() {
-        return false;
+        return true;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        island.setIgnored(true);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.isIgnored())
+                return ChangeResult.ALREADY_IGNORED;
 
-        if (targetPlayer == null)
-            Message.IGNORED_ISLAND_NAME.send(sender, island.getName());
-        else
-            Message.IGNORED_ISLAND.send(sender, targetPlayer.getName());
+            island.setIgnored(true);
+            return ChangeResult.APPLIED;
+        });
+
+        change.sendSummary(sender, args[1]);
+    }
+
+    @Override
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersAndMultipleIslands(plugin, args[2], false,
+                (superiorPlayer, island) -> !island.isIgnored()) : Collections.emptyList();
     }
 
 }

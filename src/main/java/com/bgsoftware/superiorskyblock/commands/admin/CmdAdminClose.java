@@ -4,6 +4,8 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -30,7 +32,8 @@ public class CmdAdminClose implements IAdminIslandCommand {
     public String getUsage(java.util.Locale locale) {
         return "admin close <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + ">";
 
     }
 
@@ -56,22 +59,25 @@ public class CmdAdminClose implements IAdminIslandCommand {
 
     @Override
     public boolean supportMultipleIslands() {
-        return false;
+        return true;
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, Island island, String[] args) {
-        if (island.isLocked()) {
-            Message.ISLAND_ALREADY_CLOSED.send(sender);
-        } else if (PluginEventsFactory.callIslandCloseEvent(island, sender)) {
-            island.setLocked(true);
-            Message.ISLAND_CLOSED.send(sender);
-        }
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.isLocked())
+                return ChangeResult.ALREADY_CLOSED;
+
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandCloseEvent(island, sender),
+                    island, true, Island::setLocked);
+        });
+
+        change.sendSummary(sender, args[1]);
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersAndIslands(plugin, args[2], false,
+        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersAndMultipleIslands(plugin, args[2], false,
                 (superiorPlayer, island) -> !island.isLocked()) : Collections.emptyList();
     }
 

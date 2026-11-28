@@ -71,18 +71,21 @@ public class CmdAdminTitleAll implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Integer> fadeIn = CommandArguments.getInterval(sender, args[3]);
 
-        if (!fadeIn.isSucceed())
+        if (!fadeIn.isSucceed()) {
             return;
+        }
 
         NumberArgument<Integer> duration = CommandArguments.getInterval(sender, args[4]);
 
-        if (!duration.isSucceed())
+        if (!duration.isSucceed()) {
             return;
+        }
 
         NumberArgument<Integer> fadeOut = CommandArguments.getInterval(sender, args[5]);
 
-        if (!fadeOut.isSucceed())
+        if (!fadeOut.isSucceed()) {
             return;
+        }
 
         Map<String, String> parsedArguments = CommandArguments.parseArguments(args);
 
