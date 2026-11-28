@@ -42,16 +42,19 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
     }
 
     @Override
+    @Deprecated
     public Normal getNormal() {
         return (Normal) getDimensionConfig(Dimension.getByName("NORMAL"));
     }
 
     @Override
+    @Deprecated
     public Nether getNether() {
         return (Nether) getDimensionConfig(Dimension.getByName("NETHER"));
     }
 
     @Override
+    @Deprecated
     public End getEnd() {
         return (End) getDimensionConfig(Dimension.getByName("THE_END"));
     }

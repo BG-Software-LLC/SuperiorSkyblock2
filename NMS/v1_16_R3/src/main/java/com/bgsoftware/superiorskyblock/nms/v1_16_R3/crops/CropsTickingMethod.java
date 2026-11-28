@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
@@ -28,6 +28,7 @@ public abstract class CropsTickingMethod {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static Set<Block> CROPS_TO_GROW_CACHE;
+    private static boolean GROW_ALL_CROPS;
 
     static {
         plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CropsTickingMethod::onSettingsUpdate);
@@ -52,14 +53,26 @@ public abstract class CropsTickingMethod {
 
     protected abstract void doTick(Chunk chunk, int tickSpeed);
 
+    private static boolean canGrowCrop(Block block) {
+        return GROW_ALL_CROPS || CROPS_TO_GROW_CACHE.contains(block);
+    }
+
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
-        plugin.getSettings().getCropsToGrow().forEach(cropName -> {
-            Key key = Keys.ofMaterialAndData(cropName);
+
+        KeySet whitelistedCrops = BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops();
+        // An empty whitelist means all randomly ticking blocks are affected.
+        GROW_ALL_CROPS = whitelistedCrops.isEmpty();
+        if (GROW_ALL_CROPS)
+            return;
+
+        whitelistedCrops.forEach(key -> {
             if (key instanceof MaterialKey) {
                 Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
-                if (block != null && block.getBlockData().isTicking())
+
+                if (block != null && block.getBlockData().isTicking()) {
                     CROPS_TO_GROW_CACHE.add(block);
+                }
             }
         });
     }
@@ -96,7 +109,7 @@ public abstract class CropsTickingMethod {
                     long raw = chunkSection.tickingList.getRaw(index);
                     int location = com.destroystokyo.paper.util.maplist.IBlockDataList.getLocationFromRaw(raw);
                     IBlockData blockData = com.destroystokyo.paper.util.maplist.IBlockDataList.getBlockDataFromRaw(raw);
-                    if (!CROPS_TO_GROW_CACHE.contains(blockData.getBlock()))
+                    if (!canGrowCrop(blockData.getBlock()))
                         continue;
 
                     chunkTickMutablePosition.d((location & 15) | chunkOffsetX,
@@ -133,7 +146,7 @@ public abstract class CropsTickingMethod {
                         int z = factor >> 8 & 15;
                         int y = factor >> 16 & 15;
                         IBlockData blockData = chunkSection.getType(x, y, z);
-                        if (blockData.isTicking() && CROPS_TO_GROW_CACHE.contains(blockData.getBlock())) {
+                        if (blockData.isTicking() && canGrowCrop(blockData.getBlock())) {
                             chunkTickMutablePosition.d(x + chunkOffsetX, y + chunkSection.getYPosition(), z + chunkOffsetZ);
                             blockData.b(worldServer, chunkTickMutablePosition, worldServer.random);
                         }

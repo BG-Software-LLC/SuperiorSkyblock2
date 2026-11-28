@@ -11,12 +11,12 @@ enabled: true
 
 # Set the divider for the island bank money in the total island worth.
 # You can set it to 0 to disable island bank money to be calculated in island worth.
-bank-worth-rate: 1000
+bank-worth-rate: 1000.0
 
 # Should island bank balance be refunded upon island disband?
 # When set to 100, all the balance will be refunded.
 # When set to 0, no balance will be refunded.
-disband-refund: 0
+disband-refund: 0.0
 
 # Should transaction logs of the island bank be saved to database?
 # Warning: There may be a lot of transactions, and can increase database.

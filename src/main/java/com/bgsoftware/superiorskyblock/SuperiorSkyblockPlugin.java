@@ -260,6 +260,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, false);
 
+            // The settings and the configs of the modules are loaded now. Caches that depend on them
+            // (such as the interact privileges of lecterns) must be ready before the listeners are registered.
+            PluginEventsFactory.callSettingsUpdateEvent();
+
             try {
                 reloadPlugin(PluginReloadReason.STARTUP);
             } catch (ManagerLoadException error) {
@@ -468,6 +472,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.runModuleLifecycle(ModuleLoadTime.PLUGIN_INITIALIZE, true);
             modulesHandler.runModuleLifecycle(ModuleLoadTime.BEFORE_WORLD_CREATION, true);
             modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, true);
+
+            // The configs of the modules were only reloaded now, after the settings update event was called.
+            // We call it again so caches that depend on module settings (such as crops to grow) are updated.
+            PluginEventsFactory.callSettingsUpdateEvent();
         }
 
         if (!checkScriptEngine()) {
