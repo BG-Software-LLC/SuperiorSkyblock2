@@ -28,12 +28,14 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
 
     @Override
     public int size() {
-        return runOnSet(KeySet::size, 0);
+        KeySet set = getCurrentSet();
+        return set == null ? 0 : set.size();
     }
 
     @Override
     public boolean contains(Object o) {
-        return runOnSet(s -> s.contains(o), false);
+        KeySet set = getCurrentSet();
+        return set != null && set.contains(o);
     }
 
     @Override
@@ -67,7 +69,8 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
 
     @Override
     public boolean remove(Object key) {
-        return runOnSet(s -> s.remove(key), false);
+        KeySet set = getCurrentSet();
+        return set != null && set.remove(key);
     }
 
     @Override
@@ -83,12 +86,14 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
     @Nullable
     @Override
     public Key getKey(Key original) {
-        return runOnSet(s -> s.getKey(original), null);
+        KeySet set = getCurrentSet();
+        return set == null ? null : set.getKey(original);
     }
 
     @Override
     public Key getKey(Key original, Key def) {
-        return runOnSet(s -> s.getKey(original, def), def);
+        KeySet set = getCurrentSet();
+        return set == null ? def : set.getKey(original, def);
     }
 
     @Override
@@ -99,6 +104,11 @@ public class LazyLoadedKeySet extends AbstractSet<Key> implements KeySet {
     @Override
     public Set<Key> asSet() {
         return runOnSet(KeySet::asSet, this);
+    }
+
+    @Nullable
+    private KeySet getCurrentSet() {
+        return this.delegate != null ? this.delegate : this.pendingCustomKeys;
     }
 
     private <T> T runOnSet(Function<KeySet, T> function, T def) {

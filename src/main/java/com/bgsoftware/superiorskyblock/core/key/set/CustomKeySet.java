@@ -28,7 +28,8 @@ public class CustomKeySet extends AbstractSet<Key> implements KeySet {
 
     @Override
     public int size() {
-        return this.innerSet.getIfPresent().map(Set::size).orElse(0);
+        Set<Key> innerSet = this.innerSet.getIfPresentOrNull();
+        return innerSet == null ? 0 : innerSet.size();
     }
 
     @Override
@@ -46,7 +47,8 @@ public class CustomKeySet extends AbstractSet<Key> implements KeySet {
     private boolean containsInternal(Key key, boolean tryGlobal) {
         Preconditions.checkArgument(!(key instanceof LazyKey), "Cannot call getInternal on LazyKey directly.");
 
-        boolean contained = this.innerSet.getIfPresent().map(s -> s.contains(key)).orElse(false);
+        Set<Key> innerSet = this.innerSet.getIfPresentOrNull();
+        boolean contained = innerSet != null && innerSet.contains(key);
 
         if (!tryGlobal || contained)
             return contained;
@@ -75,7 +77,8 @@ public class CustomKeySet extends AbstractSet<Key> implements KeySet {
             return remove(((LazyKey<?>) key).getBaseKey());
         }
 
-        return this.innerSet.getIfPresent().map(s -> s.remove(key)).orElse(false);
+        Set<Key> innerSet = this.innerSet.getIfPresentOrNull();
+        return innerSet != null && innerSet.remove(key);
     }
 
     @Override
@@ -100,10 +103,10 @@ public class CustomKeySet extends AbstractSet<Key> implements KeySet {
             return def;
 
         if (original instanceof LazyKey) {
-            return getKey(((LazyKey<?>) original).getBaseKey());
+            return getKey(((LazyKey<?>) original).getBaseKey(), def);
         }
 
-        Set<Key> set = this.innerSet.getIfPresent().orElse(null);
+        Set<Key> set = this.innerSet.getIfPresentOrNull();
 
         if (set != null) {
             if (set.contains(original))

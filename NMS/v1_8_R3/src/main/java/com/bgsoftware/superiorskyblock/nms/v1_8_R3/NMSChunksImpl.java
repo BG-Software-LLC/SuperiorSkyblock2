@@ -248,9 +248,9 @@ public class NMSChunksImpl implements NMSChunks {
             CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(
                     chunk.getWorld().getName(), ChunkCoordIntPair.a(chunk.getX(), chunk.getZ()));
             if (cropsTickingTileEntity != null) {
-                try {
+                if (NMSUtils.HAS_WORLD_TILE_ENTITY_LIST_FIELD) {
                     cropsTickingTileEntity.getWorld().tileEntityList.remove(cropsTickingTileEntity);
-                } catch (Throwable error) {
+                } else {
                     cropsTickingTileEntity.getWorld().t(cropsTickingTileEntity.getPosition());
                 }
             }
@@ -295,16 +295,8 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     private static void removeTileEntities(Chunk chunk) {
-        boolean hasWorldHField = false;
-
-        try {
-            // This field doesn't exist in Taco 1.8
-            List<TileEntity> tileEntities = chunk.world.h;
-            hasWorldHField = true;
-        } catch (Throwable ignored) {
-        }
-
-        if (hasWorldHField) {
+        // The h field doesn't exist in Taco 1.8
+        if (NMSUtils.HAS_WORLD_H_FIELD) {
             chunk.tileEntities.forEach(((blockPosition, tileEntity) -> {
                 chunk.world.tileEntityList.remove(tileEntity);
                 chunk.world.h.remove(tileEntity);

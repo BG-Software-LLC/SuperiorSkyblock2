@@ -30,7 +30,8 @@ public class CmdAdminCmdAll implements IAdminIslandCommand {
         return "admin cmdall <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <online-filter[true/false]> <" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER.getMessage(locale) + "[true/false]> <" +
                 Message.COMMAND_ARGUMENT_COMMAND.getMessage(locale) + ">";
     }
 
@@ -62,14 +63,17 @@ public class CmdAdminCmdAll implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         String command = CommandArguments.buildLongString(args, 4, false);
-        boolean onlyOnline = Boolean.parseBoolean(args[3]);
+        boolean onlineFilter = Boolean.parseBoolean(args[3]);
 
-        islands.forEach(island -> island.executeCommand(command, onlyOnline));
+        islands.forEach(island -> island.executeCommand(command, onlineFilter));
 
-        if (targetPlayer == null)
-            Message.GLOBAL_COMMAND_EXECUTED_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
-        else
+        if (islands.size() > 1) {
+            Message.GLOBAL_COMMAND_EXECUTED_ALL.send(sender);
+        } else if (targetPlayer == null) {
+            Message.GLOBAL_COMMAND_EXECUTED_NAME.send(sender, islands.get(0).getName());
+        } else {
             Message.GLOBAL_COMMAND_EXECUTED.send(sender, targetPlayer.getName());
+        }
     }
 
     @Override

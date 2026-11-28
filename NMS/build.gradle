@@ -1,33 +1,39 @@
 group 'NMS'
 
 subprojects {
-    def generatedSrcDir = file("$buildDir/generated/sources/nms")
+    def generatedSrcDir = layout.buildDirectory.dir("generated/sources/nms")
+    def propertiesFile = file("properties")
+    def templatesDir = rootProject.file("NMS/src/main/templates")
+    def templates = fileTree(templatesDir) {
+        include '**/*.template'
+    }
 
-    task generateNmsSources {
+    def generateNmsSources = tasks.register('generateNmsSources') {
+        inputs.files(templates).withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName('templates')
+        inputs.files(propertiesFile).withPathSensitivity(PathSensitivity.NONE).withPropertyName('properties')
+        outputs.dir(generatedSrcDir).withPropertyName('generatedSources')
+        outputs.cacheIf { true }
+
         doLast {
-            delete generatedSrcDir
+            File outputDir = generatedSrcDir.get().asFile
+            outputDir.deleteDir()
+            outputDir.mkdirs()
 
-            generatedSrcDir.mkdirs()
-
-            def props = new Properties()
-            def propertiesFile = file("$projectDir/properties")
             if (!propertiesFile.exists()) {
                 return
             }
 
+            def props = new Properties()
             propertiesFile.withInputStream { stream ->
                 props.load(stream)
             }
 
-            def templatesDir = file("${rootDir}/NMS/src/main/templates/")
-            def templates = fileTree(templatesDir) {
-                include '**/*.template'
-            }
+            templates.visit { FileVisitDetails details ->
+                if (details.directory)
+                    return
 
-            templates.each { File templateFile ->
-                def relativePath = templatesDir.toPath().relativize(templateFile.toPath()).toString()
-
-                def templateText = templateFile.text
+                def relativePath = details.relativePath.pathString
+                def templateText = details.file.text
 
                 // Templates starting with a `//<generate-if:KEY>` directive are only
                 // generated for versions that set KEY=true in their properties file.
@@ -35,33 +41,29 @@ subprojects {
                     def newlineIndex = templateText.indexOf('\n')
                     def directiveLine = (newlineIndex == -1 ? templateText : templateText.substring(0, newlineIndex)).trim()
                     def requiredProperty = directiveLine.substring('//<generate-if:'.length(), directiveLine.length() - 1)
-                    if (!Boolean.parseBoolean(props.getProperty(requiredProperty))) {
-                        println "Skipped ${relativePath} (${requiredProperty} is not enabled)"
+                    if (!Boolean.parseBoolean(props.getProperty(requiredProperty)))
                         return
-                    }
                     templateText = newlineIndex == -1 ? '' : templateText.substring(newlineIndex + 1)
                 }
 
-                def outputFile = new File(generatedSrcDir, relativePath.replace('.template', ''))
+                def outputFile = new File(outputDir, relativePath.replace('.template', ''))
                 outputFile.parentFile.mkdirs()
 
                 props.each { k, v ->
                     templateText = templateText.replace("\${${k}}", v)
                 }
                 outputFile.text = templateText
-                println "Generated ${outputFile}"
             }
-
         }
     }
 
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java', generatedSrcDir]
+                srcDirs = ['src/main/java']
+                srcDir(generateNmsSources)
             }
         }
     }
 
-    compileJava.dependsOn(generateNmsSources)
 }

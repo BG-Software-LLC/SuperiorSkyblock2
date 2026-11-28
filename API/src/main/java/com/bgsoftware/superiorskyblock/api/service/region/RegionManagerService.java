@@ -7,9 +7,10 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 public interface RegionManagerService {
 
@@ -126,6 +127,15 @@ public interface RegionManagerService {
     InteractionResult handlePlayerUseWindCharge(SuperiorPlayer superiorPlayer, Location location);
 
     /**
+     * Handle a player using a wind charge.
+     *
+     * @param superiorPlayer The player that used the wind charge.
+     * @param location       The location of the player.
+     * @return The result of the interaction.
+     */
+    InteractionResult handlePlayerTakeLecternBook(SuperiorPlayer superiorPlayer, Location location);
+
+    /**
      * Handle an entity damaging another entity.
      *
      * @param damager The entity that dealt the damage.
@@ -152,6 +162,16 @@ public interface RegionManagerService {
      * @return The result of the interaction.
      */
     InteractionResult handleCustomInteraction(SuperiorPlayer superiorPlayer, Location location, IslandPrivilege islandPrivilege);
+
+    /**
+     * Handle a custom interaction of a player.
+     *
+     * @param superiorPlayer   The player that made the interaction.
+     * @param location         The location of the interaction.
+     * @param islandPrivileges The privileges required for doing the interaction.
+     * @return The result of the interaction.
+     */
+    InteractionResult handleCustomInteraction(SuperiorPlayer superiorPlayer, Location location, List<IslandPrivilege> islandPrivileges);
 
     /**
      * Handle a player movement.

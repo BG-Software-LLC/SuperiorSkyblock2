@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
@@ -23,6 +22,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,10 +84,10 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
 
         @Override
         protected List<Island> requestObjects() {
-            return new SequentialListBuilder<Island>()
-                    .sorted(SortingTypes.getGlobalWarpsSorting().getComparator())
-                    .filter(ISLANDS_FILTER)
-                    .build(plugin.getGrid().getIslands());
+            List<Island> islands = new ArrayList<>(plugin.getGrid().getIslands());
+            islands.removeIf(ISLANDS_FILTER.negate());
+            islands.sort(SortingTypes.getGlobalWarpsSorting().getComparator());
+            return islands;
         }
 
         private final Predicate<Island> ISLANDS_FILTER = island -> {

@@ -2,15 +2,13 @@ package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.entity.EntityCategory;
 import com.bgsoftware.superiorskyblock.api.hooks.EntitiesProvider;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
-import com.bgsoftware.superiorskyblock.world.entity.BuiltinEntityCategory;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.ArmorStand;
@@ -33,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 public class BukkitEntities {
 
@@ -44,6 +41,8 @@ public class BukkitEntities {
     @Nullable
     private static final EntityType ZOMBIE_NAUTILUS_TYPE = EnumHelper.getEnum(EntityType.class, "ZOMBIE_NAUTILUS");
 
+    private static final boolean ABSTRACT_HORSE_SUPPORT = isAbstractHorseSupported();
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Synchronized<Int2ObjectMapView<List<ItemStack>>> entityContent =
@@ -53,12 +52,19 @@ public class BukkitEntities {
 
     }
 
-    public static boolean isEquipment(LivingEntity livingEntity, ItemStack itemStack) {
-        List<ItemStack> entityEquipment = entityContent.writeAndGet(entityContent ->
+    public static List<ItemStack> getEntityEquipment(LivingEntity livingEntity) {
+        return entityContent.writeAndGet(entityContent ->
                 entityContent.computeIfAbsent(livingEntity.getEntityId(), u -> cacheEntityEquipmentInternal(livingEntity)));
+    }
 
-        return entityEquipment.stream().anyMatch(equipmentItem -> equipmentItem != null &&
-                equipmentItem.getType() == itemStack.getType());
+    public static boolean isEquipment(List<ItemStack> entityEquipment, ItemStack itemStack) {
+        Material itemType = itemStack.getType();
+        for (ItemStack equipmentItem : entityEquipment) {
+            if (equipmentItem != null && equipmentItem.getType() == itemType)
+                return true;
+        }
+
+        return false;
     }
 
     public static void cacheEntityEquipment(LivingEntity livingEntity) {
@@ -88,22 +94,19 @@ public class BukkitEntities {
                 entityEquipment.add(horseInventory.getArmor());
         }
 
-        try {
-            if (livingEntity instanceof AbstractHorse) {
-                AbstractHorseInventory horseInventory = ((AbstractHorse) livingEntity).getInventory();
-                horseInventory.forEach(itemStack -> {
-                    if (itemStack != null)
-                        entityEquipment.add(itemStack);
-                });
+        if (ABSTRACT_HORSE_SUPPORT && livingEntity instanceof AbstractHorse) {
+            AbstractHorseInventory horseInventory = ((AbstractHorse) livingEntity).getInventory();
+            horseInventory.forEach(itemStack -> {
+                if (itemStack != null)
+                    entityEquipment.add(itemStack);
+            });
 
-                entityEquipment.add(new ItemStack(Material.CHEST));
+            entityEquipment.add(new ItemStack(Material.CHEST));
 
-                if (horseInventory.getSaddle() != null)
-                    entityEquipment.add(horseInventory.getSaddle());
-                if (horseInventory instanceof HorseInventory && ((HorseInventory) horseInventory).getArmor() != null)
-                    entityEquipment.add(((HorseInventory) horseInventory).getArmor());
-            }
-        } catch (Throwable ignored) {
+            if (horseInventory.getSaddle() != null)
+                entityEquipment.add(horseInventory.getSaddle());
+            if (horseInventory instanceof HorseInventory && ((HorseInventory) horseInventory).getArmor() != null)
+                entityEquipment.add(((HorseInventory) horseInventory).getArmor());
         }
 
         return entityEquipment.isEmpty() ? Collections.emptyList() : entityEquipment;
@@ -113,16 +116,23 @@ public class BukkitEntities {
         entityContent.write(entityContent -> entityContent.remove(livingEntity.getEntityId()));
     }
 
-    public static Optional<Player> getPlayerSource(Entity damager) {
+    @Nullable
+    public static Player getPlayerSource(@Nullable Entity damager) {
         if (damager instanceof Projectile) {
             ProjectileSource shooter = ((Projectile) damager).getShooter();
             if (shooter instanceof Player)
-                return Optional.of((Player) shooter);
+                return (Player) shooter;
         } else if (damager instanceof Player) {
-            return Optional.of((Player) damager);
+            return (Player) damager;
         }
 
-        return Optional.empty();
+        return null;
+    }
+
+    @Nullable
+    public static SuperiorPlayer getSuperiorPlayerSource(@Nullable Entity entity) {
+        Player player = getPlayerSource(entity);
+        return player == null ? null : plugin.getPlayers().getSuperiorPlayer(player);
     }
 
     public static boolean canHaveLimit(EntityType entityType) {
@@ -149,7 +159,7 @@ public class BukkitEntities {
         return false;
     }
 
-    public static boolean isTameable(Entity entity) {
+    public static boolean isTamed(Entity entity) {
         return entity instanceof Tameable && ((Tameable) entity).isTamed();
     }
 
@@ -161,13 +171,13 @@ public class BukkitEntities {
         return entityType == NAUTILUS_TYPE || entityType == ZOMBIE_NAUTILUS_TYPE;
     }
 
-    public static List<EntityCategory> getCategories(Entity entity) {
-        List<EntityCategory> categories = plugin.getSettings().getEntityCategoriesMap().getCategories(Keys.of(entity));
-        if (isTameable(entity)) {
-            categories = new LinkedList<>(categories);
-            categories.add(BuiltinEntityCategory.TAMEABLE.getEntityCategory());
+    private static boolean isAbstractHorseSupported() {
+        try {
+            Class.forName("org.bukkit.entity.AbstractHorse");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
         }
-        return categories;
     }
 
 }

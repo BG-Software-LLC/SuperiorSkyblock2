@@ -340,9 +340,7 @@ public class PlayersListener extends AbstractGameEventListener {
             return;
         }
 
-        SuperiorPlayer damagerPlayer = e.getArgs().damager == null ? null :
-                BukkitEntities.getPlayerSource(e.getArgs().damager)
-                        .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
+        SuperiorPlayer damagerPlayer = BukkitEntities.getSuperiorPlayerSource(e.getArgs().damager);
 
         // Some plugins, such as Sentinel, may actually cause a NPC to attack.
         if (damagerPlayer instanceof SuperiorNPCPlayer) {

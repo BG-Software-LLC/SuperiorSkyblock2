@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.NMSUtils;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -78,9 +79,9 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
         this.chunkZ = chunk.locZ;
         a(chunk.getWorld());
         a(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
-        try {
+        if (NMSUtils.HAS_WORLD_TILE_ENTITY_LIST_FIELD) {
             world.tileEntityList.add(this);
-        } catch (Throwable error) {
+        } else {
             world.a(this);
         }
         this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;

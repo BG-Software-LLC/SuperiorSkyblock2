@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
@@ -99,8 +98,7 @@ public class MenuIslandChest extends AbstractPagedMenu<MenuIslandChest.View, Isl
 
         @Override
         protected List<IslandChest> requestObjects() {
-            return new SequentialListBuilder<IslandChest>()
-                    .build(Arrays.asList(island.getChest()));
+            return Arrays.asList(island.getChest());
         }
 
     }

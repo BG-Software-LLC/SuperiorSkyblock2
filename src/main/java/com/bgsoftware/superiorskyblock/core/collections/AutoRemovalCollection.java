@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
@@ -31,15 +32,17 @@ public class AutoRemovalCollection<E> implements Collection<E> {
         this.elements = collectionSupplier.get();
         this.elementsLifeTime = CacheBuilder.newBuilder()
                 .expireAfterWrite(removalDelay, timeUnit)
+                .concurrencyLevel(1)
                 .removalListener(removalNotification -> {
-                    elements.remove(removalNotification.getKey());
+                    if (removalNotification.wasEvicted())
+                        elements.removeAll(Collections.singleton(removalNotification.getKey()));
                 })
                 .build();
     }
 
     @Override
     public int size() {
-        refreshLifeTime();
+        this.expireElements();
         return elements.size();
     }
 
@@ -50,34 +53,34 @@ public class AutoRemovalCollection<E> implements Collection<E> {
 
     @Override
     public boolean contains(Object o) {
-        refreshLifeTime(o);
+        this.expireElements();
         return elements.contains(o);
     }
 
     @NotNull
     @Override
     public Iterator<E> iterator() {
-        refreshLifeTime();
+        this.expireElements();
         return elements.iterator();
     }
 
     @NotNull
     @Override
     public Object[] toArray() {
-        refreshLifeTime();
+        this.expireElements();
         return elements.toArray();
     }
 
     @NotNull
     @Override
     public <T> T[] toArray(@NotNull T[] a) {
-        refreshLifeTime();
+        this.expireElements();
         return elements.toArray(a);
     }
 
     @Override
     public boolean add(E e) {
-        refreshLifeTime(e);
+        this.expireElements();
         boolean result = elements.add(e);
         if (result)
             this.elementsLifeTime.put(e, DUMMY);
@@ -92,7 +95,7 @@ public class AutoRemovalCollection<E> implements Collection<E> {
 
     @Override
     public boolean containsAll(@NotNull Collection<?> c) {
-        c.forEach(this::refreshLifeTime);
+        this.expireElements();
         return elements.containsAll(c);
     }
 
@@ -111,7 +114,7 @@ public class AutoRemovalCollection<E> implements Collection<E> {
 
     @Override
     public boolean removeAll(@NotNull Collection<?> c) {
-        this.elementsLifeTime.invalidateAll((Iterable<E>) c.iterator());
+        this.elementsLifeTime.invalidateAll(c);
         return elements.removeAll(c);
     }
 
@@ -121,16 +124,8 @@ public class AutoRemovalCollection<E> implements Collection<E> {
         this.elementsLifeTime.invalidateAll();
     }
 
-    private void refreshLifeTime(Object o) {
-        try {
-            this.elementsLifeTime.get((E) o, () -> null);
-        } catch (Throwable ignored) {
-
-        }
-    }
-
-    private void refreshLifeTime() {
-        this.elementsLifeTime.size();
+    private void expireElements() {
+        this.elementsLifeTime.cleanUp();
     }
 
 }

@@ -96,7 +96,7 @@ public class StackedBlocksListener extends AbstractGameEventListener {
 
         if (inHand == null) {
             Log.error("BlockPlaceEvent by player ", player.getName(), " of block ", block.getType().name(), " with null hand item: ", usedHand);
-            throw new RuntimeException("BlockPlaceEvent with null hand item");
+            return;
         }
 
         // We do not stack blocks when the hand items has a name or a lore.

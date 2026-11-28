@@ -201,10 +201,13 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return mission.getRequiredMissions().stream().allMatch(_mission -> {
-            Mission<?> missionToCheck = _mission == null ? null : plugin.getMissions().getMission(_mission);
-            return missionToCheck != null && hasCompleted(superiorPlayer, missionToCheck);
-        });
+        for (String requiredMission : mission.getRequiredMissions()) {
+            Mission<?> missionToCheck = requiredMission == null ? null : plugin.getMissions().getMission(requiredMission);
+            if (missionToCheck == null || !hasCompleted(superiorPlayer, missionToCheck))
+                return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -214,16 +217,22 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
 
-        return offlinePlayer != null && mission.getRequiredChecks().stream().allMatch(check -> {
+        if (offlinePlayer == null)
+            return false;
+
+        for (String check : mission.getRequiredChecks()) {
             check = this.placeholdersService.get().parsePlaceholders(offlinePlayer, check);
             try {
-                return Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + "");
+                if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
+                    return false;
             } catch (ScriptException error) {
                 Log.entering("ENTER", superiorPlayer.getName(), mission.getName());
                 Log.error(error, "An unexpected error occurred while checking mission requirements:");
                 return false;
             }
-        });
+        }
+
+        return true;
     }
 
     @Override

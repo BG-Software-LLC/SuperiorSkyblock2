@@ -136,10 +136,11 @@ public class WorldsSection extends SettingsContainerHolder implements SettingsMa
                 for (PortalType portalType : PortalType.values()) {
                     String destination = portals.getString(portalType.name());
                     if (destination != null) {
-                        try {
-                            portalAgents.put(portalType, Dimension.getByName(destination));
-                        } catch (NullPointerException error) {
+                        Dimension destinationDimension = Dimension.getByNameOrNull(destination);
+                        if (destinationDimension == null) {
                             Log.warnFromFile("config.yml", "Cannot find valid dimension ", destination, " - skipping...");
+                        } else {
+                            portalAgents.put(portalType, destinationDimension);
                         }
                     }
                 }

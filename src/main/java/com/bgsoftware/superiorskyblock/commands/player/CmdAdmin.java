@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -74,7 +75,7 @@ public class CmdAdmin implements ISuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-        if (args.length > 1 && !isNumber(args[1])) {
+        if (args.length > 1 && !Text.isInt(args[1])) {
             String executedSubCommand = args[1];
 
             Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
@@ -220,15 +221,6 @@ public class CmdAdmin implements ISuperiorCommand {
         }
 
         return list.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(list);
-    }
-
-    private boolean isNumber(String str) {
-        try {
-            Integer.valueOf(str);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
     }
 
 }

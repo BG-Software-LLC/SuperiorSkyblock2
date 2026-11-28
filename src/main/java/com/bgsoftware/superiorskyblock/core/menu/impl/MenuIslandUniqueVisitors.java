@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
@@ -16,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -62,8 +62,11 @@ public class MenuIslandUniqueVisitors extends AbstractPagedMenu<MenuIslandUnique
 
         @Override
         protected List<UniqueVisitorInfo> requestObjects() {
-            return new SequentialListBuilder<UniqueVisitorInfo>()
-                    .build(island.getUniqueVisitorsWithTimes(), VISITOR_INFO_MAPPER);
+            List<Pair<SuperiorPlayer, Long>> uniqueVisitors = island.getUniqueVisitorsWithTimes();
+            List<UniqueVisitorInfo> visitorsInfo = new ArrayList<>(uniqueVisitors.size());
+            for (Pair<SuperiorPlayer, Long> uniqueVisitor : uniqueVisitors)
+                visitorsInfo.add(VISITOR_INFO_MAPPER.apply(uniqueVisitor));
+            return visitorsInfo;
         }
 
         @Override

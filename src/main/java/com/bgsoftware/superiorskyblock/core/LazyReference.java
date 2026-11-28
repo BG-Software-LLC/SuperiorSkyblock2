@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.common.annotations.Nullable;
+
 import java.util.Optional;
 
 public abstract class LazyReference<E> {
@@ -14,6 +16,15 @@ public abstract class LazyReference<E> {
 
     public Optional<E> getIfPresent() {
         return Optional.ofNullable(this.instance);
+    }
+
+    @Nullable
+    public E getIfPresentOrNull() {
+        return this.instance;
+    }
+
+    public void reset() {
+        this.instance = null;
     }
 
 }

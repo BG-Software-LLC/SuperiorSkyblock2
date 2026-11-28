@@ -113,7 +113,7 @@ public class CmdAdminData implements ISuperiorCommand {
                 if (subCommand != null && args[3].equalsIgnoreCase("island"))
                     return CommandTabCompletes.getOnlinePlayersAndIslands(plugin, args[4], false, null);
                 else if (subCommand != null && args[3].equalsIgnoreCase("player"))
-                    CommandTabCompletes.getOnlinePlayers(plugin, args[4], false);
+                    return CommandTabCompletes.getOnlinePlayers(plugin, args[4], false);
                 else
                     return Collections.emptyList();
             }

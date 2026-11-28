@@ -215,7 +215,7 @@ public class WorldRecordServiceImpl implements WorldRecordService, IService {
             island.handleBlockBreak(blockKey, blockCount, handleBlockBreakFlag);
 
         if (handleNearbyBlocks || dirtyChunks) {
-            EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
+            EnumMap<BlockFace, Key> nearbyBlocks = handleNearbyBlocks ? new EnumMap<>(BlockFace.class) : null;
             Block block = blockLocation.getBlock();
 
             if (handleNearbyBlocks) {

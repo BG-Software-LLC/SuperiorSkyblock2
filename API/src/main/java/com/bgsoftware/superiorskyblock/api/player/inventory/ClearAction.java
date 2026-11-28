@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.player.inventory;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
@@ -62,13 +63,21 @@ public abstract class ClearAction implements Enumerable {
      * @param name The name to check.
      */
     public static ClearAction getByName(String name) {
+        ClearAction clearAction = getByNameOrNull(name);
+
+        return Preconditions.checkNotNull(clearAction, "Couldn't find an ClearAction with the name " + name + ".");
+    }
+
+    /**
+     * Get a clear action by its name, or null if it doesn't exist.
+     *
+     * @param name The name to check.
+     */
+    @Nullable
+    public static ClearAction getByNameOrNull(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        ClearAction clearAction = clearActions.get(name.toUpperCase(Locale.ENGLISH));
-
-        Preconditions.checkNotNull(clearAction, "Couldn't find an ClearAction with the name " + name + ".");
-
-        return clearAction;
+        return clearActions.get(name.toUpperCase(Locale.ENGLISH));
     }
 
     /**

@@ -69,43 +69,41 @@ public class CmdAdminSetRoleLimit implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         PlayerRole playerRole = CommandArguments.getPlayerRoleForLimit(sender, args[3]);
-        if (playerRole == null)
+
+        if (playerRole == null) {
             return;
+        }
 
         NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[4]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int limit = arguments.getNumber();
 
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (limit <= 0) {
-                if (PluginEventsFactory.callIslandRemoveRoleLimitEvent(island, sender, playerRole)) {
-                    ++islandsChangedCount;
-                    island.removeRoleLimit(playerRole);
-                }
-            } else {
-                PluginEvent<PluginEventArgs.IslandChangeRoleLimit> event = PluginEventsFactory.callIslandChangeRoleLimitEvent(
-                        island, sender, playerRole, limit);
-                if (!event.isCancelled()) {
-                    island.setRoleLimit(playerRole, event.getArgs().roleLimit);
-                    ++islandsChangedCount;
-                }
+            PluginEvent<PluginEventArgs.IslandChangeRoleLimit> event = PluginEventsFactory.callIslandChangeRoleLimitEvent(
+                    island, sender, playerRole, limit);
+            if (!event.isCancelled()) {
+                island.setRoleLimit(playerRole, event.getArgs().roleLimit);
+                ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_ROLE_LIMIT_ALL.send(sender, playerRole);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_ROLE_LIMIT_NAME.send(sender, playerRole, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_ROLE_LIMIT.send(sender, playerRole, targetPlayer.getName());
+        }
     }
 
     @Override

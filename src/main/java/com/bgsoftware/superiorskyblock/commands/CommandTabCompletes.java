@@ -41,8 +41,6 @@ import java.util.stream.Stream;
 
 public class CommandTabCompletes {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private CommandTabCompletes() {
 
     }
@@ -116,6 +114,33 @@ public class CommandTabCompletes {
         return Collections.unmodifiableList(tabArguments);
     }
 
+    public static List<String> getOnlinePlayersAndMultipleIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish,
+                                                          @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
+        List<String> onlinePlayersAndIslands = getOnlinePlayersAndIslands(plugin, argument, hideVanish, predicate);
+
+        if (!"*".contains(argument) || !hasMatchingIsland(plugin, predicate))
+            return onlinePlayersAndIslands;
+
+        // Same order as IAdminIslandCommand#tabComplete: "*" comes first.
+        List<String> tabArguments = new LinkedList<>();
+        tabArguments.add("*");
+        tabArguments.addAll(onlinePlayersAndIslands);
+
+        return Collections.unmodifiableList(tabArguments);
+    }
+
+    private static boolean hasMatchingIsland(SuperiorSkyblockPlugin plugin, @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
+        if (predicate == null)
+            return !plugin.getGrid().getIslands().isEmpty();
+
+        for (Island island : plugin.getGrid().getIslands()) {
+            if (predicate.test(island.getOwner(), island))
+                return true;
+        }
+
+        return false;
+    }
+
     public static List<String> getIslandWarps(Island island, String argument) {
         return filterByArgument(island.getIslandWarps().keySet(), argument.toLowerCase(Locale.ENGLISH));
     }
@@ -143,14 +168,14 @@ public class CommandTabCompletes {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
                 .filter(var -> var.contains(lowerArgument))
-                .build(Stream.of(tabVariables).map(i -> i + ""));
+                .build(tabVariables.mapToObj(i -> i + ""));
     }
 
     public static List<String> getSchematics(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
-                .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_normal") &&
-                        !schematic.endsWith("_the_end") && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
+                .filter(schematic -> !plugin.getSchematics().isDimensionSchematic(schematic)
+                        && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .build(plugin.getSchematics().getSchematics());
     }
 
@@ -236,7 +261,7 @@ public class CommandTabCompletes {
                 argument.toLowerCase(Locale.ENGLISH));
     }
 
-    public static List<String> getBiomes(String argument) {
+    public static List<String> getBiomes(SuperiorSkyblockPlugin plugin, String argument) {
         NMSAlgorithms.EnumBridge<Biome> biomeEnumBridge = plugin.getNMSAlgorithms().getBiomeBridge();
         return filterByArgument(biomeEnumBridge.getValues(), biomeEnumBridge::getName, argument.toLowerCase(Locale.ENGLISH));
     }

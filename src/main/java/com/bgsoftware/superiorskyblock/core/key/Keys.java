@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.key;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
@@ -29,6 +30,9 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class Keys {
+
+    private static final ReflectMethod<Boolean> MATERIAL_IS_ITEM = new ReflectMethod<>(
+            Material.class, boolean.class, "isItem");
 
     private static final Pattern KEY_SPLITTER_PATTERN = Pattern.compile("[:;]");
 
@@ -135,6 +139,10 @@ public class Keys {
         // Therefore, this code is duplicated from the above method, but
         // creates the baseKey directly, not from ItemStack.
         Key baseKey = MaterialKey.of(material, data, MaterialKeySource.ITEM);
+        if (material == Material.AIR || Materials.isLegacy(material) ||
+                (MATERIAL_IS_ITEM.isValid() && !MATERIAL_IS_ITEM.invoke(material))) {
+            return baseKey;
+        }
 
         try {
             // Now we try to convert the key.
@@ -169,11 +177,13 @@ public class Keys {
             return Keys.ofSpawner(data);
         }
 
-        try {
-            return Keys.of(material, Short.parseShort(data));
-        } catch (NumberFormatException e) {
+        // All the short values are valid data, so the data is parsed as an int and checked to be a short.
+        // This also catches data that is not a number, as the default value is not a short either.
+        int durability = Text.parseInt(data, Integer.MIN_VALUE);
+        if (durability < Short.MIN_VALUE || durability > Short.MAX_VALUE)
             return MaterialKey.of(material, data, MaterialKeySource.BLOCK);
-        }
+
+        return Keys.of(material, (short) durability);
     }
 
     /* Spawner keys */

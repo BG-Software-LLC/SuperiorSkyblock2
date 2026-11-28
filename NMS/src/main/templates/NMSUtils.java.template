@@ -24,6 +24,7 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
@@ -57,6 +58,8 @@ public class NMSUtils {
 
     private static final ReflectMethod<LevelChunk> CHUNK_CACHE_SERVER_GET_CHUNK_IF_CACHED = new ReflectMethod<>(
             ServerChunkCache.class, "getChunkAtIfCachedImmediately", int.class, int.class);
+    private static final ReflectMethod<ChunkAccess> LEVEL_GET_CHUNK_IF_LOADED_IMMEDIATELY = new ReflectMethod<>(
+            Level.class, "getChunkIfLoadedImmediately", int.class, int.class);
 
     private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
@@ -105,13 +108,10 @@ public class NMSUtils {
         chunksCoords.forEach(chunkPosition -> {
             ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 
-            ChunkAccess chunkAccess;
-
-            try {
-                chunkAccess = serverLevel.getChunkIfLoadedImmediately(chunkPosition.getX(), chunkPosition.getZ());
-            } catch (Throwable ex) {
-                chunkAccess = serverLevel.getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
-            }
+            // getChunkIfLoadedImmediately only exists on Paper.
+            ChunkAccess chunkAccess = LEVEL_GET_CHUNK_IF_LOADED_IMMEDIATELY.isValid() ?
+                    serverLevel.getChunkIfLoadedImmediately(chunkPosition.getX(), chunkPosition.getZ()) :
+                    serverLevel.getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
 
             if (chunkAccess instanceof LevelChunk levelChunk) {
                 loadedChunks.add(levelChunk);

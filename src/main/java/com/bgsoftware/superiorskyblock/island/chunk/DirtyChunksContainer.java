@@ -87,8 +87,12 @@ public class DirtyChunksContainer {
         if (chunkIndex < 0)
             throw new IllegalStateException("Chunk is not inside island boundaries: " + chunkPosition);
 
-        BitSet dirtyChunksBitset = this.dirtyChunks.computeIfAbsent(chunkPosition.getWorldsInfo().getDimension(),
-                e -> new BitSet(this.totalChunksCount));
+        Dimension dimension = chunkPosition.getWorldsInfo().getDimension();
+        BitSet dirtyChunksBitset = this.dirtyChunks.get(dimension);
+        if (dirtyChunksBitset == null) {
+            dirtyChunksBitset = new BitSet(this.totalChunksCount);
+            this.dirtyChunks.put(dimension, dirtyChunksBitset);
+        }
 
         boolean isMarkedDirty = !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
 

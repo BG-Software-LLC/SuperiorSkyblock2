@@ -26,6 +26,9 @@ import java.util.Map;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20_3.AbstractNMSAlgorithms {
 
+    private static final ReflectField<Object> MINECRAFT_SERVER_TPS1 = new ReflectField<>(
+            MinecraftServer.class, Object.class, "tps1");
+
     private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
             new ReflectField<>(CraftRegistry.class, Map.class, "cache");
 
@@ -73,12 +76,11 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_20
 
     @Override
     public double getCurrentTps() {
-        try {
+        if (MINECRAFT_SERVER_TPS1.isValid())
             return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
-        }
+
+        //noinspection removal
+        return MinecraftServer.getServer().recentTps[0];
     }
 
     @Override

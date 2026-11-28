@@ -69,18 +69,21 @@ public class CmdAdminTitleAll implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Integer> fadeIn = CommandArguments.getInterval(sender, args[3]);
 
-        if (!fadeIn.isSucceed())
+        if (!fadeIn.isSucceed()) {
             return;
+        }
 
         NumberArgument<Integer> duration = CommandArguments.getInterval(sender, args[4]);
 
-        if (!duration.isSucceed())
+        if (!duration.isSucceed()) {
             return;
+        }
 
         NumberArgument<Integer> fadeOut = CommandArguments.getInterval(sender, args[5]);
 
-        if (!fadeOut.isSucceed())
+        if (!fadeOut.isSucceed()) {
             return;
+        }
 
         Map<String, String> parsedArguments = CommandArguments.parseArguments(args);
 
@@ -96,10 +99,13 @@ public class CmdAdminTitleAll implements IAdminIslandCommand {
                 subtitle == null ? null : Formatters.COLOR_FORMATTER.format(subtitle),
                 fadeIn.getNumber(), duration.getNumber(), fadeOut.getNumber()));
 
-        if (targetPlayer == null)
-            Message.GLOBAL_TITLE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
-        else
+        if (islands.size() > 1) {
+            Message.GLOBAL_TITLE_SENT_ALL.send(sender);
+        } else if (targetPlayer == null) {
+            Message.GLOBAL_TITLE_SENT_NAME.send(sender, islands.get(0).getName());
+        } else {
             Message.GLOBAL_TITLE_SENT.send(sender, targetPlayer.getName());
+        }
     }
 
 }

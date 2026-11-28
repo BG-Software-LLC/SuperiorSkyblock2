@@ -98,7 +98,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
                     EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
 
                     if (!(lastDamage instanceof EntityDamageByEntityEvent) ||
-                            !BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()).isPresent()) {
+                            BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()) == null) {
                         return;
                     }
                 }
@@ -115,9 +115,10 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
         private void modifyEventDrops(List<ItemStack> drops, LivingEntity livingEntity, double mobDropsMultiplier) {
             List<ItemStack> dropsToAdd = isWildStackerInstalled ? null : new LinkedList<>();
+            List<ItemStack> entityEquipment = BukkitEntities.getEntityEquipment(livingEntity);
 
             for (ItemStack itemStack : drops) {
-                if (itemStack != null && !BukkitEntities.isEquipment(livingEntity, itemStack)) {
+                if (itemStack != null && !BukkitEntities.isEquipment(entityEquipment, itemStack)) {
                     if (!canMultiplyDrops(itemStack)) {
                         continue;
                     }
