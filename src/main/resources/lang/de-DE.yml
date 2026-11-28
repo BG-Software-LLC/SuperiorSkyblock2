@@ -22,7 +22,7 @@ ADMIN_DEPOSIT_MONEY_NAME: '&e&lBank | &7Du hast {0} Citycoins auf die Bank der I
 ADMIN_HELP_FOOTER: '&e&lSkyblock &7Entwickelt von einem Entwickler'
 ADMIN_HELP_HEADER: '&e&lSkyblock &7Admin Befehlsliste [{0} / {1}]:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7 {1}'
-ADMIN_HELP_NEXT_PAGE: '&e&lSkyblock &7Verwende /is admin {0} für die nächste Seite.'
+ADMIN_HELP_NEXT_PAGE: '&e&lSkyblock &7Verwende {1} {0} für die nächste Seite.'
 ALREADY_IN_ISLAND: '&c&lError | &7Du bist bereits auf einer Insel. '
 ALREADY_IN_ISLAND_OTHER: '&c&lFehler | &7Dieser Spieler ist bereits Mitglied deiner
   Insel.'
@@ -590,7 +590,7 @@ ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE: '&e&lInsel | &7&oDu warst auf einer Insel, 
 ISLAND_HELP_FOOTER: '&e&lSkyblock &7Entwickelt von einem Entwickler'
 ISLAND_HELP_HEADER: '&e&lSkyblock &7Befehlsliste [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
-ISLAND_HELP_NEXT_PAGE: '&e&lSkyblock &7Verwende /is help {0} für die nächste Seite.'
+ISLAND_HELP_NEXT_PAGE: '&e&lSkyblock &7Verwende {1} {0} für die nächste Seite.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lInsel | &7Banklimit: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lInsel | &7Blockgrenzen:

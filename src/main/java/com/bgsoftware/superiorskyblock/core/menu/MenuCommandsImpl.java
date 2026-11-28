@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.menu.layout.MenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.menu.button.click.ButtonClickContextImpl;
 import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
@@ -113,7 +114,8 @@ public class MenuCommandsImpl implements MenuCommands {
                 break;
             case "admin":
                 String commandLabel = plugin.getSettings().getIslandCommand().split(",")[0];
-                runCommandInternal(menuView, commandLabel + " admin " + args, player, sender, onClose, onBack);
+                runCommandInternal(menuView, commandLabel + " " + CommandsHelper.getCommandLabel("admin") + " " + args,
+                        player, sender, onClose, onBack);
                 break;
             case "close":
                 ((AbstractMenuView<?, ?>) menuView).setClickedCloseButton();
@@ -124,7 +126,7 @@ public class MenuCommandsImpl implements MenuCommands {
                 onBack.run();
                 break;
             default:
-                plugin.getCommands().dispatchSubCommand(sender, subCommand, args);
+                plugin.getCommands().dispatchTypedSubCommand(sender, subCommand, args);
                 break;
         }
     }

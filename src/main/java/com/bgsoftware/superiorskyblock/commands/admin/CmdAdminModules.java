@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -115,7 +116,7 @@ public class CmdAdminModules implements ISuperiorCommand {
                         Message.MODULE_UNLOADED_SUCCESS.send(sender);
                         break;
                     default:
-                        Message.COMMAND_USAGE.send(sender, plugin.getCommands().getLabel() + " " + getUsage(PlayerLocales.getLocale(sender)));
+                        Message.COMMAND_USAGE.send(sender, CommandsHelper.getCommandUsage(this, PlayerLocales.getLocale(sender)));
                         break;
                 }
             }

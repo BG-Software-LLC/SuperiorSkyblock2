@@ -126,11 +126,12 @@ public class CmdHelp implements ISuperiorCommand {
             String description = subCommand.getDescription(locale);
             if (description == null)
                 new NullPointerException("The description of the command " + subCommand.getAliases().get(0) + " is null.").printStackTrace();
-            Message.ISLAND_HELP_LINE.send(sender, plugin.getCommands().getLabel() + " " + subCommand.getUsage(locale), description == null ? "" : description);
+            Message.ISLAND_HELP_LINE.send(sender, CommandsHelper.getCommandUsage(subCommand, locale), description == null ? "" : description);
         }
 
         if (page != lastPage)
-            Message.ISLAND_HELP_NEXT_PAGE.send(sender, page + 1);
+            Message.ISLAND_HELP_NEXT_PAGE.send(sender, page + 1,
+                    "/" + plugin.getCommands().getLabel() + " " + CommandsHelper.getCommandLabel(this));
         else
             Message.ISLAND_HELP_FOOTER.send(sender);
     }

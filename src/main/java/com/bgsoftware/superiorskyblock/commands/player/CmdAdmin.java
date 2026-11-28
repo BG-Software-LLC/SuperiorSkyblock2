@@ -80,7 +80,7 @@ public class CmdAdmin implements ISuperiorCommand {
 
             Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
 
-            SuperiorCommand command = plugin.getCommands().getAdminCommand(executedSubCommand);
+            SuperiorCommand command = plugin.getCommands().getTypedAdminCommand(executedSubCommand);
             if (command != null) {
                 // The console approves pending requests of dangerous commands by executing the sub command without arguments.
                 if (sender instanceof ConsoleCommandSender && args.length == 2 &&
@@ -106,8 +106,9 @@ public class CmdAdmin implements ISuperiorCommand {
                 }
 
                 if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
-                    Message.COMMAND_USAGE.send(sender, locale, plugin.getCommands().getLabel() + " " + command.getUsage(locale));
+                    String usage = CommandsHelper.getCommandUsage(command, locale);
+                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", usage);
+                    Message.COMMAND_USAGE.send(sender, locale, usage);
                     return;
                 }
 
@@ -185,11 +186,12 @@ public class CmdAdmin implements ISuperiorCommand {
             String description = subCommand.getDescription(locale);
             if (description == null)
                 new NullPointerException("The description of the command " + subCommand.getAliases().get(0) + " is null.").printStackTrace();
-            Message.ADMIN_HELP_LINE.send(sender, locale, plugin.getCommands().getLabel() + " " + subCommand.getUsage(locale), description);
+            Message.ADMIN_HELP_LINE.send(sender, locale, CommandsHelper.getCommandUsage(subCommand, locale), description);
         }
 
         if (page != lastPage)
-            Message.ADMIN_HELP_NEXT_PAGE.send(sender, locale, page + 1);
+            Message.ADMIN_HELP_NEXT_PAGE.send(sender, locale, page + 1,
+                    "/" + plugin.getCommands().getLabel() + " " + CommandsHelper.getCommandLabel(this));
         else
             Message.ADMIN_HELP_FOOTER.send(sender, locale);
     }
@@ -197,7 +199,7 @@ public class CmdAdmin implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         if (args.length > 1) {
-            SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
+            SuperiorCommand command = plugin.getCommands().getTypedAdminCommand(args[1]);
             if (command != null) {
                 return CommandsHelper.hasCommandAccess(command, sender) ?
                         command.tabComplete(plugin, sender, args) : Collections.emptyList();
@@ -210,8 +212,7 @@ public class CmdAdmin implements ISuperiorCommand {
 
         for (SuperiorCommand subCommand : plugin.getCommands().getAdminSubCommands()) {
             if (CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender)) {
-                List<String> aliases = new LinkedList<>(subCommand.getAliases());
-                aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
+                List<String> aliases = new LinkedList<>(CommandsHelper.getCommandAliases(subCommand));
                 for (String alias : aliases) {
                     if (alias.contains(args[1].toLowerCase(Locale.ENGLISH))) {
                         list.add(alias);

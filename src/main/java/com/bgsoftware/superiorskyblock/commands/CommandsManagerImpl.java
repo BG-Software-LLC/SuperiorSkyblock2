@@ -164,11 +164,19 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
     @Override
     public void dispatchSubCommand(CommandSender sender, String subCommand, @Nullable String args) {
         // We first check that the sub command is enabled.
-        if (getCommand(subCommand) == null) {
+        // This is used by code that refers to commands by their default labels, therefore these are
+        // accepted even if they were overridden.
+        SuperiorCommand command = getCommand(subCommand);
+        if (command == null) {
             Bukkit.dispatchCommand(sender, this.label + " " + subCommand + (args == null ? "" : " " + args));
             return;
         }
 
+        Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), subCommand);
+        pluginCommand.executeCommand(sender, command, buildArguments(subCommand, args));
+    }
+
+    private static String[] buildArguments(String subCommand, @Nullable String args) {
         String[] argsSplit = args == null ? null : args.split(" ");
         String[] commandArguments;
 
@@ -181,7 +189,36 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             System.arraycopy(argsSplit, 0, commandArguments, 1, argsSplit.length);
         }
 
-        pluginCommand.execute(sender, "", commandArguments);
+        return commandArguments;
+    }
+
+    public CommandsMap getPlayerCommandsMap() {
+        return playerCommandsMap;
+    }
+
+    /**
+     * Get an admin sub command by a label that was typed by a player, the console or a config file.
+     * When override-default-aliases is enabled, default aliases that were overridden are not accepted.
+     */
+    @Nullable
+    public SuperiorCommand getTypedAdminCommand(String commandLabel) {
+        return adminCommandsMap.getTypedCommand(commandLabel);
+    }
+
+    /**
+     * Dispatch a sub command by a label from a config file (for example, a menu action).
+     * Unlike {@link #dispatchSubCommand(CommandSender, String, String)}, which is used by code that refers to
+     * commands by their default labels, default aliases that were overridden are not accepted.
+     */
+    public void dispatchTypedSubCommand(CommandSender sender, String subCommand, @Nullable String args) {
+        SuperiorCommand command = playerCommandsMap.getTypedCommand(subCommand);
+        if (command == null) {
+            Bukkit.dispatchCommand(sender, this.label + " " + subCommand + (args == null || args.isEmpty() ? "" : " " + args));
+            return;
+        }
+
+        Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), subCommand);
+        pluginCommand.executeCommand(sender, command, buildArguments(subCommand, args));
     }
 
     public String getLabel() {
@@ -213,7 +250,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
         Message.DANGEROUS_COMMAND_REQUEST_SENT.send(player, executedCommand);
         Message.DANGEROUS_COMMAND_REQUEST_CONSOLE.send(Bukkit.getConsoleSender(), player.getName(),
-                executedCommand, this.label + " admin " + commandLabel);
+                executedCommand, this.label + " " + CommandsHelper.getCommandLabel("admin") + " " + CommandsHelper.getCommandLabel(command));
     }
 
     @Override
@@ -371,73 +408,21 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         public boolean execute(CommandSender sender, String label, String[] args) {
             java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-            String executedSubCommand;
-
             if (args.length > 0) {
-                executedSubCommand = args[0];
+                String executedSubCommand = args[0];
 
                 Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
 
-                SuperiorCommand command = playerCommandsMap.getCommand(executedSubCommand);
+                SuperiorCommand command = playerCommandsMap.getTypedCommand(executedSubCommand);
                 if (command != null) {
-                    if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
-                        Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
-                        return false;
-                    }
-
-                    if (!CommandsHelper.hasCommandAccess(command, sender)) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-
-                        if (!plugin.getSettings().isHelpOnNoPermission())
-                            Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
-                        else if (!"help".equalsIgnoreCase(executedSubCommand))
-                            dispatchSubCommand(sender, "help");
-
-                        return false;
-                    }
-
-                    if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                        Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", command.getUsage(locale));
-                        Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
-                        return false;
-                    }
-
-                    if (sender instanceof Player) {
-                        UUID uuid = ((Player) sender).getUniqueId();
-                        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
-                        if (!superiorPlayer.hasPermission("superior.admin.bypass.cooldowns")) {
-                            Pair<Integer, String> commandCooldown = getCooldown(command);
-                            if (commandCooldown != null) {
-                                String commandLabel = command.getAliases().get(0);
-
-                                Map<String, Long> playerCooldowns = commandsCooldown.get(uuid);
-                                long timeNow = System.currentTimeMillis();
-
-                                if (playerCooldowns != null) {
-                                    Long timeToExecute = playerCooldowns.get(commandLabel);
-                                    if (timeToExecute != null) {
-                                        if (timeNow < timeToExecute) {
-                                            String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
-                                            Log.debugResult(Debug.EXECUTE_COMMAND, "Return Cooldown", formattedTime);
-                                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
-                                            return false;
-                                        }
-                                    }
-                                }
-
-                                commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
-                                        timeNow + commandCooldown.getKey());
-                            }
-                        }
-                    }
-
-                    command.execute(plugin, sender, args);
+                    executeCommand(sender, command, args);
                     return false;
                 }
 
                 if (!plugin.getSettings().isHelpOnInvalidCommand())
                     Message.INVALID_COMMAND.send(sender, locale, executedSubCommand);
-                else if (!"help".equalsIgnoreCase(executedSubCommand))
+                else if (getCommand("help") != null)
+                    // The help command is executed directly, so this cannot end up in an infinite loop.
                     dispatchSubCommand(sender, "help");
 
                 return false;
@@ -464,10 +449,74 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             return false;
         }
 
+        void executeCommand(CommandSender sender, SuperiorCommand command, String[] args) {
+            java.util.Locale locale = PlayerLocales.getLocale(sender);
+
+            if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
+                Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
+                return;
+            }
+
+            if (!CommandsHelper.hasCommandAccess(command, sender)) {
+                String permission = command.getPermission();
+                Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", permission);
+
+                if (!plugin.getSettings().isHelpOnNoPermission()) {
+                    Message.NO_COMMAND_PERMISSION.send(sender, locale, permission);
+                } else {
+                    SuperiorCommand helpCommand = getCommand("help");
+                    // We don't want to end up in an infinite loop
+                    if (helpCommand != null && helpCommand != command)
+                        dispatchSubCommand(sender, "help");
+                }
+
+                return;
+            }
+
+            if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
+                String usage = CommandsHelper.getCommandUsage(command, locale);
+                Log.debugResult(Debug.EXECUTE_COMMAND, "Return Incorrect Usage", usage);
+                Message.COMMAND_USAGE.send(sender, locale, usage);
+                return;
+            }
+
+            if (sender instanceof Player) {
+                UUID uuid = ((Player) sender).getUniqueId();
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
+                if (!superiorPlayer.hasPermission("superior.admin.bypass.cooldowns")) {
+                    Pair<Integer, String> commandCooldown = getCooldown(command);
+                    if (commandCooldown != null) {
+                        // Cooldowns are kept by the default label, as reloading the plugin creates new command instances.
+                        String commandLabel = command.getAliases().get(0).toLowerCase(Locale.ENGLISH);
+
+                        Map<String, Long> playerCooldowns = commandsCooldown.get(uuid);
+                        long timeNow = System.currentTimeMillis();
+
+                        if (playerCooldowns != null) {
+                            Long timeToExecute = playerCooldowns.get(commandLabel);
+                            if (timeToExecute != null) {
+                                if (timeNow < timeToExecute) {
+                                    String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
+                                    Log.debugResult(Debug.EXECUTE_COMMAND, "Return Cooldown", formattedTime);
+                                    Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
+                                    return;
+                                }
+                            }
+                        }
+
+                        commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
+                                timeNow + commandCooldown.getKey());
+                    }
+                }
+            }
+
+            command.execute(plugin, sender, args);
+        }
+
         @Override
         public List<String> tabComplete(CommandSender sender, String label, String[] args) {
             if (args.length > 0) {
-                SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
+                SuperiorCommand command = playerCommandsMap.getTypedCommand(args[0]);
                 if (command != null) {
                     return CommandsHelper.shouldDisplayCommandForPlayer(command, sender) ?
                             command.tabComplete(plugin, sender, args) : Collections.emptyList();
@@ -478,8 +527,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
             for (SuperiorCommand subCommand : getSubCommands()) {
                 if (CommandsHelper.shouldDisplayCommandForPlayer(subCommand, sender)) {
-                    List<String> aliases = new LinkedList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
+                    List<String> aliases = new LinkedList<>(CommandsHelper.getCommandAliases(subCommand));
                     for (String alias : aliases) {
                         if (alias.contains(args[0].toLowerCase(Locale.ENGLISH))) {
                             list.add(alias);

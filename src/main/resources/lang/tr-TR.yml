@@ -20,7 +20,7 @@ ADMIN_DEPOSIT_MONEY_NAME: '&e&lBanka | &7{1} adasının bankasına ${0} yatırd�
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Geliştiren: Ome_R'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Yönetici Komutları Listesi [{0}/{1}]:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
-ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Sonraki sayfa için /is admin {0} kullan.'
+ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Sonraki sayfa için {1} {0} kullan.'
 ALREADY_IN_ISLAND: '&c&lHata | &7Zaten bir adadasın.'
 ALREADY_IN_ISLAND_OTHER: '&c&lHata | &7Bu oyuncu zaten adanın bir üyesi.'
 BAN_ANNOUNCEMENT: '&e&lAda | &7{0}, {1} tarafından adadan YASAKLANDI.'
@@ -562,7 +562,7 @@ ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE: '&e&lAda | &7&oPVP''nin açıldığı bir a
 ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Geliştiren: Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Komutlar Listesi [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
-ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Sonraki sayfa için /is help {0} kullan.'
+ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Sonraki sayfa için {1} {0} kullan.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lAda | &7Banka Limiti: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lAda | &7Blok Limitleri:
