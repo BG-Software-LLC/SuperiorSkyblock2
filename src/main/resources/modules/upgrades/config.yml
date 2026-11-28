@@ -20,6 +20,8 @@ crop-growth:
   interval: 5
 
   # List of whitelisted crops that will be affected by the crop-growth multiplier.
+  # When the list is empty ('whitelisted-crops: []'), all the crops listed by default are affected.
+  # To stop the multiplier from affecting crops, set 'enabled' to false.
   # You can find a list of materials here: https://bg-software.com/materials/
   whitelisted-crops:
     - 'ACACIA_SAPLING'
@@ -73,19 +75,19 @@ mob-drops:
   only-player-kills: false
 
   # List of whitelisted items that will be multiplied.
-  # You can disable this feature by setting the section to 'whitelisted-items: []'
+  # When the list is empty ('whitelisted-items: []'), all items are multiplied.
   whitelisted-items: [ ]
 
   # List of blacklisted items that won't be multiplied.
-  # You can disable this feature by setting the section to 'blacklisted-items: []'
+  # An item that is in both lists is not multiplied.
   blacklisted-items: [ ]
 
   # List of whitelisted entities whose drops will be multiplied.
-  # You can disable this feature by setting the section to 'whitelisted-entities: []'
+  # When the list is empty ('whitelisted-entities: []'), drops of all entities are multiplied.
   whitelisted-entities: [ ]
 
   # List of blacklisted entities whose drops won't be multiplied.
-  # You can disable this feature by setting the section to 'blacklisted-entities: []'
+  # An entity that is in both lists does not get its drops multiplied.
   blacklisted-entities: [ ]
 
 # Whether the spawner-rates multiplier should be enabled.

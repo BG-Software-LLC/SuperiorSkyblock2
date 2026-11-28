@@ -1213,12 +1213,17 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         boolean forceSave = false;
 
         if (!upgradesConfig.isConfigurationSection("crop-growth")) {
-            upgradesConfig.set("crop-growth.enabled", upgradesConfig.getBoolean("crop-growth"));
+            upgradesConfig.set("crop-growth.enabled", upgradesConfig.getBoolean("crop-growth", true));
             forceSave = true;
         }
 
         if (mainConfig.isList("crops-to-grow")) {
-            upgradesConfig.set("crop-growth.whitelisted-crops", mainConfig.getList("crops-to-grow"));
+            List<?> cropsToGrow = mainConfig.getList("crops-to-grow");
+            // An empty crops-to-grow list used to mean no crops are affected.
+            // An empty whitelist now means all crops, so keep the old behaviour by disabling the upgrade.
+            if (cropsToGrow.isEmpty())
+                upgradesConfig.set("crop-growth.enabled", false);
+            upgradesConfig.set("crop-growth.whitelisted-crops", cropsToGrow);
             mainConfig.set("crops-to-grow", null);
             forceSave = true;
         }
@@ -1230,7 +1235,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         }
 
         if (!upgradesConfig.isConfigurationSection("mob-drops")) {
-            upgradesConfig.set("mob-drops.enabled", upgradesConfig.getBoolean("mob-drops"));
+            upgradesConfig.set("mob-drops.enabled", upgradesConfig.getBoolean("mob-drops", true));
             forceSave = true;
         }
 
