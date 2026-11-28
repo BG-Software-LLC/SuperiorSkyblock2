@@ -20,7 +20,7 @@ ADMIN_DEPOSIT_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã gửi ${0} vào ngân 
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Phát triển bởi Ome_R'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Danh sách các lệnh cho quản trị viên [{0}/{1}]:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
-ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng /is admin {0} để xem trang kế tiếp.'
+ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng {1} {0} để xem trang kế tiếp.'
 ALREADY_IN_ISLAND: '&c&lLỗi | &7Bạn đã ở trong đảo rồi.'
 ALREADY_IN_ISLAND_OTHER: '&c&lLỗi | &7Người chơi này đã là thành viên trong đảo của
   bạn.'
@@ -497,7 +497,7 @@ ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE: '&e&lĐảo | &7&oBạn đã ở trong mộ
 ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Được phát triển bởi Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Danh sách lệnh [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
-ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng /is help {0} cho trang tiếp theo.'
+ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng {1} {0} cho trang tiếp theo.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lĐảo | &7Giới Hạn Ngân Hàng: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lĐảo | &7Giới Hạn Các Khối:

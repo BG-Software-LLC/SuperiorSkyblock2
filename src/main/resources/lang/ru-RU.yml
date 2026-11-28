@@ -18,7 +18,7 @@ ADMIN_DEPOSIT_MONEY_NAME: '&e&lБанк | &7Вы внесли ${0} на банк
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Разработано Ome_R'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Список команд администратора [{0}/{1}]:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
-ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Используйте /is admin {0} для следующей страницы.'
+ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Используйте {1} {0} для следующей страницы.'
 ALREADY_IN_ISLAND: '&c&lОшибка | &7Вы уже на острове.'
 ALREADY_IN_ISLAND_OTHER: '&c&lОшибка | &7Этот игрок уже является членом вашего острова.'
 BAN_ANNOUNCEMENT: '&e&lОстров | &7{0} был ЗАБАНЕН на острове {1}.'
@@ -441,7 +441,7 @@ ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE: '&e&lОстров | &7&oВы были вн�
 ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Разработано Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Список команд [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
-ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Используйте /is help {0} для следующей страницы.'
+ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Используйте {1} {0} для следующей страницы.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lОстров | &7Лимит банка: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lОстров | &7Лимиты блоков:

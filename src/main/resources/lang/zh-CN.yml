@@ -18,7 +18,7 @@ ADMIN_DEPOSIT_MONEY_NAME: '&e&l银行 | &7你存入了 ${0} 至岛屿 {1} 的银
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7由 Ome_R 开发'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7管理员命令列表[{0}/{1}]:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
-ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7使用 /is admin {0} 来翻到下一页.'
+ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7使用 {1} {0} 来翻到下一页.'
 ALREADY_IN_ISLAND: '&c&l错误 | &7你已经处于一个岛屿中了.'
 ALREADY_IN_ISLAND_OTHER: '&c&l错误 | &7此玩家已经是其他的岛屿成员了.'
 BAN_ANNOUNCEMENT: '&e&l岛屿 | &7{0} 已被 {1} 从该岛屿封禁.'
@@ -441,7 +441,7 @@ ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE: '&e&l岛屿 | &7&o你正处于一个开启�
 ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock&7, 由 Ome_R 开发'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7命令列表 [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
-ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7使用 /is help {0} 来翻到下一页.'
+ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7使用 {1} {0} 来翻到下一页.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&l岛屿 | &7银行限制: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&l岛屿 | &7方块限制:

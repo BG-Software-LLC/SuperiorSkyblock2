@@ -3,9 +3,11 @@ package com.bgsoftware.superiorskyblock.core.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
@@ -405,7 +407,7 @@ public enum Message {
                 }
 
                 for (BaseComponent baseComponent : baseComponents)
-                    baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " accept " + args[0]));
+                    baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " " + getAcceptLabel() + " " + args[0]));
 
                 IMessageComponent messageComponent = ComplexMessageComponent.of(baseComponents);
                 if (messageComponent != null) {
@@ -1022,6 +1024,11 @@ public enum Message {
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
         }
+    }
+
+    private static String getAcceptLabel() {
+        SuperiorCommand acceptCommand = plugin.getCommands().getCommand("accept");
+        return acceptCommand == null ? "accept" : CommandsHelper.getCommandLabel(acceptCommand);
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {

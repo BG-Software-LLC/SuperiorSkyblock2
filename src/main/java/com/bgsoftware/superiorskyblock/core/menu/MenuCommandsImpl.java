@@ -95,7 +95,7 @@ public class MenuCommandsImpl implements MenuCommands {
                 clickEvent.getWhoClicked().closeInventory();
                 break;
             default:
-                plugin.getCommands().dispatchSubCommand(sender, subCommand, args);
+                plugin.getCommands().dispatchTypedSubCommand(sender, subCommand, args);
                 break;
         }
     }

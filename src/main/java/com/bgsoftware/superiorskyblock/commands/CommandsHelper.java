@@ -31,29 +31,36 @@ public class CommandsHelper {
 
     public static String getCommandUsage(SuperiorCommand superiorCommand, Locale locale) {
         String pluginLabel = plugin.getCommands().getLabel() + " ";
+        String usage = superiorCommand.getUsage(locale);
 
         if (!plugin.getSettings().isOverrideDefaultAliases())
-            return pluginLabel + superiorCommand.getUsage(locale);
+            return pluginLabel + usage;
 
-        String usage = superiorCommand.getUsage(locale);
+        // Plain string operations are used, as labels may contain regex characters.
         String defaultLabel = superiorCommand.getAliases().get(0);
 
-        if (usage.startsWith(defaultLabel))
-            return pluginLabel + usage.replaceFirst(defaultLabel, getCommandLabel(superiorCommand));
+        if (startsWithLabel(usage, defaultLabel))
+            return pluginLabel + getCommandLabel(superiorCommand) + usage.substring(defaultLabel.length());
 
-        SuperiorCommand cmdAdmin = plugin.getCommands().getCommand("admin");
-        String defaultAdminLabel = cmdAdmin.getAliases().get(0);
+        SuperiorCommand cmdAdmin = plugin.getCommands().getPlayerCommandsMap().findCommand("admin");
+        if (cmdAdmin != null) {
+            String defaultAdminLabel = cmdAdmin.getAliases().get(0);
+            if (startsWithLabel(usage, defaultAdminLabel)) {
+                usage = usage.substring(defaultAdminLabel.length()).trim();
 
-        if (usage.startsWith(defaultAdminLabel)) {
-            usage = usage.substring(defaultAdminLabel.length() + 1);
+                if (startsWithLabel(usage, defaultLabel))
+                    usage = getCommandLabel(superiorCommand) + usage.substring(defaultLabel.length());
 
-            if (usage.startsWith(defaultLabel))
-                usage = usage.replaceFirst(defaultLabel, getCommandLabel(superiorCommand));
-
-            return pluginLabel + getCommandLabel(cmdAdmin) + " " + usage;
+                return pluginLabel + getCommandLabel(cmdAdmin) + (usage.isEmpty() ? "" : " " + usage);
+            }
         }
 
         return pluginLabel + usage;
+    }
+
+    private static boolean startsWithLabel(String usage, String label) {
+        return usage.regionMatches(true, 0, label, 0, label.length()) &&
+                (usage.length() == label.length() || Character.isWhitespace(usage.charAt(label.length())));
     }
 
     public static String getCommandLabel(SuperiorCommand superiorCommand) {
@@ -68,7 +75,8 @@ public class CommandsHelper {
         List<String> customAliases = new ArrayList<>();
 
         for (String alias : defaultAliases) {
-            List<String> aliases = plugin.getSettings().getCommandAliases().getOrDefault(alias, Collections.emptyList());
+            List<String> aliases = plugin.getSettings().getCommandAliases()
+                    .getOrDefault(alias.toLowerCase(Locale.ENGLISH), Collections.emptyList());
             customAliases.addAll(aliases);
         }
 

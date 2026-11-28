@@ -76,7 +76,7 @@ public class CmdAdmin implements ISuperiorCommand {
         if (args.length > 1 && !isNumber(args[1])) {
             Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), args[1]);
 
-            SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
+            SuperiorCommand command = plugin.getCommands().getTypedAdminCommand(args[1]);
             if (command != null) {
                 if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
                     Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
@@ -162,7 +162,8 @@ public class CmdAdmin implements ISuperiorCommand {
         }
 
         if (page != lastPage)
-            Message.ADMIN_HELP_NEXT_PAGE.send(sender, locale, page + 1);
+            Message.ADMIN_HELP_NEXT_PAGE.send(sender, locale, page + 1,
+                    "/" + plugin.getCommands().getLabel() + " " + CommandsHelper.getCommandLabel(this));
         else
             Message.ADMIN_HELP_FOOTER.send(sender, locale);
     }
@@ -170,7 +171,7 @@ public class CmdAdmin implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         if (args.length > 1) {
-            SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
+            SuperiorCommand command = plugin.getCommands().getTypedAdminCommand(args[1]);
             if (command != null) {
                 return CommandsHelper.hasCommandAccess(command, sender) ?
                         command.tabComplete(plugin, sender, args) : Collections.emptyList();

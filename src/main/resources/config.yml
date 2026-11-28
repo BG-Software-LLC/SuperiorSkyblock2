@@ -563,6 +563,7 @@ afk-integrations:
 
 # A list of commands that should have cooldown.
 # Cooldowns are in milliseconds.
+# Commands are listed by their default labels, even if they have custom aliases.
 # You can disable this section by using:
 # commands-cooldown:
 #   random:
@@ -812,8 +813,17 @@ island-chests:
   default-size: 3
 
 # Should custom aliases for plugin's commands override the default aliases?
-# When true, default aliases will be disabled, and the plugin will attempt to replace
-# default command labels in command usage messages with the first custom alias.
+# When true, the default aliases of commands that have custom aliases can no longer be used
+# (commands without custom aliases keep their default ones), and command usage messages will show
+# the first custom alias instead of the default label.
+# This applies to players, the console and commands in the config files: you must update the commands
+# in your menus (for example, '[player] is permissions' in the control panel) and in your missions,
+# upgrades and other configs (for example, 'is admin msg') to use the custom aliases.
+# The custom aliases are shared by player and admin commands with the same name:
+# for example, 'kick' renames both '/is kick' and '/is admin kick'.
+# Messages of existing language files may still show the default labels (for example, the
+# '/is help {0}' hint for the next help page); you can replace them with '{1} {0}' to show
+# the custom label.
 override-default-aliases: false
 
 # Custom aliases for plugin's commands.
@@ -822,7 +832,7 @@ override-default-aliases: false
 #   panel:
 #   - gui
 #   - menu
-command-aliases: [ ]
+command-aliases: { }
 
 # A list of valuable blocks.
 # These blocks require the "VALUABLE_BREAK" permission in order to break them.

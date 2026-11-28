@@ -130,7 +130,8 @@ public class CmdHelp implements ISuperiorCommand {
         }
 
         if (page != lastPage)
-            Message.ISLAND_HELP_NEXT_PAGE.send(sender, page + 1);
+            Message.ISLAND_HELP_NEXT_PAGE.send(sender, page + 1,
+                    "/" + plugin.getCommands().getLabel() + " " + CommandsHelper.getCommandLabel(this));
         else
             Message.ISLAND_HELP_FOOTER.send(sender);
     }

@@ -18,7 +18,7 @@ ADMIN_DEPOSIT_MONEY_NAME: '&e&lBanco | &7Você depositou R${0} no banco da ilha 
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Desenvolvido por Ome_R'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Lista de Comandos Admin [{0}/{1}]:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
-ADMIN_HELP_NEXT_PAGE: '&e&lSkyblock &7Use /is admin {0} para a próxima página.'
+ADMIN_HELP_NEXT_PAGE: '&e&lSkyblock &7Use {1} {0} para a próxima página.'
 ALREADY_IN_ISLAND: '&c&lErro | &7Você já está em uma ilha.'
 ALREADY_IN_ISLAND_OTHER: '&c&lErro | &7Este jogador já é membro da sua ilha.'
 BAN_ANNOUNCEMENT: '&e&lIlha | &7{0} foi BANIDO da ilha por {1}.'
@@ -441,7 +441,7 @@ ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE: '&e&lIlha | &7&oVocê estava dentro de uma 
 ISLAND_HELP_FOOTER: '&e&lSkyblock &7Desenvolvido por Ome_R'
 ISLAND_HELP_HEADER: '&e&lSkyblock &7Lista de Comandos [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
-ISLAND_HELP_NEXT_PAGE: '&e&lSkyblock &7Use /is help {0} para a próxima página.'
+ISLAND_HELP_NEXT_PAGE: '&e&lSkyblock &7Use {1} {0} para a próxima página.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIlha | &7Limite do Banco: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lIlha | &7Blocos Limites:
