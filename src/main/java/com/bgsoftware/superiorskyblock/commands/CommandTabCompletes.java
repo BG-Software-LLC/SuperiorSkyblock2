@@ -116,13 +116,29 @@ public class CommandTabCompletes {
 
     public static List<String> getOnlinePlayersAndMultipleIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish,
                                                           @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
-        List<String> tabArguments = new LinkedList<>(getOnlinePlayersAndIslands(plugin, argument, hideVanish, predicate));
+        List<String> onlinePlayersAndIslands = getOnlinePlayersAndIslands(plugin, argument, hideVanish, predicate);
 
-        if ("*".contains(argument)) {
-            tabArguments.add("*");
-        }
+        if (!"*".contains(argument) || !hasMatchingIsland(plugin, predicate))
+            return onlinePlayersAndIslands;
+
+        // Same order as IAdminIslandCommand#tabComplete: "*" comes first.
+        List<String> tabArguments = new LinkedList<>();
+        tabArguments.add("*");
+        tabArguments.addAll(onlinePlayersAndIslands);
 
         return Collections.unmodifiableList(tabArguments);
+    }
+
+    private static boolean hasMatchingIsland(SuperiorSkyblockPlugin plugin, @Nullable BiPredicate<SuperiorPlayer, Island> predicate) {
+        if (predicate == null)
+            return !plugin.getGrid().getIslands().isEmpty();
+
+        for (Island island : plugin.getGrid().getIslands()) {
+            if (predicate.test(island.getOwner(), island))
+                return true;
+        }
+
+        return false;
     }
 
     public static List<String> getIslandWarps(Island island, String argument) {
@@ -158,7 +174,7 @@ public class CommandTabCompletes {
     public static List<String> getSchematics(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return new SequentialListBuilder<String>()
-                .filter(schematic -> plugin.getSchematics().isDefaultSchematic(schematic)
+                .filter(schematic -> !plugin.getSchematics().isDimensionSchematic(schematic)
                         && schematic.toLowerCase(Locale.ENGLISH).contains(lowerArgument))
                 .build(plugin.getSchematics().getSchematics());
     }

@@ -418,8 +418,8 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     }
 
-    public boolean isDefaultSchematic(String schematic) {
-        return this.schematicsContainer.isDefaultSchematic(schematic);
+    public boolean isDimensionSchematic(String schematic) {
+        return this.schematicsContainer.isDimensionSchematic(schematic);
     }
 
     public String getDefaultSchematic(Dimension dimension) {

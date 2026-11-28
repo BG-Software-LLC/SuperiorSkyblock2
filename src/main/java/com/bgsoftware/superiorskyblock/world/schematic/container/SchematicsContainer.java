@@ -16,7 +16,7 @@ public interface SchematicsContainer {
 
     Map<String, Schematic> getSchematics();
 
-    boolean isDefaultSchematic(String schematic);
+    boolean isDimensionSchematic(String schematic);
 
     void addSchematicParser(SchematicParser schematicParser);
 

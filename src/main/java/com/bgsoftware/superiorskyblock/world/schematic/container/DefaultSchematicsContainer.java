@@ -6,16 +6,18 @@ import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class DefaultSchematicsContainer implements SchematicsContainer {
 
     private final Map<String, Schematic> schematicMap = new LinkedHashMap<>();
-    private final List<String> defaultSchematics = new LinkedList<>();
+    private final Set<String> dimensionSchematics = new HashSet<>();
     private final List<SchematicParser> schematicParsers = new LinkedList<>();
 
     @Nullable
@@ -30,8 +32,8 @@ public class DefaultSchematicsContainer implements SchematicsContainer {
 
         this.schematicMap.put(schematicName, schematic);
 
-        if (isDefaultSchematicInternal(schematicName)) {
-            this.defaultSchematics.add(schematicName);
+        if (isDimensionSchematicInternal(schematicName)) {
+            this.dimensionSchematics.add(schematicName);
         }
     }
 
@@ -41,8 +43,8 @@ public class DefaultSchematicsContainer implements SchematicsContainer {
     }
 
     @Override
-    public boolean isDefaultSchematic(String schematic) {
-        return this.defaultSchematics.contains(schematic.toLowerCase(Locale.ENGLISH));
+    public boolean isDimensionSchematic(String schematic) {
+        return this.dimensionSchematics.contains(schematic.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
@@ -58,19 +60,19 @@ public class DefaultSchematicsContainer implements SchematicsContainer {
     @Override
     public void clearSchematics() {
         this.schematicMap.clear();
-        this.defaultSchematics.clear();
+        this.dimensionSchematics.clear();
     }
 
-    private static boolean isDefaultSchematicInternal(String schematicName) {
+    private static boolean isDimensionSchematicInternal(String schematicName) {
         for (Dimension dimension : Dimension.values()) {
             String dimensionSuffix = "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
 
             if (schematicName.endsWith(dimensionSuffix)) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
 }
