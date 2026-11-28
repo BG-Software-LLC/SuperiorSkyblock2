@@ -53,6 +53,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
+    private final Long2ObjectMapView.AbsentConsumer<ChunkData> chunkDataCreator = ChunkData::new;
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
     private final List<BlockPosition> lights = new LinkedList<>();
@@ -109,7 +110,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         if (plugin.getSettings().isLightsUpdate() && blockData.d() > 0)
             lights.add(blockPosition);
 
-        ChunkData chunkData = this.chunks.computeIfAbsent(ChunkCoordIntPair.a(chunkCoord.x, chunkCoord.z), ChunkData::new);
+        ChunkData chunkData = this.chunks.computeIfAbsent(ChunkCoordIntPair.a(chunkCoord.x, chunkCoord.z), this.chunkDataCreator);
 
         ChunkSection chunkSection = chunkData.chunkSections[blockPosition.getY() >> 4];
 

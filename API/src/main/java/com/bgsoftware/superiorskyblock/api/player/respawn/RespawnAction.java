@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.player.respawn;
 
+import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -57,13 +58,21 @@ public abstract class RespawnAction implements Enumerable {
      * @param name The name to check.
      */
     public static RespawnAction getByName(String name) {
+        RespawnAction respawnAction = getByNameOrNull(name);
+
+        return Preconditions.checkNotNull(respawnAction, "Couldn't find an RespawnAction with the name " + name + ".");
+    }
+
+    /**
+     * Get a respawn action by its name, or null if it doesn't exist.
+     *
+     * @param name The name to check.
+     */
+    @Nullable
+    public static RespawnAction getByNameOrNull(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        RespawnAction respawnAction = respawnActions.get(name.toUpperCase(Locale.ENGLISH));
-
-        Preconditions.checkNotNull(respawnAction, "Couldn't find an RespawnAction with the name " + name + ".");
-
-        return respawnAction;
+        return respawnActions.get(name.toUpperCase(Locale.ENGLISH));
     }
 
     /**

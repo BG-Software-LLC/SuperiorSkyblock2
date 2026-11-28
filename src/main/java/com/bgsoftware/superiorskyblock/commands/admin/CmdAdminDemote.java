@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -76,8 +77,8 @@ public class CmdAdminDemote implements IAdminPlayerCommand {
 
         do {
             previousRole = previousRole.getPreviousRole();
-            roleLimit = previousRole == null ? -1 : island.getRoleLimit(previousRole);
-        } while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit >= island.getIslandMembers(previousRole).size());
+            roleLimit = previousRole == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : island.getRoleLimit(previousRole);
+        } while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit <= island.getIslandMembers(previousRole).size());
 
         if (previousRole == null) {
             Message.LAST_ROLE_DEMOTE.send(sender);

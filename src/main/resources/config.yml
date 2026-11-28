@@ -231,10 +231,11 @@ island-roles:
       - PICKUP_AXOLOTL
       - PICKUP_DROPS
       - PICKUP_FISH
-      - PICKUP_LECTERN_BOOK
+      - READ_LECTERN_BOOK
       - SADDLE_ENTITY
       - SIGN_INTERACT
       - SCULK_SENSOR
+      - SULFUR_CUBE_INTERACT
       - TURTLE_EGG_TRAMPING
       - USE
       - VILLAGER_TRADING
@@ -828,6 +829,13 @@ disabled-events: [ ]
 # You can add a label or an alias of a command to disable it.
 disabled-commands: [ ]
 
+# A list of admin sub-commands that are considered dangerous.
+# When a player executes one of them, the command is not executed until the console approves it
+# by executing the same admin sub-command without arguments (e.g. "is admin purge").
+# Requests expire after 1 minute, or when the player leaves the server.
+# You can add a label or an alias of an admin command.
+dangerous-commands: [ ]
+
 # List of plugins that their hooks should not be enabled.
 # Simply add the plugin's name in order to prevent it from enabling.
 disabled-hooks: [ ]
@@ -853,10 +861,6 @@ command-aliases:
   example-command:
     - 'Aliase1'
     - 'Aliase2'
-
-# A list of valuable blocks.
-# These blocks require the "VALUABLE_BREAK" permission in order to break them.
-valuable-blocks: [ ]
 
 # Settings related to the island previews.
 island-previews:

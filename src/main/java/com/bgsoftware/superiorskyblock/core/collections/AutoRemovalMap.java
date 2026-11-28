@@ -32,54 +32,57 @@ public class AutoRemovalMap<K, V> implements Map<K, V> {
         this.elements = mapSupplier.get();
         this.elementsLifeTime = CacheBuilder.newBuilder()
                 .expireAfterWrite(removalDelay, timeUnit)
+                .concurrencyLevel(1)
                 .removalListener(removalNotification -> {
-                    elements.remove(removalNotification.getKey());
+                    if (removalNotification.wasEvicted())
+                        elements.remove(removalNotification.getKey());
                 })
                 .build();
     }
 
     @Override
     public int size() {
-        refreshLifeTime();
+        this.expireElements();
         return elements.size();
     }
 
     @Override
     public boolean isEmpty() {
-        refreshLifeTime();
+        this.expireElements();
         return elements.isEmpty();
     }
 
     @Override
     public boolean containsKey(Object key) {
-        refreshLifeTime(key);
+        this.expireElements();
         return elements.containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        refreshLifeTime();
+        this.expireElements();
         return elements.containsValue(value);
     }
 
     @Override
     public V get(Object key) {
-        refreshLifeTime(key);
+        this.expireElements();
         return elements.get(key);
     }
 
     @Nullable
     @Override
     public V put(K key, V value) {
-        refreshLifeTime(key);
+        this.expireElements();
         V old = elements.put(key, value);
         if (old != value)
             this.elementsLifeTime.put(key, DUMMY);
-        return value;
+        return old;
     }
 
     @Override
     public V remove(Object key) {
+        this.expireElements();
         V value = elements.remove(key);
         this.elementsLifeTime.invalidate(key);
         return value;
@@ -99,34 +102,26 @@ public class AutoRemovalMap<K, V> implements Map<K, V> {
     @NotNull
     @Override
     public Set<K> keySet() {
-        refreshLifeTime();
+        this.expireElements();
         return elements.keySet();
     }
 
     @NotNull
     @Override
     public Collection<V> values() {
-        refreshLifeTime();
+        this.expireElements();
         return elements.values();
     }
 
     @NotNull
     @Override
     public Set<Entry<K, V>> entrySet() {
-        refreshLifeTime();
+        this.expireElements();
         return elements.entrySet();
     }
 
-    private void refreshLifeTime(Object o) {
-        try {
-            this.elementsLifeTime.get((K) o, () -> null);
-        } catch (Throwable ignored) {
-
-        }
-    }
-
-    private void refreshLifeTime() {
-        this.elementsLifeTime.size();
+    private void expireElements() {
+        this.elementsLifeTime.cleanUp();
     }
 
 }

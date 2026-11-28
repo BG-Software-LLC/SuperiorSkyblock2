@@ -27,8 +27,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -39,23 +37,27 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import ${CRAFTBUKKIT_PACKAGE}.CraftChunk;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
-import ${CRAFTBUKKIT_PACKAGE}.util.CraftNamespacedKey;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractNMSChunks implements NMSChunks {
+
+    private static boolean creatingFakeEntities = false;
 
     protected final SuperiorSkyblockPlugin plugin;
 
@@ -152,8 +154,27 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     public boolean isChunkEmpty(Chunk bukkitChunk) {
         ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
-        return levelChunk != null && Arrays.stream(levelChunk.getSections()).allMatch(chunkSection ->
-                chunkSection == null || NMSUtilsVersioned.isLevelChunkSectionEmpty(chunkSection));
+        return isLevelChunkEmpty(levelChunk);
+    }
+
+    @Override
+    public boolean isChunkEmptyIfLoaded(Chunk bukkitChunk) {
+        ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        // We must not load the chunk, as this may be called while the chunk is being unloaded.
+        LevelChunk levelChunk = serverLevel.getChunkSource().getChunk(bukkitChunk.getX(), bukkitChunk.getZ(), false);
+        return isLevelChunkEmpty(levelChunk);
+    }
+
+    private static boolean isLevelChunkEmpty(@Nullable LevelChunk levelChunk) {
+        if (levelChunk == null)
+            return false;
+
+        for (LevelChunkSection chunkSection : levelChunk.getSections()) {
+            if (chunkSection != null && !NMSUtilsVersioned.isLevelChunkSectionEmpty(chunkSection))
+                return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -218,19 +239,60 @@ public abstract class AbstractNMSChunks implements NMSChunks {
         KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         List<Location> spawnersLocations = new LinkedList<>();
 
+        // Count the section per block state through its palette instead of reading its 4096 positions.
+        // Only states whose key depends on the location (spawners, custom key parsers) are counted per position.
+        Set<BlockState> positionalStates = Collections.newSetFromMap(new IdentityHashMap<>());
+        PalettedContainer.CountConsumer<BlockState> countConsumer = (blockState, amount) -> {
+            if (!countBlockState(blockState, amount, blockCounts))
+                positionalStates.add(blockState);
+        };
+
         for (int i = 0; i < chunkSections.length; ++i) {
             LevelChunkSection levelChunkSection = chunkSections[i];
             if (levelChunkSection != null && !NMSUtilsVersioned.isLevelChunkSectionEmpty(levelChunkSection)) {
                 int sectionBottomY = level.getSectionYFromSectionIndex(i) << 4;
-                for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
-                    BlockState blockState = levelChunkSection.getBlockState(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                    calculateChunkInternal(blockState, blockPos.getX(), blockPos.getY(), blockPos.getZ(), chunkPosition,
-                            sectionBottomY, blockCounts, spawnersLocations);
+
+                levelChunkSection.getStates().count(countConsumer);
+
+                if (!positionalStates.isEmpty()) {
+                    for (BlockPos blockPos : BlockPos.betweenClosed(0, 0, 0, 15, 15, 15)) {
+                        BlockState blockState = levelChunkSection.getBlockState(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+                        if (positionalStates.contains(blockState)) {
+                            calculateChunkInternal(blockState, blockPos.getX(), blockPos.getY(), blockPos.getZ(), chunkPosition,
+                                    sectionBottomY, blockCounts, spawnersLocations);
+                        }
+                    }
+                    positionalStates.clear();
                 }
             }
         }
 
         return new CalculatedChunk.Blocks(chunkPosition, blockCounts, spawnersLocations);
+    }
+
+    /**
+     * Adds {@code amount} blocks of {@code blockState} to {@code blockCounts} when their key does not depend on
+     * their location. Returns false, without counting, when the blocks must go through calculateChunkInternal.
+     */
+    private boolean countBlockState(BlockState blockState, int amount, KeyMap<Counter> blockCounts) {
+        if (blockState == null)
+            return true;
+
+        Block block = blockState.getBlock();
+
+        if (block == Blocks.AIR)
+            return true;
+
+        if (block == Blocks.SPAWNER)
+            return false;
+
+        Key blockKey = KeyBlocksCache.getBlockKey(block);
+        if (plugin.getKeys().hasCustomMaterialKeyParser(blockKey))
+            return false;
+
+        int blockAmount = NMSUtils.isDoubleBlock(block, blockState) ? amount * 2 : amount;
+        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
+        return true;
     }
 
     protected CalculatedChunk.Entities calculatedChunk(ChunkPosition chunkPosition, LevelChunk levelChunk) {
@@ -247,21 +309,30 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     protected CalculatedChunk.Entities calculatedChunk(ChunkPosition chunkPosition, ServerLevel serverLevel, ListTag entitiesTag) {
         KeyMap<Counter> chunkEntities = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
 
-        for (Tag entityTag : entitiesTag) {
-            Entity fakeEntity = createEntityFromTag((CompoundTag) entityTag, serverLevel).orElse(null);
-            if(fakeEntity == null)
-                continue;
+        creatingFakeEntities = true;
+        try {
+            for (Tag entityTag : entitiesTag) {
+                Entity fakeEntity = createEntityFromTag((CompoundTag) entityTag, serverLevel).orElse(null);
+                if (fakeEntity == null)
+                    continue;
 
-            fakeEntity.valid = false;
-            if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
-                continue;
+                fakeEntity.valid = false;
+                if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
+                    continue;
 
-            Key entityKey = Keys.of(fakeEntity.getBukkitEntity());
+                Key entityKey = Keys.of(fakeEntity.getBukkitEntity());
 
-            chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+                chunkEntities.computeIfAbsent(entityKey, k -> new Counter(0)).inc(1);
+            }
+        } finally {
+            creatingFakeEntities = false;
         }
 
         return new CalculatedChunk.Entities(chunkPosition, chunkEntities);
+    }
+
+    public static boolean isCreatingFakeEntities() {
+        return creatingFakeEntities;
     }
 
     private void calculateChunkInternal(BlockState blockState, int x, int y, int z, ChunkPosition chunkPosition,
@@ -294,8 +365,8 @@ public abstract class AbstractNMSChunks implements NMSChunks {
     protected void removeEntities(LevelChunk levelChunk) {
         ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
 
-        int chunkWorldCoordX = levelChunk.locX << 4;
-        int chunkWorldCoordZ = levelChunk.locZ << 4;
+        int chunkWorldCoordX = NMSUtilsVersioned.getLevelChunkX(levelChunk) << 4;
+        int chunkWorldCoordZ = NMSUtilsVersioned.getLevelChunkZ(levelChunk) << 4;
 
         AABB chunkBounds = new AABB(chunkWorldCoordX, NMSUtilsVersioned.getMinBuildHeight(serverLevel), chunkWorldCoordZ,
                 chunkWorldCoordX + 15, NMSUtilsVersioned.getMaxBuildHeight(serverLevel), chunkWorldCoordZ + 15);

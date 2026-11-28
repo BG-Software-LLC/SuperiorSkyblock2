@@ -12,8 +12,8 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.config.section.BlockCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.EntityCategoriesSection;
-import com.bgsoftware.superiorskyblock.config.section.InteractablesSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
@@ -56,7 +56,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -138,7 +137,6 @@ public class SettingsContainer {
     public final Set<String> worldPermissions;
     public final boolean voidTeleportMembers;
     public final boolean voidTeleportVisitors;
-    public final SettingsManager.Interactables interactables;
     public final KeySet safeBlocks;
     public final boolean visitorsDamage;
     public final boolean coopDamage;
@@ -212,13 +210,13 @@ public class SettingsContainer {
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
     public final List<String> disabledCommands;
+    public final List<String> dangerousCommands;
     public final List<String> disabledHooks;
     public final boolean schematicNameArgument;
     public final String islandChestTitle;
     public final int islandChestsDefaultPage;
     public final int islandChestsDefaultSize;
     public final Map<String, List<String>> commandAliases;
-    public final KeySet valuableBlocks;
     public final GameMode islandPreviewsGameMode;
     public final int islandPreviewsMaxDistance;
     public final List<String> islandPreviewsBlockedCommands;
@@ -244,7 +242,8 @@ public class SettingsContainer {
     public final boolean helpOnNoPermission;
     public final boolean helpOnInvalidCommand;
     public final boolean cacheSchematics;
-    public final SettingsManager.EntityCategories entityCategories;
+    public final BlockCategoriesSection blockCategories;
+    public final EntityCategoriesSection entityCategories;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -393,7 +392,6 @@ public class SettingsContainer {
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet())));
         voidTeleportMembers = config.getBoolean("void-teleport.members", true);
         voidTeleportVisitors = config.getBoolean("void-teleport.visitors", true);
-        interactables = loadInteractables(plugin);
         safeBlocks = loadSafeBlocks(plugin);
         visitorsDamage = config.getBoolean("visitors-damage", false);
         coopDamage = config.getBoolean("coop-damage", true);
@@ -552,6 +550,8 @@ public class SettingsContainer {
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         disabledCommands = Collections.unmodifiableList(config.getStringList("disabled-commands")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
+        dangerousCommands = Collections.unmodifiableList(config.getStringList("dangerous-commands")
+                .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         disabledHooks = Collections.unmodifiableList(config.getStringList("disabled-hooks")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         schematicNameArgument = config.getBoolean("schematic-name-argument", true);
@@ -565,8 +565,6 @@ public class SettingsContainer {
             }
         }
         this.commandAliases = Collections.unmodifiableMap(commandAliases);
-        valuableBlocks = KeySets.unmodifiableKeySet(
-                KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks")));
         GameMode islandPreviewsGameMode;
         String islandPreviewsGameModeName = config.getString("island-previews.game-mode", "SPECTATOR").toUpperCase(Locale.ENGLISH);
         try {
@@ -614,10 +612,11 @@ public class SettingsContainer {
         deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
         List<RespawnAction> playerRespawnActions = new LinkedList<>();
         config.getStringList("player-respawn").forEach(respawnAction -> {
-            try {
-                playerRespawnActions.add(RespawnAction.getByName(respawnAction));
-            } catch (NullPointerException error) {
+            RespawnAction playerRespawnAction = RespawnAction.getByNameOrNull(respawnAction);
+            if (playerRespawnAction == null) {
                 Log.warnFromFile("config.yml", "Invalid respawn action ", respawnAction + ", skipping...");
+            } else {
+                playerRespawnActions.add(playerRespawnAction);
             }
         });
         this.playerRespawnActions = Collections.unmodifiableList(playerRespawnActions);
@@ -627,6 +626,7 @@ public class SettingsContainer {
         helpOnInvalidCommand = config.getBoolean("help-on-invalid-command", true);
         helpOnNoPermission = config.getBoolean("help-on-no-permission", false);
         cacheSchematics = config.getBoolean("cache-schematics", true);
+        blockCategories = loadBlockCategories(plugin);
         entityCategories = loadEntityCategories(plugin);
     }
 
@@ -647,10 +647,9 @@ public class SettingsContainer {
                 continue;
             }
 
-            try {
+            // Dimensions are already registered when the plugin is reloaded.
+            if (Dimension.getByNameOrNull(dimensionName) == null)
                 Dimension.register(dimensionName, environment);
-            } catch (IllegalStateException ignored) {
-            }
         }
     }
 
@@ -692,79 +691,84 @@ public class SettingsContainer {
 
     private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
         List<ClearAction> clearActions = new LinkedList<>();
-        clearActionsNames.forEach(clearAction -> {
-            try {
-                clearActions.add(ClearAction.getByName(clearAction));
-            } catch (NullPointerException error) {
+        for(String clearAction : clearActionsNames) {
+            ClearAction loadedClearAction = ClearAction.getByNameOrNull(clearAction);
+            if (loadedClearAction == null) {
                 Log.warnFromFile("config.yml", "Invalid clear action ", clearAction + ", skipping...");
+            } else {
+                clearActions.add(loadedClearAction);
             }
-        });
-        return Collections.unmodifiableList(clearActions);
+        }
+        return clearActions.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(clearActions);
     }
 
-    private SettingsManager.Interactables loadInteractables(SuperiorSkyblockPlugin plugin) {
-        File file = new File(plugin.getDataFolder(), "interactables.yml");
+    private BlockCategoriesSection loadBlockCategories(SuperiorSkyblockPlugin plugin) {
+        File file = new File(plugin.getDataFolder(), "block-categories.yml");
 
-        if (!file.exists())
-            plugin.saveResource("interactables.yml", false);
+        boolean removeInvalidBlocks = false;
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
-        InteractablesSection interactables = new InteractablesSection(plugin, cfg);
-
-        // Warn about interactables that the default file contains but the current
-        // file does not.
-        Set<String> localInteractables = new HashSet<>();
-        for (Key key : interactables.getInteractables()) {
-            localInteractables.add(key.toString());
+        if (!file.exists()) {
+            plugin.saveResource("block-categories.yml", false);
+            removeInvalidBlocks = true;
         }
 
-        YamlConfiguration defaultInteractablesConfig = CommentedConfiguration.loadConfiguration(plugin.getResource("interactables.yml"));
-        for (String block : defaultInteractablesConfig.getStringList("interactables")) {
-            if (!localInteractables.contains(block)) {
-                Log.warn("Potentially missing interactable block ", block);
-            }
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
+
+        if (removeInvalidBlocks) {
+            BlockCategoriesSection.removeInvalidBlocks(config, file);
         }
 
-        if (interactables.isLegacy()) {
-            try {
-                interactables.saveToFile(file);
-            } catch (IOException error) {
-                Log.errorFromFile(error, "interactables.yml", "Failed to save interactables:");
-            }
+        try {
+            config.syncWithConfig(file, plugin.getResource("block-categories.yml"),
+                    BlockCategoriesSection.IGNORED_SECTIONS);
+        } catch (Exception error) {
+            Log.error(error, file, "An unexpected error occurred while loading file:");
         }
 
-        return interactables;
+        BlockCategoriesSection.warnMissingBlocks(config,
+                CommentedConfiguration.loadConfiguration(plugin.getResource("block-categories.yml")));
+
+        return new BlockCategoriesSection(config);
     }
 
-    private SettingsManager.EntityCategories loadEntityCategories(SuperiorSkyblockPlugin plugin) {
+    private EntityCategoriesSection loadEntityCategories(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "entity-categories.yml");
 
-        boolean removeInvalidEntityKeys = false;
+        boolean removeInvalidEntities = false;
 
         if (!file.exists()) {
             plugin.saveResource("entity-categories.yml", false);
-            removeInvalidEntityKeys = true;
+            removeInvalidEntities = true;
         }
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
-        if (removeInvalidEntityKeys) {
-            EntityCategoriesSection.removeInvalidEntityKeys(cfg, file);
+        EntityCategoriesSection.convertToSections(config, file);
+
+        if (removeInvalidEntities) {
+            EntityCategoriesSection.removeInvalidEntities(config, file);
         }
 
-        return new EntityCategoriesSection(cfg);
+        try {
+            config.syncWithConfig(file, plugin.getResource("entity-categories.yml"),
+                    EntityCategoriesSection.IGNORED_SECTIONS);
+        } catch (Exception error) {
+            Log.error(error, file, "An unexpected error occurred while loading file:");
+        }
+
+        return new EntityCategoriesSection(config);
     }
 
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "safe_blocks.yml");
 
-        if (!file.exists())
+        if (!file.exists()) {
             Resources.saveResource("safe_blocks.yml");
+        }
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
-        List<String> safeBlocks = cfg.getStringList("safe-blocks");
+        List<String> safeBlocks = config.getStringList("safe-blocks");
 
         if (safeBlocks.isEmpty()) {
             Log.warnFromFile(file.getName(), "There are no valid safe blocks! Generating default ones...");
@@ -775,8 +779,8 @@ public class SettingsContainer {
                     .collect(Collectors.toList()));
 
             try {
-                cfg.set("safe-blocks", safeBlocks);
-                cfg.save(file);
+                config.set("safe-blocks", safeBlocks);
+                config.save(file);
             } catch (IOException error) {
                 Log.errorFromFile(error, "config.yml", "An unexpected error occurred while saving safe blocks into file:");
             }

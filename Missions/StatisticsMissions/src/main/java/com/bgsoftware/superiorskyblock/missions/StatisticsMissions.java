@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.missions;
 
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.Requirements;
@@ -203,10 +204,19 @@ public final class StatisticsMissions extends BuiltinMission<Void> implements Li
         if (statistic == null)
             return false;
 
+        String statisticName = statistic.name();
+        boolean isSubstatistic = statistic.isSubstatistic();
+
         for (Requirements requirement : requiredStatistics.keySet()) {
-            if (requirement.contains(statistic.name()) || (statistic.isSubstatistic() &&
-                    requirement.stream().anyMatch(line -> line.contains(statistic.name()))))
+            if (requirement.contains(statisticName))
                 return true;
+
+            if (isSubstatistic) {
+                for (String line : requirement) {
+                    if (line.contains(statisticName))
+                        return true;
+                }
+            }
         }
 
         return false;
@@ -222,11 +232,11 @@ public final class StatisticsMissions extends BuiltinMission<Void> implements Li
             if (sections.length == 1) {
                 currentStatisticAmount = OptionalInt.of(player.getStatistic(statistic));
             } else if (sections.length == 2) {
-                Material material = getEnumSafe(Material.class, sections[1]);
+                Material material = EnumHelper.getEnum(Material.class, sections[1]);
                 if (material != null) {
                     currentStatisticAmount = OptionalInt.of(player.getStatistic(statistic, material));
                 } else {
-                    EntityType entityType = getEnumSafe(EntityType.class, sections[1]);
+                    EntityType entityType = EnumHelper.getEnum(EntityType.class, sections[1]);
                     if (entityType != null)
                         currentStatisticAmount = OptionalInt.of(player.getStatistic(statistic, entityType));
                 }
@@ -235,14 +245,6 @@ public final class StatisticsMissions extends BuiltinMission<Void> implements Li
         }
 
         return currentStatisticAmount;
-    }
-
-    private static <T extends Enum<T>> T getEnumSafe(Class<T> clazz, String name) {
-        try {
-            return Enum.valueOf(clazz, name);
-        } catch (Throwable ex) {
-            return null;
-        }
     }
 
 }

@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class DelegateIsland implements Island {
 
@@ -108,6 +109,16 @@ public class DelegateIsland implements Island {
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
         return this.handle.getAllPlayersInside();
+    }
+
+    @Override
+    public boolean anyPlayerInsideMatches(Predicate<SuperiorPlayer> predicate) {
+        return this.handle.anyPlayerInsideMatches(predicate);
+    }
+
+    @Override
+    public int countPlayersInside(Predicate<SuperiorPlayer> predicate) {
+        return this.handle.countPlayersInside(predicate);
     }
 
     @Override
@@ -838,6 +849,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getEffectiveIslandSize() {
+        return this.handle.getEffectiveIslandSize();
+    }
+
+    @Override
     public String getDiscord() {
         return this.handle.getDiscord();
     }
@@ -1483,8 +1499,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getBlockLimitRaw(Key key) {
+        return this.handle.getBlockLimitRaw(key);
+    }
+
+    @Override
     public int getExactBlockLimit(Key key) {
         return this.handle.getExactBlockLimit(key);
+    }
+
+    @Override
+    public int getExactBlockLimitRaw(Key key) {
+        return this.handle.getExactBlockLimitRaw(key);
     }
 
     @Override
@@ -1535,6 +1561,16 @@ public class DelegateIsland implements Island {
     @Override
     public int getEntityLimit(Key key) {
         return this.handle.getEntityLimit(key);
+    }
+
+    @Override
+    public int getEntityLimitRaw(Key key) {
+        return this.handle.getEntityLimitRaw(key);
+    }
+
+    @Override
+    public int getExactEntityLimitRaw(Key key) {
+        return this.handle.getExactEntityLimitRaw(key);
     }
 
     @Override
@@ -1638,6 +1674,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getPotionEffectLevelRaw(PotionEffectType type) {
+        return this.handle.getPotionEffectLevelRaw(type);
+    }
+
+    @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
         return this.handle.getPotionEffects();
     }
@@ -1680,6 +1721,11 @@ public class DelegateIsland implements Island {
     @Override
     public void removeRoleLimit(PlayerRole playerRole) {
         this.handle.removeRoleLimit(playerRole);
+    }
+
+    @Override
+    public void clearRoleLimits() {
+        this.handle.clearRoleLimits();
     }
 
     @Override
@@ -1863,8 +1909,19 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorPercentage(key, dimension);
+    }
+
+    @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
         return this.handle.getGeneratorPercentages(dimension);
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorPercentagesAsKeys(Dimension dimension) {
+        return this.handle.getGeneratorPercentagesAsKeys(dimension);
     }
 
     @Override
@@ -1883,13 +1940,34 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getGeneratorAmountRaw(Key key, Dimension dimension) {
+        return this.handle.getGeneratorAmountRaw(key, dimension);
+    }
+
+    @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorAmount(key, dimension);
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorAmountRaw(key, dimension);
+    }
+
+    @Override
     public int getGeneratorTotalAmount(Dimension dimension) {
         return this.handle.getGeneratorTotalAmount(dimension);
     }
 
     @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
         return this.handle.getGeneratorAmounts(dimension);
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorAmountsAsKeys(Dimension dimension) {
+        return this.handle.getGeneratorAmountsAsKeys(dimension);
     }
 
     @Override

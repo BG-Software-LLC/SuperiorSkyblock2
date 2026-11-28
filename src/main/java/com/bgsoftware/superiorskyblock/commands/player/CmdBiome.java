@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.api.enums.DimensionSelectionMode;
+import com.bgsoftware.superiorskyblock.island.biome.DimensionSelectionMode;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;

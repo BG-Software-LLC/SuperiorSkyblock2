@@ -169,6 +169,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: Ajouter un effet d'île à l'île du spéc
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: Augmenter la limite d'entités pour l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Ajouter un poucentage de chance pour un block au générateur de cobblestone.
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: Augmenter le multiplicateur de butin des monstres pour l'île du joueur spécifié.
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: Aggrandir l'île du joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: Augmenter le multiplicateur de taux des spawners pour l'île du joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: Augmenter la limite de membres pour l'île du joueur spécifié.
@@ -205,8 +206,11 @@ COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promouvoir un membre d'une île.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Re-calculer la valeur d'une île.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Retirer la limite de bloc d'une île.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_EFFECT: 'Remove an effect from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_GENERATOR: 'Remove a material from the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Suppimer toutes les notes attribuées par un joueur.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: Réinitialiser l'île d'un monde précis pour l'île spécifiée.
@@ -311,6 +315,13 @@ COOP_LIMIT_EXCEED: '&c&lErreur | &7Vous avez atteint le nombre maximal de coopé
 CREATE_ISLAND: '&e&lIle | &7Création d''une nouvelle île aux coordonnées {0} en {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lErreur | &7Une erreur est survenue ors de la création de votre île. Veuillez contacter un administrateur et le notifier de ce problème.'
 CREATE_WORLD_FAILURE: '&c&lError | &7An error occurred while generating your world. Please contact the administrator to investigate the issue.'
+DANGEROUS_COMMAND_APPROVED: '&e&lCommands | &7Your request to execute {0} was approved by the console.'
+DANGEROUS_COMMAND_CANCELLED: '&c&lError | &7Your request to execute {0} was cancelled due to a reload.'
+DANGEROUS_COMMAND_NO_ACCESS: '&c&lError | &7Skipped the request of {0} to execute {1}: they no longer have access to the command.'
+DANGEROUS_COMMAND_PLAYER_OFFLINE: '&c&lError | &7Skipped the request of {0} to execute {1}: the player is offline.'
+DANGEROUS_COMMAND_PLAYER_QUIT: '&c&lError | &7The request of {0} to execute {1} was cancelled as they left the server.'
+DANGEROUS_COMMAND_REQUEST_CONSOLE: '&e&lCommands | &7{0} requested to execute the dangerous command {1}. Execute "{2}" within 1 minute to approve it.'
+DANGEROUS_COMMAND_REQUEST_SENT: '&e&lCommands | &7The command {0} is dangerous and requires approval from the console. The request expires in 1 minute.'
 DEBUG_MODE_DISABLED: '&e&lDebug | &7Débogage &cDÉSACTIVÉ&7.'
 DEBUG_MODE_ENABLED: '&e&lDebug | &7Débogage &aACTIVÉ&7.'
 DEBUG_MODE_FILTER_ADD: '&e&lDebug | &7Toggled debug filter {0} &aON&7.'
@@ -353,6 +364,8 @@ FORMAT_DAY_NAME: jour
 GENERATOR_CLEARED: '&e&lIle | &7Nettoyage des taux des générateurs pour l''île de {0}.'
 GENERATOR_CLEARED_NAME: '&e&lIle | &7Nettoyage des taux des générateurs pour l''île {0}.'
 GENERATOR_CLEARED_ALL: '&e&lIle | &7Nettoyage des taux des générateurs de toutes les îles.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
 GLOBAL_COMMAND_EXECUTED: '&e&lIle | &7Éxécution de la commande sur les membres de l''île de {0} !'
@@ -564,6 +577,7 @@ LEAVE_ISLAND_AS_LEADER: |-
 LEFT_ISLAND: '&e&lIle | &7Vous avez quitté votre île.'
 LEFT_ISLAND_COOP: '&e&lIle | &7Vous n''êtes plus un coopérateur de l''île de {0}.'
 LEFT_ISLAND_COOP_NAME: '&e&lIle | &7Vous n''êtes plus un coopérateur de l''île {0}.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lWorlds | &7The world {0} is now locked for all islands!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lWorlds | &7The world {0} is now locked for the island {1}!'

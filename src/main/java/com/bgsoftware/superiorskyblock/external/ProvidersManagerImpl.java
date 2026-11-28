@@ -460,7 +460,12 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     }
 
     public boolean isAFK(Player player) {
-        return AFKProvidersList.stream().anyMatch(afkProvider -> afkProvider.isAFK(player));
+        for (AFKProvider afkProvider : AFKProvidersList) {
+            if (afkProvider.isAFK(player))
+                return true;
+        }
+
+        return false;
     }
 
     public boolean shouldListenToSpawnerChanges() {
@@ -506,22 +511,25 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         if (canRegisterHook("ProtocolLib"))
             registerHook("ProtocolLibHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Oraxen"))
+        if (canRegisterHook("Oraxen"))
             registerHook("OraxenHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Nexo"))
+        if (canRegisterHook("Nexo"))
             registerHook("NexoHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Nova"))
+        if (canRegisterHook("Nova"))
             registerHook("NovaHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder"))
+        if (canRegisterHook("ItemsAdder"))
             registerHook("ItemsAdderHook");
+
+        if (canRegisterHook("MythicMobs"))
+            registerHook("MythicMobsHook");
 
         if (canRegisterHook("Plan"))
             registerHook("PlanHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("CraftEngine")) {
+        if (canRegisterHook("CraftEngine")) {
             // We load the hook with an extra delay to let CraftEngine load its data first
             Plugin plugin = Bukkit.getPluginManager().getPlugin("CraftEngine");
             if (plugin.getDescription().getVersion().startsWith("0.0.")) {
@@ -683,7 +691,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
                 ShopsProvider.findAvailableProvider() : ShopsProvider.getShopsProvider(pricesProviderName));
 
         shopsProvider.flatMap(provider -> provider.createInstance(plugin)
-                .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, provider, shopsBridge)))
+                        .map(shopsBridge -> new PricesProvider_ShopsBridgeWrapper(plugin, provider, shopsBridge)))
                 .ifPresent(this::setPricesProvider);
     }
 

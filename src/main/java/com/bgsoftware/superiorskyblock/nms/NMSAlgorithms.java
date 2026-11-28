@@ -60,6 +60,8 @@ public interface NMSAlgorithms {
 
     Key getFallingBlockType(FallingBlock fallingBlock);
 
+    boolean canPlaceBookIntoLectern(Block lectern, ItemStack book);
+
     void setCustomModel(ItemMeta itemMeta, int customModel);
 
     void setItemModel(ItemMeta itemMeta, String itemModel);

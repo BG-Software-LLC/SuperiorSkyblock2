@@ -99,7 +99,9 @@ public class ChunksListener extends AbstractGameEventListener {
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
             plugin.getNMSChunks().startTickingChunk(island, chunk, true);
 
-        if (!plugin.getNMSChunks().isChunkEmpty(chunk))
+        // The chunk is being unloaded, therefore we must not load it again while checking it.
+        // If it cannot be accessed anymore, it is marked as dirty so its blocks are still calculated.
+        if (!plugin.getNMSChunks().isChunkEmptyIfLoaded(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
     }
 

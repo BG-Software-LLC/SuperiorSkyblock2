@@ -5,12 +5,18 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "2026.2"
+version = "2026.3"
+
+// Read lazily so a new BUILD_NUMBER on every CI run does not invalidate the configuration cache.
+String baseVersion = version.toString()
 
 project.ext {
     targetFolder = file("target/")
-    buildVersion = System.getenv("BUILD_NUMBER") == null || Boolean.parseBoolean(System.getenv("STABLE_BUILD")) ?
-            version : version + "-b" + System.getenv("BUILD_NUMBER")
+    buildVersion = providers.environmentVariable("BUILD_NUMBER")
+            .zip(providers.environmentVariable("STABLE_BUILD").orElse("false")) { String buildNumber, String stableBuild ->
+                Boolean.parseBoolean(stableBuild) ? baseVersion : baseVersion + "-b" + buildNumber
+            }
+            .orElse(baseVersion)
 }
 
 allprojects {
@@ -36,12 +42,20 @@ allprojects {
     }
 
     tasks.register('checkDebug') {
-        Set<File> filesWithDebug = fileTree('src/main/java').filter { file ->
-            file.text.contains('Bukkit.broadcastMessage')
-        }.getFiles()
+        def sources = fileTree('src/main/java')
+        def marker = layout.buildDirectory.file('tmp/checkDebug/ok')
+        inputs.files(sources).withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName('sources')
+        outputs.file(marker)
+        doLast {
+            Set<File> filesWithDebug = sources.filter { File file ->
+                file.text.contains('Bukkit.broadcastMessage')
+            }.getFiles()
 
-        if (!filesWithDebug.isEmpty())
-            throw new GradleException("Found debug messages: " + filesWithDebug)
+            if (!filesWithDebug.isEmpty())
+                throw new GradleException("Found debug messages: " + filesWithDebug)
+
+            marker.get().asFile.text = ''
+        }
     }
 
     shadowJar {
@@ -67,7 +81,7 @@ dependencies {
     implementation 'com.bgsoftware.common.executors:Executors:b3'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b21:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
-    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b22'
+    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b23'
     implementation 'com.bgsoftware.common.databasebridge:DatabaseBridge:b2'
 
     implementation 'org.bstats:bstats-bukkit:3.0.0'
@@ -78,14 +92,19 @@ dependencies {
 }
 
 processResources {
-    outputs.upToDateWhen { false }
-    eachFile { details ->
-        if (details.name.contentEquals('plugin.yml')) {
-            filter { String line ->
-                line.replace('${project.version}', rootProject.buildVersion)
-            }
+    def pluginVersion = rootProject.buildVersion
+    inputs.property('pluginVersion', pluginVersion)
+    filesMatching('plugin.yml') {
+        filter { String line ->
+            line.replace('${project.version}', pluginVersion.get())
         }
     }
+}
+
+// The shaded jar takes the unclassified name, so move the plain jar out of its way.
+// Both tasks used to write the same file, which made them rerun on every build and blocked caching.
+jar {
+    archiveClassifier.set('plain')
 }
 
 subprojects.each { evaluationDependsOn(it.path) }
@@ -104,13 +123,14 @@ shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     subprojects.each { sub ->
+        def subName = sub.name
         if (sub.path.startsWith(':NMS:v1')) {
             try {
                 def reobfTask = sub.tasks.named('reobfJar')
                 dependsOn(reobfTask)
                 from(reobfTask.map { it.outputJar }) {
                     exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-                    rename { sub.name }
+                    rename { subName }
                     into("nms")
                 }
                 return;
@@ -124,7 +144,7 @@ shadowJar {
 
             from(shadowJarTask.map { it.archiveFile }) {
                 exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-                rename { sub.name }
+                rename { subName }
                 into("nms")
             }
         } else {
@@ -135,12 +155,13 @@ shadowJar {
     def missionsProject = project(':Missions');
 
     missionsProject.subprojects.forEach { sub ->
+        def subName = sub.name
         def shadowJarTask = sub.tasks.named("shadowJar")
         dependsOn(shadowJarTask)
 
         from(shadowJarTask.map { it.archiveFile }) {
             exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-            rename { sub.name }
+            rename { subName }
             into("modules/missions")
         }
     }
@@ -160,19 +181,20 @@ tasks.register('cleanTarget', Delete) {
     delete rootProject.targetFolder
 }
 
-tasks.register('collectArtifacts', Copy) {
+tasks.register('collectArtifacts', Sync) {
     group = 'build'
 
-    dependsOn('cleanTarget')
-    dependsOn(tasks.named('shadowJar'))
-    dependsOn(project(':API').tasks.named('shadowJar'))
+    def rootName = rootProject.name
+    def pluginJarName = rootProject.buildVersion.map { rootName + "-" + it + ".jar" }
+    def apiJarName = rootName + "-API.jar"
+    inputs.property('pluginJarName', pluginJarName)
 
-    from(tasks.named('shadowJar').map { it.archiveFile }) {
-        rename { rootProject.name + "-" + rootProject.buildVersion + ".jar" }
+    from(tasks.named('shadowJar').flatMap { it.archiveFile }) {
+        rename { pluginJarName.get() }
     }
 
-    from(project(':API').tasks.named('shadowJar').map { it.archiveFile }) {
-        rename { rootProject.name + "-API.jar" }
+    from(project(':API').tasks.named('shadowJar').flatMap { it.archiveFile }) {
+        rename { apiJarName }
     }
 
     into(rootProject.targetFolder)
@@ -180,6 +202,12 @@ tasks.register('collectArtifacts', Copy) {
 
 tasks.named('build') {
     dependsOn(tasks.named('shadowJar'))
+}
+
+subprojects {
+    tasks.matching { it.name == 'reobfJar' }.configureEach {
+        outputs.cacheIf { true }
+    }
 }
 
 tasks.named('shadowJar') {

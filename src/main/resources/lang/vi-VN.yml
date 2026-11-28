@@ -192,6 +192,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: 'Thêm hiệu ứng đảo của người 
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: 'Tăng giới hạn vật thể của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: 'Thêm phần trăm vật liệu cho máy tạo đá cuội.'
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: 'Tăng hệ số vật phẩm của quái rớt ra của người chơi khác.'
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: 'Mở rộng đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: 'Tăng hệ số tỷ lệ lồng sinh sản của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: 'Tăng giới hạn thành viên đảo của người chơi khác.'
@@ -229,9 +230,12 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: Cập nhật mức độ nâng cấp cho hòn 
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Xóa giới hạn khối khỏi một hòn đảo.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_EFFECT: 'Remove an effect from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_GENERATOR: 'Remove a material from the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
   một người chơi.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Tái tạo lại thế giới cho một hòn đảo.'
@@ -354,6 +358,13 @@ COOP_LIMIT_EXCEED: '&c&lLỗi | &7Bạn đã đạt số lượng người chơi
 CREATE_ISLAND: '&e&lĐảo | &7Tạo một hòn đảo mới tại {0} trong {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lLỗi | &7Đã xảy ra lỗi khi tạo đảo của bạn. Vui lòng liên hệ với quản trị viên để điều tra vấn đề.'
 CREATE_WORLD_FAILURE: '&c&lLỗi | &7Đã xảy ra lỗi khi tạo thế giới của bạn. Vui lòng liên hệ với quản trị viên để điều tra vấn đề.'
+DANGEROUS_COMMAND_APPROVED: '&e&lCommands | &7Your request to execute {0} was approved by the console.'
+DANGEROUS_COMMAND_CANCELLED: '&c&lError | &7Your request to execute {0} was cancelled due to a reload.'
+DANGEROUS_COMMAND_NO_ACCESS: '&c&lError | &7Skipped the request of {0} to execute {1}: they no longer have access to the command.'
+DANGEROUS_COMMAND_PLAYER_OFFLINE: '&c&lError | &7Skipped the request of {0} to execute {1}: the player is offline.'
+DANGEROUS_COMMAND_PLAYER_QUIT: '&c&lError | &7The request of {0} to execute {1} was cancelled as they left the server.'
+DANGEROUS_COMMAND_REQUEST_CONSOLE: '&e&lCommands | &7{0} requested to execute the dangerous command {1}. Execute "{2}" within 1 minute to approve it.'
+DANGEROUS_COMMAND_REQUEST_SENT: '&e&lCommands | &7The command {0} is dangerous and requires approval from the console. The request expires in 1 minute.'
 DEBUG_MODE_DISABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &cTẮT&7.'
 DEBUG_MODE_ENABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &aBẬT&7.'
 DEBUG_MODE_FILTER_ADD: '&e&lGỡ lỗi | &7Đã bật bộ lọc gỡ lỗi {0} &aBẬT&7.'
@@ -399,6 +410,8 @@ FORMAT_DAY_NAME: ngày
 GENERATOR_CLEARED: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho đảo của {0}.'
 GENERATOR_CLEARED_NAME: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho đảo {0}.'
 GENERATOR_CLEARED_ALL: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho tất cả các đảo.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo của {1}.'
 GENERATOR_UPDATED_NAME: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo {1}.'
 GENERATOR_UPDATED_ALL: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho tất cả các đảo.'
@@ -623,6 +636,7 @@ LEFT_ISLAND_COOP: '&e&lĐảo | &7Bạn không còn là thành viên co-op đả
   nữa.'
 LEFT_ISLAND_COOP_NAME: '&e&lĐảo | &7Bạn không còn là thành viên co-op đảo {0}
   nữa.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
 LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lThế giới | &7Thế giới {0} hiện đã bị khóa đối với tất cả các hòn đảo!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lThế giới | &7Thế giới {0} hiện đã bị khóa đối với hòn đảo {1}!'

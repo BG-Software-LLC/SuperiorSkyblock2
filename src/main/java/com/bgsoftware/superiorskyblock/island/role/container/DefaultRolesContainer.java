@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island.role.container;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
@@ -15,9 +16,21 @@ import java.util.Map;
 
 public class DefaultRolesContainer implements RolesContainer {
 
+    private static final Comparator<PlayerRole> ROLE_ID_COMPARATOR = Comparator.comparingInt(PlayerRole::getId);
+
     private final Int2ObjectMapView<PlayerRole> rolesByWeight = CollectionsFactory.createInt2ObjectArrayMap();
     private final Int2ObjectMapView<PlayerRole> rolesById = CollectionsFactory.createInt2ObjectArrayMap();
     private final Map<String, PlayerRole> rolesByName = new HashMap<>();
+
+    @Nullable
+    private final LazyReference<List<PlayerRole>> rolesList = new LazyReference<List<PlayerRole>>() {
+        @Override
+        protected List<PlayerRole> create() {
+            return new SequentialListBuilder<PlayerRole>()
+                    .sorted(ROLE_ID_COMPARATOR)
+                    .build(rolesById.valueIterator());
+        }
+    };
 
     @Nullable
     @Override
@@ -42,9 +55,7 @@ public class DefaultRolesContainer implements RolesContainer {
 
     @Override
     public List<PlayerRole> getRoles() {
-        return new SequentialListBuilder<PlayerRole>()
-                .sorted(Comparator.comparingInt(PlayerRole::getId))
-                .build(rolesById.valueIterator());
+        return this.rolesList.get();
     }
 
     @Override
@@ -52,6 +63,7 @@ public class DefaultRolesContainer implements RolesContainer {
         this.rolesByWeight.put(playerRole.getWeight(), playerRole);
         this.rolesById.put(playerRole.getId(), playerRole);
         this.rolesByName.put(playerRole.getName().toUpperCase(Locale.ENGLISH), playerRole);
+        this.rolesList.reset();
     }
 
     @Override
@@ -59,5 +71,6 @@ public class DefaultRolesContainer implements RolesContainer {
         this.rolesByWeight.clear();
         this.rolesById.clear();
         this.rolesByName.clear();
+        this.rolesList.reset();
     }
 }

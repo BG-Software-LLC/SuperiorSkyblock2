@@ -62,9 +62,11 @@ public class AbstractKeySet<K extends Key> extends AbstractSet<Key> implements K
         boolean contained;
 
         if (this.keyType.isInstance(key)) {
-            contained = this.innerSet.getIfPresent().map(s -> s.contains(key)).orElse(false);
+            Set<K> innerSet = this.innerSet.getIfPresentOrNull();
+            contained = innerSet != null && innerSet.contains(key);
         } else if (key instanceof CustomKey) {
-            contained = this.customInnerSet.getIfPresent().map(s -> s.contains(key)).orElse(false);
+            Set<CustomKey> customInnerSet = this.customInnerSet.getIfPresentOrNull();
+            contained = customInnerSet != null && customInnerSet.contains(key);
         } else {
             contained = false;
         }
@@ -112,9 +114,11 @@ public class AbstractKeySet<K extends Key> extends AbstractSet<Key> implements K
         boolean contained;
 
         if (this.keyType.isInstance(key)) {
-            contained = this.innerSet.getIfPresent().map(s -> s.remove(key)).orElse(false);
+            Set<K> innerSet = this.innerSet.getIfPresentOrNull();
+            contained = innerSet != null && innerSet.remove(key);
         } else if (key instanceof CustomKey) {
-            contained = this.customInnerSet.getIfPresent().map(s -> s.remove(key)).orElse(false);
+            Set<CustomKey> customInnerSet = this.customInnerSet.getIfPresentOrNull();
+            contained = customInnerSet != null && customInnerSet.remove(key);
         } else {
             return false;
         }
@@ -149,15 +153,15 @@ public class AbstractKeySet<K extends Key> extends AbstractSet<Key> implements K
             return def;
 
         if (original instanceof LazyKey) {
-            return getKey(((LazyKey<?>) original).getBaseKey());
+            return getKey(((LazyKey<?>) original).getBaseKey(), def);
         }
 
         Set set;
 
         if (this.keyType.isInstance(original)) {
-            set = this.innerSet.getIfPresent().orElse(null);
+            set = this.innerSet.getIfPresentOrNull();
         } else if (original instanceof CustomKey) {
-            set = this.customInnerSet.getIfPresent().orElse(null);
+            set = this.customInnerSet.getIfPresentOrNull();
         } else {
             set = null;
         }

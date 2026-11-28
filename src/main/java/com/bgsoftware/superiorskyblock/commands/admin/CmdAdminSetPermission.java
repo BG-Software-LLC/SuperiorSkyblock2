@@ -102,7 +102,7 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
             case 4:
                 return CommandTabCompletes.getIslandPrivileges(args[3]);
             case 5: {
-                IslandPrivilege islandPrivilege = getIslandPrivilegeSafe(args[3]);
+                IslandPrivilege islandPrivilege = IslandPrivilege.getByNameOrNull(args[3]);
 
                 if (islandPrivilege == null)
                     return Collections.emptyList();
@@ -113,15 +113,6 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
             }
             default:
                 return Collections.emptyList();
-        }
-    }
-
-    @Nullable
-    private static IslandPrivilege getIslandPrivilegeSafe(String name) {
-        try {
-            return IslandPrivilege.getByName(name);
-        } catch (NullPointerException error) {
-            return null;
         }
     }
 

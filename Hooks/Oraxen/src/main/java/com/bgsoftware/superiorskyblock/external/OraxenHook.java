@@ -108,7 +108,7 @@ public class OraxenHook {
         if (!registered) {
             registered = true;
             plugin.getProviders().registerCustomBlocksProvider(new OraxenCustomBlocksProvider());
-            plugin.getBlockValues().registerKeyParser(new OraxenKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
+            plugin.getKeys().registerCustomMaterialKeyParser(new OraxenKeyParser(), BLOCK_ITEM_KEY, BLOCK_KEY);
         }
     }
 

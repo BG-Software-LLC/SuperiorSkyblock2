@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.superiorskyblock.nms.algorithms.SpigotGlowEnchantment;
 import net.minecraft.core.Registry;
@@ -16,6 +17,9 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.AbstractNMSAlgorithms {
+
+    private static final ReflectField<Object> MINECRAFT_SERVER_TPS1 = new ReflectField<>(
+            MinecraftServer.class, Object.class, "tps1");
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
@@ -36,12 +40,11 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_17
 
     @Override
     public double getCurrentTps() {
-        try {
+        if (MINECRAFT_SERVER_TPS1.isValid())
             return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
-        }
+
+        //noinspection removal
+        return MinecraftServer.getServer().recentTps[0];
     }
 
     @Override

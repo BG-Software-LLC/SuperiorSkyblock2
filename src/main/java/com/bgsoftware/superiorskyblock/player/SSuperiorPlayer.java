@@ -719,7 +719,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void updateWorldBorder(@Nullable Island island) {
-        plugin.getNMSWorld().setWorldBorder(this, island);
+        BukkitExecutor.ensureMain(() -> plugin.getNMSWorld().setWorldBorder(this, island));
     }
 
     @Override

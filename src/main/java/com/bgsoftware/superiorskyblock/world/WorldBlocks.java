@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -40,10 +41,10 @@ public class WorldBlocks {
     }
 
     public static boolean isSafeBlock(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
-        return isSafeBlockInternal(chunkSnapshot, x, y, z) || isSafeBlockInternal(chunkSnapshot, x, y - 1, z);
+        return isSafeStandingSpot(chunkSnapshot, x, y, z) || isSafeStandingSpot(chunkSnapshot, x, y - 1, z);
     }
 
-    private static boolean isSafeBlockInternal(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+    public static boolean isSafeStandingSpot(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         // Checks that the block in the parameter is safe for teleportation.
         // This means that the block below it is considered "safe", and the two blocks above the safe blocks
         // cannot suffocate the player.
@@ -66,14 +67,16 @@ public class WorldBlocks {
     }
 
     public static boolean isChunkEmpty(Island island, ChunkSnapshot chunkSnapshot) {
-        for (int i = 0; i < 16; i++) {
+        World world = Bukkit.getWorld(chunkSnapshot.getWorldName());
+        int sectionsCount = (world.getMaxHeight() - plugin.getNMSWorld().getMinHeight(world)) >> 4;
+
+        for (int i = 0; i < sectionsCount; i++) {
             if (!chunkSnapshot.isSectionEmpty(i)) {
                 return false;
             }
         }
 
-        island.markChunkEmpty(Bukkit.getWorld(chunkSnapshot.getWorldName()),
-                chunkSnapshot.getX(), chunkSnapshot.getZ(), true);
+        island.markChunkEmpty(world, chunkSnapshot.getX(), chunkSnapshot.getZ(), true);
 
         return true;
     }

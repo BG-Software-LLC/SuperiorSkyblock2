@@ -63,7 +63,7 @@ public class MenuIslandRate extends AbstractMenu<IslandMenuView, IslandViewArgs>
         return new MenuIslandRate(menuParseResult);
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
 
         if (!oldFile.exists())

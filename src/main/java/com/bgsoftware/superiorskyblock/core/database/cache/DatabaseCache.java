@@ -16,7 +16,12 @@ public class DatabaseCache<V> {
     }
 
     public Record<V> computeIfAbsentInfo(UUID uuid, Supplier<V> value) {
-        return cache.computeIfAbsent(uuid, u -> new Record<>(value.get()));
+        Record<V> record = cache.get(uuid);
+        if (record == null) {
+            record = new Record<>(value.get());
+            cache.put(uuid, record);
+        }
+        return record;
     }
 
     public static class Record<T> {

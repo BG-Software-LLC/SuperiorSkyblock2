@@ -54,7 +54,7 @@ public class MenuConfirmDisband extends AbstractMenu<IslandMenuView, IslandViewA
         return new MenuConfirmDisband(menuParseResult);
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/confirm-disband.yml");
 
         if (!oldFile.exists())

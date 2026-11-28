@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -75,9 +74,11 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
         V value;
 
         if (this.keyType.isInstance(key)) {
-            value = this.innerMap.getIfPresent().map(m -> m.get(key)).orElse(null);
+            Map<K, V> innerMap = this.innerMap.getIfPresentOrNull();
+            value = innerMap == null ? null : innerMap.get(key);
         } else if (key instanceof CustomKey) {
-            value = this.customInnerMap.getIfPresent().map(m -> m.get(key)).orElse(null);
+            Map<CustomKey, V> customInnerMap = this.customInnerMap.getIfPresentOrNull();
+            value = customInnerMap == null ? null : customInnerMap.get(key);
         } else {
             value = null;
         }
@@ -125,9 +126,11 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
         V oldValue;
 
         if (this.keyType.isInstance(key)) {
-            oldValue = this.innerMap.getIfPresent().map(m -> m.remove(key)).orElse(null);
+            Map<K, V> innerMap = this.innerMap.getIfPresentOrNull();
+            oldValue = innerMap == null ? null : innerMap.remove(key);
         } else if (key instanceof CustomKey) {
-            oldValue = this.customInnerMap.getIfPresent().map(m -> m.remove(key)).orElse(null);
+            Map<CustomKey, V> customInnerMap = this.customInnerMap.getIfPresentOrNull();
+            oldValue = customInnerMap == null ? null : customInnerMap.remove(key);
         } else {
             return null;
         }
@@ -163,15 +166,15 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
             return def;
 
         if (original instanceof LazyKey) {
-            return getKey(((LazyKey<?>) original).getBaseKey());
+            return getKey(((LazyKey<?>) original).getBaseKey(), def);
         }
 
         Map<? extends Key, V> map;
 
         if (this.keyType.isInstance(original)) {
-            map = this.innerMap.getIfPresent().orElse(null);
+            map = this.innerMap.getIfPresentOrNull();
         } else if (original instanceof CustomKey) {
-            map = this.customInnerMap.getIfPresent().orElse(null);
+            map = this.customInnerMap.getIfPresentOrNull();
         } else {
             map = null;
         }
@@ -230,7 +233,8 @@ public class AbstractKeyMap<K extends Key, V> extends AbstractMap<Key, V> implem
             return getRawNoSizeCheck(((LazyKey<?>) key).getBaseKey(), def);
         }
 
-        return Optional.ofNullable(getInternal(key, false)).orElse(def);
+        V value = getInternal(key, false);
+        return value == null ? def : value;
     }
 
     @Override

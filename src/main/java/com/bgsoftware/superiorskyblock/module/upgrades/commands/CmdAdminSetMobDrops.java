@@ -66,8 +66,9 @@ public class CmdAdminSetMobDrops implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         NumberArgument<Double> arguments = CommandArguments.getMultiplier(sender, args[3]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         double multiplier = arguments.getNumber();
 
@@ -82,15 +83,17 @@ public class CmdAdminSetMobDrops implements IAdminIslandCommand {
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_MOB_DROPS_ALL.send(sender);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_MOB_DROPS_NAME.send(sender, islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_MOB_DROPS.send(sender, targetPlayer.getName());
+        }
     }
 
 }

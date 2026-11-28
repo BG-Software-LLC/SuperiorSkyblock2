@@ -1,7 +1,8 @@
 group 'Missions:FarmingMissions'
 
 dependencies {
-    compileOnly "org.spigotmc:v1_16_R3:latest"
+    compileOnly 'com.gmail.nossr50:mcMMO:2.1.202'
+    compileOnly 'org.spigotmc:v1_16_R3:latest'
 }
 
 shadowJar {

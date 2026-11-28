@@ -6,13 +6,14 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.missions.MissionLoadException;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.missions.common.BuiltinMission;
 import com.bgsoftware.superiorskyblock.missions.common.Placeholders;
 import com.bgsoftware.superiorskyblock.missions.common.requirements.KeyRequirements;
 import com.bgsoftware.superiorskyblock.missions.common.tracker.KeyDataTracker;
 import com.bgsoftware.superiorskyblock.missions.farming.PlantType;
 import com.bgsoftware.superiorskyblock.missions.farming.PlantsTracker;
+import com.gmail.nossr50.datatypes.skills.SubSkillType;
+import com.gmail.nossr50.events.skills.secondaryabilities.SubSkillBlockEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,6 +49,8 @@ import java.util.UUID;
 
 public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implements Listener {
 
+    private static final boolean BLOCK_DATA_SUPPORT = isBlockDataSupported();
+
     private static final BlockFace[] STEM_NEARBY_BLOCKS = new BlockFace[]{
             BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH
     };
@@ -76,6 +79,12 @@ public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implem
     @Override
     protected void registerListeners() {
         registerListener(this);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (Bukkit.getPluginManager().isPluginEnabled("mcMMO")) {
+                registerListener(new mcMMOListener());
+            }
+        }, 1L);
     }
 
     @Override
@@ -265,6 +274,20 @@ public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implem
         handlePlantGrow(e.getBlock(), e.getNewState());
     }
 
+    private class mcMMOListener implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSubSkillBlock(SubSkillBlockEvent e) {
+            if (e.getSubSkillType() != SubSkillType.HERBALISM_GREEN_THUMB) {
+                return;
+            }
+
+            Bukkit.getScheduler().runTaskLater(plugin, () ->
+                    PlantsTracker.INSTANCE.track(e.getBlock(), e.getPlayer().getUniqueId()), 1L);
+        }
+
+    }
+
     private void handlePlantGrow(Block plantBlock, BlockState newState) {
         PlantType plantType = PlantType.getByType(newState.getType());
         Key plantKey = plantType == PlantType.UNKNOWN ? Key.of(newState) : plantType.getCachedKey();
@@ -329,12 +352,21 @@ public final class FarmingMissions extends BuiltinMission<KeyDataTracker> implem
     }
 
     private int getBlockAge(BlockState newState) {
-        try {
-            BlockData blockData = newState.getBlockData();
-            return blockData instanceof Ageable ? ((Ageable) blockData).getAge() : 0;
-        } catch (Throwable error) {
+        if (!BLOCK_DATA_SUPPORT) {
             // noinspection deprecation
             return newState.getRawData();
+        }
+
+        BlockData blockData = newState.getBlockData();
+        return blockData instanceof Ageable ? ((Ageable) blockData).getAge() : 0;
+    }
+
+    private static boolean isBlockDataSupported() {
+        try {
+            BlockState.class.getMethod("getBlockData");
+            return true;
+        } catch (NoSuchMethodException error) {
+            return false;
         }
     }
 

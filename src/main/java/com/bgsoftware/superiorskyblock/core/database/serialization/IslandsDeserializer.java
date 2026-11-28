@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,8 +45,6 @@ public class IslandsDeserializer {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Gson GSON = new GsonBuilder().create();
-    private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
-    private static final int SYNCED_VALUE = -2;
 
     private IslandsDeserializer() {
 
@@ -160,14 +159,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            IslandPrivilege islandPrivilege = playerPermissions.getString("permission").map(name -> {
-                try {
-                    return IslandPrivilege.getByName(name);
-                } catch (NullPointerException error) {
-                    IslandPrivilege.register(name);
-                    return IslandPrivilege.getByName(name);
-                }
-            }).orElseThrow(IllegalStateException::new);
+            IslandPrivilege islandPrivilege = playerPermissions.getString("permission")
+                    .map(IslandsDeserializer::getOrRegisterIslandPrivilege).orElseThrow(IllegalStateException::new);
 
             Optional<Byte> status = playerPermissions.getByte("status");
             if (!status.isPresent()) {
@@ -196,14 +189,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            IslandPrivilege islandPrivilege = rolePermissions.getString("permission").map(name -> {
-                try {
-                    return IslandPrivilege.getByName(name);
-                } catch (NullPointerException error) {
-                    IslandPrivilege.register(name);
-                    return IslandPrivilege.getByName(name);
-                }
-            }).orElseThrow(IllegalStateException::new);
+            IslandPrivilege islandPrivilege = rolePermissions.getString("permission")
+                    .map(IslandsDeserializer::getOrRegisterIslandPrivilege).orElseThrow(IllegalStateException::new);
 
             Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_role_permissions");
             builder.setRolePermission(islandPrivilege, playerRole.get());
@@ -318,13 +305,28 @@ public class IslandsDeserializer {
             return;
 
         for (String dimensionName : dimensions.split(",")) {
-            try {
-                Dimension dimension = Dimension.getByName(dimensionName);
+            Dimension dimension = Dimension.getByNameOrNull(dimensionName);
+            if (dimension != null)
                 consumer.accept(dimension);
-            } catch (NullPointerException ignored) {
-
-            }
         }
+    }
+
+    private static IslandPrivilege getOrRegisterIslandPrivilege(String name) {
+        IslandPrivilege islandPrivilege = IslandPrivilege.getByNameOrNull(name);
+        if (islandPrivilege != null)
+            return islandPrivilege;
+
+        IslandPrivilege.register(name);
+        return IslandPrivilege.getByName(name);
+    }
+
+    private static IslandFlag getOrRegisterIslandFlag(String name) {
+        IslandFlag islandFlag = IslandFlag.getByNameOrNull(name);
+        if (islandFlag != null)
+            return islandFlag;
+
+        IslandFlag.register(name);
+        return IslandFlag.getByName(name);
     }
 
     public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
@@ -463,14 +465,8 @@ public class IslandsDeserializer {
                 return;
             }
 
-            IslandFlag islandFlag = islandFlagResult.getString("name").map(name -> {
-                try {
-                    return IslandFlag.getByName(name);
-                } catch (NullPointerException error) {
-                    IslandFlag.register(name);
-                    return IslandFlag.getByName(name);
-                }
-            }).orElseThrow(IllegalStateException::new);
+            IslandFlag islandFlag = islandFlagResult.getString("name")
+                    .map(IslandsDeserializer::getOrRegisterIslandFlag).orElseThrow(IllegalStateException::new);
 
             Optional<Byte> status = islandFlagResult.getByte("status");
             if (!status.isPresent()) {
@@ -729,14 +725,14 @@ public class IslandsDeserializer {
 
             Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_settings");
 
-            builder.setIslandSize(islandSettings.getInt("size").orElse(SYNCED_VALUE));
-            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(SYNCED_VALUE));
-            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(SYNCED_VALUE));
-            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse((double) SYNCED_VALUE));
-            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse((double) SYNCED_VALUE));
-            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse((double) SYNCED_VALUE));
-            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(SYNCED_VALUE));
-            builder.setBankLimit(islandSettings.getBigDecimal("bank_limit").orElse(SYNCED_BANK_LIMIT_VALUE));
+            builder.setIslandSize(islandSettings.getInt("size").orElse(IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse((double) IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse((double) IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse((double) IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(IslandUpgradeConstants.SYNCED_VALUE));
+            builder.setBankLimit(islandSettings.getBigDecimal("bank_limit").orElse(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
         });
     }
 

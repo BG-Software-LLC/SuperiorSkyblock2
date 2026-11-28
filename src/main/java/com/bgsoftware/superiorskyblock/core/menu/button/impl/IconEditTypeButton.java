@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
 import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
@@ -36,26 +38,18 @@ public class IconEditTypeButton<E> extends AbstractMenuViewButton<AbstractIconPr
         PlayerChat.listen(player, message -> {
             if (!message.equalsIgnoreCase("-cancel")) {
                 String[] sections = message.split(":");
-                Material material;
+                Material material = EnumHelper.getEnum(Material.class, sections[0].toUpperCase(Locale.ENGLISH));
 
-                try {
-                    material = Material.valueOf(sections[0].toUpperCase(Locale.ENGLISH));
-                    if (material == Material.AIR)
-                        throw new IllegalArgumentException();
-                } catch (IllegalArgumentException ex) {
+                if (material == null || material == Material.AIR) {
                     Message.INVALID_MATERIAL.send(player, message);
                     return true;
                 }
 
                 String rawMessage = sections.length == 2 ? sections[1] : "0";
 
-                short data;
+                short data = Text.parseShort(rawMessage, (short) -1);
 
-                try {
-                    data = Short.parseShort(rawMessage);
-                    if (data < 0)
-                        throw new IllegalArgumentException();
-                } catch (IllegalArgumentException ex) {
+                if (data < 0) {
                     Message.INVALID_MATERIAL_DATA.send(player, rawMessage);
                     return true;
                 }

@@ -16,6 +16,7 @@ import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -32,9 +33,11 @@ import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -71,6 +74,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBiome;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -98,6 +102,18 @@ public class NMSUtilsVersioned {
             ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
     private static final ReflectField<SimpleRegionStorage> ENTITY_STORAGE_REGION_STORAGE = new ReflectField<>(
             EntityStorage.class, SimpleRegionStorage.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+    public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
+    }
+
+    public static int getLevelChunkX(LevelChunk levelChunk) {
+        return levelChunk.getPos().x;
+    }
+
+    public static int getLevelChunkZ(LevelChunk levelChunk) {
+        return levelChunk.getPos().z;
+    }
 
     public static CompoundTag readChunk(ChunkMap chunkMap, ChunkPos chunkPos) {
         return chunkMap.read(chunkPos).join().orElse(null);
@@ -325,6 +341,14 @@ public class NMSUtilsVersioned {
         return serverLevel.getDragonFight();
     }
 
+    public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
+        enderDragon.setFightOrigin(fightOrigin);
+    }
+
+    public static void removeDragonTicket(ServerLevel serverLevel) {
+        serverLevel.getChunkSource().removeTicketWithRadius(TicketType.DRAGON, new ChunkPos(0, 0), 9);
+    }
+
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {
         entity.absSnapTo(x, y, z, yaw, pitch);
     }
@@ -361,16 +385,30 @@ public class NMSUtilsVersioned {
         return compoundTag.getLongOr(key, def);
     }
 
+    private static Component parseSignLine(String line) {
+        String trimmedLine = line.trim();
+
+        if (!trimmedLine.isEmpty()) {
+            char firstChar = trimmedLine.charAt(0);
+            // JSON text components start with one of these characters, other lines are plain text.
+            if (firstChar != '{' && firstChar != '[' && firstChar != '"')
+                return CraftChatMessage.fromString(line)[0];
+        }
+
+        try {
+            return CraftChatMessage.fromJSON(line);
+        } catch (JsonParseException error) {
+            // Plain text lines that start like JSON, such as "[Shop]".
+            return CraftChatMessage.fromString(line)[0];
+        }
+    }
+
     private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {
         blockEntityCompound.getCompound(key).ifPresent(textCompound -> {
             ListTag messages = textCompound.getListOrEmpty("messages");
             List<Component> textLines = new ArrayList<>();
             for (net.minecraft.nbt.Tag lineTag : messages) {
-                try {
-                    textLines.add(CraftChatMessage.fromJSON(lineTag.asString().orElseThrow()));
-                } catch (JsonParseException error) {
-                    textLines.add(CraftChatMessage.fromString(lineTag.asString().orElseThrow())[0]);
-                }
+                textLines.add(parseSignLine(lineTag.asString().orElseThrow()));
             }
 
             for (int i = 0; i < 4; i++) {

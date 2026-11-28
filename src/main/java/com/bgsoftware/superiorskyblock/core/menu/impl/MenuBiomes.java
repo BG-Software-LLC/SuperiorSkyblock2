@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.annotations.NotNull;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.enums.DimensionSelectionMode;
+import com.bgsoftware.superiorskyblock.island.biome.DimensionSelectionMode;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
@@ -33,8 +33,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -267,7 +269,7 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/biomes-gui.yml");
 
         if (!oldFile.exists())
@@ -352,9 +354,11 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
         if (!biomeChars.isEmpty()) {
             List<String> pattern = cfg.getStringList("pattern");
             List<String> newPattern = new ArrayList<>(pattern.size());
+            Map<Character, List<Integer>> biomeSlots = new LinkedHashMap<>();
 
             char newChar = biomeChars.iterator().next();
 
+            int slot = 0;
             for (String line : pattern) {
                 StringBuilder newLine = new StringBuilder();
                 char[] chars = line.replace(" ", "").toCharArray();
@@ -363,11 +367,33 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
                     char ch = chars[i];
                     newLine.append(biomeChars.contains(ch) ? newChar : ch);
 
-                    if (i < chars.length - 1)
+                    if (i < chars.length - 1) {
                         newLine.append(" ");
+                    }
+
+                    if (biomeChars.contains(ch)) {
+                        biomeSlots.computeIfAbsent(ch, key -> new ArrayList<>()).add(slot);
+                    }
+
+                    slot++;
                 }
 
                 newPattern.add(newLine.toString());
+            }
+
+            if (!biomeSlots.isEmpty()) {
+                boolean shouldChangeLayout = false;
+
+                for (List<Integer> slots : biomeSlots.values()) {
+                    if (slots.size() > 1) {
+                        shouldChangeLayout = true;
+                        break;
+                    }
+                }
+
+                if (shouldChangeLayout) {
+                    cfg.set("custom-layout", new ArrayList<>(biomeSlots.values()));
+                }
             }
 
             cfg.set("pattern", newPattern);
@@ -380,13 +406,14 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
     @Nullable
     private static Dimension getDimensionSafe(String dimensionName) {
-        try {
-            return Dimension.getByName(dimensionName);
-        } catch (Exception e) {
+        Dimension dimension = Dimension.getByNameOrNull(dimensionName);
+
+        if (dimension == null) {
             Log.warnFromFile("biomes.yml", "Couldn't convert '" + dimensionName +
                     "' into an Dimension, skipping...");
-            return null;
         }
+
+        return dimension;
     }
 
 }

@@ -33,6 +33,7 @@ import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.ChunkSection;
+import net.minecraft.server.v1_16_R3.DataPaletteBlock;
 import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.EntityHuman;
 import net.minecraft.server.v1_16_R3.EntityTypes;
@@ -66,10 +67,12 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -79,6 +82,11 @@ public class NMSChunksImpl implements NMSChunks {
             BiomeStorage.class, BiomeBase[].class, "h");
     private static final ReflectField<Collection<Entity>[]> ENTITY_SLICE_ARRAY = new ReflectField<>(
             Chunk.class, null, "entitySlices");
+    // Spigot and Paper keep the entity slices of chunks as lists, while some forks keep vanilla's EntitySlice.
+    private static final boolean ENTITY_SLICES_LISTS = new ReflectField<>(
+            Chunk.class, List[].class, "entitySlices").isValid();
+
+    private static boolean creatingFakeEntities = false;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -118,6 +126,9 @@ public class NMSChunksImpl implements NMSChunks {
                 PacketPlayOutLightUpdate lightUpdatePacket = new PacketPlayOutLightUpdate(chunkCoords, lightEngineThreaded, true);
 
                 playersToUpdate.forEach(player -> {
+                    if (!player.isOnline() || player.getWorld() != chunk.world.getWorld())
+                        return;
+
                     PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
                     playerConnection.sendPacket(unloadChunkPacket);
                     playerConnection.sendPacket(lightUpdatePacket);
@@ -329,7 +340,14 @@ public class NMSChunksImpl implements NMSChunks {
                             if (entityType == null)
                                 continue;
 
-                            Entity fakeEntity = EntityTypes.a((NBTTagCompound) entityTag, worldServer).orElse(null);
+                            Entity fakeEntity;
+                            creatingFakeEntities = true;
+                            try {
+                                fakeEntity = EntityTypes.a((NBTTagCompound) entityTag, worldServer).orElse(null);
+                            } finally {
+                                creatingFakeEntities = false;
+                            }
+
                             if (fakeEntity != null) {
                                 fakeEntity.valid = false;
                                 if (BukkitEntities.canBypassEntityLimit(fakeEntity.getBukkitEntity()))
@@ -421,35 +439,35 @@ public class NMSChunksImpl implements NMSChunks {
         return blockEntities;
     }
 
-    private static CalculatedChunk.Blocks calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
+    public static boolean isCreatingFakeEntities() {
+        return creatingFakeEntities;
+    }
+
+    private CalculatedChunk.Blocks calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
         KeyMap<Counter> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         List<Location> spawnersLocations = new LinkedList<>();
 
+        // Count the section per block state through its palette instead of reading its 4096 positions.
+        // Only states whose key depends on the location (spawners, custom key parsers) are counted per position.
+        Set<IBlockData> positionalStates = Collections.newSetFromMap(new IdentityHashMap<>());
+        DataPaletteBlock.a<IBlockData> countConsumer = (blockData, amount) -> {
+            if (!countBlockData(blockData, amount, blockCounts))
+                positionalStates.add(blockData);
+        };
+
         for (ChunkSection chunkSection : chunkSections) {
             if (chunkSection != null && !chunkSection.c()) {
-                for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
-                    IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                    Block block = blockData.getBlock();
-                    if (block != Blocks.AIR) {
-                        Location location = new Location(chunkPosition.getWorld(),
-                                (chunkPosition.getX() << 4) + bp.getX(),
-                                chunkSection.getYPosition() + bp.getY(),
-                                (chunkPosition.getZ() << 4) + bp.getZ());
+                chunkSection.getBlocks().a(countConsumer);
 
-                        int blockAmount = 1;
-
-                        if ((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
-                                blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.DOUBLE) {
-                            blockAmount = 2;
-                            blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.BOTTOM);
-                        }
-
-                        Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(blockData.getBlock()), location);
-                        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
-                        if (block == Blocks.SPAWNER) {
-                            spawnersLocations.add(location);
+                if (!positionalStates.isEmpty()) {
+                    for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
+                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                        if (positionalStates.contains(blockData)) {
+                            calculateBlockData(blockData, bp.getX(), bp.getY(), bp.getZ(), chunkPosition,
+                                    chunkSection.getYPosition(), blockCounts, spawnersLocations);
                         }
                     }
+                    positionalStates.clear();
                 }
             }
         }
@@ -457,14 +475,67 @@ public class NMSChunksImpl implements NMSChunks {
         return new CalculatedChunk.Blocks(chunkPosition, blockCounts, spawnersLocations);
     }
 
+    /**
+     * Adds {@code amount} blocks of {@code blockData} to {@code blockCounts} when their key does not depend on
+     * their location. Returns false, without counting, when the blocks must go through calculateBlockData.
+     */
+    private boolean countBlockData(IBlockData blockData, int amount, KeyMap<Counter> blockCounts) {
+        if (blockData == null)
+            return true;
+
+        Block block = blockData.getBlock();
+
+        if (block == Blocks.AIR)
+            return true;
+
+        if (block == Blocks.SPAWNER)
+            return false;
+
+        Key blockKey = KeyBlocksCache.getBlockKey(block);
+        if (plugin.getKeys().hasCustomMaterialKeyParser(blockKey))
+            return false;
+
+        int blockAmount = isDoubleSlab(blockData) ? amount * 2 : amount;
+        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
+        return true;
+    }
+
+    private static void calculateBlockData(IBlockData blockData, int x, int y, int z, ChunkPosition chunkPosition,
+                                           int sectionBottomY, KeyMap<Counter> blockCounts,
+                                           List<Location> spawnersLocations) {
+        Block block = blockData.getBlock();
+
+        if (block == Blocks.AIR)
+            return;
+
+        Location location = new Location(chunkPosition.getWorld(),
+                (chunkPosition.getX() << 4) + x,
+                sectionBottomY + y,
+                (chunkPosition.getZ() << 4) + z);
+
+        int blockAmount = isDoubleSlab(blockData) ? 2 : 1;
+
+        Key blockKey = Keys.of(KeyBlocksCache.getBlockKey(block), location);
+        blockCounts.computeIfAbsent(blockKey, b -> new Counter(0)).inc(blockAmount);
+        if (block == Blocks.SPAWNER) {
+            spawnersLocations.add(location);
+        }
+    }
+
+    private static boolean isDoubleSlab(IBlockData blockData) {
+        Block block = blockData.getBlock();
+        return (block.a(TagsBlock.SLABS) || block.a(TagsBlock.WOODEN_SLABS)) &&
+                blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.DOUBLE;
+    }
+
     private static void removeEntities(Chunk chunk) {
         Collection<Entity>[] entitySlices = null;
         Function<Void, Collection<Entity>> entitySliceCreationFunction = null;
 
-        try {
+        if (ENTITY_SLICES_LISTS) {
             entitySlices = chunk.entitySlices;
             entitySliceCreationFunction = v -> new UnsafeList<>();
-        } catch (Throwable ex) {
+        } else {
             try {
                 entitySlices = ENTITY_SLICE_ARRAY.get(chunk);
                 entitySliceCreationFunction = v -> new net.minecraft.server.v1_16_R3.EntitySlice<>(Entity.class);

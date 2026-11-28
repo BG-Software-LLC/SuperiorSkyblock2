@@ -26,6 +26,7 @@ import org.bukkit.event.inventory.InventoryType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -101,8 +102,28 @@ public class MenuParserImpl implements MenuParser {
             inventoryMenuLayoutBuilder.setNextPageSlots(parseButtonSlots(cfg, "next-page", menuSlotsMap));
             inventoryMenuLayoutBuilder.setPagedObjectSlots(parseButtonSlots(cfg, "slots", menuSlotsMap), pagedButtonBuilder);
 
-            if (cfg.isList("custom-order"))
+            if (cfg.isList("custom-layout")) {
+                List<?> customLayout = cfg.getList("custom-layout");
+                List<List<Integer>> slotsLayout = new ArrayList<>();
+
+                for (Object element : customLayout) {
+                    if (element instanceof List<?>) {
+                        List<Integer> slots = new ArrayList<>();
+
+                        for (Object slot : (List<?>) element) {
+                            slots.add(((Number) slot).intValue());
+                        }
+
+                        slotsLayout.add(slots);
+                    }
+                }
+
+                if (!slotsLayout.isEmpty()) {
+                    inventoryMenuLayoutBuilder.setCustomLayout(slotsLayout);
+                }
+            } else if (cfg.isList("custom-order")) {
                 inventoryMenuLayoutBuilder.setCustomLayoutOrder(cfg.getIntegerList("custom-order"));
+            }
         }
 
         return new MenuParseResult<>(menuLayoutBuilder, openingSound, previousMoveAllowed, skipOneItem, menuSlotsMap, cfg);
@@ -143,11 +164,11 @@ public class MenuParserImpl implements MenuParser {
 
         File file = new File(plugin.getDataFolder(), "menus/" + menuPath + fileName);
 
-        CommentedConfiguration cfg = loadMenuFile(file, fileName, customMenu, converter);
+        CommentedConfiguration config = loadMenuFile(file, fileName, customMenu, converter);
 
-        if (cfg != null) {
+        if (config != null) {
             try {
-                return parseMenu(fileName, cfg);
+                return parseMenu(fileName, config);
             } catch (MenuParseException error) {
                 Log.errorFromFile(fileName, error.getMessage());
             }
@@ -159,13 +180,17 @@ public class MenuParserImpl implements MenuParser {
     @Nullable
     private static CommentedConfiguration loadMenuFile(File file, String fileName, boolean customMenu,
                                                        @Nullable IMenuConverter converter) {
-        if (!file.exists() && !customMenu)
-            Resources.saveResource("menus/" + fileName);
+        boolean firstTime = false;
 
-        CommentedConfiguration cfg = new CommentedConfiguration();
+        if (!file.exists() && !customMenu) {
+            Resources.saveResource("menus/" + fileName);
+            firstTime = true;
+        }
+
+        CommentedConfiguration config = new CommentedConfiguration();
 
         try {
-            cfg.load(file);
+            config.load(file);
         } catch (InvalidConfigurationException error) {
             Log.errorFromFile(error, fileName, "There is an issue with the format of the file:");
             return null;
@@ -174,15 +199,15 @@ public class MenuParserImpl implements MenuParser {
             return null;
         }
 
-        if (converter != null && converter.convert(plugin, cfg)) {
+        if (converter != null && converter.convert(plugin, config, firstTime)) {
             try {
-                cfg.save(file);
+                config.save(file);
             } catch (Exception error) {
                 Log.errorFromFile(error, fileName, "An unexpected error occurred while saving file:");
             }
         }
 
-        return cfg;
+        return config;
     }
 
     public List<Integer> parseButtonSlots(ConfigurationSection section, String key, MenuSlotsMap menuSlotsMap) {
@@ -340,7 +365,7 @@ public class MenuParserImpl implements MenuParser {
 
     public interface IMenuConverter {
 
-        boolean convert(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg);
+        boolean convert(SuperiorSkyblockPlugin plugin, YamlConfiguration config, boolean firstTime);
 
     }
 

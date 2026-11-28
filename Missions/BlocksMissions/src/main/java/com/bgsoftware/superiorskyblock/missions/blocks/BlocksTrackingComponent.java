@@ -38,12 +38,12 @@ public class BlocksTrackingComponent {
 
     public boolean remove(int blockX, int blockY, int blockZ) {
         long chunkKey = serializeChunk(blockX >> 4, blockZ >> 4);
-        return this.trackedBlocksData.untrack(chunkKey, () -> serializeLocation(blockX, blockY, blockZ));
+        return this.trackedBlocksData.untrack(chunkKey, serializeLocation(blockX, blockY, blockZ));
     }
 
     public boolean contains(int blockX, int blockY, int blockZ) {
         long chunkKey = serializeChunk(blockX >> 4, blockZ >> 4);
-        return this.trackedBlocksData.contains(chunkKey, () -> serializeLocation(blockX, blockY, blockZ));
+        return this.trackedBlocksData.contains(chunkKey, serializeLocation(blockX, blockY, blockZ));
     }
 
     public void loadBlocks(TrackedBlocksData trackedBlocksData) {

@@ -21,8 +21,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundChunkBatchFinishedPacket;
-import net.minecraft.network.protocol.game.ClientboundChunkBatchStartPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -63,8 +61,6 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
     private static final ReflectMethod<Codec<PalettedContainer<Holder<Biome>>>> CONTAINER_FACTORY_BIOME_RW_CODEC =
             new ReflectMethod<>(PalettedContainerFactory.class, "biomeContainerCodecRW");
 
-    private static final ClientboundChunkBatchFinishedPacket CHUNK_BATCH_FINISHED_PACKET = new ClientboundChunkBatchFinishedPacket(1);
-
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
@@ -89,18 +85,28 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.A
 
                 levelChunk.markUnsaved();
 
-                ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk, levelChunk.getLevel().getLightEngine(), null, null);
+                BukkitExecutor.ensureMain(() -> {
+                    ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
+                    if (playersToUpdate.isEmpty() || serverLevel.getChunkSource().getChunkNow(
+                            levelChunk.getPos().getMinBlockX() >> 4, levelChunk.getPos().getMinBlockZ() >> 4) != levelChunk)
+                        return;
 
-                playersToUpdate.forEach(player -> {
-                    ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+                    List<ServerPlayer> trackingPlayers = serverLevel.getChunkSource().chunkMap
+                            .getPlayers(levelChunk.getPos(), false);
+                    if (trackingPlayers.isEmpty())
+                        return;
 
-                    try {
-                        serverPlayer.connection.send(ClientboundChunkBatchStartPacket.INSTANCE);
-                        serverPlayer.connection.send(mapChunkPacket);
-                    } finally {
-                        serverPlayer.connection.send(CHUNK_BATCH_FINISHED_PACKET);
-                    }
+                    ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
+                            levelChunk, serverLevel.getLightEngine(), null, null);
+
+                    playersToUpdate.forEach(player -> {
+                        if (!player.isOnline() || player.getWorld() != serverLevel.getWorld())
+                            return;
+
+                        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+                        if (trackingPlayers.contains(serverPlayer))
+                            serverPlayer.connection.send(mapChunkPacket);
+                    });
                 });
             }
 

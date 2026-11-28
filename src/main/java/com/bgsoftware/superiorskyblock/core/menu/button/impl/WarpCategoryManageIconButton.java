@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSoundImpl;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -66,13 +67,9 @@ public class WarpCategoryManageIconButton extends AbstractMenuViewButton<MenuWar
             if (!message.equalsIgnoreCase("-cancel")) {
                 int rowsSize = Menus.MENU_WARP_CATEGORIES.getRowsSize();
 
-                int slot;
+                int slot = Text.parseInt(message, -1);
 
-                try {
-                    slot = Integer.parseInt(message);
-                    if (slot < 0 || slot >= rowsSize * 9)
-                        throw new IllegalArgumentException();
-                } catch (IllegalArgumentException ex) {
+                if (slot < 0 || slot >= rowsSize * 9) {
                     Message.INVALID_SLOT.send(player, message);
                     return true;
                 }

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
+import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -35,6 +36,7 @@ import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
+import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -58,6 +60,12 @@ public class PlayersListener extends AbstractGameEventListener {
         @Override
         protected RegionManagerService create() {
             return plugin.getServices().getService(RegionManagerService.class);
+        }
+    };
+    private final LazyReference<DragonBattleServiceImpl> dragonBattleService = new LazyReference<DragonBattleServiceImpl>() {
+        @Override
+        protected DragonBattleServiceImpl create() {
+            return (DragonBattleServiceImpl) plugin.getServices().getService(DragonBattleService.class);
         }
     };
 
@@ -180,6 +188,10 @@ public class PlayersListener extends AbstractGameEventListener {
 
     private void onPlayerQuit(GameEvent<GameEventArgs.PlayerQuitEvent> e) {
         Player player = e.getArgs().player;
+
+        // Pending requests of dangerous commands should not be executed after the player left.
+        plugin.getCommands().cancelDangerousRequests(player.getUniqueId());
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if (superiorPlayer instanceof SuperiorNPCPlayer) {
@@ -328,9 +340,7 @@ public class PlayersListener extends AbstractGameEventListener {
             return;
         }
 
-        SuperiorPlayer damagerPlayer = e.getArgs().damager == null ? null :
-                BukkitEntities.getPlayerSource(e.getArgs().damager)
-                        .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
+        SuperiorPlayer damagerPlayer = BukkitEntities.getSuperiorPlayerSource(e.getArgs().damager);
 
         // Some plugins, such as Sentinel, may actually cause a NPC to attack.
         if (damagerPlayer instanceof SuperiorNPCPlayer) {
@@ -535,6 +545,8 @@ public class PlayersListener extends AbstractGameEventListener {
             if (respawnAtIsland != null) {
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 superiorPlayer.updateWorldBorder(respawnAtIsland);
+                // Respawning does not go through the island enter handling.
+                this.dragonBattleService.get().restoreKilledEnderDragonBattle(respawnAtIsland, respawnLocation.getWorld());
             }
         }, 2L);
 

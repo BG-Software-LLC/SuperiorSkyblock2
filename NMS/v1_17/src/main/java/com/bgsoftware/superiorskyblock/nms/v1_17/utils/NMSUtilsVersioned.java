@@ -1,19 +1,18 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17.utils;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectConstructor;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_17.NMSUtils;
-import com.bgsoftware.superiorskyblock.nms.v1_17.utils.TickingBlockList;
-import com.bgsoftware.superiorskyblock.nms.v1_17.world.WorldEditSessionImpl;
 import com.google.common.base.Suppliers;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -25,17 +24,22 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -53,6 +57,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -74,6 +79,25 @@ public class NMSUtilsVersioned {
             EntityStorage.class, IOWorker.class, Modifier.PRIVATE | Modifier.FINAL, 1);
     private static final ReflectMethod<CompletableFuture<CompoundTag>> WORKER_LOAD_ASYNC = new ReflectMethod<>(
             IOWorker.class, CompletableFuture.class, 1, ChunkPos.class);
+    private static final boolean HAS_PAPER_PROTO_CHUNK_CONSTRUCTOR = new ReflectConstructor<>(ProtoChunk.class,
+            ChunkPos.class, UpgradeData.class, LevelHeightAccessor.class, ServerLevel.class).isValid();
+    private static final boolean HAS_PAPER_PROTO_CHUNK_SECTIONS_CONSTRUCTOR = new ReflectConstructor<>(ProtoChunk.class,
+            ChunkPos.class, UpgradeData.class, LevelChunkSection[].class, ProtoTickList.class, ProtoTickList.class,
+            LevelHeightAccessor.class, ServerLevel.class).isValid();
+    private static final boolean HAS_PAPER_LEVEL_CHUNK_SECTION_CONSTRUCTOR = new ReflectConstructor<>(LevelChunkSection.class,
+            int.class, ChunkAccess.class, Level.class, boolean.class).isValid();
+
+    public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
+    }
+
+    public static int getLevelChunkX(LevelChunk levelChunk) {
+        return levelChunk.getPos().x;
+    }
+
+    public static int getLevelChunkZ(LevelChunk levelChunk) {
+        return levelChunk.getPos().z;
+    }
 
     public static CompoundTag readChunk(ChunkMap chunkMap, ChunkPos chunkPos) throws IOException {
         return chunkMap.read(chunkPos);
@@ -115,12 +139,11 @@ public class NMSUtilsVersioned {
     }
 
     public static ProtoChunk createProtoChunk(ChunkPos chunkPos, ServerLevel serverLevel) {
-        try {
+        if (HAS_PAPER_PROTO_CHUNK_CONSTRUCTOR)
             return new ProtoChunk(chunkPos, UpgradeData.EMPTY, serverLevel, serverLevel);
-        } catch (Throwable ex) {
-            //noinspection deprecation
-            return new ProtoChunk(chunkPos, UpgradeData.EMPTY, serverLevel);
-        }
+
+        //noinspection deprecation
+        return new ProtoChunk(chunkPos, UpgradeData.EMPTY, serverLevel);
     }
 
     public static ProtoChunk createProtoChunk(ChunkPos chunkPos, LevelChunkSection[] chunkSections,
@@ -132,11 +155,10 @@ public class NMSUtilsVersioned {
             return fluid == null || fluid == Fluids.EMPTY;
         }, chunkPos, levelHeightAccessor);
 
-        try {
+        if (HAS_PAPER_PROTO_CHUNK_SECTIONS_CONSTRUCTOR)
             return new ProtoChunk(chunkPos, UpgradeData.EMPTY, chunkSections, blockTickScheduler, fluidTickScheduler, levelHeightAccessor, serverLevel);
-        } catch (Throwable error) {
-            return new ProtoChunk(chunkPos, UpgradeData.EMPTY, chunkSections, blockTickScheduler, fluidTickScheduler, levelHeightAccessor);
-        }
+
+        return new ProtoChunk(chunkPos, UpgradeData.EMPTY, chunkSections, blockTickScheduler, fluidTickScheduler, levelHeightAccessor);
     }
 
     public static boolean isBlockStateLiquid(BlockState blockState) {
@@ -189,11 +211,9 @@ public class NMSUtilsVersioned {
         for (int i = 0; i < chunkSections.length; ++i) {
             int chunkSectionPos = levelHeightAccessor.getSectionYFromSectionIndex(i);
 
-            try {
-                chunkSections[i] = new LevelChunkSection(chunkSectionPos, null, serverLevel, true);
-            } catch (Throwable error) {
-                chunkSections[i] = new LevelChunkSection(chunkSectionPos);
-            }
+            chunkSections[i] = HAS_PAPER_LEVEL_CHUNK_SECTION_CONSTRUCTOR ?
+                    new LevelChunkSection(chunkSectionPos, null, serverLevel, true) :
+                    new LevelChunkSection(chunkSectionPos);
         }
     }
 
@@ -269,6 +289,14 @@ public class NMSUtilsVersioned {
 
     public static EndDragonFight getEndDragonFight(ServerLevel serverLevel) {
         return serverLevel.dragonFight();
+    }
+
+    public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
+        // Fight origin does not exist in this version; DragonUtils handles the podium position instead.
+    }
+
+    public static void removeDragonTicket(ServerLevel serverLevel) {
+        serverLevel.getChunkSource().removeRegionTicket(TicketType.DRAGON, new ChunkPos(0, 0), 9, Unit.INSTANCE);
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {

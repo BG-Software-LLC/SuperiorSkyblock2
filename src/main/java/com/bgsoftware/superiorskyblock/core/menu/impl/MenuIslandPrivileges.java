@@ -209,11 +209,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         private final LazyReference<IslandPrivilege> islandPrivilege = new LazyReference<IslandPrivilege>() {
             @Override
             protected IslandPrivilege create() {
-                try {
-                    return IslandPrivilege.getByName(IslandPrivilegeInfo.this.islandPrivilegeName);
-                } catch (Exception error) {
-                    return null;
-                }
+                return IslandPrivilege.getByNameOrNull(IslandPrivilegeInfo.this.islandPrivilegeName);
             }
         };
 
@@ -284,11 +280,16 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/permissions-gui.yml");
 
-        if (!oldFile.exists())
-            return false;
+        if (!oldFile.exists()) {
+            if (firstTime) {
+                return removeInvalidPrivileges(newMenu);
+            } else {
+                return false;
+            }
+        }
 
         //We want to reset the items of newMenu.
         ConfigurationSection itemsSection = newMenu.createSection("items");
@@ -326,6 +327,23 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
                 AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
+    }
+
+    private static boolean removeInvalidPrivileges(YamlConfiguration config) {
+        boolean shouldSave = false;
+
+        ConfigurationSection permissionsSection = config.getConfigurationSection("permissions");
+
+        if (permissionsSection != null) {
+            for (String name : permissionsSection.getKeys(false)) {
+                if (IslandPrivilege.getByNameOrNull(name) == null) {
+                    config.set("permissions." + name, null);
+                    shouldSave = true;
+                }
+            }
+        }
+
+        return shouldSave;
     }
 
 }

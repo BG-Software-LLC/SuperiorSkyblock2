@@ -118,7 +118,7 @@ public class MenuIslandUpgrades extends AbstractMenu<IslandMenuView, IslandViewA
         return new MenuIslandUpgrades(menuParseResult);
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/upgrades-gui.yml");
 
         if (!oldFile.exists())

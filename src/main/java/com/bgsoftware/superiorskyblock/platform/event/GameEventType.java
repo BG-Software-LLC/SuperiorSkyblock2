@@ -49,6 +49,7 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.LeavesDecayEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PistonExtendEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PistonRetractEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerAttackEntityEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerChangedWorldEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerChatEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerCommandEvent;
@@ -66,6 +67,7 @@ import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerQuitEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerRespawnEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerShearEntityEvent;
+import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerTakeLecternBookEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.PlayerUnleashEntityEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ProjectileHitEvent;
 import static com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs.ProjectileLaunchEvent;
@@ -138,6 +140,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<DialogOpenEvent> DIALOG_OPEN_EVENT = register(GameEventFlags.INVENTORY_EVENT | GameEventFlags.PLAYER_EVENT);
 
     // Player Events
+    public static final GameEventType<PlayerAttackEntityEvent> PLAYER_ATTACK_ENTITY_EVENT = register(PlayerAttackEntityEvent.class, GameEventFlags.PLAYER_EVENT | GameEventFlags.ENTITY_EVENT);
     public static final GameEventType<PlayerChangedWorldEvent> PLAYER_CHANGED_WORLD_EVENT = register(PlayerChangedWorldEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerChatEvent> PLAYER_CHAT_EVENT = register(PlayerChatEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerCommandEvent> PLAYER_COMMAND_EVENT = register(PlayerCommandEvent.class, GameEventFlags.PLAYER_EVENT);
@@ -155,6 +158,7 @@ public class GameEventType<Args extends IEventArgs> extends EventType<Args, Game
     public static final GameEventType<PlayerQuitEvent> PLAYER_QUIT_EVENT = register(PlayerQuitEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerRespawnEvent> PLAYER_RESPAWN_EVENT = register(PlayerRespawnEvent.class, GameEventFlags.PLAYER_EVENT);
     public static final GameEventType<PlayerShearEntityEvent> PLAYER_SHEAR_ENTITY_EVENT = register(PlayerShearEntityEvent.class, GameEventFlags.PLAYER_EVENT | GameEventFlags.ENTITY_EVENT);
+    public static final GameEventType<PlayerTakeLecternBookEvent> PLAYER_TAKE_LECTERN_BOOK_EVENT = register(PlayerTakeLecternBookEvent.class, GameEventFlags.PLAYER_EVENT | GameEventFlags.BLOCK_EVENT);
     public static final GameEventType<PlayerUnleashEntityEvent> PLAYER_UNLEASH_ENTITY_EVENT = register(PlayerUnleashEntityEvent.class, GameEventFlags.PLAYER_EVENT | GameEventFlags.ENTITY_EVENT);
 
     @GameEventFlags

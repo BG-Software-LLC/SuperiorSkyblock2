@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -28,7 +29,10 @@ public class BukkitItems {
     private static final ReflectMethod<ItemStack> GET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "getItemInOffHand");
     private static final ReflectMethod<ItemStack> SET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "setItemInOffHand", ItemStack.class);
 
+    @Nullable
     private static final Material END_CRYSTAL_ITEM_TYPE = EnumHelper.getEnum(Material.class, "END_CRYSTAL");
+
+    public static final boolean SPAWN_EGG_META_SUPPORT = isSpawnEggMetaSupported();
 
     private BukkitItems() {
 
@@ -111,12 +115,11 @@ public class BukkitItems {
         }
 
         if (ServerVersion.isLegacy()) {
-            try {
-                SpawnEggMeta spawnEggMeta = (SpawnEggMeta) itemStack.getItemMeta();
-                return spawnEggMeta.getSpawnedType() == null ? EntityType.PIG : spawnEggMeta.getSpawnedType();
-            } catch (NoClassDefFoundError error) {
+            if (!SPAWN_EGG_META_SUPPORT)
                 return EntityType.fromId(itemStack.getDurability());
-            }
+
+            SpawnEggMeta spawnEggMeta = (SpawnEggMeta) itemStack.getItemMeta();
+            return spawnEggMeta.getSpawnedType() == null ? EntityType.PIG : spawnEggMeta.getSpawnedType();
         } else {
             return EntityType.fromName(itemStack.getType().name().replace("_SPAWN_EGG", ""));
         }
@@ -136,13 +139,28 @@ public class BukkitItems {
         return !itemType.isBlock() && itemType.name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
     }
 
-    public static boolean isInteractableItem(@Nullable ItemStack itemStack) {
+    public static boolean isInteractableItem(@Nullable ItemStack itemStack, Block clickedBlock) {
         if (itemStack == null)
             return false;
 
         Material itemType = itemStack.getType();
 
+        // End crystals can only be placed on obsidian and bedrock, other blocks are interacted with normally.
+        if (itemType == END_CRYSTAL_ITEM_TYPE) {
+            Material clickedBlockType = clickedBlock.getType();
+            return clickedBlockType == Material.OBSIDIAN || clickedBlockType == Material.BEDROCK;
+        }
+
         return itemType == Material.ARMOR_STAND || isValidAndSpawnEgg(itemType);
+    }
+
+    private static boolean isSpawnEggMetaSupported() {
+        try {
+            Class.forName("org.bukkit.inventory.meta.SpawnEggMeta");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
     }
 
 }

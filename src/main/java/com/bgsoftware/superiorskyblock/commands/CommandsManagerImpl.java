@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.FileClassLoader;
 import com.bgsoftware.superiorskyblock.core.io.Files;
@@ -18,6 +20,8 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -28,6 +32,7 @@ import java.lang.reflect.Constructor;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,10 +41,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("UnstableApiUsage")
 public class CommandsManagerImpl extends Manager implements CommandsManager {
 
+    private static Set<String> DANGEROUS_COMMANDS_CACHE;
+
     private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
+    private final Map<String, Cache<UUID, DangerousCommandRequest>> dangerousCommandsRequests = new HashMap<>();
 
     private final CommandsMap playerCommandsMap;
     private final CommandsMap adminCommandsMap;
@@ -57,6 +67,9 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
     @Override
     public void loadData() {
+        // Pending requests of dangerous commands should not survive reloads.
+        cancelAllDangerousRequests();
+
         String islandCommand = plugin.getSettings().getIslandCommand();
         label = islandCommand.split(",")[0];
 
@@ -173,6 +186,118 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
     public String getLabel() {
         return label;
+    }
+
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CommandsManagerImpl::onSettingsUpdate);
+        // Admin commands can be registered after settings are loaded (e.g. by modules).
+        dispatcher.registerCallback(PluginEventType.COMMANDS_UPDATE_EVENT, CommandsManagerImpl::onSettingsUpdate);
+    }
+
+    @Override
+    public boolean isDangerousCommand(SuperiorCommand command) {
+        return DANGEROUS_COMMANDS_CACHE.contains(getCommandLabel(command));
+    }
+
+    @Override
+    public void submitDangerousRequest(Player player, SuperiorCommand command, String[] args) {
+        String commandLabel = getCommandLabel(command);
+        String executedCommand = "/" + this.label + " " + String.join(" ", args);
+
+        // Overrides any previous request of the player for this command, and resets its expiry time.
+        dangerousCommandsRequests.computeIfAbsent(commandLabel, l -> CacheBuilder.newBuilder()
+                .expireAfterWrite(1, TimeUnit.MINUTES)
+                .build()
+        ).put(player.getUniqueId(), new DangerousCommandRequest(player.getUniqueId(), player.getName(),
+                executedCommand, args, System.currentTimeMillis()));
+
+        Message.DANGEROUS_COMMAND_REQUEST_SENT.send(player, executedCommand);
+        Message.DANGEROUS_COMMAND_REQUEST_CONSOLE.send(Bukkit.getConsoleSender(), player.getName(),
+                executedCommand, this.label + " admin " + commandLabel);
+    }
+
+    @Override
+    public boolean hasPendingDangerousRequests(SuperiorCommand command) {
+        Cache<UUID, DangerousCommandRequest> requests = dangerousCommandsRequests.get(getCommandLabel(command));
+        if (requests == null)
+            return false;
+
+        requests.cleanUp();
+        return requests.size() > 0;
+    }
+
+    @Override
+    public void approveDangerousRequests(CommandSender sender, SuperiorCommand command) {
+        Cache<UUID, DangerousCommandRequest> requests = dangerousCommandsRequests.get(getCommandLabel(command));
+        if (requests == null)
+            return;
+
+        List<DangerousCommandRequest> requestsToExecute = new LinkedList<>(requests.asMap().values());
+        // We clear the requests before executing them, so they cannot be executed twice.
+        requests.invalidateAll();
+
+        requestsToExecute.sort(Comparator.comparingLong(request -> request.creationTime));
+
+        for (DangerousCommandRequest request : requestsToExecute) {
+            Player player = Bukkit.getPlayer(request.playerUUID);
+
+            if (player == null || !player.isOnline()) {
+                Message.DANGEROUS_COMMAND_PLAYER_OFFLINE.send(sender, request.playerName, request.executedCommand);
+                continue;
+            }
+
+            if (!CommandsHelper.hasCommandAccess(command, player)) {
+                Message.DANGEROUS_COMMAND_NO_ACCESS.send(sender, request.playerName, request.executedCommand);
+                continue;
+            }
+
+            Message.DANGEROUS_COMMAND_APPROVED.send(player, request.executedCommand);
+
+            try {
+                command.execute(plugin, player, request.args);
+            } catch (Throwable error) {
+                Log.error(error, "An unexpected error occurred while executing approved command ",
+                        request.executedCommand, " of ", request.playerName, ":");
+            }
+        }
+    }
+
+    @Override
+    public void cancelDangerousRequests(UUID playerUUID) {
+        for (Cache<UUID, DangerousCommandRequest> requests : dangerousCommandsRequests.values()) {
+            DangerousCommandRequest request = requests.getIfPresent(playerUUID);
+            if (request != null) {
+                requests.invalidate(playerUUID);
+                Message.DANGEROUS_COMMAND_PLAYER_QUIT.send(Bukkit.getConsoleSender(), request.playerName, request.executedCommand);
+            }
+        }
+    }
+
+    @Override
+    public void cancelAllDangerousRequests() {
+        for (Cache<UUID, DangerousCommandRequest> requests : dangerousCommandsRequests.values()) {
+            for (DangerousCommandRequest request : requests.asMap().values()) {
+                Player player = Bukkit.getPlayer(request.playerUUID);
+                if (player != null)
+                    Message.DANGEROUS_COMMAND_CANCELLED.send(player, request.executedCommand);
+            }
+        }
+
+        dangerousCommandsRequests.clear();
+    }
+
+    private static void onSettingsUpdate() {
+        DANGEROUS_COMMANDS_CACHE = new HashSet<>();
+        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+        plugin.getSettings().getDangerousCommands().forEach(commandLabel -> {
+            SuperiorCommand superiorCommand = plugin.getCommands().getAdminCommand(commandLabel);
+            if (superiorCommand != null)
+                DANGEROUS_COMMANDS_CACHE.add(getCommandLabel(superiorCommand));
+        });
+    }
+
+    private static String getCommandLabel(SuperiorCommand command) {
+        return command.getAliases().get(0).toLowerCase(Locale.ENGLISH);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -364,6 +489,24 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             }
 
             return list;
+        }
+
+    }
+
+    private static class DangerousCommandRequest {
+
+        private final UUID playerUUID;
+        private final String playerName;
+        private final String executedCommand;
+        private final String[] args;
+        private final long creationTime;
+
+        DangerousCommandRequest(UUID playerUUID, String playerName, String executedCommand, String[] args, long creationTime) {
+            this.playerUUID = playerUUID;
+            this.playerName = playerName;
+            this.executedCommand = executedCommand;
+            this.args = args;
+            this.creationTime = creationTime;
         }
 
     }

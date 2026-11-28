@@ -5,6 +5,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsTickingBlockEntity;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops.CropsTickingMethod;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -38,8 +41,8 @@ public class CropsBlockEntity extends BlockEntity {
     }
 
     public static void create(Island island, String worldName, LevelChunk levelChunk) {
-        int chunkX = levelChunk.locX;
-        int chunkZ = levelChunk.locZ;
+        int chunkX = NMSUtilsVersioned.getLevelChunkX(levelChunk);
+        int chunkZ = NMSUtilsVersioned.getLevelChunkZ(levelChunk);
         long packedPos = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
         tickingChunks.computeIfAbsent(worldName, packedPos, () -> {
             BlockPos blockPos = new BlockPos(chunkX << 4, 1, chunkZ << 4);
@@ -65,11 +68,6 @@ public class CropsBlockEntity extends BlockEntity {
 
     public boolean isValidBlockState(BlockState state) {
         return true;
-    }
-
-    private net.minecraft.world.level.ChunkPos getPos() {
-        LevelChunk levelChunk = this.chunk.get();
-        return levelChunk == null ? null : levelChunk.getPos();
     }
 
     public void remove() {

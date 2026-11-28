@@ -134,11 +134,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
         private final LazyReference<IslandFlag> islandFlag = new LazyReference<IslandFlag>() {
             @Override
             protected IslandFlag create() {
-                try {
-                    return IslandFlag.getByName(IslandFlagInfo.this.islandFlagName);
-                } catch (Exception error) {
-                    return null;
-                }
+                return IslandFlag.getByNameOrNull(IslandFlagInfo.this.islandFlagName);
             }
         };
 
@@ -182,7 +178,7 @@ public class MenuIslandFlags extends AbstractPagedMenu<MenuIslandFlags.View, Isl
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/settings-gui.yml");
 
         if (!oldFile.exists())

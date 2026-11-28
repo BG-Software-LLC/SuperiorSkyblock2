@@ -338,6 +338,13 @@ public class GameEventArgs implements IEventArgs {
     }
 
 
+    public static class PlayerAttackEntityEvent extends PlayerEvent {
+
+        public Entity entity;
+
+    }
+
+
     public static class PlayerShearEntityEvent extends PlayerEvent {
 
         public Entity entity;
@@ -380,6 +387,12 @@ public class GameEventArgs implements IEventArgs {
     }
 
     public static class PlayerPickupArrowEvent extends PlayerPickupItemEvent {
+
+    }
+
+    public static class PlayerTakeLecternBookEvent extends PlayerEvent {
+
+        public Block clickedBlock;
 
     }
 
