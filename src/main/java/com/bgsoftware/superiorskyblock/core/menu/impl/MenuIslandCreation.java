@@ -228,16 +228,20 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
     @Nullable
     private static Float parseRotationPart(String part, String partName, String rotation, String itemSectionName) {
+        Float value = null;
+
         try {
-            float value = Float.parseFloat(part.trim());
-            if (Float.isNaN(value) || Float.isInfinite(value))
-                throw new NumberFormatException();
-            return value;
-        } catch (NumberFormatException error) {
+            value = Float.parseFloat(part.trim());
+        } catch (NumberFormatException ignored) {
+        }
+
+        if (value == null || value.isNaN() || value.isInfinite()) {
             Log.warnFromFile("island-creation.yml", "Invalid ", partName, " '", part.trim(), "' in rotation '",
                     rotation, "' for item ", itemSectionName, ", ignoring it");
             return null;
         }
+
+        return value;
     }
 
 }
