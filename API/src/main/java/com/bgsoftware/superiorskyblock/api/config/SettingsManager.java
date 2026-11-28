@@ -472,6 +472,7 @@ public interface SettingsManager {
 
     /**
      * List of crops that can get affected by the crops-growth multiplier.
+     * An empty list means all randomly ticking blocks are affected.
      *
      * @deprecated Moved to the upgrades module configuration.
      */

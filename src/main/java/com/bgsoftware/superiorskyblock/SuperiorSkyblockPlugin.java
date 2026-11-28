@@ -260,6 +260,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             modulesHandler.runModuleLifecycle(ModuleLoadTime.NORMAL, false);
 
+            // The settings and the configs of the modules are loaded now. Caches that depend on them
+            // (such as the interact privileges of lecterns) must be ready before the listeners are registered.
+            PluginEventsFactory.callSettingsUpdateEvent();
+
             try {
                 reloadPlugin(PluginReloadReason.STARTUP);
             } catch (ManagerLoadException error) {
