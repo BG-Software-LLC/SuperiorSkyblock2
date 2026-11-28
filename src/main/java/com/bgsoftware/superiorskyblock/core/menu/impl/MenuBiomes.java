@@ -32,9 +32,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -90,7 +88,7 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
             dimensionSelectionMode = DimensionSelectionMode.DEFAULT;
         }
 
-        List<BiomeInfo> biomes = new LinkedList<>();
+        List<BiomeInfo> biomes = new ArrayList<>();
         Optional.ofNullable(cfg.getConfigurationSection("biomes")).ifPresent(biomesSection -> {
             for (String biomeName : biomesSection.getKeys(false)) {
                 Biome biome = plugin.getNMSAlgorithms().getBiome(biomeName);
@@ -185,7 +183,7 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
 
         @Override
         protected List<BiomeInfo> requestObjects() {
-            List<BiomeInfo> requestObjects = new LinkedList<>();
+            List<BiomeInfo> requestObjects = new ArrayList<>();
             for (BiomeInfo biomeInfo : biomes) {
                 if ((biomeInfo.getDimensions().isEmpty() && dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension()) ||
                         biomeInfo.getDimensions().contains(dimension)) {
@@ -193,7 +191,7 @@ public class MenuBiomes extends AbstractPagedMenu<MenuBiomes.View, MenuBiomes.Ar
                 }
             }
 
-            return Collections.unmodifiableList(requestObjects);
+            return requestObjects;
         }
 
     }
