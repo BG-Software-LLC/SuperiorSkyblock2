@@ -83,7 +83,7 @@ public class CmdAdminAddCropGrowth implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setCropGrowthMultiplier(eventArgs.cropGrowth));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

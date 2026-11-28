@@ -96,7 +96,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandWorldResetEvent(island, sender, dimension),
                 island, dimension, CmdAdminResetWorld::resetWorldInternal));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     private static void resetWorldInternal(Island island, Dimension dimension) {

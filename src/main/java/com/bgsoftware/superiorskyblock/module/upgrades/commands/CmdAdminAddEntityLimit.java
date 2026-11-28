@@ -95,7 +95,7 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setEntityLimit(eventArgs.entity, eventArgs.entityLimit));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

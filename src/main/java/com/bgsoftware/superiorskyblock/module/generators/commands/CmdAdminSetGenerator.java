@@ -132,7 +132,7 @@ public class CmdAdminSetGenerator implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setGeneratorAmount(eventArgs.block, eventArgs.generatorRate, eventArgs.dimension));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
 
         if (islandsFilledWithDefaultBlockCount.get() > 0) {
             sendFilledWithDefaultBlockMessage(sender, defaultBlock, defaultBlockPercentage.get(),

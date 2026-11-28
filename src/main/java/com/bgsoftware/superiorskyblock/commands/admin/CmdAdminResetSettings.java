@@ -65,7 +65,7 @@ public class CmdAdminResetSettings implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandClearFlagsEvent(island, sender),
                 island, Island::resetSettings));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

@@ -76,7 +76,7 @@ public class CmdAdminSetTeamLimit implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandChangeMembersLimitEvent(island, sender, limit),
                 eventArgs -> eventArgs.island.setTeamLimit(eventArgs.membersLimit)));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

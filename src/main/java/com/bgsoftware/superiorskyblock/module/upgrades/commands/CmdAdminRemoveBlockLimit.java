@@ -78,7 +78,7 @@ public class CmdAdminRemoveBlockLimit implements IAdminIslandCommand {
                     island, key, Island::removeBlockLimit);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

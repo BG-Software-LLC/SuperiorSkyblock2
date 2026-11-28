@@ -22,7 +22,7 @@ Permission `"superior.admin.<alias>"`. Pick the interface by target:
 - `IAdminPlayerCommand`: `execute(plugin, sender, targetPlayer, args)`, `supportMultiplePlayers()`;
 - plain `ISuperiorCommand`.
 
-Argument counts include `admin` and the sub-command; the target is `args[2]`. Parse the shared arguments first; the parsers send their own errors. Then build `BulkChange.ofIslands(islands, island -> ...)` (or `BulkChange.ofPlayers(targetPlayers, ...)`), which returns a `ChangeResult` per target, and finish with `change.sendSummary(sender, args[1])`. Don't add success messages of your own (`messages.md`). Per target:
+Argument counts include `admin` and the sub-command; the target is `args[2]`. Parse the shared arguments first; the parsers send their own errors. Then build `BulkChange.ofIslands(islands, island -> ...)` (or `BulkChange.ofPlayers(targetPlayers, ...)`), which returns a `ChangeResult` per target, and finish with `change.sendSummary(sender, args)`. Don't add success messages of your own (`messages.md`). Per target:
 - A value check that fails returns its skip reason before the event fires: `ChangeResult.UNLIMITED` (an add on a limit `<= IslandUpgradeConstants.NO_LIMIT_VALUE`), `BELOW_MINIMUM`, or `ABOVE_MAXIMUM`.
 - Otherwise fire the cancellable event and `return ChangeResult.ifAllowed(event, eventArgs -> ...)`, applying the values from `eventArgs`. Events that return a `boolean` use `ChangeResult.ifAllowed(allowed, island, [value, ...,] Island::setX)`.
 - A failure that carries a reason from another plugin returns `ChangeResult.cancelled(reason)`.

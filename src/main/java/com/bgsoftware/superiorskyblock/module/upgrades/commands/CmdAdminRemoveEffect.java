@@ -81,7 +81,7 @@ public class CmdAdminRemoveEffect implements IAdminIslandCommand {
                     island, effectType, Island::removePotionEffect);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

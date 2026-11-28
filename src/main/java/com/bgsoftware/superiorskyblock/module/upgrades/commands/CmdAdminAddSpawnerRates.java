@@ -83,7 +83,7 @@ public class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setSpawnerRatesMultiplier(eventArgs.spawnerRates));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

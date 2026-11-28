@@ -90,7 +90,7 @@ public class CmdAdminSetChestRow implements IAdminIslandCommand {
             return ChangeResult.APPLIED;
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

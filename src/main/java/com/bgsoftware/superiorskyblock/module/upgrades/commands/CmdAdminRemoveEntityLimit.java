@@ -78,7 +78,7 @@ public class CmdAdminRemoveEntityLimit implements IAdminIslandCommand {
                     island, key, Island::removeEntityLimit);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

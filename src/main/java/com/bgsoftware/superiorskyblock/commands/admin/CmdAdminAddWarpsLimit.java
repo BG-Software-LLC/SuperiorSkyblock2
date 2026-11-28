@@ -89,7 +89,7 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setWarpsLimit(eventArgs.warpsLimit));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

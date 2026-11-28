@@ -81,7 +81,7 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandChangeRolePrivilegeEvent(island, sender, playerRole),
                 island, playerRole, islandPrivilege, Island::setPermission));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

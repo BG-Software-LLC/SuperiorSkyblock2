@@ -79,6 +79,12 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
             return;
 
         int level = arguments.getNumber();
+
+        if (level < 1) {
+            Message.INVALID_LEVEL.send(sender, args[4]);
+            return;
+        }
+
         int maxLevel = upgrade.getMaxUpgradeLevel();
 
         if (level > maxLevel) {
@@ -91,7 +97,7 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
                         IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE),
                 eventArgs -> eventArgs.island.setUpgradeLevel(eventArgs.upgrade, eventArgs.nextLevel.getLevel())));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.BulkChange;
@@ -14,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CmdAdminRemoveRatings implements IAdminIslandCommand {
 
@@ -63,7 +65,10 @@ public class CmdAdminRemoveRatings implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         boolean removingAllRatings = targetPlayer == null;
-        Collection<Island> iterIslands = removingAllRatings ? islands : plugin.getGrid().getIslands();
+        // When removing the ratings of a player, only the islands that player rated are changed.
+        Collection<Island> iterIslands = removingAllRatings ? islands : plugin.getGrid().getIslands().stream()
+                .filter(island -> island.getRating(targetPlayer) != Rating.UNKNOWN)
+                .collect(Collectors.toList());
 
         BulkChange<Island> change = BulkChange.ofIslands(iterIslands, island -> {
             if (removingAllRatings)
@@ -74,7 +79,7 @@ public class CmdAdminRemoveRatings implements IAdminIslandCommand {
                     island, targetPlayer, Island::removeRating);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

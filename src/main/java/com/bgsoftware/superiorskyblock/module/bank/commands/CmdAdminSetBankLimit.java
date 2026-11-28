@@ -74,7 +74,7 @@ public class CmdAdminSetBankLimit implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandChangeBankLimitEvent(island, sender, limit),
                 eventArgs -> eventArgs.island.setBankLimit(eventArgs.bankLimit)));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

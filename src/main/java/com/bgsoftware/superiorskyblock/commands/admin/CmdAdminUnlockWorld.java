@@ -84,7 +84,7 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
             return ChangeResult.ifAllowed(allowed, island, dimension, unlockWorld, Island::setDimensionEnabled);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

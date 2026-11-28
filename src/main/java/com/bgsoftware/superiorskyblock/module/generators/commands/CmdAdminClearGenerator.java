@@ -82,7 +82,7 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
                     island, dimension, Island::clearGeneratorAmounts);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

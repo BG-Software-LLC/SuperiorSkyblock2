@@ -76,7 +76,7 @@ public class CmdAdminSetWarpsLimit implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandChangeWarpsLimitEvent(island, sender, limit),
                 eventArgs -> eventArgs.island.setWarpsLimit(eventArgs.warpsLimit)));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

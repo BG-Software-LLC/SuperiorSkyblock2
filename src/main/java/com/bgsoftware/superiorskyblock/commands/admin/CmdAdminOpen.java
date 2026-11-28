@@ -71,7 +71,7 @@ public class CmdAdminOpen implements IAdminIslandCommand {
                     island, false, Island::setLocked);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

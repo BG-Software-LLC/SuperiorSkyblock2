@@ -87,7 +87,7 @@ public class CmdAdminRemoveGenerator implements IAdminIslandCommand {
                     island, key, dimension, Island::removeGeneratorAmount);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

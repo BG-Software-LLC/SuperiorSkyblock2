@@ -14,7 +14,7 @@ Exemplars: `git show 42fa8f1ae` (messages), `git show c59bf2e11` (a new language
 
 ## Rules
 - **Admin commands that target `<player/island/*>`** get no success messages of their own (no `X_ALL`/`X_NAME`/`X`/`X_OTHER` trio). `BulkChange.sendSummary` reports for every command (`commands.md`):
-  - one `ISLANDS_CHANGE_SUMMARY` / `PLAYERS_CHANGE_SUMMARY` line;
+  - one `ISLANDS_CHANGE_SUMMARY` / `PLAYERS_CHANGE_SUMMARY` line: `{0}` sub-command, `{1}` applied, `{2}` targets, `{3}` skipped, `{4}`/`{5}` applied names (comma/newline separated), `{6}` the sub-command with the change's values (`setsize 50`), built from `args` by `sendSummary`;
   - one `ISLANDS_/PLAYERS_CHANGE_SKIPPED` line per skip reason (`_CONSOLE` for non-player senders, which can't hover).
   - A new skip reason is a `CHANGE_SKIP_REASON_X` key plus a `ChangeResult` constant. Its text is lower-case with no final period, because it is inserted mid-sentence.
   - Messages to the targets themselves (`DISBAND_SET` to the player, the text msgall sends) keep their own keys.

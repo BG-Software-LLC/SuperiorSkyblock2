@@ -68,14 +68,23 @@ public class BulkChange<T> {
         return this.appliedTargets.size();
     }
 
-    public void sendSummary(CommandSender sender, String commandLabel) {
+    /**
+     * Sends the summary to the executor.
+     *
+     * @param args The arguments of the command: args[1] is the sub-command, args[2] the target, and the rest
+     *             are the values of the change, which are listed next to the sub-command.
+     */
+    public void sendSummary(CommandSender sender, String[] args) {
         Locale locale = PlayerLocales.getLocale(sender);
+
+        // Both messages are sent through Message#send(CommandSender, Object...), so AttemptPlayerSendMessageEvent
+        // is called for player executors, like for any other message.
 
         if (!this.summaryMessage.isEmpty(locale)) {
             int skippedCount = this.targetsCount - this.appliedTargets.size();
-            this.summaryMessage.send(sender, locale, commandLabel, this.appliedTargets.size(), this.targetsCount,
+            this.summaryMessage.send(sender, args[1], this.appliedTargets.size(), this.targetsCount,
                     skippedCount, joinNames(this.appliedTargets, ", ", locale),
-                    joinNames(this.appliedTargets, "\n", locale));
+                    joinNames(this.appliedTargets, "\n", locale), getChangeDescription(args));
         }
 
         if (this.skippedTargets.isEmpty())
@@ -84,8 +93,16 @@ public class BulkChange<T> {
         // Tooltips are not shown in the console, therefore it has its own message.
         Message skippedMessage = sender instanceof Player ? this.skippedMessage : this.skippedConsoleMessage;
 
-        this.skippedTargets.forEach((result, targetNames) -> skippedMessage.send(sender, locale, targetNames.size(),
+        this.skippedTargets.forEach((result, targetNames) -> skippedMessage.send(sender, targetNames.size(),
                 result.getReason(locale), joinNames(targetNames, ", ", locale), joinNames(targetNames, "\n", locale)));
+    }
+
+    private static String getChangeDescription(String[] args) {
+        // The sub-command followed by the values of the change, without the target.
+        StringBuilder description = new StringBuilder(args[1]);
+        for (int i = 3; i < args.length; ++i)
+            description.append(' ').append(args[i]);
+        return description.toString();
     }
 
     private static String joinNames(List<String> names, String separator, Locale locale) {
@@ -99,7 +116,11 @@ public class BulkChange<T> {
 
     private static String getIslandName(Island island) {
         // Stripped names, so a colored island name doesn't color the names listed after it.
-        return island.getStrippedName().isEmpty() ? island.getOwner().getName() : island.getStrippedName();
+        if (!island.getStrippedName().isEmpty())
+            return island.getStrippedName();
+
+        SuperiorPlayer owner = island.getOwner();
+        return owner == null ? island.getUniqueId().toString() : owner.getName();
     }
 
 }

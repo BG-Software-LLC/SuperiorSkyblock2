@@ -82,7 +82,7 @@ public class CmdAdminRemoveRoleLimit implements IAdminIslandCommand {
                     island, playerRole, Island::removeRoleLimit);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

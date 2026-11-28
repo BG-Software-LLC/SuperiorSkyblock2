@@ -65,7 +65,7 @@ public class CmdAdminResetPermissions implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandClearRolesPrivilegesEvent(island, sender),
                 island, Island::resetPermissions));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

@@ -82,7 +82,7 @@ public class CmdAdminDeposit implements IAdminIslandCommand {
                     ChangeResult.cancelled(transaction.getFailureReason());
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

@@ -76,7 +76,7 @@ public class CmdAdminSetCropGrowth implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandChangeCropGrowthEvent(island, sender, multiplier),
                 eventArgs -> eventArgs.island.setCropGrowthMultiplier(eventArgs.cropGrowth)));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

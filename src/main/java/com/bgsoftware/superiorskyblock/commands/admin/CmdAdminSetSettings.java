@@ -86,7 +86,7 @@ public class CmdAdminSetSettings implements IAdminIslandCommand {
                     island, islandFlag, Island::disableSettings);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

@@ -83,7 +83,7 @@ public class CmdAdminAddMobDrops implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setMobDropsMultiplier(eventArgs.mobDrops));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

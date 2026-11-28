@@ -89,7 +89,7 @@ public class CmdAdminAddTeamLimit implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setTeamLimit(eventArgs.membersLimit));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

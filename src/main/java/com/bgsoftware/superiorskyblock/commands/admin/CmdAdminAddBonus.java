@@ -98,7 +98,7 @@ public class CmdAdminAddBonus implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setBonusLevel(eventArgs.levelBonus));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

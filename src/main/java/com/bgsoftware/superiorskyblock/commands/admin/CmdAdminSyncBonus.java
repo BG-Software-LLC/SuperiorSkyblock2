@@ -78,8 +78,8 @@ public class CmdAdminSyncBonus implements IAdminIslandCommand {
             BigDecimal currentBonus = isWorthBonus ? island.getBonusWorth() : island.getBonusLevel();
             BigDecimal newBonus = calculateValue(island, isWorthBonus);
 
-            if (newBonus.equals(currentBonus))
-                return ChangeResult.APPLIED;
+            if (newBonus.compareTo(currentBonus) == 0)
+                return ChangeResult.ALREADY_SYNCED;
 
             if (isWorthBonus) {
                 return ChangeResult.ifAllowed(PluginEventsFactory.callIslandChangeWorthBonusEvent(island, sender,
@@ -92,7 +92,7 @@ public class CmdAdminSyncBonus implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setBonusLevel(eventArgs.levelBonus));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

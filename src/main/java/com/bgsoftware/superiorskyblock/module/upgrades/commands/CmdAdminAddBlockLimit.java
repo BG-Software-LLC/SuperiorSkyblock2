@@ -95,7 +95,7 @@ public class CmdAdminAddBlockLimit implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setBlockLimit(eventArgs.block, eventArgs.blockLimit));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

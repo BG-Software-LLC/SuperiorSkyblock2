@@ -89,7 +89,7 @@ public class CmdAdminSetEffect implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandChangeEffectLevelEvent(island, sender, effectType, level),
                 eventArgs -> eventArgs.island.setPotionEffect(eventArgs.effectType, eventArgs.effectLevel)));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

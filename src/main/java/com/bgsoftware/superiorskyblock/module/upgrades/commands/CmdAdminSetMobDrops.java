@@ -76,7 +76,7 @@ public class CmdAdminSetMobDrops implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandChangeMobDropsEvent(island, sender, multiplier),
                 eventArgs -> eventArgs.island.setMobDropsMultiplier(eventArgs.mobDrops)));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

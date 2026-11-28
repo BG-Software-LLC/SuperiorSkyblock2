@@ -82,7 +82,7 @@ public class CmdAdminSetBlockLimit implements IAdminIslandCommand {
                 PluginEventsFactory.callIslandChangeBlockLimitEvent(island, sender, key, limit),
                 eventArgs -> eventArgs.island.setBlockLimit(eventArgs.block, eventArgs.blockLimit)));
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

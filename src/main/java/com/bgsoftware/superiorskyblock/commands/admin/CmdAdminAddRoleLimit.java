@@ -99,7 +99,7 @@ public class CmdAdminAddRoleLimit implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setRoleLimit(eventArgs.playerRole, eventArgs.roleLimit));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override

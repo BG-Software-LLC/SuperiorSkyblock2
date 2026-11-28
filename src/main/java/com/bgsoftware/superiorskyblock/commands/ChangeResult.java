@@ -22,6 +22,10 @@ public class ChangeResult {
     public static final ChangeResult ALREADY_OPENED = new ChangeResult(Message.CHANGE_SKIP_REASON_ALREADY_OPENED, null);
     public static final ChangeResult ALREADY_IGNORED = new ChangeResult(Message.CHANGE_SKIP_REASON_ALREADY_IGNORED, null);
     public static final ChangeResult ALREADY_UNIGNORED = new ChangeResult(Message.CHANGE_SKIP_REASON_ALREADY_UNIGNORED, null);
+    public static final ChangeResult ALREADY_SYNCED = new ChangeResult(Message.CHANGE_SKIP_REASON_ALREADY_SYNCED, null);
+
+    // The failure reason the API's bank events set when they are cancelled without a reason of their own.
+    private static final String GENERIC_EVENT_CANCEL_REASON = "Generic event cancel.";
 
     @Nullable
     private final Message reasonMessage;
@@ -34,7 +38,8 @@ public class ChangeResult {
     }
 
     public static ChangeResult cancelled(@Nullable String reason) {
-        return Text.isBlank(reason) ? CANCELLED : new ChangeResult(null, reason);
+        return Text.isBlank(reason) || GENERIC_EVENT_CANCEL_REASON.equals(reason) ? CANCELLED :
+                new ChangeResult(null, reason);
     }
 
     // The appliers get everything they need as parameters (the event args, or the target and its values), so

@@ -92,7 +92,7 @@ public class CmdAdminAddSize implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setIslandSize(eventArgs.borderSize));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
 
         if (change.hasApplied() && plugin.getSettings().isBuildOutsideIsland()) {
             Message.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);

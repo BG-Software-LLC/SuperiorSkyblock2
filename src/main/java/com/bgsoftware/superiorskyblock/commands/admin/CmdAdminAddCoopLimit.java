@@ -89,7 +89,7 @@ public class CmdAdminAddCoopLimit implements IAdminIslandCommand {
                     eventArgs -> eventArgs.island.setCoopLimit(eventArgs.coopLimit));
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
 }

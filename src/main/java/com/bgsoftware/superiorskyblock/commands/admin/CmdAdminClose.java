@@ -72,7 +72,7 @@ public class CmdAdminClose implements IAdminIslandCommand {
                     island, true, Island::setLocked);
         });
 
-        change.sendSummary(sender, args[1]);
+        change.sendSummary(sender, args);
     }
 
     @Override
