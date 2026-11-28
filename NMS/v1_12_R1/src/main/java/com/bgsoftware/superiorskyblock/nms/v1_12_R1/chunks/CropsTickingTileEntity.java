@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -29,6 +30,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static Set<Block> CROPS_TO_GROW_CACHE;
+    private static boolean GROW_ALL_CROPS;
 
     static {
         plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CropsTickingTileEntity::onSettingsUpdate);
@@ -112,7 +114,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
                         int y = factor >> 16 & 15;
                         IBlockData blockData = chunkSection.getType(x, y, z);
                         Block block = blockData.getBlock();
-                        if (block.isTicking() && CROPS_TO_GROW_CACHE.contains(block)) {
+                        if (block.isTicking() && canGrowCrop(block)) {
                             block.a(world, new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4)),
                                     blockData, ThreadLocalRandom.current());
                         }
@@ -127,10 +129,20 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
         this.cachedCropGrowthMultiplier = cropGrowthMultiplier;
     }
 
+    private static boolean canGrowCrop(Block block) {
+        return GROW_ALL_CROPS || CROPS_TO_GROW_CACHE.contains(block);
+    }
+
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
 
-        BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
+        KeySet whitelistedCrops = BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops();
+        // An empty whitelist means all randomly ticking blocks are affected.
+        GROW_ALL_CROPS = whitelistedCrops.isEmpty();
+        if (GROW_ALL_CROPS)
+            return;
+
+        whitelistedCrops.forEach(key -> {
             if (key instanceof MaterialKey) {
                 Block block = CraftMagicNumbers.getBlock(((MaterialKey) key).getMaterial());
 

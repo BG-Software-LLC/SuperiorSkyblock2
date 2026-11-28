@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.crops;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -31,6 +32,7 @@ public abstract class CropsTickingMethod {
             new PaperCropsTickingMethod() : new SpigotCropsTickingMethod();
 
     private static Set<Block> CROPS_TO_GROW_CACHE;
+    private static boolean GROW_ALL_CROPS;
 
     static {
         plugin.getPluginEventsDispatcher().registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CropsTickingMethod::onSettingsUpdate);
@@ -50,10 +52,20 @@ public abstract class CropsTickingMethod {
 
     protected abstract void doTick(LevelChunk levelChunk, int tickSpeed);
 
+    private static boolean canGrowCrop(Block block) {
+        return GROW_ALL_CROPS || CROPS_TO_GROW_CACHE.contains(block);
+    }
+
     private static void onSettingsUpdate() {
         CROPS_TO_GROW_CACHE = new HashSet<>();
 
-        BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops().forEach(key -> {
+        KeySet whitelistedCrops = BuiltinModules.UPGRADES.getConfiguration().getCropGrowthWhitelistedCrops();
+        // An empty whitelist means all randomly ticking blocks are affected.
+        GROW_ALL_CROPS = whitelistedCrops.isEmpty();
+        if (GROW_ALL_CROPS)
+            return;
+
+        whitelistedCrops.forEach(key -> {
             if (key instanceof MaterialKey materialKey) {
                 Block block = CraftMagicNumbers.getBlock(materialKey.getMaterial());
 
@@ -103,7 +115,7 @@ public abstract class CropsTickingMethod {
 
                     int location = tickList.getRaw(index) & 0xFFFF;
                     BlockState blockState = states.get(location);
-                    if (!CROPS_TO_GROW_CACHE.contains(blockState.getBlock()))
+                    if (!canGrowCrop(blockState.getBlock()))
                         continue;
 
                     // do not use a mutable pos, as some random tick implementations store the input without calling immutable()!
@@ -146,7 +158,7 @@ public abstract class CropsTickingMethod {
                     int z = factor >> 8 & 15;
                     int y = factor >> 16 & 15;
                     BlockState blockState = levelChunkSection.getBlockState(x, y, z);
-                    if (blockState.isRandomlyTicking() && CROPS_TO_GROW_CACHE.contains(blockState.getBlock())) {
+                    if (blockState.isRandomlyTicking() && canGrowCrop(blockState.getBlock())) {
                         BlockPos blockPos = new BlockPos(x + chunkOffsetX, y + sectionBottomY, z + chunkOffsetZ);
                         blockState.randomTick(serverLevel, blockPos, serverLevel.getRandom());
                     }

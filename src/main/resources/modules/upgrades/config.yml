@@ -20,7 +20,7 @@ crop-growth:
   interval: 5
 
   # List of whitelisted crops that will be affected by the crop-growth multiplier.
-  # When the list is empty ('whitelisted-crops: []'), all the crops listed by default are affected.
+  # When the list is empty ('whitelisted-crops: []'), all randomly ticking blocks are affected.
   # To stop the multiplier from affecting crops, set 'enabled' to false.
   # You can find a list of materials here: https://bg-software.com/materials/
   whitelisted-crops:

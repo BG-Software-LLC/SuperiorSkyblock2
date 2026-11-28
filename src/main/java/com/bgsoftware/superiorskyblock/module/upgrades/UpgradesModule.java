@@ -46,8 +46,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -202,14 +200,8 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
             this.enabled = config.getBoolean("enabled", true);
 
             this.cropGrowthInterval = config.getInt("crop-growth.interval", 5);
-            List<String> whitelistedCrops = config.getStringList("crop-growth.whitelisted-crops");
-            if (whitelistedCrops.isEmpty()) {
-                // An empty whitelist means all crops, same as an empty whitelist for mob-drops.
-                // "All crops" is the default list bundled with the plugin, rather than every randomly ticking block.
-                whitelistedCrops = getDefaultWhitelistedCrops();
-            }
             this.cropGrowthWhitelistedCrops = KeySets.unmodifiableKeySet(
-                    KeySets.createHashSet(KeyIndicator.MATERIAL, whitelistedCrops));
+                    KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("crop-growth.whitelisted-crops")));
 
             this.mobDropsOnlyPlayerKills = config.getBoolean("mob-drops.only-player-kills", false);
             this.mobDropsWhitelistedItems = KeySets.unmodifiableKeySet(
@@ -255,17 +247,6 @@ public class UpgradesModule extends BuiltinModule<UpgradesModule.Configuration> 
 
         public KeySet getMobDropsBlacklistedEntities() {
             return this.mobDropsBlacklistedEntities;
-        }
-
-        private List<String> getDefaultWhitelistedCrops() {
-            try (InputStream defaultConfigStream = plugin.getResource("modules/upgrades/config.yml")) {
-                if (defaultConfigStream == null)
-                    return Collections.emptyList();
-                return CommentedConfiguration.loadConfiguration(defaultConfigStream)
-                        .getStringList("crop-growth.whitelisted-crops");
-            } catch (IOException error) {
-                return Collections.emptyList();
-            }
         }
 
         private void loadUpgrades(CommentedConfiguration config) {
