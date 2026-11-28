@@ -29,10 +29,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -95,7 +95,7 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
         String exactRolePermission = cfg.getString("messages.exact-role-permission", "");
         String higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
-        List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges = new LinkedList<>();
+        List<MenuIslandPrivileges.IslandPrivilegeInfo> islandPrivileges = new ArrayList<>();
         Set<String> detectedPrivileges = new HashSet<>();
 
         Optional.ofNullable(cfg.getConfigurationSection("permissions")).ifPresent(permissionsSection -> {
@@ -192,14 +192,14 @@ public class MenuIslandPrivileges extends AbstractPagedMenu<
 
             if (this.permissionHolder instanceof SuperiorPlayer &&
                     !island.isMember((SuperiorPlayer) this.permissionHolder)) {
-                islandPrivileges = new LinkedList<>(islandPrivileges);
+                islandPrivileges = new ArrayList<>(islandPrivileges);
                 islandPrivileges.removeIf(info -> {
                     IslandPrivilege islandPrivilege = info.getIslandPrivilege();
                     return islandPrivilege != null && islandPrivilege.getType() == IslandPrivilege.Type.COMMAND;
                 });
             }
 
-            return Collections.unmodifiableList(islandPrivileges);
+            return islandPrivileges;
         }
 
     }

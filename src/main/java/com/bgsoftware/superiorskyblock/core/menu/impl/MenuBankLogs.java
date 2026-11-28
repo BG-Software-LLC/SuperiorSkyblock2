@@ -31,7 +31,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -189,7 +188,7 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
 
             transactions.sort(sorting);
 
-            return Collections.unmodifiableList(transactions);
+            return transactions;
         }
 
         @Override
