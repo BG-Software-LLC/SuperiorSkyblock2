@@ -5,8 +5,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.SchematicOptions;
+import com.bgsoftware.superiorskyblock.api.schematic.parser.FileSchematicParser;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
+import com.bgsoftware.superiorskyblock.api.schematic.parser.StreamSchematicParser;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -47,10 +49,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,14 +62,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipException;
 
 public class SchematicsManagerImpl extends Manager implements SchematicManager {
+
+    private static final Set<String> WARNED_UNSUPPORTED_PARSERS = ConcurrentHashMap.newKeySet();
 
     private final SchematicsContainer schematicsContainer;
 
@@ -186,13 +195,38 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     private void loadDefaultSchematicParsers() {
-        if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
-            try {
-                Class.forName("com.boydti.fawe.object.schematic.Schematic");
-                SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser").newInstance();
-                this.schematicsContainer.addSchematicParser(schematicParser);
-            } catch (Exception ignored) {
-            }
+        if (!Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit") &&
+                !Bukkit.getPluginManager().isPluginEnabled("WorldEdit"))
+            return;
+
+        // Legacy FAWE (com.boydti) keeps using the legacy parser, exactly like before.
+        if (isClassPresent("com.boydti.fawe.object.schematic.Schematic")) {
+            loadSchematicParser("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser");
+            return;
+        }
+
+        // Modern FAWE and WorldEdit 7+.
+        if (isClassPresent("com.sk89q.worldedit.math.BlockVector3") &&
+                isClassPresent("com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats")) {
+            loadSchematicParser("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser7");
+        }
+    }
+
+    private void loadSchematicParser(String parserClassName) {
+        try {
+            SchematicParser schematicParser = (SchematicParser) Class.forName(parserClassName).newInstance();
+            this.schematicsContainer.addSchematicParser(schematicParser);
+        } catch (Throwable error) {
+            Log.error(error, "Failed to load schematic parser ", parserClassName, ":");
+        }
+    }
+
+    private static boolean isClassPresent(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (Throwable error) {
+            return false;
         }
     }
 
@@ -434,16 +468,53 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     private Schematic parseSchematic(File file, String schemName, SchematicParser schematicParser,
                                      Consumer<SchematicParseException> onSchematicParseError) {
-        try (DataInputStream reader = new DataInputStream(new GZIPInputStream(java.nio.file.Files.newInputStream(file.toPath())))) {
-            return schematicParser.parseSchematic(reader, schemName);
+        try {
+            if (schematicParser instanceof FileSchematicParser)
+                return ((FileSchematicParser) schematicParser).parseSchematic(file, schemName);
+
+            if (schematicParser instanceof StreamSchematicParser) {
+                try (InputStream rawStream = new BufferedInputStream(java.nio.file.Files.newInputStream(file.toPath()))) {
+                    return ((StreamSchematicParser) schematicParser).parseSchematic(rawStream, schemName);
+                }
+            }
+
+            return parseSchematicLegacy(file, schemName, schematicParser);
         } catch (SchematicParseException error) {
             onSchematicParseError.accept(error);
-        } catch (Exception error) {
+        } catch (Throwable error) {
+            // Throwable and not Exception: a parser built against another WorldEdit version can throw
+            // LinkageErrors (NoSuchMethodError, NoClassDefFoundError), and the next parsers must still get the file.
             Log.entering("SchematicsManagerImpl", "parseSchematic", "ENTER", file.getName(), schemName);
             Log.error(error, "An unexpected error occurred while loading schematic:");
         }
 
         return null;
+    }
+
+    @Nullable
+    @SuppressWarnings("deprecation")
+    private Schematic parseSchematicLegacy(File file, String schemName, SchematicParser schematicParser)
+            throws SchematicParseException, IOException {
+        // Legacy parsers (neither FileSchematicParser nor StreamSchematicParser) get the GZIP-decompressed
+        // stream through the deprecated method, as before.
+        try (InputStream rawStream = new BufferedInputStream(java.nio.file.Files.newInputStream(file.toPath()))) {
+            DataInputStream decompressedStream;
+            try {
+                decompressedStream = new DataInputStream(new GZIPInputStream(rawStream));
+            } catch (ZipException error) {
+                // Not a GZIP file, so not in the format legacy parsers expect.
+                throw new SchematicParseException(schemName + " is not GZIP-compressed: " + error.getMessage());
+            }
+
+            return schematicParser.parseSchematic(decompressedStream, schemName);
+        } catch (UnsupportedOperationException error) {
+            if (WARNED_UNSUPPORTED_PARSERS.add(schematicParser.getClass().getName())) {
+                Log.warn("Schematic parser ", schematicParser.getClass().getName(), " implements neither ",
+                        "FileSchematicParser nor StreamSchematicParser, nor the legacy parseSchematic method; ",
+                        "it is skipped.");
+            }
+            return null;
+        }
     }
 
     private Schematic loadFromFile(String schemName, File file) {

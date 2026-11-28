@@ -1,10 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.schematic.parser;
 
-import java.io.DataInputStream;
-
 /**
- * This exception is used inside {@link SchematicParser#parseSchematic(DataInputStream, String)}
- * when a faulty stream is given to the parser.
+ * This exception is thrown by {@link SchematicParser}s when the given schematic
+ * doesn't meet the format of the parser.
  */
 public class SchematicParseException extends Exception {
 
