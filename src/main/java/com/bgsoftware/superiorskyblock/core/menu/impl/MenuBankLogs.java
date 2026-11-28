@@ -29,10 +29,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -162,11 +162,6 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
                     plugin.getPlayers().getSuperiorPlayer(filteredPlayer);
         }
 
-        public void setSorting(Comparator<BankTransaction> sorting) {
-            this.sorting = sorting;
-            this.sortingType = null;
-        }
-
         @Nullable
         public BankLogsSortButton.SortType getSortingType() {
             return this.sortingType;
@@ -190,7 +185,7 @@ public class MenuBankLogs extends AbstractPagedMenu<MenuBankLogs.View, IslandVie
                 return transactions;
             }
 
-            transactions = new LinkedList<>(transactions);
+            transactions = new ArrayList<>(transactions);
 
             transactions.sort(sorting);
 
