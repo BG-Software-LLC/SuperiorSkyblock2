@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -23,6 +22,7 @@ import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -112,14 +112,18 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
             if (inventoryViewer == null) {
                 this.missions = Collections.emptyList();
             } else {
-                SequentialListBuilder<Mission<?>> listBuilder = new SequentialListBuilder<>();
+                List<Mission<?>> categoryMissions = args.missionCategory.getMissions();
+                List<MissionReference> missions = new ArrayList<>(categoryMissions.size());
+
+                for (Mission<?> mission : categoryMissions) {
+                    if (plugin.getMissions().canDisplayMission(mission, inventoryViewer, removeCompleted))
+                        missions.add(new MissionReference(mission));
+                }
 
                 if (sortByCompletion)
-                    listBuilder.sorted(Comparator.comparingInt(this::getCompletionStatus));
+                    missions.sort(Comparator.comparingInt(missionReference -> getCompletionStatus(missionReference.getMission())));
 
-                this.missions = listBuilder
-                        .filter(mission -> plugin.getMissions().canDisplayMission(mission, inventoryViewer, removeCompleted))
-                        .map(args.missionCategory.getMissions(), MissionReference::new);
+                this.missions = missions;
             }
         }
 
