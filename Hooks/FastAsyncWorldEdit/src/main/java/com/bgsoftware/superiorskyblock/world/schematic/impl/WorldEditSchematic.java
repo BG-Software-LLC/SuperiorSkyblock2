@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
+import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
@@ -23,8 +23,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.util.LinkedList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -41,7 +41,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     private static final ReflectMethod<Integer> GET_DATA = new ReflectMethod<>(BaseBlock.class, "getData");
 
     private final com.boydti.fawe.object.schematic.Schematic schematic;
-    private List<ChunkPosition> affectedChunks = Collections.emptyList();
+    private volatile List<ChunkPosition> affectedChunks = Collections.emptyList();
 
     static {
         try {
@@ -52,13 +52,13 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
         } catch (ClassNotFoundException ignored) {
 
         }
-        
+
         try {
             Class<?> bukkitAdapterClass = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter");
             Class<?> blockTypesClass = Class.forName("com.sk89q.worldedit.world.block.BlockTypes");
             ADAPT = new ReflectMethod<>(bukkitAdapterClass, "adapt", blockTypesClass);
         } catch (ClassNotFoundException ignored) {
-
+            // WorldEdit 6 doesn't have BukkitAdapter/BlockTypes; the legacy id/data path is used instead.
         }
     }
 
@@ -91,7 +91,7 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
                         affected.add(ChunkPosition.of(world, x, z, false));
                     }
                 }
-                this.affectedChunks = affected;
+                this.affectedChunks = Collections.unmodifiableList(affected);
             }
 
             Object _point = AT.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());

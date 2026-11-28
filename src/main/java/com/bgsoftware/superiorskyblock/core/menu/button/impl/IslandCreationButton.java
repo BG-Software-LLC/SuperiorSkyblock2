@@ -255,5 +255,4 @@ public class IslandCreationButton extends AbstractMenuViewButton<MenuIslandCreat
 
     }
 
-
 }

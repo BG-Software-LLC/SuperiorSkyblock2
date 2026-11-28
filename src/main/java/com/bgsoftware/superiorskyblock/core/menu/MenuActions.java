@@ -138,8 +138,6 @@ public class MenuActions {
         }
 
         plugin.getGrid().createIsland(builder, creationConfig.getBiome(), offset, spawnOffset, spawnYaw, spawnPitch);
-
-
     }
 
     public static void simulateWarpsClick(SuperiorPlayer superiorPlayer, Island island, IslandWarp islandWarp) {

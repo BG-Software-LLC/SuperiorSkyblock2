@@ -119,22 +119,8 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 if (itemSection.isString("spawn-offset"))
                     buttonBuilder.setSpawnOffset(Serializers.OFFSET_SPACED_SERIALIZER.deserialize(itemSection.getString("spawn-offset")));
 
-                if (itemSection.contains("rotation")) {
-                    String rotationStr = itemSection.getString("rotation");
-                    if (rotationStr != null) {
-                        String[] parts = rotationStr.split(",");
-                        if (parts.length >= 1) {
-                            try {
-                                buttonBuilder.setSpawnYaw(Float.parseFloat(parts[0].trim()));
-                            } catch (NumberFormatException ignored) {}
-                        }
-                        if (parts.length >= 2) {
-                            try {
-                                buttonBuilder.setSpawnPitch(Float.parseFloat(parts[1].trim()));
-                            } catch (NumberFormatException ignored) {}
-                        }
-                    }
-                }
+                if (itemSection.contains("rotation"))
+                    parseRotation(itemSection.getString("rotation"), itemSectionName, buttonBuilder);
 
                 buttonBuilder.setAccessItem(MenuParserUtils.getItemStack("menus/island-creation.yml",
                         itemSection.getConfigurationSection("access")));
@@ -214,6 +200,44 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
+    }
+
+    private static void parseRotation(@Nullable String rotation, String itemSectionName,
+                                      IslandCreationButton.Builder buttonBuilder) {
+        if (rotation == null || rotation.trim().isEmpty()) {
+            Log.warnFromFile("island-creation.yml", "Invalid rotation for item ", itemSectionName,
+                    ": expected 'yaw' or 'yaw, pitch', got an empty value");
+            return;
+        }
+
+        String[] parts = rotation.split(",");
+        if (parts.length > 2) {
+            Log.warnFromFile("island-creation.yml", "Invalid rotation for item ", itemSectionName,
+                    ": expected 'yaw' or 'yaw, pitch', got '", rotation, "'");
+            return;
+        }
+
+        Float yaw = parseRotationPart(parts[0], "yaw", rotation, itemSectionName);
+        Float pitch = parts.length == 2 ? parseRotationPart(parts[1], "pitch", rotation, itemSectionName) : null;
+
+        if (yaw != null)
+            buttonBuilder.setSpawnYaw(yaw);
+        if (pitch != null)
+            buttonBuilder.setSpawnPitch(pitch);
+    }
+
+    @Nullable
+    private static Float parseRotationPart(String part, String partName, String rotation, String itemSectionName) {
+        try {
+            float value = Float.parseFloat(part.trim());
+            if (Float.isNaN(value) || Float.isInfinite(value))
+                throw new NumberFormatException();
+            return value;
+        } catch (NumberFormatException error) {
+            Log.warnFromFile("island-creation.yml", "Invalid ", partName, " '", part.trim(), "' in rotation '",
+                    rotation, "' for item ", itemSectionName, ", ignoring it");
+            return null;
+        }
     }
 
 }

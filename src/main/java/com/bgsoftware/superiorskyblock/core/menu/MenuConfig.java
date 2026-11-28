@@ -93,7 +93,6 @@ public class MenuConfig {
             return this.template == null ? null : this.template.getSpawnPitch();
         }
 
-
         private static Biome getBiomeInternal(@Nullable IslandCreationButton.Template template) {
             if (template != null) {
                 Biome biome = template.getBiome();
