@@ -1358,8 +1358,9 @@ public class SIsland implements Island {
 
         for (Dimension dimension : Dimension.values()) {
             // Dimensions that are not enabled have no world, and therefore no chunks.
+            // Lazy worlds providers may return info of worlds that are not loaded, which have no loaded chunks.
             WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
-            if (worldInfo != null)
+            if (worldInfo != null && Bukkit.getWorld(worldInfo.getName()) != null)
                 chunks.addAll(getLoadedChunksInternal(worldInfo, flags));
         }
 
