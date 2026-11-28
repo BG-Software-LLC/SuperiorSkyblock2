@@ -13,17 +13,11 @@ import java.util.Locale;
 
 public class SpawnersProvider_TimbruSilkSpawners implements SpawnersProvider_AutoDetect {
 
-    private static boolean registered = false;
-
     private final SilkUtil silkUtil;
 
     public SpawnersProvider_TimbruSilkSpawners() {
         this.silkUtil = SilkUtil.hookIntoSilkSpanwers();
-
-        if (!registered) {
-            registered = true;
-            Log.info("Using SilkSpawners as a spawners provider.");
-        }
+        Log.info("Using SilkSpawners as a spawners provider.");
     }
 
     @Override

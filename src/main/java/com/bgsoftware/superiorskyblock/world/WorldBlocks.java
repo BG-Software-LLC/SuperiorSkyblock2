@@ -6,10 +6,12 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -30,36 +32,51 @@ public class WorldBlocks {
         // This means that the block below it is considered "safe", and the two blocks above the safe blocks
         // cannot suffocate the player.
 
-        return !plugin.getNMSWorld().canPlayerSuffocate(block) &&
-                !plugin.getNMSWorld().canPlayerSuffocate(block.getRelative(BlockFace.UP)) &&
+        return !canPlayerSuffocateFromBlock(block) && !canPlayerSuffocateFromBlock(block.getRelative(BlockFace.UP)) &&
                 plugin.getSettings().getSafeBlocks().contains(Keys.of(block.getRelative(BlockFace.DOWN)));
     }
 
+    private static boolean canPlayerSuffocateFromBlock(Block block) {
+        return canPlayerGetHurtFromBlock(block.getType()) || plugin.getNMSWorld().canPlayerSuffocate(block);
+    }
+
     public static boolean isSafeBlock(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
-        Key feetBlockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y + 1, z);
-        Key headBlockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y + 2, z);
+        return isSafeStandingSpot(chunkSnapshot, x, y, z) || isSafeStandingSpot(chunkSnapshot, x, y - 1, z);
+    }
 
-        try {
-            if (Material.valueOf(feetBlockKey.getGlobalKey()).isSolid() ||
-                    Material.valueOf(headBlockKey.getGlobalKey()).isSolid())
-                return false;
-        } catch (IllegalArgumentException error) {
-            return false;
-        }
+    public static boolean isSafeStandingSpot(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        // Checks that the block in the parameter is safe for teleportation.
+        // This means that the block below it is considered "safe", and the two blocks above the safe blocks
+        // cannot suffocate the player.
 
-        Key standingBlockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z);
-        return plugin.getSettings().getSafeBlocks().contains(standingBlockKey);
+        return !canPlayerSuffocateFromBlock(chunkSnapshot, x, y, z) &&
+                !canPlayerSuffocateFromBlock(chunkSnapshot, x, y + 1, z) &&
+                plugin.getSettings().getSafeBlocks().contains(plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y - 1, z));
+    }
+
+    private static boolean canPlayerSuffocateFromBlock(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        if (plugin.getNMSWorld().canPlayerSuffocate(chunkSnapshot, x, y, z))
+            return true;
+
+        Key blockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z);
+        return blockKey != null && canPlayerGetHurtFromBlock(((MaterialKey) blockKey).getMaterial());
+    }
+
+    private static boolean canPlayerGetHurtFromBlock(Material material) {
+        return material == Material.LAVA || material == Material.FIRE;
     }
 
     public static boolean isChunkEmpty(Island island, ChunkSnapshot chunkSnapshot) {
-        for (int i = 0; i < 16; i++) {
+        World world = Bukkit.getWorld(chunkSnapshot.getWorldName());
+        int sectionsCount = (world.getMaxHeight() - plugin.getNMSWorld().getMinHeight(world)) >> 4;
+
+        for (int i = 0; i < sectionsCount; i++) {
             if (!chunkSnapshot.isSectionEmpty(i)) {
                 return false;
             }
         }
 
-        island.markChunkEmpty(Bukkit.getWorld(chunkSnapshot.getWorldName()),
-                chunkSnapshot.getX(), chunkSnapshot.getZ(), true);
+        island.markChunkEmpty(world, chunkSnapshot.getX(), chunkSnapshot.getZ(), true);
 
         return true;
     }

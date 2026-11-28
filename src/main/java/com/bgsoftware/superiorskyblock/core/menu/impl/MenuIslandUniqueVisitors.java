@@ -6,8 +6,7 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -16,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -61,14 +61,20 @@ public class MenuIslandUniqueVisitors extends AbstractPagedMenu<MenuIslandUnique
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", island.getUniqueVisitorsWithTimes().size() + "");
+        protected List<UniqueVisitorInfo> requestObjects() {
+            List<Pair<SuperiorPlayer, Long>> uniqueVisitors = island.getUniqueVisitorsWithTimes();
+            List<UniqueVisitorInfo> visitorsInfo = new ArrayList<>(uniqueVisitors.size());
+            for (Pair<SuperiorPlayer, Long> uniqueVisitor : uniqueVisitors)
+                visitorsInfo.add(VISITOR_INFO_MAPPER.apply(uniqueVisitor));
+            return visitorsInfo;
         }
 
         @Override
-        protected List<UniqueVisitorInfo> requestObjects() {
-            return new SequentialListBuilder<UniqueVisitorInfo>()
-                    .build(island.getUniqueVisitorsWithTimes(), VISITOR_INFO_MAPPER);
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = String.valueOf(island.getUniqueVisitorsWithTimes().size());
         }
 
     }

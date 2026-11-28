@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -23,15 +22,15 @@ public interface UpgradeLevel {
     /**
      * Get the price required to upgrade to the next level.
      *
-     * @deprecated See getCost()
+     * @deprecated See {@link #getCosts()}
      */
     @Deprecated
-    double getPrice();
+    UpgradeCost getCost();
 
     /**
-     * Get the price required to upgrade to the next level.
+     * Get all the prices required to upgrade to the next level.
      */
-    UpgradeCost getCost();
+    List<UpgradeCost> getCosts();
 
     /**
      * Get all commands that will be executed when upgrading to the next level.
@@ -53,14 +52,29 @@ public interface UpgradeLevel {
     String checkRequirements(SuperiorPlayer superiorPlayer);
 
     /**
+     * Checks if this level has a custom crop growth multiplier.
+     */
+    boolean hasCropGrowth();
+
+    /**
      * Get the crop growth multiplier of this level.
      */
     double getCropGrowth();
 
     /**
+     * Checks if this level has a custom spawner rates multiplier.
+     */
+    boolean hasSpawnerRates();
+
+    /**
      * Get the spawner rates multiplier of this level.
      */
     double getSpawnerRates();
+
+    /**
+     * Checks if this level has a custom mob drops multiplier.
+     */
+    boolean hasMobDrops();
 
     /**
      * Get the mob drops multiplier of this level.
@@ -106,9 +120,19 @@ public interface UpgradeLevel {
     Map<Key, Integer> getEntityLimitsAsKeys();
 
     /**
+     * Checks if this level has a custom team limit.
+     */
+    boolean hasTeamLimit();
+
+    /**
      * Get the team limit of this level.
      */
     int getTeamLimit();
+
+    /**
+     * Checks if this level has a custom warps limit.
+     */
+    boolean hasWarpsLimit();
 
     /**
      * Get the warps limit of this level.
@@ -116,9 +140,19 @@ public interface UpgradeLevel {
     int getWarpsLimit();
 
     /**
+     * Checks if this level has a custom coop limit.
+     */
+    boolean hasCoopLimit();
+
+    /**
      * Get the coop players limit of this level.
      */
     int getCoopLimit();
+
+    /**
+     * Checks if this level has a custom border size.
+     */
+    boolean hasBorderSize();
 
     /**
      * Get the border size of this level.
@@ -134,28 +168,11 @@ public interface UpgradeLevel {
     int getGeneratorAmount(Key key, Dimension dimension);
 
     /**
-     * Get the generator rate of a block for this level in a specific world.
-     *
-     * @param key         The block to check.
-     * @param environment The world environment
-     */
-    @Deprecated
-    int getGeneratorAmount(Key key, World.Environment environment);
-
-    /**
      * Get all the generator rates for this level in a specific world.
      *
      * @param dimension The world dimension
      */
     Map<String, Integer> getGeneratorAmounts(Dimension dimension);
-
-    /**
-     * Get all the generator rates for this level in a specific world.
-     *
-     * @param environment The world environment
-     */
-    @Deprecated
-    Map<String, Integer> getGeneratorAmounts(World.Environment environment);
 
     /**
      * Get the potion effect for this level.
@@ -168,6 +185,11 @@ public interface UpgradeLevel {
      * Get all the potion effects for this level.
      */
     Map<PotionEffectType, Integer> getPotionEffects();
+
+    /**
+     * Checks if this level has a custom bank limit.
+     */
+    boolean hasBankLimit();
 
     /**
      * Get the bank limit of this level.

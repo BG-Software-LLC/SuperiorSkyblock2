@@ -75,38 +75,39 @@ public class CmdAdminSetEffect implements IAdminIslandCommand {
 
         NumberArgument<Integer> arguments = CommandArguments.getLevel(sender, args[4]);
 
-        if (!arguments.isSucceed())
+        if (!arguments.isSucceed()) {
             return;
+        }
 
         int level = arguments.getNumber();
+
+        if (level < 0) {
+            Message.INVALID_LEVEL.send(sender, level);
+            return;
+        }
 
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (level <= 0) {
-                if (PluginEventsFactory.callIslandRemoveEffectEvent(island, sender, effectType)) {
-                    ++islandsChangedCount;
-                    island.removePotionEffect(effectType);
-                }
-            } else {
-                PluginEvent<PluginEventArgs.IslandChangeEffectLevel> event = PluginEventsFactory.callIslandChangeEffectLevelEvent(
-                        island, sender, effectType, level);
-                if (!event.isCancelled()) {
-                    island.setPotionEffect(effectType, event.getArgs().effectLevel);
-                    ++islandsChangedCount;
-                }
+            PluginEvent<PluginEventArgs.IslandChangeEffectLevel> event = PluginEventsFactory.callIslandChangeEffectLevelEvent(
+                    island, sender, effectType, level);
+            if (!event.isCancelled()) {
+                island.setPotionEffect(effectType, event.getArgs().effectLevel);
+                ++islandsChangedCount;
             }
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islandsChangedCount > 1)
+        if (islandsChangedCount > 1) {
             Message.CHANGED_ISLAND_EFFECT_LEVEL_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()));
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.CHANGED_ISLAND_EFFECT_LEVEL_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()), islands.get(0).getName());
-        else
+        } else {
             Message.CHANGED_ISLAND_EFFECT_LEVEL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(effectType.getName()), targetPlayer.getName());
+        }
     }
 
     @Override

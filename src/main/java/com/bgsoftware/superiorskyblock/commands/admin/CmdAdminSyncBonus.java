@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -122,7 +121,8 @@ public class CmdAdminSyncBonus implements IAdminIslandCommand {
 
         for (Dimension dimension : Dimension.values()) {
             if (island.wasSchematicGenerated(dimension)) {
-                String suffix = dimension == Dimensions.NORMAL ? "" : "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
+                String suffix = dimension == plugin.getSettings().getWorlds().getDefaultWorldDimension() ? ""
+                        : "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
                 Schematic schematic = plugin.getSchematics().getSchematic(generatedSchematic + suffix);
                 if (schematic != null) {
                     value = value.add(_calculateValues(schematic.getBlockCounts(), calculateWorth));

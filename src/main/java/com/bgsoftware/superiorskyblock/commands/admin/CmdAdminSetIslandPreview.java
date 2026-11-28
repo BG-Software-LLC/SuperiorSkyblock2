@@ -66,6 +66,11 @@ public class CmdAdminSetIslandPreview implements ISuperiorCommand {
         String schematicPreviewLocation;
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             Location location = player.getLocation(wrapper.getHandle());
+            location.setX(location.getBlockX());
+            location.setY(location.getBlockY());
+            location.setZ(location.getBlockZ());
+            // Fix to corner of a block
+            location.add(0.5, 0, 0.5);
             schematicPreviewLocation = Serializers.LOCATION_SPACED_SERIALIZER.serialize(location);
         }
 

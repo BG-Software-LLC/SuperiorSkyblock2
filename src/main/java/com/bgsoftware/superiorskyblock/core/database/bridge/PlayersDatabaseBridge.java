@@ -8,8 +8,9 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.database.DBColumn;
 
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,7 +22,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unchecked")
 public class PlayersDatabaseBridge {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -43,88 +43,72 @@ public class PlayersDatabaseBridge {
     }
 
     public static void saveTextureValue(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players",
-                createFilter("uuid", superiorPlayer),
-                new Pair<>("last_used_skin", superiorPlayer.getTextureValue())
-        ));
+        updatePlayerValue(superiorPlayer, "last_used_skin", superiorPlayer.getTextureValue());
     }
 
     public static void savePlayerName(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players",
-                createFilter("uuid", superiorPlayer),
-                new Pair<>("last_used_name", superiorPlayer.getName())
-        ));
+        updatePlayerValue(superiorPlayer, "last_used_name", superiorPlayer.getName());
     }
 
     public static void saveUserLocale(SuperiorPlayer superiorPlayer) {
         Locale userLocale = superiorPlayer.getUserLocale();
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players_settings",
-                createFilter("player", superiorPlayer),
-                new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry())
-        ));
+        updatePlayerSettingsValue(superiorPlayer, "language", userLocale.getLanguage() + "-" + userLocale.getCountry());
     }
 
     public static void saveToggledBorder(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players_settings",
-                createFilter("player", superiorPlayer),
-                new Pair<>("toggled_border", superiorPlayer.hasWorldBorderEnabled())
-        ));
+        updatePlayerSettingsValue(superiorPlayer, "toggled_border", superiorPlayer.hasWorldBorderEnabled());
     }
 
     public static void saveDisbands(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players",
-                createFilter("uuid", superiorPlayer),
-                new Pair<>("disbands", superiorPlayer.getDisbands())
-        ));
+        updatePlayerValue(superiorPlayer, "disbands", superiorPlayer.getDisbands());
     }
 
     public static void saveToggledPanel(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players_settings",
-                createFilter("player", superiorPlayer),
-                new Pair<>("toggled_panel", superiorPlayer.hasToggledPanel())
-        ));
+        updatePlayerSettingsValue(superiorPlayer, "toggled_panel", superiorPlayer.hasToggledPanel());
     }
 
     public static void saveIslandFly(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players_settings",
-                createFilter("player", superiorPlayer),
-                new Pair<>("island_fly", superiorPlayer.hasIslandFlyEnabled())
-        ));
+        updatePlayerSettingsValue(superiorPlayer, "island_fly", superiorPlayer.hasIslandFlyEnabled());
     }
 
     public static void saveBorderColor(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players_settings",
-                createFilter("player", superiorPlayer),
-                new Pair<>("border_color", superiorPlayer.getBorderColor().name())
-        ));
+        updatePlayerSettingsValue(superiorPlayer, "border_color", superiorPlayer.getBorderColor().name());
     }
 
     public static void saveLastTimeStatus(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("players",
-                createFilter("uuid", superiorPlayer),
-                new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
-        ));
+        updatePlayerValue(superiorPlayer, "last_time_updated", superiorPlayer.getLastTimeStatus());
     }
 
     public static void saveMission(SuperiorPlayer superiorPlayer, Mission<?> mission, int finishCount) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("players_missions",
-                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
-                new Pair<>("name", mission.getName().toLowerCase(Locale.ENGLISH)),
-                new Pair<>("finish_count", finishCount)
-        ));
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+                databaseBridge.insertObject("players_missions",
+                        pool.obtain().withNameAndValue("player", superiorPlayer.getUniqueId().toString()),
+                        pool.obtain().withNameAndValue("name", mission.getName().toLowerCase(Locale.ENGLISH)),
+                        pool.obtain().withNameAndValue("finish_count", finishCount)
+                );
+            }
+        });
     }
 
     public static void removeMission(SuperiorPlayer superiorPlayer, Mission<?> mission) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("players_missions",
-                createFilter("player", superiorPlayer, new Pair<>("name", mission.getName().toLowerCase(Locale.ENGLISH)))
-        ));
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+                DBColumn column = pool.obtain().withNameAndValue("name", mission.getName().toLowerCase(Locale.ENGLISH));
+                databaseBridge.deleteObject("players_missions", createFilter(pool, "player", superiorPlayer, column));
+            }
+        });
     }
 
     public static void savePersistentDataContainer(SuperiorPlayer superiorPlayer) {
-        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("players_custom_data",
-                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
-                new Pair<>("data", superiorPlayer.getPersistentDataContainer().serialize())
-        ));
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+                databaseBridge.insertObject("players_custom_data",
+                        pool.obtain().withNameAndValue("player", superiorPlayer.getUniqueId().toString()),
+                        pool.obtain().withNameAndValue("data", superiorPlayer.getPersistentDataContainer().serialize())
+                );
+            }
+        });
     }
 
     public static void removePersistentDataContainer(SuperiorPlayer superiorPlayer) {
@@ -134,57 +118,69 @@ public class PlayersDatabaseBridge {
 
     public static void insertPlayer(SuperiorPlayer superiorPlayer) {
         runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
-            Locale userLocale = superiorPlayer.getUserLocale();
+            try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+                databaseBridge.insertObject("players",
+                        pool.obtain().withNameAndValue("uuid", superiorPlayer.getUniqueId().toString()),
+                        pool.obtain().withNameAndValue("last_used_name", superiorPlayer.getName()),
+                        pool.obtain().withNameAndValue("last_used_skin", superiorPlayer.getTextureValue()),
+                        pool.obtain().withNameAndValue("disbands", superiorPlayer.getDisbands()),
+                        pool.obtain().withNameAndValue("last_time_updated", superiorPlayer.getLastTimeStatus())
+                );
+            }
+        });
+        insertPlayerSettings(superiorPlayer);
+    }
 
-            databaseBridge.insertObject("players",
-                    new Pair<>("uuid", superiorPlayer.getUniqueId().toString()),
-                    new Pair<>("last_used_name", superiorPlayer.getName()),
-                    new Pair<>("last_used_skin", superiorPlayer.getTextureValue()),
-                    new Pair<>("disbands", superiorPlayer.getDisbands()),
-                    new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
-            );
-
-            databaseBridge.insertObject("players_settings",
-                    new Pair<>("player", superiorPlayer.getUniqueId().toString()),
-                    new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
-                    new Pair<>("toggled_panel", superiorPlayer.hasToggledPanel()),
-                    new Pair<>("border_color", superiorPlayer.getBorderColor().name()),
-                    new Pair<>("toggled_border", superiorPlayer.hasWorldBorderEnabled()),
-                    new Pair<>("island_fly", superiorPlayer.hasIslandFlyEnabled())
-            );
+    public static void insertPlayerSettings(SuperiorPlayer superiorPlayer) {
+        Locale userLocale = superiorPlayer.getUserLocale();
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+                databaseBridge.insertObject("players_settings",
+                        pool.obtain().withNameAndValue("player", superiorPlayer.getUniqueId().toString()),
+                        pool.obtain().withNameAndValue("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
+                        pool.obtain().withNameAndValue("toggled_panel", superiorPlayer.hasToggledPanel()),
+                        pool.obtain().withNameAndValue("border_color", superiorPlayer.getBorderColor().name()),
+                        pool.obtain().withNameAndValue("toggled_border", superiorPlayer.hasWorldBorderEnabled()),
+                        pool.obtain().withNameAndValue("island_fly", superiorPlayer.hasIslandFlyEnabled())
+                );
+            }
         });
     }
 
     public static void replacePlayer(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
         DatabaseBridge playersReplacer = getGlobalPlayersBridge();
 
-        Pair<String, Object> uuidColumn = new Pair<>("uuid", newPlayer.getUniqueId().toString());
-        DatabaseFilter uuidFilter = createFilter("uuid", originalPlayer);
+        try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+            DBColumn uuidColumn = pool.obtain().withNameAndValue("uuid", newPlayer.getUniqueId().toString());
+            DatabaseFilter uuidFilter = createFilter("uuid", originalPlayer);
 
-        Pair<String, Object> playerColumn = new Pair<>("player", newPlayer.getUniqueId().toString());
-        DatabaseFilter playerFilter = createFilter("player", originalPlayer);
+            DBColumn playerColumn = pool.obtain().withNameAndValue("player", newPlayer.getUniqueId().toString());
+            DatabaseFilter playerFilter = createFilter("player", originalPlayer);
 
-        // We go through all possible tables (both island and players) and replace the player uuids.
-        playersReplacer.updateObject("players", uuidFilter, uuidColumn);
-        playersReplacer.updateObject("players_settings", playerFilter, playerColumn);
+            // We go through all possible tables (both island and players) and replace the player uuids.
+            playersReplacer.updateObject("players", uuidFilter, uuidColumn);
+            playersReplacer.updateObject("players_settings", playerFilter, playerColumn);
 
 
-        playersReplacer.updateObject("bank_transactions", playerFilter, playerColumn);
-        playersReplacer.updateObject("islands_bans", playerFilter, playerColumn);
-        playersReplacer.updateObject("islands_bans", createFilter("banned_by", originalPlayer), new Pair<>("banned_by", newPlayer.getUniqueId().toString()));
-        playersReplacer.updateObject("islands_player_permissions", playerFilter, playerColumn);
-        playersReplacer.updateObject("islands_ratings", playerFilter, playerColumn);
-        playersReplacer.updateObject("islands_visitors", playerFilter, playerColumn);
+            playersReplacer.updateObject("bank_transactions", playerFilter, playerColumn);
+            playersReplacer.updateObject("islands_bans", playerFilter, playerColumn);
+            playersReplacer.updateObject("islands_bans", createFilter("banned_by", originalPlayer),
+                    pool.obtain().withNameAndValue("banned_by", newPlayer.getUniqueId().toString()));
+            playersReplacer.updateObject("islands_player_permissions", playerFilter, playerColumn);
+            playersReplacer.updateObject("islands_ratings", playerFilter, playerColumn);
+            playersReplacer.updateObject("islands_visitors", playerFilter, playerColumn);
 
-        if (newPlayer.hasIsland()) {
-            playersReplacer.updateObject("islands", createFilter("owner", originalPlayer), new Pair<>("owner", newPlayer.getUniqueId().toString()));
-            playersReplacer.updateObject("islands_members", playerFilter, playerColumn);
+            if (newPlayer.hasIsland()) {
+                playersReplacer.updateObject("islands", createFilter("owner", originalPlayer),
+                        pool.obtain().withNameAndValue("owner", newPlayer.getUniqueId().toString()));
+                playersReplacer.updateObject("islands_members", playerFilter, playerColumn);
+            }
+
+            if (!newPlayer.isPersistentDataContainerEmpty())
+                playersReplacer.updateObject("players_custom_data", playerFilter, playerColumn);
+            if (!newPlayer.getCompletedMissions().isEmpty())
+                playersReplacer.updateObject("players_missions", playerFilter, playerColumn);
         }
-
-        if (!newPlayer.isPersistentDataContainerEmpty())
-            playersReplacer.updateObject("players_custom_data", playerFilter, playerColumn);
-        if (!newPlayer.getCompletedMissions().isEmpty())
-            playersReplacer.updateObject("players_missions", playerFilter, playerColumn);
     }
 
     public static void deletePlayer(SuperiorPlayer superiorPlayer) {
@@ -267,11 +263,32 @@ public class PlayersDatabaseBridge {
         }
     }
 
-    private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer, Pair<String, Object>... others) {
+    private static void updatePlayerValue(SuperiorPlayer superiorPlayer, String columnName, Object value) {
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Wrapper<DBColumn> wrapper = ObjectsPools.DB_COLUMN.obtain()) {
+                DBColumn column = wrapper.getHandle().withNameAndValue(columnName, value);
+                databaseBridge.updateObject("players", createFilter("uuid", superiorPlayer), column);
+            }
+        });
+    }
+
+    private static void updatePlayerSettingsValue(SuperiorPlayer superiorPlayer, String columnName, Object value) {
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Wrapper<DBColumn> wrapper = ObjectsPools.DB_COLUMN.obtain()) {
+                DBColumn column = wrapper.getHandle().withNameAndValue(columnName, value);
+                databaseBridge.updateObject("players_settings", createFilter("player", superiorPlayer), column);
+            }
+        });
+    }
+
+    private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer) {
+        return DatabaseFilter.fromFilter(id, superiorPlayer.getUniqueId().toString());
+    }
+
+    private static DatabaseFilter createFilter(ObjectsPools.Batch<DBColumn> pool, String id, SuperiorPlayer superiorPlayer, DBColumn column) {
         List<Pair<String, Object>> filters = new LinkedList<>();
-        filters.add(new Pair<>(id, superiorPlayer.getUniqueId().toString()));
-        if (others != null)
-            filters.addAll(Arrays.asList(others));
+        filters.add(pool.obtain().withNameAndValue(id, superiorPlayer.getUniqueId().toString()));
+        filters.add(column);
         return DatabaseFilter.fromFilters(filters);
     }
 

@@ -16,13 +16,13 @@ import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
+import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.bridge.PistonPushReaction;
 import com.bgsoftware.superiorskyblock.platform.event.GameEvent;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
-import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,6 +41,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -50,15 +51,22 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
     @Nullable
     private static final Material CHORUS_FLOWER = EnumHelper.getEnum(Material.class, "CHORUS_FLOWER");
+
     @Nullable
-    private static final Material POINTED_DRIPSTONE = EnumHelper.getEnum(Material.class, "POINTED_DRIPSTONE");
+    private static final Material CLOSED_EYEBLOSSOM = EnumHelper.getEnum(Material.class, "CLOSED_EYEBLOSSOM");
+
+    @Nullable
+    private static final Material OPEN_EYEBLOSSOM = EnumHelper.getEnum(Material.class, "OPEN_EYEBLOSSOM");
     @Nullable
     private static final CreatureSpawnEvent.SpawnReason BUILD_COPPERGOLEM = EnumHelper.getEnum(CreatureSpawnEvent.SpawnReason.class, "BUILD_COPPERGOLEM");
+    @Nullable
+    private static final Material COPPER_CHEST = EnumHelper.getEnum(Material.class, "COPPER_CHEST");
+
+    private static final BlockFace[] COPPER_GOLEM_FACES = {
+            BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
 
     @WorldRecordFlags
     private static final int REGULAR_RECORD_FLAGS = WorldRecordFlags.SAVE_BLOCK_COUNT | WorldRecordFlags.DIRTY_CHUNKS;
-    @WorldRecordFlags
-    private static final int ALL_RECORD_FLAGS = REGULAR_RECORD_FLAGS | WorldRecordFlags.HANDLE_NEARBY_BLOCKS;
 
     static {
         for (Material material : Material.values()) {
@@ -69,6 +77,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private final Collection<Location> alreadySpongeAbosrbCalled = AutoRemovalCollection.newArrayList(5L * 50, TimeUnit.MILLISECONDS);
+    private final Collection<Location> alreadyChorusFlowerTracked = AutoRemovalCollection.newArrayList(1L * 50, TimeUnit.MILLISECONDS);
 
     private final LazyReference<WorldRecordService> worldRecordService = new LazyReference<WorldRecordService>() {
         @Override
@@ -179,12 +188,59 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
 
+        Block source = e.getArgs().source;
         BlockState newState = e.getArgs().newState;
 
+        Material newStateType = newState.getType();
+        Material sourceType = source.getType();
+
+        Key spreadBlock = null;
+
+        if (newStateType == CHORUS_FLOWER && sourceType == CHORUS_FLOWER) {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location spreadBlockLocation = source.getLocation(wrapper.getHandle());
+                // When a chorus flower grows, it is replaced with a flower plant and multiple new flowers can grow.
+                // Therefore, we want to track a plant one time instead of a new flower.
+                if (!alreadyChorusFlowerTracked.contains(spreadBlockLocation)) {
+                    spreadBlock = ConstantKeys.CHORUS_PLANT;
+                    alreadyChorusFlowerTracked.add(spreadBlockLocation.clone());
+                }
+            }
+        }
+
+        if (spreadBlock == null) {
+            spreadBlock = Keys.of(newState);
+        }
+
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            this.worldRecordService.get().recordBlockPlace(Keys.of(newState),
+            this.worldRecordService.get().recordBlockPlace(spreadBlock,
                     block.getLocation(wrapper.getHandle()),
                     1, block.getState(), REGULAR_RECORD_FLAGS);
+        }
+    }
+
+    private void onBlockShapeUpdate(GameEvent<GameEventArgs.BlockUpdateShapeEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
+            return;
+
+        Key newStateKey = Keys.of(block);
+
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location blockLocation = block.getLocation(wrapper.getHandle());
+
+            if (newStateKey.equals(ConstantKeys.AIR)) {
+                // New state is AIR, so this is a block break
+                Key oldStateKey = Keys.of(e.getArgs().oldState);
+                this.worldRecordService.get().recordBlockBreak(oldStateKey, blockLocation,
+                        1, REGULAR_RECORD_FLAGS);
+            } else {
+                this.worldRecordService.get().recordBlockPlace(newStateKey,
+                        block.getLocation(wrapper.getHandle()),
+                        1, e.getArgs().oldState, REGULAR_RECORD_FLAGS);
+            }
         }
     }
 
@@ -235,8 +291,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
             Key newSpawnerKey = Keys.of(clickedBlock);
             if (!oldSpawnerKey.equals(newSpawnerKey)) {
                 try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                    this.worldRecordService.get().recordBlockPlace(newSpawnerKey, clickedBlock.getLocation(wrapper.getHandle()),
-                            1, oldBlockState, REGULAR_RECORD_FLAGS);
+                    Location location = clickedBlock.getLocation(wrapper.getHandle());
+                    int spawnerCount = plugin.getProviders().getSpawnersProvider().getSpawner(location).getKey();
+                    this.worldRecordService.get().recordBlockBreak(oldSpawnerKey, location, spawnerCount, REGULAR_RECORD_FLAGS);
+                    this.worldRecordService.get().recordBlockPlace(newSpawnerKey, location, spawnerCount, null, REGULAR_RECORD_FLAGS);
                 }
             }
         }, 1L);
@@ -264,12 +322,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
             if (!oldBlockKey.equals(ConstantKeys.AIR)) {
                 this.worldRecordService.get().recordBlockBreak(oldBlockKey, blockLocation,
                         plugin.getNMSWorld().getDefaultAmount(block),
-                        ALL_RECORD_FLAGS);
+                        REGULAR_RECORD_FLAGS);
             }
 
             if (!newBlockKey.equals(ConstantKeys.AIR)) {
                 this.worldRecordService.get().recordBlockPlace(newBlockKey, blockLocation, 1,
-                        null, ALL_RECORD_FLAGS);
+                        null, REGULAR_RECORD_FLAGS);
             }
         }
     }
@@ -283,17 +341,7 @@ public class BlockChangesListener extends AbstractGameEventListener {
         if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
             return;
 
-        this.worldRecordService.get().recordBlockBreak(block, ALL_RECORD_FLAGS);
-    }
-
-    private void onBlockDestroy(GameEvent<GameEventArgs.BlockDestroyEvent> e) {
-        Block block = e.getArgs().block;
-
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(block.getWorld()))
-            return;
-
-        this.worldRecordService.get().recordBlockBreak(block, WorldRecordFlags.DIRTY_CHUNKS);
+        this.worldRecordService.get().recordBlockBreak(block, REGULAR_RECORD_FLAGS);
     }
 
     private void onBucketFill(GameEvent<GameEventArgs.PlayerFillBucketEvent> e) {
@@ -367,18 +415,61 @@ public class BlockChangesListener extends AbstractGameEventListener {
             } else if (spawnReason == CreatureSpawnEvent.SpawnReason.BUILD_WITHER) {
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.SOUL_SAND, entityLocation, 4, 0);
                 this.worldRecordService.get().recordBlockBreak(ConstantKeys.WITHER_SKELETON_SKULL, entityLocation, 3, REGULAR_RECORD_FLAGS);
-            } else if (spawnReason == BUILD_COPPERGOLEM) {
-                Block copperOrChestBlock = entityLocation.getBlock().getRelative(BlockFace.DOWN);
-                Key copperBlock = Keys.of(copperOrChestBlock);
-                this.worldRecordService.get().recordBlockBreak(copperBlock, entityLocation, 1, 0);
-                this.worldRecordService.get().recordBlockBreak(ConstantKeys.CARVED_PUMPKIN, entityLocation, 1, 0);
-                BukkitExecutor.sync(() -> {
-                    Key chestBlock = Keys.of(copperOrChestBlock);
-                    this.worldRecordService.get().recordBlockPlace(chestBlock, entityLocation, 1, null, REGULAR_RECORD_FLAGS);
-                }, 1L);
+            } else if (COPPER_CHEST != null && spawnReason == BUILD_COPPERGOLEM) {
+                handleCopperGolemStructure(entityLocation);
             }
         }
 
+    }
+
+    private void handleCopperGolemStructure(Location entityLocation) {
+        this.worldRecordService.get().recordBlockBreak(ConstantKeys.CARVED_PUMPKIN, entityLocation, 1, 0);
+
+        // A copper golem can be built in any orientation, so the copper block it consumes (and
+        // its pre-transform key) can be any of the golem's 6 face neighbors. Capture all copper
+        // neighbors now, then one tick later record the one that actually turned into a copper
+        // chest.
+        Block golemBlock = entityLocation.getBlock();
+        EnumMap<BlockFace, Key> copperNeighbors = new EnumMap<>(BlockFace.class);
+        for (BlockFace face : COPPER_GOLEM_FACES) {
+            Key blockKey = Keys.of(golemBlock.getRelative(face));
+            if (blockKey instanceof MaterialKey && Materials.isCopperGolemBlock(((MaterialKey) blockKey).getMaterial()))
+                copperNeighbors.put(face, blockKey);
+        }
+
+        if (copperNeighbors.isEmpty()) {
+            // This should never occur as the copper block should not have turned into a chest in this time.
+            // Log and abort.
+            new IllegalStateException("Could not find a valid Copper Block for the copper golem structure").printStackTrace();
+            return;
+        }
+
+        BukkitExecutor.sync(() -> {
+            int foundBlocks = 0;
+
+            for (BlockFace face : COPPER_GOLEM_FACES) {
+                Key oldBlockKey = copperNeighbors.get(face);
+                if (oldBlockKey != null) {
+                    Block neighbor = golemBlock.getRelative(face);
+                    Key newBlockKey = Keys.of(neighbor);
+                    if (newBlockKey instanceof MaterialKey &&
+                            ((MaterialKey) newBlockKey).getMaterial() == COPPER_CHEST && !newBlockKey.equals(oldBlockKey)) {
+                        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                            Location copperLocation = neighbor.getLocation(wrapper.getHandle());
+                            this.worldRecordService.get().recordBlockBreak(oldBlockKey, copperLocation, 1, 0);
+                            this.worldRecordService.get().recordBlockPlace(newBlockKey, copperLocation, 1, null, REGULAR_RECORD_FLAGS);
+                            ++foundBlocks;
+                        }
+                    }
+                }
+            }
+
+            if (foundBlocks != 1) {
+                // This should never occur as only one copper block should have turned into a copper chest.
+                // Log and abort
+                new IllegalStateException("Could not find a valid Copper Chest for the copper golem structure").printStackTrace();
+            }
+        }, 1L);
     }
 
     private void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
@@ -422,8 +513,12 @@ public class BlockChangesListener extends AbstractGameEventListener {
             this.worldRecordService.get().recordBlockBreak(toBlock, 1, WorldRecordFlags.DIRTY_CHUNKS);
         } else {
             BukkitExecutor.sync(() -> {
-                // Do not save block counts
-                this.worldRecordService.get().recordBlockPlace(toBlock, 1, null, WorldRecordFlags.DIRTY_CHUNKS);
+                // Ignore cobblestone blocks, otherwise it will add +1 to the count of cobblestone when generated
+                // from cobblestone generator
+                if (toBlock.getType() != Material.COBBLESTONE) {
+                    // Do not save block counts
+                    this.worldRecordService.get().recordBlockPlace(toBlock, 1, null, WorldRecordFlags.DIRTY_CHUNKS);
+                }
             });
         }
     }
@@ -450,6 +545,9 @@ public class BlockChangesListener extends AbstractGameEventListener {
     }
 
     private void onEntityExplode(GameEvent<GameEventArgs.EntityExplodeEvent> e) {
+        if (e.getArgs().isSoftExplosion)
+            return;
+
         Entity entity = e.getArgs().entity;
 
         // We do not care about spawn island, and therefore only island worlds are relevant.
@@ -458,11 +556,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
 
         KeyMap<Integer> blockCounts = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
         e.getArgs().blocks.forEach(block -> {
-            Material blockType = block.getType();
-            // Soft explosions only break chorus flowers and pointed drip-stones
-            if (e.getArgs().isSoftExplosion && blockType != CHORUS_FLOWER && blockType != POINTED_DRIPSTONE)
-                return;
-
             Key blockKey = Keys.of(block);
             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
         });
@@ -474,21 +567,6 @@ public class BlockChangesListener extends AbstractGameEventListener {
             this.worldRecordService.get().recordMultiBlocksBreak(blockCounts,
                     entity.getLocation(wrapper.getHandle()), REGULAR_RECORD_FLAGS);
         }
-    }
-
-    private void onChorusHit(GameEvent<GameEventArgs.ProjectileHitEvent> e) {
-        Entity entity = e.getArgs().entity;
-
-        // We do not care about spawn island, and therefore only island worlds are relevant.
-        if (!plugin.getGrid().isIslandsWorld(entity.getWorld()))
-            return;
-
-        BukkitEntities.getPlayerSource(entity).ifPresent(shooter -> {
-            Block hitBlock = e.getArgs().hitBlock;
-            if (hitBlock != null && hitBlock.getType() == CHORUS_FLOWER) {
-                this.worldRecordService.get().recordBlockBreak(hitBlock, 1, REGULAR_RECORD_FLAGS);
-            }
-        });
     }
 
     private void onSpongeAbsorb(GameEvent<GameEventArgs.SpongeAbsorbEvent> e) {
@@ -511,6 +589,38 @@ public class BlockChangesListener extends AbstractGameEventListener {
         }
     }
 
+    private void onGenericGame(GameEvent<GameEventArgs.GenericGameEvent> e) {
+        // We do not care about spawn island, and therefore only island worlds are relevant.
+        if (!plugin.getGrid().isIslandsWorld(e.getArgs().world))
+            return;
+
+        // We only care about block_change
+        if (!e.getArgs().gameEvent.equals("block_change"))
+            return;
+
+        Location blockLocation = e.getArgs().location;
+        Block block = blockLocation.getBlock();
+        Material blockType = block.getType();
+
+        Key newBlockKey;
+        Key oldBlockKey;
+
+        if (blockType == OPEN_EYEBLOSSOM) {
+            // OPEN_EYEBLOSSOM was changed, we want to remove CLOSED_EYEBLOSSOM and replace it with OPEN_EYEBLOSSOM
+            newBlockKey = ConstantKeys.OPEN_EYEBLOSSOM;
+            oldBlockKey = ConstantKeys.CLOSED_EYEBLOSSOM;
+        } else if (blockType == CLOSED_EYEBLOSSOM) {
+            // CLOSED_EYEBLOSSOM was changed, we want to remove OPEN_EYEBLOSSOM and replace it with CLOSED_EYEBLOSSOM
+            newBlockKey = ConstantKeys.CLOSED_EYEBLOSSOM;
+            oldBlockKey = ConstantKeys.OPEN_EYEBLOSSOM;
+        } else {
+            return;
+        }
+
+        worldRecordService.get().recordBlockPlace(newBlockKey, blockLocation, 1, null, 0);
+        worldRecordService.get().recordBlockBreak(oldBlockKey, blockLocation, 1, REGULAR_RECORD_FLAGS);
+    }
+
     /* INTERNAL */
 
     private void registerListeners() {
@@ -520,10 +630,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_GROW_EVENT, GameEventPriority.MONITOR, this::onBlockGrow);
         registerCallback(GameEventType.BLOCK_FORM_EVENT, GameEventPriority.MONITOR, this::onBlockForm);
         registerCallback(GameEventType.BLOCK_SPREAD_EVENT, GameEventPriority.MONITOR, this::onBlockSpread);
+        registerCallback(GameEventType.BLOCK_UPDATE_SHAPE_EVENT, GameEventPriority.MONITOR, this::onBlockShapeUpdate);
         registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.MONITOR, this::onSpawnerChange);
         registerCallback(GameEventType.ENTITY_CHANGE_BLOCK_EVENT, GameEventPriority.MONITOR, this::onEntityChangeBlock);
         registerCallback(GameEventType.BLOCK_BREAK_EVENT, GameEventPriority.MONITOR, this::onBlockBreak);
-        registerCallback(GameEventType.BLOCK_DESTROY_EVENT, GameEventPriority.MONITOR, this::onBlockDestroy);
         registerCallback(GameEventType.PLAYER_FILL_BUCKET_EVENT, GameEventPriority.MONITOR, this::onBucketFill);
         registerCallback(GameEventType.ENTITY_SPAWN_EVENT, GameEventPriority.MONITOR, this::onEntitySpawn);
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.MONITOR, this::onPistonExtend);
@@ -531,8 +641,10 @@ public class BlockChangesListener extends AbstractGameEventListener {
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.MONITOR, this::onBlockFromTo);
         registerCallback(GameEventType.BLOCK_FADE_EVENT, GameEventPriority.MONITOR, this::onBlockFade);
         registerCallback(GameEventType.ENTITY_EXPLODE_EVENT, GameEventPriority.MONITOR, this::onEntityExplode);
-        registerCallback(GameEventType.PROJECTILE_HIT_EVENT, GameEventPriority.MONITOR, this::onChorusHit);
         registerCallback(GameEventType.SPONGE_ABSORB_EVENT, GameEventPriority.MONITOR, this::onSpongeAbsorb);
+
+        if (CLOSED_EYEBLOSSOM != null || OPEN_EYEBLOSSOM != null)
+            registerCallback(GameEventType.GENERIC_GAME_EVENT, GameEventPriority.MONITOR, this::onGenericGame);
     }
 
     @Nullable

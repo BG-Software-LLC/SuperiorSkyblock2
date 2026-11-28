@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.service.portals.PortalsManagerService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
@@ -47,7 +48,8 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
     public String getUsage(java.util.Locale locale) {
         return "admin teleport <" +
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> [normal/nether/the_end]";
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> [" +
+                Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + "]";
     }
 
     @Override
@@ -96,21 +98,21 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
 
         if (dimension != plugin.getSettings().getWorlds().getDefaultWorldDimension()) {
             if (!island.wasSchematicGenerated(dimension)) {
-                PortalType portalType = dimension.getEnvironment() == World.Environment.NETHER ? PortalType.NETHER : PortalType.ENDER;
-                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
-                Location homeLocation = island.getIslandHomePosition(dimension).toLocation(worldInfo);
-                IslandWorlds.accessIslandWorldAsync(island, homeLocation, true, islandWorldResult -> {
+                IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
                     islandWorldResult.ifRight(Throwable::printStackTrace).ifLeft(world -> {
-                        homeLocation.setWorld(world);
-                        portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island, homeLocation, portalType, false);
+                        Location simulatedPortalLocation = island.getCenter(
+                                plugin.getSettings().getWorlds().getDefaultWorldDimension());
+                        Location destinationLocation = island.getCenter(dimension);
+                        portalsManager.get().handlePlayerPortalFromIsland(superiorPlayer, island,
+                                simulatedPortalLocation, PortalType.CUSTOM, destinationLocation, false);
                     });
                 });
                 return;
             }
         }
 
-        superiorPlayer.teleport(island, dimension, result -> {
-            if (!result) {
+        superiorPlayer.teleportWithResult(island, dimension, result -> {
+            if (result != PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
                 superiorPlayer.teleport(island.getIslandHome(dimension));
             }
         });
@@ -118,7 +120,7 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getDimensions(args[3]) : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getDimensions(plugin, args[3]) : Collections.emptyList();
     }
 
 }

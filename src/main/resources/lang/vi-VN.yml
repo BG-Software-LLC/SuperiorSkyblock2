@@ -15,6 +15,7 @@ ADMIN_ADD_PLAYER: '&e&lĐảo | &7Thêm thành công người chơi {0} vào đ�
 ADMIN_ADD_PLAYER_NAME: '&e&lĐảo | &7Thêm thành công người chơi {0} vào đảo {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&lNgân Hàng | &7Bạn đã gửi ${0} vào ngân hàng đảo của
   {1}.'
+ADMIN_DEPOSIT_MONEY_ALL: '&e&lBank | &7You deposited ${0} into the banks of all islands.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã gửi ${0} vào ngân hàng đảo tên
   {1}.'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Phát triển bởi Ome_R'
@@ -34,7 +35,7 @@ BANK_WITHDRAW_CUSTOM: '&e&lNgân Hàng | &7Nhập số lượng tiền bạn mu�
 BANK_WITHDRAW_COMPLETED: 'Rút tiền thành công'
 BANNED_FROM_ISLAND: '&c&lLỗi | &7Bạn đã bị cấm trong hòn đảo này.'
 BLOCK_COUNT_CHECK: '&e&lĐảo | &7Đảo này có x{0} {1}.'
-BLOCK_COUNTS_CHECK: |
+BLOCK_COUNTS_CHECK: |-
   &e&lĐảo | &7Hòn đảo này có các khối sau:
   &7{0}
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lĐảo | &7Đảo này không có khối được theo dõi.'
@@ -59,11 +60,10 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể thay đ�
 CHANGED_BANK_LIMIT: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng đảo của {0}.'
 CHANGED_BANK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng của tất cả đảo.'
 CHANGED_BANK_LIMIT_NAME: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng của {0}.'
-CHANGED_BIOME: '&e&lĐảo | &7Thay đổi thành công quần xã thành {0}. Bạn có thể
-  cần kết nối lại với máy chủ để xem các thay đổi.'
-CHANGED_BIOME_ALL: '&e&lĐảo | &7Thành công thay đổi quần xã thành {0} cho tất cả các đảo.'
-CHANGED_BIOME_NAME: '&e&lĐảo | &7Thành công thay đổi quần xã thành {0} cho đảo {1}.'
-CHANGED_BIOME_OTHER: '&e&lĐảo | &7Thành công thay đổi quần xã thành {0} cho đảo của {1}.'
+CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dimension for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lKhối | &7Thành công thay đổi số lượng khối từ {0} thành {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Thay đổi thành công giới hạn khối {0} đảo của
   {1}.'
@@ -132,6 +132,9 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lNâng Cấp | &7Cập nhật thành công giới h
   của tất cả các đảo.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lNâng Cấp | &7Cập nhật thành công giới hạn khu vực
   của đảo {0}.'
+CLOSED_ISLAND: '&e&lIsland | &7Successfully closed {0}''s island to the public.'
+CLOSED_ISLAND_ALL: '&e&lIsland | &7Successfully closed all islands to the public.'
+CLOSED_ISLAND_NAME: '&e&lIsland | &7Successfully closed the island {0} to the public.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_MATERIALS: '*'
 COMMAND_ARGUMENT_ALL_MISSIONS: '*'
@@ -140,6 +143,8 @@ COMMAND_ARGUMENT_AMOUNT: so-luong
 COMMAND_ARGUMENT_BIOME: quan-xa
 COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: lenh...
+COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER: 'online-filter'
+COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: hieu-ung-thuoc
 COMMAND_ARGUMENT_EMAIL: email
@@ -152,6 +157,7 @@ COMMAND_ARGUMENT_LIMIT: gioi-han
 COMMAND_ARGUMENT_MATERIAL: vat-lieu
 COMMAND_ARGUMENT_MENU: ten-giao-dien
 COMMAND_ARGUMENT_MESSAGE: tin-nhan...
+COMMAND_ARGUMENT_MISSION_CATEGORY: 'mission-category'
 COMMAND_ARGUMENT_MISSION_NAME: ten-nhiem-vu
 COMMAND_ARGUMENT_MODULE_NAME: ten-module
 COMMAND_ARGUMENT_MULTIPLIER: he-so
@@ -182,6 +188,7 @@ COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
 COMMAND_DESCRIPTION_ADMIN: Sử dụng các lệnh của admin.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_ADD: Thêm người vào đảo.
+COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Tăng giới hạn khối cho đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Thêm thưởng cho người chơi.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Tăng giới hạn thành viên đảo co-op của người chơi khác.'
@@ -190,6 +197,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: 'Thêm hiệu ứng đảo của người 
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: 'Tăng giới hạn vật thể của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: 'Thêm phần trăm vật liệu cho máy tạo đá cuội.'
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: 'Tăng hệ số vật phẩm của quái rớt ra của người chơi khác.'
+COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT: 'Increase role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: 'Mở rộng đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: 'Tăng hệ số tỷ lệ lồng sinh sản của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: 'Tăng giới hạn thành viên đảo của người chơi khác.'
@@ -227,14 +235,17 @@ COMMAND_DESCRIPTION_ADMIN_RANKUP: Cập nhật mức độ nâng cấp cho hòn 
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Xóa giới hạn khối khỏi một hòn đảo.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_EFFECT: 'Remove an effect from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_GENERATOR: 'Remove a material from the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
   một người chơi.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT: 'Remove a role limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS: 'Reset all island settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Tái tạo lại thế giới cho một hòn đảo.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
-COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Đặt mức giới hạn ngân hàng cho một hòn đảo.'
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Đặt số lượng khối ở một vị trí cụ thể.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi
@@ -303,6 +314,7 @@ COMMAND_DESCRIPTION_INVITE: Mời một người chơi đến đảo của bạn
 COMMAND_DESCRIPTION_KICK: Kick một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_LANG: Thay đổi ngôn ngữ cá nhân của bạn.
 COMMAND_DESCRIPTION_LEAVE: Rời khỏi hòn đảo của bạn.
+COMMAND_DESCRIPTION_LOCAL_CHAT: 'Toggle local chat mode.'
 COMMAND_DESCRIPTION_MEMBERS: Mở menu thành viên.
 COMMAND_DESCRIPTION_MISSION: Hoàn thành nhiệm vụ.
 COMMAND_DESCRIPTION_MISSIONS: Mở menu nhiệm vụ.
@@ -351,6 +363,13 @@ COOP_LIMIT_EXCEED: '&c&lLỗi | &7Bạn đã đạt số lượng người chơi
 CREATE_ISLAND: '&e&lĐảo | &7Tạo một hòn đảo mới tại {0} trong {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lLỗi | &7Đã xảy ra lỗi khi tạo đảo của bạn. Vui lòng liên hệ với quản trị viên để điều tra vấn đề.'
 CREATE_WORLD_FAILURE: '&c&lLỗi | &7Đã xảy ra lỗi khi tạo thế giới của bạn. Vui lòng liên hệ với quản trị viên để điều tra vấn đề.'
+DANGEROUS_COMMAND_APPROVED: '&e&lCommands | &7Your request to execute {0} was approved by the console.'
+DANGEROUS_COMMAND_CANCELLED: '&c&lError | &7Your request to execute {0} was cancelled due to a reload.'
+DANGEROUS_COMMAND_NO_ACCESS: '&c&lError | &7Skipped the request of {0} to execute {1}: they no longer have access to the command.'
+DANGEROUS_COMMAND_PLAYER_OFFLINE: '&c&lError | &7Skipped the request of {0} to execute {1}: the player is offline.'
+DANGEROUS_COMMAND_PLAYER_QUIT: '&c&lError | &7The request of {0} to execute {1} was cancelled as they left the server.'
+DANGEROUS_COMMAND_REQUEST_CONSOLE: '&e&lCommands | &7{0} requested to execute the dangerous command {1}. Execute "{2}" within 1 minute to approve it.'
+DANGEROUS_COMMAND_REQUEST_SENT: '&e&lCommands | &7The command {0} is dangerous and requires approval from the console. The request expires in 1 minute.'
 DEBUG_MODE_DISABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &cTẮT&7.'
 DEBUG_MODE_ENABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &aBẬT&7.'
 DEBUG_MODE_FILTER_ADD: '&e&lGỡ lỗi | &7Đã bật bộ lọc gỡ lỗi {0} &aBẬT&7.'
@@ -396,22 +415,30 @@ FORMAT_DAY_NAME: ngày
 GENERATOR_CLEARED: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho đảo của {0}.'
 GENERATOR_CLEARED_NAME: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho đảo {0}.'
 GENERATOR_CLEARED_ALL: '&e&lĐảo | &7Xóa thành công số lượng máy tạo quặng cho tất cả các đảo.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK: '&e&lIsland | &7There are no other blocks in the generator, so the remaining {0}% will be {1}.'
+GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL: '&e&lIsland | &7Islands without other blocks in the generator: {2}. The remaining {0}% of their generator will be {1}.'
 GENERATOR_UPDATED: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo của {1}.'
 GENERATOR_UPDATED_NAME: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo {1}.'
 GENERATOR_UPDATED_ALL: '&e&lĐảo | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho tất cả các đảo.'
 GLOBAL_COMMAND_EXECUTED: '&e&lĐảo | &7Thành công thực hiện lệnh cho tất cả thành viên đảo của {0}!'
+GLOBAL_COMMAND_EXECUTED_ALL: '&e&lIsland | &7Successfully executed the command on all members of all islands!'
 GLOBAL_COMMAND_EXECUTED_NAME: '&e&lĐảo | &7Thành công thực hiện lệnh cho tất cả thành viên đảo {0}!'
 GLOBAL_MESSAGE_SENT: '&e&lĐảo | &7Gửi thành công tin nhắn đến thành viên
   đảo của {0}!'
+GLOBAL_MESSAGE_SENT_ALL: '&e&lIsland | &7Successfully sent the message to all members of all islands!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lĐảo | &7Gửi thành công tin nhắn đến thành
   viên của đảo {0}!'
 GLOBAL_TITLE_SENT: '&e&lĐảo | &7Gửi title cho thành viên đảo của {0} thành công!'
+GLOBAL_TITLE_SENT_ALL: '&e&lIsland | &7Successfully sent the title to all members of all islands!'
 GLOBAL_TITLE_SENT_NAME: '&e&lĐảo | &7Gửi title cho thành viên đảo {0} thành công!'
 GOT_BANNED: '&e&lĐảo | &7Bạn đã bị &cCẤM&7 khỏi đảo của {0}.'
 GOT_DEMOTED: '&e&lĐảo | &7Bạn đã bị hạ cấp xuống thành {0} trong đảo của bạn.'
 GOT_EXPELLED: '&e&lĐảo | &7&oBạn đã bị trục xuất khỏi đảo bởi {0}...'
-GOT_INVITE: '&e&lĐảo | &7{0} mời bạn đến đảo của họ.'
-GOT_INVITE_TOOLTIP: '&7Nhấp vào tin nhắn để chấp nhận lời mời.'
+GOT_INVITE:
+  0:
+    text: '&e&lĐảo | &7{0} mời bạn đến đảo của họ.'
+    tooltip: '&7Nhấp vào tin nhắn để chấp nhận lời mời.'
+    command: '/is accept {0}'
 GOT_KICKED: '&e&lĐảo | &7Bạn đã bị kick khỏi đảo của bạn bởi {0}.'
 GOT_PROMOTED: '&e&lĐảo | &7Bạn đã được thăng chức {0} trong đảo của bạn.'
 GOT_REVOKED: '&e&lĐảo | &7{0} đã thu hồi lời mời bạn đến đảo của họ.'
@@ -420,6 +447,7 @@ HIT_ISLAND_MEMBER: '&c&lLỗi| &7Bạn không thể đánh thành viên đảo c
 HIT_PLAYER_IN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh người chơi trong đảo.'
 IGNORED_ISLAND: '&e&lĐảo | &7Đảo của {0} bây giờ không còn hiển thị trong
   danh sách đảo hàng đầu.'
+IGNORED_ISLAND_ALL: '&e&lIsland | &7Successfully ignored all islands from top islands.'
 IGNORED_ISLAND_NAME: '&e&lĐảo | &7Đảo {0} bây giờ không còn hiển thị trong
   danh sách đảo hàng đầu.'
 INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài phạm vi bảo
@@ -428,15 +456,16 @@ INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_BIOME: '&c&lLỗi | &7Quần xã không chính xác {0}.'
 INVALID_BLOCK: '&c&lLỗi | &7Vị trí khối không hợp lệ {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
+INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lLỗi | &7Hiệu ứng không hợp lệ {0}.'
 INVALID_ENTITY: '&c&lLỗi | &7Vật thể không chính xác {0}.'
-INVALID_ENVIRONMENT: '&c&lLỗi | &7Thế giới {0} không hợp lệ.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lLỗi | &7Thời gian nghỉ không hợp lệ {0}.'
 INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'
 INVALID_ISLAND_LOCATION: '&c&lLỗi | &7Không có đảo nào ở vị trí của bạn.'
 INVALID_ISLAND_OTHER: '&c&lLỗi | &7{0} không có đảo.'
 INVALID_ISLAND_OTHER_NAME: '&c&lLỗi | &7Không có đảo nào với tên {0}.'
-INVALID_ISLAND_PERMISSION: |
+INVALID_ISLAND_PERMISSION: |-
   &c&lLỗi | &7Không thể tìm thấy quyền của đảo {0}.
   &c&lLỗi | &7Quyền của đảo: {1}
 INVALID_LEVEL: '&c&lLỗi | &7Cấp độ không hợp lệ {0}.'
@@ -445,27 +474,28 @@ INVALID_MATERIAL: '&c&lLỗi | &7Vật liệu không hợp lệ {0}.'
 INVALID_MATERIAL_DATA: '&c&lLỗi | &7Dữ liệu-vật liệu không hợp lệ {0}.'
 INVALID_MENU: '&c&lLỗi | &7Menu không hợp lệ {0}.'
 INVALID_MISSION: '&c&lLỗi | &7Nhiệm vụ không hợp lệ {0}.'
+INVALID_MISSION_CATEGORY: '&c&lError | &7Invalid mission category {0}.'
 INVALID_MODULE: '&c&lLỗi | &7Module không hợp lệ {0}.'
 INVALID_MULTIPLIER: '&c&lLỗi | &7Hệ số không hợp lệ {0}.'
 INVALID_PAGE: '&c&lLỗi | &7Trang không hợp lệ {0}.'
 INVALID_PERCENTAGE: '&c&lLỗi | &7Tỷ lệ phần trăm phải nằm trong khoảng từ 0 đến 100.'
 INVALID_PLAYER: '&c&lLỗi | &7Không thể tìm thấy người chơi tên {0}'
-INVALID_RATE: |
+INVALID_RATE: |-
   &c&lLỗi | &7Không thể tìm thấy một đánh giá với tên {0}.
   &c&lLỗi | &7Các đánh giá đảo: {1}
 INVALID_ROWS: '&c&lLỗi | &7Số lượng dòng không hợp lệ: {0}'
-INVALID_ROLE: |
+INVALID_ROLE: |-
   &c&lLỗi | &7Không thể tìm thấy vai trò đảo {0}.
   &c&lLỗi | &7Các vai trò của đảo: {1}
 INVALID_SCHEMATIC: '&c&lLỗi | &7không thể tìm thấy schematic với tên {0}.'
-INVALID_SETTINGS: |
+INVALID_SETTINGS: |-
   &c&lLỗi | &7Không thể tìm thấy cài đặt đảo {0}.
   &c&lLỗi | &7Các điều chỉnh đảo: {1}
 INVALID_SIZE: '&c&lLỗi | &7Kích thước không hợp lệ {0}.'
 INVALID_SLOT: '&c&lLỗi | &7Vị trí không hợp lệ {0}.'
 INVALID_TITLE: '&c&lLỗi | &7Đã nhập title không hợp lệ.'
 INVALID_TOGGLE_MODE: '&c&lLỗi | &7Không thể chuyển đổi {0}.'
-INVALID_UPGRADE: |
+INVALID_UPGRADE: |-
   &c&lLỗi | &7Không thể tìm thấy bản nâng cấp được gọi là {0}.
   &c&lLỗi | &7Nâng cấp: {1}
 INVALID_VISIT_LOCATION: '&c&lLỗi | &7Hòn đảo này không có vị trí du khách.'
@@ -479,7 +509,9 @@ INVITE_TO_FULL_ISLAND: '&c&lLỗi | &7Bạn không thể mời thêm thành viê
   bạn.'
 ISLAND_ALREADY_CLOSED: '&c&lLỗi | &7Đảo đã được đóng cửa biên giới.'
 ISLAND_ALREADY_EXIST: '&c&lLỗi | &7Một hòn đảo với tên đó đã tồn tại.'
+ISLAND_ALREADY_IGNORED: '&c&lError | &7The island is already ignored from top islands.'
 ISLAND_ALREADY_OPENED: '&c&lLỗi | &7Đảo đã được mở cửa biên giới.'
+ISLAND_ALREADY_UNIGNORED: '&c&lError | &7The island is already un-ignored from top islands.'
 ISLAND_BANK_EMPTY: '&e&lNgân Hàng | &7Đảo ngân hàng trống rỗng.'
 ISLAND_BANK_SHOW: '&e&lNgân Hàng | &7Đảo bạn có ${0}.'
 ISLAND_BANK_SHOW_OTHER: '&e&lNgân Hàng | &7Đảo của {0} có ${1}.'
@@ -488,6 +520,7 @@ ISLAND_BEING_CALCULATED: '&c&lLỗi | &7Bạn không thể tương tác với c�
 ISLAND_CLOSED: '&e&lĐảo | &7Thành công đóng cửa đảo cho công cộng.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lLỗi | &7Bạn đã có một nhiệm vụ tạo đảo đang diễn ra.'
 ISLAND_CREATE_PROCCESS_REQUEST: '&e&lĐảo | &7Đang xử lý yêu cầu của bạn...'
+ISLAND_DESCRIPTION_NONE: None
 ISLAND_FLY_DISABLED: '&e&lBay | &7Bay trong đảo đã tự động &cvô hiệu hóad&7.'
 ISLAND_FLY_ENABLED: '&e&lBay | &7Bay trong đảo đã tự động &akích hoạt&7.'
 ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lĐảo | &7&oBạn đã ở trong một hòn đảo đã
@@ -499,33 +532,33 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Danh sách lệnh [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng {1} {0} cho trang tiếp theo.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lĐảo | &7Giới Hạn Ngân Hàng: {0}'
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lĐảo | &7Giới Hạn Các Khối:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lĐảo | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lĐảo | &7Giới Hạn Co-op: {0}'
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |-
   &e&lĐảo | &7Các hiệu ứng đảo:
   {0}
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lĐảo | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lĐảo | &7Giới hạn các vật thể:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lĐảo | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lĐảo | &7Cây trồng đa cấp: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lĐảo | &7Drops đa cấp: {0}'
-ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |-
   &e&lĐảo | &7Tỉ lệ máy tạo quặng ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lĐảo | &7  {0}: {1}% ({2})'
-ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |-
   &e&lĐảo | &7Giới Hạn Vai Trò:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lĐảo | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lĐảo | &7Kích thước đảo: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lĐảo | &7Hệ số lồng sinh sản: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lĐảo | &7Giới hạn thành viên: {0}'
-ISLAND_INFO_ADMIN_UPGRADES: |
+ISLAND_INFO_ADMIN_UPGRADES: |-
   &e&lĐảo | &7Các Nâng Cấp:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lĐảo | &7  {0}: {1}'
@@ -554,7 +587,7 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
-ISLAND_INFO_ROLES: |
+ISLAND_INFO_ROLES: |-
   &e&lĐảo | &7{0}s:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lĐảo | &7Số lượt khách: {0} ({1} unique visitors)'
@@ -568,7 +601,7 @@ ISLAND_PREVIEW_CANCEL: '&e&lXem Trước | &7Bạn đã hủy chế độ xem tr
 ISLAND_PREVIEW_CONFIRM_TEXT: 'DONG-Y'
 ISLAND_PREVIEW_CANCEL_TEXT: 'HUY-BO'
 ISLAND_PREVIEW_SET: '&e&lPreview | &7Successfully updated the preview location for {0} schematic to {1}.'
-ISLAND_PREVIEW_START: |
+ISLAND_PREVIEW_START: |-
   &e&lXem Trước | &7Bạn đã bắt đầu chế độ xem trước schematic {0}.
   &e&lXem Trước | &7Nhập &a&lDONG-Y &7để tạo đảo mới, hoặc &c&lHUY-BO &7để dừng chế độ xem trước.
   &e&lXem Trước | &7Bạn không thể rời khỏi khu vực của hòn đảo, nếu không chế độ xem trước sẽ tự động bị hủy.
@@ -601,6 +634,7 @@ KICK_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã bị kick khỏi đảo bởi {1}.'
 KICK_ISLAND_LEADER: '&c&lLỗi | &7Bạn không thể đá người chủ đảo, thay vào đó sử dụng /is admin disband.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể kick người chơi có vai trò
   đảo thấp hơn bạn.'
+KICKED_MEMBER: '&e&lIsland | &7You kicked {0} from their island.'
 LACK_CHANGE_PERMISSION: '&c&Lỗi | &7Bạn phải có quyền này để thay đổi nó thành các
   vai trò khác.'
 LAST_ROLE_DEMOTE: '&c&lLỗi | &7Bạn không thể hạ cấp người chơi này nữa.'
@@ -614,6 +648,8 @@ LEFT_ISLAND_COOP: '&e&lĐảo | &7Bạn không còn là thành viên co-op đả
   nữa.'
 LEFT_ISLAND_COOP_NAME: '&e&lĐảo | &7Bạn không còn là thành viên co-op đảo {0}
   nữa.'
+LIMIT_IS_UNLIMITED: '&c&lError | &7This island''s limit is unlimited and cannot be increased.'
+LOCAL_CHAT_FORMAT: '&6[{0}] {1}&f: &7{2}'
 LOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lThế giới | &7Thế giới {0} hiện đã bị khóa đối với tất cả các hòn đảo!'
 LOCK_WORLD_ANNOUNCEMENT_NAME: '&e&lThế giới | &7Thế giới {0} hiện đã bị khóa đối với hòn đảo {1}!'
 LOCK_WORLD_ANNOUNCEMENT: '&e&lThế giới | &7Thế giới {0} hiện đã bị khóa đối với hòa đảo của {1}!'
@@ -630,7 +666,7 @@ MISSION_STATUS_COMPLETE_ALL: '&e&lNhiệm Vụ | &7Đã thay đổi trạng thá
 MISSION_STATUS_RESET: '&e&lNhiệm Vụ | &7Đặt lại trạng thái của nhiệm vụ {0} cho {1}.'
 MISSION_STATUS_RESET_ALL: '&e&lNhiệm Vụ | &7Đặt lại tất cả các nhiệm vụ cho {0}.'
 MODULE_ALREADY_INITIALIZED: '&e&lModule | &7Module đã đước tải sẵn trước đó.'
-MODULE_INFO: |
+MODULE_INFO: |-
   &e&lModule | &7{0} bởi {1}
   &e&lModule | &7&m--------------------
   &e&lModule | &7{2}
@@ -701,6 +737,9 @@ NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lLỗi | &7Bạn không có đủ tiền để 
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lLỗi | &7Bạn không có đủ tiền để nâng cấp.'
 NOT_ENOUGH_MONEY_TO_WARP: '&c&lLỗi | &7Bạn không có đủ tiền để dùng các khu vực đảo.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oBạn quá mệt mỏi để tương tác với các menu, bạn không nghĩ vậy sao?'
+OPENED_ISLAND: '&e&lIsland | &7Successfully opened {0}''s island to the public.'
+OPENED_ISLAND_ALL: '&e&lIsland | &7Successfully opened all islands to the public.'
+OPENED_ISLAND_NAME: '&e&lIsland | &7Successfully opened the island {0} to the public.'
 PANEL_TOGGLE_OFF: |-
   &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo: &cTẮT&7.
   &e&lBảng điều khiển | &7Xài /is sẽ dịch chuyển bạn về đảo.'
@@ -752,6 +791,7 @@ RATE_ANNOUNCEMENT: '&e&lĐánh giá | &7{0} đã đánh giá đảo của bạn 
 RATE_CHANGE_OTHER: '&e&lĐánh giá | &7Bạn đã thay đổi đánh giá của đảo {0} thành {1}.'
 RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của bạn.'
 RATE_REMOVE_ALL: '&e&lĐánh giá | &7Thành công xóa bỏ tất cả đánh giá của đảo {0}.'
+RATE_REMOVE_ALL_ISLAND: '&e&lIsland | &7Successfully removed all ratings of the island {0}.'
 RATE_REMOVE_ALL_ISLANDS: '&e&lĐảo | &7Thành công xóa bỏ tất cả đánh giá của tất cả các đảo.'
 RATE_SUCCESS: '&e&lĐánh giá | &7Bạn đánh giả đảo này với {0} sao!'
 REACHED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
@@ -774,7 +814,7 @@ SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Đã chọn vị trí #2 ({0})'
 SCHEMATIC_NOT_ADDED: '&c&lError | &7The server hasn''t added a {0} schematic. Please contact administrator to solve the problem. The format for {0} schematic is "{1}".'
 SCHEMATIC_NOT_READY: '&c&lLỗi | &7Bạn chưa chọn hai vị trí.'
 SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Đang xử lý yêu cầu của bạn...'
-SCHEMATIC_READY_TO_CREATE: |
+SCHEMATIC_READY_TO_CREATE: |-
   &e&lSchematics | &7Bạn đã chọn hai vị trí. Xài /is admin schematic <tên> để tạo schematic mới.
   &e&lSchematics | &7Hãy chắc chắn rằng bạn đứng ở vị trí dịch chuyển khi thực hiện lệnh.
 SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Đã chọn vị trí #1 ({0})'
@@ -782,6 +822,7 @@ SCHEMATIC_SAVED: '&e&lSchematics | &7Lưu thành công schematic!'
 SELF_ROLE_CHANGE: '&c&lLỗi | &7Bạn không thể thay đổi vai trò của chính mình.'
 SET_UPGRADE_LEVEL: '&e&lNâng Cấp | &7Nâng cấp thành công cấp độ của {0} cho đảo của
   {1}.'
+SET_UPGRADE_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of {0} for all islands.'
 SET_UPGRADE_LEVEL_NAME: '&e&lNâng Cấp | &7Thay đổi thành công cấp độ {0} cho đảo {1}.'
 SET_WARP: '&e&lĐảo | &7Tạo thành công một khu vực mới tại {0}.'
 SET_WARP_OUTSIDE: '&c&lLỗi | &7Bạn không thể đặt khu vực bên ngoài hòn đảo của bạn.'
@@ -800,6 +841,7 @@ SPAWN_PROTECTED: '&c&lError | &7Spawn is protected.'
 SPAWN_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 SPAWN_TELEPORT_SUCCESS: '&e&lTrung Tâm | &7Dịch chuyển thành công {0} đến trung tâm.'
 SPAWN_SET_SUCCESS: '&e&lTrung Tâm | &7Cập nhật thành công vị trí trung tâm thành {0}.'
+SPY_LOCAL_CHAT_FORMAT: '&7[Spy] &6[{0}] {1}&f: &7{2}'
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'
 SYNC_UPGRADES: '&e&lNâng Cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp đảo của {0}.'
 SYNC_UPGRADES_ALL: '&e&lNâng Cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp cho tất cả các đảo.'
@@ -823,6 +865,8 @@ TOGGLED_FLY_OFF: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &cT�
 TOGGLED_FLY_ON: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &aBẬT&7.'
 TOGGLED_FLY_OFF_OTHER: '&e&lFly | &7Toggled island fly &cOFF&7 for {0}.'
 TOGGLED_FLY_ON_OTHER: '&e&lFly | &7Toggled island fly &aON&7 for {0}.'
+TOGGLED_LOCAL_CHAT_OFF: '&e&lChat | &7Toggling local chat &cOFF&7.'
+TOGGLED_LOCAL_CHAT_ON: '&e&lChat | &7Toggling local chat &aON&7.'
 TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Chuyển đổi chế độ schematic: &cTẮT&7.'
 TOGGLED_SCHEMATIC_ON: |-
   &e&lSchematics | &7Chuyển đổi chế độ schematic: &aBẬT&7.
@@ -851,6 +895,7 @@ UNCOOP_LEFT_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã thoát khỏi trò chơi và 
   còn là một thành viên co-op.'
 UNIGNORED_ISLAND: '&e&lĐảo | &7Đảo của {0} bây giờ không được bỏ qua từ các
   đảo hàng đầu.'
+UNIGNORED_ISLAND_ALL: '&e&lIsland | &7Successfully un-ignored all islands from top islands.'
 UNIGNORED_ISLAND_NAME: '&e&lĐảo | &7Đảo {0} bây giờ không được bỏ qua từ các
   đảo hàng đầu.'
 UNLOCK_WORLD_ANNOUNCEMENT_ALL: '&e&lThế giới | &7Thế giới {0} hiện đã được mở khóa cho tất cả đảo!'
@@ -864,7 +909,7 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lLỗi | &77Bạn có thể nâng cấp lại trong
 VAULT_NOT_INSTALLED: '&c&lError | &7Server doesn''t have vault installed so transactions are disabled.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
-WARP_CATEGORY_ICON_NEW_LORE: |
+WARP_CATEGORY_ICON_NEW_LORE: |-
   &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
   &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
@@ -878,7 +923,7 @@ WARP_CATEGORY_SLOT_SUCCESS: '&e&lKhu Vực | &7Thành công thay đổi danh m�
 WARP_CATEGORY_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lLỗi | &7Tên này đã được dùng bởi một danh mục khu vực khác.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lKhu Vực | &7Thành công đổi tên danh mục thành {0}.'
-WARP_ICON_NEW_LORE: |
+WARP_ICON_NEW_LORE: |-
   &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
   &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
 WARP_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
@@ -900,4 +945,5 @@ WITHDRAW_ERROR: '&c&lLỗi | &7{0}.'
 WITHDRAWN_MONEY: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo của {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo {1}!'
 WORLD_NOT_ENABLED: '&e&lWorlds | &7The {0} world is not enabled on the server.'
+WORLD_NOT_GENERATED: '&e&lWorlds | &7The {0} world is not generated yet!'
 WORLD_NOT_UNLOCKED: '&e&lThế Giới | &7Thế giới {0} hiện chưa được mở khóa!'

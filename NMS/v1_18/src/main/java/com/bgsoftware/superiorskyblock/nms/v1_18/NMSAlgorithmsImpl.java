@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.superiorskyblock.nms.algorithms.SpigotGlowEnchantment;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
@@ -12,8 +14,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_18.AbstractNMSAlgorithms {
+
+    private static final ReflectField<Object> MINECRAFT_SERVER_TPS1 = new ReflectField<>(
+            MinecraftServer.class, Object.class, "tps1");
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
@@ -34,11 +40,19 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_18
 
     @Override
     public double getCurrentTps() {
-        try {
+        if (MINECRAFT_SERVER_TPS1.isValid())
             return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
+
+        //noinspection removal
+        return MinecraftServer.getServer().recentTps[0];
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 

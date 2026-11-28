@@ -20,7 +20,6 @@ public interface ModulesContainer {
 
     void addModuleData(PluginModule pluginModule, ModuleData moduleData);
 
-    @Nullable
-    ModuleData getModuleData(PluginModule module);
+    void removeModuleData(PluginModule module);
 
 }

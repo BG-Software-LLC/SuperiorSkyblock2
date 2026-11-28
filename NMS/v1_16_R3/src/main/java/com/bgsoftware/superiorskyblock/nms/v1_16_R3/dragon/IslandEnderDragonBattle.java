@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3.dragon;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.NMSUtils;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -167,16 +169,14 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
     private void updateBattlePlayers() {
         Set<UUID> nearbyPlayers = new HashSet<>();
 
-        for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
-            Player bukkitPlayer = superiorPlayer.asPlayer();
-            assert bukkitPlayer != null;
+        WorldInfo worldInfo = WorldInfo.of(this.world.getWorld());
 
-            EntityPlayer entityPlayer = ((CraftPlayer) bukkitPlayer).getHandle();
-
-            if (entityPlayer.getWorld().equals(this.world)) {
+        try(IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(island)) {
+            strategy.getPlayers(worldInfo).forEach(player -> {
+                EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
                 this.bossBattle.addPlayer(entityPlayer);
                 nearbyPlayers.add(entityPlayer.getUniqueID());
-            }
+            });
         }
 
         this.bossBattle.getPlayers().stream()

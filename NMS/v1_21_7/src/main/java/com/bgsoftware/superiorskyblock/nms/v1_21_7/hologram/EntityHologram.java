@@ -2,8 +2,12 @@ package com.bgsoftware.superiorskyblock.nms.v1_21_7.hologram;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityHologram extends com.bgsoftware.superiorskyblock.nms.v1_21_7.hologram.AbstractEntityHologram {
 
@@ -51,6 +55,12 @@ public class EntityHologram extends com.bgsoftware.superiorskyblock.nms.v1_21_7.
     @Override
     public void load(ValueInput input) {
         // Do not load NBT.
+    }
+
+    @Override
+    public InteractionResult interactAt(Player player, Vec3 hitPos, InteractionHand hand) {
+        // Prevent stand being equipped
+        return InteractionResult.PASS;
     }
 
 }

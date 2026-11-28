@@ -10,7 +10,7 @@ dependencies {
     compileOnly 'com.syntaxphoenix:SmoothTimber:1.27.0'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('hook.compile_smoothtimber') &&

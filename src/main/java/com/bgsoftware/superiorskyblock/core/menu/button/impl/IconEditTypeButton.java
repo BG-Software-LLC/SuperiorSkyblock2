@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
@@ -12,9 +12,7 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -30,8 +28,8 @@ public class IconEditTypeButton<E> extends AbstractMenuViewButton<AbstractIconPr
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        Player player = (Player) clickEvent.getWhoClicked();
+    public void onButtonClick(ButtonClickContext<AbstractIconProviderMenu.View<E>> context) {
+        Player player = context.getPlayer();
 
         getTemplate().newLoreMessage.send(player);
 
@@ -40,26 +38,18 @@ public class IconEditTypeButton<E> extends AbstractMenuViewButton<AbstractIconPr
         PlayerChat.listen(player, message -> {
             if (!message.equalsIgnoreCase("-cancel")) {
                 String[] sections = message.split(":");
-                Material material;
+                Material material = EnumHelper.getEnum(Material.class, sections[0].toUpperCase(Locale.ENGLISH));
 
-                try {
-                    material = Material.valueOf(sections[0].toUpperCase(Locale.ENGLISH));
-                    if (material == Material.AIR)
-                        throw new IllegalArgumentException();
-                } catch (IllegalArgumentException ex) {
+                if (material == null || material == Material.AIR) {
                     Message.INVALID_MATERIAL.send(player, message);
                     return true;
                 }
 
                 String rawMessage = sections.length == 2 ? sections[1] : "0";
 
-                short data;
+                short data = Text.parseShort(rawMessage, (short) -1);
 
-                try {
-                    data = Short.parseShort(rawMessage);
-                    if (data < 0)
-                        throw new IllegalArgumentException();
-                } catch (IllegalArgumentException ex) {
+                if (data < 0) {
                     Message.INVALID_MATERIAL_DATA.send(player, rawMessage);
                     return true;
                 }
@@ -85,7 +75,7 @@ public class IconEditTypeButton<E> extends AbstractMenuViewButton<AbstractIconPr
 
         @Override
         public MenuTemplateButton<AbstractIconProviderMenu.View<E>> build() {
-            return new Template<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, newLoreMessage);
+            return new Template<>(this, newLoreMessage);
         }
 
     }
@@ -94,10 +84,8 @@ public class IconEditTypeButton<E> extends AbstractMenuViewButton<AbstractIconPr
 
         private final Message newLoreMessage;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Message newLoreMessage) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    IconEditTypeButton.class, IconEditTypeButton::new);
+        Template(AbstractBuilder<AbstractIconProviderMenu.View<E>> builder, Message newLoreMessage) {
+            super(builder, IconEditTypeButton.class, IconEditTypeButton::new);
             this.newLoreMessage = Objects.requireNonNull(newLoreMessage, "newLoreMessage cannot be null");
         }
 

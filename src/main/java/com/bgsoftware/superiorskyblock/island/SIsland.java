@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.enums.MemberRemoveReason;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.BlockChangeResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBiomeFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandBlockFlags;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
@@ -30,7 +31,9 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -43,9 +46,9 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.IslandWorldsPlayersStrategy;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
-import com.bgsoftware.superiorskyblock.core.LegacyMasks;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.SWorldPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -55,6 +58,7 @@ import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.Location2ObjectMap;
+import com.bgsoftware.superiorskyblock.core.collections.UnparsedEnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
@@ -92,6 +96,7 @@ import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.bgsoftware.superiorskyblock.island.upgrade.DefaultUpgradeLevel;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.container.IslandUpgrades;
 import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
@@ -102,7 +107,6 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.bgsoftware.superiorskyblock.world.GeneratorType;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
@@ -148,23 +152,50 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SIsland implements Island {
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
-    private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
     private static final UUID[] EMPTY_IGNORED_MEMBERS = new UUID[0];
     private static final Object[] EMPTY_MESSAGE_ARGS = new Object[0];
+    private static final long MAX_GENERATOR_TOTAL_AMOUNT = 100;
+    // Non-capturing functions for playersInside, used by anyPlayerInsideMatches and countPlayersInside.
+    private static final BiFunction<SortedSet<SuperiorPlayer>, Predicate<SuperiorPlayer>, Boolean> ANY_PLAYER_MATCHES =
+            (playersInside, predicate) -> {
+                for (SuperiorPlayer superiorPlayer : playersInside) {
+                    if (predicate.test(superiorPlayer))
+                        return true;
+                }
+                return false;
+            };
+    private static final BiFunction<SortedSet<SuperiorPlayer>, Predicate<SuperiorPlayer>, Integer> COUNT_PLAYERS_MATCHES =
+            (playersInside, predicate) -> {
+                int count = 0;
+                for (SuperiorPlayer superiorPlayer : playersInside) {
+                    if (predicate.test(superiorPlayer))
+                        ++count;
+                }
+                return count;
+            };
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
+        @Override
+        protected MessagesService create() {
+            return plugin.getServices().getService(MessagesService.class);
+        }
+    };
     private static final LazyReference<PlaceholdersService> placeholdersService = new LazyReference<PlaceholdersService>() {
         @Override
         protected PlaceholdersService create() {
@@ -172,7 +203,7 @@ public class SIsland implements Island {
         }
     };
 
-    private static EnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
+    private static UnparsedEnumerateSet<IslandFlag> DEFAULT_FLAGS_CACHE;
 
     private final DatabaseBridge databaseBridge;
     private final IslandBank islandBank;
@@ -180,6 +211,7 @@ public class SIsland implements Island {
     private final IslandBlocksTrackerAlgorithm blocksTracker;
     private final IslandEntitiesTrackerAlgorithm entitiesTracker;
     private final Synchronized<BukkitTask> bankInterestTask = Synchronized.of(null);
+    private final Synchronized<Set<BukkitTask>> activeTasks = Synchronized.of(Collections.newSetFromMap(new WeakHashMap<>()));
     private final DirtyChunksContainer dirtyChunksContainer;
     private final LazyReference<IslandCache> islandCache = new LazyReference<IslandCache>() {
         @Override
@@ -200,17 +232,17 @@ public class SIsland implements Island {
     /*
      * Island Upgrade Values
      */
-    private final Synchronized<IntValue> islandSize = Synchronized.of(IntValue.syncedFixed(-1));
-    private final Synchronized<IntValue> warpsLimit = Synchronized.of(IntValue.syncedFixed(-1));
-    private final Synchronized<IntValue> teamLimit = Synchronized.of(IntValue.syncedFixed(-1));
-    private final Synchronized<IntValue> coopLimit = Synchronized.of(IntValue.syncedFixed(-1));
-    private final Synchronized<DoubleValue> cropGrowth = Synchronized.of(DoubleValue.syncedFixed(-1D));
-    private final Synchronized<DoubleValue> spawnerRates = Synchronized.of(DoubleValue.syncedFixed(-1D));
-    private final Synchronized<DoubleValue> mobDrops = Synchronized.of(DoubleValue.syncedFixed(-1D));
-    private final Synchronized<Value<BigDecimal>> bankLimit = Synchronized.of(Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE));
+    private final Synchronized<IntValue> borderSize = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<IntValue> coopLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<IntValue> teamLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<IntValue> warpsLimit = Synchronized.of(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<DoubleValue> cropGrowth = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<DoubleValue> mobDrops = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<DoubleValue> spawnerRates = Synchronized.of(DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+    private final Synchronized<Value<BigDecimal>> bankLimit = Synchronized.of(Value.syncedFixed(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
     private final Synchronized<Int2ObjectMapView<IntValue>> roleLimits = Synchronized.of(CollectionsFactory.createInt2ObjectArrayMap());
-    private final Synchronized<EnumerateMap<Dimension, KeyMap<IntValue>>> cobbleGeneratorValues = Synchronized.of(new EnumerateMap<>(Dimension.values()));
-    private final Map<PotionEffectType, IntValue> islandEffects = new ConcurrentHashMap<>();
+    private final Synchronized<EnumerateMap<Dimension, KeyMap<IntValue>>> generatorAmounts = Synchronized.of(new EnumerateMap<>(Dimension.values()));
+    private final Map<PotionEffectType, IntValue> effectLevels = new ConcurrentHashMap<>();
     private final KeyMap<IntValue> blockLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
     private final KeyMap<IntValue> entityLimits = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
     /*
@@ -244,9 +276,9 @@ public class SIsland implements Island {
     private final AtomicReference<BigDecimal> bonusLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final Map<MissionReference, Counter> completedMissions = new ConcurrentHashMap<>();
     private final Synchronized<IslandChest[]> islandChests = Synchronized.of(createDefaultIslandChests());
-    private final Synchronized<CompletableFuture<Biome>> biomeGetterTask = Synchronized.of(null);
     private final Synchronized<EnumerateSet<Dimension>> generatedSchematics = Synchronized.of(new EnumerateSet<>(Dimension.values()));
     private final Synchronized<EnumerateSet<Dimension>> unlockedWorlds = Synchronized.of(new EnumerateSet<>(Dimension.values()));
+    private final Synchronized<EnumerateMap<Dimension, IslandBiome>> islandBiomes = Synchronized.of(new EnumerateMap<>(Dimension.values()));
     @Nullable
     private PersistentDataContainer persistentDataContainer;
     /*
@@ -272,7 +304,6 @@ public class SIsland implements Island {
     private volatile String formattedName;
     private volatile String strippedName;
     private volatile String description;
-    private volatile Biome biome = null;
 
     public SIsland(IslandBuilderImpl builder) {
         this.uuid = builder.uuid;
@@ -311,10 +342,10 @@ public class SIsland implements Island {
         this.ratings.putAll(builder.ratings);
         this.completedMissions.putAll(builder.completedMissions);
         this.islandFlags.putAll(builder.islandFlags);
-        this.cobbleGeneratorValues.write(cobbleGeneratorValues -> cobbleGeneratorValues.putAll(builder.cobbleGeneratorValues));
+        this.generatorAmounts.write(cobbleGeneratorValues -> cobbleGeneratorValues.putAll(builder.cobbleGeneratorValues));
         this.uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.addAll(builder.uniqueVisitors));
         this.entityLimits.putAll(builder.entityLimits);
-        this.islandEffects.putAll(builder.islandEffects);
+        this.effectLevels.putAll(builder.islandEffects);
         IslandChest[] islandChests = new IslandChest[builder.islandChests.size()];
         for (int index = 0; index < islandChests.length; ++index) {
             islandChests[index] = SIslandChest.createChest(this, index, builder.islandChests.get(index));
@@ -322,7 +353,7 @@ public class SIsland implements Island {
         this.islandChests.set(islandChests);
         this.roleLimits.write(roleLimits -> roleLimits.putAll(builder.roleLimits));
         this.visitorHomes.set(builder.visitorHomes);
-        this.islandSize.set(builder.islandSize);
+        this.borderSize.set(builder.islandSize);
         this.teamLimit.set(builder.teamLimit);
         this.warpsLimit.set(builder.warpsLimit);
         this.cropGrowth.set(builder.cropGrowth);
@@ -389,9 +420,7 @@ public class SIsland implements Island {
         plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
 
         updateDatesFormatter();
-        startBankInterest();
         checkMembersDuplication();
-        updateOldUpgradeValues();
         updateUpgrades();
         updateIslandChests();
 
@@ -402,6 +431,10 @@ public class SIsland implements Island {
 
         this.islandBank.setBalance(builder.balance);
         builder.bankTransactions.forEach(this.islandBank::loadTransaction);
+
+        // We need to load the transactions and balance before the bank interest process starts.
+        startBankInterest();
+
         if (builder.persistentData.length > 0)
             getPersistentDataContainer().load(builder.persistentData);
 
@@ -414,31 +447,27 @@ public class SIsland implements Island {
 
     @Override
     public SuperiorPlayer getOwner() {
-        return owner;
+        return this.owner;
     }
 
     @Override
     public UUID getUniqueId() {
-        return uuid;
+        return this.uuid;
     }
 
     @Override
     public long getCreationTime() {
-        return creationTime;
+        return this.creationTime;
     }
-
-    /*
-     *  Player related methods
-     */
 
     @Override
     public String getCreationTimeDate() {
-        return creationTimeDate;
+        return this.creationTimeDate;
     }
 
     @Override
     public void updateDatesFormatter() {
-        this.creationTimeDate = Formatters.DATE_FORMATTER.format(new Date(creationTime * 1000));
+        this.creationTimeDate = Formatters.DATE_FORMATTER.format(new Date(this.creationTime * 1000));
     }
 
     @Override
@@ -446,34 +475,9 @@ public class SIsland implements Island {
         return this.islandCache.get();
     }
 
-    @Override
-    public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
-        List<SuperiorPlayer> members = this.members.readAndGet(_members -> new SequentialListBuilder<SuperiorPlayer>()
-                .mutable()
-                .build(_members));
-
-        if (includeOwner)
-            members.add(owner);
-
-        return Collections.unmodifiableList(members);
-    }
-
-    @Override
-    public List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles) {
-        Preconditions.checkNotNull(playerRoles, "playerRoles parameter cannot be null.");
-
-        List<PlayerRole> rolesToFilter = Arrays.asList(playerRoles);
-        List<SuperiorPlayer> members = this.members.readAndGet(_members -> new SequentialListBuilder<SuperiorPlayer>()
-                .mutable()
-                .filter(superiorPlayer -> rolesToFilter.contains(superiorPlayer.getPlayerRole()))
-                .build(_members));
-
-
-        if (rolesToFilter.contains(SPlayerRole.lastRole()))
-            members.add(owner);
-
-        return Collections.unmodifiableList(members);
-    }
+    /*
+     *  Ban related methods
+     */
 
     @Override
     public List<SuperiorPlayer> getBannedPlayers() {
@@ -481,64 +485,159 @@ public class SIsland implements Island {
     }
 
     @Override
-    public List<SuperiorPlayer> getIslandVisitors() {
-        return getIslandVisitors(true);
-    }
-
-    @Override
-    public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
-        return playersInside.readAndGet(playersInside -> new SequentialListBuilder<SuperiorPlayer>()
-                .filter(superiorPlayer -> !isMember(superiorPlayer) && (vanishPlayers || superiorPlayer.isShownAsOnline()))
-                .build(playersInside));
-    }
-
-    @Override
-    public List<SuperiorPlayer> getAllPlayersInside() {
-        return playersInside.readAndGet(playersInside -> new SequentialListBuilder<SuperiorPlayer>()
-                .filter(SuperiorPlayer::isOnline)
-                .build(playersInside));
-    }
-
-    @Override
-    public List<SuperiorPlayer> getUniqueVisitors() {
-        return uniqueVisitors.readAndGet(uniqueVisitors -> new SequentialListBuilder<SuperiorPlayer>()
-                .build(uniqueVisitors, UniqueVisitor::getSuperiorPlayer));
-    }
-
-    @Override
-    public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
-        return uniqueVisitors.readAndGet(uniqueVisitors -> new SequentialListBuilder<Pair<SuperiorPlayer, Long>>()
-                .build(uniqueVisitors, UniqueVisitor::toPair));
-    }
-
-    @Override
-    public void inviteMember(SuperiorPlayer superiorPlayer) {
+    public boolean isBanned(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
-        Log.debug(Debug.INVITE_MEMBER, owner.getName(), superiorPlayer.getName());
-
-        invitedPlayers.add(superiorPlayer);
-        superiorPlayer.addInvite(this);
-
-        //Revoke the invite after 5 minutes
-        BukkitExecutor.sync(() -> revokeInvite(superiorPlayer), 6000L);
+        return this.bannedPlayers.contains(superiorPlayer);
     }
 
     @Override
-    public void revokeInvite(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-
-        Log.debug(Debug.REVOKE_INVITE, owner.getName(), superiorPlayer.getName());
-
-        invitedPlayers.remove(superiorPlayer);
-        superiorPlayer.removeInvite(this);
+    public void banMember(SuperiorPlayer superiorPlayer) {
+        banMember(superiorPlayer, null);
     }
 
     @Override
-    public boolean isInvited(SuperiorPlayer superiorPlayer) {
+    public void banMember(SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer whom) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return invitedPlayers.contains(superiorPlayer);
+
+        Log.debug(Debug.BAN_PLAYER, this.owner.getName(), superiorPlayer.getName(), whom);
+
+        boolean bannedPlayer = this.bannedPlayers.add(superiorPlayer);
+
+        // This player is already banned from the island.
+        if (!bannedPlayer) {
+            return;
+        }
+
+        if (isMember(superiorPlayer)) {
+            removeMember(superiorPlayer, MemberRemoveReason.KICK);
+        }
+
+        plugin.getMenus().refreshIslandBannedPlayers(this);
+
+        superiorPlayer.runIfOnline(player -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                if (isInside(player.getLocation(wrapper.getHandle()))) {
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                }
+            }
+        });
+
+        IslandsDatabaseBridge.addBannedPlayer(this, superiorPlayer,
+                whom == null ? CONSOLE_UUID : whom.getUniqueId(), System.currentTimeMillis());
     }
+
+    @Override
+    public void unbanMember(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        Log.debug(Debug.UNBAN_PLAYER, this.owner.getName(), superiorPlayer.getName());
+
+        boolean unbannedPlayer = this.bannedPlayers.remove(superiorPlayer);
+
+        // This player is not banned from the island.
+        if (!unbannedPlayer) {
+            return;
+        }
+
+        plugin.getMenus().refreshIslandBannedPlayers(this);
+        IslandsDatabaseBridge.removeBannedPlayer(this, superiorPlayer);
+    }
+
+    /*
+     *  Coop related methods
+     */
+
+    @Override
+    public List<SuperiorPlayer> getCoopPlayers() {
+        return new SequentialListBuilder<SuperiorPlayer>().build(this.coopPlayers);
+    }
+
+    @Override
+    public boolean isCoop(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        return plugin.getSettings().isCoopMembers() && this.coopPlayers.contains(superiorPlayer);
+    }
+
+    @Override
+    public void addCoop(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        Log.debug(Debug.ADD_COOP, this.owner.getName(), superiorPlayer.getName());
+
+        boolean addedCoop = this.coopPlayers.add(superiorPlayer);
+
+        // This player is already a coop member of the island.
+        if (!addedCoop) {
+            return;
+        }
+
+        superiorPlayer.addCoop(this);
+        plugin.getMenus().refreshCoops(this);
+    }
+
+    @Override
+    public void removeCoop(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        Log.debug(Debug.REMOVE_COOP, this.owner.getName(), superiorPlayer.getName());
+
+        boolean removedCoop = this.coopPlayers.remove(superiorPlayer);
+
+        // This player is not a coop member of the island.
+        if (!removedCoop) {
+            return;
+        }
+
+        superiorPlayer.removeCoop(this);
+
+        superiorPlayer.runIfOnline(player -> {
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                if (isLocked() && isInside(player.getLocation(wrapper.getHandle()))) {
+                    MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
+
+                    if (openedView != null) {
+                        openedView.closeView();
+                    }
+
+                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                }
+            }
+        });
+
+        plugin.getMenus().refreshCoops(this);
+    }
+
+    @Override
+    public int getCoopLimit() {
+        return this.coopLimit.readAndGet(IntValue::get);
+    }
+
+    @Override
+    public int getCoopLimitRaw() {
+        return this.coopLimit.readAndGet(coopLimit ->
+                coopLimit.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
+    }
+
+    @Override
+    public void setCoopLimit(int coopLimit) {
+        int finalCoopLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, coopLimit);
+
+        Log.debug(Debug.SET_COOP_LIMIT, this.owner.getName(), finalCoopLimit);
+
+        IntValue oldCoopLimit = this.coopLimit.set(IntValue.fixed(finalCoopLimit));
+
+        if (finalCoopLimit == IntValue.getNonSynced(oldCoopLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+            return;
+        }
+
+        IslandsDatabaseBridge.saveCoopLimit(this);
+    }
+
+    /*
+     *  Team related methods
+     */
 
     @Override
     public List<SuperiorPlayer> getInvitedPlayers() {
@@ -546,19 +645,86 @@ public class SIsland implements Island {
     }
 
     @Override
+    public boolean isInvited(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        return this.invitedPlayers.contains(superiorPlayer);
+    }
+
+    @Override
+    public void inviteMember(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        Log.debug(Debug.INVITE_MEMBER, this.owner.getName(), superiorPlayer.getName());
+
+        this.invitedPlayers.add(superiorPlayer);
+        superiorPlayer.addInvite(this);
+
+        // Revoke the invite after 5 minutes.
+        registerTask(BukkitExecutor.sync(() -> revokeInvite(superiorPlayer), 6000L));
+    }
+
+    @Override
+    public void revokeInvite(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        Log.debug(Debug.REVOKE_INVITE, this.owner.getName(), superiorPlayer.getName());
+
+        this.invitedPlayers.remove(superiorPlayer);
+        superiorPlayer.removeInvite(this);
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
+        List<SuperiorPlayer> membersBuilder = this.members.readAndGet(members ->
+                new SequentialListBuilder<SuperiorPlayer>().mutable().build(members));
+
+        if (includeOwner) {
+            membersBuilder.add(this.owner);
+        }
+
+        return membersBuilder.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(membersBuilder);
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles) {
+        Preconditions.checkNotNull(playerRoles, "playerRoles parameter cannot be null.");
+
+        List<PlayerRole> rolesToFilter = Arrays.asList(playerRoles);
+        List<SuperiorPlayer> membersBuilder = this.members.readAndGet(members ->
+                new SequentialListBuilder<SuperiorPlayer>().mutable().filter(superiorPlayer ->
+                                rolesToFilter.contains(superiorPlayer.getPlayerRole())).build(members));
+
+
+        if (rolesToFilter.contains(SPlayerRole.lastRole())) {
+            membersBuilder.add(this.owner);
+        }
+
+        return membersBuilder.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(membersBuilder);
+    }
+
+    @Override
+    public boolean isMember(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        return this.owner.equals(superiorPlayer.getIslandLeader());
+    }
+
+    @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
 
-        Log.debug(Debug.ADD_MEMBER, owner.getName(), superiorPlayer.getName(), playerRole);
+        Log.debug(Debug.ADD_MEMBER, this.owner.getName(), superiorPlayer.getName(), playerRole);
 
-        boolean addedNewMember = members.writeAndGet(members -> members.add(superiorPlayer));
+        boolean addedMember = this.members.writeAndGet(members -> members.add(superiorPlayer));
 
-        // This player is already a member of the island
-        if (!addedNewMember)
+        // This player is already a member of the island.
+        if (!addedMember) {
             return;
+        }
 
-        // Remove player from being cooped, invited and its ratings
+        // Remove player from being cooped, invited and its ratings.
         removeCoop(superiorPlayer);
         revokeInvite(superiorPlayer);
         removeRating(superiorPlayer);
@@ -575,6 +741,9 @@ public class SIsland implements Island {
 
         updateLastTime();
 
+        ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnJoin(),
+                plugin.getSettings().isTeleportOnJoin() ? this : null);
+
         if (superiorPlayer.isOnline()) {
             updateIslandFly(superiorPlayer);
             setCurrentlyActive();
@@ -583,242 +752,350 @@ public class SIsland implements Island {
         IslandsDatabaseBridge.addMember(this, superiorPlayer, System.currentTimeMillis());
     }
 
-    @Override
-    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason memberRemoveReason) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(memberRemoveReason, "memberRemoveReason parameter cannot be null.");
-
-        if (memberRemoveReason == MemberRemoveReason.KICK) {
-            Log.debug(Debug.KICK_MEMBER, owner.getName(), superiorPlayer.getName());
-        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
-            Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
-        }
-
-        boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
-
-        if (!removedMember) {
-            // If the remove method failed, we iterate through all the members and remove the member manually.
-            // Should fix issues if members are not in the correct order.
-            // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
-            removedMember = members.writeAndGet(members -> members.removeIf(superiorPlayer::equals));
-        }
-
-        // This player is not a member of the island.
-        if (!removedMember)
-            return;
-
-        superiorPlayer.setIsland(null);
-
-        if (memberRemoveReason == MemberRemoveReason.KICK) {
-            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnKick());
-        } else if (memberRemoveReason == MemberRemoveReason.LEAVE) {
-            ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnLeave());
-        }
-
-        superiorPlayer.runIfOnline(player -> {
-            MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
-
-            if (openedView != null)
-                openedView.closeView();
-
-            boolean shouldTeleport = (memberRemoveReason == MemberRemoveReason.KICK && plugin.getSettings().isTeleportOnKick()) ||
-                    (memberRemoveReason == MemberRemoveReason.LEAVE && plugin.getSettings().isTeleportOnLeave());
-
-            if (shouldTeleport && getAllPlayersInside().contains(superiorPlayer)) {
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-            } else {
-                updateIslandFly(superiorPlayer);
-            }
-        });
-
-        plugin.getMissions().getPlayerMissions().forEach(mission -> {
-            MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
-            if (missionData != null && missionData.isLeaveReset())
-                superiorPlayer.resetMission(mission);
-        });
-
-        plugin.getMenus().destroyMemberManage(superiorPlayer);
-        plugin.getMenus().destroyMemberRole(superiorPlayer);
-        plugin.getMenus().refreshMembers(this);
-
-        IslandsDatabaseBridge.removeMember(this, superiorPlayer);
-    }
-
-    @Override
     @Deprecated
+    @Override
     public void kickMember(SuperiorPlayer superiorPlayer) {
         removeMember(superiorPlayer, MemberRemoveReason.KICK);
     }
 
     @Override
-    public boolean isMember(SuperiorPlayer superiorPlayer) {
+    public void removeMember(SuperiorPlayer superiorPlayer, MemberRemoveReason reason) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return owner.equals(superiorPlayer.getIslandLeader());
+        Preconditions.checkNotNull(reason, "memberRemoveReason parameter cannot be null.");
+        Preconditions.checkArgument(!superiorPlayer.equals(getOwner()), "superiorPlayer cannot be island owner.");
+
+        removeMemberInternal(superiorPlayer, reason);
     }
 
-    @Override
-    public void banMember(SuperiorPlayer superiorPlayer) {
-        banMember(superiorPlayer, null);
-    }
+    private void removeMemberInternal(SuperiorPlayer superiorPlayer, MemberRemoveReason reason) {
+        if (reason == MemberRemoveReason.KICK) {
+            Log.debug(Debug.KICK_MEMBER, getOwner().getName(), superiorPlayer.getName());
+        } else if (reason == MemberRemoveReason.LEAVE) {
+            Log.debug(Debug.LEAVE_ISLAND, getOwner().getName(), superiorPlayer.getName());
+        }
 
-    @Override
-    public void banMember(SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer whom) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        if (!superiorPlayer.equals(owner)) {
+            boolean removedMember = this.members.writeAndGet(members -> members.remove(superiorPlayer));
 
-        Log.debug(Debug.BAN_PLAYER, owner.getName(), superiorPlayer.getName(), whom);
+            if (!removedMember) {
+                // If the remove method failed, we iterate through all the members and remove the member manually.
+                // Should fix issues if members are not in the correct order.
+                // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
+                removedMember = this.members.writeAndGet(members -> members.removeIf(superiorPlayer::equals));
+            }
 
-        boolean bannedPlayer = bannedPlayers.add(superiorPlayer);
+            // This player is not a member of the island.
+            if (!removedMember) {
+                return;
+            }
+        }
 
-        // This player is already banned.
-        if (!bannedPlayer)
-            return;
+        boolean isInside = superiorPlayer.isInsideIsland();
+        superiorPlayer.setIsland(null);
 
-        if (isMember(superiorPlayer))
-            removeMember(superiorPlayer, MemberRemoveReason.KICK);
+        if (reason == MemberRemoveReason.DISBAND) {
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnDisband(),
+                    isInside ? plugin.getGrid().getSpawnIsland() : null);
+        } else if (reason == MemberRemoveReason.KICK) {
+            boolean shouldTeleport = plugin.getSettings().isTeleportOnKick() && isInside;
 
-        plugin.getMenus().refreshIslandBannedPlayers(this);
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnKick(),
+                    shouldTeleport ? plugin.getGrid().getSpawnIsland() : null);
+
+            if (!shouldTeleport) {
+                updateIslandFly(superiorPlayer);
+            }
+        } else if (reason == MemberRemoveReason.LEAVE) {
+            boolean shouldTeleport = plugin.getSettings().isTeleportOnLeave() && isInside;
+
+            ClearActions.runClearActions(superiorPlayer, plugin.getSettings().getClearActionsOnLeave(),
+                    shouldTeleport ? plugin.getGrid().getSpawnIsland() : null);
+
+            if (!shouldTeleport) {
+                updateIslandFly(superiorPlayer);
+            }
+        }
 
         superiorPlayer.runIfOnline(player -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                if (isInside(player.getLocation(wrapper.getHandle())))
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
+
+            if (openedView != null) {
+                openedView.closeView();
             }
         });
 
-        IslandsDatabaseBridge.addBannedPlayer(this,
-                superiorPlayer, whom == null ? CONSOLE_UUID : whom.getUniqueId(),
-                System.currentTimeMillis());
-    }
+        plugin.getMissions().getPlayerMissions().forEach(mission -> {
+            MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
 
-    @Override
-    public void unbanMember(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+            if (missionData == null) {
+                return;
+            }
 
-        Log.debug(Debug.UNBAN_PLAYER, owner.getName(), superiorPlayer.getName());
+            if ((reason == MemberRemoveReason.DISBAND && missionData.isDisbandReset()) ||
+                    ((reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) && missionData.isLeaveReset())) {
+                superiorPlayer.resetMission(mission);
+            }
+        });
 
-        boolean unbannedPlayer = bannedPlayers.remove(superiorPlayer);
+        if (reason == MemberRemoveReason.KICK || reason == MemberRemoveReason.LEAVE) {
+            plugin.getMenus().destroyMemberManage(superiorPlayer);
+            plugin.getMenus().destroyMemberRole(superiorPlayer);
+            plugin.getMenus().refreshMembers(this);
 
-        if (unbannedPlayer) {
-            plugin.getMenus().refreshIslandBannedPlayers(this);
-
-            IslandsDatabaseBridge.removeBannedPlayer(this, superiorPlayer);
+            IslandsDatabaseBridge.removeMember(this, superiorPlayer);
         }
     }
 
     @Override
-    public boolean isBanned(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return bannedPlayers.contains(superiorPlayer);
+    public int getTeamLimit() {
+        return this.teamLimit.readAndGet(IntValue::get);
     }
 
     @Override
-    public void addCoop(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-
-        Log.debug(Debug.ADD_COOP, owner.getName(), superiorPlayer.getName());
-
-        boolean coopPlayer = coopPlayers.add(superiorPlayer);
-
-        if (!coopPlayer)
-            return;
-
-        superiorPlayer.addCoop(this);
-        plugin.getMenus().refreshCoops(this);
+    public int getTeamLimitRaw() {
+        return this.teamLimit.readAndGet(teamLimit ->
+                teamLimit.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
-    public void removeCoop(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+    public void setTeamLimit(int teamLimit) {
+        int finalTeamLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, teamLimit);
 
-        Log.debug(Debug.REMOVE_COOP, owner.getName(), superiorPlayer.getName());
+        Log.debug(Debug.SET_TEAM_LIMIT, this.owner.getName(), finalTeamLimit);
 
-        boolean uncoopPlayer = coopPlayers.remove(superiorPlayer);
+        IntValue oldTeamLimit = this.teamLimit.set(IntValue.fixed(finalTeamLimit));
 
-        // This player was not coop.
-        if (!uncoopPlayer)
+        if (!oldTeamLimit.isSynced() &&
+                finalTeamLimit == IntValue.getNonSynced(oldTeamLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
+        }
 
-        superiorPlayer.removeCoop(this);
+        IslandsDatabaseBridge.saveTeamLimit(this);
+    }
 
-        superiorPlayer.runIfOnline(player -> {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                if (isLocked() && isInside(player.getLocation(wrapper.getHandle()))) {
-                    MenuView<?, ?> openedView = superiorPlayer.getOpenedView();
-                    if (openedView != null)
-                        openedView.closeView();
+    @Override
+    public Map<PlayerRole, Integer> getRoleLimits() {
+        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty)) {
+            return Collections.emptyMap();
+        }
 
-                    superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+        Map<PlayerRole, Integer> roleLimitsBuilder = new HashMap<>();
+
+        this.roleLimits.read(roleLimits -> {
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+
+                PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+                if (playerRole != null) {
+                    roleLimitsBuilder.put(playerRole, entry.getValue().get());
                 }
             }
         });
 
-        plugin.getMenus().refreshCoops(this);
+        return roleLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimitsBuilder);
     }
 
     @Override
-    public boolean isCoop(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return plugin.getSettings().isCoopMembers() && coopPlayers.contains(superiorPlayer);
+    public Map<PlayerRole, Integer> getCustomRoleLimits() {
+        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty)) {
+            return Collections.emptyMap();
+        }
+
+        Map<PlayerRole, Integer> roleLimitsBuilder = new HashMap<>();
+
+        this.roleLimits.read(roleLimits -> {
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+
+                if (!entry.getValue().isSynced()) {
+                    PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+                    if (playerRole != null) {
+                        roleLimitsBuilder.put(playerRole, entry.getValue().get());
+                    }
+                }
+            }
+        });
+
+        return roleLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(roleLimitsBuilder);
     }
 
     @Override
-    public List<SuperiorPlayer> getCoopPlayers() {
-        return new SequentialListBuilder<SuperiorPlayer>().build(this.coopPlayers);
+    public int getRoleLimit(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
+
+        IntValue roleLimit = this.roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId()));
+
+        return roleLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : roleLimit.get();
     }
 
     @Override
-    public int getCoopLimit() {
-        return this.coopLimit.readAndGet(IntValue::get);
+    public int getRoleLimitRaw(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.roleLimits.readAndGet(roleLimits ->
+                roleLimits.get(playerRole.getId())), IslandUpgradeConstants.SYNCED_VALUE);
     }
 
     @Override
-    public int getCoopLimitRaw() {
-        return this.coopLimit.readAndGet(coopLimit -> coopLimit.getNonSynced(-1));
-    }
+    public void setRoleLimit(PlayerRole playerRole, int roleLimit) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
 
-    @Override
-    public void setCoopLimit(int coopLimit) {
-        coopLimit = Math.max(0, coopLimit);
+        int finalRoleLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, roleLimit);
 
-        Log.debug(Debug.SET_COOP_LIMIT, owner.getName(), coopLimit);
+        Log.debug(Debug.SET_ROLE_LIMIT, owner.getName(), playerRole.getName(), finalRoleLimit);
 
-        // Original and new coop limit are the same
-        if (coopLimit == getCoopLimitRaw())
+        IntValue oldRoleLimit = this.roleLimits.writeAndGet(roleLimits ->
+                roleLimits.put(playerRole.getId(), IntValue.fixed(finalRoleLimit)));
+
+        if (oldRoleLimit != null && !oldRoleLimit.isSynced() &&
+                finalRoleLimit == IntValue.getNonSynced(oldRoleLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
+        }
 
-        this.coopLimit.set(IntValue.fixed(coopLimit));
-        IslandsDatabaseBridge.saveCoopLimit(this);
+        IslandsDatabaseBridge.saveRoleLimit(this, playerRole, finalRoleLimit);
+    }
+
+    @Override
+    public void removeRoleLimit(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
+
+        Log.debug(Debug.REMOVE_ROLE_LIMIT, owner.getName(), playerRole.getName());
+
+        boolean removed = this.roleLimits.writeAndGet(roleLimits -> {
+            IntValue oldRoleLimit = roleLimits.get(playerRole.getId());
+
+            if (oldRoleLimit == null || oldRoleLimit.isSynced()) {
+                return false;
+            }
+
+            roleLimits.remove(playerRole.getId());
+            return true;
+        });
+
+        if (!removed) {
+            return;
+        }
+
+        IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
+
+        syncRoleLimit(DefaultUpgradeLevel.getInstance(), playerRole);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncRoleLimit((SUpgradeLevel) getUpgradeLevel(upgrade), playerRole));
+    }
+
+    @Override
+    public void clearRoleLimits() {
+        Log.debug(Debug.CLEAR_ROLE_LIMITS, this.owner.getName());
+
+        List<PlayerRole> customRoleLimits = this.roleLimits.writeAndGet(roleLimits -> {
+            List<PlayerRole> rolesToSync = new LinkedList<>();
+
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+
+                if (!entry.getValue().isSynced()) {
+                    PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+                    if (playerRole != null) {
+                        rolesToSync.add(playerRole);
+                    }
+
+                    iterator.remove();
+                }
+            }
+
+            return rolesToSync;
+        });
+
+        if (customRoleLimits == null || customRoleLimits.isEmpty()) {
+            return;
+        }
+
+        IslandsDatabaseBridge.clearRoleLimits(this);
+
+        for (PlayerRole playerRole : customRoleLimits) {
+            syncRoleLimit(DefaultUpgradeLevel.getInstance(), playerRole);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncRoleLimit((SUpgradeLevel) getUpgradeLevel(upgrade), playerRole));
+        }
     }
 
     /*
-     *  Location related methods
+     *  Visitor related methods
      */
+
+    @Override
+    public List<SuperiorPlayer> getIslandVisitors() {
+        return getIslandVisitors(true);
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
+        return this.playersInside.readAndGet(playersInside ->
+                new SequentialListBuilder<SuperiorPlayer>().filter(superiorPlayer ->
+                                !isMember(superiorPlayer) && (vanishPlayers || superiorPlayer.isShownAsOnline()))
+                        .build(playersInside));
+    }
+
+    @Override
+    public List<SuperiorPlayer> getUniqueVisitors() {
+        return this.uniqueVisitors.readAndGet(uniqueVisitors ->
+                new SequentialListBuilder<SuperiorPlayer>().build(uniqueVisitors, UniqueVisitor::getSuperiorPlayer));
+    }
+
+    @Override
+    public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
+        return this.uniqueVisitors.readAndGet(uniqueVisitors ->
+                new SequentialListBuilder<Pair<SuperiorPlayer, Long>>().build(uniqueVisitors, UniqueVisitor::toPair));
+    }
+
+    @Override
+    public boolean isVisitor(SuperiorPlayer superiorPlayer, boolean includeCoopStatus) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        return !isMember(superiorPlayer) && (!includeCoopStatus || !isCoop(superiorPlayer));
+    }
+
+    @Override
+    public List<SuperiorPlayer> getAllPlayersInside() {
+        return this.playersInside.readAndGet(playersInside ->
+                new SequentialListBuilder<SuperiorPlayer>().filter(SuperiorPlayer::isOnline).build(playersInside));
+    }
 
     @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
         if (inside) {
-            Log.debug(Debug.ENTER_ISLAND, owner.getName(), superiorPlayer.getName());
+            Log.debug(Debug.ENTER_ISLAND, this.owner.getName(), superiorPlayer.getName());
         } else {
-            Log.debug(Debug.LEAVE_ISLAND, owner.getName(), superiorPlayer.getName());
+            Log.debug(Debug.LEAVE_ISLAND, this.owner.getName(), superiorPlayer.getName());
         }
 
-        boolean changePlayers = playersInside.writeAndGet(playersInside -> {
-            if (inside)
+        boolean changePlayers = this.playersInside.writeAndGet(playersInside -> {
+            if (inside) {
                 return playersInside.add(superiorPlayer);
-            else
+            } else {
                 return playersInside.remove(superiorPlayer);
+            }
         });
 
         // The players inside the player weren't changed.
-        if (!changePlayers)
+        if (!changePlayers) {
             return;
+        }
 
         plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_PLAYERS, this);
 
         if (!isMember(superiorPlayer) && superiorPlayer.isShownAsOnline()) {
-            Optional<UniqueVisitor> uniqueVisitorOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
+            Optional<UniqueVisitor> uniqueVisitorOptional = this.uniqueVisitors.readAndGet(uniqueVisitors ->
                     uniqueVisitors.stream().filter(pair -> pair.getSuperiorPlayer().equals(superiorPlayer)).findFirst());
 
             long visitTime = System.currentTimeMillis();
@@ -829,7 +1106,8 @@ public class SIsland implements Island {
                 uniqueVisitorOptional.get().setLastVisitTime(visitTime);
                 updateVisitor = true;
             } else {
-                updateVisitor = uniqueVisitors.writeAndGet(uniqueVisitors -> uniqueVisitors.add(new UniqueVisitor(superiorPlayer, visitTime)));
+                updateVisitor = this.uniqueVisitors.writeAndGet(uniqueVisitors ->
+                        uniqueVisitors.add(new UniqueVisitor(superiorPlayer, visitTime)));
             }
 
             if (updateVisitor) {
@@ -845,11 +1123,22 @@ public class SIsland implements Island {
     }
 
     @Override
-    public boolean isVisitor(SuperiorPlayer superiorPlayer, boolean includeCoopStatus) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+    public boolean anyPlayerInsideMatches(Predicate<SuperiorPlayer> predicate) {
+        Preconditions.checkNotNull(predicate, "predicate parameter cannot be null.");
 
-        return !isMember(superiorPlayer) && (!includeCoopStatus || !isCoop(superiorPlayer));
+        return playersInside.readAndGet(predicate, ANY_PLAYER_MATCHES);
     }
+
+    @Override
+    public int countPlayersInside(Predicate<SuperiorPlayer> predicate) {
+        Preconditions.checkNotNull(predicate, "predicate parameter cannot be null.");
+
+        return playersInside.readAndGet(predicate, COUNT_PLAYERS_MATCHES);
+    }
+
+    /*
+     *  Location related methods
+     */
 
     @Override
     public Location getCenter(Dimension dimension) {
@@ -1032,10 +1321,10 @@ public class SIsland implements Island {
         List<Chunk> chunks = new LinkedList<>();
 
         for (Dimension dimension : Dimension.values()) {
-            try {
-                chunks.addAll(getAllChunks(dimension, flags));
-            } catch (NullPointerException ignored) {
-            }
+            // Dimensions that are not enabled have no world, and therefore no chunks.
+            World world = plugin.getGrid().getIslandsWorld(this, dimension);
+            if (world != null)
+                chunks.addAll(getAllChunksInternal(world, flags));
         }
 
         return Collections.unmodifiableList(chunks);
@@ -1050,7 +1339,10 @@ public class SIsland implements Island {
     public List<Chunk> getAllChunks(Dimension dimension, @IslandChunkFlags int flags) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
 
-        World world = getCenter(dimension).getWorld();
+        return getAllChunksInternal(getCenter(dimension).getWorld(), flags);
+    }
+
+    private List<Chunk> getAllChunksInternal(World world, @IslandChunkFlags int flags) {
         return new SequentialListBuilder<Chunk>().build(IslandUtils.getChunkCoords(this, WorldInfo.of(world), flags),
                 chunkPosition -> world.getChunkAt(chunkPosition.getX(), chunkPosition.getZ()));
     }
@@ -1065,10 +1357,11 @@ public class SIsland implements Island {
         List<Chunk> chunks = new LinkedList<>();
 
         for (Dimension dimension : Dimension.values()) {
-            try {
-                chunks.addAll(getLoadedChunks(dimension, flags));
-            } catch (NullPointerException ignored) {
-            }
+            // Dimensions that are not enabled have no world, and therefore no chunks.
+            // Lazy worlds providers may return info of worlds that are not loaded, which have no loaded chunks.
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
+            if (worldInfo != null && Bukkit.getWorld(worldInfo.getName()) != null)
+                chunks.addAll(getLoadedChunksInternal(worldInfo, flags));
         }
 
         return Collections.unmodifiableList(chunks);
@@ -1085,6 +1378,10 @@ public class SIsland implements Island {
 
         WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dimension);
 
+        return getLoadedChunksInternal(worldInfo, flags);
+    }
+
+    private List<Chunk> getLoadedChunksInternal(WorldInfo worldInfo, @IslandChunkFlags int flags) {
         return new SequentialListBuilder<Chunk>().filter(Objects::nonNull).build(
                 IslandUtils.getChunkCoords(this, worldInfo, flags), plugin.getNMSChunks()::getChunkIfLoaded);
     }
@@ -1222,8 +1519,7 @@ public class SIsland implements Island {
     @Override
     public boolean isInside(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
-        return isIslandWorld(location.getWorld()) && this.entireArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+        return isIslandWorld(location) && this.entireArea.expandAndIntercepts(location.getX(), location.getZ(), extraRadius);
     }
 
     @Override
@@ -1324,8 +1620,7 @@ public class SIsland implements Island {
     @Override
     public boolean isInsideRange(Location location, double extraRadius) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
-        return isIslandWorld(location.getWorld()) && this.protectedArea.expandAndIntercepts(location.getBlockX(), location.getBlockZ(), extraRadius);
+        return isIslandWorld(location) && this.protectedArea.expandAndIntercepts(location.getX(), location.getZ(), extraRadius);
     }
 
     @Override
@@ -1412,45 +1707,53 @@ public class SIsland implements Island {
         return this.protectedArea.expandRshiftAndIntercepts(chunkX, chunkZ, extraRadius, 4);
     }
 
-    private static boolean isIslandWorld(@Nullable World world) {
-        return world != null && plugin.getProviders().getWorldsProvider().isIslandsWorld(world);
+    private boolean isIslandWorld(Location location) {
+        return isIslandWorld(LazyWorldLocation.getWorldName(location));
+    }
+
+    private boolean isIslandWorld(@Nullable World world) {
+        return world != null && isIslandWorld(world.getName());
     }
 
     private boolean isIslandWorld(@Nullable WorldInfo worldInfo) {
-        if (worldInfo == null)
+        return worldInfo != null && isIslandWorld(worldInfo.getName());
+    }
+
+    private boolean isIslandWorld(@Nullable String worldName) {
+        if (worldName == null)
             return false;
 
-        return plugin.getGrid().getIslandsWorldInfo(this, worldInfo.getName()) != null;
+        return plugin.getGrid().getIslandsWorldInfo(this, worldName) != null;
     }
 
     @Override
     public boolean isNormalEnabled() {
-        return isDimensionEnabled(Dimensions.NORMAL);
+        return isDimensionEnabled(Dimension.getByName("NORMAL"));
     }
 
     @Override
     public void setNormalEnabled(boolean enabled) {
-        setDimensionEnabled(Dimensions.NORMAL, enabled);
+        setDimensionEnabled(Dimension.getByName("NORMAL"), enabled);
     }
 
     @Override
     public boolean isNetherEnabled() {
-        return isDimensionEnabled(Dimensions.NETHER);
+        return isDimensionEnabled(Dimension.getByName("NETHER"));
     }
 
     @Override
     public void setNetherEnabled(boolean enabled) {
-        setDimensionEnabled(Dimensions.NETHER, enabled);
+        setDimensionEnabled(Dimension.getByName("NETHER"), enabled);
     }
 
     @Override
     public boolean isEndEnabled() {
-        return isDimensionEnabled(Dimensions.THE_END);
+        return isDimensionEnabled(Dimension.getByName("THE_END"));
     }
 
     @Override
     public void setEndEnabled(boolean enabled) {
-        setDimensionEnabled(Dimensions.THE_END, enabled);
+        setDimensionEnabled(Dimension.getByName("THE_END"), enabled);
     }
 
     @Override
@@ -1477,12 +1780,6 @@ public class SIsland implements Island {
                 unlockedWorlds.collect(Dimension.values())));
     }
 
-    @Override
-    @Deprecated
-    public int getUnlockedWorldsFlag() {
-        return this.unlockedWorlds.readAndGet(LegacyMasks::convertUnlockedWorldsMask);
-    }
-
     /*
      *  Permissions related methods
      */
@@ -1501,8 +1798,8 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
 
         PermissionNode playerNode = getPermissionNode(superiorPlayer);
-        return superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*") ||
-                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
+        return superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasBypassPermission(islandPrivilege) ||
+                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*") ||
                 (playerNode != null && playerNode.hasPermission(islandPrivilege));
     }
 
@@ -1614,7 +1911,8 @@ public class SIsland implements Island {
     @Override
     public PrivilegeNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return playerPermissions.getOrDefault(superiorPlayer, new PlayerPrivilegeNode(superiorPlayer, this));
+        PlayerPrivilegeNode permissionNode = playerPermissions.get(superiorPlayer);
+        return permissionNode != null ? permissionNode : new PlayerPrivilegeNode(superiorPlayer, this);
     }
 
     @Override
@@ -1626,19 +1924,22 @@ public class SIsland implements Island {
         if (playerRoleId != null)
             return plugin.getRoles().getPlayerRoleFromId(playerRoleId);
 
-        return plugin.getRoles().getRoles().stream()
-                .filter(_playerRole -> {
-                    if (!plugin.getSettings().isCoopMembers() && _playerRole == SPlayerRole.coopRole())
-                        return false;
+        // Called twice for every privilege check, so it uses a plain loop instead of a stream.
+        boolean coopMembers = plugin.getSettings().isCoopMembers();
+        PlayerRole coopRole = SPlayerRole.coopRole();
+        PlayerRole requiredRole = null;
 
-                    return ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege);
-                })
-                .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.lastRole());
+        for (PlayerRole playerRole : plugin.getRoles().getRoles()) {
+            if (!coopMembers && playerRole == coopRole)
+                continue;
+
+            if ((requiredRole == null || playerRole.getWeight() < requiredRole.getWeight()) &&
+                    ((SPlayerRole) playerRole).getDefaultPermissions().hasPermission(islandPrivilege))
+                requiredRole = playerRole;
+        }
+
+        return requiredRole == null ? SPlayerRole.lastRole() : requiredRole;
     }
-
-    /*
-     *  General methods
-     */
 
     @Override
     public Map<SuperiorPlayer, PermissionNode> getPlayerPermissions() {
@@ -1653,6 +1954,10 @@ public class SIsland implements Island {
         )));
     }
 
+    /*
+     *  General methods
+     */
+
     @Override
     public boolean isSpawn() {
         return false;
@@ -1661,31 +1966,6 @@ public class SIsland implements Island {
     @Override
     public String getName() {
         return plugin.getSettings().getIslandNames().isColorSupport() ? getFormattedName() : getStrippedName();
-    }
-
-    @Override
-    public void setName(String islandName) {
-        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
-
-        String strippedName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
-
-        Log.debug(Debug.SET_NAME, owner.getName(), strippedName);
-
-        String oldName = this.strippedName;
-
-        setNameInternal(islandName);
-
-        if (Objects.equals(strippedName, oldName))
-            return;
-
-        plugin.getGrid().getIslandsContainer().updateIslandName(this, oldName);
-
-        IslandsDatabaseBridge.saveName(this);
-    }
-
-    private void setNameInternal(String name) {
-        this.formattedName = Formatters.COLOR_FORMATTER.format(name);
-        this.strippedName = Formatters.STRIP_COLOR_FORMATTER.format(name);
     }
 
     @Override
@@ -1701,6 +1981,32 @@ public class SIsland implements Island {
     @Override
     public String getFormattedName() {
         return this.formattedName;
+    }
+
+    @Override
+    public void setName(String islandName) {
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+
+        String strippedName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
+
+        Log.debug(Debug.SET_NAME, this.owner.getName(), strippedName);
+
+        String oldName = this.strippedName;
+
+        setNameInternal(islandName);
+
+        if (Objects.equals(strippedName, oldName)) {
+            return;
+        }
+
+        plugin.getGrid().getIslandsContainer().updateIslandName(this, oldName);
+
+        IslandsDatabaseBridge.saveName(this);
+    }
+
+    private void setNameInternal(String name) {
+        this.formattedName = Formatters.COLOR_FORMATTER.format(name);
+        this.strippedName = Formatters.STRIP_COLOR_FORMATTER.format(name);
     }
 
     @Override
@@ -1727,21 +2033,13 @@ public class SIsland implements Island {
         long profilerId = Profiler.start(ProfileType.DISBAND_ISLAND, 2);
 
         forEachIslandMember(EMPTY_IGNORED_MEMBERS, false, islandMember -> {
-            if (islandMember.equals(owner)) {
-                owner.setIsland(null);
-            } else {
-                removeMember(islandMember, MemberRemoveReason.DISBAND);
-            }
-
-            ClearActions.runClearActions(islandMember.asOfflinePlayer(), true, plugin.getSettings().getClearActionsOnDisband());
-
-            for (Mission<?> mission : plugin.getMissions().getPlayerMissions()) {
-                MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
-                if (missionData != null && missionData.isDisbandReset()) {
-                    islandMember.resetMission(mission);
-                }
-            }
+            removeMemberInternal(islandMember, MemberRemoveReason.DISBAND);
         });
+
+        this.activeTasks.write(activeTasks -> {
+            activeTasks.forEach(BukkitTask::cancel);
+        });
+        this.bankInterestTask.set((BukkitTask) null);
 
         invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
         coopPlayers.forEach(coopPlayer -> coopPlayer.removeCoop(this));
@@ -1827,38 +2125,9 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void calcIslandWorth(@Nullable SuperiorPlayer asker) {
-        calcIslandWorth(asker, null);
-    }
-
-    @Override
-    public void calcIslandWorth(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
-        Log.debug(Debug.CALCULATE_ISLAND, owner.getName(), asker);
-
-        long lastUpdateTime = getLastTimeUpdate();
-
-        if (lastUpdateTime != -1 && (System.currentTimeMillis() / 1000) - lastUpdateTime >= 600) {
-            Log.debugResult(Debug.CALCULATE_ISLAND, "Result Cooldown", owner.getName());
-            finishCalcIsland(asker, callback, getIslandLevel(), getWorth());
-            return;
-        }
-
-        if (Bukkit.isPrimaryThread()) {
-            calcIslandWorthInternal(asker, callback);
-        } else {
-            BukkitExecutor.sync(() -> calcIslandWorthInternal(asker, callback));
-        }
-    }
-
-    @Override
-    public IslandCalculationAlgorithm getCalculationAlgorithm() {
-        return this.calculationAlgorithm;
-    }
-
-    @Override
     public void updateBorder() {
         Log.debug(Debug.UPDATE_BORDER, owner.getName());
-        getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this));
+        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this)));
     }
 
     @Override
@@ -1869,25 +2138,39 @@ public class SIsland implements Island {
 
     @Override
     public int getIslandSize() {
-        if (plugin.getSettings().isBuildOutsideIsland())
+        if (plugin.getSettings().isBuildOutsideIsland()) {
             return (int) Math.round(plugin.getSettings().getMaxIslandSize() * 1.5);
+        }
 
-        return this.islandSize.readAndGet(IntValue::get);
+        return this.borderSize.readAndGet(IntValue::get);
+    }
+
+    @Override
+    public int getEffectiveIslandSize() {
+        return this.borderSize.readAndGet(IntValue::get);
+    }
+
+    @Override
+    public int getIslandSizeRaw() {
+        return this.borderSize.readAndGet(islandSize -> islandSize.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
     public void setIslandSize(int islandSize) {
-        islandSize = Math.max(1, islandSize);
+        int finalIslandSize = Math.max(1, islandSize);
 
-        Preconditions.checkArgument(islandSize <= plugin.getSettings().getMaxIslandSize(), "Border size " + islandSize + " cannot be larger than max island size: " + plugin.getSettings().getMaxIslandSize());
+        Preconditions.checkArgument(finalIslandSize <= plugin.getSettings().getMaxIslandSize(),
+                "Border size " + finalIslandSize + " cannot be larger than max island size: " + plugin.getSettings().getMaxIslandSize());
 
-        Log.debug(Debug.SET_SIZE, owner.getName(), islandSize);
+        Log.debug(Debug.SET_SIZE, owner.getName(), finalIslandSize);
 
-        if (islandSize == getIslandSizeRaw())
+        IntValue oldIslandSize = this.borderSize.get();
+
+        if (finalIslandSize == IntValue.getNonSynced(oldIslandSize, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
+        }
 
-        setIslandSizeInternal(IntValue.fixed(islandSize));
-
+        setIslandSizeInternal(IntValue.fixed(finalIslandSize));
         IslandsDatabaseBridge.saveSize(this);
     }
 
@@ -1903,28 +2186,23 @@ public class SIsland implements Island {
         }
 
         // Changing the size of the island
-        this.islandSize.set(islandSize);
+        this.borderSize.set(islandSize);
 
         if (cropGrowthEnabled) {
             // We now collect the new chunks after the size was changed
             List<Chunk> newChunks = getLoadedChunks(IslandChunkFlags.ONLY_PROTECTED);
 
-            BukkitExecutor.ensureMain(() -> {
+            registerTask(BukkitExecutor.ensureMain(() -> {
                 // We stop all old chunks from being ticked.
                 oldChunks.getValue().forEach(chunk -> plugin.getNMSChunks().startTickingChunk(this, chunk, true));
                 // We start ticking all the new chunks
                 newChunks.forEach(chunk -> plugin.getNMSChunks().startTickingChunk(this, chunk, false));
-            });
+            }));
         }
 
         this.protectedArea.update(this.center, getIslandSize());
 
         updateBorder();
-    }
-
-    @Override
-    public int getIslandSizeRaw() {
-        return this.islandSize.readAndGet(islandSize -> islandSize.getNonSynced(-1));
     }
 
     @Override
@@ -1964,25 +2242,40 @@ public class SIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public Biome getBiome() {
-        if (biome == null) {
-            biomeGetterTask.set(this::getBiomeAsyncTask);
-            return IslandUtils.getDefaultWorldBiome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
-        }
-
-        return biome;
+        return getBiome(plugin.getSettings().getWorlds().getDefaultWorldDimension());
     }
 
-    private CompletableFuture<Biome> getBiomeAsyncTask(CompletableFuture<Biome> currentTask) {
-        if (currentTask != null)
-            return currentTask;
+    @Override
+    public Biome getBiome(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        Dimension defaultWorldDimension = plugin.getSettings().getWorlds().getDefaultWorldDimension();
+        Biome biome = islandBiomes.readAndGet(map -> {
+            IslandBiome islandBiome = map.get(dimension);
+            return (islandBiome != null) ? islandBiome.getBiome() : null;
+        });
+
+        if (biome != null) {
+            return biome;
+        }
+
+        islandBiomes.write(map -> {
+            IslandBiome islandBiome = map.computeIfAbsent(dimension, d -> new IslandBiome());
+
+            if (islandBiome.getTask() == null) {
+                islandBiome.setTask(getBiomeAsyncTask(dimension, islandBiome));
+            }
+        });
+
+        return IslandUtils.getDefaultWorldBiome(dimension);
+    }
+
+    private CompletableFuture<Biome> getBiomeAsyncTask(Dimension dimension, IslandBiome islandBiome) {
         BlockPosition centerBlockPosition = getCenterPosition();
-
         CompletableFuture<Biome> newTask = new CompletableFuture<>();
 
-        IslandWorlds.accessIslandWorldAsync(this, defaultWorldDimension, true, islandWorldResult -> {
+        IslandWorlds.accessIslandWorldAsync(this, dimension, true, islandWorldResult -> {
             if (islandWorldResult.getRight() != null) {
                 newTask.completeExceptionally(islandWorldResult.getRight());
                 return;
@@ -1990,17 +2283,20 @@ public class SIsland implements Island {
 
             World world = islandWorldResult.getLeft();
 
-            ChunkPosition centerChunkPosition =
-                    ChunkPosition.of(world, centerBlockPosition.getX() >> 4, centerBlockPosition.getZ() >> 4);
+            ChunkPosition centerChunkPosition = ChunkPosition.of(world,
+                    centerBlockPosition.getX() >> 4, centerBlockPosition.getZ() >> 4);
 
             ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
                     .thenApply(chunk -> centerBlockPosition.toLocation(world).getBlock().getBiome())
                     .whenComplete((biome, error) -> {
-                        if (error != null)
+                        if (error != null) {
                             newTask.completeExceptionally(error);
-                        else {
-                            this.biome = biome;
-                            biomeGetterTask.set((CompletableFuture<Biome>) null);
+                        } else {
+                            islandBiomes.write(map -> {
+                                islandBiome.setBiome(biome);
+                                islandBiome.clearTask();
+                            });
+
                             newTask.complete(biome);
                         }
                     });
@@ -2011,38 +2307,86 @@ public class SIsland implements Island {
 
 
     @Override
+    @Deprecated
     public void setBiome(Biome biome) {
         setBiome(biome, true);
     }
 
     @Override
+    @Deprecated
     public void setBiome(Biome biome, boolean updateBlocks) {
+        setBiome(plugin.getSettings().getWorlds().getDefaultWorldDimension(), biome,
+                IslandBiomeFlags.UPDATE_ALL_DIMENSIONS | (updateBlocks ? IslandBiomeFlags.UPDATE_BLOCKS : 0));
+    }
+
+    @Override
+    public void setBiome(Dimension dimension, Biome biome) {
+        setBiome(dimension, biome, IslandBiomeFlags.UPDATE_BLOCKS | IslandBiomeFlags.UPDATE_DIMENSION);
+    }
+
+    @Override
+    public void setBiome(Dimension dimension, Biome biome, int flags) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
 
-        Log.debug(Debug.SET_BIOME, owner.getName(), biome, updateBlocks);
+        Log.debug(Debug.SET_BIOME, owner.getName(), biome, dimension);
 
-        this.biome = biome;
-
-        if (!updateBlocks)
-            return;
-
-        List<Player> playersToUpdate = new SequentialListBuilder<Player>()
-                .build(getAllPlayersInside(), SuperiorPlayer::asPlayer);
-
-        IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
-            result.ifLeft(world -> {
-                WorldInfo worldInfo = WorldInfo.of(world);
-                Biome worldBiome = plugin.getSettings().getWorlds().getDefaultWorldDimension() == worldInfo.getDimension() ?
-                        biome : IslandUtils.getDefaultWorldBiome(worldInfo.getDimension());
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
-                plugin.getNMSChunks().setBiome(chunkPositions, worldBiome, playersToUpdate);
-            });
+        islandBiomes.write(map -> {
+            IslandBiome islandBiome = map.computeIfAbsent(dimension, d -> new IslandBiome());
+            islandBiome.setBiome(biome);
+            islandBiome.clearTask();
         });
 
-        for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(registeredWorld), 0);
-            plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
+        if ((flags & IslandBiomeFlags.UPDATE_BLOCKS) == 0) {
+            return;
         }
+
+        boolean updateDimension = (flags & IslandBiomeFlags.UPDATE_DIMENSION) != 0;
+        boolean updateAllDimensions = (flags & IslandBiomeFlags.UPDATE_ALL_DIMENSIONS) != 0;
+
+        if (updateAllDimensions) {
+            IslandWorlds.accessIslandWorldsAsync(this, false, result -> {
+                result.ifLeft(world -> {
+                    WorldInfo worldInfo = WorldInfo.of(world);
+                    Dimension worldDimension = worldInfo.getDimension();
+                    Biome worldBiome = worldDimension == dimension ? biome : getBiome(worldDimension);
+
+                    setBiome(worldInfo, worldBiome);
+                });
+            });
+        } else if (updateDimension) {
+            IslandWorlds.accessIslandWorldAsync(this, dimension, false, result -> {
+                result.ifLeft(world -> {
+                    WorldInfo worldInfo = WorldInfo.of(world);
+
+                    setBiome(worldInfo, biome);
+                });
+            });
+        }
+
+        try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
+            for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
+                WorldInfo worldInfo = WorldInfo.of(registeredWorld);
+
+                if (updateAllDimensions || (updateDimension && worldInfo.getDimension() == dimension)) {
+                    List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
+                    List<Player> playersToUpdate = strategy.getPlayers(worldInfo);
+
+                    plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
+                }
+            }
+        }
+    }
+
+    private void setBiome(WorldInfo worldInfo, Biome biome) {
+        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, worldInfo, 0);
+
+        List<Player> playersToUpdate;
+        try (IslandWorldsPlayersStrategy strategy = IslandWorldsPlayersStrategy.create(this)) {
+            playersToUpdate = strategy.getPlayers(worldInfo);
+        }
+
+        plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
     }
 
     @Override
@@ -2103,14 +2447,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SEND_MESSAGE, owner.getName(), message, Arrays.toString(ignoredMembers));
 
-        forEachIslandMember(ignoredMembers, false, islandMember -> {
-            String playerMessage = message;
-
-            if (!Text.isBlank(playerMessage))
-                playerMessage = placeholdersService.get().parsePlaceholders(islandMember.asOfflinePlayer(), playerMessage);
-
-            Message.CUSTOM.send(islandMember, playerMessage, false);
-        });
+        forEachIslandMember(ignoredMembers, false,
+                islandMember -> Message.CUSTOM.send(islandMember, message, false));
     }
 
     @Override
@@ -2154,17 +2492,10 @@ public class SIsland implements Island {
         Log.debug(Debug.SEND_TITLE, owner.getName(), title, subtitle, fadeIn, duration, fadeOut, Arrays.toString(ignoredMembers));
 
         forEachIslandMember(ignoredMembers, true, islandMember -> {
-            String playerTitle = title;
-            String playerSubtitle = subtitle;
-
-            Player player = islandMember.asPlayer();
-
-            if (!Text.isBlank(playerTitle))
-                playerTitle = placeholdersService.get().parsePlaceholders(player, playerTitle);
-            if (!Text.isBlank(playerSubtitle))
-                playerSubtitle = placeholdersService.get().parsePlaceholders(player, playerSubtitle);
-
-            plugin.getNMSPlayers().sendTitle(player, playerTitle, playerSubtitle, fadeIn, duration, fadeOut);
+            MessagesService.Builder builder = messagesService.get().newBuilder();
+            builder.addTitle(Formatters.COLOR_FORMATTER.format(title),
+                    Formatters.COLOR_FORMATTER.format(subtitle), fadeIn, duration, fadeOut);
+            builder.build().sendMessage(islandMember.asPlayer());
         });
     }
 
@@ -2180,7 +2511,7 @@ public class SIsland implements Island {
 
         Log.debug(Debug.EXECUTE_ISLAND_COMMANDS, owner.getName(), command, onlyOnlineMembers, Arrays.toString(ignoredMembers));
 
-        BukkitExecutor.ensureMain(() -> {
+        registerTask(BukkitExecutor.ensureMain(() -> {
             forEachIslandMember(ignoredMembers, onlyOnlineMembers, islandMember -> {
                 String playerCommand = command;
 
@@ -2191,17 +2522,17 @@ public class SIsland implements Island {
 
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), playerCommand);
             });
-        });
-    }
-
-    @Override
-    public boolean isBeingRecalculated() {
-        return beingRecalculated;
+        }));
     }
 
     @Override
     public void updateLastTime() {
         setLastTimeUpdate(System.currentTimeMillis() / 1000);
+    }
+
+    @Override
+    public boolean isCurrentlyActive() {
+        return this.currentlyActive;
     }
 
     @Override
@@ -2213,11 +2544,6 @@ public class SIsland implements Island {
     public void setCurrentlyActive(boolean active) {
         Log.debug(Debug.ISLAND_ACTIVE, getOwner().getName(), active);
         this.currentlyActive = active;
-    }
-
-    @Override
-    public boolean isCurrentlyActive() {
-        return this.currentlyActive;
     }
 
     @Override
@@ -2238,87 +2564,48 @@ public class SIsland implements Island {
             IslandsDatabaseBridge.saveLastTimeUpdate(this);
     }
 
-    @Override
-    public IslandBank getIslandBank() {
-        return islandBank;
-    }
-
-    @Override
-    public BigDecimal getBankLimit() {
-        return this.bankLimit.readAndGet(Value::get);
-    }
-
     /*
      *  Bank related methods
      */
 
     @Override
-    public void setBankLimit(BigDecimal bankLimit) {
-        Preconditions.checkNotNull(bankLimit, "bankLimit parameter cannot be null.");
-
-        Log.debug(Debug.SET_BANK_LIMIT, owner.getName(), bankLimit);
-
-        if (Objects.equals(bankLimit, getBankLimitRaw()))
-            return;
-
-        if (bankLimit.compareTo(SYNCED_BANK_LIMIT_VALUE) <= 0) {
-            this.bankLimit.set(Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE));
-
-            getUpgrades().forEach((upgradeName, level) -> {
-                Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
-                if (upgrade != null) {
-                    UpgradeLevel upgradeLevel = upgrade.getUpgradeLevel(level);
-                    if (upgradeLevel.getBankLimit().compareTo(getBankLimit()) > 0) {
-                        this.bankLimit.set(Value.syncedFixed(upgradeLevel.getBankLimit()));
-                    }
-                }
-            });
-        } else {
-            this.bankLimit.set(Value.fixed(bankLimit));
-        }
-
-        // Trying to give interest again if the last one failed.
-        if (hasGiveInterestFailed())
-            giveInterest(false);
-
-        IslandsDatabaseBridge.saveBankLimit(this);
-    }
-
-    @Override
-    public BigDecimal getBankLimitRaw() {
-        return this.bankLimit.readAndGet(bankLimit -> bankLimit.getNonSynced(SYNCED_BANK_LIMIT_VALUE));
+    public IslandBank getIslandBank() {
+        return this.islandBank;
     }
 
     @Override
     public boolean giveInterest(boolean checkOnlineOwner) {
-        Log.debug(Debug.GIVE_BANK_INTEREST, owner.getName());
+        Log.debug(Debug.GIVE_BANK_INTEREST, this.owner.getName());
 
         long currentTime = System.currentTimeMillis() / 1000;
 
         int bankInterestRecentActive = BuiltinModules.BANK.getConfiguration().getBankInterestRecentActive();
-        if (checkOnlineOwner && bankInterestRecentActive > 0 &&
-                currentTime - owner.getLastTimeStatus() > bankInterestRecentActive) {
-            Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Cooldown", owner.getName());
+        if (checkOnlineOwner && bankInterestRecentActive > 0 && !this.owner.isOnline() &&
+                currentTime - this.owner.getLastTimeStatus() > bankInterestRecentActive) {
+            Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Cooldown", this.owner.getName());
+
             return false;
         }
 
         int bankInterestPercentage = BuiltinModules.BANK.getConfiguration().getBankInterestPercentage();
 
-        BigDecimal balance = islandBank.getBalance().max(BigDecimal.ONE);
+        BigDecimal balance = this.islandBank.getBalance().max(BigDecimal.ONE);
         BigDecimal balanceToGive = balance.multiply(new BigDecimal(bankInterestPercentage / 100D));
 
         // If the money that will be given exceeds limit, we want to give money later.
-        if (!islandBank.canDepositMoney(balanceToGive)) {
-            Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Cannot Deposit Money", owner.getName());
-            giveInterestFailed = true;
+        if (!this.islandBank.canDepositMoney(balanceToGive)) {
+            Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Cannot Deposit Money", this.owner.getName());
+
+            this.giveInterestFailed = true;
+
             return false;
         }
 
-        Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Success", owner.getName());
+        Log.debugResult(Debug.GIVE_BANK_INTEREST, "Return Success", this.owner.getName());
 
-        giveInterestFailed = false;
+        this.giveInterestFailed = false;
 
-        islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
+        this.islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
 
         setLastInterestTime(currentTime);
 
@@ -2327,21 +2614,18 @@ public class SIsland implements Island {
 
     @Override
     public long getLastInterestTime() {
-        return lastInterest;
+        return this.lastInterest;
     }
 
     @Override
     public void setLastInterestTime(long lastInterest) {
-        if (this.lastInterest == lastInterest)
+        if (this.lastInterest == lastInterest) {
             return;
+        }
 
         if (BuiltinModules.BANK.getConfiguration().isBankInterestEnabled()) {
             long ticksToNextInterest = BuiltinModules.BANK.getConfiguration().getBankInterestInterval() * 20L;
-            this.bankInterestTask.set(bankInterestTask -> {
-                if (bankInterestTask != null)
-                    bankInterestTask.cancel();
-                return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
-            });
+            resetBankInterestTask(ticksToNextInterest);
         }
 
         this.lastInterest = lastInterest;
@@ -2352,11 +2636,190 @@ public class SIsland implements Island {
     public long getNextInterest() {
         long currentTime = System.currentTimeMillis() / 1000;
         int bankInterestInterval = BuiltinModules.BANK.getConfiguration().getBankInterestInterval();
-        return bankInterestInterval - (currentTime - lastInterest);
+
+        return bankInterestInterval - (currentTime - this.lastInterest);
+    }
+
+    private void resetBankInterestTask(long ticksToNextInterest) {
+        this.bankInterestTask.set(bankInterestTask -> {
+            if (bankInterestTask != null) {
+                bankInterestTask.cancel();
+            }
+
+            return registerTask(BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest));
+        });
+    }
+
+    @Override
+    public BigDecimal getBankLimit() {
+        return this.bankLimit.readAndGet(Value::get);
+    }
+
+    @Override
+    public BigDecimal getBankLimitRaw() {
+        return this.bankLimit.readAndGet(bankLimit ->
+                bankLimit.getNonSynced(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE));
+    }
+
+    @Override
+    public void setBankLimit(BigDecimal bankLimit) {
+        Preconditions.checkNotNull(bankLimit, "bankLimit parameter cannot be null.");
+
+        BigDecimal finalBankLimit = bankLimit.max(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE);
+
+        Log.debug(Debug.SET_BANK_LIMIT, owner.getName(), finalBankLimit);
+
+        Value<BigDecimal> oldBankLimit = this.bankLimit.set(Value.fixed(finalBankLimit));
+
+        if (!oldBankLimit.isSynced() &&
+                finalBankLimit.compareTo(Value.getNonSynced(oldBankLimit, IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE)) == 0) {
+            return;
+        }
+
+        if (hasGiveInterestFailed()) {
+            giveInterest(false);
+        }
+
+        IslandsDatabaseBridge.saveBankLimit(this);
     }
 
     /*
-     *  Worth related methods
+     *  Level & Worth related methods
+     */
+
+    @Override
+    public BigDecimal getIslandLevel() {
+        BigDecimal bonusLevel = this.bonusLevel.get();
+        BigDecimal islandLevel = this.islandLevel.get().add(bonusLevel);
+
+        if (plugin.getSettings().isRoundedIslandLevels()) {
+            islandLevel = islandLevel.setScale(0, plugin.getSettings().getIslandLevelRoundingMode());
+        }
+
+        if (!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0) {
+            islandLevel = BigDecimal.ZERO;
+        }
+
+        return islandLevel;
+    }
+
+    @Override
+    public BigDecimal getRawLevel() {
+        BigDecimal islandLevel = this.islandLevel.get();
+
+        if (plugin.getSettings().isRoundedIslandLevels()) {
+            islandLevel = islandLevel.setScale(0, plugin.getSettings().getIslandLevelRoundingMode());
+        }
+
+        if (!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0) {
+            islandLevel = BigDecimal.ZERO;
+        }
+
+        return islandLevel;
+    }
+
+    @Override
+    public BigDecimal getBonusLevel() {
+        return this.bonusLevel.get();
+    }
+
+    @Override
+    public void setBonusLevel(BigDecimal bonusLevel) {
+        Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
+
+        Log.debug(Debug.SET_BONUS_LEVEL, this.owner.getName(), bonusLevel);
+
+        BigDecimal oldBonusLevel = this.bonusLevel.getAndSet(bonusLevel);
+
+        if (Objects.equals(oldBonusLevel, bonusLevel)) {
+            return;
+        }
+
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
+        plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
+
+        IslandsDatabaseBridge.saveBonusLevel(this);
+    }
+
+    @Override
+    public BigDecimal getWorth() {
+        double bankWorthRate = BuiltinModules.BANK.getConfiguration().getBankWorthRate();
+
+        BigDecimal islandWorth = this.islandWorth.get();
+        BigDecimal islandBank = this.islandBank.getBalance();
+        BigDecimal bonusWorth = this.bonusWorth.get();
+        BigDecimal finalIslandWorth = (bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(
+                islandBank.multiply(BigDecimal.valueOf(bankWorthRate)))).add(bonusWorth);
+
+        if (!plugin.getSettings().isNegativeWorth() && finalIslandWorth.compareTo(BigDecimal.ZERO) < 0) {
+            return BigDecimal.ZERO;
+        }
+
+        return finalIslandWorth;
+    }
+
+    @Override
+    public BigDecimal getRawWorth() {
+        return this.islandWorth.get();
+    }
+
+    @Override
+    public BigDecimal getBonusWorth() {
+        return this.bonusWorth.get();
+    }
+
+    @Override
+    public void setBonusWorth(BigDecimal bonusWorth) {
+        Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
+
+        Log.debug(Debug.SET_BONUS_WORTH, this.owner.getName(), bonusWorth);
+
+        BigDecimal oldBonusWorth = this.bonusWorth.getAndSet(bonusWorth);
+
+        if (Objects.equals(oldBonusWorth, bonusWorth)) {
+            return;
+        }
+
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
+        plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
+
+        IslandsDatabaseBridge.saveBonusWorth(this);
+    }
+
+    @Override
+    public boolean isBeingRecalculated() {
+        return this.beingRecalculated;
+    }
+
+    @Override
+    public void calcIslandWorth(@Nullable SuperiorPlayer asker) {
+        calcIslandWorth(asker, null);
+    }
+
+    @Override
+    public void calcIslandWorth(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
+        Log.debug(Debug.CALCULATE_ISLAND, this.owner.getName(), asker);
+
+        long lastUpdateTime = getLastTimeUpdate();
+
+        if (lastUpdateTime != -1 && (System.currentTimeMillis() / 1000) - lastUpdateTime >= 600) {
+            Log.debugResult(Debug.CALCULATE_ISLAND, "Result Cooldown", owner.getName());
+
+            finishCalcIsland(asker, callback, getIslandLevel(), getWorth());
+
+            return;
+        }
+
+        registerTask(BukkitExecutor.ensureMain(() -> calcIslandWorthInternal(asker, callback)));
+    }
+
+    @Override
+    public IslandCalculationAlgorithm getCalculationAlgorithm() {
+        return this.calculationAlgorithm;
+    }
+
+    /*
+     *  Blocks related methods
      */
 
     @Override
@@ -2433,13 +2896,12 @@ public class SIsland implements Island {
     private BlockChangeResult handleBlockPlaceInternal(Key key, @Size BigInteger amount, @IslandBlockFlags int flags) {
         boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
 
-        boolean trackedBlock = accessBlocksTracker(rawBlocks,
-                blocksTracker -> blocksTracker.trackBlock(key, amount));
+        boolean trackedBlock = trackOrUntrackBlock(rawBlocks, true, key, amount);
 
         if (!trackedBlock)
             return BlockChangeResult.MISSING_BLOCK_VALUE;
 
-        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.updateAndGet(count -> count.add(amount));
+        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.accumulateAndGet(amount, BigInteger::add);
 
         BigDecimal oldWorth = getWorth();
         BigDecimal oldLevel = getIslandLevel();
@@ -2452,13 +2914,13 @@ public class SIsland implements Island {
         boolean updateLastTimeStatus = (flags & IslandBlockFlags.UPDATE_LAST_TIME_STATUS) != 0;
 
         if (blockWorth.compareTo(BigDecimal.ZERO) != 0) {
-            islandWorth.updateAndGet(islandWorth -> islandWorth.add(blockWorth.multiply(new BigDecimal(amount))));
+            islandWorth.accumulateAndGet(blockWorth.multiply(new BigDecimal(amount)), BigDecimal::add);
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         }
 
         if (blockLevel.compareTo(BigDecimal.ZERO) != 0) {
-            islandLevel.updateAndGet(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
+            islandLevel.accumulateAndGet(blockLevel.multiply(new BigDecimal(amount)), BigDecimal::add);
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
         }
@@ -2644,13 +3106,12 @@ public class SIsland implements Island {
 
         boolean rawBlocks = (flags & IslandBlockFlags.RAW_BLOCKS) != 0;
 
-        boolean untrackedBlocks = accessBlocksTracker(rawBlocks,
-                blocksTracker -> blocksTracker.untrackBlock(key, amountBig));
+        boolean untrackedBlocks = trackOrUntrackBlock(rawBlocks, false, key, amountBig);
 
         if (!untrackedBlocks)
             return BlockChangeResult.MISSING_BLOCK_VALUE;
 
-        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.updateAndGet(count -> count.subtract(amountBig));
+        BigInteger newTotalBlocksCount = this.currentTotalBlockCounts.accumulateAndGet(amountBig, BigInteger::subtract);
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
@@ -2662,13 +3123,13 @@ public class SIsland implements Island {
         boolean updateLastTimeStatus = (flags & IslandBlockFlags.UPDATE_LAST_TIME_STATUS) != 0;
 
         if (blockWorth.compareTo(BigDecimal.ZERO) != 0) {
-            this.islandWorth.updateAndGet(islandWorth -> islandWorth.subtract(blockWorth.multiply(new BigDecimal(amount))));
+            this.islandWorth.accumulateAndGet(blockWorth.multiply(new BigDecimal(amount)), BigDecimal::subtract);
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         }
 
         if (blockLevel.compareTo(BigDecimal.ZERO) != 0) {
-            this.islandLevel.updateAndGet(islandLevel -> islandLevel.subtract(blockLevel.multiply(new BigDecimal(amount))));
+            this.islandLevel.accumulateAndGet(blockLevel.multiply(new BigDecimal(amount)), BigDecimal::subtract);
             if (saveBlockCounts)
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
         }
@@ -2798,7 +3259,7 @@ public class SIsland implements Island {
     @Override
     public void markChunkDirty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
-        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markDirty(chunkPosition, save);
         }
@@ -2812,7 +3273,7 @@ public class SIsland implements Island {
 
     @Override
     public void markChunkEmpty(WorldInfo worldInfo, int chunkX, int chunkZ, boolean save) {
-        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        Preconditions.checkArgument(isInside(worldInfo, chunkX, chunkZ), "Chunk {" + worldInfo.getName() + "," + chunkX + "," + chunkZ + "} must be within the island boundaries.");
         try (ChunkPosition chunkPosition = ChunkPosition.of(worldInfo, chunkX, chunkZ)) {
             this.dirtyChunksContainer.markEmpty(chunkPosition, save);
         }
@@ -2824,22 +3285,22 @@ public class SIsland implements Island {
     }
 
     @Override
-    public Map<Key, BigInteger> getBlockCountsAsBigInteger() {
-        return this.blocksTracker.getBlockCounts();
-    }
-
-    @Override
     public BigInteger getExactBlockCountAsBigInteger(Key key) {
         return this.blocksTracker.getExactBlockCount(key);
     }
 
     @Override
+    public Map<Key, BigInteger> getBlockCountsAsBigInteger() {
+        return this.blocksTracker.getBlockCounts();
+    }
+
+    @Override
     public void clearBlockCounts() {
-        blocksTracker.clearBlockCounts();
+        this.blocksTracker.clearBlockCounts();
         this.currentTotalBlockCounts.set(BigInteger.ZERO);
 
-        islandWorth.set(BigDecimal.ZERO);
-        islandLevel.set(BigDecimal.ZERO);
+        this.islandWorth.set(BigDecimal.ZERO);
+        this.islandLevel.set(BigDecimal.ZERO);
 
         plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
@@ -2851,98 +3312,333 @@ public class SIsland implements Island {
     }
 
     @Override
-    public BigDecimal getWorth() {
-        double bankWorthRate = BuiltinModules.BANK.getConfiguration().getBankWorthRate();
+    public Map<Key, Integer> getBlocksLimits() {
+        KeyMap<Integer> blockLimitsBuilder = KeyMap.createKeyMap();
 
-        BigDecimal islandWorth = this.islandWorth.get();
-        BigDecimal islandBank = this.islandBank.getBalance();
-        BigDecimal bonusWorth = this.bonusWorth.get();
-        BigDecimal finalIslandWorth = (bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(
-                islandBank.multiply(BigDecimal.valueOf(bankWorthRate)))).add(bonusWorth);
+        this.blockLimits.forEach((key, limitValue) -> {
+            blockLimitsBuilder.put(key, limitValue.get());
+        });
 
-        if (!plugin.getSettings().isNegativeWorth() && finalIslandWorth.compareTo(BigDecimal.ZERO) < 0)
-            return BigDecimal.ZERO;
-
-        return finalIslandWorth;
+        return blockLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(blockLimitsBuilder);
     }
 
     @Override
-    public BigDecimal getRawWorth() {
-        return islandWorth.get();
+    public Map<Key, Integer> getCustomBlocksLimits() {
+        KeyMap<Integer> blockLimitsBuilder = KeyMap.createKeyMap();
+
+        this.blockLimits.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                blockLimitsBuilder.put(key, limitValue.get());
+            }
+        });
+
+        return blockLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(blockLimitsBuilder);
     }
 
     @Override
-    public BigDecimal getBonusWorth() {
-        return bonusWorth.get();
+    public int getBlockLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        IntValue blockLimit = this.blockLimits.get(key);
+
+        return blockLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : blockLimit.get();
     }
 
     @Override
-    public void setBonusWorth(BigDecimal bonusWorth) {
-        Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
+    public int getBlockLimitRaw(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        Log.debug(Debug.SET_BONUS_WORTH, owner.getName(), bonusWorth);
+        return IntValue.getNonSynced(this.blockLimits.get(key), IslandUpgradeConstants.SYNCED_VALUE);
+    }
 
-        BigDecimal oldBonusWorth = this.bonusWorth.getAndSet(bonusWorth);
+    @Override
+    public int getExactBlockLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        if (Objects.equals(oldBonusWorth, bonusWorth))
+        IntValue blockLimit = this.blockLimits.getRaw(key, null);
+
+        return blockLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : blockLimit.get();
+    }
+
+    @Override
+    public int getExactBlockLimitRaw(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.blockLimits.getRaw(key, null), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
+    public Key getBlockLimitKey(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return this.blockLimits.getKey(key, key);
+    }
+
+    @Override
+    public void setBlockLimit(Key key, int blockLimit) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        int finalBlockLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, blockLimit);
+
+        Log.debug(Debug.SET_BLOCK_LIMIT, owner.getName(), key, finalBlockLimit);
+
+        IntValue oldBlockLimit = this.blockLimits.put(key, IntValue.fixed(finalBlockLimit));
+
+        if (oldBlockLimit != null && !oldBlockLimit.isSynced() &&
+                finalBlockLimit == IntValue.getNonSynced(oldBlockLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
-
-        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
-        plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
-
-        IslandsDatabaseBridge.saveBonusWorth(this);
-    }
-
-    @Override
-    public BigDecimal getBonusLevel() {
-        return bonusLevel.get();
-    }
-
-    @Override
-    public void setBonusLevel(BigDecimal bonusLevel) {
-        Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
-
-        Log.debug(Debug.SET_BONUS_LEVEL, owner.getName(), bonusLevel);
-
-        BigDecimal oldBonusLevel = this.bonusLevel.getAndSet(bonusLevel);
-
-        if (Objects.equals(oldBonusLevel, bonusLevel))
-            return;
-
-        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
-        plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
-
-        IslandsDatabaseBridge.saveBonusLevel(this);
-    }
-
-    @Override
-    public BigDecimal getIslandLevel() {
-        BigDecimal bonusLevel = this.bonusLevel.get();
-        BigDecimal islandLevel = this.islandLevel.get().add(bonusLevel);
-
-        if (plugin.getSettings().isRoundedIslandLevels()) {
-            islandLevel = islandLevel.setScale(0, plugin.getSettings().getIslandLevelRoundingMode());
         }
 
-        if (!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0)
-            islandLevel = BigDecimal.ZERO;
-
-        return islandLevel;
+        plugin.getBlockValues().addCustomBlockKey(key);
+        IslandsDatabaseBridge.saveBlockLimit(this, key, finalBlockLimit);
     }
 
     @Override
-    public BigDecimal getRawLevel() {
-        BigDecimal islandLevel = this.islandLevel.get();
+    public void removeBlockLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        if (plugin.getSettings().isRoundedIslandLevels()) {
-            islandLevel = islandLevel.setScale(0, plugin.getSettings().getIslandLevelRoundingMode());
+        Log.debug(Debug.REMOVE_BLOCK_LIMIT, owner.getName(), key);
+
+        IntValue oldBlockLimit = this.blockLimits.getRaw(key, null);
+
+        if (oldBlockLimit == null || oldBlockLimit.isSynced()) {
+            return;
         }
 
-        if (!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0)
-            islandLevel = BigDecimal.ZERO;
+        this.blockLimits.remove(key);
+        IslandsDatabaseBridge.removeBlockLimit(this, key);
 
-        return islandLevel;
+        syncBlockLimit(DefaultUpgradeLevel.getInstance(), key);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncBlockLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
     }
+
+    @Override
+    public void clearBlockLimits() {
+        Log.debug(Debug.CLEAR_BLOCK_LIMITS, owner.getName());
+
+        List<Key> customBlockLimits = new LinkedList<>();
+
+        this.blockLimits.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customBlockLimits.add(key);
+            }
+        });
+
+        if (customBlockLimits.isEmpty()) {
+            return;
+        }
+
+        customBlockLimits.forEach(this.blockLimits::remove);
+        IslandsDatabaseBridge.clearBlockLimits(this);
+
+        for (Key key : customBlockLimits) {
+            syncBlockLimit(DefaultUpgradeLevel.getInstance(), key);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncBlockLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+        }
+    }
+
+    @Override
+    public boolean hasReachedBlockLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return hasReachedBlockLimit(key, 1);
+    }
+
+    @Override
+    public boolean hasReachedBlockLimit(Key key, @Size int amount) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
+
+        int blockLimit = getExactBlockLimit(key);
+
+        // Checking for the specific provided key.
+        if (blockLimit >= 0) {
+            return getExactBlockCountAsBigInteger(key).add(BigInteger.valueOf(amount))
+                    .compareTo(BigInteger.valueOf(blockLimit)) > 0;
+        }
+
+        // Getting the global key values.
+        key = ((BaseKey<?>) key).toGlobalKey();
+        blockLimit = getBlockLimit(key);
+
+        return blockLimit >= 0 && getBlockCountAsBigInteger(key)
+                .add(BigInteger.valueOf(amount)).compareTo(BigInteger.valueOf(blockLimit)) > 0;
+    }
+
+    /*
+     *  Entities related methods
+     */
+
+    @Override
+    public IslandEntitiesTrackerAlgorithm getEntitiesTracker() {
+        return this.entitiesTracker;
+    }
+
+    @Override
+    public Map<Key, Integer> getEntitiesLimitsAsKeys() {
+        KeyMap<Integer> entityLimitsBuilder = KeyMap.createKeyMap();
+
+        this.entityLimits.forEach((key, limitValue) -> {
+            entityLimitsBuilder.put(key, limitValue.get());
+        });
+
+        return entityLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityLimitsBuilder);
+    }
+
+    @Override
+    public Map<Key, Integer> getCustomEntitiesLimits() {
+        KeyMap<Integer> entityLimitsBuilder = KeyMap.createKeyMap();
+
+        this.entityLimits.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                entityLimitsBuilder.put(key, limitValue.get());
+            }
+        });
+
+        return entityLimitsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityLimitsBuilder);
+    }
+
+    @Override
+    public int getEntityLimit(EntityType entityType) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
+
+        return getEntityLimit(Keys.of(entityType));
+    }
+
+    @Override
+    public int getEntityLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        IntValue entityLimit = this.entityLimits.get(key);
+
+        return entityLimit == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : entityLimit.get();
+    }
+
+    @Override
+    public int getEntityLimitRaw(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.entityLimits.get(key), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
+    public int getExactEntityLimitRaw(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.entityLimits.getRaw(key, null), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
+    public void setEntityLimit(EntityType entityType, int limit) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
+
+        setEntityLimit(Keys.of(entityType), limit);
+    }
+
+    @Override
+    public void setEntityLimit(Key key, int entityLimit) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        int finalLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, entityLimit);
+
+        Log.debug(Debug.SET_ENTITY_LIMIT, owner.getName(), key, finalLimit);
+
+        IntValue oldEntityLimit = this.entityLimits.put(key, IntValue.fixed(finalLimit));
+
+        if (oldEntityLimit != null && !oldEntityLimit.isSynced() &&
+                finalLimit == IntValue.getNonSynced(oldEntityLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+            return;
+        }
+
+        IslandsDatabaseBridge.saveEntityLimit(this, key, finalLimit);
+    }
+
+    @Override
+    public void removeEntityLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        Log.debug(Debug.REMOVE_ENTITY_LIMIT, owner.getName(), key);
+
+        IntValue oldEntityLimit = this.entityLimits.getRaw(key, null);
+
+        if (oldEntityLimit == null || oldEntityLimit.isSynced()) {
+            return;
+        }
+
+        this.entityLimits.remove(key);
+        IslandsDatabaseBridge.removeEntityLimit(this, key);
+
+        syncEntityLimit(DefaultUpgradeLevel.getInstance(), key);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncEntityLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+    }
+
+    @Override
+    public void clearEntitiesLimits() {
+        Log.debug(Debug.CLEAR_ENTITY_LIMITS, owner.getName());
+
+        List<Key> customEntityLimits = new LinkedList<>();
+
+        this.entityLimits.forEach((key, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customEntityLimits.add(key);
+            }
+        });
+
+        if (customEntityLimits.isEmpty()) {
+            return;
+        }
+
+        customEntityLimits.forEach(this.entityLimits::remove);
+        IslandsDatabaseBridge.clearEntityLimits(this);
+
+        for (Key key : customEntityLimits) {
+            syncEntityLimit(DefaultUpgradeLevel.getInstance(), key);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncEntityLimit((SUpgradeLevel) getUpgradeLevel(upgrade), key));
+        }
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
+
+        return hasReachedEntityLimit(Keys.of(entityType));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
+        return hasReachedEntityLimit(key, 1);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, @Size int amount) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
+
+        return hasReachedEntityLimit(Keys.of(entityType), amount);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, @Size int amount) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
+
+        int entityLimit = getEntityLimit(key);
+
+        if (entityLimit < 0) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCount(key) + amount > entityLimit);
+    }
+
+    /*
+     *  Upgrades related methods
+     */
 
     @Override
     public UpgradeLevel getUpgradeLevel(Upgrade upgrade) {
@@ -2989,17 +3685,9 @@ public class SIsland implements Island {
         syncUpgrades(true);
     }
 
-    /*
-     *  Upgrade related methods
-     */
-
     @Override
     public void updateUpgrades() {
-        clearUpgrades(false);
-        // We want to sync the default upgrade first, then the actual upgrades
-        syncUpgrade(DefaultUpgradeLevel.getInstance(), false);
-        // Syncing all real upgrades
-        plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), false));
+        syncUpgrades(false);
     }
 
     @Override
@@ -3012,8 +3700,13 @@ public class SIsland implements Island {
         long lastTimeUpgrade = getLastTimeUpgrade();
         long currentTime = System.currentTimeMillis();
         long upgradeCooldown = plugin.getSettings().getUpgradeCooldown();
+
         return upgradeCooldown > 0 && lastTimeUpgrade > 0 && currentTime - lastTimeUpgrade <= upgradeCooldown;
     }
+
+    /*
+     *  Multipliers related methods
+     */
 
     @Override
     public double getCropGrowthMultiplier() {
@@ -3021,51 +3714,25 @@ public class SIsland implements Island {
     }
 
     @Override
+    public double getCropGrowthRaw() {
+        return this.cropGrowth.readAndGet(cropGrowth -> cropGrowth.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
+    }
+
+    @Override
     public void setCropGrowthMultiplier(double cropGrowth) {
-        cropGrowth = Math.max(1, cropGrowth);
+        double finalCropGrowth = Math.max(1, cropGrowth);
 
-        Log.debug(Debug.SET_CROP_GROWTH, owner.getName(), cropGrowth);
+        Log.debug(Debug.SET_CROP_GROWTH, owner.getName(), finalCropGrowth);
 
-        if (cropGrowth == getCropGrowthRaw())
+        DoubleValue oldCropGrowth = this.cropGrowth.set(DoubleValue.fixed(finalCropGrowth));
+
+        if (!oldCropGrowth.isSynced() &&
+                finalCropGrowth == DoubleValue.getNonSynced(oldCropGrowth, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
-
-        DoubleValue oldCropGrowth = this.cropGrowth.set(DoubleValue.fixed(cropGrowth));
-
-        if (cropGrowth == DoubleValue.getNonSynced(oldCropGrowth, -1D))
-            return;
+        }
 
         IslandsDatabaseBridge.saveCropGrowth(this);
-
-        notifyCropGrowthChange(cropGrowth);
-    }
-
-    @Override
-    public double getCropGrowthRaw() {
-        return this.cropGrowth.readAndGet(cropGrowth -> cropGrowth.getNonSynced(-1D));
-    }
-
-    @Override
-    public double getSpawnerRatesMultiplier() {
-        return this.spawnerRates.readAndGet(DoubleValue::get);
-    }
-
-    @Override
-    public void setSpawnerRatesMultiplier(double spawnerRates) {
-        spawnerRates = Math.max(1, spawnerRates);
-
-        Log.debug(Debug.SET_SPAWNER_RATES, owner.getName(), spawnerRates);
-
-        DoubleValue oldSpawnerRates = this.spawnerRates.set(DoubleValue.fixed(spawnerRates));
-
-        if (spawnerRates == DoubleValue.getNonSynced(oldSpawnerRates, -1D))
-            return;
-
-        IslandsDatabaseBridge.saveSpawnerRates(this);
-    }
-
-    @Override
-    public double getSpawnerRatesRaw() {
-        return this.spawnerRates.readAndGet(spawnerRates -> spawnerRates.getNonSynced(-1D));
+        notifyCropGrowthChange(finalCropGrowth);
     }
 
     @Override
@@ -3074,493 +3741,256 @@ public class SIsland implements Island {
     }
 
     @Override
+    public double getMobDropsRaw() {
+        return this.mobDrops.readAndGet(mobDrops -> mobDrops.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
+    }
+
+    @Override
     public void setMobDropsMultiplier(double mobDrops) {
-        mobDrops = Math.max(1, mobDrops);
+        double finalMobDrops = Math.max(1, mobDrops);
 
-        Log.debug(Debug.SET_MOB_DROPS, owner.getName(), mobDrops);
+        Log.debug(Debug.SET_MOB_DROPS, owner.getName(), finalMobDrops);
 
-        DoubleValue oldMobDrops = this.mobDrops.set(DoubleValue.fixed(mobDrops));
+        DoubleValue oldMobDrops = this.mobDrops.set(DoubleValue.fixed(finalMobDrops));
 
-        if (mobDrops == DoubleValue.getNonSynced(oldMobDrops, -1D))
+        if (!oldMobDrops.isSynced() &&
+                finalMobDrops == DoubleValue.getNonSynced(oldMobDrops, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
+        }
 
         IslandsDatabaseBridge.saveMobDrops(this);
     }
 
     @Override
-    public double getMobDropsRaw() {
-        return this.mobDrops.readAndGet(mobDrops -> mobDrops.getNonSynced(-1D));
+    public double getSpawnerRatesMultiplier() {
+        return this.spawnerRates.readAndGet(DoubleValue::get);
     }
 
     @Override
-    public int getBlockLimit(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        IntValue blockLimit = blockLimits.get(key);
-        return blockLimit == null ? -1 : blockLimit.get();
+    public double getSpawnerRatesRaw() {
+        return this.spawnerRates.readAndGet(spawnerRates -> spawnerRates.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
     }
 
     @Override
-    public int getExactBlockLimit(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        IntValue blockLimit = blockLimits.getRaw(key, null);
-        return blockLimit == null ? -1 : blockLimit.get();
-    }
+    public void setSpawnerRatesMultiplier(double spawnerRates) {
+        double finalSpawnerRates = Math.max(1, spawnerRates);
 
-    @Override
-    public Key getBlockLimitKey(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.getKey(key, key);
-    }
+        Log.debug(Debug.SET_SPAWNER_RATES, owner.getName(), finalSpawnerRates);
 
-    @Override
-    public Map<Key, Integer> getBlocksLimits() {
-        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
-        this.blockLimits.forEach((block, limit) -> blockLimits.put(block, limit.get()));
-        return Collections.unmodifiableMap(blockLimits);
-    }
+        DoubleValue oldSpawnerRates = this.spawnerRates.set(DoubleValue.fixed(finalSpawnerRates));
 
-    @Override
-    public Map<Key, Integer> getCustomBlocksLimits() {
-        return Collections.unmodifiableMap(this.blockLimits.entrySet().stream()
-                .filter(entry -> !entry.getValue().isSynced())
-                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
-    }
-
-    @Override
-    public void clearBlockLimits() {
-        Log.debug(Debug.CLEAR_BLOCK_LIMITS, owner.getName());
-
-        if (blockLimits.isEmpty())
-            return;
-
-        blockLimits.clear();
-        IslandsDatabaseBridge.clearBlockLimits(this);
-    }
-
-    @Override
-    public void setBlockLimit(Key key, int limit) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-
-        int finalLimit = Math.max(0, limit);
-
-        Log.debug(Debug.SET_BLOCK_LIMIT, owner.getName(), key, finalLimit);
-
-        IntValue oldLimit = blockLimits.put(key, IntValue.fixed(finalLimit));
-
-        if (limit == IntValue.getNonSynced(oldLimit, -1))
-            return;
-
-        plugin.getBlockValues().addCustomBlockKey(key);
-        IslandsDatabaseBridge.saveBlockLimit(this, key, limit);
-    }
-
-    @Override
-    public void removeBlockLimit(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-
-        Log.debug(Debug.REMOVE_BLOCK_LIMIT, owner.getName(), key);
-
-        IntValue oldBlockLimit = blockLimits.remove(key);
-
-        if (oldBlockLimit == null)
-            return;
-
-        IslandsDatabaseBridge.removeBlockLimit(this, key);
-    }
-
-    @Override
-    public boolean hasReachedBlockLimit(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return hasReachedBlockLimit(key, 1);
-    }
-
-    @Override
-    public boolean hasReachedBlockLimit(Key key, @Size int amount) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
-
-        int blockLimit = getExactBlockLimit(key);
-
-        //Checking for the specific provided key.
-        if (blockLimit >= 0) {
-            return getBlockCountAsBigInteger(key).add(BigInteger.valueOf(amount))
-                    .compareTo(BigInteger.valueOf(blockLimit)) > 0;
-        }
-
-        //Getting the global key values.
-        key = ((BaseKey<?>) key).toGlobalKey();
-        blockLimit = getBlockLimit(key);
-
-        return blockLimit >= 0 && getBlockCountAsBigInteger(key)
-                .add(BigInteger.valueOf(amount)).compareTo(BigInteger.valueOf(blockLimit)) > 0;
-    }
-
-    @Override
-    public int getEntityLimit(EntityType entityType) {
-        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return getEntityLimit(Keys.of(entityType));
-    }
-
-    @Override
-    public int getEntityLimit(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        IntValue entityLimit = entityLimits.get(key);
-        return entityLimit == null ? -1 : entityLimit.get();
-    }
-
-    @Override
-    public Map<Key, Integer> getEntitiesLimitsAsKeys() {
-        return Collections.unmodifiableMap(this.entityLimits.entrySet().stream().collect(
-                KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
-        ));
-    }
-
-    @Override
-    public Map<Key, Integer> getCustomEntitiesLimits() {
-        return Collections.unmodifiableMap(this.entityLimits.entrySet().stream()
-                .filter(entry -> !entry.getValue().isSynced())
-                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
-    }
-
-    @Override
-    public void clearEntitiesLimits() {
-        Log.debug(Debug.CLEAR_ENTITY_LIMITS, owner.getName());
-
-        if (entityLimits.isEmpty())
-            return;
-
-        entityLimits.clear();
-        IslandsDatabaseBridge.clearEntityLimits(this);
-    }
-
-    @Override
-    public void setEntityLimit(EntityType entityType, int limit) {
-        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        setEntityLimit(Keys.of(entityType), limit);
-    }
-
-    @Override
-    public void setEntityLimit(Key key, int limit) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-
-        int finalLimit = Math.max(0, limit);
-
-        Log.debug(Debug.SET_ENTITY_LIMIT, owner.getName(), key, finalLimit);
-
-        IntValue oldEntityLimit = entityLimits.put(key, IntValue.fixed(limit));
-
-        if (limit == IntValue.getNonSynced(oldEntityLimit, -1))
-            return;
-
-        IslandsDatabaseBridge.saveEntityLimit(this, key, limit);
-    }
-
-    @Override
-    public void removeEntityLimit(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-
-        Log.debug(Debug.REMOVE_ENTITY_LIMIT, owner.getName(), key);
-
-        IntValue oldEntityLimit = entityLimits.remove(key);
-
-        if (oldEntityLimit == null)
-            return;
-
-        IslandsDatabaseBridge.removeEntityLimit(this, key);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
-        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return hasReachedEntityLimit(Keys.of(entityType));
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return hasReachedEntityLimit(key, 1);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, @Size int amount) {
-        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return hasReachedEntityLimit(Keys.of(entityType), amount);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, @Size int amount) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
-
-        int entityLimit = getEntityLimit(key);
-
-        if (entityLimit < 0)
-            return CompletableFuture.completedFuture(false);
-
-        return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCount(key) + amount > entityLimit);
-    }
-
-    @Override
-    public IslandEntitiesTrackerAlgorithm getEntitiesTracker() {
-        return this.entitiesTracker;
-    }
-
-    @Override
-    public int getTeamLimit() {
-        return this.teamLimit.readAndGet(IntValue::get);
-    }
-
-    @Override
-    public void setTeamLimit(int teamLimit) {
-        teamLimit = Math.max(0, teamLimit);
-
-        Log.debug(Debug.SET_TEAM_LIMIT, owner.getName(), teamLimit);
-
-        IntValue oldTeamLimit = this.teamLimit.set(IntValue.fixed(teamLimit));
-
-        if (teamLimit == IntValue.getNonSynced(oldTeamLimit, -1))
-            return;
-
-        IslandsDatabaseBridge.saveTeamLimit(this);
-    }
-
-    @Override
-    public int getTeamLimitRaw() {
-        return this.teamLimit.readAndGet(teamLimit -> teamLimit.getNonSynced(-1));
-    }
-
-    @Override
-    public int getWarpsLimit() {
-        return this.warpsLimit.readAndGet(IntValue::get);
-    }
-
-    @Override
-    public void setWarpsLimit(int warpsLimit) {
-        warpsLimit = Math.max(0, warpsLimit);
-
-        Log.debug(Debug.SET_WARPS_LIMIT, owner.getName(), warpsLimit);
-
-        IntValue oldWarpsLimit = this.warpsLimit.set(IntValue.fixed(warpsLimit));
-
-        if (warpsLimit == IntValue.getNonSynced(oldWarpsLimit, -1))
-            return;
-
-        IslandsDatabaseBridge.saveWarpsLimit(this);
-    }
-
-    @Override
-    public int getWarpsLimitRaw() {
-        return this.warpsLimit.readAndGet(warpsLimit -> warpsLimit.getNonSynced(-1));
-    }
-
-    @Override
-    public void setPotionEffect(PotionEffectType type, int level) {
-        // Legacy support for levels can be set to <= 0 for removing the effect.
-        // Nowadays, removePotionEffect exists.
-        if (level <= 0) {
-            removePotionEffect(type);
+        if (!oldSpawnerRates.isSynced() &&
+                finalSpawnerRates == DoubleValue.getNonSynced(oldSpawnerRates, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
         }
 
-        Preconditions.checkNotNull(type, "potionEffectType parameter cannot be null.");
-
-        Log.debug(Debug.SET_ISLAND_EFFECT, owner.getName(), type.getName(), level);
-
-        IntValue oldPotionLevel = islandEffects.put(type, IntValue.fixed(level));
-
-        if (level == IntValue.getNonSynced(oldPotionLevel, -1))
-            return;
-
-        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
-            Player player = superiorPlayer.asPlayer();
-            assert player != null;
-            if (oldPotionLevel != null && oldPotionLevel.get() > level)
-                player.removePotionEffect(type);
-
-            PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
-            player.addPotionEffect(potionEffect, true);
-        }));
-
-        IslandsDatabaseBridge.saveIslandEffect(this, type, level);
+        IslandsDatabaseBridge.saveSpawnerRates(this);
     }
 
-    @Override
-    public void removePotionEffect(PotionEffectType type) {
-        Preconditions.checkNotNull(type, "potionEffectType parameter cannot be null.");
-
-        Log.debug(Debug.REMOVE_ISLAND_EFFECT, owner.getName(), type.getName());
-
-        IntValue oldEffectLevel = islandEffects.remove(type);
-
-        if (oldEffectLevel == null)
-            return;
-
-        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
-            Player player = superiorPlayer.asPlayer();
-            if (player != null)
-                player.removePotionEffect(type);
-        }));
-
-        IslandsDatabaseBridge.removeIslandEffect(this, type);
-    }
-
-    @Override
-    public int getPotionEffectLevel(PotionEffectType type) {
-        Preconditions.checkNotNull(type, "potionEffectType parameter cannot be null.");
-        IntValue islandEffect = islandEffects.get(type);
-        return islandEffect == null ? 0 : islandEffect.get();
-    }
+    /*
+     *  Effects related methods
+     */
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
-        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
+        Map<PotionEffectType, Integer> effectLevelsBuilder = new ArrayMap<>();
 
-        this.islandEffects.forEach((potionEffectType, levelValue) -> {
-            int level = levelValue.get();
-            if (level > 0)
-                islandEffects.put(potionEffectType, level);
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            effectLevelsBuilder.put(potionEffectType, levelValue.get());
         });
 
-        return islandEffects.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(islandEffects);
+        return effectLevelsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(effectLevelsBuilder);
     }
 
     @Override
     public Map<PotionEffectType, Integer> getCustomPotionEffects() {
-        Map<PotionEffectType, Integer> islandEffects = new ArrayMap<>();
+        Map<PotionEffectType, Integer> effectLevelsBuilder = new ArrayMap<>();
 
-        this.islandEffects.forEach((potionEffectType, levelValue) -> {
-            int level = levelValue.getNonSynced(-1);
-            if (level > 0)
-                islandEffects.put(potionEffectType, level);
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            if (!levelValue.isSynced()) {
+                effectLevelsBuilder.put(potionEffectType, levelValue.get());
+            }
         });
 
-        return islandEffects.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(islandEffects);
+        return effectLevelsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(effectLevelsBuilder);
     }
 
     @Override
-    public void applyEffects(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+    public int getPotionEffectLevel(PotionEffectType potionEffectType) {
+        Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
 
-        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
+        IntValue effectLevel = this.effectLevels.get(potionEffectType);
+
+        return effectLevel == null ? 0 : effectLevel.get();
+    }
+
+    @Override
+    public int getPotionEffectLevelRaw(PotionEffectType potionEffectType) {
+        Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
+
+        return IntValue.getNonSynced(this.effectLevels.get(potionEffectType), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
+    public void setPotionEffect(PotionEffectType potionEffectType, int effectLevel) {
+        Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
+
+        int finalEffectLevel = Math.max(0, effectLevel);
+
+        Log.debug(Debug.SET_ISLAND_EFFECT, owner.getName(), potionEffectType.getName(), finalEffectLevel);
+
+        IntValue oldEffectLevel = this.effectLevels.put(potionEffectType, IntValue.fixed(finalEffectLevel));
+
+        if (oldEffectLevel != null && !oldEffectLevel.isSynced() &&
+                finalEffectLevel == IntValue.getNonSynced(oldEffectLevel, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
+        }
 
-        applyEffectsNoUpgradeCheck(superiorPlayer);
+        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+            Player player = superiorPlayer.asPlayer();
+
+            if (player != null) {
+                if (oldEffectLevel != null && oldEffectLevel.get() > finalEffectLevel) {
+                    player.removePotionEffect(potionEffectType);
+                }
+
+                if (finalEffectLevel > 0) {
+                    PotionEffect potionEffect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, finalEffectLevel - 1);
+                    player.addPotionEffect(potionEffect, true);
+                }
+            }
+        })));
+
+        IslandsDatabaseBridge.saveIslandEffect(this, potionEffectType, finalEffectLevel);
     }
 
     @Override
-    public void applyEffects() {
-        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
-            getAllPlayersInside().forEach(this::applyEffectsNoUpgradeCheck);
-    }
+    public void removePotionEffect(PotionEffectType potionEffectType) {
+        Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
 
-    @Override
-    public void removeEffects(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
-            removeEffectsNoUpgradeCheck(superiorPlayer);
-    }
+        Log.debug(Debug.REMOVE_ISLAND_EFFECT, owner.getName(), potionEffectType.getName());
 
-    @Override
-    public void removeEffects() {
-        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
-            getAllPlayersInside().forEach(this::removeEffectsNoUpgradeCheck);
+        IntValue oldEffectLevel = this.effectLevels.get(potionEffectType);
+
+        if (oldEffectLevel == null || oldEffectLevel.isSynced()) {
+            return;
+        }
+
+        // A level of 0 doesn't give the effect, so a potion effect of that type is the player's own.
+        if (oldEffectLevel.get() > 0) {
+            registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer ->
+                    removePotionEffect(superiorPlayer.asPlayer(), potionEffectType))));
+        }
+
+        this.effectLevels.remove(potionEffectType);
+        IslandsDatabaseBridge.removeIslandEffect(this, potionEffectType);
+
+        syncEffectLevel(DefaultUpgradeLevel.getInstance(), potionEffectType);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncEffectLevel((SUpgradeLevel) getUpgradeLevel(upgrade), potionEffectType));
+
+        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer ->
+                addPotionEffect(superiorPlayer.asPlayer(), potionEffectType))));
     }
 
     @Override
     public void clearEffects() {
         Log.debug(Debug.CLEAR_ISLAND_EFFECTS, owner.getName());
 
-        if (islandEffects.isEmpty())
-            return;
+        List<PotionEffectType> customEffectLevels = new LinkedList<>();
+        // Only these are given to the players, as a level of 0 doesn't give the effect.
+        List<PotionEffectType> activeCustomEffects = new LinkedList<>();
 
-        islandEffects.clear();
-        removeEffects();
+        this.effectLevels.forEach((potionEffectType, limitValue) -> {
+            if (!limitValue.isSynced()) {
+                customEffectLevels.add(potionEffectType);
 
-        IslandsDatabaseBridge.clearIslandEffects(this);
-    }
+                if (limitValue.get() > 0) {
+                    activeCustomEffects.add(potionEffectType);
+                }
+            }
+        });
 
-    @Override
-    public void setRoleLimit(PlayerRole playerRole, int limit) {
-        // Legacy support for limits can be set to < 0 for removing the limit.
-        // Nowadays, removeRoleLimit exists.
-        if (limit < 0) {
-            removeRoleLimit(playerRole);
+        if (customEffectLevels.isEmpty()) {
             return;
         }
 
-        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-
-        Log.debug(Debug.SET_ROLE_LIMIT, owner.getName(), playerRole.getName(), limit);
-
-        IntValue oldRoleLimit = roleLimits.writeAndGet(roleLimits ->
-                roleLimits.put(playerRole.getId(), IntValue.fixed(limit)));
-
-        if (limit == IntValue.getNonSynced(oldRoleLimit, -1))
-            return;
-
-        IslandsDatabaseBridge.saveRoleLimit(this, playerRole, limit);
-    }
-
-    @Override
-    public void removeRoleLimit(PlayerRole playerRole) {
-        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-
-        Log.debug(Debug.REMOVE_ROLE_LIMIT, owner.getName(), playerRole.getName());
-
-        IntValue oldRoleLimit = roleLimits.writeAndGet(roleLimits -> roleLimits.remove(playerRole.getId()));
-
-        if (oldRoleLimit == null)
-            return;
-
-        IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
-    }
-
-    @Override
-    public int getRoleLimit(PlayerRole playerRole) {
-        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        IntValue roleLimit = roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId()));
-        return roleLimit == null ? -1 : roleLimit.get();
-    }
-
-    @Override
-    public int getRoleLimitRaw(PlayerRole playerRole) {
-        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        return IntValue.getNonSynced(roleLimits.readAndGet(roleLimits -> roleLimits.get(playerRole.getId())), -1);
-    }
-
-    @Override
-    public Map<PlayerRole, Integer> getRoleLimits() {
-        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty))
-            return Collections.emptyMap();
-
-        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
-        this.roleLimits.read(roleLimitsMap -> {
-            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimitsMap.entryIterator();
-            while (iterator.hasNext()) {
-                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
-                roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), entry.getValue().get());
+        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+            for (PotionEffectType potionEffectType : activeCustomEffects) {
+                removePotionEffect(superiorPlayer.asPlayer(), potionEffectType);
             }
-        });
+        })));
 
-        return Collections.unmodifiableMap(roleLimits);
+        customEffectLevels.forEach(this.effectLevels::remove);
+        IslandsDatabaseBridge.clearIslandEffects(this);
+
+        for (PotionEffectType potionEffectType : customEffectLevels) {
+            syncEffectLevel(DefaultUpgradeLevel.getInstance(), potionEffectType);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncEffectLevel((SUpgradeLevel) getUpgradeLevel(upgrade), potionEffectType));
+        }
+
+        registerTask(BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+            for (PotionEffectType potionEffectType : customEffectLevels) {
+                addPotionEffect(superiorPlayer.asPlayer(), potionEffectType);
+            }
+        })));
     }
 
     @Override
-    public Map<PlayerRole, Integer> getCustomRoleLimits() {
-        if (this.roleLimits.readAndGet(Int2ObjectMapView::isEmpty))
-            return Collections.emptyMap();
+    public void applyEffects(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
-        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
-        this.roleLimits.read(roleLimitsMap -> {
-            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimitsMap.entryIterator();
-            while (iterator.hasNext()) {
-                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
-                if (!entry.getValue().isSynced())
-                    roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), entry.getValue().get());
-            }
-        });
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
+            addPotionEffects(superiorPlayer);
+        }
+    }
 
-        return Collections.unmodifiableMap(roleLimits);
+    @Override
+    public void applyEffects() {
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
+            getAllPlayersInside().forEach(this::addPotionEffects);
+        }
+    }
+
+    @Override
+    public void removeEffects(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
+            removePotionEffects(superiorPlayer);
+        }
+    }
+
+    @Override
+    public void removeEffects() {
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
+            getAllPlayersInside().forEach(this::removePotionEffects);
+        }
+    }
+
+    /*
+     *  Warps related methods
+     */
+
+    @Override
+    public Map<String, WarpCategory> getWarpCategories() {
+        return Collections.unmodifiableMap(warpCategories);
+    }
+
+    @Override
+    public WarpCategory getWarpCategory(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        return warpCategories.get(name.toLowerCase(Locale.ENGLISH));
+    }
+
+    @Override
+    public WarpCategory getWarpCategory(int slot) {
+        for (WarpCategory warpCategory : warpCategories.values()) {
+            if (warpCategory.getSlot() == slot)
+                return warpCategory;
+        }
+        return null;
     }
 
     @Override
@@ -3589,18 +4019,6 @@ public class SIsland implements Island {
         }
 
         return warpCategory;
-    }
-
-    @Override
-    public WarpCategory getWarpCategory(String name) {
-        Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return warpCategories.get(name.toLowerCase(Locale.ENGLISH));
-    }
-
-    @Override
-    public WarpCategory getWarpCategory(int slot) {
-        return warpCategories.values().stream().filter(warpCategory -> warpCategory.getSlot() == slot)
-                .findAny().orElse(null);
     }
 
     @Override
@@ -3637,61 +4055,8 @@ public class SIsland implements Island {
     }
 
     @Override
-    public Map<String, WarpCategory> getWarpCategories() {
-        return Collections.unmodifiableMap(warpCategories);
-    }
-
-    @Override
-    public IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory) {
-        Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        if (!(location instanceof LazyWorldLocation))
-            Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
-
-        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, LazyWorldLocation.getWorldName(location));
-        WorldPosition worldPosition = SWorldPosition.of(location);
-
-        return createIslandInternal(name, worldInfo, worldPosition, warpCategory);
-    }
-
-    @Override
-    public IslandWarp createWarp(String name, WorldInfo worldInfo, WorldPosition position, @Nullable WarpCategory warpCategory) {
-        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
-        Preconditions.checkNotNull(position, "position parameter cannot be null.");
-
-        return createIslandInternal(name, worldInfo, position, warpCategory);
-    }
-
-    private IslandWarp createIslandInternal(String name, WorldInfo worldInfo, WorldPosition worldPosition, @Nullable WarpCategory warpCategory) {
-        Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        Preconditions.checkState(getWarp(name) == null, "Warp already exists: " + name);
-
-        Log.debug(Debug.CREATE_WARP, owner.getName(), name, worldInfo, worldPosition, warpCategory);
-
-        IslandWarp islandWarp = loadIslandWarp(name, worldInfo, worldPosition, warpCategory,
-                !plugin.getSettings().isPublicWarps(), null);
-
-        IslandsDatabaseBridge.saveWarp(this, islandWarp);
-
-        plugin.getMenus().refreshGlobalWarps();
-        plugin.getMenus().refreshWarps(islandWarp.getCategory());
-
-        return islandWarp;
-    }
-
-    /*
-     *  Warps related methods
-     */
-
-    @Override
-    public void renameWarp(IslandWarp islandWarp, String newName) {
-        Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
-        Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
-        Preconditions.checkArgument(IslandUtils.isWarpNameLengthValid(newName), "Warp names must cannot be longer than 255 chars.");
-        Preconditions.checkState(getWarp(newName) == null, "Cannot rename warps to an already existing warps.");
-
-        warpsByName.remove(islandWarp.getName().toLowerCase(Locale.ENGLISH));
-        warpsByName.put(newName.toLowerCase(Locale.ENGLISH), islandWarp);
-        islandWarp.setName(newName);
+    public Map<String, IslandWarp> getIslandWarps() {
+        return Collections.unmodifiableMap(warpsByName);
     }
 
     @Override
@@ -3708,35 +4073,52 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName) {
-        warpPlayer(superiorPlayer, warpName, false);
+    public IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, LazyWorldLocation.getWorldName(location));
+        WorldPosition worldPosition = SWorldPosition.of(location);
+
+        return createWarpInternal(name, worldInfo, worldPosition, warpCategory);
     }
 
     @Override
-    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName, boolean force) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(warpName, "warp parameter cannot be null.");
+    public IslandWarp createWarp(String name, WorldInfo worldInfo, WorldPosition position, @Nullable WarpCategory warpCategory) {
+        Preconditions.checkNotNull(worldInfo, "worldInfo parameter cannot be null.");
+        Preconditions.checkNotNull(position, "position parameter cannot be null.");
 
-        IslandWarp islandWarp = getWarp(warpName);
+        return createWarpInternal(name, worldInfo, position, warpCategory);
+    }
 
-        if (islandWarp == null) {
-            Message.INVALID_WARP.send(superiorPlayer, warpName);
-            return;
-        }
+    private IslandWarp createWarpInternal(String name, WorldInfo worldInfo, WorldPosition worldPosition, @Nullable WarpCategory warpCategory) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        Preconditions.checkState(getWarp(name) == null, "Warp already exists: " + name);
 
-        if (!force && !superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
-            if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
-                    .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
-                Message.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
-                return;
-            }
+        Log.debug(Debug.CREATE_WARP, owner.getName(), name, worldInfo, worldPosition, warpCategory);
 
-            plugin.getProviders().getEconomyProvider().withdrawMoney(superiorPlayer,
-                    plugin.getSettings().getChargeOnWarp());
-        }
+        IslandWarp islandWarp = loadIslandWarp(name, worldInfo, worldPosition, warpCategory,
+                !plugin.getSettings().isPublicWarps(), null);
 
-        EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getWarpsWarmup(),
-                unused -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp));
+        IslandsDatabaseBridge.saveWarp(this, islandWarp);
+
+        plugin.getMenus().refreshGlobalWarps();
+        plugin.getMenus().refreshWarps(islandWarp.getCategory());
+
+        return islandWarp;
+    }
+
+    @Override
+    public void renameWarp(IslandWarp islandWarp, String newName) {
+        Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
+        Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
+        Preconditions.checkArgument(IslandUtils.isWarpNameLengthValid(newName), "Warp names must cannot be longer than 255 chars.");
+        Preconditions.checkState(getWarp(newName) == null, "Cannot rename warps to an already existing warps.");
+
+        warpsByName.remove(islandWarp.getName().toLowerCase(Locale.ENGLISH));
+        warpsByName.put(newName.toLowerCase(Locale.ENGLISH), islandWarp);
+        islandWarp.setName(newName);
     }
 
     @Override
@@ -3786,9 +4168,66 @@ public class SIsland implements Island {
     }
 
     @Override
-    public Map<String, IslandWarp> getIslandWarps() {
-        return Collections.unmodifiableMap(warpsByName);
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName) {
+        warpPlayer(superiorPlayer, warpName, false);
     }
+
+    @Override
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warpName, boolean force) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(warpName, "warp parameter cannot be null.");
+
+        IslandWarp islandWarp = getWarp(warpName);
+
+        if (islandWarp == null) {
+            Message.INVALID_WARP.send(superiorPlayer, warpName);
+            return;
+        }
+
+        if (!force && !superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
+            if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
+                    .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
+                Message.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
+                return;
+            }
+
+            plugin.getProviders().getEconomyProvider().withdrawMoney(superiorPlayer,
+                    plugin.getSettings().getChargeOnWarp());
+        }
+
+        EntityTeleports.warmupTeleport(superiorPlayer, plugin.getSettings().getWarpsWarmup(),
+                unused -> warpPlayerWithoutWarmup(superiorPlayer, islandWarp));
+    }
+
+    @Override
+    public int getWarpsLimit() {
+        return this.warpsLimit.readAndGet(IntValue::get);
+    }
+
+    @Override
+    public int getWarpsLimitRaw() {
+        return this.warpsLimit.readAndGet(warpsLimit -> warpsLimit.getNonSynced(IslandUpgradeConstants.SYNCED_VALUE));
+    }
+
+    @Override
+    public void setWarpsLimit(int warpsLimit) {
+        int finalWarpsLimit = Math.max(IslandUpgradeConstants.NO_LIMIT_VALUE, warpsLimit);
+
+        Log.debug(Debug.SET_WARPS_LIMIT, owner.getName(), finalWarpsLimit);
+
+        IntValue oldWarpsLimit = this.warpsLimit.set(IntValue.fixed(finalWarpsLimit));
+
+        if (!oldWarpsLimit.isSynced() &&
+                finalWarpsLimit == IntValue.getNonSynced(oldWarpsLimit, IslandUpgradeConstants.SYNCED_VALUE)) {
+            return;
+        }
+
+        IslandsDatabaseBridge.saveWarpsLimit(this);
+    }
+
+    /*
+     *  Ratings related methods
+     */
 
     @Override
     public Rating getRating(SuperiorPlayer superiorPlayer) {
@@ -3982,10 +4421,6 @@ public class SIsland implements Island {
         plugin.getMenus().refreshSettings(this);
     }
 
-    /*
-     *  Ratings related methods
-     */
-
     @Override
     public void disableSettings(IslandFlag settings) {
         Preconditions.checkNotNull(settings, "settings parameter cannot be null.");
@@ -4085,112 +4520,160 @@ public class SIsland implements Island {
         plugin.getMenus().refreshSettings(this);
     }
 
-    @Override
-    public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
-        setGeneratorPercentage(key, percentage, dimension, null, false);
-    }
+    /*
+     *  Generator related methods
+     */
 
+    @Deprecated
     @Override
-    public boolean setGeneratorPercentage(Key key, int percentage, Dimension dimension,
-                                          @Nullable SuperiorPlayer caller, boolean callEvent) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+    public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        Log.debug(Debug.SET_GENERATOR_PERCENTAGE, owner.getName(), key, percentage, dimension.getName(), caller, callEvent);
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.writeAndGet(cobbleGeneratorValues ->
-                cobbleGeneratorValues.computeIfAbsent(dimension, e -> KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL)));
-
-        Preconditions.checkArgument(percentage >= 0 && percentage <= 100, "Percentage must be between 0 and 100 - got " + percentage + ".");
-
-        if (percentage == 0) {
-            if (callEvent && !PluginEventsFactory.callIslandRemoveGeneratorRateEvent(this, caller, key, dimension))
-                return false;
-
-            removeGeneratorAmount(key, dimension);
-        } else if (percentage == 100) {
-            KeyMap<IntValue> cobbleGeneratorValuesOriginal = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
-            cobbleGeneratorValuesOriginal.putAll(worldGeneratorRates);
-            worldGeneratorRates.clear();
-
-            int generatorRate = 1;
-
-            if (callEvent) {
-                PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event =
-                        PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, generatorRate);
-                if (event.isCancelled()) {
-                    // Restore the original values
-                    worldGeneratorRates.putAll(cobbleGeneratorValuesOriginal);
-                    return false;
-                }
-                generatorRate = event.getArgs().generatorRate;
-            }
-
-            setGeneratorAmount(key, generatorRate, dimension);
-        } else {
-            //Removing the key from the generator
-            removeGeneratorAmount(key, dimension);
-
-            int totalAmount = getGeneratorTotalAmount(dimension);
-            double realPercentage = percentage / 100D;
-            double amount = (realPercentage * totalAmount) / (1 - realPercentage);
-            if (amount < 1) {
-                worldGeneratorRates.entrySet().forEach(entry -> {
-                    int newAmount = entry.getValue().get() * 10;
-                    if (entry.getValue().isSynced()) {
-                        entry.setValue(IntValue.syncedFixed(newAmount));
-                    } else {
-                        entry.setValue(IntValue.fixed(newAmount));
-                    }
-                });
-                amount *= 10;
-            }
-
-            PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event =
-                    PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, (int) Math.round(amount));
-
-            if (event.isCancelled())
-                return false;
-
-            setGeneratorAmount(key, event.getArgs().generatorRate, dimension);
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
         }
 
-        return true;
+        Map<String, Integer> generatorAmountsBuilder = new HashMap<>();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) ->
+                generatorAmountsBuilder.put(key.toString(), amountValue.get()));
+
+        return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
     }
 
     @Override
-    public int getGeneratorPercentage(Key key, Dimension dimension) {
+    public Map<Key, Integer> getGeneratorAmountsAsKeys(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        KeyMap<Integer> generatorAmountsBuilder = KeyMap.createKeyMap();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) ->
+                generatorAmountsBuilder.put(key, amountValue.get()));
+
+        return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
+    }
+
+    @Override
+    public Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<Key, Integer> generatorAmountsBuilder = KeyMap.createKeyMap();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            if (!amountValue.isSynced()) {
+                generatorAmountsBuilder.put(key, amountValue.get());
+            }
+        });
+
+        return generatorAmountsBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsBuilder);
+    }
+
+    @Override
+    public int getGeneratorTotalAmount(Dimension dimension) {
+        int totalAmount = 0;
+
+        for (int amount : getGeneratorAmountsAsKeys(dimension).values()) {
+            totalAmount += amount;
+        }
+
+        return totalAmount;
+    }
+
+    @Override
+    public int getGeneratorAmount(Key key, Dimension dimension) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
 
-        int totalAmount = getGeneratorTotalAmount(dimension);
-        return totalAmount == 0 ? 0 : (getGeneratorAmount(key, dimension) * 100) / totalAmount;
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null) {
+            return 0;
+        }
+
+        IntValue generatorAmount = dimensionGeneratorAmounts.get(key);
+
+        return generatorAmount == null ? 0 : generatorAmount.get();
     }
 
     @Override
-    public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
+    public int getGeneratorAmountRaw(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-        return getGeneratorAmounts(dimension).keySet().stream().collect(Collectors.toMap(key -> key,
-                key -> getGeneratorAmount(Keys.ofMaterialAndData(key), dimension)));
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null) {
+            return IslandUpgradeConstants.SYNCED_VALUE;
+        }
+
+        return IntValue.getNonSynced(dimensionGeneratorAmounts.get(key), IslandUpgradeConstants.SYNCED_VALUE);
+    }
+
+    @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null) {
+            return 0;
+        }
+
+        IntValue generatorAmount = dimensionGeneratorAmounts.getRaw(key, null);
+
+        return generatorAmount == null ? 0 : generatorAmount.get();
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null) {
+            return IslandUpgradeConstants.SYNCED_VALUE;
+        }
+
+        return IntValue.getNonSynced(dimensionGeneratorAmounts.getRaw(key, null), IslandUpgradeConstants.SYNCED_VALUE);
     }
 
     @Override
     public void setGeneratorAmount(Key key, @Size int amount, Dimension dimension) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-        Preconditions.checkArgument(amount >= 0, "amount parameter must be non-negative.");
 
-        Log.debug(Debug.SET_GENERATOR_RATE, owner.getName(), key, amount, dimension);
+        int finalGeneratorAmount = Math.max(0, amount);
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.writeAndGet(cobbleGeneratorValues ->
-                cobbleGeneratorValues.computeIfAbsent(dimension, e -> KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL)));
+        Log.debug(Debug.SET_GENERATOR_RATE, owner.getName(), key, finalGeneratorAmount, dimension);
 
-        IntValue oldGeneratorRate = worldGeneratorRates.put(key, IntValue.fixed(amount));
+        KeyMap<IntValue> dimensionGeneratorAmount = this.generatorAmounts.writeAndGet(
+                generatorAmounts -> generatorAmounts.computeIfAbsent(dimension,
+                        unused -> KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL)));
 
-        if (amount == IntValue.getNonSynced(oldGeneratorRate, -1))
+        IntValue oldGeneratorAmount = dimensionGeneratorAmount.put(key, IntValue.fixed(finalGeneratorAmount));
+
+        if (oldGeneratorAmount != null && !oldGeneratorAmount.isSynced() &&
+                finalGeneratorAmount == IntValue.getNonSynced(oldGeneratorAmount, IslandUpgradeConstants.SYNCED_VALUE)) {
             return;
+        }
 
-        IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, amount);
+        IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, finalGeneratorAmount);
     }
 
     @Override
@@ -4200,83 +4683,24 @@ public class SIsland implements Island {
 
         Log.debug(Debug.REMOVE_GENERATOR_RATE, owner.getName(), key, dimension);
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
 
-        if (worldGeneratorRates == null)
+        if (dimensionGeneratorAmounts == null) {
             return;
-
-        IntValue oldGeneratorRate = worldGeneratorRates.get(key);
-
-        if (oldGeneratorRate == null || oldGeneratorRate.get() <= 0)
-            return;
-
-        if (oldGeneratorRate.isSynced()) {
-            // In case the old rate was upgrade-synced, we want to keep it in DB and cache as a 0 rate.
-            IslandsDatabaseBridge.saveGeneratorRate(this, dimension, key, 0);
-            worldGeneratorRates.put(key, IntValue.fixed(0));
-        } else {
-            IslandsDatabaseBridge.removeGeneratorRate(this, dimension, key);
-            worldGeneratorRates.remove(key);
         }
-    }
 
-    @Override
-    public int getGeneratorAmount(Key key, Dimension dimension) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+        IntValue oldGeneratorAmount = dimensionGeneratorAmounts.getRaw(key, null);
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
+        if (oldGeneratorAmount == null || oldGeneratorAmount.isSynced()) {
+            return;
+        }
 
-        if (worldGeneratorRates == null)
-            return 0;
+        dimensionGeneratorAmounts.remove(key);
+        IslandsDatabaseBridge.removeGeneratorRate(this, dimension, key);
 
-        IntValue generatorRate = worldGeneratorRates.get(key);
-        return generatorRate == null ? 0 : generatorRate.get();
-    }
-
-    @Override
-    public int getGeneratorTotalAmount(Dimension dimension) {
-        int totalAmount = 0;
-        for (int amt : getGeneratorAmounts(dimension).values())
-            totalAmount += amt;
-        return totalAmount;
-    }
-
-    @Override
-    public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
-
-        if (worldGeneratorRates == null)
-            return Collections.emptyMap();
-
-        Map<String, Integer> generatorAmountsResult = new HashMap<>();
-
-        worldGeneratorRates.forEach((blockKey, valueAmount) -> {
-            int amount = valueAmount.get();
-            if (amount > 0) {
-                generatorAmountsResult.put(blockKey.toString(), amount);
-            }
-        });
-
-        return generatorAmountsResult.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorAmountsResult);
-    }
-
-    @Override
-    public Map<Key, Integer> getCustomGeneratorAmounts(Dimension dimension) {
-        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
-
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
-
-        if (worldGeneratorRates == null)
-            return Collections.emptyMap();
-
-        return Collections.unmodifiableMap(worldGeneratorRates.entrySet().stream()
-                .filter(entry -> !entry.getValue().isSynced())
-                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
+        syncGeneratorAmount(DefaultUpgradeLevel.getInstance(), key, dimension);
+        plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                syncGeneratorAmount((SUpgradeLevel) getUpgradeLevel(upgrade), key, dimension));
     }
 
     @Override
@@ -4285,11 +4709,235 @@ public class SIsland implements Island {
 
         Log.debug(Debug.CLEAR_GENERATOR_RATES, owner.getName(), dimension.getName());
 
-        KeyMap<IntValue> worldGeneratorRates = this.cobbleGeneratorValues.readAndGet(
-                cobbleGeneratorValues -> cobbleGeneratorValues.get(dimension));
-        if (worldGeneratorRates != null && !worldGeneratorRates.isEmpty()) {
-            worldGeneratorRates.clear();
-            IslandsDatabaseBridge.clearGeneratorRates(this, dimension);
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null || dimensionGeneratorAmounts.isEmpty()) {
+            return;
+        }
+
+        List<Key> customGeneratorAmounts = new LinkedList<>();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            if (!amountValue.isSynced()) {
+                customGeneratorAmounts.add(key);
+            }
+        });
+
+        if (customGeneratorAmounts.isEmpty()) {
+            return;
+        }
+
+        customGeneratorAmounts.forEach(dimensionGeneratorAmounts::remove);
+        IslandsDatabaseBridge.clearGeneratorRates(this, dimension);
+
+        for (Key key : customGeneratorAmounts) {
+            syncGeneratorAmount(DefaultUpgradeLevel.getInstance(), key, dimension);
+            plugin.getUpgrades().getUpgrades().forEach(upgrade ->
+                    syncGeneratorAmount((SUpgradeLevel) getUpgradeLevel(upgrade), key, dimension));
+        }
+    }
+
+    @Deprecated
+    @Override
+    public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Integer> generatorPercentagesBuilder = new HashMap<>();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            generatorPercentagesBuilder.put(key.toString(), getGeneratorPercentage(key, dimension));
+        });
+
+        return generatorPercentagesBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorPercentagesBuilder);
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorPercentagesAsKeys(Dimension dimension) {
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        KeyMap<IntValue> dimensionGeneratorAmounts = this.generatorAmounts.readAndGet(dimension, EnumerateMap::get);
+
+        if (dimensionGeneratorAmounts == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<Key, Integer> generatorPercentagesBuilder = KeyMap.createKeyMap();
+
+        dimensionGeneratorAmounts.forEach((key, amountValue) -> {
+            generatorPercentagesBuilder.put(key, getGeneratorPercentage(key, dimension));
+        });
+
+        return generatorPercentagesBuilder.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(generatorPercentagesBuilder);
+    }
+
+    @Override
+    public int getGeneratorPercentage(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        long generatorTotalAmount = IslandUtils.getGeneratorTotalAmount(getGeneratorAmountsAsKeys(dimension));
+
+        return generatorTotalAmount == 0 ? 0 : (int) ((getGeneratorAmount(key, dimension) * 100L) / generatorTotalAmount);
+    }
+
+    @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        long generatorTotalAmount = IslandUtils.getGeneratorTotalAmount(getGeneratorAmountsAsKeys(dimension));
+
+        return generatorTotalAmount == 0 ? 0 : (int) ((getExactGeneratorAmount(key, dimension) * 100L) / generatorTotalAmount);
+    }
+
+    @Override
+    public void setGeneratorPercentage(Key key, int percentage, Dimension dimension) {
+        setGeneratorPercentage(key, percentage, dimension, null, false);
+    }
+
+    @Override
+    public boolean setGeneratorPercentage(Key key, int percentage, Dimension dimension,
+                                          @Nullable SuperiorPlayer caller, boolean callEvent) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkArgument(percentage >= 0 && percentage <= 100,
+                "Percentage must be between 0 and 100 - got " + percentage + ".");
+        Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
+
+        Log.debug(Debug.SET_GENERATOR_PERCENTAGE, owner.getName(), key, percentage, dimension.getName(), caller, callEvent);
+
+        if (percentage == 0) {
+            // There is nothing to remove if the key is not in the generator, or if its amount is already 0.
+            if (getExactGeneratorAmount(key, dimension) <= 0) {
+                return true;
+            }
+
+            if (callEvent && !PluginEventsFactory.callIslandRemoveGeneratorRateEvent(this, caller, key, dimension)) {
+                return false;
+            }
+
+            zeroGeneratorAmount(key, dimension);
+        } else {
+            // The new amounts are only calculated here, and applied after the event is called.
+            KeyMap<Long> otherGeneratorAmounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+            long otherTotalAmount = 0;
+
+            for (Map.Entry<Key, Integer> entry : getGeneratorAmountsAsKeys(dimension).entrySet()) {
+                if (entry.getValue() > 0 && !entry.getKey().equals(key)) {
+                    otherGeneratorAmounts.put(entry.getKey(), (long) entry.getValue());
+                    otherTotalAmount += entry.getValue();
+                }
+            }
+
+            if (otherTotalAmount == 0) {
+                // There are no other blocks, so the rest of the percentage is given to the default block of the generator.
+                Key defaultBlock = GeneratorType.fromDimension(dimension).getDefaultBlock();
+                if (defaultBlock != null && !defaultBlock.equals(key)) {
+                    otherGeneratorAmounts.put(defaultBlock, 1L);
+                    otherTotalAmount = 1;
+                }
+            }
+
+            KeyMap<Long> newDimensionGeneratorAmounts = KeyMaps.createHashMap(KeyIndicator.MATERIAL);
+            long amount = 1;
+
+            if (otherTotalAmount > 0) {
+                // The exact amounts: the key gets the total amount of the other blocks multiplied by the percentage,
+                // and the other blocks are multiplied by the rest of the percentage.
+                long multiplier = 100 - percentage;
+                amount = otherTotalAmount * percentage;
+                otherGeneratorAmounts.forEach((blockKey, value) -> newDimensionGeneratorAmounts.put(blockKey, value * multiplier));
+
+                long greatestCommonDivisor = getGreatestCommonDivisor(amount, newDimensionGeneratorAmounts);
+
+                long newTotalAmount = amount;
+                for (long value : newDimensionGeneratorAmounts.values()) {
+                    newTotalAmount += value;
+                }
+
+                if (newTotalAmount / greatestCommonDivisor > MAX_GENERATOR_TOTAL_AMOUNT) {
+                    // The exact amounts need a total that is too big, so the key gets its percentage of the max total,
+                    // and the other blocks share the rest of it.
+                    amount = MAX_GENERATOR_TOTAL_AMOUNT * percentage / 100;
+                    shareAmount(otherGeneratorAmounts, otherTotalAmount, MAX_GENERATOR_TOTAL_AMOUNT - amount,
+                            newDimensionGeneratorAmounts);
+                    greatestCommonDivisor = getGreatestCommonDivisor(amount, newDimensionGeneratorAmounts);
+                }
+
+                // Dividing by the greatest common divisor keeps the total amount as small as possible.
+                final long finalGreatestCommonDivisor = greatestCommonDivisor;
+                newDimensionGeneratorAmounts.replaceAll((blockKey, value) -> value / finalGreatestCommonDivisor);
+                amount /= greatestCommonDivisor;
+            }
+
+            int generatorRate = (int) amount;
+
+            if (callEvent) {
+                PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event =
+                        PluginEventsFactory.callIslandChangeGeneratorRateEvent(this, caller, key, dimension, generatorRate);
+
+                if (event.isCancelled()) {
+                    return false;
+                }
+
+                generatorRate = event.getArgs().generatorRate;
+            }
+
+            newDimensionGeneratorAmounts.forEach((blockKey, value) -> {
+                int newAmount = value.intValue();
+                if (newAmount == 0) {
+                    zeroGeneratorAmount(blockKey, dimension);
+                } else if (getExactGeneratorAmount(blockKey, dimension) != newAmount) {
+                    setGeneratorAmount(blockKey, newAmount, dimension);
+                }
+            });
+
+            setGeneratorAmount(key, generatorRate, dimension);
+        }
+
+        return true;
+    }
+
+    private static long getGreatestCommonDivisor(long a, long b) {
+        return b == 0 ? a : getGreatestCommonDivisor(b, a % b);
+    }
+
+    private static long getGreatestCommonDivisor(long amount, Map<Key, Long> amounts) {
+        long greatestCommonDivisor = amount;
+        for (long value : amounts.values()) {
+            greatestCommonDivisor = getGreatestCommonDivisor(greatestCommonDivisor, value);
+        }
+        return greatestCommonDivisor;
+    }
+
+    // Shares the new total between the blocks by their amounts. Every block gets its share rounded down, and the
+    // amount that is left is given to the blocks with the biggest remainders, so the shares add up to the new total.
+    private static void shareAmount(Map<Key, Long> amounts, long totalAmount, long newTotalAmount,
+                                    Map<Key, Long> sharedAmounts) {
+        List<Map.Entry<Key, Long>> sortedAmounts = new ArrayList<>(amounts.entrySet());
+        sortedAmounts.sort((first, second) -> {
+            int compare = Long.compare(second.getValue() * newTotalAmount % totalAmount,
+                    first.getValue() * newTotalAmount % totalAmount);
+            if (compare == 0)
+                compare = Long.compare(second.getValue(), first.getValue());
+            return compare != 0 ? compare : first.getKey().toString().compareTo(second.getKey().toString());
+        });
+
+        long leftAmount = newTotalAmount;
+
+        for (Map.Entry<Key, Long> entry : sortedAmounts) {
+            long sharedAmount = entry.getValue() * newTotalAmount / totalAmount;
+            sharedAmounts.put(entry.getKey(), sharedAmount);
+            leftAmount -= sharedAmount;
+        }
+
+        for (int i = 0; i < leftAmount; ++i) {
+            sharedAmounts.merge(sortedAmounts.get(i).getKey(), 1L, Long::sum);
         }
     }
 
@@ -4311,28 +4959,31 @@ public class SIsland implements Island {
 
         Log.debug(Debug.GENERATE_BLOCK, owner.getName(), location, dimension.getName(), optimizeDefaultBlock);
 
-        int totalGeneratorAmounts = getGeneratorTotalAmount(dimension);
+        // Calculating the total from the same map, instead of calling getGeneratorTotalAmount which builds it again.
+        Map<Key, Integer> dimensionGeneratorAmounts = getGeneratorAmountsAsKeys(dimension);
 
-        if (totalGeneratorAmounts == 0) {
+        long generatorTotalAmount = IslandUtils.getGeneratorTotalAmount(dimensionGeneratorAmounts);
+
+        if (generatorTotalAmount == 0) {
             Log.debugResult(Debug.GENERATE_BLOCK, "Return No Generator Rates", "null");
             return null;
         }
-
-        Map<String, Integer> generatorAmounts = getGeneratorAmounts(dimension);
 
         GeneratorType generatorType = GeneratorType.fromDimension(dimension);
         Key defaultBlockKey = generatorType.getDefaultBlock();
         Key newStateKey = defaultBlockKey;
 
-        if (totalGeneratorAmounts == 1) {
-            newStateKey = Keys.ofMaterialAndData(generatorAmounts.keySet().iterator().next());
+        if (dimensionGeneratorAmounts.size() == 1 && dimensionGeneratorAmounts.values().iterator().next() > 0) {
+            newStateKey = dimensionGeneratorAmounts.keySet().iterator().next();
         } else {
-            int generatedIndex = ThreadLocalRandom.current().nextInt(totalGeneratorAmounts);
-            int currentIndex = 0;
-            for (Map.Entry<String, Integer> entry : generatorAmounts.entrySet()) {
+            long generatedIndex = ThreadLocalRandom.current().nextLong(generatorTotalAmount);
+            long currentIndex = 0;
+
+            for (Map.Entry<Key, Integer> entry : dimensionGeneratorAmounts.entrySet()) {
                 currentIndex += entry.getValue();
+
                 if (generatedIndex < currentIndex) {
-                    newStateKey = Keys.ofMaterialAndData(entry.getKey());
+                    newStateKey = entry.getKey();
                     break;
                 }
             }
@@ -4380,6 +5031,10 @@ public class SIsland implements Island {
         return generatedBlock;
     }
 
+    /*
+     * Schematics related methods
+     */
+
     @Override
     public boolean wasSchematicGenerated(Dimension dimension) {
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null.");
@@ -4411,12 +5066,6 @@ public class SIsland implements Island {
     public Set<Dimension> getGeneratedSchematics() {
         return Collections.unmodifiableSet(this.generatedSchematics.readAndGet(generatedSchematics ->
                 generatedSchematics.collect(Dimension.values())));
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratedSchematicsFlag() {
-        return this.generatedSchematics.readAndGet(LegacyMasks::convertGeneratedSchematicsMask);
     }
 
     @Override
@@ -4498,7 +5147,7 @@ public class SIsland implements Island {
             calculationResult = calculationAlgorithm.calculateIsland(this);
         }
 
-        calculationResult.whenComplete((result, error) -> {
+        calculationResult.whenCompleteAsync((result, error) -> {
             beingRecalculated = false;
             boolean isLastActiveTask = plugin.getGrid().stopCalcTask();
 
@@ -4530,25 +5179,64 @@ public class SIsland implements Island {
 
             saveBlockCounts(this.currentTotalBlockCounts.get(), oldWorth, oldLevel, true, isLastActiveTask);
             updateLastTime();
-        });
+        }, BukkitExecutor.SYNC_EXECUTOR);
     }
 
     private boolean hasGiveInterestFailed() {
         return this.giveInterestFailed;
     }
 
-    private void applyEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
-        Player player = superiorPlayer.asPlayer();
-        if (player != null) {
-            getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
-                    new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
+    private void addPotionEffect(@Nullable Player player, PotionEffectType potionEffectType) {
+        if (player == null) {
+            return;
         }
+
+        IntValue effectLevel = this.effectLevels.get(potionEffectType);
+
+        if (effectLevel == null || effectLevel.get() < 1) {
+            return;
+        }
+
+        player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, effectLevel.get() - 1), true);
     }
 
-    private void removeEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
+    private void removePotionEffect(@Nullable Player player, PotionEffectType potionEffectType) {
+        if (player == null) {
+            return;
+        }
+
+        player.removePotionEffect(potionEffectType);
+    }
+
+    private void addPotionEffects(SuperiorPlayer superiorPlayer) {
         Player player = superiorPlayer.asPlayer();
-        if (player != null)
-            getPotionEffects().keySet().forEach(player::removePotionEffect);
+
+        if (player == null) {
+            return;
+        }
+
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            int level = levelValue.get();
+
+            if (level > 0) {
+                player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true);
+            }
+        });
+    }
+
+    private void removePotionEffects(SuperiorPlayer superiorPlayer) {
+        Player player = superiorPlayer.asPlayer();
+
+        if (player == null) {
+            return;
+        }
+
+        // A level of 0 doesn't give the effect, so a potion effect of that type is the player's own.
+        this.effectLevels.forEach((potionEffectType, levelValue) -> {
+            if (levelValue.get() > 0) {
+                player.removePotionEffect(potionEffectType);
+            }
+        });
     }
 
     private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {
@@ -4649,7 +5337,8 @@ public class SIsland implements Island {
         BigDecimal newLevel = getIslandLevel();
 
         if (oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
-            BukkitExecutor.async(() -> PluginEventsFactory.callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
+            registerTask(BukkitExecutor.async(() ->
+                    PluginEventsFactory.callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L));
         }
 
         BigInteger deltaBlockCounts = this.lastSavedBlockCounts.subtract(currentTotalBlocksCount);
@@ -4668,16 +5357,6 @@ public class SIsland implements Island {
         } else {
             IslandsDatabaseBridge.markBlockCountsToBeSaved(this);
         }
-    }
-
-    public void syncUpgrades(boolean overrideCustom) {
-        clearUpgrades(overrideCustom);
-
-        // We want to sync the default upgrade first, then the actual upgrades
-        syncUpgrade(DefaultUpgradeLevel.getInstance(), overrideCustom);
-
-        // Syncing all real upgrades
-        plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), overrideCustom));
     }
 
     /*
@@ -4719,8 +5398,8 @@ public class SIsland implements Island {
             return;
         }
 
-        superiorPlayer.teleport(location, success -> {
-            if (success) {
+        superiorPlayer.teleportWithResult(location, result -> {
+            if (result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
                 Message.TELEPORTED_TO_WARP.send(superiorPlayer);
                 if (superiorPlayer.isShownAsOnline()) {
                     IslandUtils.sendMessage(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
@@ -4738,14 +5417,14 @@ public class SIsland implements Island {
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(1));
+        this.changeAmountMissionsCompletedInternal(mission, false, counter -> counter.inc(1));
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.inc(-1));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.inc(-1));
     }
 
     @Override
@@ -4780,10 +5459,10 @@ public class SIsland implements Island {
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkArgument(mission.getIslandMission(), "mission parameter must be island-mission.");
-        this.changeAmountMissionsCompletedInternal(mission, counter -> counter.set(finishCount));
+        this.changeAmountMissionsCompletedInternal(mission, true, counter -> counter.set(finishCount));
     }
 
-    private void changeAmountMissionsCompletedInternal(Mission<?> mission, Function<Counter, Integer> action) {
+    private void changeAmountMissionsCompletedInternal(Mission<?> mission, boolean clearData, Function<Counter, Integer> action) {
         String missionName = mission.getName();
 
         MissionReference missionReference = new MissionReference(mission);
@@ -4794,8 +5473,8 @@ public class SIsland implements Island {
 
         Log.debug(Debug.SET_ISLAND_MISSION_COMPLETED, missionName, finishCount);
 
-        // We always want to reset data
-        mission.clearData(getOwner());
+        if (clearData)
+            mission.clearData(getOwner());
 
         if (newFinishCount > 0) {
             if (newFinishCount == oldFinishCount)
@@ -4842,10 +5521,6 @@ public class SIsland implements Island {
         return this.uuid.hashCode();
     }
 
-    /*
-     *  Private methods
-     */
-
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Island && (this == obj || this.uuid.equals(((Island) obj).getUniqueId()));
@@ -4866,6 +5541,10 @@ public class SIsland implements Island {
 
         return getOwner().getName().compareTo(other.getOwner().getName());
     }
+
+    /*
+     *  Private methods
+     */
 
     private IslandChest[] createDefaultIslandChests() {
         IslandChest[] islandChests = new IslandChest[plugin.getSettings().getIslandChests().getDefaultPages()];
@@ -4888,11 +5567,7 @@ public class SIsland implements Island {
         if (ticksToNextInterest <= 0) {
             giveInterest(true);
         } else {
-            this.bankInterestTask.set(bankInterestTask -> {
-                if (bankInterestTask != null)
-                    bankInterestTask.cancel();
-                return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
-            });
+            resetBankInterestTask(ticksToNextInterest);
         }
     }
 
@@ -4909,240 +5584,307 @@ public class SIsland implements Island {
         });
     }
 
-    private void updateOldUpgradeValues() {
-        this.blockLimits.forEach((block, limit) -> {
-            Integer defaultValue = plugin.getSettings().getDefaultValues().getBlockLimits().get(block);
-            if (defaultValue != null && (int) limit.get() == defaultValue)
-                this.blockLimits.put(block, IntValue.syncedFixed(defaultValue));
+    private void syncUpgrades(boolean overrideCustom) {
+        clearUpgrades(overrideCustom);
+
+        // We want to sync the default upgrade first, then the actual upgrades.
+        syncUpgrade(DefaultUpgradeLevel.getInstance(), overrideCustom);
+
+        // Syncing all real upgrades.
+        plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), overrideCustom));
+    }
+
+    private void clearUpgrades(boolean overrideCustom) {
+        if (overrideCustom || this.borderSize.get().isSynced()) {
+            setIslandSizeInternal(IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE));
+        }
+
+        this.cropGrowth.set(cropGrowth -> {
+            if (overrideCustom || cropGrowth.isSynced()) {
+                notifyCropGrowthChange(IslandUpgradeConstants.SYNCED_VALUE);
+
+                return DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
+            }
+
+            return cropGrowth;
         });
 
-        this.entityLimits.forEach((entity, limit) -> {
-            Integer defaultValue = plugin.getSettings().getDefaultValues().getEntityLimits().get(entity);
-            if (defaultValue != null && (int) limit.get() == defaultValue)
-                this.entityLimits.put(entity, IntValue.syncedFixed(defaultValue));
+        this.mobDrops.set(mobDrops -> {
+            if (overrideCustom || mobDrops.isSynced()) {
+                return DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
+            }
+
+            return mobDrops;
         });
 
-        this.cobbleGeneratorValues.write(cobbleGeneratorValues -> {
-            for (Dimension dimension : Dimension.values()) {
-                Map<Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getRealGeneratorsMap().get(dimension);
-                if (defaultGenerator != null) {
-                    KeyMap<IntValue> worldGeneratorRates = cobbleGeneratorValues.get(dimension);
+        this.spawnerRates.set(spawnerRates -> {
+            if (overrideCustom || spawnerRates.isSynced()) {
+                return DoubleValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
+            }
 
-                    if (worldGeneratorRates == null)
-                        continue;
+            return spawnerRates;
+        });
 
-                    worldGeneratorRates.forEach((key, rate) -> {
-                        Integer defaultValue = defaultGenerator.get(key);
-                        if (defaultValue != null && (int) rate.get() == defaultValue)
-                            worldGeneratorRates.put(key, IntValue.syncedFixed(defaultValue));
-                    });
+        this.bankLimit.set(bankLimit -> {
+            if (overrideCustom || bankLimit.isSynced()) {
+                return Value.syncedFixed(IslandUpgradeConstants.SYNCED_BANK_LIMIT_VALUE);
+            }
+
+            return bankLimit;
+        });
+
+        this.coopLimit.set(coopLimit -> {
+            if (overrideCustom || coopLimit.isSynced()) {
+                return IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
+            }
+
+            return coopLimit;
+        });
+
+        this.teamLimit.set(teamLimit -> {
+            if (overrideCustom || teamLimit.isSynced()) {
+                return IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
+            }
+
+            return teamLimit;
+        });
+
+        this.warpsLimit.set(warpsLimit -> {
+            if (overrideCustom || warpsLimit.isSynced()) {
+                return IntValue.syncedFixed(IslandUpgradeConstants.SYNCED_VALUE);
+            }
+
+            return warpsLimit;
+        });
+
+        this.blockLimits.forEach((key, blockLimit) -> {
+            if (overrideCustom && !blockLimit.isSynced()) {
+                IslandsDatabaseBridge.removeBlockLimit(this, key);
+            }
+
+            if (overrideCustom || blockLimit.isSynced()) {
+                this.blockLimits.remove(key);
+            }
+        });
+
+        this.entityLimits.forEach((key, entityLimit) -> {
+            if (overrideCustom && !entityLimit.isSynced()) {
+                IslandsDatabaseBridge.removeEntityLimit(this, key);
+            }
+
+            if (overrideCustom || entityLimit.isSynced()) {
+                this.entityLimits.remove(key);
+            }
+        });
+
+        this.roleLimits.write(roleLimits -> {
+            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
+
+            while (iterator.hasNext()) {
+                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
+
+                if (overrideCustom && !entry.getValue().isSynced()) {
+                    PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+                    if (playerRole != null) {
+                        IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
+                    }
+                }
+
+                if (overrideCustom || entry.getValue().isSynced()) {
+                    iterator.remove();
                 }
             }
         });
 
-        if (getIslandSize() == plugin.getSettings().getDefaultValues().getIslandSize())
-            this.islandSize.set(DefaultUpgradeLevel.getInstance().getBorderSizeUpgradeValue());
+        this.generatorAmounts.write(generatorAmounts -> {
+            for (Dimension dimension : Dimension.values()) {
+                KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
 
-        if (getWarpsLimit() == plugin.getSettings().getDefaultValues().getWarpsLimit())
-            this.warpsLimit.set(DefaultUpgradeLevel.getInstance().getWarpsLimitUpgradeValue());
+                if (dimensionGeneratorAmounts != null) {
+                    Iterator<Map.Entry<Key, IntValue>> iterator = dimensionGeneratorAmounts.entrySet().iterator();
 
-        if (getTeamLimit() == plugin.getSettings().getDefaultValues().getTeamLimit())
-            this.teamLimit.set(DefaultUpgradeLevel.getInstance().getTeamLimitUpgradeValue());
+                    while (iterator.hasNext()) {
+                        Map.Entry<Key, IntValue> entry = iterator.next();
 
-        if (getCoopLimit() == plugin.getSettings().getDefaultValues().getCoopLimit())
-            this.coopLimit.set(DefaultUpgradeLevel.getInstance().getCoopLimitUpgradeValue());
+                        if (overrideCustom && !entry.getValue().isSynced()) {
+                            IslandsDatabaseBridge.removeGeneratorRate(this, dimension, entry.getKey());
+                        }
 
-        if (getCropGrowthMultiplier() == plugin.getSettings().getDefaultValues().getCropGrowth())
-            this.cropGrowth.set(DefaultUpgradeLevel.getInstance().getCropGrowthUpgradeValue());
-
-        if (getSpawnerRatesMultiplier() == plugin.getSettings().getDefaultValues().getSpawnerRates())
-            this.spawnerRates.set(DefaultUpgradeLevel.getInstance().getSpawnerRatesUpgradeValue());
-
-        if (getMobDropsMultiplier() == plugin.getSettings().getDefaultValues().getMobDrops())
-            this.mobDrops.set(DefaultUpgradeLevel.getInstance().getMobDropsUpgradeValue());
-    }
-
-    private void clearUpgrades(boolean overrideCustom) {
-        if (overrideCustom || this.islandSize.get().isSynced()) {
-            setIslandSizeInternal(IntValue.syncedFixed(-1));
-        }
-
-        warpsLimit.set(warpsLimit -> {
-            if (overrideCustom || warpsLimit.isSynced()) {
-                return IntValue.syncedFixed(-1);
-            }
-            return warpsLimit;
-        });
-
-        teamLimit.set(teamLimit -> {
-            if (overrideCustom || teamLimit.isSynced()) {
-                return IntValue.syncedFixed(-1);
-            }
-            return teamLimit;
-        });
-
-        coopLimit.set(coopLimit -> {
-            if (overrideCustom || coopLimit.isSynced()) {
-                return IntValue.syncedFixed(-1);
-            }
-            return coopLimit;
-        });
-
-        cropGrowth.set(cropGrowth -> {
-            if (overrideCustom || cropGrowth.isSynced()) {
-                notifyCropGrowthChange(-1D);
-
-                return DoubleValue.syncedFixed(-1D);
-            }
-
-            return cropGrowth;
-        });
-
-        spawnerRates.set(spawnerRates -> {
-            if (overrideCustom || spawnerRates.isSynced()) {
-                return DoubleValue.syncedFixed(-1D);
-            }
-            return spawnerRates;
-        });
-
-        mobDrops.set(mobDrops -> {
-            if (overrideCustom || mobDrops.isSynced()) {
-                return DoubleValue.syncedFixed(-1D);
-            }
-            return mobDrops;
-        });
-
-        bankLimit.set(bankLimit -> {
-            if (overrideCustom || bankLimit.isSynced()) {
-                return Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE);
-            }
-            return bankLimit;
-        });
-
-        blockLimits.entrySet().stream()
-                .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
-
-        entityLimits.entrySet().stream()
-                .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
-
-        cobbleGeneratorValues.write(cobbleGeneratorValues -> {
-            cobbleGeneratorValues.values().forEach(cobbleGeneratorValue -> {
-                cobbleGeneratorValue.entrySet().stream()
-                        .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                        .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
-            });
-        });
-
-        islandEffects.entrySet().stream()
-                .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(IntValue.syncedFixed(-1)));
-
-        roleLimits.write(roleLimits -> {
-            Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = roleLimits.entryIterator();
-            while (iterator.hasNext()) {
-                Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
-                if (overrideCustom || entry.getValue().isSynced())
-                    entry.setValue(IntValue.syncedFixed(-1));
+                        if (overrideCustom || entry.getValue().isSynced()) {
+                            iterator.remove();
+                        }
+                    }
+                }
             }
         });
 
-        if (overrideCustom)
+        this.effectLevels.forEach((potionEffectType, effectLevel) -> {
+            if (overrideCustom && !effectLevel.isSynced()) {
+                IslandsDatabaseBridge.removeIslandEffect(this, potionEffectType);
+            }
+
+            if (overrideCustom || effectLevel.isSynced()) {
+                this.effectLevels.remove(potionEffectType);
+            }
+        });
+
+        if (overrideCustom) {
             IslandsDatabaseBridge.clearIslandSettings(this);
+        }
     }
 
     private void syncUpgrade(SUpgradeLevel upgradeLevel, boolean overrideCustom) {
-        cropGrowth.set(cropGrowth -> {
-            if ((overrideCustom || cropGrowth.isSynced()) && cropGrowth.get() < upgradeLevel.getCropGrowth()) {
-                notifyCropGrowthChange(upgradeLevel.getCropGrowth());
-                return upgradeLevel.getCropGrowthUpgradeValue();
+        if (upgradeLevel.hasBorderSize()) {
+            IntValue islandSize = this.borderSize.get();
+
+            if (overrideCustom || islandSize.isSynced()) {
+                setIslandSizeInternal(upgradeLevel.getBorderSizeUpgradeValue());
             }
+        }
 
-            return cropGrowth;
-        });
+        if (upgradeLevel.hasCropGrowth()) {
+            this.cropGrowth.set(cropGrowth -> {
+                if (overrideCustom || cropGrowth.isSynced()) {
+                    notifyCropGrowthChange(upgradeLevel.getCropGrowth());
+                    return upgradeLevel.getCropGrowthUpgradeValue();
+                }
 
-        spawnerRates.set(spawnerRates -> {
-            if ((overrideCustom || spawnerRates.isSynced()) && spawnerRates.get() < upgradeLevel.getSpawnerRates())
-                return upgradeLevel.getSpawnerRatesUpgradeValue();
-            return spawnerRates;
-        });
+                return cropGrowth;
+            });
+        }
 
-        mobDrops.set(mobDrops -> {
-            if ((overrideCustom || mobDrops.isSynced()) && mobDrops.get() < upgradeLevel.getMobDrops())
-                return upgradeLevel.getMobDropsUpgradeValue();
-            return mobDrops;
-        });
+        if (upgradeLevel.hasMobDrops()) {
+            this.mobDrops.set(mobDrops -> {
+                if (overrideCustom || mobDrops.isSynced()) {
+                    return upgradeLevel.getMobDropsUpgradeValue();
+                }
 
-        teamLimit.set(teamLimit -> {
-            if ((overrideCustom || teamLimit.isSynced()) && teamLimit.get() < upgradeLevel.getTeamLimit())
-                return upgradeLevel.getTeamLimitUpgradeValue();
-            return teamLimit;
-        });
+                return mobDrops;
+            });
+        }
 
-        warpsLimit.set(warpsLimit -> {
-            if ((overrideCustom || warpsLimit.isSynced()) && warpsLimit.get() < upgradeLevel.getWarpsLimit())
-                return upgradeLevel.getWarpsLimitUpgradeValue();
-            return warpsLimit;
-        });
+        if (upgradeLevel.hasSpawnerRates()) {
+            this.spawnerRates.set(spawnerRates -> {
+                if (overrideCustom || spawnerRates.isSynced()) {
+                    return upgradeLevel.getSpawnerRatesUpgradeValue();
+                }
 
-        coopLimit.set(coopLimit -> {
-            if ((overrideCustom || coopLimit.isSynced()) && coopLimit.get() < upgradeLevel.getCoopLimit())
-                return upgradeLevel.getCoopLimitUpgradeValue();
-            return coopLimit;
-        });
+                return spawnerRates;
+            });
+        }
 
-        IntValue islandSize = this.islandSize.get();
-        if ((overrideCustom || islandSize.isSynced()) && islandSize.get() < upgradeLevel.getBorderSize())
-            setIslandSizeInternal(upgradeLevel.getBorderSizeUpgradeValue());
+        if (upgradeLevel.hasBankLimit()) {
+            this.bankLimit.set(bankLimit -> {
+                if (overrideCustom || bankLimit.isSynced()) {
+                    return upgradeLevel.getBankLimitUpgradeValue();
+                }
 
-        bankLimit.set(bankLimit -> {
-            if ((overrideCustom || bankLimit.isSynced()) && bankLimit.get().compareTo(upgradeLevel.getBankLimit()) < 0)
-                return upgradeLevel.getBankLimitUpgradeValue();
-            return bankLimit;
-        });
+                return bankLimit;
+            });
+        }
+
+        if (upgradeLevel.hasCoopLimit()) {
+            this.coopLimit.set(coopLimit -> {
+                if (overrideCustom || coopLimit.isSynced()) {
+                    return upgradeLevel.getCoopLimitUpgradeValue();
+                }
+
+                return coopLimit;
+            });
+        }
+
+        if (upgradeLevel.hasTeamLimit()) {
+            this.teamLimit.set(teamLimit -> {
+                if (overrideCustom || teamLimit.isSynced()) {
+                    return upgradeLevel.getTeamLimitUpgradeValue();
+                }
+
+                return teamLimit;
+            });
+        }
+
+        if (upgradeLevel.hasWarpsLimit()) {
+            this.warpsLimit.set(warpsLimit -> {
+                if (overrideCustom || warpsLimit.isSynced()) {
+                    return upgradeLevel.getWarpsLimitUpgradeValue();
+                }
+
+                return warpsLimit;
+            });
+        }
 
         for (Map.Entry<Key, IntValue> entry : upgradeLevel.getBlockLimitsUpgradeValue().entrySet()) {
-            IntValue currentValue = blockLimits.getRaw(entry.getKey(), null);
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                blockLimits.put(entry.getKey(), entry.getValue());
+            IntValue currentValue = this.blockLimits.getRaw(entry.getKey(), null);
+
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    this.blockLimits.remove(entry.getKey());
+                } else {
+                    this.blockLimits.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
 
         for (Map.Entry<Key, IntValue> entry : upgradeLevel.getEntityLimitsUpgradeValue().entrySet()) {
-            IntValue currentValue = entityLimits.getRaw(entry.getKey(), null);
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                entityLimits.put(entry.getKey(), entry.getValue());
+            IntValue currentValue = this.entityLimits.getRaw(entry.getKey(), null);
+
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    this.entityLimits.remove(entry.getKey());
+                } else {
+                    this.entityLimits.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
 
-        EnumerateMap<Dimension, Map<Key, IntValue>> upgradeGeneratorRates = upgradeLevel.getGeneratorUpgradeValue();
-        if (!upgradeGeneratorRates.isEmpty()) {
-            this.cobbleGeneratorValues.write(cobbleGeneratorValues -> {
+        this.roleLimits.write(roleLimits -> {
+            for (Map.Entry<PlayerRole, IntValue> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()) {
+                IntValue currentValue = roleLimits.get(entry.getKey().getId());
+
+                if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                    if (entry.getValue().get() < 0) {
+                        roleLimits.remove(entry.getKey().getId());
+                    } else {
+                        roleLimits.put(entry.getKey().getId(), entry.getValue());
+                    }
+                }
+            }
+        });
+
+        EnumerateMap<Dimension, Map<Key, IntValue>> upgradeGeneratorAmounts = upgradeLevel.getGeneratorUpgradeValue();
+        if (!upgradeGeneratorAmounts.isEmpty()) {
+            this.generatorAmounts.write(generatorAmounts -> {
                 for (Dimension dimension : Dimension.values()) {
-                    Map<Key, IntValue> upgradeLevelGeneratorRates = upgradeGeneratorRates.get(dimension);
+                    Map<Key, IntValue> upgradeDimensionGeneratorAmounts = upgradeGeneratorAmounts.get(dimension);
 
-                    if (upgradeLevelGeneratorRates == null)
+                    if (upgradeDimensionGeneratorAmounts == null) {
                         continue;
-
-                    KeyMap<IntValue> worldGeneratorRates = cobbleGeneratorValues.get(dimension);
-
-                    if (worldGeneratorRates != null && !upgradeLevelGeneratorRates.isEmpty()) {
-                        KeyMap<IntValue> worldGeneratorRatesCopy = worldGeneratorRates;
-                        worldGeneratorRatesCopy.removeIf(key -> worldGeneratorRatesCopy.get(key).isSynced());
                     }
 
-                    for (Map.Entry<Key, IntValue> entry : upgradeLevelGeneratorRates.entrySet()) {
-                        Key block = entry.getKey();
-                        IntValue rate = entry.getValue();
+                    KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
 
-                        IntValue currentValue = worldGeneratorRates == null ? null : worldGeneratorRates.get(block);
-                        if (currentValue == null || ((overrideCustom || currentValue.isSynced()) &&
-                                currentValue.get() < rate.get())) {
-                            if (worldGeneratorRates == null) {
-                                worldGeneratorRates = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
-                                cobbleGeneratorValues.put(dimension, worldGeneratorRates);
+                    if (dimensionGeneratorAmounts != null && !upgradeDimensionGeneratorAmounts.isEmpty()) {
+                        KeyMap<IntValue> dimensionGeneratorAmountsCopy = dimensionGeneratorAmounts;
+                        dimensionGeneratorAmountsCopy.removeIf(key -> dimensionGeneratorAmountsCopy.get(key).isSynced());
+                    }
+
+                    for (Map.Entry<Key, IntValue> entry : upgradeDimensionGeneratorAmounts.entrySet()) {
+                        IntValue currentValue = dimensionGeneratorAmounts == null ? null : dimensionGeneratorAmounts.getRaw(entry.getKey(), null);
+
+                        if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                            if (entry.getValue().get() < 0) {
+                                if (dimensionGeneratorAmounts != null) {
+                                    dimensionGeneratorAmounts.remove(entry.getKey());
+                                }
+                            } else {
+                                if (dimensionGeneratorAmounts == null) {
+                                    dimensionGeneratorAmounts = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+                                    generatorAmounts.put(dimension, dimensionGeneratorAmounts);
+                                }
+
+                                dimensionGeneratorAmounts.put(entry.getKey(), entry.getValue());
                             }
-
-                            worldGeneratorRates.put(block, rate);
                         }
                     }
                 }
@@ -5152,9 +5894,15 @@ public class SIsland implements Island {
         boolean editedIslandEffects = false;
 
         for (Map.Entry<PotionEffectType, IntValue> entry : upgradeLevel.getPotionEffectsUpgradeValue().entrySet()) {
-            IntValue currentValue = islandEffects.get(entry.getKey());
-            if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get())) {
-                islandEffects.put(entry.getKey(), entry.getValue());
+            IntValue currentValue = this.effectLevels.get(entry.getKey());
+
+            if (currentValue == null || overrideCustom || currentValue.isSynced()) {
+                if (entry.getValue().get() < 0) {
+                    this.effectLevels.remove(entry.getKey());
+                } else {
+                    this.effectLevels.put(entry.getKey(), entry.getValue());
+                }
+
                 editedIslandEffects = true;
             }
         }
@@ -5162,14 +5910,105 @@ public class SIsland implements Island {
         if (editedIslandEffects) {
             applyEffects();
         }
+    }
 
-        roleLimits.write(roleLimits -> {
-            for (Map.Entry<PlayerRole, IntValue> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()) {
-                IntValue currentValue = roleLimits.get(entry.getKey().getId());
-                if (currentValue == null || ((overrideCustom || currentValue.isSynced()) && currentValue.get() < entry.getValue().get()))
-                    roleLimits.put(entry.getKey().getId(), entry.getValue());
+    private void syncBlockLimit(SUpgradeLevel upgradeLevel, Key key) {
+        IntValue blockLimit = upgradeLevel.getBlockLimitsUpgradeValue().get(key);
+
+        if (blockLimit != null) {
+            if (blockLimit.get() < 0) {
+                this.blockLimits.remove(key);
+            } else {
+                this.blockLimits.put(key, blockLimit);
+            }
+        }
+    }
+
+    private void syncEntityLimit(SUpgradeLevel upgradeLevel, Key key) {
+        IntValue entityLimit = upgradeLevel.getEntityLimitsUpgradeValue().get(key);
+
+        if (entityLimit != null) {
+            if (entityLimit.get() < 0) {
+                this.entityLimits.remove(key);
+            } else {
+                this.entityLimits.put(key, entityLimit);
+            }
+        }
+    }
+
+    private void syncRoleLimit(SUpgradeLevel upgradeLevel, PlayerRole playerRole) {
+        IntValue roleLimit = upgradeLevel.getRoleLimitsUpgradeValue().get(playerRole);
+
+        if (roleLimit != null) {
+            if (roleLimit.get() < 0) {
+                this.roleLimits.write(roleLimits -> roleLimits.remove(playerRole.getId()));
+            } else {
+                this.roleLimits.write(roleLimits -> roleLimits.put(playerRole.getId(), roleLimit));
+            }
+        }
+    }
+
+    private void syncEffectLevel(SUpgradeLevel upgradeLevel, PotionEffectType potionEffectType) {
+        IntValue effectLevel = upgradeLevel.getPotionEffectsUpgradeValue().get(potionEffectType);
+
+        if (effectLevel != null) {
+            if (effectLevel.get() < 0) {
+                this.effectLevels.remove(potionEffectType);
+            } else {
+                this.effectLevels.put(potionEffectType, effectLevel);
+            }
+        }
+    }
+
+    private void syncGeneratorAmount(SUpgradeLevel upgradeLevel, Key key, Dimension dimension) {
+        Map<Key, IntValue> upgradeDimensionGeneratorAmounts = upgradeLevel.getGeneratorUpgradeValue().get(dimension);
+
+        if (upgradeDimensionGeneratorAmounts == null || upgradeDimensionGeneratorAmounts.isEmpty()) {
+            return;
+        }
+
+        this.generatorAmounts.write(generatorAmounts -> {
+            KeyMap<IntValue> dimensionGeneratorAmounts = generatorAmounts.get(dimension);
+
+            if (dimensionGeneratorAmounts != null) {
+                IntValue currentValue = dimensionGeneratorAmounts.getRaw(key, null);
+
+                if (currentValue != null && currentValue.isSynced()) {
+                    dimensionGeneratorAmounts.remove(key);
+                }
+            }
+
+            IntValue generatorAmount = upgradeDimensionGeneratorAmounts.get(key);
+
+            if (generatorAmount != null) {
+                if (generatorAmount.get() < 0) {
+                    if (dimensionGeneratorAmounts != null) {
+                        dimensionGeneratorAmounts.remove(key);
+                    }
+                } else {
+                    if (dimensionGeneratorAmounts == null) {
+                        dimensionGeneratorAmounts = KeyMaps.createConcurrentHashMap(KeyIndicator.MATERIAL);
+                        generatorAmounts.put(dimension, dimensionGeneratorAmounts);
+                    }
+
+                    dimensionGeneratorAmounts.put(key, generatorAmount);
+                }
             }
         });
+    }
+
+    private void zeroGeneratorAmount(Key key, Dimension dimension) {
+        if (getExactGeneratorAmount(key, dimension) <= 0) {
+            return;
+        }
+
+        removeGeneratorAmount(key, dimension);
+
+        // Removing a custom amount brings back the synced amount of the key, if it has one.
+        // That amount is only known after the removal, so the key is then saved again with a custom amount of 0.
+        if (getExactGeneratorAmount(key, dimension) > 0) {
+            setGeneratorAmount(key, 0, dimension);
+        }
     }
 
     private void updateIslandChests() {
@@ -5255,18 +6094,44 @@ public class SIsland implements Island {
         }
     }
 
+    // Same as accessBlocksTracker, for a single block change. It is called for every block placed or broken,
+    // so it avoids allocating a capturing lambda.
+    private boolean trackOrUntrackBlock(boolean rawBlocks, boolean track, Key key, BigInteger amount) {
+        if (rawBlocks)
+            this.blocksTracker.setLoadingDataMode(true);
+
+        try {
+            return track ? this.blocksTracker.trackBlock(key, amount) : this.blocksTracker.untrackBlock(key, amount);
+        } finally {
+            if (rawBlocks)
+                this.blocksTracker.setLoadingDataMode(false);
+        }
+    }
+
+    private BukkitTask registerTask(@Nullable BukkitTask bukkitTask) {
+        if (bukkitTask != null) {
+            this.activeTasks.write(bukkitTask, Set::add);
+        }
+        return bukkitTask;
+    }
+
     public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, SIsland::onSettingsUpdate);
     }
 
     private static void onSettingsUpdate() {
-        DEFAULT_FLAGS_CACHE = new EnumerateSet<>(IslandFlag.values());
-        plugin.getSettings().getDefaultSettings().forEach(islandFlagName -> {
-            try {
-                DEFAULT_FLAGS_CACHE.add(IslandFlag.getByName(islandFlagName));
-            } catch (Throwable ignored) {
+        DEFAULT_FLAGS_CACHE = new UnparsedEnumerateSet<IslandFlag>(IslandFlag.values()) {
+            @Override
+            protected IslandFlag parseName(String name) {
+                return IslandFlag.getByNameOrNull(name);
             }
-        });
+
+            @Override
+            protected String getName(IslandFlag islandFlag) {
+                return islandFlag.getName();
+            }
+        };
+        plugin.getSettings().getDefaultSettings().forEach(DEFAULT_FLAGS_CACHE::addName);
     }
 
     private static WorldPosition adjustPositionToCenterOfBlock(@Nullable WorldPosition worldPosition) {
@@ -5294,6 +6159,33 @@ public class SIsland implements Island {
                 SWorldPosition.of(x, worldPosition.getY(), z, worldPosition.getYaw(), worldPosition.getPitch());
     }
 
+    private static class IslandBiome {
+
+        private Biome biome;
+        private CompletableFuture<Biome> task;
+
+        public Biome getBiome() {
+            return this.biome;
+        }
+
+        public void setBiome(Biome biome) {
+            this.biome = biome;
+        }
+
+        public CompletableFuture<Biome> getTask() {
+            return this.task;
+        }
+
+        public void setTask(CompletableFuture<Biome> task) {
+            this.task = task;
+        }
+
+        public void clearTask() {
+            this.task = null;
+        }
+
+    }
+
     public static class UniqueVisitor {
 
         private final Pair<SuperiorPlayer, Long> pair;
@@ -5317,7 +6209,7 @@ public class SIsland implements Island {
         }
 
         public long getLastVisitTime() {
-            return lastVisitTime;
+            return this.lastVisitTime;
         }
 
         public void setLastVisitTime(long lastVisitTime) {
@@ -5331,15 +6223,19 @@ public class SIsland implements Island {
 
         @Override
         public int hashCode() {
-            return Objects.hash(superiorPlayer, lastVisitTime);
+            return Objects.hash(this.superiorPlayer, this.lastVisitTime);
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            UniqueVisitor that = (UniqueVisitor) o;
-            return lastVisitTime == that.lastVisitTime && superiorPlayer.equals(that.superiorPlayer);
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            UniqueVisitor that = (UniqueVisitor) obj;
+            return this.lastVisitTime == that.lastVisitTime && this.superiorPlayer.equals(that.superiorPlayer);
         }
 
     }

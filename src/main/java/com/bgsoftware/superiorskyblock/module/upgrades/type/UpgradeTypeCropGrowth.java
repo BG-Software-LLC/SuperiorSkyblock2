@@ -18,9 +18,6 @@ import java.util.List;
 
 public class UpgradeTypeCropGrowth implements IUpgradeType {
 
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddCropGrowth(),
-            new CmdAdminSetCropGrowth());
-
     private final SuperiorSkyblockPlugin plugin;
 
     public UpgradeTypeCropGrowth(SuperiorSkyblockPlugin plugin) {
@@ -29,27 +26,12 @@ public class UpgradeTypeCropGrowth implements IUpgradeType {
 
     @Override
     public List<Listener> getListeners() {
-        return Collections.singletonList(new CropGrowthListener());
+        return Collections.emptyList();
     }
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
-    }
-
-    private class CropGrowthListener implements Listener {
-
-        // Should potentially fix crop growth tile entities "disappearing"
-        @EventHandler(priority = EventPriority.LOWEST)
-        public void onBlockGrow(BlockGrowEvent e) {
-            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-                Location blockLocation = e.getBlock().getLocation(wrapper.getHandle());
-                Island island = plugin.getGrid().getIslandAt(blockLocation);
-                if (island != null && island.isInsideRange(blockLocation))
-                    plugin.getNMSChunks().startTickingChunk(island, e.getBlock().getChunk(), false);
-            }
-        }
-
+        return Arrays.asList(new CmdAdminAddCropGrowth(), new CmdAdminSetCropGrowth());
     }
 
 }

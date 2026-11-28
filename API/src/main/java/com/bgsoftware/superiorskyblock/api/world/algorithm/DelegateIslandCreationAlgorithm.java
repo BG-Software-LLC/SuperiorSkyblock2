@@ -29,4 +29,14 @@ public class DelegateIslandCreationAlgorithm implements IslandCreationAlgorithm 
         return this.handle.createIsland(builder, lastIsland);
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
+
 }

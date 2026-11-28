@@ -5,14 +5,15 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.MenuConfigEditor;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.ChatColor;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class ConfigEditorPagedObjectButton extends AbstractPagedMenuButton<MenuC
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuConfigEditor.View> context) {
         MenuConfigEditor.View currentView = getView();
         SuperiorPlayer inventoryViewer = currentView.getInventoryViewer();
         Player player = inventoryViewer.asPlayer();
@@ -33,7 +34,8 @@ public class ConfigEditorPagedObjectButton extends AbstractPagedMenuButton<MenuC
             return;
 
         try {
-            String sectionPath = currentView.getPathSlots().get((currentView.getCurrentPage() - 1) * 36 + clickEvent.getRawSlot());
+            String sectionPath = currentView.getPathSlots().get((currentView.getCurrentPage() - 1) * 36 +
+                    context.getClickedSlot());
 
             if (sectionPath == null)
                 return;
@@ -66,7 +68,7 @@ public class ConfigEditorPagedObjectButton extends AbstractPagedMenuButton<MenuC
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         return pagedObject;
     }
 
@@ -120,9 +122,8 @@ public class ConfigEditorPagedObjectButton extends AbstractPagedMenuButton<MenuC
 
         @Override
         public PagedMenuTemplateButton<MenuConfigEditor.View, ItemStack> build() {
-            return new PagedMenuTemplateButtonImpl<>(null, null, null, null,
-                    null, null, getButtonIndex(),
-                    ConfigEditorPagedObjectButton.class, ConfigEditorPagedObjectButton::new);
+            return new PagedMenuTemplateButtonImpl<>(this, ConfigEditorPagedObjectButton.class,
+                    ConfigEditorPagedObjectButton::new);
         }
 
     }

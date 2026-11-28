@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -127,13 +128,18 @@ public class IslandOutsideListener extends AbstractGameEventListener {
     private void handlePlayerMoveOutsideIslandTeleport(SuperiorPlayer superiorPlayer, Location from, boolean forceTeleport) {
         Island fromIsland = plugin.getGrid().getIslandAt(from);
 
+        Player player = superiorPlayer.asPlayer();
+
         // We don't teleport in case we're inside the island, we just cancel the event.
-        if (!forceTeleport && fromIsland != null && fromIsland.isInsideRange(from))
+        // However, if the player is in vehicle, we want to eject him and teleport.
+        if (!forceTeleport && fromIsland != null && fromIsland.isInsideRange(from) && !player.isInsideVehicle())
             return;
 
+        player.eject();
+
         if (fromIsland != null) {
-            superiorPlayer.teleport(fromIsland, result -> {
-                if (!result) {
+            superiorPlayer.teleportWithResult(fromIsland, result -> {
+                if (result != PlayerTeleportAlgorithm.TeleportResult.SUCCESS) {
                     superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
                 }
             });

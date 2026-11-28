@@ -151,11 +151,9 @@ stacked-blocks:
     # The title of the menu.
     title: '&lDeposit Blocks'
 
-# Set a formula to calculate the island level by it's worth.
+# The formula used to calculate a block's level when it has a worth defined but no level specified.
 # Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
-# If you use Java 15 or above (Minecraft 1.16+), check out this page:
-# https://wiki.bg-software.com/superiorskyblock/new-java-engine
-island-level-formula: '{} / 2'
+block-level-formula: '{} / 2'
 
 # Should the island levels be a rounded integer?
 rounded-island-level: false
@@ -200,6 +198,7 @@ island-roles:
   coop:
     name: 'Coop'
     permissions:
+      - ALLAY_INTERACT
       - ANIMAL_BREED
       - ANIMAL_DAMAGE
       - ANIMAL_SHEAR
@@ -208,6 +207,7 @@ island-roles:
       - BUILD
       - CLOSE_BYPASS
       - CHORUS_FRUIT
+      - COPPER_GOLEM_INTERACT
       - CROPS_GROWTH
       - DROP_ITEMS
       - DYE_SHEEP
@@ -231,10 +231,11 @@ island-roles:
       - PICKUP_AXOLOTL
       - PICKUP_DROPS
       - PICKUP_FISH
-      - PICKUP_LECTERN_BOOK
+      - READ_LECTERN_BOOK
       - SADDLE_ENTITY
       - SIGN_INTERACT
       - SCULK_SENSOR
+      - SULFUR_CUBE_INTERACT
       - TURTLE_EGG_TRAMPING
       - USE
       - VILLAGER_TRADING
@@ -324,65 +325,91 @@ visitors-sign:
   active: '&a[Welcome]'
   # The line that will be displayed when the sign is inactive.
   inactive: '&c[Welcome]'
+  # The format in which the island description lines will be saved, players can set the island description
+  # by entering it in the next lines of the Visitors Sign. Useful if you want to display a description
+  # in the global-warps menu and want to give it a default color. {0} represents the text on that line.
+  description-line-format: '{0}'
 
 # Settings related to the island worlds.
 worlds:
   # The default world that will be used.
-  # Use normal, nether or the_end.
-  # If nether or the_end are used but they are disabled below, they wi
+  # Use one of the dimensions from below.
+  # The dimension must be enabled or the server won't start.
   default-world: normal
   # Set the name of the islands world.
   world-name: SuperiorWorld
-  # Settings related to the normal world.
-  normal:
-    # Should the normal world be enabled?
-    enabled: true
-    # Should the normal be unlocked by default to islands?
-    unlock: true
-    # Should the schematics in this world will not be counted towards worth and level values?
-    schematic-offset: true
-    # The default biome for the world.
-    # If the biome is invalid, PLAINS will be set.
-    biome: PLAINS
-  # Settings related to the nether world.
-  nether:
-    # Should the nether world be enabled?
-    enabled: false
-    # Should the nether be unlocked by default to islands?
-    unlock: true
-    # Custom name for the nether world.
-    # When empty, the name will be "<island-world>_nether"
-    name: ''
-    # Should the schematics in this world will not be counted towards worth and level values?
-    schematic-offset: true
-    # The default biome for the world.
-    # If the biome is invalid, NETHER (or it's 1.16 equivalent) will be used.
-    biome: NETHER_WASTES
-  end:
-    # Should the end world be enabled?
-    enabled: false
-    # Should the end be unlocked by default to islands?
-    unlock: false
-    # Custom name for the end world.
-    # When empty, the name will be "<island-world>_the_end"
-    name: ''
-    # Should the schematics in this world will not be counted towards worth and level values?
-    schematic-offset: true
-    # The default biome for the world.
-    # If the biome is invalid, THE_END will be used.
-    biome: THE_END
-    # Settings related to dragon fights on the server.
-    dragon-fight:
-      # Whether dragon fights should be enabled.
-      # If enabled, each island will have it's own ender dragon to battle with.
-      enabled: false
-      # The offset of the end portal (where it should be spawning) from the middle of the island.
-      # The format is '<offset-x>, <offset-y>, <offset-z>' (may be negative).
-      # Having the offset going beyond the island-radius is an undefined behavior!
-      portal-offset: '0, 0, 0'
-
   # The difficulty of the island worlds.
   difficulty: EASY
+  # Set the sea level height for island worlds.
+  sea-level-height: 100
+  # Settings related to the dimensions of the plugin.
+  # You can create custom dimensions by adding them here.
+  dimensions:
+    # Settings related to the normal world.
+    normal:
+      # Should the normal world be enabled?
+      enabled: true
+      # Should the normal be unlocked by default to islands?
+      unlock: true
+      # Should the schematics in this world will not be counted towards worth and level values?
+      schematic-offset: true
+      # The environment of this world
+      environment: NORMAL
+      # The default biome for the world.
+      # If the biome is invalid, PLAINS will be set.
+      biome: PLAINS
+      # Configure the portal agents
+      portals:
+        NETHER: nether
+        ENDER: the_end
+    # Settings related to the nether world.
+    nether:
+      # Should the nether world be enabled?
+      enabled: false
+      # Should the nether be unlocked by default to islands?
+      unlock: true
+      # Custom name for the nether world.
+      # When empty, the name will be "<island-world>_nether"
+      name: ''
+      # Should the schematics in this world will not be counted towards worth and level values?
+      schematic-offset: true
+      # The environment of this world
+      environment: NETHER
+      # The default biome for the world.
+      # If the biome is invalid, NETHER (or it's 1.16 equivalent) will be used.
+      biome: NETHER_WASTES
+      # Configure the portal agents
+      portals:
+        NETHER: normal
+        ENDER: the_end
+    the_end:
+      # Should the end world be enabled?
+      enabled: false
+      # Should the end be unlocked by default to islands?
+      unlock: false
+      # Custom name for the end world.
+      # When empty, the name will be "<island-world>_the_end"
+      name: ''
+      # Should the schematics in this world will not be counted towards worth and level values?
+      schematic-offset: true
+      # The environment of this world
+      environment: THE_END
+      # The default biome for the world.
+      # If the biome is invalid, THE_END will be used.
+      biome: THE_END
+      # Configure the portal agents
+      portals:
+        NETHER: nether
+        ENDER: normal
+      # Settings related to dragon fights on the server.
+      dragon-fight:
+        # Whether dragon fights should be enabled.
+        # If enabled, each island will have it's own ender dragon to battle with.
+        enabled: false
+        # The offset of the end portal (where it should be spawning) from the middle of the island.
+        # The format is '<offset-x>, <offset-y>, <offset-z>' (may be negative).
+        # Having the offset going beyond the island-radius is an undefined behavior!
+        portal-offset: '0, 0, 0'
 
 # All settings related to the spawn island.
 spawn:
@@ -438,12 +465,11 @@ coop-damage: true
 island-top-include-leader: true
 
 # Set default placeholders that will be returned if the island is null.
-# Please use the <placeholder>:<default> format.
 # You can find a list of placeholders here: https://bg-software.com/superiorskyblock/#placeholders
 default-placeholders:
-  - 'superior_island_leader:N/A'
-  - 'superior_island_level:0'
-  - 'superior_island_worth:0'
+  'superior_island_leader': 'N/A'
+  'superior_island_level': '0'
+  'superior_island_worth': '0'
 
 # Should a confirm gui be displayed when /is ban is executed.
 ban-confirm: true
@@ -459,14 +485,6 @@ leave-confirm: true
 
 # Should a confirm gui be displayed when /is transfer is executed.
 transfer-confirm: true
-
-# If you want a specific spawners provider to use, specify it here.
-# Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
-spawners-provider: 'AUTO'
-
-# If you want a specific stacked-blocks provider to use, specify it here.
-# Providers: Auto, WildStacker, RoseStacker
-stacked-blocks-provider: 'AUTO'
 
 # All settings related to island names.
 island-names:
@@ -493,6 +511,10 @@ island-names:
 
   # Should the plugin prevent players from using player names as island names?
   prevent-player-names: false
+
+  # Should the name change announcement be sent to all players?
+  # When disabled, only island members will see the announcement.
+  announce-change-to-all: true
 
 # Should players get teleported to the island when they create it?
 teleport-on-create: true
@@ -773,10 +795,26 @@ default-border-color: BLUE
 # Should obsidian get turned into a lava bucket when clicking it with a bucket in hand?
 obsidian-to-lava: false
 
-# Should the worth values be synced with other prices providers?
+# If you want a specific spawners provider to use, specify it here.
+# Providers: Auto, AdvancedSpawners, EpicSpawners, MergedSpawner, PvpingSpawners, RoseStacker, SilkSpawners, UltimateStacker, WildStacker
+spawners-provider: 'AUTO'
+
+# If you want a specific stacked-blocks provider to use, specify it here.
+# Providers: Auto, RoseStacker, WildStacker
+stacked-blocks-provider: 'AUTO'
+
+# If you want a specific prices provider to use, specify it here.
+# Providers: Auto, CMI, EconomyShopGUI, Essentials, ExcellentShop, GUIShop, newtShop, NextGens, QuantumShop, ShopGUIPlus, zShop
+prices-provider: 'AUTO'
+
+# If you want a specific vanish provider to use, specify it here.
+# Metadata uses the Bukkit 'vanished' metadata value.
+# Providers: Auto, Metadata (or Default), VanishNoPacket, SuperVanish, PremiumVanish, Essentials, CMI
+vanish-provider: 'AUTO'
+
+# Should the worth values be synced with the prices provider?
 # You can set the following values: NONE (disabled), BUY (buy prices), SELL (sell prices)
-# Supported Providers: ShopGUIPlus
-sync-worth: NONE
+sync-worth: 'NONE'
 
 # Can the worth value of the island be negative?
 negative-worth: true
@@ -791,6 +829,13 @@ disabled-events: [ ]
 # A list of commands that should be disabled within the plugin.
 # You can add a label or an alias of a command to disable it.
 disabled-commands: [ ]
+
+# A list of admin sub-commands that are considered dangerous.
+# When a player executes one of them, the command is not executed until the console approves it
+# by executing the same admin sub-command without arguments (e.g. "is admin purge").
+# Requests expire after 1 minute, or when the player leaves the server.
+# You can add a label or an alias of an admin command.
+dangerous-commands: [ ]
 
 # List of plugins that their hooks should not be enabled.
 # Simply add the plugin's name in order to prevent it from enabling.
@@ -833,10 +878,6 @@ override-default-aliases: false
 #   - gui
 #   - menu
 command-aliases: { }
-
-# A list of valuable blocks.
-# These blocks require the "VALUABLE_BREAK" permission in order to break them.
-valuable-blocks: [ ]
 
 # Settings related to the island previews.
 island-previews:
@@ -949,16 +990,10 @@ chat-signing-support: true
 # Setting this to 0 or below will result all commands to be shown in a single page.
 commands-per-page: 7
 
-# Configure custom entity categories.
-# By default, there are two entity categories - ANIMALS and MONSTER
-# You can add your own custom categories in here, and configure which entities are part of the category.
-# Entities in the custom categories will have custom privileges and flags for damaging and spawning them.
-# You can add the custom privileges and island flags manually to the menus.
-# For example:
-#   entity-categories:
-#     VILLAGERS:
-#     - VILLAGER
-# The `VILLAGERS` category will have VILLAGER entities in it.
-# The privileges `VILLAGERS_SPAWN` and `VILLAGERS_DAMAGE` will be required by players, and the island flags
-# `SPAWNER_VILLAGERS_SPAWN` and `NATURAL_VILLAGERS_SPAWN` will be required to be enabled for the island.
-entity-categories: { }
+# Should players receive a help instead of an `INVALID_COMMAND` message
+# when using a command that doesn't exist?
+help-on-invalid-command: true
+
+# Should players receive a help instead of a `NO_COMMAND_PERMISSION` message
+# when using a command they don't have permission for?
+help-on-no-permission: false

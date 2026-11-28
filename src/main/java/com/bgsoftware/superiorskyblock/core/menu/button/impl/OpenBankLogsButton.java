@@ -4,9 +4,9 @@ import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.impl.IslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class OpenBankLogsButton extends AbstractMenuViewButton<IslandMenuView> {
 
@@ -15,7 +15,7 @@ public class OpenBankLogsButton extends AbstractMenuViewButton<IslandMenuView> {
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<IslandMenuView> context) {
         menuView.setPreviousMove(false);
         plugin.getMenus().openBankLogs(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), menuView.getIsland());
     }
@@ -24,8 +24,7 @@ public class OpenBankLogsButton extends AbstractMenuViewButton<IslandMenuView> {
 
         @Override
         public MenuTemplateButton<IslandMenuView> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, OpenBankLogsButton.class, OpenBankLogsButton::new);
+            return new MenuTemplateButtonImpl<>(this, OpenBankLogsButton.class, OpenBankLogsButton::new);
         }
 
     }

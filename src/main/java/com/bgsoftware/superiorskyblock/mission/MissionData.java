@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.mission;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,6 +24,8 @@ public class MissionData {
     private final boolean islandMission;
     private final boolean disbandReset;
     private final boolean leaveReset;
+    private final boolean resetAfterFinish;
+    private final int resetAmount;
     @Nullable
     private final TemplateItem notCompleted;
     @Nullable
@@ -32,7 +34,6 @@ public class MissionData {
     private final TemplateItem locked;
     @Nullable
     private final TemplateItem completed;
-    private final int resetAmount;
 
     MissionData(Mission<?> mission, String missionCategoryName, ConfigurationSection section) {
         this.index = currentIndex++;
@@ -42,10 +43,11 @@ public class MissionData {
         this.disbandReset = section.getBoolean("disband-reset", false);
         this.leaveReset = section.getBoolean("leave-reset", false);
         this.resetAmount = section.getInt("reset-amount", 1);
+        this.resetAfterFinish = section.getBoolean("reset-after-finish", true);
 
         if (section.isConfigurationSection("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                TemplateItem templateItem = MenuParserImpl.getInstance().getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
+                TemplateItem templateItem = MenuParserUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
                 if (templateItem != null) {
                     ItemStack itemStack = templateItem.build();
                     itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
@@ -58,10 +60,10 @@ public class MissionData {
 
         String missionFilePath = "modules/missions/categories/" + missionCategoryName + "/" + this.missionName + ".yml";
 
-        this.notCompleted = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.not-completed"));
-        this.canComplete = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.can-complete"));
-        this.locked = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.locked"));
-        this.completed = MenuParserImpl.getInstance().getItemStack(missionFilePath, section.getConfigurationSection("icons.completed"));
+        this.notCompleted = MenuParserUtils.getItemStack(missionFilePath, section.getConfigurationSection("icons.not-completed"));
+        this.canComplete = MenuParserUtils.getItemStack(missionFilePath, section.getConfigurationSection("icons.can-complete"));
+        this.locked = MenuParserUtils.getItemStack(missionFilePath, section.getConfigurationSection("icons.locked"));
+        this.completed = MenuParserUtils.getItemStack(missionFilePath, section.getConfigurationSection("icons.completed"));
     }
 
     public boolean isAutoReward() {
@@ -98,6 +100,10 @@ public class MissionData {
 
     public int getResetAmount() {
         return resetAmount;
+    }
+
+    public boolean isResetAfterFinish() {
+        return resetAfterFinish;
     }
 
     public boolean hasLocked() {

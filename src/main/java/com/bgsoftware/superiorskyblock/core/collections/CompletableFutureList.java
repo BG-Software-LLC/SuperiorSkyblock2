@@ -15,7 +15,7 @@ public class CompletableFutureList<E> extends ArrayList<CompletableFuture<E>> {
         this.timeout = timeout;
     }
 
-    public void forEachCompleted(Consumer<? super E> consumer, Consumer<Throwable> onFailure) {
+    public boolean forEachCompleted(Consumer<? super E> consumer, Consumer<Throwable> onFailure) {
         CompletableFuture<Void> allTasks = CompletableFuture.allOf(toArray(new CompletableFuture[0])).thenRun(() -> {
             for (CompletableFuture<E> completableFuture : this) {
                 E result = completableFuture.getNow(null);
@@ -33,7 +33,10 @@ public class CompletableFutureList<E> extends ArrayList<CompletableFuture<E>> {
             allTasks.get(timeout, TimeUnit.SECONDS);
         } catch (Throwable error) {
             Log.error(error, "An unexpected error occurred while waiting for tasks to complete:");
+            return false;
         }
+
+        return true;
     }
 
 }

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world.WorldEditSessionImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import net.minecraft.core.BlockPos;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec2;
 import org.bukkit.Location;
 
 import java.util.Collections;
@@ -39,7 +41,7 @@ public class WorldEditSessionDataImpl implements WorldEditSession.Data {
     public WorldEditSessionDataImpl(Location baseLocation, Long2ObjectMapView<WorldEditSessionImpl.ChunkData> chunks,
                                     List<Pair<BlockPos, BlockState>> blocksToUpdate,
                                     List<Pair<BlockPos, CompoundTag>> blockEntities,
-                                    Set<ChunkPos> lightenChunks) {
+                                    Set<Vec2> lightenChunks) {
         int baseBlockPosXAxis = baseLocation.getBlockX();
         int baseBlockPosYAxis = baseLocation.getBlockY();
         int baseBlockPosZAxis = baseLocation.getBlockZ();
@@ -91,8 +93,8 @@ public class WorldEditSessionDataImpl implements WorldEditSession.Data {
 
         // Convert lights
         lightenChunks.forEach(lightPosition -> {
-            this.lightenChunks.add(new PositionedObject<>(lightPosition.x - baseChunkPosXAxis,
-                    lightPosition.z - baseChunkPosZAxis, null));
+            this.lightenChunks.add(new PositionedObject<>((int)lightPosition.x - baseChunkPosXAxis,
+                    (int)lightPosition.y - baseChunkPosZAxis, null));
         });
     }
 
@@ -100,7 +102,7 @@ public class WorldEditSessionDataImpl implements WorldEditSession.Data {
                            int baseBlockPosZAxis, WorldEditSessionImpl worldEditSession,
                            Long2ObjectMapView<WorldEditSessionImpl.ChunkData> chunks) {
         this.chunks.forEach(chunkDataPositioned -> {
-            long newPos = ChunkPos.asLong(baseChunkPosXAxis + chunkDataPositioned.xOffset,
+            long newPos = NMSUtils.getChunkPackedPos(baseChunkPosXAxis + chunkDataPositioned.xOffset,
                     baseChunkPosZAxis + chunkDataPositioned.zOffset);
 
             List<BlockPos> lights = chunkDataPositioned.object.lights.isEmpty() ? Collections.emptyList() : new LinkedList<>();

@@ -93,4 +93,13 @@ public class DelegatePersistentDataContainer implements PersistentDataContainer 
         this.handle.load(data);
     }
 
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
+    }
 }

@@ -14,8 +14,8 @@ import com.bgsoftware.superiorskyblock.nms.v1_21_4.utils.TickingBlockList;
 import com.google.common.base.Suppliers;
 import com.google.gson.JsonParseException;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -25,23 +25,30 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -61,7 +68,9 @@ import net.minecraft.world.ticks.ProtoChunkTicks;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBiome;
+import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -76,6 +85,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
 
 public class NMSUtilsVersioned {
 
@@ -85,6 +95,18 @@ public class NMSUtilsVersioned {
             ServerLevel.class, PersistentEntitySectionManager.class, Modifier.PUBLIC | Modifier.FINAL, 1);
     private static final ReflectField<SimpleRegionStorage> ENTITY_STORAGE_REGION_STORAGE = new ReflectField<>(
             EntityStorage.class, SimpleRegionStorage.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+    public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
+    }
+
+    public static int getLevelChunkX(LevelChunk levelChunk) {
+        return levelChunk.getPos().x;
+    }
+
+    public static int getLevelChunkZ(LevelChunk levelChunk) {
+        return levelChunk.getPos().z;
+    }
 
     public static CompoundTag readChunk(ChunkMap chunkMap, ChunkPos chunkPos) {
         return chunkMap.read(chunkPos).join().orElse(null);
@@ -297,12 +319,20 @@ public class NMSUtilsVersioned {
         return gameProfile.getProperties();
     }
 
-    public static String getPropertyValue(Property property) {
+    public static String getPropertyValue(com.mojang.authlib.properties.Property property) {
         return property.value();
     }
 
     public static EndDragonFight getEndDragonFight(ServerLevel serverLevel) {
         return serverLevel.getDragonFight();
+    }
+
+    public static void setFightOrigin(EnderDragon enderDragon, BlockPos fightOrigin) {
+        enderDragon.setFightOrigin(fightOrigin);
+    }
+
+    public static void removeDragonTicket(ServerLevel serverLevel) {
+        serverLevel.getChunkSource().removeRegionTicket(TicketType.DRAGON, new ChunkPos(0, 0), 9, Unit.INSTANCE);
     }
 
     public static void moveEntity(Entity entity, double x, double y, double z, float yaw, float pitch) {
@@ -325,17 +355,39 @@ public class NMSUtilsVersioned {
         levelChunk.markUnsaved();
     }
 
+    public static Optional<CompoundTag> loadPlayerData(ServerPlayer serverPlayer) {
+        return MinecraftServer.getServer().getPlayerList().load(serverPlayer);
+    }
+
+    public static long getCompoundTagLong(net.minecraft.nbt.CompoundTag compoundTag, String key, long def) {
+        return compoundTag.getLong(key);
+    }
+
+    private static Component parseSignLine(String line) {
+        String trimmedLine = line.trim();
+
+        if (!trimmedLine.isEmpty()) {
+            char firstChar = trimmedLine.charAt(0);
+            // JSON text components start with one of these characters, other lines are plain text.
+            if (firstChar != '{' && firstChar != '[' && firstChar != '"')
+                return CraftChatMessage.fromString(line)[0];
+        }
+
+        try {
+            return CraftChatMessage.fromJSON(line);
+        } catch (JsonParseException error) {
+            // Plain text lines that start like JSON, such as "[Shop]".
+            return CraftChatMessage.fromString(line)[0];
+        }
+    }
+
     private static void applySignTextLines(CompoundTag blockEntityCompound, String key) {
         if (blockEntityCompound.contains(key)) {
             CompoundTag frontText = blockEntityCompound.getCompound(key);
             ListTag messages = frontText.getList("messages", net.minecraft.nbt.Tag.TAG_STRING);
             List<Component> textLines = new ArrayList<>();
             for (net.minecraft.nbt.Tag lineTag : messages) {
-                try {
-                    textLines.add(CraftChatMessage.fromJSON(lineTag.getAsString()));
-                } catch (JsonParseException error) {
-                    textLines.add(CraftChatMessage.fromString(lineTag.getAsString())[0]);
-                }
+                textLines.add(parseSignLine(lineTag.getAsString()));
             }
 
             while (textLines.size() < 4)
@@ -375,6 +427,22 @@ public class NMSUtilsVersioned {
             SignText.DIRECT_CODEC.encodeStart(NbtOps.INSTANCE, signText).result()
                     .ifPresent(frontTextNBT -> blockEntityCompound.put("front_text", frontTextNBT));
         }
+    }
+
+    public static BlockState getBlockState(org.bukkit.block.Block block) {
+        return ((CraftBlock) block).getNMS();
+    }
+
+    public static boolean forEachProperty(BlockState blockState, BiConsumer<Property<?>, Comparable<?>> consumer) {
+        if (blockState.getValues().isEmpty())
+            return false;
+
+        blockState.getValues().forEach(consumer);
+        return true;
+    }
+
+    public static ResourceLocation getBlockEntityTypeKey(BlockEntityType<?> type) {
+        return BlockEntityType.getKey(type);
     }
 
     private NMSUtilsVersioned() {

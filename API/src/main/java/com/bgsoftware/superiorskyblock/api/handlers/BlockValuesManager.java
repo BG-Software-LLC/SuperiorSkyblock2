@@ -46,7 +46,9 @@ public interface BlockValuesManager {
      *
      * @param customKeyParser The custom key parser.
      * @param blockTypes      All the block types you want to check.
+     * @deprecated See {@link KeysManager#registerCustomMaterialKeyParser(CustomKeyParser, Key...)}
      */
+    @Deprecated
     void registerKeyParser(CustomKeyParser customKeyParser, Key... blockTypes);
 
     enum SyncWorthStatus {

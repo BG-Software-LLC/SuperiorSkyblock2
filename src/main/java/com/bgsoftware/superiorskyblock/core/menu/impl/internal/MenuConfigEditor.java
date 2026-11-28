@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.core.menu.impl.internal;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
+import com.bgsoftware.superiorskyblock.api.menu.layout.PagedInventoryMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -17,7 +18,6 @@ import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.ConfigEditorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.ConfigEditorSaveButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
-import com.bgsoftware.superiorskyblock.core.menu.layout.PagedMenuLayoutImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,6 +27,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -81,9 +82,9 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
     }
 
     public static MenuConfigEditor createInstance() {
-        PagedMenuLayoutImpl.Builder<MenuConfigEditor.View, ItemStack> patternBuilder = PagedMenuLayoutImpl.newBuilder();
+        PagedInventoryMenuLayout.Builder<MenuConfigEditor.View, ItemStack> patternBuilder = PagedInventoryMenuLayout.newBuilder();
 
-        patternBuilder.setTitle(ChatColor.BOLD + "Settings Editor");
+        patternBuilder.setTitle("{0}");
         patternBuilder.setInventoryType(InventoryType.CHEST);
         patternBuilder.setRowsCount(6);
 
@@ -145,6 +146,8 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
              Menu<View, Args> menu, Args args) {
             super(inventoryViewer, previousMenuView, menu);
             this.path = args.path;
+            this.cachedTitleArgs = new Object[]{path.isEmpty() ? ChatColor.BOLD + "Settings Editor" :
+                    ChatColor.BOLD + "Section: " + path};
         }
 
         public List<String> getPathSlots() {
@@ -156,15 +159,10 @@ public class MenuConfigEditor extends AbstractPagedMenu<MenuConfigEditor.View, M
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return path.isEmpty() ? title : ChatColor.BOLD + "Section: " + path;
-        }
-
-        @Override
         protected List<ItemStack> requestObjects() {
-            LinkedList<ItemStack> itemStacks = new LinkedList<>();
+            List<ItemStack> itemStacks = new ArrayList<>();
             buildFromSection(itemStacks, config.getConfigurationSection(this.path));
-            return Collections.unmodifiableList(itemStacks);
+            return itemStacks;
         }
 
         private void buildFromSection(List<ItemStack> itemStacks, ConfigurationSection section) {

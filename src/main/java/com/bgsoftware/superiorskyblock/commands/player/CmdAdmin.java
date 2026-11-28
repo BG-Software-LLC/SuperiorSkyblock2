@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -25,7 +27,7 @@ public class CmdAdmin implements ISuperiorCommand {
 
     private static final Int2ObjectMapView<List<SuperiorCommand>> commandsPerPageCache = CollectionsFactory.createInt2ObjectArrayMap();
 
-    public static void registerCallbacks(PluginEventsDispatcher dispatcher) {
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
         dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, CmdAdmin::onCommandsRefresh);
         dispatcher.registerCallback(PluginEventType.COMMANDS_UPDATE_EVENT, CmdAdmin::onCommandsRefresh);
     }
@@ -73,11 +75,20 @@ public class CmdAdmin implements ISuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-        if (args.length > 1 && !isNumber(args[1])) {
-            Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), args[1]);
+        if (args.length > 1 && !Text.isInt(args[1])) {
+            String executedSubCommand = args[1];
 
-            SuperiorCommand command = plugin.getCommands().getTypedAdminCommand(args[1]);
+            Log.debug(Debug.EXECUTE_COMMAND, sender.getName(), executedSubCommand);
+
+            SuperiorCommand command = plugin.getCommands().getTypedAdminCommand(executedSubCommand);
             if (command != null) {
+                // The console approves pending requests of dangerous commands by executing the sub command without arguments.
+                if (sender instanceof ConsoleCommandSender && args.length == 2 &&
+                        plugin.getCommands().hasPendingDangerousRequests(command)) {
+                    plugin.getCommands().approveDangerousRequests(sender, command);
+                    return;
+                }
+
                 if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
                     Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
                     return;
@@ -85,7 +96,12 @@ public class CmdAdmin implements ISuperiorCommand {
 
                 if (!CommandsHelper.hasCommandAccess(command, sender)) {
                     Log.debugResult(Debug.EXECUTE_COMMAND, "Return Missing Permission", command.getPermission());
-                    Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
+
+                    if (!plugin.getSettings().isHelpOnNoPermission())
+                        Message.NO_COMMAND_PERMISSION.send(sender, locale, command.getPermission());
+                    else
+                        plugin.getCommands().dispatchSubCommand(sender, "admin");
+
                     return;
                 }
 
@@ -96,9 +112,21 @@ public class CmdAdmin implements ISuperiorCommand {
                     return;
                 }
 
-                command.execute(plugin, sender, args);
+                if (sender instanceof Player && plugin.getCommands().isDangerousCommand(command)) {
+                    plugin.getCommands().submitDangerousRequest((Player) sender, command, args);
+                } else {
+                    command.execute(plugin, sender, args);
+                }
+
                 return;
             }
+
+            if (!plugin.getSettings().isHelpOnInvalidCommand())
+                Message.INVALID_COMMAND.send(sender, locale, executedSubCommand);
+            else
+                plugin.getCommands().dispatchSubCommand(sender, "admin");
+
+            return;
         }
 
         int page = 1;
@@ -194,15 +222,6 @@ public class CmdAdmin implements ISuperiorCommand {
         }
 
         return list.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(list);
-    }
-
-    private boolean isNumber(String str) {
-        try {
-            Integer.valueOf(str);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
     }
 
 }

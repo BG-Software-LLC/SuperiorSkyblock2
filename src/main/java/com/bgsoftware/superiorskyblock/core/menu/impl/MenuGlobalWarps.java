@@ -3,18 +3,15 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
-import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.GlobalWarpsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
@@ -25,6 +22,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +55,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
         if (menuParseResult == null)
             return null;
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         PagedMenuLayout.Builder<View, Island> patternBuilder = (PagedMenuLayout.Builder<View, Island>) menuParseResult.getLayoutBuilder();
 
@@ -66,9 +64,9 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
         List<Integer> slots = new LinkedList<>();
 
         if (cfg.isString("warps"))
-            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warps", menuPatternSlots));
+            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "warps", menuSlotsMap));
         if (cfg.isString("slots"))
-            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "slots", menuPatternSlots));
+            slots.addAll(MenuParserImpl.getInstance().parseButtonSlots(cfg, "slots", menuSlotsMap));
         if (slots.isEmpty())
             slots.add(-1);
 
@@ -86,10 +84,10 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
 
         @Override
         protected List<Island> requestObjects() {
-            return new SequentialListBuilder<Island>()
-                    .sorted(SortingTypes.getGlobalWarpsSorting().getComparator())
-                    .filter(ISLANDS_FILTER)
-                    .build(plugin.getGrid().getIslands());
+            List<Island> islands = new ArrayList<>(plugin.getGrid().getIslands());
+            islands.removeIf(ISLANDS_FILTER.negate());
+            islands.sort(SortingTypes.getGlobalWarpsSorting().getComparator());
+            return islands;
         }
 
         private final Predicate<Island> ISLANDS_FILTER = island -> {
@@ -103,7 +101,7 @@ public class MenuGlobalWarps extends AbstractPagedMenu<MenuGlobalWarps.View, Emp
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
         if (!oldFile.exists())

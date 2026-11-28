@@ -18,8 +18,8 @@ import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.world.WorldGenerator;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -59,12 +59,16 @@ public class CachedSuperiorSchematic extends BaseSchematic implements Schematic 
     }
 
     @Override
-    public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> pasteSchematic(island, location, callback, onFailure));
-            return;
-        }
+    public List<Location> getEntityLocations(EntityType entityType, Location location) {
+        return this.baseSchematic.getEntityLocations(entityType, location);
+    }
 
+    @Override
+    public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
+        BukkitExecutor.ensureAsync(() -> pasteSchematicInternal(island, location, callback, onFailure));
+    }
+
+    private void pasteSchematicInternal(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         long profiler = Profiler.start(ProfileType.SCHEMATIC_PLACE, getName());
 
         Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);

@@ -3,7 +3,7 @@ group 'NMS:v1_8_R3'
 dependencies {
     compileOnly "org.spigotmc:v1_8_R3:latest"
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('nms.compile_v1_8') && !Boolean.valueOf(project.findProperty("nms.compile_v1_8").toString())) {

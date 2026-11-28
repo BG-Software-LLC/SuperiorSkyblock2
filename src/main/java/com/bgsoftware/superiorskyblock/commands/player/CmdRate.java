@@ -56,7 +56,7 @@ public class CmdRate implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        IslandArgument arguments = args.length == 1 ? CommandArguments.getIslandWhereStanding(plugin, sender) :
+        IslandArgument arguments = args.length == 1 ? CommandArguments.getIslandWhereStandingOrSenderIsland(plugin, sender) :
                 CommandArguments.getIsland(plugin, sender, args[1]);
 
         Island island = arguments.getIsland();
@@ -64,13 +64,7 @@ public class CmdRate implements ISuperiorCommand {
         if (island == null)
             return;
 
-        if (island.isSpawn()) {
-            Message.INVALID_ISLAND_LOCATION.send(sender);
-            return;
-        }
-
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-
         RateResult rateResult = canRateIsland(plugin, superiorPlayer, island);
 
         switch (rateResult) {

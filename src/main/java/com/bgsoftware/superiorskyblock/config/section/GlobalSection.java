@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
@@ -15,7 +14,6 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class GlobalSection extends SettingsContainerHolder {
 
@@ -35,12 +33,16 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().islandsHeight;
     }
 
+    public int getSeaLevelHeight() {
+        return getContainer().seaLevelHeight;
+    }
+
     public boolean isWorldBorders() {
         return getContainer().worldBordersEnabled;
     }
 
-    public String getIslandLevelFormula() {
-        return getContainer().islandLevelFormula;
+    public String getBlockLevelFormula() {
+        return getContainer().blockLevelFormula;
     }
 
     public boolean isRoundedIslandLevels() {
@@ -77,10 +79,6 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public List<String> getSignWarp() {
         return getContainer().signWarp;
-    }
-
-    public List<String> getInteractables() {
-        return getContainer().interactables;
     }
 
     public Collection<Key> getSafeBlocks() {
@@ -129,14 +127,6 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public boolean isTransferConfirm() {
         return getContainer().transferConfirm;
-    }
-
-    public String getSpawnersProvider() {
-        return getContainer().spawnersProvider;
-    }
-
-    public String getStackedBlocksProvider() {
-        return getContainer().stackedBlocksProvider;
     }
 
     public boolean isTeleportOnCreate() {
@@ -303,6 +293,22 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().obsidianToLava;
     }
 
+    public String getSpawnersProvider() {
+        return getContainer().spawnersProvider;
+    }
+
+    public String getStackedBlocksProvider() {
+        return getContainer().stackedBlocksProvider;
+    }
+
+    public String getPricesProvider() {
+        return getContainer().pricesProvider;
+    }
+
+    public String getVanishProvider() {
+        return getContainer().vanishProvider;
+    }
+
     public BlockValuesManager.SyncWorthStatus getSyncWorth() {
         return getContainer().syncWorth;
     }
@@ -323,6 +329,10 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().disabledCommands;
     }
 
+    public List<String> getDangerousCommands() {
+        return getContainer().dangerousCommands;
+    }
+
     public List<String> getDisabledHooks() {
         return getContainer().disabledHooks;
     }
@@ -337,10 +347,6 @@ public class GlobalSection extends SettingsContainerHolder {
 
     public Map<String, List<String>> getCommandAliases() {
         return getContainer().commandAliases;
-    }
-
-    public Set<Key> getValuableBlocks() {
-        return getContainer().valuableBlocks;
     }
 
     public boolean isTabCompleteHideVanished() {
@@ -415,12 +421,24 @@ public class GlobalSection extends SettingsContainerHolder {
         return getContainer().commandsPerPage;
     }
 
+    public boolean isHelpOnInvalidCommand() {
+        return getContainer().helpOnInvalidCommand;
+    }
+
+    public boolean isHelpOnNoPermission() {
+        return getContainer().helpOnNoPermission;
+    }
+
     public boolean isCacheSchematics() {
         return getContainer().cacheSchematics;
     }
 
-    public Map<String, KeySet> getEntityCategories() {
+    public EntityCategoriesSection getEntityCategoriesMapping() {
         return getContainer().entityCategories;
+    }
+
+    public BlockCategoriesSection getBlockCategoriesMapping() {
+        return getContainer().blockCategories;
     }
 
 }

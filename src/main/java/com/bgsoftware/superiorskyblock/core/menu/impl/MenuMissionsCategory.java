@@ -10,18 +10,19 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.MissionsPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.mission.MissionReference;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -56,7 +57,7 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         PagedMenuLayout.Builder<View, MissionReference> patternBuilder = (PagedMenuLayout.Builder<View, MissionReference>) menuParseResult.getLayoutBuilder();
 
@@ -71,12 +72,12 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
                 if (soundSection == null)
                     continue;
 
-                GameSound completedSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("completed"));
-                GameSound notCompletedSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("not-completed"));
-                GameSound canCompleteSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("can-complete"));
-                GameSound lockedSound = MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("locked"));
+                GameSound completedSound = MenuParserUtils.getSound(soundSection.getConfigurationSection("completed"));
+                GameSound notCompletedSound = MenuParserUtils.getSound(soundSection.getConfigurationSection("not-completed"));
+                GameSound canCompleteSound = MenuParserUtils.getSound(soundSection.getConfigurationSection("can-complete"));
+                GameSound lockedSound = MenuParserUtils.getSound(soundSection.getConfigurationSection("locked"));
 
-                patternBuilder.setPagedObjectSlots(menuPatternSlots.getSlots(slotChar), new MissionsPagedObjectButton.Builder()
+                patternBuilder.setPagedObjectSlots(menuSlotsMap.getSlots(slotChar), new MissionsPagedObjectButton.Builder()
                         .setCompletedSound(completedSound)
                         .setNotCompletedSound(notCompletedSound)
                         .setCanCompleteSound(canCompleteSound)
@@ -111,20 +112,19 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
             if (inventoryViewer == null) {
                 this.missions = Collections.emptyList();
             } else {
-                SequentialListBuilder<Mission<?>> listBuilder = new SequentialListBuilder<>();
+                List<Mission<?>> categoryMissions = args.missionCategory.getMissions();
+                List<MissionReference> missions = new ArrayList<>(categoryMissions.size());
+
+                for (Mission<?> mission : categoryMissions) {
+                    if (plugin.getMissions().canDisplayMission(mission, inventoryViewer, removeCompleted))
+                        missions.add(new MissionReference(mission));
+                }
 
                 if (sortByCompletion)
-                    listBuilder.sorted(Comparator.comparingInt(this::getCompletionStatus));
+                    missions.sort(Comparator.comparingInt(missionReference -> getCompletionStatus(missionReference.getMission())));
 
-                this.missions = listBuilder
-                        .filter(mission -> plugin.getMissions().canDisplayMission(mission, inventoryViewer, removeCompleted))
-                        .map(args.missionCategory.getMissions(), MissionReference::new);
+                this.missions = missions;
             }
-        }
-
-        @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", missionCategory.getName());
         }
 
         @Override
@@ -132,12 +132,20 @@ public class MenuMissionsCategory extends AbstractPagedMenu<MenuMissionsCategory
             return missions;
         }
 
+        @Override
+        public void updateTitleArgs() {
+            if (this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = this.missionCategory.getName();
+        }
+
         private int getCompletionStatus(Mission<?> mission) {
             SuperiorPlayer inventoryViewer = getInventoryViewer();
             IMissionsHolder missionsHolder = mission.getIslandMission() ? inventoryViewer.getIsland() : inventoryViewer;
             return missionsHolder == null ? 0 :
                     !missionsHolder.canCompleteMissionAgain(mission) ? 2 :
-                            plugin.getMissions().canComplete(inventoryViewer, mission) ? 1 : 0;
+                    plugin.getMissions().canComplete(inventoryViewer, mission) ? 1 : 0;
         }
 
     }

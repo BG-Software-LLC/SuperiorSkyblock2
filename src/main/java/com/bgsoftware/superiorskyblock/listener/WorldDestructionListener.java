@@ -9,7 +9,10 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventPriority;
 import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.function.Function;
@@ -56,15 +59,16 @@ public class WorldDestructionListener extends AbstractGameEventListener {
     }
 
     public void onPistonExtend(GameEvent<GameEventArgs.PistonExtendEvent> e) {
-        Block block = e.getArgs().block;
+        Block pistonBlock = e.getArgs().block;
 
         // We care about destruction of island worlds only
-        if (!plugin.getGrid().isIslandsWorld(block.getWorld())) {
+        if (!plugin.getGrid().isIslandsWorld(pistonBlock.getWorld())) {
             return;
         }
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
-            if (preventMultiDestruction(block.getLocation(wrapper.getHandle()), e.getArgs().blocks, null))
+            if (preventMultiDestruction(pistonBlock.getLocation(wrapper.getHandle()), e.getArgs().blocks,
+                    e.getArgs().direction))
                 e.setCancelled();
         }
     }
@@ -79,7 +83,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             if (preventMultiDestruction(pistonBlock.getLocation(wrapper.getHandle()), e.getArgs().blocks,
-                    block -> block.getRelative(e.getArgs().direction)))
+                    e.getArgs().direction))
                 e.setCancelled();
         }
     }
@@ -99,6 +103,28 @@ public class WorldDestructionListener extends AbstractGameEventListener {
         }
     }
 
+    private void onBucketDispense(GameEvent<GameEventArgs.BlockDispenseEvent> e) {
+        Block block = e.getArgs().block;
+
+        // We care about destruction of island worlds only
+        if (!plugin.getGrid().isIslandsWorld(block.getWorld())) {
+            return;
+        }
+
+        Material itemType = e.getArgs().dispensedItem.getType();
+
+        if (!(itemType == Material.BUCKET || itemType == Material.WATER_BUCKET || itemType == Material.LAVA_BUCKET))
+            return;
+
+        Vector velocity = e.getArgs().velocity;
+
+        Location dispenseBlockLocation = new Location(block.getWorld(), velocity.getBlockX(),
+                velocity.getBlockY(), velocity.getBlockZ());
+
+        if (preventDestruction(dispenseBlockLocation))
+            e.setCancelled();
+    }
+
     /* INTERNAL */
 
     private boolean preventDestruction(Location location) {
@@ -107,7 +133,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
     }
 
     private boolean preventMultiDestruction(Location islandLocation, List<Block> blockList,
-                                            @Nullable Function<Block, Block> blockTransform) {
+                                            @Nullable BlockFace moveDirection) {
         Island island = plugin.getGrid().getIslandAt(islandLocation);
 
         if (island == null)
@@ -115,8 +141,8 @@ public class WorldDestructionListener extends AbstractGameEventListener {
 
         try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
             for (Block block : blockList) {
-                if (blockTransform != null)
-                    block = blockTransform.apply(block);
+                if (moveDirection != null)
+                    block = block.getRelative(moveDirection);
                 if (!island.isInsideRange(block.getLocation(wrapper.getHandle())))
                     return true;
             }
@@ -131,6 +157,7 @@ public class WorldDestructionListener extends AbstractGameEventListener {
         registerCallback(GameEventType.PISTON_EXTEND_EVENT, GameEventPriority.NORMAL, this::onPistonExtend);
         registerCallback(GameEventType.PISTON_RETRACT_EVENT, GameEventPriority.NORMAL, this::onPistonRetract);
         registerCallback(GameEventType.BLOCK_FROM_TO_EVENT, GameEventPriority.NORMAL, this::onBlockFlow);
+        registerCallback(GameEventType.BLOCK_DISPENSE_EVENT, GameEventPriority.NORMAL, this::onBucketDispense);
     }
 
 }

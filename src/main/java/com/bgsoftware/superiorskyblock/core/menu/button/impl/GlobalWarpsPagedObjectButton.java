@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.button.PagedMenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.Menus;
@@ -12,11 +10,11 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Locale;
-import java.util.Map;
 
 public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGlobalWarps.View, Island> {
 
@@ -27,7 +25,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuGlobalWarps.View> context) {
         if (Menus.MENU_GLOBAL_WARPS.isVisitorWarps()) {
             menuView.setPreviousMove(false);
             plugin.getCommands().dispatchSubCommand(menuView.getInventoryViewer().asPlayer(),
@@ -39,43 +37,33 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
-        final SuperiorPlayer viewer = menuView.getInventoryViewer();
-        final SuperiorPlayer owner = pagedObject.getOwner();
-        final String ownerName = owner.getName();
-        String islandName = pagedObject.getName();
-        if (Text.isBlank(islandName)) islandName = ownerName;
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
+        String ownerName = pagedObject.getOwner().getName();
+        String islandName = pagedObject.getName().isEmpty() ? ownerName : pagedObject.getName();
 
-        final int warpsCount = pagedObject.getIslandWarps().size();
+        Locale locale = menuView.getInventoryViewer().getUserLocale();
+        String[] description;
 
-        Locale userLocale = viewer.getUserLocale();
-        String levelNum = Formatters.NUMBER_FORMATTER.format(pagedObject.getIslandLevel());
-        String worthNum = Formatters.NUMBER_FORMATTER.format(pagedObject.getWorth());
-        String levelFancy = Formatters.FANCY_NUMBER_FORMATTER.format(pagedObject.getIslandLevel(), userLocale);
-        String worthFancy = Formatters.FANCY_NUMBER_FORMATTER.format(pagedObject.getWorth(), userLocale);
+        if (!pagedObject.getDescription().isEmpty())
+            description = pagedObject.getDescription().split("\n");
+        else if (!Message.ISLAND_DESCRIPTION_NONE.isEmpty(locale))
+            description = new String[] {Message.ISLAND_DESCRIPTION_NONE.getMessage(locale)};
+        else
+            description = EMPTY_STRING_ARRAY;
 
-        int ratingCount = pagedObject.getRatingAmount();
-
-        String ratingAvgNum = Formatters.NUMBER_FORMATTER.format(pagedObject.getTotalRating());
-        String ratingAvgFancy = Formatters.RATING_FORMATTER.format(pagedObject.getTotalRating(), userLocale);
-
-        String[] descLines = Text.isBlank(pagedObject.getDescription())
-                ? EMPTY_STRING_ARRAY
-                : pagedObject.getDescription().split("\n");
-
-        return new ItemBuilder(buttonItem)
+        return itemBuilder
                 .asSkullOf(pagedObject.getOwner())
                 .replaceAll("{0}", ownerName)
-                .replaceLoreWithLines("{1}", descLines)
-                .replaceAll("{2}", String.valueOf(warpsCount))
+                .replaceLoreWithLines("{1}", description)
+                .replaceAll("{2}", String.valueOf(pagedObject.getIslandWarps().size()))
                 .replaceAll("{3}", islandName)
-                .replaceAll("{4}", levelNum)
-                .replaceAll("{5}", levelFancy)
-                .replaceAll("{6}", worthNum)
-                .replaceAll("{7}", worthFancy)
-                .replaceAll("{8}", ratingAvgNum)
-                .replaceAll("{9}", ratingAvgFancy)
-                .replaceAll("{10}", String.valueOf(ratingCount))
+                .replaceAll("{4}", Formatters.NUMBER_FORMATTER.format(pagedObject.getIslandLevel()))
+                .replaceAll("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(pagedObject.getIslandLevel(), locale))
+                .replaceAll("{6}", Formatters.NUMBER_FORMATTER.format(pagedObject.getWorth()))
+                .replaceAll("{7}", Formatters.FANCY_NUMBER_FORMATTER.format(pagedObject.getWorth(), locale))
+                .replaceAll("{8}", Formatters.NUMBER_FORMATTER.format(pagedObject.getTotalRating()))
+                .replaceAll("{9}", Formatters.RATING_FORMATTER.format(pagedObject.getTotalRating(), locale))
+                .replaceAll("{10}", String.valueOf(pagedObject.getRatingAmount()))
                 .build(pagedObject.getOwner());
     }
 
@@ -83,8 +71,7 @@ public class GlobalWarpsPagedObjectButton extends AbstractPagedMenuButton<MenuGl
 
         @Override
         public PagedMenuTemplateButton<MenuGlobalWarps.View, Island> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), GlobalWarpsPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, GlobalWarpsPagedObjectButton.class,
                     GlobalWarpsPagedObjectButton::new);
         }
 

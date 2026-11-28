@@ -21,7 +21,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -68,8 +67,6 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_3.A
                 Registry<Biome> biomesRegistry = levelChunk.level.registryAccess().lookupOrThrow(Registries.BIOME);
                 Holder<Biome> biome = CraftBiome.bukkitToMinecraftHolder(bukkitBiome);
 
-                ChunkPos chunkPos = levelChunk.getPos();
-
                 LevelChunkSection[] chunkSections = levelChunk.getSections();
                 for (int i = 0; i < chunkSections.length; ++i) {
                     LevelChunkSection currentSection = chunkSections[i];
@@ -82,14 +79,28 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_3.A
 
                 levelChunk.markUnsaved();
 
-                ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos);
-                ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk, levelChunk.level.getLightEngine(), null, null, true);
+                BukkitExecutor.ensureMain(() -> {
+                    ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
+                    if (playersToUpdate.isEmpty() || serverLevel.getChunkSource().getChunkNow(
+                            levelChunk.getPos().getMinBlockX() >> 4, levelChunk.getPos().getMinBlockZ() >> 4) != levelChunk)
+                        return;
 
-                playersToUpdate.forEach(player -> {
-                    ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                    serverPlayer.connection.send(forgetLevelChunkPacket);
-                    serverPlayer.connection.send(mapChunkPacket);
+                    List<ServerPlayer> trackingPlayers = serverLevel.getChunkSource().chunkMap
+                            .getPlayers(levelChunk.getPos(), false);
+                    if (trackingPlayers.isEmpty())
+                        return;
+
+                    ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(
+                            levelChunk, serverLevel.getLightEngine(), null, null);
+
+                    playersToUpdate.forEach(player -> {
+                        if (!player.isOnline() || player.getWorld() != serverLevel.getWorld())
+                            return;
+
+                        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+                        if (trackingPlayers.contains(serverPlayer))
+                            serverPlayer.connection.send(mapChunkPacket);
+                    });
                 });
             }
 

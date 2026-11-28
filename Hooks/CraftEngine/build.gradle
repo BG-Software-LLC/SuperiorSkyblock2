@@ -15,7 +15,7 @@ dependencies {
     compileOnly "net.momirealms:craft-engine-bukkit:0.0.56"
     compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('hook.compile_craftengine') &&

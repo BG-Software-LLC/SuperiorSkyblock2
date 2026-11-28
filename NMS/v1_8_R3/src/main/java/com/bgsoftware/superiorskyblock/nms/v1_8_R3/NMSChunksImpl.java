@@ -10,8 +10,8 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
-import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
@@ -109,7 +109,7 @@ public class NMSChunksImpl implements NMSChunks {
 
     @Override
     public CompletableFuture<List<CalculatedChunk.Blocks>> calculateChunks(List<ChunkPosition> chunkPositions,
-                                                                    Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache) {
+                                                                           Synchronized<Chunk2ObjectMap<CalculatedChunk.Blocks>> unloadedChunksCache) {
         List<CalculatedChunk.Blocks> allCalculatedChunks = new LinkedList<>();
         List<ChunkPosition> chunkPositionsToCalculate = new LinkedList<>();
 
@@ -245,16 +245,16 @@ public class NMSChunksImpl implements NMSChunks {
 
         if (stop) {
             CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(
-                    ChunkCoordIntPair.a(chunk.getX(), chunk.getZ()));
+                    chunk.getWorld().getName(), ChunkCoordIntPair.a(chunk.getX(), chunk.getZ()));
             if (cropsTickingTileEntity != null) {
-                try {
+                if (NMSUtils.HAS_WORLD_TILE_ENTITY_LIST_FIELD) {
                     cropsTickingTileEntity.getWorld().tileEntityList.remove(cropsTickingTileEntity);
-                } catch (Throwable error) {
+                } else {
                     cropsTickingTileEntity.getWorld().t(cropsTickingTileEntity.getPosition());
                 }
             }
         } else {
-            CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
+            CropsTickingTileEntity.create(island, chunk.getWorld().getName(), ((CraftChunk) chunk).getHandle());
         }
     }
 
@@ -294,16 +294,8 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     private static void removeTileEntities(Chunk chunk) {
-        boolean hasWorldHField = false;
-
-        try {
-            // This field doesn't exist in Taco 1.8
-            List<TileEntity> tileEntities = chunk.world.h;
-            hasWorldHField = true;
-        } catch (Throwable ignored) {
-        }
-
-        if (hasWorldHField) {
+        // The h field doesn't exist in Taco 1.8
+        if (NMSUtils.HAS_WORLD_H_FIELD) {
             chunk.tileEntities.forEach(((blockPosition, tileEntity) -> {
                 chunk.world.tileEntityList.remove(tileEntity);
                 chunk.world.h.remove(tileEntity);

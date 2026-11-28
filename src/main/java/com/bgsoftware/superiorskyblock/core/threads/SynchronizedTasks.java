@@ -1,7 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.threads;
 
-import org.bukkit.Bukkit;
-
 import javax.annotation.Nullable;
 import java.util.concurrent.CountDownLatch;
 
@@ -23,11 +21,10 @@ public class SynchronizedTasks {
     }
 
     public void waitAllAsync() {
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(this::waitAllAsync);
-            return;
-        }
+        BukkitExecutor.ensureAsync(this::waitAllAsyncInternal);
+    }
 
+    private void waitAllAsyncInternal() {
         if (this.countDownLatch != null) {
             try {
                 this.countDownLatch.await();

@@ -4,17 +4,18 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.service.region.ProtectionHelper;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
@@ -23,21 +24,27 @@ import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.handlers.SystemManager;
 import com.bgsoftware.wildstacker.api.objects.StackedBarrel;
+import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_AutoDetect, StackedBlocksSnapshotProvider {
+
+    private static final boolean BARRELS_ITEMS_SUPPORT = isBarrelsItemsSupported();
 
     private static boolean registered = false;
 
@@ -45,11 +52,11 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
     public StackedBlocksProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
 
-            SuperiorSkyblockAPI.getBlockValues().registerKeyParser(new CustomKeyParser() {
+        if (!registered) {
+            registered = true;
+            SuperiorSkyblockAPI.getKeys().registerCustomMaterialKeyParser(new CustomKeyParser() {
 
                 private final SystemManager systemManager = WildStackerAPI.getWildStacker().getSystemManager();
 
@@ -67,20 +74,21 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
             }, ConstantKeys.CAULDRON);
 
-            Log.info("Using WildStacker as a stacked-blocks provider.");
         }
+
+        Log.info("Using WildStacker as a stacked-blocks provider.");
     }
 
     @Override
     public Collection<Pair<Key, Integer>> getBlocks(World world, int chunkX, int chunkZ) {
         try (ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ)) {
             return WildStackerSnapshotsContainer.accessStackedSnapshot(chunkPosition, stackedSnapshot -> {
-                try {
+                if (BARRELS_ITEMS_SUPPORT) {
                     return stackedSnapshot.getAllBarrelsItems().values().stream()
                             .filter(entry -> entry.getValue() != null)
                             .map(entry -> new Pair<>(Key.of(entry.getValue()), entry.getKey()))
                             .collect(Collectors.toSet());
-                } catch (Throwable ex) {
+                } else {
                     return stackedSnapshot.getAllBarrels().values().stream()
                             .map(entry -> new Pair<>(Key.of(entry.getValue(), (short) 0), entry.getKey()))
                             .collect(Collectors.toSet());
@@ -152,9 +160,16 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             if (island == null)
                 return;
 
-            if (!island.hasPermission(player, IslandPrivileges.BREAK)) {
-                e.setCancelled(true);
-                ProtectionHelper.sendProtectionMessage(player);
+            Key blockKey = getBarrelKey(e.getBarrel());
+
+            List<IslandPrivilege> islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(blockKey);
+
+            for (IslandPrivilege islandPrivilege : islandPrivileges) {
+                if (!island.hasPermission(player, islandPrivilege)) {
+                    e.setCancelled(true);
+                    ProtectionHelper.sendProtectionMessage(player);
+                    return;
+                }
             }
         }
 
@@ -183,11 +198,61 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
             }
         }
 
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        public void onBarrelInteract(PlayerInteractEvent e) {
+            Block block = e.getClickedBlock();
+            if (block == null)
+                return;
+
+            StackedBarrel stackedBarrel;
+            Island island;
+
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                Location location = block.getLocation(wrapper.getHandle());
+
+                if (!WildStackerAPI.getWildStacker().getSystemManager().isStackedBarrel(location))
+                    return;
+
+                stackedBarrel = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
+                island = plugin.getGrid().getIslandAt(location);
+            }
+
+            if (island == null)
+                return;
+
+            Player player = e.getPlayer();
+            Key blockKey = getBarrelKey(stackedBarrel);
+
+            List<IslandPrivilege> islandPrivileges;
+            if (player.isSneaking()) {
+                islandPrivileges = ProtectionHelper.getBlockPlacePrivileges(blockKey);
+            } else {
+                islandPrivileges = ProtectionHelper.getBlockBreakPrivileges(blockKey);
+            }
+
+            for (IslandPrivilege islandPrivilege : islandPrivileges) {
+                if (!island.hasPermission(player, islandPrivilege)) {
+                    e.setCancelled(true);
+                    ProtectionHelper.sendProtectionMessage(player);
+                    return;
+                }
+            }
+        }
+
     }
 
     private static Key getBarrelKey(StackedBarrel barrel) {
         ItemStack barrelItem = barrel.getBarrelItem(1);
         return ServerVersion.isLegacy() ? Key.of(barrelItem) : Key.of(barrelItem.getType());
+    }
+
+    private static boolean isBarrelsItemsSupported() {
+        try {
+            StackedSnapshot.class.getMethod("getAllBarrelsItems");
+            return true;
+        } catch (NoSuchMethodException error) {
+            return false;
+        }
     }
 
 }

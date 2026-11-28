@@ -29,16 +29,18 @@ public abstract class PrivilegeNodeAbstract implements PermissionNode {
         String[] permission = permissions.split(";");
         for (String perm : permission) {
             String[] permissionSections = perm.split(":");
+            IslandPrivilege islandPrivilege = IslandPrivilege.getByNameOrNull(permissionSections[0]);
+            if (islandPrivilege == null)
+                // Ignored - invalid privilege.
+                continue;
+
             try {
-                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permissionSections[0]);
                 if (permissionSections.length == 2) {
                     privileges.put(islandPrivilege, PrivilegeStatus.of(permissionSections[1]));
                 } else {
                     if (!checkDefaults || !isDefault(islandPrivilege))
                         privileges.put(islandPrivilege, PrivilegeStatus.ENABLED);
                 }
-            } catch (NullPointerException ignored) {
-                // Ignored - invalid privilege.
             } catch (Exception error) {
                 Log.error(error, "An unexpected error while loading permissions for '", perm, "':");
             }

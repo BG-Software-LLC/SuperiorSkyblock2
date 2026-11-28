@@ -4,32 +4,33 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.database.DBColumn;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlock;
 
-import java.util.Arrays;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unchecked")
 public class StackedBlocksDatabaseBridge {
 
+    private StackedBlocksDatabaseBridge() {
+    }
+
     public static void saveStackedBlock(StackedBlocksManager stackedBlocks, StackedBlock stackedBlock) {
-        runOperationIfRunning(stackedBlocks.getDatabaseBridge(), databaseBridge -> databaseBridge.insertObject("stacked_blocks",
-                new Pair<>("location", Serializers.LOCATION_SPACED_SERIALIZER.serialize(stackedBlock.getLocation())),
-                new Pair<>("amount", stackedBlock.getAmount()),
-                new Pair<>("block_type", stackedBlock.getBlockKey().toString())
-        ));
+        runOperationIfRunning(stackedBlocks.getDatabaseBridge(), databaseBridge -> {
+            try (ObjectsPools.Batch<DBColumn> pool = ObjectsPools.DB_COLUMN_BATCH.obtain()) {
+                databaseBridge.insertObject("stacked_blocks",
+                        pool.obtain().withNameAndValue("location", Serializers.LOCATION_SPACED_SERIALIZER.serialize(stackedBlock.getLocation())),
+                        pool.obtain().withNameAndValue("amount", stackedBlock.getAmount()),
+                        pool.obtain().withNameAndValue("block_type", stackedBlock.getBlockKey().toString())
+                );
+            }
+        });
     }
 
     public static void deleteStackedBlock(StackedBlocksManager stackedBlocks, StackedBlock stackedBlock) {
         runOperationIfRunning(stackedBlocks.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("stacked_blocks",
-                createFilter(new Pair<>("location", Serializers.LOCATION_SPACED_SERIALIZER.serialize(stackedBlock.getLocation())))
-        ));
-    }
-
-    private static DatabaseFilter createFilter(Pair<String, Object>... others) {
-        return DatabaseFilter.fromFilters(Arrays.asList(others));
+                DatabaseFilter.fromFilter("location", Serializers.LOCATION_SPACED_SERIALIZER.serialize(stackedBlock.getLocation()))));
     }
 
     private static void runOperationIfRunning(DatabaseBridge databaseBridge, Consumer<DatabaseBridge> databaseBridgeConsumer) {

@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 
 public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_AutoDetect {
 
-    private static boolean registered = false;
-
     private final SuperiorSkyblockPlugin plugin;
     private final LazyReference<RegionManagerService> protectionManager = new LazyReference<RegionManagerService>() {
         @Override
@@ -47,12 +45,8 @@ public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_
 
     public StackedBlocksProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
-            Log.info("Using RoseStacker as a stacked-blocks provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Log.info("Using RoseStacker as a stacked-blocks provider.");
     }
 
     @Override

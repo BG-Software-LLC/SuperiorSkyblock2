@@ -9,8 +9,7 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
@@ -30,6 +29,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -103,7 +103,8 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
             this.warpCategory = args.warpCategory;
-            this.hasManagePerms = warpCategory.getIsland().hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
+            this.hasManagePerms = warpCategory.getIsland().isMember(inventoryViewer) &&
+                    warpCategory.getIsland().hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
         }
 
         @Override
@@ -114,9 +115,10 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
         @Override
         protected List<IslandWarp> requestObjects() {
             boolean isMember = warpCategory.getIsland().isMember(getInventoryViewer());
-            return new SequentialListBuilder<IslandWarp>()
-                    .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
-                    .build(warpCategory.getWarps());
+            List<IslandWarp> islandWarps = new ArrayList<>(warpCategory.getWarps());
+            if (!isMember)
+                islandWarps.removeIf(IslandWarp::hasPrivateFlag);
+            return islandWarps;
         }
 
         public WarpCategory getWarpCategory() {
@@ -129,7 +131,7 @@ public class MenuWarps extends AbstractPagedMenu<MenuWarps.View, MenuWarps.Args,
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
         if (!oldFile.exists())

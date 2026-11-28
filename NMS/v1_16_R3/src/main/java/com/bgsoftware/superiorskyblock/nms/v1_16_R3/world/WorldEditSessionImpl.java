@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.world;
 
 import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.common.reflection.ReflectConstructor;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -30,6 +31,7 @@ import net.minecraft.server.v1_16_R3.ChunkConverter;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.ChunkSection;
 import net.minecraft.server.v1_16_R3.ChunkStatus;
+import net.minecraft.server.v1_16_R3.IChunkAccess;
 import net.minecraft.server.v1_16_R3.FluidType;
 import net.minecraft.server.v1_16_R3.FluidTypes;
 import net.minecraft.server.v1_16_R3.HeightMap;
@@ -62,10 +64,13 @@ import java.util.function.Supplier;
 
 public class WorldEditSessionImpl implements WorldEditSession {
 
-    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
-
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
             BiomeStorage.class, BiomeBase[].class, "h");
+    private static final boolean HAS_PAPER_PROTO_CHUNK_CONSTRUCTOR = new ReflectConstructor<>(ProtoChunk.class,
+            ChunkCoordIntPair.class, ChunkConverter.class, ChunkSection[].class, ProtoChunkTickList.class,
+            ProtoChunkTickList.class, net.minecraft.server.v1_16_R3.World.class).isValid();
+    private static final boolean HAS_PAPER_CHUNK_SECTION_CONSTRUCTOR = new ReflectConstructor<>(ChunkSection.class,
+            int.class, IChunkAccess.class, net.minecraft.server.v1_16_R3.World.class, boolean.class).isValid();
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final boolean isStarLightInterface = ((Supplier<Boolean>) () -> {
@@ -77,7 +82,11 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
     }).get();
 
+    // Must be initialized after the static fields above.
+    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
+
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectHashMap();
+    private final Long2ObjectMapView.AbsentConsumer<ChunkData> chunkDataCreator = ChunkData::new;
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
     private final Set<ChunkCoordIntPair> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
@@ -155,7 +164,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         if (blockEntityData != null)
             blockEntities.add(new Pair<>(blockPosition, blockEntityData));
 
-        ChunkData chunkData = this.chunks.computeIfAbsent(chunkCoord.pair(), ChunkData::new);
+        ChunkData chunkData = this.chunks.computeIfAbsent(chunkCoord.pair(), this.chunkDataCreator);
 
         if (plugin.getSettings().isLightsUpdate() && !isStarLightInterface && blockData.f() > 0)
             chunkData.lights.add(blockPosition);
@@ -334,13 +343,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 return fluid == null || fluid == FluidTypes.EMPTY;
             }, chunkCoord);
 
-            ProtoChunk tempChunk;
-
-            try {
-                tempChunk = new ProtoChunk(chunkCoord, ChunkConverter.a, this.chunkSections, blockTickScheduler, fluidTickScheduler, worldServer);
-            } catch (Throwable error) {
-                tempChunk = new ProtoChunk(chunkCoord, ChunkConverter.a, this.chunkSections, blockTickScheduler, fluidTickScheduler);
-            }
+            ProtoChunk tempChunk = HAS_PAPER_PROTO_CHUNK_CONSTRUCTOR ?
+                    new ProtoChunk(chunkCoord, ChunkConverter.a, this.chunkSections, blockTickScheduler, fluidTickScheduler, worldServer) :
+                    new ProtoChunk(chunkCoord, ChunkConverter.a, this.chunkSections, blockTickScheduler, fluidTickScheduler);
 
             createHeightmaps(tempChunk);
             if (worldServer != null)
@@ -369,11 +374,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
             for (int i = 0; i < this.chunkSections.length; ++i) {
                 int chunkSectionPos = i << 4;
 
-                try {
-                    this.chunkSections[i] = new ChunkSection(chunkSectionPos, null, worldServer, true);
-                } catch (Throwable error) {
-                    this.chunkSections[i] = new ChunkSection(chunkSectionPos);
-                }
+                this.chunkSections[i] = HAS_PAPER_CHUNK_SECTION_CONSTRUCTOR ?
+                        new ChunkSection(chunkSectionPos, null, worldServer, true) :
+                        new ChunkSection(chunkSectionPos);
             }
         }
 

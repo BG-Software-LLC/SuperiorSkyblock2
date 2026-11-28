@@ -33,7 +33,7 @@ public class PlayersDeserializer {
             }
 
             UUID uuid = UUID.fromString(player.get());
-            SuperiorPlayer.Builder builder = databaseCache.computeIfAbsentInfo(uuid, SuperiorPlayer::newBuilder);
+            SuperiorPlayer.Builder builder = lookupPlayer(databaseCache, uuid, "players_missions");
 
             Optional<String> name = missions.getString("name");
 
@@ -68,7 +68,7 @@ public class PlayersDeserializer {
             }
 
             UUID uuid = UUID.fromString(player.get());
-            SuperiorPlayer.Builder builder = databaseCache.computeIfAbsentInfo(uuid, SuperiorPlayer::newBuilder);
+            SuperiorPlayer.Builder builder = lookupPlayer(databaseCache, uuid, "players_settings");
             playerSettings.getBoolean("toggled_panel").ifPresent(builder::setToggledPanel);
             playerSettings.getBoolean("island_fly").ifPresent(builder::setIslandFly);
             playerSettings.getEnum("border_color", BorderColor.class).ifPresent(builder::setBorderColor);
@@ -92,9 +92,16 @@ public class PlayersDeserializer {
             if (persistentData.length == 0)
                 return;
 
-            SuperiorPlayer.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), SuperiorPlayer::newBuilder);
+            SuperiorPlayer.Builder builder = lookupPlayer(databaseCache, uuid.get(), "players_custom_data");
             builder.setPersistentData(persistentData);
         });
+    }
+
+    private static SuperiorPlayer.Builder lookupPlayer(DatabaseCache<SuperiorPlayer.Builder> databaseCache, UUID uuid, String tableName) {
+        DatabaseCache.Record<SuperiorPlayer.Builder> playerRecord =
+                databaseCache.computeIfAbsentInfo(uuid, SuperiorPlayer::newBuilder);
+        playerRecord.recordTable(tableName);
+        return playerRecord.get();
     }
 
 }

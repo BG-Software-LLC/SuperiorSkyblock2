@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 /**
  * Plugin modules are similar to plugins. The difference between them and regular plugins is that the modules are
@@ -194,7 +195,7 @@ public abstract class PluginModule {
     /**
      * Get the logger of the module {@link ModuleLogger}
      */
-    public final ModuleLogger getLogger() {
+    public final Logger getLogger() {
         return logger;
     }
 

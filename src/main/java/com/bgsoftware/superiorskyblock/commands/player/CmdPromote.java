@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 
 import java.util.Collections;
 import java.util.List;
@@ -91,7 +92,7 @@ public class CmdPromote implements IPermissibleCommand {
 
         do {
             nextRole = nextRole.getNextRole();
-            roleLimit = nextRole == null ? -1 : island.getRoleLimit(nextRole);
+            roleLimit = nextRole == null ? IslandUpgradeConstants.NO_LIMIT_VALUE : island.getRoleLimit(nextRole);
         } while (nextRole != null && !nextRole.isLastRole() && !nextRole.isHigherThan(superiorPlayer.getPlayerRole()) &&
                 roleLimit >= 0 && island.getIslandMembers(nextRole).size() >= roleLimit);
 

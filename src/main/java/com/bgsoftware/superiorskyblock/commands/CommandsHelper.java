@@ -63,6 +63,14 @@ public class CommandsHelper {
                 (usage.length() == label.length() || Character.isWhitespace(usage.charAt(label.length())));
     }
 
+    /**
+     * Get the label players use for a command, by its default label.
+     */
+    public static String getCommandLabel(String defaultLabel) {
+        SuperiorCommand superiorCommand = plugin.getCommands().getCommand(defaultLabel);
+        return superiorCommand == null ? defaultLabel : getCommandLabel(superiorCommand);
+    }
+
     public static String getCommandLabel(SuperiorCommand superiorCommand) {
         if (!plugin.getSettings().isOverrideDefaultAliases())
             return superiorCommand.getAliases().get(0);

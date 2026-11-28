@@ -9,12 +9,12 @@ title: '&lTop Islands'
 previous-menu: true
 
 pattern:
-  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
-  - '@ % @ @ @ # @ @ @'
-  - '@ * @ @ # # # @ @'
-  - '@ ^ @ # # # # # @'
-  - '@ & @ @ @ $ @ @ @'
-  - '~ ~ ! ~ - ~ + ~ ~'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ # @ @ @'
+  - '@ $ @ @ # # # @ @'
+  - '@ @ @ # # # # # @'
+  - '~ ~ ~ ~ % ~ ~ ~ ~'
+  - '@ @ ! @ - @ + @ @'
 
 slots: '#'
 previous-page: '!'
@@ -22,7 +22,11 @@ current-page: '-'
 next-page: '+'
 
 player-island: '$'
-sort-glow-when-selected: true
+sort-islands: '%'
+
+messages:
+  selected-sorting-type: '&8 - &a{0}'
+  unselected-sorting-type: '&8 - &7{0}'
 
 items:
   '#':
@@ -31,12 +35,13 @@ items:
       name: '&e&l[!] Island: &6&n{0}&7 (#{1})'
       lore:
         - '&7'
-        - '&6&l* &e&lIsland Level &7{2}'
-        - '&7'
         - '&6&l* &e&lPlace &7#{1}'
+        - '&7'
+        - '&6&l* &e&lLevel: &7{2}'
         - '&6&l* &e&lWorth &7${3}'
         - '&6&l* &e&lRating {8} &7({9})'
         - '&6&l* &e&lPlayers &7{10}'
+        - '&6&l* &e&lBank &7${11}'
         - '&7'
         - '&6&l* &e&lMembers:'
         - '{4}:&f  - &7{}'
@@ -47,21 +52,51 @@ items:
       type: PLAYER_HEAD
       name: '&cInvalid Island'
   '%':
-    type: DIAMOND
-    sorting-type: 'WORTH'
-    name: '&6Sort by Worth'
-  '*':
-    type: GOLD_INGOT
-    sorting-type: 'LEVEL'
-    name: '&6Sort by Level'
-  '^':
-    type: EMERALD
-    sorting-type: 'RATING'
-    name: '&6Sort by Rating'
-  '&':
-    type: PLAYER_HEAD
-    sorting-type: 'PLAYERS'
-    name: '&6Sort by Players'
+    WORTH:
+      display-name: 'Worth'
+      type: DIAMOND
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    LEVEL:
+      display-name: 'Level'
+      type: GOLD_INGOT
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    RATING:
+      display-name: 'Rating'
+      type: NETHER_STAR
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    PLAYERS:
+      display-name: 'Players'
+      type: PLAYER_HEAD
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
+    BANK:
+      display-name: 'Bank'
+      type: EMERALD
+      name: '&6Switch Sorting Type'
+      lore:
+        - '&7Switch top islands sorting type.'
+        - '&7Sorting Type: &e{1}&7.'
+        - ''
+        - '{0}'
   '!':
     type: PAPER
     name: '{0}Previous Page'
@@ -79,6 +114,10 @@ items:
 
 sounds:
   '@':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '%':
     type: ENTITY_EXPERIENCE_ORB_PICKUP
     volume: 0.2
     pitch: 0.2

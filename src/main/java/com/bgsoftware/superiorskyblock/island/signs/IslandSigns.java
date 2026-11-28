@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
@@ -86,7 +87,8 @@ public class IslandSigns {
 
     private static Reason handleWarpSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation,
                                               String[] signLines, boolean sendMessage) {
-        if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
+        int warpsLimit = island.getWarpsLimit();
+        if (warpsLimit >= 0 && island.getIslandWarps().size() >= warpsLimit) {
             if (sendMessage)
                 Message.NO_MORE_WARPS.send(superiorPlayer);
 
@@ -133,7 +135,8 @@ public class IslandSigns {
 
     private static Result handleVisitorsSignPlace(SuperiorPlayer superiorPlayer, Island island, Location visitorsLocation,
                                                   String[] warpLines, boolean sendMessage) {
-        if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
+        int warpsLimit = island.getWarpsLimit();
+        if (warpsLimit >= 0 && island.getIslandWarps().size() >= warpsLimit) {
             if (sendMessage)
                 Message.NO_MORE_WARPS.send(superiorPlayer);
 
@@ -150,11 +153,13 @@ public class IslandSigns {
 
         for (int i = 1; i < 4; i++) {
             String line = warpLines[i];
-            if (!line.isEmpty())
-                descriptionBuilder.append("\n").append(ChatColor.RESET).append(line);
+            if (!line.isEmpty()) {
+                String formattedLine = plugin.getSettings().getVisitorsSign().getDescriptionLineFormat().replace("{0}", line);
+                Text.appendWithLine(descriptionBuilder, ChatColor.RESET).append(formattedLine);
+            }
         }
 
-        String description = descriptionBuilder.length() < 1 ? "" : descriptionBuilder.substring(1);
+        String description = descriptionBuilder.toString();
 
         warpLines[0] = plugin.getSettings().getVisitorsSign().getActive();
 

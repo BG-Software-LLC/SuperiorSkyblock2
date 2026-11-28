@@ -60,6 +60,8 @@ public class CmdAdminSetSpawn implements ISuperiorCommand {
             location.setX(location.getBlockX());
             location.setY(location.getBlockY());
             location.setZ(location.getBlockZ());
+            // Fix to corner of a block
+            location.add(0.5, 0, 0.5);
             newSpawnLocation = Serializers.LOCATION_SPACED_SERIALIZER.serialize(location);
         }
 

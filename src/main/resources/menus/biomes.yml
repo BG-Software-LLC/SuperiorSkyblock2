@@ -5,201 +5,352 @@
 ##                                                  ##
 ######################################################
 
-title: '&lSelect a biome'
+title: '&lIsland Biomes'
 previous-menu: true
 
 pattern:
+  - '# # # # # # # # #'
+  - '# @ @ @ @ @ @ @ #'
+  - '# @ @ @ @ @ @ @ #'
+  - '# @ @ @ @ @ @ @ #'
   - '$ $ $ $ $ $ $ $ $'
-  - '# ! # % # & # ~ #'
-  - '# # @ # ^ # * # #'
-  - '$ $ $ $ $ $ $ $ $'
+  - '# # % # * # ^ # #'
+
+slots: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
 
 # Should the current biome be glowing?
 current-biome-glow: false
+
+# How should the dimension in which the player changes biome be selected?
+# DEFAULT  - Always uses the default dimension.
+# ARGUMENT - Uses the dimension from the command argument, or the default if invalid.
+# LOCATION - Uses the player's current dimension, or the default if is not inside the island world.
+# AUTO     - Prioritizes ARGUMENT, then LOCATION or DEFAULT if the previous ones fail.
+dimension-selection-mode: DEFAULT
 
 items:
   '$':
     type: STAINED_GLASS_PANE
     data: 15
     name: '&f'
-  '!':
-    biome: PLAINS
-    access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk1ZDM3OTkzZTU5NDA4MjY3ODQ3MmJmOWQ4NjgyMzQxM2MyNTBkNDMzMmEyYzdkOGM1MmRlNDk3NmIzNjIifX19'
-      name: '&ePlains Biome &a(Available)'
-      lore:
-        - '&7Change your island biome to plains.'
-    no-access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk1ZDM3OTkzZTU5NDA4MjY3ODQ3MmJmOWQ4NjgyMzQxM2MyNTBkNDMzMmEyYzdkOGM1MmRlNDk3NmIzNjIifX19'
-      name: '&ePlains Biome &c(Unavailable)'
-      lore:
-        - '&7Change your island biome to plains.'
-  '@':
-    biome: JUNGLE
-    access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODQ0OWI5MzE4ZTMzMTU4ZTY0YTQ2YWIwZGUxMjFjM2Q0MDAwMGUzMzMyYzE1NzQ5MzJiM2M4NDlkOGZhMGRjMiJ9fX0='
-      name: '&eJungle Biome &a(Available)'
-      lore:
-        - '&7Change your island biome to jungle.'
-    no-access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODQ0OWI5MzE4ZTMzMTU4ZTY0YTQ2YWIwZGUxMjFjM2Q0MDAwMGUzMzMyYzE1NzQ5MzJiM2M4NDlkOGZhMGRjMiJ9fX0='
-      name: '&eJungle Biome &c(Unavailable)'
-      lore:
-        - '&7Change your island biome to jungle.'
   '%':
-    biome: TAIGA
-    access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDNjNTJlYWU3NDdjYWQ1YjRmZDE5YjFhMjNiMzlhMzM2YjYyZWQ0MjI3OTdhNjIyZDA0NWY0M2U1ZDM4In19fQ=='
-      name: '&eTaiga Biome &a(Available)'
-      lore:
-        - '&7Change your island biome to taiga.'
-    no-access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDNjNTJlYWU3NDdjYWQ1YjRmZDE5YjFhMjNiMzlhMzM2YjYyZWQ0MjI3OTdhNjIyZDA0NWY0M2U1ZDM4In19fQ=='
-      name: '&eTaiga Biome &c(Unavailable)'
-      lore:
-        - '&7Change your island biome to taiga.'
+    type: PAPER
+    name: '{0}Previous Page'
+  '*':
+    type: DOUBLE_PLANT
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
   '^':
-    biome: DESERT
+    type: PAPER
+    name: '{0}Next Page'
+
+biomes:
+  BEACH:
+    dimension: NORMAL
     access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTMxOTkzZTRjZmRhMTUzZWFmN2RjMTM4ZDUyYmJhNWMyODNkMDE2MzI2MDIyNjIxNjE3NzZmMGY0Yjg2YSJ9fX0='
+      type: SAND
+      name: '&eBeach Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: SAND
+      name: '&eBeach Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  BIRCH_FOREST:
+    dimension: NORMAL
+    access:
+      type: SAPLING
+      data: 2
+      name: '&eBirch Forest Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: SAPLING
+      data: 2
+      name: '&eBirch Forest Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  DESERT:
+    dimension: NORMAL
+    access:
+      type: CACTUS
       name: '&eDesert Biome &a(Available)'
       lore:
-        - '&7Change your island biome to desert.'
-        - '&cWarning ice and snow must go!'
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTMxOTkzZTRjZmRhMTUzZWFmN2RjMTM4ZDUyYmJhNWMyODNkMDE2MzI2MDIyNjIxNjE3NzZmMGY0Yjg2YSJ9fX0='
+      type: CACTUS
       name: '&eDesert Biome &c(Unavailable)'
       lore:
-        - '&7Change your island biome to desert.'
-        - '&cWarning ice and snow must go!'
-  '&':
-    biome: HELL
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  FOREST:
+    dimension: NORMAL
     access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTU2Y2E1YzY3OTMzNmRkNGYzMjYyZjRmYmMyM2MxYTJlZTBkODJhN2ZkODFlNmU2MjMzN2U1ZmQ1YzcifX19'
-      name: '&eNether Biome &a(Available)'
+      type: SAPLING
+      name: '&eForest Biome &a(Available)'
       lore:
-        - '&7Change your island biome to nether.'
-        - '&cWarning ice, snow and water must go!'
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTU2Y2E1YzY3OTMzNmRkNGYzMjYyZjRmYmMyM2MxYTJlZTBkODJhN2ZkODFlNmU2MjMzN2U1ZmQ1YzcifX19'
-      name: '&eNether Biome &c(Unavailable)'
+      type: SAPLING
+      name: '&eForest Biome &c(Unavailable)'
       lore:
-        - '&7Change your island biome to nether.'
-        - '&cWarning ice snow, and water must go!'
-  '*':
-    biome: SWAMPLAND
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  ICE_PLAINS_SPIKES:
+    dimension: NORMAL
     access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzdlOGNiNTdmZTc5MGU5NjVlM2NmYTZjNGZiYzE2ZTMyMjYyMTBkNjVmNTYxNGU4ODUzZmE5ZmI4NDA3NDQ0MSJ9fX0='
-      name: '&eSwamp Biome &a(Available)'
+      type: PACKED_ICE
+      name: '&eIce Plains Spikes Biome &a(Available)'
       lore:
-        - '&7Change your island biome to swamp.'
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzdlOGNiNTdmZTc5MGU5NjVlM2NmYTZjNGZiYzE2ZTMyMjYyMTBkNjVmNTYxNGU4ODUzZmE5ZmI4NDA3NDQ0MSJ9fX0='
-      name: '&eSwamp Biome &c(Unavailable)'
+      type: PACKED_ICE
+      name: '&eIce Plains Spikes Biome &c(Unavailable)'
       lore:
-        - '&7Change your island biome to swamp.'
-  '~':
-    biome: MESA
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  JUNGLE:
+    dimension: NORMAL
     access:
-      type: SKULL_ITEM
+      type: SAPLING
       data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODJkNWZlZmUyMGRhZjMxYzIzOGVlMjI3ZGQxNDE4MjdhZGE1ZWY4NDgyZDhkMzU3YmJlNWE3Y2Y0MGFmODUifX19'
+      name: '&eJungle Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: SAPLING
+      data: 3
+      name: '&eJungle Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  MESA:
+    dimension: NORMAL
+    access:
+      type: DEAD_BUSH
       name: '&eMesa Biome &a(Available)'
       lore:
-        - '&7Change your island biome to Mesa.'
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: SKULL_ITEM
-      data: 3
-      skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODJkNWZlZmUyMGRhZjMxYzIzOGVlMjI3ZGQxNDE4MjdhZGE1ZWY4NDgyZDhkMzU3YmJlNWE3Y2Y0MGFmODUifX19'
+      type: DEAD_BUSH
       name: '&eMesa Biome &c(Unavailable)'
       lore:
-        - '&7Change your island biome to Mesa.'
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
 
-sounds:
-  '!':
+  MUSHROOM_ISLAND:
+    dimension: NORMAL
     access:
-      type: ENDERMAN_TELEPORT
-      volume: 0.8
-      pitch: 0.2
+      type: MYCEL
+      name: '&eMushroom Island Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: ANVIL_LAND
-      volume: 0.2
-      pitch: 0.2
-  '@':
+      type: MYCEL
+      name: '&eMushroom Island Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  OCEAN:
+    dimension: NORMAL
     access:
-      type: ENDERMAN_TELEPORT
-      volume: 0.8
-      pitch: 0.2
+      type: WATER_BUCKET
+      name: '&eOcean Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: ANVIL_LAND
-      volume: 0.2
-      pitch: 0.2
-  '%':
+      type: WATER_BUCKET
+      name: '&eOcean Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  PLAINS:
+    dimension: NORMAL
     access:
-      type: ENDERMAN_TELEPORT
-      volume: 0.8
-      pitch: 0.2
+      type: LONG_GRASS
+      data: 1
+      name: '&ePlains Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: ANVIL_LAND
-      volume: 0.2
-      pitch: 0.2
-  '^':
+      type: LONG_GRASS
+      data: 1
+      name: '&ePlains Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  ROOFED_FOREST:
+    dimension: NORMAL
     access:
-      type: ENDERMAN_TELEPORT
-      volume: 0.8
-      pitch: 0.2
+      type: SAPLING
+      data: 5
+      name: '&eRoofed Forest Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: ANVIL_LAND
-      volume: 0.2
-      pitch: 0.2
-  '&':
+      type: SAPLING
+      data: 5
+      name: '&eRoofed Forest Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  SAVANNA:
+    dimension: NORMAL
     access:
-      type: ENDERMAN_TELEPORT
-      volume: 0.8
-      pitch: 0.2
+      type: SAPLING
+      data: 4
+      name: '&eSavanna Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: ANVIL_LAND
-      volume: 0.2
-      pitch: 0.2
-  '*':
+      type: SAPLING
+      data: 4
+      name: '&eSavanna Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  SWAMPLAND:
+    dimension: NORMAL
     access:
-      type: ENDERMAN_TELEPORT
-      volume: 0.8
-      pitch: 0.2
+      type: WATER_LILY
+      name: '&eSwamp Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: ANVIL_LAND
-      volume: 0.2
-      pitch: 0.2
-  '~':
+      type: WATER_LILY
+      name: '&eSwamp Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2
+
+  TAIGA:
+    dimension: NORMAL
     access:
-      type: ENDERMAN_TELEPORT
-      volume: 0.8
-      pitch: 0.2
+      type: SAPLING
+      data: 1
+      name: '&eTaiga Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
     no-access:
-      type: ANVIL_LAND
-      volume: 0.2
-      pitch: 0.2
+      type: SAPLING
+      data: 1
+      name: '&eTaiga Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ANVIL_LAND
+        volume: 0.8
+        pitch: 0.2

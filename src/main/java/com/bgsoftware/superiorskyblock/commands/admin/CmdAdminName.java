@@ -8,12 +8,9 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
@@ -81,12 +78,10 @@ public class CmdAdminName implements IAdminIslandCommand {
         String coloredName = island.getName();
 
         if (targetPlayer == null) {
-            for (Player player : Bukkit.getOnlinePlayers())
-                Message.NAME_ANNOUNCEMENT_OTHER_NAME.send(player, sender.getName(), oldName, coloredName);
+            IslandNames.announceChange(island, Message.NAME_ANNOUNCEMENT_OTHER_NAME, sender.getName(), oldName, coloredName);
             Message.CHANGED_NAME_OTHER_NAME.send(sender, oldName, coloredName);
         } else {
-            for (Player player : Bukkit.getOnlinePlayers())
-                Message.NAME_ANNOUNCEMENT_OTHER.send(player, sender.getName(), targetPlayer.getName(), coloredName);
+            IslandNames.announceChange(island, Message.NAME_ANNOUNCEMENT_OTHER, sender.getName(), targetPlayer.getName(), coloredName);
             Message.CHANGED_NAME_OTHER.send(sender, targetPlayer.getName(), coloredName);
         }
     }

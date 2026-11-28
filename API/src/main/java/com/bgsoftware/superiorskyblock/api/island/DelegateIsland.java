@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class DelegateIsland implements Island {
 
@@ -108,6 +109,16 @@ public class DelegateIsland implements Island {
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
         return this.handle.getAllPlayersInside();
+    }
+
+    @Override
+    public boolean anyPlayerInsideMatches(Predicate<SuperiorPlayer> predicate) {
+        return this.handle.anyPlayerInsideMatches(predicate);
+    }
+
+    @Override
+    public int countPlayersInside(Predicate<SuperiorPlayer> predicate) {
+        return this.handle.countPlayersInside(predicate);
     }
 
     @Override
@@ -630,31 +641,37 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public boolean isNormalEnabled() {
         return this.handle.isNormalEnabled();
     }
 
     @Override
+    @Deprecated
     public void setNormalEnabled(boolean enabled) {
         this.handle.setNormalEnabled(enabled);
     }
 
     @Override
+    @Deprecated
     public boolean isNetherEnabled() {
         return this.handle.isNetherEnabled();
     }
 
     @Override
+    @Deprecated
     public void setNetherEnabled(boolean enabled) {
         this.handle.setNetherEnabled(enabled);
     }
 
     @Override
+    @Deprecated
     public boolean isEndEnabled() {
         return this.handle.isEndEnabled();
     }
 
     @Override
+    @Deprecated
     public void setEndEnabled(boolean enabled) {
         this.handle.setEndEnabled(enabled);
     }
@@ -672,12 +689,6 @@ public class DelegateIsland implements Island {
     @Override
     public Collection<Dimension> getUnlockedWorlds() {
         return this.handle.getUnlockedWorlds();
-    }
-
-    @Override
-    @Deprecated
-    public int getUnlockedWorldsFlag() {
-        return this.handle.getUnlockedWorldsFlag();
     }
 
     @Override
@@ -838,6 +849,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getEffectiveIslandSize() {
+        return this.handle.getEffectiveIslandSize();
+    }
+
+    @Override
     public String getDiscord() {
         return this.handle.getDiscord();
     }
@@ -858,18 +874,36 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public Biome getBiome() {
         return this.handle.getBiome();
     }
 
     @Override
+    public Biome getBiome(Dimension dimension) {
+        return this.handle.getBiome(dimension);
+    }
+
+    @Override
+    @Deprecated
     public void setBiome(Biome biome) {
         this.handle.setBiome(biome);
     }
 
     @Override
+    @Deprecated
     public void setBiome(Biome biome, boolean updateBlocks) {
         this.handle.setBiome(biome, updateBlocks);
+    }
+
+    @Override
+    public void setBiome(Dimension dimension, Biome biome) {
+        this.handle.setBiome(dimension, biome);
+    }
+
+    @Override
+    public void setBiome(Dimension dimension, Biome biome, @IslandBiomeFlags int flags) {
+        this.handle.setBiome(dimension, biome, flags);
     }
 
     @Override
@@ -1465,8 +1499,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getBlockLimitRaw(Key key) {
+        return this.handle.getBlockLimitRaw(key);
+    }
+
+    @Override
     public int getExactBlockLimit(Key key) {
         return this.handle.getExactBlockLimit(key);
+    }
+
+    @Override
+    public int getExactBlockLimitRaw(Key key) {
+        return this.handle.getExactBlockLimitRaw(key);
     }
 
     @Override
@@ -1517,6 +1561,16 @@ public class DelegateIsland implements Island {
     @Override
     public int getEntityLimit(Key key) {
         return this.handle.getEntityLimit(key);
+    }
+
+    @Override
+    public int getEntityLimitRaw(Key key) {
+        return this.handle.getEntityLimitRaw(key);
+    }
+
+    @Override
+    public int getExactEntityLimitRaw(Key key) {
+        return this.handle.getExactEntityLimitRaw(key);
     }
 
     @Override
@@ -1620,6 +1674,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getPotionEffectLevelRaw(PotionEffectType type) {
+        return this.handle.getPotionEffectLevelRaw(type);
+    }
+
+    @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
         return this.handle.getPotionEffects();
     }
@@ -1662,6 +1721,11 @@ public class DelegateIsland implements Island {
     @Override
     public void removeRoleLimit(PlayerRole playerRole) {
         this.handle.removeRoleLimit(playerRole);
+    }
+
+    @Override
+    public void clearRoleLimits() {
+        this.handle.clearRoleLimits();
     }
 
     @Override
@@ -1845,8 +1909,19 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getExactGeneratorPercentage(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorPercentage(key, dimension);
+    }
+
+    @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorPercentages(Dimension dimension) {
         return this.handle.getGeneratorPercentages(dimension);
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorPercentagesAsKeys(Dimension dimension) {
+        return this.handle.getGeneratorPercentagesAsKeys(dimension);
     }
 
     @Override
@@ -1865,13 +1940,34 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public int getGeneratorAmountRaw(Key key, Dimension dimension) {
+        return this.handle.getGeneratorAmountRaw(key, dimension);
+    }
+
+    @Override
+    public int getExactGeneratorAmount(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorAmount(key, dimension);
+    }
+
+    @Override
+    public int getExactGeneratorAmountRaw(Key key, Dimension dimension) {
+        return this.handle.getExactGeneratorAmountRaw(key, dimension);
+    }
+
+    @Override
     public int getGeneratorTotalAmount(Dimension dimension) {
         return this.handle.getGeneratorTotalAmount(dimension);
     }
 
     @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorAmounts(Dimension dimension) {
         return this.handle.getGeneratorAmounts(dimension);
+    }
+
+    @Override
+    public Map<Key, Integer> getGeneratorAmountsAsKeys(Dimension dimension) {
+        return this.handle.getGeneratorAmountsAsKeys(dimension);
     }
 
     @Override
@@ -1911,12 +2007,6 @@ public class DelegateIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratedSchematicsFlag() {
-        return this.handle.getGeneratedSchematicsFlag();
-    }
-
-    @Override
     public Collection<Dimension> getGeneratedSchematics() {
         return this.handle.getGeneratedSchematics();
     }
@@ -1944,6 +2034,16 @@ public class DelegateIsland implements Island {
     @Override
     public void setChestRows(int index, int rows) {
         this.handle.setChestRows(index, rows);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.handle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.handle.equals(o);
     }
 
     @Override

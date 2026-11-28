@@ -11,7 +11,9 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.player.cache.PlayerCache;
+import com.bgsoftware.superiorskyblock.api.player.chat.ChatState;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -19,6 +21,7 @@ import com.bgsoftware.superiorskyblock.core.ObjectsPool;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -55,7 +58,7 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     @Override
     public void release() {
         this.npc = null;
-
+        POOL.release(this);
     }
 
     @Override
@@ -170,6 +173,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
+    public boolean hasBypassPermission(IslandPrivilege islandPrivilege) {
+        return false;
+    }
+
+    @Override
     public HitActionResult canHit(SuperiorPlayer other) {
         return HitActionResult.NOT_ONLINE;
     }
@@ -201,6 +209,12 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
+    public void teleportWithResult(Location location, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
+        if (teleportResult != null)
+            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
+    }
+
+    @Override
     public void teleport(Island island) {
         // Do nothing.
     }
@@ -217,22 +231,21 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     }
 
     @Override
+    public void teleportWithResult(Island island, Dimension dimension, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
+        if (teleportResult != null)
+            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
+    }
+
+    @Override
     public void teleport(Island unused, @Nullable Consumer<Boolean> teleportResult) {
         if (teleportResult != null)
             teleportResult.accept(false);
     }
 
     @Override
-    @Deprecated
-    public void teleport(Island island, World.Environment environment) {
-        // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public void teleport(Island unused, World.Environment unused2, @Nullable Consumer<Boolean> teleportResult) {
+    public void teleportWithResult(Island island, @Nullable Consumer<PlayerTeleportAlgorithm.TeleportResult> teleportResult) {
         if (teleportResult != null)
-            teleportResult.accept(false);
+            teleportResult.accept(PlayerTeleportAlgorithm.TeleportResult.GENERAL_FAILURE);
     }
 
     @Override
@@ -293,6 +306,16 @@ public class SuperiorNPCPlayer implements SuperiorPlayer, ObjectsPool.Releasable
     @Override
     public List<Island> getCoopIslands() {
         throw new UnsupportedOperationException("Cannot mark NPCs as coop players");
+    }
+
+    @Override
+    public ChatState getChatState() {
+        return ChatStates.GLOBAL;
+    }
+
+    @Override
+    public void setChatState(ChatState chatState) {
+        // Do nothing.
     }
 
     @Override

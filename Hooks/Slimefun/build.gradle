@@ -6,7 +6,7 @@ dependencies {
     compileOnly project(":API")
     compileOnly project(":Hooks:Slimefun:ProtectionModule_RC13")
     compileOnly project(":Hooks:Slimefun:ProtectionModule_Dev999")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('hook.compile_slimefun') &&

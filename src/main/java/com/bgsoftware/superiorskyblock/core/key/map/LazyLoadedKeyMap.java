@@ -11,7 +11,9 @@ import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -30,17 +32,20 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public int size() {
-        return runOnMap(KeyMap::size, 0);
+        KeyMap<V> map = getCurrentMap();
+        return map == null ? 0 : map.size();
     }
 
     @Override
     public boolean containsKey(Object o) {
-        return runOnMap(m -> m.containsKey(o), false);
+        KeyMap<V> map = getCurrentMap();
+        return map != null && map.containsKey(o);
     }
 
     @Override
     public V get(Object obj) {
-        return runOnMap(m -> m.get(obj), null);
+        KeyMap<V> map = getCurrentMap();
+        return map == null ? null : map.get(obj);
     }
 
     @Override
@@ -74,7 +79,8 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public V remove(Object key) {
-        return runOnMap(m -> m.remove(key), null);
+        KeyMap<V> map = getCurrentMap();
+        return map == null ? null : map.remove(key);
     }
 
     @Override
@@ -96,33 +102,57 @@ public class LazyLoadedKeyMap<V> extends AbstractMap<Key, V> implements KeyMap<V
     @Nullable
     @Override
     public Key getKey(Key original) {
-        return runOnMap(m -> m.getKey(original), null);
+        KeyMap<V> map = getCurrentMap();
+        return map == null ? null : map.getKey(original);
     }
 
     @Override
     public Key getKey(Key original, @Nullable Key def) {
-        return runOnMap(m -> m.getKey(original, def), def);
+        KeyMap<V> map = getCurrentMap();
+        return map == null ? def : map.getKey(original, def);
     }
 
 
     @Override
     public boolean removeIf(Predicate<Key> predicate) {
-        return runOnMap(m -> m.removeIf(predicate), false);
+        KeyMap<V> map = getCurrentMap();
+        return map != null && map.removeIf(predicate);
     }
 
     @Override
     public V getRaw(Key key, V def) {
-        return runOnMap(m -> m.getRaw(key, def), def);
+        KeyMap<V> map = getCurrentMap();
+        return map == null ? def : map.getRaw(key, def);
     }
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
-        return runOnMap(m -> m.getOrDefault(key, defaultValue), defaultValue);
+        KeyMap<V> map = getCurrentMap();
+        return map == null ? defaultValue : map.getOrDefault(key, defaultValue);
+    }
+
+    @Override
+    public V merge(Key key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        Objects.requireNonNull(remappingFunction);
+        Objects.requireNonNull(value);
+        V oldValue = getRaw(key, null);
+        V newValue = (oldValue == null) ? value : remappingFunction.apply(oldValue, value);
+        if (newValue == null) {
+            remove(key);
+        } else {
+            put(key, newValue);
+        }
+        return newValue;
     }
 
     @Override
     public Map<Key, V> asMap() {
         return runOnMap(KeyMap::asMap, this);
+    }
+
+    @Nullable
+    private KeyMap<V> getCurrentMap() {
+        return this.delegate != null ? this.delegate : this.pendingCustomKeys;
     }
 
     private <T> T runOnMap(Function<KeyMap<V>, T> function, T def) {

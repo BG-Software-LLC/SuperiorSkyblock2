@@ -7,11 +7,9 @@ import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
@@ -31,20 +29,20 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
     }
 
     @Override
-    public CompletableFuture<Boolean> teleport(Player player, Location location) {
-        CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
+    public CompletableFuture<TeleportResult> teleportWithResult(Player player, Location location) {
+        CompletableFuture<TeleportResult> completableFuture = new CompletableFuture<>();
         EntityTeleports.teleport(player, location, completableFuture::complete);
         return completableFuture;
     }
 
     @Override
-    public CompletableFuture<Boolean> teleport(Player player, Island island) {
-        return this.teleport(player, island, plugin.getSettings().getWorlds().getDefaultWorldDimension());
+    public CompletableFuture<TeleportResult> teleportWithResult(Player player, Island island) {
+        return this.teleportWithResult(player, island, plugin.getSettings().getWorlds().getDefaultWorldDimension());
     }
 
     @Override
-    public CompletableFuture<Boolean> teleport(Player player, Island island, Dimension dimension) {
-        CompletableFuture<Boolean> result = new CompletableFuture<>();
+    public CompletableFuture<TeleportResult> teleportWithResult(Player player, Island island, Dimension dimension) {
+        CompletableFuture<TeleportResult> result = new CompletableFuture<>();
         IslandWorlds.accessIslandWorldAsync(island, dimension, true, islandWorldResult -> {
             islandWorldResult.ifRight(result::completeExceptionally).ifLeft(world ->
                     teleportInternal(player, island, dimension, result));
@@ -52,13 +50,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
         return result;
     }
 
-    @Override
-    @Deprecated
-    public CompletableFuture<Boolean> teleport(Player player, Island island, World.Environment environment) {
-        return teleport(player, island, Dimensions.fromEnvironment(environment));
-    }
-
-    public void teleportInternal(Player player, Island island, Dimension dimension, CompletableFuture<Boolean> result) {
+    public void teleportInternal(Player player, Island island, Dimension dimension, CompletableFuture<TeleportResult> result) {
         Location homeLocation = island.getIslandHome(dimension);
 
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
@@ -72,16 +64,16 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                 result.completeExceptionally(error);
             } else if (safeSpot == null) {
                 Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", null);
-                result.complete(false);
+                result.complete(TeleportResult.UNSAFE_SPOT);
             } else {
                 Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Location", safeSpot);
-                teleport(player, safeSpot).whenComplete((teleport, teleportError) -> {
+                teleportWithResult(player, safeSpot).whenComplete((teleportResult, teleportError) -> {
                     if (teleportError != null) {
                         Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Result", false);
                         result.completeExceptionally(teleportError);
                     } else {
-                        Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Result", true);
-                        result.complete(teleport);
+                        Log.debugResult(Debug.TELEPORT_PLAYER, "Teleport Result", teleportResult);
+                        result.complete(teleportResult);
                     }
                 });
             }

@@ -4,7 +4,7 @@ dependencies {
     compileOnly "com.songoda:EpicSpawners:8.1.0"
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('hook.compile_epicspawners8') &&

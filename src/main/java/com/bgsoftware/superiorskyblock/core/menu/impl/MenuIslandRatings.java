@@ -7,14 +7,14 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.RatingsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.view.AbstractPagedMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.IIslandMenuView;
 import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
@@ -22,6 +22,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -70,14 +71,20 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
         }
 
         @Override
-        public String replaceTitle(String title) {
-            return title.replace("{0}", String.valueOf(island.getTotalRating()));
+        public void updateTitleArgs() {
+            if(this.cachedTitleArgs == null) {
+                this.cachedTitleArgs = new Object[1];
+            }
+            this.cachedTitleArgs[0] = Formatters.NUMBER_FORMATTER.format(island.getTotalRating());
         }
 
         @Override
         protected List<RatingInfo> requestObjects() {
-            return new SequentialListBuilder<RatingInfo>()
-                    .build(island.getRatings().entrySet(), RATING_INFO_MAPPER);
+            Map<UUID, Rating> ratings = island.getRatings();
+            List<RatingInfo> ratingsInfo = new ArrayList<>(ratings.size());
+            for (Map.Entry<UUID, Rating> rating : ratings.entrySet())
+                ratingsInfo.add(RATING_INFO_MAPPER.apply(rating));
+            return ratingsInfo;
         }
 
     }
@@ -102,7 +109,7 @@ public class MenuIslandRatings extends AbstractPagedMenu<MenuIslandRatings.View,
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
 
         if (!oldFile.exists())

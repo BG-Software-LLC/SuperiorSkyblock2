@@ -159,6 +159,8 @@ public class NBTUtils {
                 return ListTag.class;
             case NBTTags.TYPE_COMPOUND:
                 return CompoundTag.class;
+            case NBTTags.TYPE_INT_ARRAY:
+                return IntArrayTag.class;
             case NBTTags.TYPE_BIG_DECIMAL:
                 return BigDecimalTag.class;
             case NBTTags.TYPE_UUID:

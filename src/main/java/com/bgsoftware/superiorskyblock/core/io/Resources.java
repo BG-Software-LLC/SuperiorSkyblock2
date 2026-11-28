@@ -90,8 +90,10 @@ public class Resources {
 
     private static String[] getPathAndSuffix(String name) {
         int lastIndex = name.lastIndexOf('.');
-        String suffix = lastIndex == -1 || lastIndex + 1 >= name.length() ? "" : name.substring(lastIndex + 1);
-        return suffix.isEmpty() ? new String[]{name, ""} : new String[]{name.substring(0, name.length() - suffix.length()), suffix};
+        // The suffix keeps its dot, so the version is inserted before it: heads.yml -> heads1_13.yml
+        if (lastIndex == -1 || lastIndex < name.lastIndexOf('/'))
+            return new String[]{name, ""};
+        return new String[]{name.substring(0, lastIndex), name.substring(lastIndex)};
     }
 
 }

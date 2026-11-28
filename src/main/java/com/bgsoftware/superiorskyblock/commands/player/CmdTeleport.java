@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -79,10 +80,10 @@ public class CmdTeleport implements ISuperiorCommand {
 
     private void teleportToIsland(SuperiorPlayer superiorPlayer, Island island) {
         superiorPlayer.setTeleportTask(null);
-        superiorPlayer.teleport(island, result -> {
-            if (result)
+        superiorPlayer.teleportWithResult(island, result -> {
+            if (result == PlayerTeleportAlgorithm.TeleportResult.SUCCESS)
                 Message.TELEPORTED_SUCCESS.send(superiorPlayer);
-            else
+            else if (result != PlayerTeleportAlgorithm.TeleportResult.CUSTOM)
                 Message.TELEPORTED_FAILED.send(superiorPlayer);
         });
     }

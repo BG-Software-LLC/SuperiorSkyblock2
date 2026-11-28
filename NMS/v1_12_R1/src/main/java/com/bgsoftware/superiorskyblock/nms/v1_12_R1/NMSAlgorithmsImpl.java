@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
@@ -21,6 +22,7 @@ import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
@@ -34,14 +36,19 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
 import java.util.Optional;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
+
+    private static final ReflectField<Object> MINECRAFT_SERVER_TPS1 = new ReflectField<>(
+            MinecraftServer.class, Object.class, "tps1");
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
@@ -129,6 +136,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public boolean canPlaceBookIntoLectern(org.bukkit.block.Block lectern, ItemStack book) {
+        // Does not exist
+        return false;
+    }
+
+    @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         // Doesn't exist
     }
@@ -145,6 +158,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
+        // Doesn't exist
+    }
+
+    @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
         // Doesn't exist
     }
 
@@ -174,12 +192,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public double getCurrentTps() {
-        try {
+        if (MINECRAFT_SERVER_TPS1.isValid())
             return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
-        }
+
+        //noinspection removal
+        return MinecraftServer.getServer().recentTps[0];
     }
 
     @Override
@@ -190,6 +207,15 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         return defaultHolder;
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private static Enchantment initializeGlowEnchantment() {

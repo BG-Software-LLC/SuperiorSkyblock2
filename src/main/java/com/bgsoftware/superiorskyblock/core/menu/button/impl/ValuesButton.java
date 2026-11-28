@@ -1,10 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -13,12 +11,10 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandValues;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
 
 public class ValuesButton extends AbstractMenuViewButton<MenuIslandValues.View> {
@@ -32,11 +28,6 @@ public class ValuesButton extends AbstractMenuViewButton<MenuIslandValues.View> 
     @Override
     public Template getTemplate() {
         return (Template) super.getTemplate();
-    }
-
-    @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        // Dummy Button
     }
 
     @Override
@@ -81,7 +72,7 @@ public class ValuesButton extends AbstractMenuViewButton<MenuIslandValues.View> 
 
         @Override
         public MenuTemplateButton<MenuIslandValues.View> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, block);
+            return new Template(this, block);
         }
 
     }
@@ -90,10 +81,8 @@ public class ValuesButton extends AbstractMenuViewButton<MenuIslandValues.View> 
 
         private final Key block;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Key block) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    ValuesButton.class, ValuesButton::new);
+        Template(AbstractBuilder<MenuIslandValues.View> builder, Key block) {
+            super(builder, ValuesButton.class, ValuesButton::new);
             this.block = Objects.requireNonNull(block, "block cannot be null");
         }
 

@@ -11,9 +11,13 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
+import org.bukkit.ExplosionResult;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
@@ -24,7 +28,6 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 
 import java.lang.reflect.Modifier;
 import java.util.Locale;
-import java.util.Objects;
 
 public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21_9.AbstractNMSAlgorithms {
 
@@ -54,19 +57,31 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21
     @Override
     public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
         if (itemMeta instanceof ArmorMeta armorMeta) {
-            TrimMaterial material = Objects.requireNonNull(Bukkit.getRegistry(TrimMaterial.class)).get(NamespacedKey.minecraft(trimMaterial));
-            TrimPattern pattern = Objects.requireNonNull(Bukkit.getRegistry(TrimPattern.class)).get(NamespacedKey.minecraft(trimPattern));
+            Registry<TrimMaterial> materialRegistry = Bukkit.getRegistry(TrimMaterial.class);
+            Registry<TrimPattern> patternRegistry = Bukkit.getRegistry(TrimPattern.class);
 
-            if (material == null)
-                throw new IllegalArgumentException("Couldn't convert " + trimMaterial.toUpperCase(Locale.ENGLISH) +
-                        " into trim material, skipping...");
-            if (pattern == null)
-                throw new IllegalArgumentException("Couldn't convert " + trimPattern.toUpperCase(Locale.ENGLISH) +
-                        " into trim pattern, skipping...");
+            if (materialRegistry == null || patternRegistry == null) {
+                return;
+            }
+
+            TrimMaterial material = materialRegistry.get(NamespacedKey.minecraft(trimMaterial));
+            TrimPattern pattern = patternRegistry.get(NamespacedKey.minecraft(trimPattern));
+
+            if (material == null) {
+                throw new IllegalArgumentException("Couldn't convert '" + trimMaterial + "' into a trim material");
+            }
+            if (pattern == null) {
+                throw new IllegalArgumentException("Couldn't convert '" + trimPattern + "' into a trim pattern");
+            }
 
             ArmorTrim armorTrim = new ArmorTrim(material, pattern);
             armorMeta.setTrim(armorTrim);
         }
+    }
+
+    @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
+        itemMeta.setHideTooltip(true);
     }
 
     @Override
@@ -82,6 +97,31 @@ public class NMSAlgorithmsImpl extends com.bgsoftware.superiorskyblock.nms.v1_21
     @Override
     public double getCurrentTps() {
         return (SERVER_RECENT_TPS.isValid() ? SERVER_RECENT_TPS.get(MinecraftServer.getServer()) : Bukkit.getTPS())[0];
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        NamespacedKey key = NamespacedKey.fromString(biomeName.toLowerCase(Locale.ENGLISH));
+        if (key != null) {
+            Registry<Biome> registry = Bukkit.getRegistry(Biome.class);
+            if (registry != null) {
+                Biome biome = registry.get(key);
+                if (biome != null) {
+                    return biome;
+                }
+            }
+        }
+
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean isSoftExplosion(EntityExplodeEvent e) {
+        return e.getExplosionResult() == ExplosionResult.TRIGGER_BLOCK;
     }
 
 }

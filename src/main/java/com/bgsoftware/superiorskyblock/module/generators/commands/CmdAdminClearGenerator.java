@@ -34,7 +34,7 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
                 Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
                 Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> [" +
-                Message.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_DIMENSION.getMessage(locale) + "]";
     }
 
     @Override
@@ -67,33 +67,39 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
         Dimension dimension = args.length == 3 ? plugin.getSettings().getWorlds().getDefaultWorldDimension() :
                 CommandArguments.getDimension(sender, args[3]);
 
-        if (dimension == null)
+        if (dimension == null) {
             return;
+        }
 
         int islandsChangedCount = 0;
 
         for (Island island : islands) {
-            if (!PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension))
-                continue;
+            if (!island.getCustomGeneratorAmounts(dimension).isEmpty()) {
+                if (!PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension)) {
+                    continue;
+                }
+
+                island.clearGeneratorAmounts(dimension);
+            }
 
             ++islandsChangedCount;
-
-            island.clearGeneratorAmounts(dimension);
         }
 
-        if (islandsChangedCount <= 0)
+        if (islandsChangedCount <= 0) {
             return;
+        }
 
-        if (islands.size() != 1)
+        if (islandsChangedCount > 1) {
             Message.GENERATOR_CLEARED_ALL.send(sender);
-        else if (targetPlayer == null)
+        } else if (targetPlayer == null) {
             Message.GENERATOR_CLEARED_NAME.send(sender, islands.get(0).getName());
-        else
+        } else {
             Message.GENERATOR_CLEARED.send(sender, targetPlayer.getName());
+        }
     }
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getDimensions(args[3]) : Collections.emptyList();
+        return args.length == 4 ? CommandTabCompletes.getDimensions(plugin, args[3]) : Collections.emptyList();
     }
 }

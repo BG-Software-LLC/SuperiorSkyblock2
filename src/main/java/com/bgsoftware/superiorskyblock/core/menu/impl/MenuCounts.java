@@ -7,8 +7,7 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
-import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.key.types.MaterialKey;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
@@ -20,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.args.IslandViewArgs;
 import org.bukkit.Material;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -74,9 +74,12 @@ public class MenuCounts extends AbstractPagedMenu<MenuCounts.View, IslandViewArg
 
         @Override
         protected List<MenuCounts.BlockCount> requestObjects() {
-            return new SequentialListBuilder<BlockCount>()
-                    .sorted(BLOCK_COUNT_COMPARATOR)
-                    .build(island.getBlockCountsAsBigInteger().entrySet(), BLOCK_COUNT_MAPPER);
+            Map<Key, BigInteger> blockCounts = island.getBlockCountsAsBigInteger();
+            List<BlockCount> blockCountsList = new ArrayList<>(blockCounts.size());
+            for (Map.Entry<Key, BigInteger> blockCount : blockCounts.entrySet())
+                blockCountsList.add(BLOCK_COUNT_MAPPER.apply(blockCount));
+            blockCountsList.sort(BLOCK_COUNT_COMPARATOR);
+            return blockCountsList;
         }
 
     }

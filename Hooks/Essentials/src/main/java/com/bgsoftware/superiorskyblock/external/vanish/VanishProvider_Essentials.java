@@ -15,20 +15,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class VanishProvider_Essentials implements VanishProvider, Listener {
 
-    private static boolean alreadyEnabled = false;
-
     private final SuperiorSkyblockPlugin plugin;
     private final Essentials instance;
 
     public VanishProvider_Essentials(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.instance = JavaPlugin.getPlugin(Essentials.class);
-
-        if (!alreadyEnabled) {
-            alreadyEnabled = true;
-            Bukkit.getPluginManager().registerEvents(this, plugin);
-        }
-
+        Bukkit.getPluginManager().registerEvents(this, plugin);
         Log.info("Hooked into Essentials for support of vanish status of players.");
     }
 

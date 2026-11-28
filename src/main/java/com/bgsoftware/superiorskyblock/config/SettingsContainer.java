@@ -12,9 +12,10 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.player.inventory.ClearAction;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.config.section.BlockCategoriesSection;
+import com.bgsoftware.superiorskyblock.config.section.EntityCategoriesSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
-import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
 import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
@@ -23,7 +24,6 @@ import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
@@ -31,14 +31,16 @@ import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
+import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
@@ -61,7 +63,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class SettingsContainer {
@@ -94,6 +95,7 @@ public class SettingsContainer {
     public final Int2IntMapView defaultRoleLimits;
     public final Map<PotionEffectType, Integer> defaultIslandEffects;
     public final int islandsHeight;
+    public final int seaLevelHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
     public final KeySet whitelistedStackedBlocks;
@@ -103,7 +105,7 @@ public class SettingsContainer {
     public final boolean stackedBlocksAutoPickup;
     public final boolean stackedBlocksMenuEnabled;
     public final String stackedBlocksMenuTitle;
-    public final String islandLevelFormula;
+    public final String blockLevelFormula;
     public final boolean roundedIslandLevel;
     public final RoundingMode islandLevelRoundingMode;
     public final boolean autoBlocksTracking;
@@ -119,6 +121,7 @@ public class SettingsContainer {
     public final String visitorsSignLine;
     public final String visitorsSignActive;
     public final String visitorsSignInactive;
+    public final String visitorsSignDescriptionLineFormat;
     public final Dimension defaultWorldDimension;
     public final String defaultWorldName;
     public final String islandWorldName;
@@ -134,7 +137,6 @@ public class SettingsContainer {
     public final Set<String> worldPermissions;
     public final boolean voidTeleportMembers;
     public final boolean voidTeleportVisitors;
-    public final List<String> interactables;
     public final KeySet safeBlocks;
     public final boolean visitorsDamage;
     public final boolean coopDamage;
@@ -145,8 +147,6 @@ public class SettingsContainer {
     public final boolean kickConfirm;
     public final boolean leaveConfirm;
     public final boolean transferConfirm;
-    public final String spawnersProvider;
-    public final String stackedBlocksProvider;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
@@ -154,6 +154,7 @@ public class SettingsContainer {
     public final boolean islandNamesColorSupport;
     public final boolean islandNamesIslandTop;
     public final boolean islandNamesPreventPlayerNames;
+    public final boolean islandNamesAnnounceChangeToAll;
     public final boolean teleportOnCreate;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
@@ -200,11 +201,16 @@ public class SettingsContainer {
     public final boolean defaultIslandFly;
     public final String defaultBorderColor;
     public final boolean obsidianToLava;
+    public final String spawnersProvider;
+    public final String stackedBlocksProvider;
+    public final String pricesProvider;
+    public final String vanishProvider;
     public final BlockValuesManagerImpl.SyncWorthStatus syncWorth;
     public final boolean negativeWorth;
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
     public final List<String> disabledCommands;
+    public final List<String> dangerousCommands;
     public final List<String> disabledHooks;
     public final boolean schematicNameArgument;
     public final String islandChestTitle;
@@ -212,7 +218,6 @@ public class SettingsContainer {
     public final int islandChestsDefaultSize;
     public final boolean overrideDefaultAliases;
     public final Map<String, List<String>> commandAliases;
-    public final KeySet valuableBlocks;
     public final GameMode islandPreviewsGameMode;
     public final int islandPreviewsMaxDistance;
     public final List<String> islandPreviewsBlockedCommands;
@@ -235,8 +240,11 @@ public class SettingsContainer {
     public final BigInteger blockCountsSaveThreshold;
     public final boolean chatSigningSupport;
     public final int commandsPerPage;
+    public final boolean helpOnNoPermission;
+    public final boolean helpOnInvalidCommand;
     public final boolean cacheSchematics;
-    public final Map<String, KeySet> entityCategories;
+    public final BlockCategoriesSection blockCategories;
+    public final EntityCategoriesSection entityCategories;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -255,43 +263,64 @@ public class SettingsContainer {
         calcInterval = config.getLong("calc-interval", 6000);
         islandCommand = config.getString("island-command", "island,is,islands");
         maxIslandSize = config.getInt("max-island-size", 200);
-        defaultIslandSize = config.getInt("default-values.island-size", 20);
+        defaultIslandSize = Math.max(config.getInt("default-values.island-size", 20), 1);
         KeyMap<Integer> defaultBlockLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        loadListOrSection(config, "default-values.block-limits", "block limit", (key, limit) -> {
-            Key blockKey = Keys.ofMaterialAndData(key);
-            defaultBlockLimits.put(blockKey, limit);
-            plugin.getBlockValues().addCustomBlockKey(blockKey);
-        });
+        if (config.isConfigurationSection("default-values.block-limits")) {
+            for (String blockName : config.getConfigurationSection("default-values.block-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.block-limits." + blockName);
+                if (limit >= 0) {
+                    Key materialKey = Keys.ofMaterialAndData(blockName);
+                    defaultBlockLimits.put(materialKey, limit);
+                    plugin.getBlockValues().addCustomBlockKey(materialKey);
+                }
+            }
+        }
         this.defaultBlockLimits = KeyMaps.unmodifiableKeyMap(defaultBlockLimits);
         KeyMap<Integer> defaultEntityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
-        loadListOrSection(config, "default-values.entity-limits", "entity limit", (entityType, limit) ->
-                defaultEntityLimits.put(Keys.ofEntityType(entityType), limit));
+        if (config.isConfigurationSection("default-values.entity-limits")) {
+            for (String entityName : config.getConfigurationSection("default-values.entity-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.entity-limits." + entityName);
+                if (limit >= 0) {
+                    defaultEntityLimits.put(Keys.ofEntityType(entityName), limit);
+                }
+            }
+        }
         this.defaultEntityLimits = KeyMaps.unmodifiableKeyMap(defaultEntityLimits);
         Map<PotionEffectType, Integer> defaultIslandEffects = new ArrayMap<>();
-        loadListOrSection(config, "default-values.island-effects", "island effect", (effectName, effectLevel) -> {
-            PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
-            if (potionEffectType == null) {
-                Log.errorFromFile("config.yml", "Invalid potion effect " + effectName + ", skipping...");
-            } else {
-                defaultIslandEffects.put(potionEffectType, effectLevel - 1);
+        if (config.isConfigurationSection("default-values.island-effects")) {
+            for (String effectName : config.getConfigurationSection("default-values.island-effects").getKeys(false)) {
+                int level = config.getInt("default-values.island-effects." + effectName);
+                if (level >= 0) {
+                    PotionEffectType potionEffectType = PotionEffectType.getByName(effectName);
+                    if (potionEffectType == null) {
+                        Log.errorFromFile("config.yml", "Invalid potion effect " + effectName + ", skipping...");
+                    } else {
+                        defaultIslandEffects.put(potionEffectType, level - 1);
+                    }
+                }
             }
-        });
+        }
         this.defaultIslandEffects = Collections.unmodifiableMap(defaultIslandEffects);
-        defaultTeamLimit = config.getInt("default-values.team-limit", 4);
-        defaultWarpsLimit = config.getInt("default-values.warps-limit", 3);
-        defaultCoopLimit = config.getInt("default-values.coop-limit", 8);
-        defaultCropGrowth = config.getInt("default-values.crop-growth", 1);
-        defaultSpawnerRates = config.getDouble("default-values.spawner-rates", 1D);
-        defaultMobDrops = config.getDouble("default-values.mob-drops", 1D);
-        defaultBankLimit = new BigDecimal(config.getString("default-values.bank-limit", "-1"));
+        defaultTeamLimit = Math.max(config.getInt("default-values.team-limit", 4), IslandUpgradeConstants.NO_LIMIT_VALUE);
+        defaultWarpsLimit = Math.max(config.getInt("default-values.warps-limit", 3), IslandUpgradeConstants.NO_LIMIT_VALUE);
+        defaultCoopLimit = Math.max(config.getInt("default-values.coop-limit", 8), IslandUpgradeConstants.NO_LIMIT_VALUE);
+        defaultCropGrowth = Math.max(config.getInt("default-values.crop-growth", 1), IslandUpgradeConstants.NO_LIMIT_VALUE);
+        defaultSpawnerRates = Math.max(config.getDouble("default-values.spawner-rates", 1D), IslandUpgradeConstants.NO_LIMIT_VALUE);
+        defaultMobDrops = Math.max(config.getDouble("default-values.mob-drops", 1D), IslandUpgradeConstants.NO_LIMIT_VALUE);
+        defaultBankLimit = new BigDecimal(config.getString("default-values.bank-limit", "-1")).max(IslandUpgradeConstants.NO_BANK_LIMIT_VALUE);
         defaultRoleLimits = CollectionsFactory.createInt2IntHashMap();
-        loadListOrSection(config, "default-values.role-limits", "role limit", (role, limit) -> {
-            try {
-                defaultRoleLimits.put(Integer.parseInt(role), limit);
-            } catch (NumberFormatException error) {
-                Log.warnFromFile("config.yml", "Invalid role id for limit: " + role);
+        if (config.isConfigurationSection("default-values.role-limits")) {
+            for (String roleId : config.getConfigurationSection("default-values.role-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.role-limits." + roleId);
+                if (limit >= 0) {
+                    try {
+                        defaultRoleLimits.put(Integer.parseInt(roleId), limit);
+                    } catch (NumberFormatException error) {
+                        Log.warnFromFile("config.yml", "Invalid role id for limit: " + roleId + ", skipping...");
+                    }
+                }
             }
-        });
+        }
         islandsHeight = config.getInt("islands-height", 100);
         worldBordersEnabled = config.getBoolean("world-borders", true);
         stackedBlocksEnabled = config.getBoolean("stacked-blocks.enabled", true);
@@ -299,15 +328,17 @@ public class SettingsContainer {
         whitelistedStackedBlocks = KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("stacked-blocks.whitelisted"));
         stackedBlocksName = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.custom-name"));
         KeyMap<Integer> stackedBlocksLimits = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        loadListOrSection(config, "stacked-blocks.limits", "stacked-block limit", (key, limit) -> {
-            Key blockKey = Keys.ofMaterialAndData(key);
-            stackedBlocksLimits.put(blockKey, limit);
-        });
+        if (config.isConfigurationSection("stacked-blocks.limits")) {
+            for (String materialName : config.getConfigurationSection("stacked-blocks.limits").getKeys(false)) {
+                int limit = config.getInt("stacked-blocks.limits." + materialName);
+                stackedBlocksLimits.put(Keys.ofMaterialAndData(materialName), limit);
+            }
+        }
         this.stackedBlocksLimits = KeyMaps.unmodifiableKeyMap(stackedBlocksLimits);
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
         stackedBlocksMenuEnabled = config.getBoolean("stacked-blocks.deposit-menu.enabled", true);
         stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
-        islandLevelFormula = config.getString("island-level-formula", "{} / 2");
+        blockLevelFormula = config.getString("block-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
         islandLevelRoundingMode = Optional.ofNullable(EnumHelper.getEnum(RoundingMode.class,
                         config.getString("island-level-rounding-mode").toUpperCase(Locale.ENGLISH)))
@@ -341,51 +372,14 @@ public class SettingsContainer {
         visitorsSignLine = config.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));
+        visitorsSignDescriptionLineFormat = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.description-line-format", "{0}"));
+        loadDimensions(config.getConfigurationSection("worlds.dimensions"));
         islandWorldName = config.getString("worlds.world-name", "SuperiorWorld");
-
-        {
-            ConfigurationSection normalWorldSection = config.getConfigurationSection("worlds.normal");
-            if (normalWorldSection != null) {
-                dimensionConfigs.put(Dimensions.NORMAL, new WorldsSection.NormalDimensionConfig(normalWorldSection, islandWorldName));
-            } else {
-                dimensionConfigs.put(Dimensions.NORMAL, new WorldsSection.NormalDimensionConfig(
-                        true, true, true, "PLAINS", "", islandWorldName));
-            }
-        }
-
-        {
-            ConfigurationSection netherWorldSection = config.getConfigurationSection("worlds.nether");
-            if (netherWorldSection != null) {
-                dimensionConfigs.put(Dimensions.NETHER, new WorldsSection.NetherDimensionConfig(netherWorldSection, islandWorldName));
-            } else {
-                dimensionConfigs.put(Dimensions.NETHER, new WorldsSection.NetherDimensionConfig(
-                        false, true, true, "NETHER_WASTES", "", islandWorldName));
-            }
-        }
-
-        {
-            ConfigurationSection endWorldSection = config.getConfigurationSection("worlds.end");
-            if (endWorldSection != null) {
-                dimensionConfigs.put(Dimensions.THE_END, new WorldsSection.EndDimensionConfig(endWorldSection, islandWorldName));
-            } else {
-                dimensionConfigs.put(Dimensions.THE_END, new WorldsSection.EndDimensionConfig(
-                        false, false, true, "THE_END", "", islandWorldName,
-                        false, SBlockOffset.ZERO));
-            }
-        }
-
-        try {
-            Dimension defaultWorld = Dimension.getByName(config.getString("worlds.default-world"));
-            SettingsManager.Worlds.DimensionConfig dimensionConfig = this.dimensionConfigs.get(defaultWorld);
-            if (dimensionConfig == null || !dimensionConfig.isEnabled())
-                throw new Exception();
-            this.defaultWorldDimension = defaultWorld;
-            this.defaultWorldName = dimensionConfig.getName();
-        } catch (Exception error) {
-            throw new ManagerLoadException("Cannot find a default islands world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-        }
-
         worldsDifficulty = config.getString("worlds.difficulty", "EASY").toUpperCase(Locale.ENGLISH);
+        seaLevelHeight = config.getInt("worlds.sea-level-height", 100);
+        this.defaultWorldDimension = Dimension.getByName(config.getString("worlds.default-world"));
+        loadDimensionConfigs(config.getConfigurationSection("worlds.dimensions"));
+        this.defaultWorldName = this.dimensionConfigs.get(this.defaultWorldDimension).getName();
         spawnLocation = config.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = config.getBoolean("spawn.protection", true);
         spawnSettings = Collections.unmodifiableList(new LinkedList<>(config.getStringList("spawn.settings")
@@ -399,22 +393,24 @@ public class SettingsContainer {
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet())));
         voidTeleportMembers = config.getBoolean("void-teleport.members", true);
         voidTeleportVisitors = config.getBoolean("void-teleport.visitors", true);
-        interactables = loadInteractables(plugin);
         safeBlocks = loadSafeBlocks(plugin);
         visitorsDamage = config.getBoolean("visitors-damage", false);
         coopDamage = config.getBoolean("coop-damage", true);
         islandTopIncludeLeader = config.getBoolean("island-top-include-leader", true);
-        defaultPlaceholders = Collections.unmodifiableMap(config.getStringList("default-placeholders").stream().collect(Collectors.toMap(
-                line -> line.split(":")[0].replace("superior_", "").toLowerCase(Locale.ENGLISH),
-                line -> line.split(":")[1]
-        )));
+        Map<String, String> defaultPlaceholders = new HashMap<>();
+        if (config.isConfigurationSection("default-placeholders")) {
+            for (String placeholderName : config.getConfigurationSection("default-placeholders").getKeys(false)) {
+                String placeholder = placeholderName.replace("superior_", "").toLowerCase(Locale.ENGLISH);
+                String replacement = config.getString("default-placeholders." + placeholderName);
+                defaultPlaceholders.put(placeholder, replacement);
+            }
+        }
+        this.defaultPlaceholders = Collections.unmodifiableMap(defaultPlaceholders);
         banConfirm = config.getBoolean("ban-confirm");
         disbandConfirm = config.getBoolean("disband-confirm");
         kickConfirm = config.getBoolean("kick-confirm");
         leaveConfirm = config.getBoolean("leave-confirm");
         transferConfirm = config.getBoolean("transfer-confirm");
-        spawnersProvider = config.getString("spawners-provider", "AUTO");
-        stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
         islandNamesRequiredForCreation = config.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = config.getInt("island-names.max-length", 16);
         islandNamesMinLength = config.getInt("island-names.min-length", 3);
@@ -424,6 +420,7 @@ public class SettingsContainer {
         islandNamesColorSupport = config.getBoolean("island-names.color-support", true);
         islandNamesIslandTop = config.getBoolean("island-names.island-top", true);
         islandNamesPreventPlayerNames = config.getBoolean("island-names.prevent-player-names", true);
+        islandNamesAnnounceChangeToAll = config.getBoolean("island-names.announce-change-to-all", true);
         teleportOnCreate = config.getBoolean("teleport-on-create", true);
         teleportOnJoin = config.getBoolean("teleport-on-join", false);
         teleportOnKick = config.getBoolean("teleport-on-kick", true);
@@ -438,25 +435,35 @@ public class SettingsContainer {
                 .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList()));
         defaultGenerator = new EnumerateMap<>(Dimension.values());
         if (config.isConfigurationSection("default-values.generator")) {
-            for (String env : config.getConfigurationSection("default-values.generator").getKeys(false)) {
+            for (String dimensionName : config.getConfigurationSection("default-values.generator").getKeys(false)) {
                 try {
-                    Dimension dimension = Dimension.getByName(env.toUpperCase(Locale.ENGLISH));
-                    loadGenerator(config, "default-values.generator." + env, dimension);
+                    Dimension dimension = Dimension.getByName(dimensionName.toUpperCase(Locale.ENGLISH));
+
+                    KeyMap<Integer> defaultGenerator = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
+                    if (config.isConfigurationSection("default-values.generator." + dimensionName)) {
+                        for (String materialName : config.getConfigurationSection("default-values.generator." + dimensionName).getKeys(false)) {
+                            int percentage = config.getInt("default-values.generator." + dimensionName + "." + materialName);
+                            if (percentage >= 0) {
+                                defaultGenerator.put(Keys.ofMaterialAndData(materialName), percentage);
+                            }
+                        }
+                    }
+                    this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
                 } catch (Exception error) {
-                    Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading default generator values for ", env + ":");
+                    Log.errorFromFile(error, "config.yml", "An unexpected error occurred while loading default generator values for ", dimensionName + ":");
                 }
             }
-        } else {
-            loadGenerator(config, "default-values.generator", this.defaultWorldDimension);
         }
         disableRedstoneOffline = config.getBoolean("disable-redstone-offline", true);
         disableRedstoneAFK = config.getBoolean("afk-integrations.disable-redstone", false);
         disableSpawningAFK = config.getBoolean("afk-integrations.disable-spawning", true);
         Map<String, Pair<Integer, String>> commandsCooldown = new HashMap<>();
-        for (String subCommand : config.getConfigurationSection("commands-cooldown").getKeys(false)) {
-            int cooldown = config.getInt("commands-cooldown." + subCommand + ".cooldown");
-            String permission = config.getString("commands-cooldown." + subCommand + ".bypass-permission");
-            commandsCooldown.put(subCommand, new Pair<>(cooldown, permission));
+        if (config.isConfigurationSection("commands-cooldown")) {
+            for (String subCommand : config.getConfigurationSection("commands-cooldown").getKeys(false)) {
+                int cooldown = config.getInt("commands-cooldown." + subCommand + ".cooldown");
+                String permission = config.getString("commands-cooldown." + subCommand + ".bypass-permission");
+                commandsCooldown.put(subCommand, new Pair<>(cooldown, permission));
+            }
         }
         this.commandsCooldown = Collections.unmodifiableMap(commandsCooldown);
         upgradeCooldown = config.getLong("upgrade-cooldown", -1L);
@@ -481,7 +488,7 @@ public class SettingsContainer {
                     for (String slot : containerSection.getKeys(false)) {
                         try {
                             // Reading the item from the config
-                            TemplateItem templateItem = MenuParserImpl.getInstance().getItemStack("config.yml", containerSection.getConfigurationSection(slot));
+                            TemplateItem templateItem = MenuParserUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot));
 
                             if (templateItem == null)
                                 continue;
@@ -533,12 +540,18 @@ public class SettingsContainer {
         defaultIslandFly = config.getBoolean("default-island-fly", false);
         defaultBorderColor = config.getString("default-border-color", "BLUE");
         obsidianToLava = config.getBoolean("obsidian-to-lava", false);
+        spawnersProvider = config.getString("spawners-provider", "AUTO");
+        stackedBlocksProvider = config.getString("stacked-blocks-provider", "AUTO");
+        pricesProvider = config.getString("prices-provider", "AUTO");
+        vanishProvider = config.getString("vanish-provider", "AUTO");
         syncWorth = BlockValuesManagerImpl.SyncWorthStatus.of(config.getString("sync-worth", "NONE"));
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
         disabledEvents = Collections.unmodifiableList(config.getStringList("disabled-events")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         disabledCommands = Collections.unmodifiableList(config.getStringList("disabled-commands")
+                .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
+        dangerousCommands = Collections.unmodifiableList(config.getStringList("dangerous-commands")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
         disabledHooks = Collections.unmodifiableList(config.getStringList("disabled-hooks")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()));
@@ -554,8 +567,6 @@ public class SettingsContainer {
             }
         }
         this.commandAliases = Collections.unmodifiableMap(commandAliases);
-        valuableBlocks = KeySets.unmodifiableKeySet(
-                KeySets.createHashSet(KeyIndicator.MATERIAL, config.getStringList("valuable-blocks")));
         GameMode islandPreviewsGameMode;
         String islandPreviewsGameModeName = config.getString("island-previews.game-mode", "SPECTATOR").toUpperCase(Locale.ENGLISH);
         try {
@@ -571,7 +582,7 @@ public class SettingsContainer {
         if (config.isConfigurationSection("island-previews.locations")) {
             for (String schematic : config.getConfigurationSection("island-previews.locations").getKeys(false)) {
                 try {
-                    islandPreviewsLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
+                    islandPreviewsLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SPACED_CENTERED_SERIALIZER
                             .deserialize(config.getString("island-previews.locations." + schematic)));
                 } catch (Exception error) {
                     Log.warnFromFile("config.yml", "Cannot deserialize island preview for ", schematic, ", skipping...");
@@ -603,65 +614,163 @@ public class SettingsContainer {
         deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
         List<RespawnAction> playerRespawnActions = new LinkedList<>();
         config.getStringList("player-respawn").forEach(respawnAction -> {
-            try {
-                playerRespawnActions.add(RespawnAction.getByName(respawnAction));
-            } catch (NullPointerException error) {
+            RespawnAction playerRespawnAction = RespawnAction.getByNameOrNull(respawnAction);
+            if (playerRespawnAction == null) {
                 Log.warnFromFile("config.yml", "Invalid respawn action ", respawnAction + ", skipping...");
+            } else {
+                playerRespawnActions.add(playerRespawnAction);
             }
         });
         this.playerRespawnActions = Collections.unmodifiableList(playerRespawnActions);
         blockCountsSaveThreshold = BigInteger.valueOf(config.getInt("block-counts-save-threshold", 100));
         chatSigningSupport = config.getBoolean("chat-signing-support", true);
         commandsPerPage = config.getInt("commands-per-page", 7);
+        helpOnInvalidCommand = config.getBoolean("help-on-invalid-command", true);
+        helpOnNoPermission = config.getBoolean("help-on-no-permission", false);
         cacheSchematics = config.getBoolean("cache-schematics", true);
-        entityCategories = parseEntityCategories(config.getConfigurationSection("entity-categories"));
+        blockCategories = loadBlockCategories(plugin);
+        entityCategories = loadEntityCategories(plugin);
+    }
+
+    private void loadDimensions(ConfigurationSection dimensionsSection) throws ManagerLoadException {
+        // If the section is null, it will not be possible to load any dimension, so the plugin cannot start.
+        if (dimensionsSection == null) {
+            throw new ManagerLoadException("Cannot find any island world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
+
+        // First register all dimensions
+        for (String dimensionName : dimensionsSection.getKeys(false)) {
+            String environmentName = dimensionsSection.getString(dimensionName + ".environment");
+            World.Environment environment;
+            try {
+                environment = World.Environment.valueOf(environmentName.toUpperCase(Locale.ENGLISH));
+            } catch (IllegalArgumentException error) {
+                Log.warnFromFile("config.yml", "Cannot load dimension due to invalid environment: ", environmentName, " - skipping...");
+                continue;
+            }
+
+            // Dimensions are already registered when the plugin is reloaded.
+            if (Dimension.getByNameOrNull(dimensionName) == null)
+                Dimension.register(dimensionName, environment);
+        }
+    }
+
+    private void loadDimensionConfigs(ConfigurationSection dimensionsSection) throws ManagerLoadException {
+        // We don't need to check if section is null, because loadDimensions() will do that beforehand.
+        for (String dimensionName : dimensionsSection.getKeys(false)) {
+            ConfigurationSection dimensionSection = dimensionsSection.getConfigurationSection(dimensionName);
+
+            if (dimensionSection == null) {
+                Log.warnFromFile("config.yml", "Invalid dimension config section for ", dimensionName, " - skipping...");
+                continue;
+            }
+
+            Dimension dimension = Dimension.getByName(dimensionName);
+
+            String worldName = defaultWorldDimension == dimension ? islandWorldName :
+                    islandWorldName + "_" + dimensionName.toLowerCase(Locale.ENGLISH);
+
+            switch (dimension.getEnvironment()) {
+                case NORMAL:
+                    dimensionConfigs.put(dimension, new WorldsSection.NormalDimensionConfig(dimensionSection, dimension, worldName));
+                    break;
+                case NETHER:
+                    dimensionConfigs.put(dimension, new WorldsSection.NetherDimensionConfig(dimensionSection, dimension, worldName));
+                    break;
+                case THE_END:
+                    dimensionConfigs.put(dimension, new WorldsSection.EndDimensionConfig(dimensionSection, dimension, worldName));
+                    break;
+            }
+
+        }
+
+        // Check the default dimension is valid
+        SettingsManager.Worlds.DimensionConfig dimensionConfig = this.dimensionConfigs.get(this.defaultWorldDimension);
+        if (dimensionConfig == null || !dimensionConfig.isEnabled()) {
+            throw new ManagerLoadException("Cannot find a default islands world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
     }
 
     private List<ClearAction> loadClearActions(List<String> clearActionsNames) {
         List<ClearAction> clearActions = new LinkedList<>();
-        clearActionsNames.forEach(clearAction -> {
-            try {
-                clearActions.add(ClearAction.getByName(clearAction));
-            } catch (NullPointerException error) {
+        for(String clearAction : clearActionsNames) {
+            ClearAction loadedClearAction = ClearAction.getByNameOrNull(clearAction);
+            if (loadedClearAction == null) {
                 Log.warnFromFile("config.yml", "Invalid clear action ", clearAction + ", skipping...");
-            }
-        });
-        return Collections.unmodifiableList(clearActions);
-    }
-
-    private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {
-        File file = new File(plugin.getDataFolder(), "interactables.yml");
-
-        if (!file.exists())
-            plugin.saveResource("interactables.yml", false);
-
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
-        List<String> interactablesList = cfg.getStringList("interactables");
-
-        // Warn about interactables that the default file contains but the current
-        // file does not.
-        YamlConfiguration defaultInteractablesConfig = CommentedConfiguration.loadConfiguration(plugin.getResource("interactables.yml"));
-        List<String> defaultInteractables = defaultInteractablesConfig.getStringList("interactables");
-        if (defaultInteractables != null) {
-            for (String interactableBlock : defaultInteractables) {
-                if (!interactablesList.contains(interactableBlock))
-                    Log.warn("Potentially missing interactable block ", interactableBlock);
+            } else {
+                clearActions.add(loadedClearAction);
             }
         }
+        return clearActions.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(clearActions);
+    }
 
-        return Collections.unmodifiableList(interactablesList);
+    private BlockCategoriesSection loadBlockCategories(SuperiorSkyblockPlugin plugin) {
+        File file = new File(plugin.getDataFolder(), "block-categories.yml");
+
+        boolean removeInvalidBlocks = false;
+
+        if (!file.exists()) {
+            plugin.saveResource("block-categories.yml", false);
+            removeInvalidBlocks = true;
+        }
+
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
+
+        if (removeInvalidBlocks) {
+            BlockCategoriesSection.removeInvalidBlocks(config, file);
+        }
+
+        try {
+            config.syncWithConfig(file, plugin.getResource("block-categories.yml"),
+                    BlockCategoriesSection.IGNORED_SECTIONS);
+        } catch (Exception error) {
+            Log.error(error, file, "An unexpected error occurred while loading file:");
+        }
+
+        BlockCategoriesSection.warnMissingBlocks(config,
+                CommentedConfiguration.loadConfiguration(plugin.getResource("block-categories.yml")));
+
+        return new BlockCategoriesSection(config);
+    }
+
+    private EntityCategoriesSection loadEntityCategories(SuperiorSkyblockPlugin plugin) {
+        File file = new File(plugin.getDataFolder(), "entity-categories.yml");
+
+        boolean removeInvalidEntities = false;
+
+        if (!file.exists()) {
+            plugin.saveResource("entity-categories.yml", false);
+            removeInvalidEntities = true;
+        }
+
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
+
+        EntityCategoriesSection.convertToSections(config, file);
+
+        if (removeInvalidEntities) {
+            EntityCategoriesSection.removeInvalidEntities(config, file);
+        }
+
+        try {
+            config.syncWithConfig(file, plugin.getResource("entity-categories.yml"),
+                    EntityCategoriesSection.IGNORED_SECTIONS);
+        } catch (Exception error) {
+            Log.error(error, file, "An unexpected error occurred while loading file:");
+        }
+
+        return new EntityCategoriesSection(config);
     }
 
     private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "safe_blocks.yml");
 
-        if (!file.exists())
+        if (!file.exists()) {
             Resources.saveResource("safe_blocks.yml");
+        }
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
-        List<String> safeBlocks = cfg.getStringList("safe-blocks");
+        List<String> safeBlocks = config.getStringList("safe-blocks");
 
         if (safeBlocks.isEmpty()) {
             Log.warnFromFile(file.getName(), "There are no valid safe blocks! Generating default ones...");
@@ -672,64 +781,14 @@ public class SettingsContainer {
                     .collect(Collectors.toList()));
 
             try {
-                cfg.set("safe-blocks", safeBlocks);
-                cfg.save(file);
+                config.set("safe-blocks", safeBlocks);
+                config.save(file);
             } catch (IOException error) {
                 Log.errorFromFile(error, "config.yml", "An unexpected error occurred while saving safe blocks into file:");
             }
         }
 
         return KeySets.unmodifiableKeySet(KeySets.createHashSet(KeyIndicator.MATERIAL, safeBlocks));
-    }
-
-    private void loadGenerator(YamlConfiguration config, String path, Dimension dimension) {
-        KeyMap<Integer> defaultGenerator = KeyMaps.createArrayMap(KeyIndicator.MATERIAL);
-        loadListOrSection(config, path, "generator-rates", (key, percentage) -> {
-            Key blockKey = Keys.ofMaterialAndData(key);
-            defaultGenerator.put(blockKey, percentage);
-        });
-        this.defaultGenerator.put(dimension, KeyMaps.unmodifiableKeyMap(defaultGenerator));
-    }
-
-    private static Map<String, KeySet> parseEntityCategories(ConfigurationSection section) {
-        Map<String, KeySet> entityCategories = new HashMap<>();
-
-        for (String categoryName : section.getKeys(false)) {
-            KeySet entityTypes = KeySets.createHashSet(KeyIndicator.ENTITY_TYPE);
-            for (String entityType : section.getStringList(categoryName)) {
-                entityTypes.add(Keys.ofEntityType(entityType));
-            }
-            if (!entityTypes.isEmpty())
-                entityCategories.put(categoryName, KeySets.unmodifiableKeySet(entityTypes));
-        }
-
-        return entityCategories.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(entityCategories);
-    }
-
-    private static void loadListOrSection(YamlConfiguration config, String path, String parseName, BiConsumer<String, Integer> consumer) {
-        Object value = config.get(path);
-        if (value == null)
-            return;
-
-        if (value instanceof List) {
-            ((List<String>) value).forEach(line -> {
-                String[] sections = line.split(":");
-                if (sections.length == 2) {
-                    consumer.accept(sections[0], Integer.parseInt(sections[1]));
-                } else if (sections.length == 3) {
-                    consumer.accept(sections[0] + ":" + sections[1], Integer.parseInt(sections[2]));
-                } else {
-                    Log.warnFromFile("config.yml", "Cannot parse " + parseName + " '", line, "', skipping...");
-                }
-            });
-
-        } else if (value instanceof ConfigurationSection) {
-            for (String key : ((ConfigurationSection) value).getKeys(false)) {
-                consumer.accept(key, ((ConfigurationSection) value).getInt(key));
-            }
-        } else {
-            throw new IllegalArgumentException("Value of path '" + path + "' is not a list or a section, but " + value.getClass());
-        }
     }
 
 }

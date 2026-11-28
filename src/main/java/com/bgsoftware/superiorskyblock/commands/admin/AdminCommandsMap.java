@@ -14,14 +14,13 @@ public class AdminCommandsMap extends CommandsMap {
         clearCommands();
 
         registerCommand(new CmdAdminAdd());
-        registerCommand(new CmdAdminAddBlockLimit());
         registerCommand(new CmdAdminAddBonus());
         if (plugin.getSettings().isCoopMembers())
             registerCommand(new CmdAdminAddCoopLimit());
         registerCommand(new CmdAdminAddDisbands());
-        registerCommand(new CmdAdminAddEntityLimit());
         registerCommand(new CmdAdminAddSize());
         registerCommand(new CmdAdminAddTeamLimit());
+        registerCommand(new CmdAdminAddRoleLimit());
         registerCommand(new CmdAdminAddWarpsLimit());
         registerCommand(new CmdAdminBypass());
         registerCommand(new CmdAdminChest());
@@ -47,23 +46,19 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminPurge());
         registerCommand(new CmdAdminRecalc());
         registerCommand(new CmdAdminReload());
-        registerCommand(new CmdAdminRemoveBlockLimit());
-        registerCommand(new CmdAdminRemoveEntityLimit());
         registerCommand(new CmdAdminRemoveRatings());
+        registerCommand(new CmdAdminRemoveRoleLimit());
         registerCommand(new CmdAdminResetPermissions());
         registerCommand(new CmdAdminResetSettings());
         registerCommand(new CmdAdminResetWorld());
         registerCommand(new CmdAdminSchematic());
-        registerCommand(new CmdAdminSetBankLimit());
         registerCommand(new CmdAdminSetBiome());
         registerCommand(new CmdAdminSetBlockAmount());
-        registerCommand(new CmdAdminSetBlockLimit());
         registerCommand(new CmdAdminSetBonus());
         registerCommand(new CmdAdminSetChestRow());
         if (plugin.getSettings().isCoopMembers())
             registerCommand(new CmdAdminSetCoopLimit());
         registerCommand(new CmdAdminSetDisbands());
-        registerCommand(new CmdAdminSetEntityLimit());
         registerCommand(new CmdAdminSetIslandPreview());
         registerCommand(new CmdAdminSetLeader());
         registerCommand(new CmdAdminSetPermission());

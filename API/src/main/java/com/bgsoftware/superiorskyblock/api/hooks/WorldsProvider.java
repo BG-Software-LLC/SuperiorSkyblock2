@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.hooks;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldLoadListener;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -153,5 +154,15 @@ public interface WorldsProvider {
      * Check whether a dimension is unlocked for islands by default.
      */
     boolean isDimensionUnlocked(Dimension dimension);
+
+    /**
+     * Add a listener to when worlds are loaded by the provider.
+     * This is called by the plugin to listen to changes and fix things within island worlds.
+     *
+     * @param worldLoadListener The callback to listener.
+     */
+    default void addWorldLoadListener(IWorldLoadListener worldLoadListener) {
+        throw new UnsupportedOperationException("This operation is not supported by this WorldProvider.");
+    }
 
 }

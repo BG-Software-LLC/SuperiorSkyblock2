@@ -3,10 +3,10 @@ package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
 import com.bgsoftware.superiorskyblock.api.menu.layout.PagedMenuLayout;
 import com.bgsoftware.superiorskyblock.api.menu.view.PagedMenuView;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class NextPageButton<V extends PagedMenuView<V, ?, E>, E> extends AbstractMenuViewButton<V> {
 
@@ -15,7 +15,7 @@ public class NextPageButton<V extends PagedMenuView<V, ?, E>, E> extends Abstrac
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<V> context) {
         PagedMenuLayout<V> pagedMenuPattern = (PagedMenuLayout<V>) menuView.getMenu().getLayout();
 
         if (pagedMenuPattern == null)
@@ -33,8 +33,7 @@ public class NextPageButton<V extends PagedMenuView<V, ?, E>, E> extends Abstrac
 
         @Override
         public MenuTemplateButton<V> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, NextPageButton.class, NextPageButton::new);
+            return new MenuTemplateButtonImpl<>(this, NextPageButton.class, NextPageButton::new);
         }
 
     }

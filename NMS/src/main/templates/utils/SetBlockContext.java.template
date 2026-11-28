@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils;
 
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -14,7 +13,7 @@ public interface SetBlockContext {
 
     LevelHeightAccessor levelHeightAccessor();
 
-    void prepareChunkAccess(ChunkPos chunkPos);
+    void prepareChunkAccess(int chunkX, int chunkZ);
 
     LevelChunkSection getChunkSection(int i);
 

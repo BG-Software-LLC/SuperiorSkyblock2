@@ -11,14 +11,17 @@ import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.io.ClassProcessor;
+import com.bgsoftware.superiorskyblock.listener.BukkitEventsListener;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.menu.MenuBrewingStandBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.menu.MenuDispenserBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.menu.MenuFurnaceBlockEntity;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.menu.MenuHopperBlockEntity;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world.BlockEntityCache;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world.KeyBlocksCache;
+import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import io.papermc.paper.chat.ChatRenderer;
@@ -26,10 +29,12 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.${ABSTRACT_MINECART_SUBPACKAGE}.AbstractMinecart;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,11 +49,14 @@ import ${CRAFTBUKKIT_PACKAGE}.CraftServer;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftFallingBlock;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftMinecart;
+import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
 import ${CRAFTBUKKIT_PACKAGE}.util.CraftMagicNumbers;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.world.GenericGameEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -197,6 +205,17 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
     }
 
     @Override
+    public boolean canPlaceBookIntoLectern(org.bukkit.block.Block lectern, ItemStack book) {
+        // Check book is actually a book a lectern can take
+        if (!CraftItemStack.asNMSCopy(book).is(ItemTags.LECTERN_BOOKS))
+            return false;
+
+        // Check lectern has no book inside it already
+        BlockState blockState = NMSUtilsVersioned.getBlockState(lectern);
+        return !blockState.getValue(LecternBlock.HAS_BOOK);
+    }
+
+    @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         itemMeta.setCustomModelData(customModel);
     }
@@ -213,6 +232,11 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
 
     @Override
     public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
+        // Doesn't exist
+    }
+
+    @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
         // Doesn't exist
     }
 
@@ -262,6 +286,17 @@ public abstract class AbstractNMSAlgorithms implements NMSAlgorithms {
     @Override
     public EnumBridge<Biome> getBiomeBridge() {
         return BIOME_ENUM_BRIDGE;
+    }
+
+    @Override
+    public BukkitEventsListener.GameEventCreator getGenericGameCreator() {
+        return (eventType, priority, event) -> {
+            GameEventArgs.GenericGameEvent genericGameEvent = new GameEventArgs.GenericGameEvent();
+            genericGameEvent.world = ((GenericGameEvent) event).getWorld();
+            genericGameEvent.gameEvent = ((GenericGameEvent) event).getEvent().getKey().getKey();
+            genericGameEvent.location = ((GenericGameEvent) event).getLocation();
+            return eventType.createEvent(genericGameEvent);
+        };
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {

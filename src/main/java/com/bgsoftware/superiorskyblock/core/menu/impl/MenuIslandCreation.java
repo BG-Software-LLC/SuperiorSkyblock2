@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserUtils;
+import com.bgsoftware.superiorskyblock.core.menu.MenuSlotsMap;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.Menu;
@@ -8,12 +10,11 @@ import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.menu.view.ViewArgs;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.IslandCreationButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.layout.AbstractMenuLayout;
@@ -26,7 +27,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Locale;
 
 public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, MenuIslandCreation.Args> {
 
@@ -49,7 +49,7 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
             return null;
         }
 
-        MenuPatternSlots menuPatternSlots = menuParseResult.getPatternSlots();
+        MenuSlotsMap menuSlotsMap = menuParseResult.getPatternSlots();
         YamlConfiguration cfg = menuParseResult.getConfig();
         MenuLayout.Builder<View> patternBuilder = menuParseResult.getLayoutBuilder();
 
@@ -71,15 +71,16 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
                 {
                     String biomeName = itemSection.getString("biome");
-                    if(biomeName != null) {
-                        try {
-                            Biome biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
-                            buttonBuilder.setBiome(biome);
-                        } catch (IllegalArgumentException error) {
+                    if (biomeName != null) {
+                        Biome biome = plugin.getNMSAlgorithms().getBiome(biomeName);
+
+                        if (biome == null) {
                             Log.warnFromFile("island-creation.yml", "Invalid biome name for item ",
                                     itemSectionName, ": ", biomeName);
                             continue;
                         }
+
+                        buttonBuilder.setBiome(biome);
                     }
                 }
 
@@ -103,8 +104,8 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
                 ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + itemSectionName);
                 if (soundSection != null) {
-                    buttonBuilder.setAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("access")));
-                    buttonBuilder.setNoAccessSound(MenuParserImpl.getInstance().getSound(soundSection.getConfigurationSection("no-access")));
+                    buttonBuilder.setAccessSound(MenuParserUtils.getSound(soundSection.getConfigurationSection("access")));
+                    buttonBuilder.setNoAccessSound(MenuParserUtils.getSound(soundSection.getConfigurationSection("no-access")));
                 }
 
                 ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + itemSectionName);
@@ -118,12 +119,15 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 if (itemSection.isString("spawn-offset"))
                     buttonBuilder.setSpawnOffset(Serializers.OFFSET_SPACED_SERIALIZER.deserialize(itemSection.getString("spawn-offset")));
 
-                buttonBuilder.setAccessItem(MenuParserImpl.getInstance().getItemStack("menus/island-creation.yml",
+                if (itemSection.contains("rotation"))
+                    parseRotation(itemSection.getString("rotation"), itemSectionName, buttonBuilder);
+
+                buttonBuilder.setAccessItem(MenuParserUtils.getItemStack("menus/island-creation.yml",
                         itemSection.getConfigurationSection("access")));
-                buttonBuilder.setNoAccessItem(MenuParserImpl.getInstance().getItemStack("menus/island-creation.yml",
+                buttonBuilder.setNoAccessItem(MenuParserUtils.getItemStack("menus/island-creation.yml",
                         itemSection.getConfigurationSection("no-access")));
 
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), buttonBuilder);
+                patternBuilder.mapButtons(menuSlotsMap.getSlots(itemSectionName), buttonBuilder);
             }
         }
 
@@ -156,7 +160,7 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         File oldFile = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
 
         if (!oldFile.exists())
@@ -196,6 +200,48 @@ public class MenuIslandCreation extends AbstractMenu<MenuIslandCreation.View, Me
                 AbstractMenuLayout.BUTTON_SYMBOLS[charCounter]));
 
         return true;
+    }
+
+    private static void parseRotation(@Nullable String rotation, String itemSectionName,
+                                      IslandCreationButton.Builder buttonBuilder) {
+        if (rotation == null || rotation.trim().isEmpty()) {
+            Log.warnFromFile("island-creation.yml", "Invalid rotation for item ", itemSectionName,
+                    ": expected 'yaw' or 'yaw, pitch', got an empty value");
+            return;
+        }
+
+        String[] parts = rotation.split(",");
+        if (parts.length > 2) {
+            Log.warnFromFile("island-creation.yml", "Invalid rotation for item ", itemSectionName,
+                    ": expected 'yaw' or 'yaw, pitch', got '", rotation, "'");
+            return;
+        }
+
+        Float yaw = parseRotationPart(parts[0], "yaw", rotation, itemSectionName);
+        Float pitch = parts.length == 2 ? parseRotationPart(parts[1], "pitch", rotation, itemSectionName) : null;
+
+        if (yaw != null)
+            buttonBuilder.setSpawnYaw(yaw);
+        if (pitch != null)
+            buttonBuilder.setSpawnPitch(pitch);
+    }
+
+    @Nullable
+    private static Float parseRotationPart(String part, String partName, String rotation, String itemSectionName) {
+        Float value = null;
+
+        try {
+            value = Float.parseFloat(part.trim());
+        } catch (NumberFormatException ignored) {
+        }
+
+        if (value == null || value.isNaN() || value.isInfinite()) {
+            Log.warnFromFile("island-creation.yml", "Invalid ", partName, " '", part.trim(), "' in rotation '",
+                    rotation, "' for item ", itemSectionName, ", ignoring it");
+            return null;
+        }
+
+        return value;
     }
 
 }

@@ -10,7 +10,6 @@ import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.bukkit.events.SkinApplyBukkitEvent;
 import net.skinsrestorer.api.property.IProperty;
 import net.skinsrestorer.shared.storage.Config;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,6 +21,8 @@ import java.nio.file.Path;
 public class SkinsRestorer14Hook {
 
     private static final ReflectMethod<Object> SKINS_RESTORER_GET_SKIN = new ReflectMethod<>(SkinsRestorerAPI.class, "getSkinData", String.class);
+
+    private static final boolean DIRECT_GET_SKIN_DATA = new ReflectMethod<>(SkinsRestorerAPI.class, "getSkinData", IProperty.class).isValid();
 
     private static SuperiorSkyblockPlugin plugin;
 
@@ -55,11 +56,10 @@ public class SkinsRestorer14Hook {
     }
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> setSkinTexture(superiorPlayer));
-            return;
-        }
+        BukkitExecutor.ensureAsync(() -> setSkinTextureInternal(superiorPlayer));
+    }
 
+    private static void setSkinTextureInternal(SuperiorPlayer superiorPlayer) {
         Property property = getSkin(superiorPlayer);
         if (property != null)
             BukkitExecutor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
@@ -67,9 +67,9 @@ public class SkinsRestorer14Hook {
 
     private static Property getSkin(SuperiorPlayer superiorPlayer) {
         IProperty property;
-        try {
+        if (DIRECT_GET_SKIN_DATA) {
             property = SkinsRestorerAPI.getApi().getSkinData(superiorPlayer.getName());
-        } catch (Throwable ex) {
+        } else {
             property = (IProperty) SKINS_RESTORER_GET_SKIN.invoke(SkinsRestorerAPI.getApi(), superiorPlayer.getName());
         }
 

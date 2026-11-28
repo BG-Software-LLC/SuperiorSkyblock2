@@ -1,0 +1,623 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lIsland Biomes ({0})'
+previous-menu: true
+
+pattern:
+  - '# # # # # # # # #'
+  - '# @ @ @ @ @ @ @ #'
+  - '# @ @ @ @ @ @ @ #'
+  - '# @ @ @ @ @ @ @ #'
+  - '$ $ $ $ $ $ $ $ $'
+  - '# # % # * # ^ # #'
+
+slots: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
+
+# Should the current biome be glowing?
+current-biome-glow: false
+
+# How should the dimension in which the player changes biome be selected?
+# DEFAULT  - Always uses the default dimension.
+# ARGUMENT - Uses the dimension from the command argument, or the default if invalid.
+# LOCATION - Uses the player's current dimension, or the default if is not inside the island world.
+# AUTO     - Prioritizes ARGUMENT, then LOCATION or DEFAULT if the previous ones fail.
+dimension-selection-mode: AUTO
+
+items:
+  '$':
+    type: BLACK_STAINED_GLASS_PANE
+    name: '&f'
+  '%':
+    type: PAPER
+    name: '{0}Previous Page'
+  '*':
+    type: SUNFLOWER
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '^':
+    type: PAPER
+    name: '{0}Next Page'
+
+biomes:
+
+  # Normal Biomes
+
+  BADLANDS:
+    dimension: NORMAL
+    access:
+      type: DEAD_BUSH
+      name: '&eBadlands Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: DEAD_BUSH
+      name: '&eBadlands Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  BAMBOO_JUNGLE:
+    dimension: NORMAL
+    access:
+      type: BAMBOO
+      name: '&eBamboo Jungle Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: BAMBOO
+      name: '&eBamboo Jungle Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  BEACH:
+    dimension: NORMAL
+    access:
+      type: SAND
+      name: '&eBeach Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: SAND
+      name: '&eBeach Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  BIRCH_FOREST:
+    dimension: NORMAL
+    access:
+      type: BIRCH_SAPLING
+      name: '&eBirch Forest Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: BIRCH_SAPLING
+      name: '&eBirch Forest Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  DARK_FOREST:
+    dimension: NORMAL
+    access:
+      type: DARK_OAK_SAPLING
+      name: '&eDark Forest Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: DARK_OAK_SAPLING
+      name: '&eDark Forest Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  DEEP_OCEAN:
+    dimension: NORMAL
+    access:
+      type: PRISMARINE_SHARD
+      name: '&eDeep Ocean Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: PRISMARINE_SHARD
+      name: '&eDeep Ocean Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  DESERT:
+    dimension: NORMAL
+    access:
+      type: CACTUS
+      name: '&eDesert Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: CACTUS
+      name: '&eDesert Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  FLOWER_FOREST:
+    dimension: NORMAL
+    access:
+      type: WHITE_TULIP
+      name: '&eFlower Forest Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: WHITE_TULIP
+      name: '&eFlower Forest Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  FOREST:
+    dimension: NORMAL
+    access:
+      type: OAK_SAPLING
+      name: '&eForest Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: OAK_SAPLING
+      name: '&eForest Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  ICE_SPIKES:
+    dimension: NORMAL
+    access:
+      type: PACKED_ICE
+      name: '&eIce Spikes Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: PACKED_ICE
+      name: '&eIce Spikes Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  JUNGLE:
+    dimension: NORMAL
+    access:
+      type: JUNGLE_SAPLING
+      name: '&eJungle Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: JUNGLE_SAPLING
+      name: '&eJungle Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  MUSHROOM_FIELDS:
+    dimension: NORMAL
+    access:
+      type: RED_MUSHROOM
+      name: '&eMushroom Fields Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: RED_MUSHROOM
+      name: '&eMushroom Fields Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  OCEAN:
+    dimension: NORMAL
+    access:
+      type: KELP
+      name: '&eOcean Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: KELP
+      name: '&eOcean Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  PLAINS:
+    dimension: NORMAL
+    access:
+      type: GRASS_BLOCK
+      name: '&ePlains Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: GRASS_BLOCK
+      name: '&ePlains Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  RIVER:
+    dimension: NORMAL
+    access:
+      type: WATER_BUCKET
+      name: '&eRiver Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: WATER_BUCKET
+      name: '&eRiver Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  SAVANNA:
+    dimension: NORMAL
+    access:
+      type: ACACIA_SAPLING
+      name: '&eSavanna Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: ACACIA_SAPLING
+      name: '&eSavanna Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  SNOWY_TAIGA:
+    dimension: NORMAL
+    access:
+      type: SNOWBALL
+      name: '&eSnowy Taiga Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: SNOWBALL
+      name: '&eSnowy Taiga Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  SUNFLOWER_PLAINS:
+    dimension: NORMAL
+    access:
+      type: SUNFLOWER
+      name: '&eSunflower Plains Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: SUNFLOWER
+      name: '&eSunflower Plains Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  SWAMP:
+    dimension: NORMAL
+    access:
+      type: LILY_PAD
+      name: '&eSwamp Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: LILY_PAD
+      name: '&eSwamp Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  TAIGA:
+    dimension: NORMAL
+    access:
+      type: SPRUCE_SAPLING
+      name: '&eTaiga Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: SPRUCE_SAPLING
+      name: '&eTaiga Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  WARM_OCEAN:
+    dimension: NORMAL
+    access:
+      type: BRAIN_CORAL
+      name: '&eWarm Ocean Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: BRAIN_CORAL
+      name: '&eWarm Ocean Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  # Nether Biomes
+
+  BASALT_DELTAS:
+    dimension: NETHER
+    access:
+      type: BASALT
+      name: '&eBasalt Deltas Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: BASALT
+      name: '&eBasalt Deltas Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  CRIMSON_FOREST:
+    dimension: NETHER
+    access:
+      type: CRIMSON_STEM
+      name: '&eCrimson Forest Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: CRIMSON_STEM
+      name: '&eCrimson Forest Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  NETHER_WASTES:
+    dimension: NETHER
+    access:
+      type: NETHERRACK
+      name: '&eNether Wastes Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: NETHERRACK
+      name: '&eNether Wastes Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  SOUL_SAND_VALLEY:
+    dimension: NETHER
+    access:
+      type: SOUL_SAND
+      name: '&eSoul Sand Valley Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: SOUL_SAND
+      name: '&eSoul Sand Valley Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  WARPED_FOREST:
+    dimension: NETHER
+    access:
+      type: WARPED_STEM
+      name: '&eWarped Forest Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: WARPED_STEM
+      name: '&eWarped Forest Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2
+
+  # The End Biomes
+
+  THE_END:
+    dimension: THE_END
+    access:
+      type: END_STONE
+      name: '&eThe End Biome &a(Available)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: ENTITY_ENDERMAN_TELEPORT
+        volume: 0.8
+        pitch: 0.2
+    no-access:
+      type: END_STONE
+      name: '&eThe End Biome &c(Unavailable)'
+      lore:
+        - '&7Change your island biome.'
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.8
+        pitch: 0.2

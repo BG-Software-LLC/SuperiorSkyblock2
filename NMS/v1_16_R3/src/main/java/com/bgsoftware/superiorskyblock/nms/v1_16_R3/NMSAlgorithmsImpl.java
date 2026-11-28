@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -23,6 +24,7 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_16_R3.Block;
+import net.minecraft.server.v1_16_R3.BlockLectern;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.EntityFallingBlock;
 import net.minecraft.server.v1_16_R3.EntityMinecartAbstract;
@@ -31,16 +33,19 @@ import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IInventory;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
+import net.minecraft.server.v1_16_R3.TagsItem;
 import net.minecraft.server.v1_16_R3.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftFallingBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecart;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
@@ -59,10 +64,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
+
+    private static final ReflectField<Object> MINECRAFT_SERVER_TPS1 = new ReflectField<>(
+            MinecraftServer.class, Object.class, "tps1");
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -185,6 +194,17 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public boolean canPlaceBookIntoLectern(org.bukkit.block.Block lectern, ItemStack book) {
+        // Check book is actually a book a lectern can take
+        if (!CraftItemStack.asNMSCopy(book).getItem().a(TagsItem.LECTERN_BOOKS))
+            return false;
+
+        // Check lectern has no book inside it already
+        IBlockData blockData = ((CraftBlock) lectern).getNMS();
+        return !blockData.get(BlockLectern.c);
+    }
+
+    @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         itemMeta.setCustomModelData(customModel);
     }
@@ -201,6 +221,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
+        // Doesn't exist
+    }
+
+    @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
         // Doesn't exist
     }
 
@@ -228,12 +253,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public double getCurrentTps() {
-        try {
+        if (MINECRAFT_SERVER_TPS1.isValid())
             return MinecraftServer.getServer().tps1.getAverage();
-        } catch (Throwable error) {
-            //noinspection removal
-            return MinecraftServer.getServer().recentTps[0];
-        }
+
+        //noinspection removal
+        return MinecraftServer.getServer().recentTps[0];
     }
 
     @Override
@@ -259,6 +283,15 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         MenuCreator menuCreator = MENUS_HOLDER_CREATORS.get(inventoryType);
         return menuCreator == null ? null : menuCreator.apply(defaultHolder, title);
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private static Enchantment initializeGlowEnchantment() {

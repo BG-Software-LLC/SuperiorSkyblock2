@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractPagedMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCoops;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import org.bukkit.inventory.ItemStack;
 
 public class CoopsPagedObjectButton extends AbstractPagedMenuButton<MenuCoops.View, SuperiorPlayer> {
@@ -17,13 +17,13 @@ public class CoopsPagedObjectButton extends AbstractPagedMenuButton<MenuCoops.Vi
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "uncoop", pagedObject.getName());
+    public void onButtonClick(ButtonClickContext<MenuCoops.View> context) {
+        plugin.getCommands().dispatchSubCommand(context.getPlayer(), "uncoop", pagedObject.getName());
     }
 
     @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
-        return new ItemBuilder(buttonItem)
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
+        return itemBuilder
                 .replaceAll("{0}", pagedObject.getName())
                 .replaceAll("{1}", pagedObject.getPlayerRole() + "")
                 .asSkullOf(pagedObject)
@@ -34,8 +34,7 @@ public class CoopsPagedObjectButton extends AbstractPagedMenuButton<MenuCoops.Vi
 
         @Override
         public PagedMenuTemplateButton<MenuCoops.View, SuperiorPlayer> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), CoopsPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, CoopsPagedObjectButton.class,
                     CoopsPagedObjectButton::new);
         }
 

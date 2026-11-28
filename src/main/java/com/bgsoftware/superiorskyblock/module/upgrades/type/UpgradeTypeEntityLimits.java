@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
@@ -15,6 +16,9 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEntityLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveEntityLimit;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEntityLimit;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import org.bukkit.Location;
@@ -37,7 +41,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +49,9 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class UpgradeTypeEntityLimits implements IUpgradeType {
+
+    @Nullable
+    private static final Material GOLDEN_DANDELION_TYPE = EnumHelper.getEnum(Material.class, "GOLDEN_DANDELION");
 
     private final Map<EntityType, SpawningPlayerData> entityBreederPlayers = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
     private final Map<Location, SpawningPlayerData> vehiclesOwners = AutoRemovalMap.newMap(2, TimeUnit.SECONDS, Location2ObjectMap::new);
@@ -63,19 +70,29 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
         listeners.add(new EntityLimitsListener());
 
         checkEntityBreedListener().ifPresent(listeners::add);
+        checkEntityPlaceListener().ifPresent(listeners::add);
 
         return listeners;
     }
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return Collections.emptyList();
+        return Arrays.asList(new CmdAdminAddEntityLimit(), new CmdAdminRemoveEntityLimit(), new CmdAdminSetEntityLimit());
     }
 
     private Optional<Listener> checkEntityBreedListener() {
         try {
             Class.forName("org.bukkit.event.entity.EntityBreedEvent");
             return Optional.of(new EntityLimitsBreedListener());
+        } catch (ClassNotFoundException error) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<Listener> checkEntityPlaceListener() {
+        try {
+            Class.forName("org.bukkit.event.entity.EntityPlaceEvent");
+            return Optional.of(new EntityLimitsPlaceListener());
         } catch (ClassNotFoundException error) {
             return Optional.empty();
         }
@@ -254,6 +271,40 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     }
 
+    private class EntityLimitsPlaceListener implements Listener {
+
+        @Nullable
+        private final EntityType CUSHION_TYPE = EnumHelper.getEnum(EntityType.class, "CUSHION");
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onEntityPlace(org.bukkit.event.entity.EntityPlaceEvent e) {
+            Entity entity = e.getEntity();
+            EntityType entityType = entity.getType();
+
+            if (entityType != CUSHION_TYPE || BukkitEntities.canBypassEntityLimit(entity)
+                    || !BukkitEntities.canHaveLimit(entityType)) {
+                return;
+            }
+
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt(entity.getLocation(wrapper.getHandle()));
+            }
+
+            if (island == null) {
+                return;
+            }
+
+            boolean hasReachedLimit = island.hasReachedEntityLimit(Keys.of(entity)).join();
+
+            if (hasReachedLimit) {
+                entity.remove();
+                Message.REACHED_ENTITY_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(entityType.toString()));
+            }
+        }
+
+    }
+
     private class EntityLimitsBreedListener implements Listener {
 
         private final Int2ObjectMapView<ItemStack> trackedBreedItems = CollectionsFactory.createInt2ObjectArrayMap();
@@ -289,7 +340,8 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             PlayerHand usedHand = BukkitItems.getHand(e);
             ItemStack usedItem = BukkitItems.getHandItem(e.getPlayer(), usedHand);
 
-            if (usedItem == null || !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked()))
+            if (usedItem == null || (usedItem.getType() != GOLDEN_DANDELION_TYPE &&
+                    !plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked())))
                 return;
 
             // We want to calculate the amount of items consumed by breeding this animal.

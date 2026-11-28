@@ -57,8 +57,8 @@ public class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public BossBar createBossBar(Player player, String message, BossBar.Color color, double ticksToRun) {
-        BossBarImpl bossBar = new BossBarImpl(message, BarColor.valueOf(color.name()), ticksToRun);
+    public BossBar createBossBar(Player player, String message, BossBar.Color color, BossBar.Style style, double ticksToRun) {
+        BossBarImpl bossBar = new BossBarImpl(message, BarColor.valueOf(color.name()), BarStyle.valueOf(style.name()), ticksToRun);
         bossBar.addPlayer(player);
         return bossBar;
     }
@@ -92,8 +92,8 @@ public class NMSPlayersImpl implements NMSPlayers {
         private final org.bukkit.boss.BossBar bossBar;
         private final BossBarTask bossBarTask;
 
-        public BossBarImpl(String message, BarColor color, double ticksToRun) {
-            bossBar = Bukkit.createBossBar(message, color, BarStyle.SOLID);
+        public BossBarImpl(String message, BarColor color, BarStyle style, double ticksToRun) {
+            bossBar = Bukkit.createBossBar(message, color, style);
             this.bossBarTask = BossBarTask.create(this, ticksToRun);
         }
 

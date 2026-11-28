@@ -4,7 +4,7 @@ dependencies {
     compileOnly 'com.Zrips:CMI:8.5.1.4'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('hook.compile_cmi') && !Boolean.valueOf(project.findProperty("hook.compile_cmi").toString())) {

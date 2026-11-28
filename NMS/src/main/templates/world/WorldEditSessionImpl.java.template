@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.collections.view.LongIterator;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.SetBlockContext;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.world.WorldEditSessionDataImpl;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
@@ -29,6 +30,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec2;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -46,8 +48,6 @@ import java.util.function.Supplier;
 
 public class WorldEditSessionImpl implements WorldEditSession {
 
-    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
-
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final boolean isStarLightInterface = ((Supplier<Boolean>) () -> {
         try {
@@ -58,10 +58,16 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
     }).get();
 
+    // Must be initialized after the static fields above.
+    private static final ObjectsPool<WorldEditSessionImpl> POOL = new ObjectsPool<>(WorldEditSessionImpl::new);
+
     private final Long2ObjectMapView<ChunkData> chunks = CollectionsFactory.createLong2ObjectArrayMap();
+    private final Long2ObjectMapView.AbsentConsumer<ChunkData> chunkDataCreator = packedPos ->
+            new ChunkData(new ChunkPos(ChunkPos.getX(packedPos), ChunkPos.getZ(packedPos)));
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
-    private final Set<ChunkPos> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
+    private final Set<Vec2> lightenChunks = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
+    private final Set<ChunkPos> lightenChunksPositions = isStarLightInterface ? new HashSet<>() : Collections.emptySet();
 
     private Dimension dimension;
     private LevelHeightAccessor levelHeightAccessor;
@@ -79,8 +85,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
         }
 
         @Override
-        public void prepareChunkAccess(ChunkPos chunkPos) {
-            chunkData = chunks.computeIfAbsent(chunkPos.toLong(), ChunkData::new);
+        public void prepareChunkAccess(int chunkX, int chunkZ) {
+            long packedPos = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
+            chunkData = chunks.computeIfAbsent(packedPos, chunkDataCreator);
         }
 
         @Override
@@ -172,11 +179,13 @@ public class WorldEditSessionImpl implements WorldEditSession {
     public void applyBlocks(Chunk bukkitChunk) {
         Preconditions.checkState(this.serverLevel != null, "Cannot call WorldEditSession#applyBlocks on partial initialized session");
 
-        ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
-        ChunkPos chunkPos = levelChunk.getPos();
+        int chunkX = bukkitChunk.getX();
+        int chunkZ = bukkitChunk.getZ();
 
-        long chunkKey = chunkPos.toLong();
+        ServerLevel serverLevel = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(chunkX, chunkZ);
+
+        long chunkKey = NMSUtils.getChunkPackedPos(chunkX, chunkZ);
         ChunkData chunkData = this.chunks.remove(chunkKey);
 
         if (chunkData == null)
@@ -187,13 +196,13 @@ public class WorldEditSessionImpl implements WorldEditSession {
             levelChunk.getSections()[i] = chunkData.chunkSections[i];
         }
 
-        chunkData.heightmaps.forEach(((type, heightmap) -> {
-            levelChunk.setHeightmap(type, heightmap.getRawData());
-        }));
+        chunkData.heightmaps.forEach(((type, heightmap) ->
+            levelChunk.setHeightmap(type, heightmap.getRawData())));
 
         if (plugin.getSettings().isLightsUpdate()) {
             if (isStarLightInterface) {
-                this.lightenChunks.add(chunkPos);
+                this.lightenChunks.add(new Vec2(chunkX, chunkZ));
+                this.lightenChunksPositions.add(levelChunk.getPos());
             } else {
                 ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
                 chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
@@ -232,8 +241,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         if (plugin.getSettings().isLightsUpdate() && isStarLightInterface && !lightenChunks.isEmpty()) {
             ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
-            NMSUtilsVersioned.relightChunks(threadedLevelLightEngine, lightenChunks);
+            NMSUtilsVersioned.relightChunks(threadedLevelLightEngine, lightenChunksPositions);
             this.lightenChunks.clear();
+            this.lightenChunksPositions.clear();
         }
 
         release();
@@ -260,7 +270,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 baseBlockPosZAxis, this, this.chunks);
         dataImpl.readBlocksToUpdate(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blocksToUpdate);
         dataImpl.readBlockEntities(baseBlockPosXAxis, baseBlockPosYAxis, baseBlockPosZAxis, this.blockEntities);
-        dataImpl.readLights(baseChunkPosXAxis, baseChunkPosZAxis, this.lightenChunks);
+        dataImpl.readLights(baseChunkPosXAxis, baseChunkPosZAxis, this.lightenChunksPositions);
     }
 
     @Override
@@ -269,6 +279,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         this.blocksToUpdate.clear();
         this.blockEntities.clear();
         this.lightenChunks.clear();
+        this.lightenChunksPositions.clear();
         this.serverLevel = null;
         this.dimension = null;
         this.levelHeightAccessor = null;
@@ -277,12 +288,6 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     public ChunkData createChunkData(LevelChunkSection[] chunkSections, Map<Heightmap.Types, Heightmap> heightmaps, List<BlockPos> lights) {
         return new ChunkData(chunkSections, heightmaps, lights);
-    }
-
-    private boolean isValidPosition(BlockPos blockPos) {
-        return blockPos.getX() >= -30000000 && blockPos.getZ() >= -30000000 &&
-                blockPos.getX() < 30000000 && blockPos.getZ() < 30000000 &&
-                !this.levelHeightAccessor.isOutsideBuildHeight(blockPos.getY());
     }
 
     private static LevelHeightAccessor createLevelHeightAccessor(int minY, int height) {
@@ -308,11 +313,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
         private final Map<Heightmap.Types, Heightmap> heightmaps;
         private final List<BlockPos> lights;
 
-        private ChunkData(long chunkKey) {
+        private ChunkData(ChunkPos chunkPos) {
             this(new LevelChunkSection[levelHeightAccessor.getSectionsCount()], new EnumMap<>(Heightmap.Types.class),
                     isStarLightInterface ? Collections.emptyList() : new LinkedList<>());
-
-            ChunkPos chunkPos = new ChunkPos(chunkKey);
 
             NMSUtilsVersioned.createChunkSections(serverLevel, levelHeightAccessor, this.chunkSections, dimension);
 

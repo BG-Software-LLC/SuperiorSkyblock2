@@ -14,9 +14,11 @@ import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventType;
+import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsDispatcher;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -49,6 +51,7 @@ import java.util.function.Function;
 public class FeaturesListener extends AbstractGameEventListener {
 
     private static final EnumerateMap<PluginEventType<?>, PlaceholdersPopulator<?>> POPULATORS = new EnumerateMap<>(PluginEventType.values());
+    private static final EnumerateSet<PluginEventType<?>> EVENT_COMMANDS_TYPES = new EnumerateSet<>(PluginEventType.values());
 
     @Nullable
     private static final Material VAULT = EnumHelper.getEnum(Material.class, "VAULT");
@@ -73,8 +76,26 @@ public class FeaturesListener extends AbstractGameEventListener {
 
     /* EVENT COMMANDS */
 
-    private void onGeneralPluginEvent(PluginEvent<?> event) {
-        List<String> commands = plugin.getSettings().getEventCommands().get(event.getType().getBukkitEventName());
+    public static void registerListeners(PluginEventsDispatcher dispatcher) {
+        dispatcher.registerCallback(PluginEventType.SETTINGS_UPDATE_EVENT, () -> registerEventCommands(dispatcher));
+    }
+
+    private static void registerEventCommands(PluginEventsDispatcher dispatcher) {
+        // Registered from settings updates rather than from the listener's constructor, as the listener is
+        // created again on every reload, while its plugin-event callbacks would stay registered.
+        Map<String, List<String>> eventCommands = SuperiorSkyblockPlugin.getPlugin().getSettings().getEventCommands();
+        if (eventCommands.isEmpty())
+            return;
+
+        for (PluginEventType<?> eventType : PluginEventType.values()) {
+            String bukkitEventName = eventType.getBukkitEventName();
+            if (bukkitEventName != null && eventCommands.containsKey(bukkitEventName) && EVENT_COMMANDS_TYPES.add(eventType))
+                dispatcher.registerCallback(eventType, FeaturesListener::onGeneralPluginEvent);
+        }
+    }
+
+    private static void onGeneralPluginEvent(PluginEvent<?> event) {
+        List<String> commands = SuperiorSkyblockPlugin.getPlugin().getSettings().getEventCommands().get(event.getType().getBukkitEventName());
 
         if (commands == null)
             return;
@@ -282,12 +303,6 @@ public class FeaturesListener extends AbstractGameEventListener {
     /* INTERNAL */
 
     private void registerListeners() {
-        for (PluginEventType<?> eventType : PluginEventType.values()) {
-            String bukkitEventName = eventType.getBukkitEventName();
-            if (bukkitEventName != null && plugin.getSettings().getEventCommands().containsKey(bukkitEventName))
-                plugin.getPluginEventsDispatcher().registerCallback(eventType, this::onGeneralPluginEvent);
-        }
-
         if (plugin.getSettings().isObsidianToLava())
             registerCallback(GameEventType.PLAYER_INTERACT_EVENT, GameEventPriority.HIGHEST, this::onObsidianClick);
         if (!plugin.getSettings().getBlockedVisitorsCommands().isEmpty())

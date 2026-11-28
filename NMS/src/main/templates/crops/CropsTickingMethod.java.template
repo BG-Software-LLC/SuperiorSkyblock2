@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersione
 import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.TickingBlockList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -68,13 +67,12 @@ public abstract class CropsTickingMethod {
 
         @Override
         protected void doTick(LevelChunk levelChunk, int tickSpeed) {
-            ServerLevel serverLevel = levelChunk.level;
+            ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
             LevelChunkSection[] sections = levelChunk.getSections();
 
             int minSection = NMSUtilsVersioned.getMinSection(serverLevel);
-            ChunkPos chunkPos = levelChunk.getPos();
-            int chunkOffsetX = chunkPos.x << 4;
-            int chunkOffsetZ = chunkPos.z << 4;
+            int chunkOffsetX = NMSUtilsVersioned.getLevelChunkX(levelChunk) << 4;
+            int chunkOffsetZ = NMSUtilsVersioned.getLevelChunkZ(levelChunk) << 4;
 
             ${SERVER_LEVEL_RANDOM_TYPE} simpleRandom = SERVER_LEVEL_SIMPLE_RANDOM.get(serverLevel);
 
@@ -91,7 +89,7 @@ public abstract class CropsTickingMethod {
                     continue;
                 }
 
-                PalettedContainer<BlockState> states = levelChunkSection.states;
+                PalettedContainer<BlockState> states = levelChunkSection.getStates();
 
                 int offsetY = (sectionIndex + minSection) << 4;
 
@@ -102,7 +100,7 @@ public abstract class CropsTickingMethod {
                         continue;
                     }
 
-                    int location = (int) tickList.getRaw(index) & 0xFFFF;
+                    int location = tickList.getRaw(index) & 0xFFFF;
                     BlockState blockState = states.get(location);
                     if (!CROPS_TO_GROW_CACHE.contains(blockState.getBlock()))
                         continue;
@@ -127,11 +125,10 @@ public abstract class CropsTickingMethod {
         @Override
         protected void doTick(LevelChunk levelChunk, int tickSpeed) {
             LevelChunkSection[] sections = levelChunk.getSections();
-            ServerLevel serverLevel = levelChunk.level;
+            ServerLevel serverLevel = (ServerLevel) levelChunk.getLevel();
 
-            ChunkPos chunkPos = levelChunk.getPos();
-            int chunkOffsetX = chunkPos.x << 4;
-            int chunkOffsetZ = chunkPos.z << 4;
+            int chunkOffsetX = NMSUtilsVersioned.getLevelChunkX(levelChunk) << 4;
+            int chunkOffsetZ = NMSUtilsVersioned.getLevelChunkZ(levelChunk) << 4;
 
             for (int sectionIndex = 0; sectionIndex < sections.length; ++sectionIndex) {
                 LevelChunkSection levelChunkSection = sections[sectionIndex];

@@ -1,9 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
@@ -11,9 +9,7 @@ import com.bgsoftware.superiorskyblock.core.menu.view.AbstractIconProviderMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.List;
 import java.util.Objects;
 
 public class IconRenameButton<E> extends AbstractMenuViewButton<AbstractIconProviderMenu.View<E>> {
@@ -28,8 +24,8 @@ public class IconRenameButton<E> extends AbstractMenuViewButton<AbstractIconProv
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        Player player = (Player) clickEvent.getWhoClicked();
+    public void onButtonClick(ButtonClickContext<AbstractIconProviderMenu.View<E>> context) {
+        Player player = context.getPlayer();
 
         getTemplate().newNameMessage.send(player);
 
@@ -58,7 +54,7 @@ public class IconRenameButton<E> extends AbstractMenuViewButton<AbstractIconProv
 
         @Override
         public MenuTemplateButton<AbstractIconProviderMenu.View<E>> build() {
-            return new Template<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, newNameMessage);
+            return new Template<>(this, newNameMessage);
         }
 
     }
@@ -67,10 +63,8 @@ public class IconRenameButton<E> extends AbstractMenuViewButton<AbstractIconProv
 
         private final Message newNameMessage;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, Message newNameMessage) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    IconRenameButton.class, IconRenameButton::new);
+        Template(AbstractBuilder<AbstractIconProviderMenu.View<E>> builder, Message newNameMessage) {
+            super(builder, IconRenameButton.class, IconRenameButton::new);
             this.newNameMessage = Objects.requireNonNull(newNameMessage, "newNameMessage cannot be null");
         }
 

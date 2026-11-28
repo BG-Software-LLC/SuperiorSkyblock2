@@ -1,0 +1,24 @@
+group 'Hooks:CraftEngine26'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+repositories {
+    maven { url "https://repo.momirealms.net/releases/" }
+}
+
+dependencies {
+    compileOnly "net.momirealms:craft-engine-core:26.5"
+    compileOnly "net.momirealms:craft-engine-bukkit:26.5"
+    compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
+    compileOnly project(":API")
+    compileOnly project(":")
+}
+
+if (project.hasProperty('hook.compile_craftengine26') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_craftengine26").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

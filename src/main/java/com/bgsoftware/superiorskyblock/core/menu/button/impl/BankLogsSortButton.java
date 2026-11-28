@@ -1,18 +1,14 @@
 package com.bgsoftware.superiorskyblock.core.menu.button.impl;
 
-import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.api.menu.button.MenuTemplateButton;
-import com.bgsoftware.superiorskyblock.api.world.GameSound;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBankLogs;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 public class BankLogsSortButton extends AbstractMenuViewButton<MenuBankLogs.View> {
@@ -27,31 +23,25 @@ public class BankLogsSortButton extends AbstractMenuViewButton<MenuBankLogs.View
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        getTemplate().sortType.onButtonClick(clickEvent, menuView);
+    public void onButtonClick(ButtonClickContext<MenuBankLogs.View> context) {
+        menuView.setSortingType(getTemplate().sortType);
         menuView.refreshView();
     }
 
     public enum SortType {
 
-        TIME {
-            @Override
-            void onButtonClick(InventoryClickEvent clickEvent, MenuBankLogs.View menuView) {
-                menuView.setSorting(Comparator.comparingLong(BankTransaction::getTime));
-            }
-        },
-        MONEY {
-            @Override
-            void onButtonClick(InventoryClickEvent clickEvent, MenuBankLogs.View menuView) {
-                menuView.setSorting((o1, o2) -> o2.getAmount().compareTo(o1.getAmount()));
-            }
-        };
+        TIME(Comparator.comparingLong(BankTransaction::getTime)),
+        MONEY((o1, o2) -> o2.getAmount().compareTo(o1.getAmount()));
 
-        SortType() {
+        private final Comparator<BankTransaction> comparator;
 
+        SortType(Comparator<BankTransaction> comparator) {
+            this.comparator = comparator;
         }
 
-        abstract void onButtonClick(InventoryClickEvent clickEvent, MenuBankLogs.View menuView);
+        public Comparator<BankTransaction> getComparator() {
+            return this.comparator;
+        }
 
     }
 
@@ -66,7 +56,7 @@ public class BankLogsSortButton extends AbstractMenuViewButton<MenuBankLogs.View
 
         @Override
         public MenuTemplateButton<MenuBankLogs.View> build() {
-            return new Template(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, sortType);
+            return new Template(this, sortType);
         }
 
     }
@@ -75,10 +65,8 @@ public class BankLogsSortButton extends AbstractMenuViewButton<MenuBankLogs.View
 
         private final SortType sortType;
 
-        Template(@Nullable TemplateItem buttonItem, @Nullable GameSound clickSound, @Nullable List<String> commands,
-                 @Nullable String requiredPermission, @Nullable GameSound lackPermissionSound, SortType sortType) {
-            super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound,
-                    BankLogsSortButton.class, BankLogsSortButton::new);
+        Template(AbstractBuilder<MenuBankLogs.View> builder, SortType sortType) {
+            super(builder, BankLogsSortButton.class, BankLogsSortButton::new);
             this.sortType = Objects.requireNonNull(sortType, "sortType cannot be null");
         }
 

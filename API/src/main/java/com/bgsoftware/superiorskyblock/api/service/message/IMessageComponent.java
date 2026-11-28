@@ -83,7 +83,6 @@ public interface IMessageComponent {
          */
         TITLE
 
-
     }
 
 }

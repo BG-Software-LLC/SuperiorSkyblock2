@@ -16,16 +16,12 @@ public class PlayerMenuView extends AbstractMenuView<PlayerMenuView, PlayerViewA
                           Menu<PlayerMenuView, PlayerViewArgs> menu, PlayerViewArgs args) {
         super(inventoryViewer, previousMenuView, menu);
         this.superiorPlayer = args.getSuperiorPlayer();
+        this.cachedTitleArgs = new Object[]{this.superiorPlayer.getName()};
     }
 
     @Override
     public SuperiorPlayer getSuperiorPlayer() {
         return this.superiorPlayer;
-    }
-
-    @Override
-    public String replaceTitle(String title) {
-        return title.replace("{}", this.superiorPlayer.getName());
     }
 
 }

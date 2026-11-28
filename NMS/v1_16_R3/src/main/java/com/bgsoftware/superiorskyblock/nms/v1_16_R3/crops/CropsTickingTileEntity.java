@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.crops;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.collections.CollectionsFactory;
-import com.bgsoftware.superiorskyblock.core.collections.view.Long2ObjectMapView;
+import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
@@ -19,9 +19,12 @@ import java.util.function.Consumer;
 
 public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
+    private static final ReflectMethod<Void> TILE_ENTITY_SET_CURRENT_CHUNK = new ReflectMethod<>(
+            TileEntity.class, "setCurrentChunk", Chunk.class);
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final Long2ObjectMapView<CropsTickingTileEntity> tickingChunks = CollectionsFactory.createLong2ObjectHashMap();
+    private static final Chunk2ObjectMap<CropsTickingTileEntity> tickingChunks = new Chunk2ObjectMap<>();
 
     private final WeakReference<Island> island;
     private final WeakReference<Chunk> chunk;
@@ -37,10 +40,8 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
         ChunkCoordIntPair chunkCoord = chunk.getPos();
         setLocation(chunk.getWorld(), new BlockPosition(chunkCoord.x << 4, 1, chunkCoord.z << 4));
 
-        try {
-            // Not a method of Spigot - fixes https://github.com/OmerBenGera/SuperiorSkyblock2/issues/5
+        if (TILE_ENTITY_SET_CURRENT_CHUNK.isValid()) {
             setCurrentChunk(chunk);
-        } catch (Throwable ignored) {
         }
 
         assert world != null;
@@ -49,13 +50,13 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
         this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;
     }
 
-    public static void create(Island island, Chunk chunk) {
+    public static void create(Island island, String worldName, Chunk chunk) {
         long chunkPair = chunk.getPos().pair();
-        tickingChunks.computeIfAbsent(chunkPair, i -> new CropsTickingTileEntity(island, chunk));
+        tickingChunks.computeIfAbsent(worldName, chunkPair, () -> new CropsTickingTileEntity(island, chunk));
     }
 
-    public static CropsTickingTileEntity remove(long chunkCoords) {
-        return tickingChunks.remove(chunkCoords);
+    public static CropsTickingTileEntity remove(String worldName, long chunkCoords) {
+        return tickingChunks.remove(worldName, chunkCoords);
     }
 
     public static void forEachChunk(List<ChunkPosition> chunkPositions, Consumer<CropsTickingTileEntity> cropsTickingTileEntityConsumer) {
@@ -64,7 +65,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
         chunkPositions.forEach(chunkPosition -> {
             long chunkKey = chunkPosition.asPair();
-            CropsTickingTileEntity cropsTickingTileEntity = tickingChunks.get(chunkKey);
+            CropsTickingTileEntity cropsTickingTileEntity = tickingChunks.get(chunkPosition.getWorldName(), chunkKey);
             if (cropsTickingTileEntity != null)
                 cropsTickingTileEntityConsumer.accept(cropsTickingTileEntity);
         });

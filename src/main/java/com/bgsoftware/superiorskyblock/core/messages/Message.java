@@ -3,11 +3,9 @@ package com.bgsoftware.superiorskyblock.core.messages;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandsHelper;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.ArrayMap;
@@ -21,13 +19,8 @@ import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -36,7 +29,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +37,7 @@ public enum Message {
     ADMIN_ADD_PLAYER,
     ADMIN_ADD_PLAYER_NAME,
     ADMIN_DEPOSIT_MONEY,
+    ADMIN_DEPOSIT_MONEY_ALL,
     ADMIN_DEPOSIT_MONEY_NAME,
     ADMIN_HELP_FOOTER,
     ADMIN_HELP_HEADER,
@@ -136,6 +129,9 @@ public enum Message {
     CHANGED_WARPS_LIMIT_ALL,
     CHANGED_WARPS_LIMIT_NAME,
     CHANGE_PERMISSION_FOR_HIGHER_ROLE,
+    CLOSED_ISLAND,
+    CLOSED_ISLAND_ALL,
+    CLOSED_ISLAND_NAME,
     COMMAND_ARGUMENT_ALL_ISLANDS("*"),
     COMMAND_ARGUMENT_ALL_MATERIALS("*"),
     COMMAND_ARGUMENT_ALL_MISSIONS("*"),
@@ -144,6 +140,8 @@ public enum Message {
     COMMAND_ARGUMENT_BIOME("biome"),
     COMMAND_ARGUMENT_BORDER_COLOR("border-color"),
     COMMAND_ARGUMENT_COMMAND("command..."),
+    COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER("online-filter"),
+    COMMAND_ARGUMENT_DIMENSION("dimension"),
     COMMAND_ARGUMENT_DISCORD("discord..."),
     COMMAND_ARGUMENT_EFFECT("effect"),
     COMMAND_ARGUMENT_EMAIL("email"),
@@ -156,6 +154,7 @@ public enum Message {
     COMMAND_ARGUMENT_MATERIAL("material"),
     COMMAND_ARGUMENT_MENU("menu-name"),
     COMMAND_ARGUMENT_MESSAGE("message..."),
+    COMMAND_ARGUMENT_MISSION_CATEGORY("mission-category"),
     COMMAND_ARGUMENT_MISSION_NAME("mission-name"),
     COMMAND_ARGUMENT_MODULE_NAME("module-name"),
     COMMAND_ARGUMENT_MULTIPLIER("multiplier"),
@@ -184,6 +183,7 @@ public enum Message {
     COMMAND_DESCRIPTION_ACCEPT,
     COMMAND_DESCRIPTION_ADMIN,
     COMMAND_DESCRIPTION_ADMIN_ADD,
+    COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT,
     COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT,
     COMMAND_DESCRIPTION_ADMIN_ADD_BONUS,
     COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT,
@@ -192,6 +192,7 @@ public enum Message {
     COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT,
     COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR,
     COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS,
+    COMMAND_DESCRIPTION_ADMIN_ADD_ROLE_LIMIT,
     COMMAND_DESCRIPTION_ADMIN_ADD_SIZE,
     COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES,
     COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT,
@@ -228,7 +229,10 @@ public enum Message {
     COMMAND_DESCRIPTION_ADMIN_RELOAD,
     COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT,
     COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT,
+    COMMAND_DESCRIPTION_ADMIN_REMOVE_EFFECT,
+    COMMAND_DESCRIPTION_ADMIN_REMOVE_GENERATOR,
     COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS,
+    COMMAND_DESCRIPTION_ADMIN_REMOVE_ROLE_LIMIT,
     COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS,
     COMMAND_DESCRIPTION_ADMIN_RESET_SETTINGS,
     COMMAND_DESCRIPTION_ADMIN_RESET_WORLD,
@@ -293,6 +297,7 @@ public enum Message {
     COMMAND_DESCRIPTION_KICK,
     COMMAND_DESCRIPTION_LANG,
     COMMAND_DESCRIPTION_LEAVE,
+    COMMAND_DESCRIPTION_LOCAL_CHAT,
     COMMAND_DESCRIPTION_MEMBERS,
     COMMAND_DESCRIPTION_MISSION,
     COMMAND_DESCRIPTION_MISSIONS,
@@ -335,6 +340,13 @@ public enum Message {
     CREATE_ISLAND,
     CREATE_ISLAND_FAILURE,
     CREATE_WORLD_FAILURE,
+    DANGEROUS_COMMAND_APPROVED,
+    DANGEROUS_COMMAND_CANCELLED,
+    DANGEROUS_COMMAND_NO_ACCESS,
+    DANGEROUS_COMMAND_PLAYER_OFFLINE,
+    DANGEROUS_COMMAND_PLAYER_QUIT,
+    DANGEROUS_COMMAND_REQUEST_CONSOLE,
+    DANGEROUS_COMMAND_REQUEST_SENT,
     DEBUG_MODE_DISABLED,
     DEBUG_MODE_ENABLED,
     DEBUG_MODE_FILTER_ADD,
@@ -377,48 +389,24 @@ public enum Message {
     GENERATOR_CLEARED,
     GENERATOR_CLEARED_ALL,
     GENERATOR_CLEARED_NAME,
+    GENERATOR_FILLED_WITH_DEFAULT_BLOCK,
+    GENERATOR_FILLED_WITH_DEFAULT_BLOCK_ALL,
     GENERATOR_UPDATED,
     GENERATOR_UPDATED_ALL,
     GENERATOR_UPDATED_NAME,
     GLOBAL_COMMAND_EXECUTED,
+    GLOBAL_COMMAND_EXECUTED_ALL,
     GLOBAL_COMMAND_EXECUTED_NAME,
     GLOBAL_MESSAGE_SENT,
+    GLOBAL_MESSAGE_SENT_ALL,
     GLOBAL_MESSAGE_SENT_NAME,
     GLOBAL_TITLE_SENT,
+    GLOBAL_TITLE_SENT_ALL,
     GLOBAL_TITLE_SENT_NAME,
     GOT_BANNED,
     GOT_DEMOTED,
     GOT_EXPELLED,
-    GOT_INVITE {
-        @Override
-        public void send(CommandSender sender, Locale locale, Object... args) {
-            if (!(sender instanceof Player)) {
-                super.send(sender, locale, args);
-            } else {
-                String message = getMessage(locale);
-
-                if (message == null)
-                    return;
-
-                BaseComponent[] baseComponents = TextComponent.fromLegacyText(message);
-                if (!GOT_INVITE_TOOLTIP.isEmpty(locale)) {
-                    for (BaseComponent baseComponent : baseComponents)
-                        baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(GOT_INVITE_TOOLTIP.getMessage(locale))}));
-                }
-
-                for (BaseComponent baseComponent : baseComponents)
-                    baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " " + getAcceptLabel() + " " + args[0]));
-
-                IMessageComponent messageComponent = ComplexMessageComponent.of(baseComponents);
-                if (messageComponent != null) {
-                    PluginEvent<PluginEventArgs.SendMessage> event = PluginEventsFactory.callSendMessageEvent(sender, name(), messageComponent, args);
-                    if (!event.isCancelled())
-                        event.getArgs().messageComponent.sendMessage(sender, args);
-                }
-            }
-        }
-    },
-    GOT_INVITE_TOOLTIP,
+    GOT_INVITE,
     GOT_KICKED,
     GOT_PROMOTED,
     GOT_REVOKED,
@@ -426,12 +414,14 @@ public enum Message {
     HIT_ISLAND_MEMBER,
     HIT_PLAYER_IN_ISLAND,
     IGNORED_ISLAND,
+    IGNORED_ISLAND_ALL,
     IGNORED_ISLAND_NAME,
     INTERACT_OUTSIDE_ISLAND,
     INVALID_AMOUNT,
     INVALID_BIOME,
     INVALID_BLOCK,
     INVALID_BORDER_COLOR,
+    INVALID_COMMAND,
     INVALID_EFFECT,
     INVALID_ENTITY,
     INVALID_ENVIRONMENT,
@@ -447,6 +437,7 @@ public enum Message {
     INVALID_MATERIAL_DATA,
     INVALID_MENU,
     INVALID_MISSION,
+    INVALID_MISSION_CATEGORY,
     INVALID_MODULE,
     INVALID_MULTIPLIER,
     INVALID_PAGE,
@@ -470,8 +461,10 @@ public enum Message {
     INVITE_BANNED_PLAYER,
     INVITE_TO_FULL_ISLAND,
     ISLAND_ALREADY_CLOSED,
+    ISLAND_ALREADY_IGNORED,
     ISLAND_ALREADY_EXIST,
     ISLAND_ALREADY_OPENED,
+    ISLAND_ALREADY_UNIGNORED,
     ISLAND_BANK_EMPTY,
     ISLAND_BANK_SHOW,
     ISLAND_BANK_SHOW_OTHER,
@@ -480,6 +473,7 @@ public enum Message {
     ISLAND_CLOSED,
     ISLAND_CREATE_PROCCESS_REQUEST,
     ISLAND_CREATE_PROCESS_FAIL,
+    ISLAND_DESCRIPTION_NONE,
     ISLAND_FLY_DISABLED,
     ISLAND_FLY_ENABLED,
     ISLAND_GOT_DELETED_WHILE_INSIDE,
@@ -571,6 +565,7 @@ public enum Message {
     KICK_ANNOUNCEMENT,
     KICK_ISLAND_LEADER,
     KICK_PLAYERS_WITH_LOWER_ROLE,
+    KICKED_MEMBER,
     LACK_CHANGE_PERMISSION,
     LAST_ROLE_DEMOTE,
     LAST_ROLE_PROMOTE,
@@ -579,6 +574,8 @@ public enum Message {
     LEFT_ISLAND,
     LEFT_ISLAND_COOP,
     LEFT_ISLAND_COOP_NAME,
+    LIMIT_IS_UNLIMITED,
+    LOCAL_CHAT_FORMAT,
     LOCK_WORLD_ANNOUNCEMENT_ALL,
     LOCK_WORLD_ANNOUNCEMENT_NAME,
     LOCK_WORLD_ANNOUNCEMENT,
@@ -646,6 +643,9 @@ public enum Message {
     NO_UPGRADE_PERMISSION,
     NO_WITHDRAW_PERMISSION,
     OPEN_MENU_WHILE_SLEEPING,
+    OPENED_ISLAND,
+    OPENED_ISLAND_ALL,
+    OPENED_ISLAND_NAME,
     PANEL_TOGGLE_OFF,
     PANEL_TOGGLE_ON,
     PERMISSIONS_RESET,
@@ -688,6 +688,7 @@ public enum Message {
     RATE_CHANGE_OTHER,
     RATE_OWN_ISLAND,
     RATE_REMOVE_ALL,
+    RATE_REMOVE_ALL_ISLAND,
     RATE_REMOVE_ALL_ISLANDS,
     RATE_SUCCESS,
     REACHED_BLOCK_LIMIT,
@@ -720,6 +721,7 @@ public enum Message {
     SETTINGS_UPDATED_ALL,
     SETTINGS_UPDATED_NAME,
     SET_UPGRADE_LEVEL,
+    SET_UPGRADE_LEVEL_ALL,
     SET_UPGRADE_LEVEL_NAME,
     SET_WARP,
     SET_WARP_OUTSIDE,
@@ -728,6 +730,7 @@ public enum Message {
     SPAWN_PROTECTED_OPPED,
     SPAWN_SET_SUCCESS,
     SPAWN_TELEPORT_SUCCESS,
+    SPY_LOCAL_CHAT_FORMAT,
     SPY_TEAM_CHAT_FORMAT,
     SYNC_UPGRADES,
     SYNC_UPGRADES_ALL,
@@ -748,6 +751,8 @@ public enum Message {
     TOGGLED_FLY_ON,
     TOGGLED_FLY_OFF_OTHER,
     TOGGLED_FLY_ON_OTHER,
+    TOGGLED_LOCAL_CHAT_OFF,
+    TOGGLED_LOCAL_CHAT_ON,
     TOGGLED_SCHEMATIC_OFF,
     TOGGLED_SCHEMATIC_ON,
     TOGGLED_SPY_OFF,
@@ -769,6 +774,7 @@ public enum Message {
     UNCOOP_AUTO_ANNOUNCEMENT,
     UNCOOP_LEFT_ANNOUNCEMENT,
     UNIGNORED_ISLAND,
+    UNIGNORED_ISLAND_ALL,
     UNIGNORED_ISLAND_NAME,
     UNLOCK_WORLD_ANNOUNCEMENT_ALL,
     UNLOCK_WORLD_ANNOUNCEMENT_NAME,
@@ -810,6 +816,7 @@ public enum Message {
     WITHDRAW_ANNOUNCEMENT,
     WITHDRAW_ERROR,
     WORLD_NOT_ENABLED,
+    WORLD_NOT_GENERATED,
     WORLD_NOT_UNLOCKED,
 
     CUSTOM(true) {
@@ -826,26 +833,21 @@ public enum Message {
                 message = Formatters.COLOR_FORMATTER.format(message);
             }
 
-            for (MessagesServiceImpl.CustomComponentParser parser : messagesService.get().getCustomComponentParsers()) {
-                Optional<IMessageComponent> component = parser.parse(message);
-                if (component.isPresent()) {
-                    component.get().sendMessage(sender);
-                    return;
-                }
-            }
-
-            sender.sendMessage(message);
+            MessagesService.Builder builder = messagesService.get().newBuilder();
+            builder.addRawMessage(message);
+            builder.build().sendMessage(sender);
         }
 
     };
 
+    private static final String[] IGNORED_SECTIONS = new String[]{"lang/en-US.yml", "GOT_INVITE"};
     private static final Object[] EMPTY_ARGS = new Object[0];
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final LazyReference<MessagesServiceImpl> messagesService = new LazyReference<MessagesServiceImpl>() {
+    private static final LazyReference<MessagesService> messagesService = new LazyReference<MessagesService>() {
         @Override
-        protected MessagesServiceImpl create() {
-            return (MessagesServiceImpl) plugin.getServices().getService(MessagesService.class);
+        protected MessagesService create() {
+            return plugin.getServices().getService(MessagesService.class);
         }
     };
 
@@ -860,18 +862,13 @@ public enum Message {
     }
 
     Message(boolean isCustom) {
-        this(null, isCustom, 0L, null);
+        this.defaultMessage = null;
+        this.isCustom = isCustom;
     }
 
     Message(String defaultMessage) {
-        this(defaultMessage, false, 0L, null);
-    }
-
-    Message(String defaultMessage, boolean isCustom, long delay, @Nullable TimeUnit delayUnit) {
         this.defaultMessage = defaultMessage;
-        this.isCustom = isCustom;
-        if (delay > 0 && delayUnit != null)
-            delayedMessages = AutoRemovalCollection.newHashSet(delay, delayUnit);
+        this.isCustom = false;
     }
 
     public static void reload() {
@@ -888,6 +885,7 @@ public enum Message {
             plugin.saveResource("lang/en-US.yml", false);
             plugin.saveResource("lang/es-ES.yml", false);
             plugin.saveResource("lang/fr-FR.yml", false);
+            plugin.saveResource("lang/hu-HU.yml", false);
             plugin.saveResource("lang/it-IT.yml", false);
             plugin.saveResource("lang/iw-IL.yml", false);
             plugin.saveResource("lang/pl-PL.yml", false);
@@ -919,8 +917,18 @@ public enum Message {
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
 
+            // Additional saving, because we are not adding a new message, we are only changing the format of the old one,
+            // so cfg.syncWithConfig() will not detect it and will not save the file.
+            if (convertData(cfg)) {
+                try {
+                    cfg.save(langFile);
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
+                }
+            }
+
             try (InputStream langResourceStream = plugin.getResource("lang/" + langFile.getName())) {
-                cfg.syncWithConfig(langFile, langResourceStream == null ? plugin.getResource("lang/en-US.yml") : langResourceStream, "lang/en-US.yml");
+                cfg.syncWithConfig(langFile, langResourceStream == null ? plugin.getResource("lang/en-US.yml") : langResourceStream, IGNORED_SECTIONS);
             } catch (Exception error) {
                 Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
             }
@@ -945,9 +953,9 @@ public enum Message {
     }
 
     public boolean isEmpty(Locale locale) {
-        IMessageComponent messageContainer = getComponent(locale);
-        return messageContainer == null || messageContainer.getType() == IMessageComponent.Type.EMPTY ||
-                messageContainer.getMessage().isEmpty();
+        IMessageComponent messageComponent = getComponent(locale);
+        return messageComponent == null || messageComponent.getType() == IMessageComponent.Type.EMPTY ||
+                messageComponent.getMessage(EMPTY_ARGS).isEmpty();
     }
 
     @Nullable
@@ -963,6 +971,18 @@ public enum Message {
     @Nullable
     public String getMessage(Locale locale, Object... args) {
         return isEmpty(locale) ? defaultMessage : messages.get(locale).getMessage(args);
+    }
+
+    public final void sendPlayerOrConsole(@Nullable SuperiorPlayer superiorPlayer) {
+        sendPlayerOrConsole(superiorPlayer, EMPTY_ARGS);
+    }
+
+    public final void sendPlayerOrConsole(@Nullable SuperiorPlayer superiorPlayer, Object... args) {
+        if (superiorPlayer == null) {
+            send(Bukkit.getConsoleSender(), args);
+        } else {
+            send(superiorPlayer, args);
+        }
     }
 
     public final void send(SuperiorPlayer superiorPlayer) {
@@ -1026,9 +1046,18 @@ public enum Message {
         }
     }
 
-    private static String getAcceptLabel() {
-        SuperiorCommand acceptCommand = plugin.getCommands().getCommand("accept");
-        return acceptCommand == null ? "accept" : CommandsHelper.getCommandLabel(acceptCommand);
+    private static boolean convertData(CommentedConfiguration cfg) {
+        if (cfg.isString("GOT_INVITE_TOOLTIP")) {
+            cfg.set("GOT_INVITE.0.text", cfg.getString("GOT_INVITE"));
+            cfg.set("GOT_INVITE.0.tooltip", cfg.getString("GOT_INVITE_TOOLTIP"));
+            cfg.set("GOT_INVITE.0.command", "/is accept {0}");
+
+            cfg.set("GOT_INVITE_TOOLTIP", null);
+
+            return true;
+        }
+
+        return false;
     }
 
     public static void registerListeners(PluginEventsDispatcher dispatcher) {

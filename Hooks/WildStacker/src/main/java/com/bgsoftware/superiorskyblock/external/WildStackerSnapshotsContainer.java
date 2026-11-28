@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.core.collections.Chunk2ObjectMap;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
+import com.bgsoftware.wildstacker.api.handlers.SystemManager;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Chunk;
 
@@ -13,6 +14,8 @@ import java.util.function.Function;
 public class WildStackerSnapshotsContainer {
 
     private static final Synchronized<Chunk2ObjectMap<RefCount<StackedSnapshot>>> cachedSnapshots = Synchronized.of(new Chunk2ObjectMap<>());
+
+    private static final boolean SNAPSHOT_WITHOUT_LOAD_DATA = isSnapshotWithoutLoadDataSupported();
 
     private WildStackerSnapshotsContainer() {
 
@@ -37,9 +40,9 @@ public class WildStackerSnapshotsContainer {
         try {
             StackedSnapshot stackedSnapshot;
 
-            try {
+            if (SNAPSHOT_WITHOUT_LOAD_DATA) {
                 stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk);
-            } catch (Throwable ex) {
+            } else {
                 //noinspection deprecation
                 stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false);
             }
@@ -70,6 +73,15 @@ public class WildStackerSnapshotsContainer {
                 return null;
             return refCountBase.readAndGet(function);
         });
+    }
+
+    private static boolean isSnapshotWithoutLoadDataSupported() {
+        try {
+            SystemManager.class.getMethod("getStackedSnapshot", Chunk.class);
+            return true;
+        } catch (NoSuchMethodException error) {
+            return false;
+        }
     }
 
     private static class RefCount<T> {

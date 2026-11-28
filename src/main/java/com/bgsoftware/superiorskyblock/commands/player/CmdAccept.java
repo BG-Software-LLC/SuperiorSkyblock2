@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.player.inventory.ClearActions;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -82,7 +81,8 @@ public class CmdAccept implements ISuperiorCommand {
             return;
         }
 
-        if (island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()) {
+        int teamLimit = island.getTeamLimit();
+        if (teamLimit >= 0 && island.getIslandMembers(true).size() >= teamLimit) {
             Message.JOIN_FULL_ISLAND.send(superiorPlayer);
             island.revokeInvite(superiorPlayer);
             return;
@@ -99,11 +99,6 @@ public class CmdAccept implements ISuperiorCommand {
             Message.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());
         else
             Message.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
-
-        if (plugin.getSettings().isTeleportOnJoin())
-            superiorPlayer.teleport(island);
-
-        ClearActions.runClearActions(superiorPlayer.asOfflinePlayer(), false, plugin.getSettings().getClearActionsOnJoin());
     }
 
     @Override

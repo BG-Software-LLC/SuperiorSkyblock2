@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms.${NMS_VERSION};
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.AbstractNMSAlgorithms;
+import com.bgsoftware.superiorskyblock.nms.${NMS_VERSION}.utils.NMSUtilsVersioned;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
@@ -16,7 +17,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
 import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
-import ${CRAFTBUKKIT_PACKAGE}.util.CraftMagicNumbers;
 
 public abstract class AbstractNMSTags implements NMSTags {
 
@@ -45,7 +45,7 @@ public abstract class AbstractNMSTags implements NMSTags {
 
         ItemStack itemStack = parseItemStack(tagCompound);
 
-        return CraftItemStack.asCraftMirror(itemStack);
+        return NMSUtilsVersioned.asMirror(itemStack);
     }
 
     protected abstract int getCompoundTagInt(net.minecraft.nbt.CompoundTag compoundTag, String key, int def);
@@ -65,7 +65,7 @@ public abstract class AbstractNMSTags implements NMSTags {
             setItemStackCompoundTag(itemStack, (net.minecraft.nbt.CompoundTag) nbtData.toNBT());
         }
 
-        return CraftItemStack.asCraftMirror(itemStack);
+        return NMSUtilsVersioned.asMirror(itemStack);
     }
 
     protected abstract void setItemStackCompoundTag(ItemStack itemStack, net.minecraft.nbt.CompoundTag compoundTag);

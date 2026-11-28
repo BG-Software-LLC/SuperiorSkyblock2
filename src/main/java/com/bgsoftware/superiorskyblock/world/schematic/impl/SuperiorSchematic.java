@@ -185,11 +185,10 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-        if (Bukkit.isPrimaryThread()) {
-            BukkitExecutor.async(() -> pasteSchematic(island, location, callback, onFailure));
-            return;
-        }
+        BukkitExecutor.ensureAsync(() -> pasteSchematicInternal(island, location, callback, onFailure));
+    }
 
+    private void pasteSchematicInternal(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         long profiler = Profiler.start(ProfileType.SCHEMATIC_PLACE, getName());
 
         Log.debug(Debug.PASTE_SCHEMATIC, this.name, island.getOwner().getName(), location);
@@ -277,48 +276,42 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             }));
         });
 
-        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
+        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenCompleteAsync((v, error) -> {
             if (failed.get())
                 return;
 
             Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Chunks Loading", "");
 
-            BukkitExecutor.ensureMain(() -> {
-                try {
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
-                    worldEditSession.finish(island);
+            try {
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "Placing Schematic", "");
+                worldEditSession.finish(island);
 
-                    if (island.getOwner().isOnline()) {
-                        postPlaceTasks.forEach(schematicBlock -> {
-                            schematicBlock.doPostPlace(island);
-                        });
+                postPlaceTasks.forEach(schematicBlock -> schematicBlock.doPostPlace(island));
+
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
+
+                island.handleBlocksPlace(cachedCounts);
+
+                PluginEventsFactory.callIslandSchematicPasteEvent(island, null, name, location);
+
+                Profiler.end(profiler);
+
+                synchronized (this) {
+                    try {
+                        Location min = this.data.offset.applyToLocation(location);
+                        prepareCallback(affectedChunks, min);
+                        callback.run();
+                    } finally {
+                        finishCallback();
                     }
-
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Finished Schematic Placement", "");
-
-                    island.handleBlocksPlace(cachedCounts);
-
-                    PluginEventsFactory.callIslandSchematicPasteEvent(island, null, name, location);
-
-                    Profiler.end(profiler);
-
-                    synchronized (this) {
-                        try {
-                            Location min = this.data.offset.applyToLocation(location);
-                            prepareCallback(affectedChunks, min);
-                            callback.run();
-                        } finally {
-                            finishCallback();
-                        }
-                    }
-                } catch (Throwable error2) {
-                    Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Finishing Placement", error2);
-                    Profiler.end(profiler);
-                    if (onFailure != null)
-                        onFailure.accept(error2);
                 }
-            });
-        });
+            } catch (Throwable error2) {
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "Failed Finishing Placement", error2);
+                Profiler.end(profiler);
+                if (onFailure != null)
+                    onFailure.accept(error2);
+            }
+        }, BukkitExecutor.SYNC_EXECUTOR);
     }
 
     private void pasteSchematicAsyncInternal(Island island, Location location, long profiler, Runnable callback, Consumer<Throwable> onFailure) {
@@ -358,6 +351,19 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         return this.onTeleportCallback;
     }
 
+    @Override
+    public List<Location> getEntityLocations(EntityType entityType, Location location) {
+        Location min = this.data.offset.applyToLocation(location);
+        List<Location> entityLocations = new LinkedList<>();
+
+        for (SchematicEntity entity : this.data.entities) {
+            if (entity.getEntityType() == entityType)
+                entityLocations.add(entity.getLocation(min));
+        }
+
+        return entityLocations;
+    }
+
     public SuperiorSchematic copy(String newName) {
         return new SuperiorSchematic(newName, this.data, this.cachedCounts);
     }
@@ -372,7 +378,17 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         // We spawn the entities with a delay, waiting for players to teleport to the island first.
         this.onTeleportCallback = () -> {
             BukkitExecutor.sync(() -> {
+                // Entities of the schematic may still exist from an earlier paste, for example outside the
+                // protected area after the world of the island was reset, or when the spot of a disbanded
+                // island is reused. We check all the entities before spawning any of them, so entities of the
+                // schematic that share the same block do not prevent each other from spawning.
+                List<SchematicEntity> entitiesToSpawn = new LinkedList<>();
                 for (SchematicEntity entity : data.entities) {
+                    if (!entity.isAlreadySpawned(min))
+                        entitiesToSpawn.add(entity);
+                }
+
+                for (SchematicEntity entity : entitiesToSpawn) {
                     entity.spawnEntity(min);
                 }
             }, 20L);

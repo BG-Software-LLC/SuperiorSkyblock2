@@ -28,9 +28,6 @@ import java.util.List;
 
 public class UpgradeTypeMobDrops implements IUpgradeType {
 
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddMobDrops(),
-            new CmdAdminSetMobDrops());
-
     private final SuperiorSkyblockPlugin plugin;
     private final boolean isWildStackerInstalled;
 
@@ -46,7 +43,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
+        return Arrays.asList(new CmdAdminAddMobDrops(), new CmdAdminSetMobDrops());
     }
 
     private static boolean canDupeDropsForEntity(Entity entity) {
@@ -92,7 +89,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             if (plugin.getSettings().isDropsUpgradePlayersMultiply()) {
                 EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
                 if (!(lastDamage instanceof EntityDamageByEntityEvent) ||
-                        !BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()).isPresent())
+                        BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()) == null)
                     return;
             }
 
@@ -105,9 +102,10 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
 
         private void modifyEventDrops(List<ItemStack> drops, LivingEntity livingEntity, double mobDropsMultiplier) {
             List<ItemStack> dropsToAdd = isWildStackerInstalled ? null : new LinkedList<>();
+            List<ItemStack> entityEquipment = BukkitEntities.getEntityEquipment(livingEntity);
 
             for (ItemStack itemStack : drops) {
-                if (itemStack != null && !BukkitEntities.isEquipment(livingEntity, itemStack)) {
+                if (itemStack != null && !BukkitEntities.isEquipment(entityEquipment, itemStack)) {
                     int newAmount = (int) Math.floor(itemStack.getAmount() * mobDropsMultiplier);
 
                     if (isWildStackerInstalled) {

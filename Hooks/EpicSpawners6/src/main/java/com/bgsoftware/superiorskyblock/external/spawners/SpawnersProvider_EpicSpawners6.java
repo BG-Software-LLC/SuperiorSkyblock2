@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -26,18 +25,13 @@ import org.bukkit.inventory.ItemStack;
 
 public class SpawnersProvider_EpicSpawners6 implements SpawnersProvider_AutoDetect {
 
-    private static boolean registered = false;
-
     private final EpicSpawners instance = EpicSpawners.getInstance();
     private final SuperiorSkyblockPlugin plugin;
 
     public SpawnersProvider_EpicSpawners6(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
-            registered = true;
-            Log.info("Using EpicSpawners as a spawners provider.");
-        }
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
+        Log.info("Using EpicSpawners as a spawners provider.");
     }
 
     @Override

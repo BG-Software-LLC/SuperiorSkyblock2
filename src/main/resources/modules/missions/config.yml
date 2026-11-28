@@ -5,7 +5,8 @@
 ##                                                  ##
 ######################################################
 
-# Should missions be enabled on your server?
+# Whether the module should be enabled.
+# When disabled, all module commands and features will also be disabled.
 enabled: true
 
 # Should mission rewards be automatically claimed outside island worlds?

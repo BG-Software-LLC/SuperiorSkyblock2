@@ -21,6 +21,7 @@ import net.minecraft.server.v1_8_R3.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
@@ -34,11 +35,13 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
 import java.util.Optional;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
@@ -129,6 +132,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
+    public boolean canPlaceBookIntoLectern(org.bukkit.block.Block lectern, ItemStack book) {
+        // Does not exist
+        return false;
+    }
+
+    @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         // Doesn't exist
     }
@@ -145,6 +154,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public void setTrim(ItemMeta itemMeta, String trimMaterial, String trimPattern) {
+        // Doesn't exist
+    }
+
+    @Override
+    public void setHideTooltip(ItemMeta itemMeta) {
         // Doesn't exist
     }
 
@@ -183,6 +197,15 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public int getDataVersion() {
         return -1;
+    }
+
+    @Override
+    public Biome getBiome(String biomeName) {
+        try {
+            return Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private static Enchantment initializeGlowEnchantment() {

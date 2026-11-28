@@ -48,6 +48,21 @@ public interface PortalsManagerService {
                                                     boolean checkImmunedPortalsStatus);
 
     /**
+     * Handle a player going through a portal on an island.
+     *
+     * @param superiorPlayer            The player that entered the portal.
+     * @param island                    The island the portal is inside.
+     * @param portalLocation            The location of the portal.
+     * @param portalType                The type of the portal.
+     * @param checkImmunedPortalsStatus Whether to check if the player is immuned to portal teleports.
+     * @param destinationLocation       The location that the player should be teleported to.
+     * @return The result of going through the portal.
+     */
+    EntityPortalResult handlePlayerPortalFromIsland(SuperiorPlayer superiorPlayer, Island island,
+                                                    Location portalLocation, PortalType portalType,
+                                                    Location destinationLocation, boolean checkImmunedPortalsStatus);
+
+    /**
      * Handle an entity going through a portal on an island.
      *
      * @param entity         The entity that entered the portal.
@@ -56,6 +71,20 @@ public interface PortalsManagerService {
      * @param portalType     The type of the portal.
      * @return The result of going through the portal.
      */
-    EntityPortalResult handleEntityPortalFromIsland(Entity entity, Island island, Location portalLocation, PortalType portalType);
+    EntityPortalResult handleEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,
+                                                    PortalType portalType);
+
+    /**
+     * Handle an entity going through a portal on an island.
+     *
+     * @param entity              The entity that entered the portal.
+     * @param island              The island the portal is inside.
+     * @param portalLocation      The location of the portal.
+     * @param portalType          The type of the portal.
+     * @param destinationLocation The location that the player should be teleported to.
+     * @return The result of going through the portal.
+     */
+    EntityPortalResult handleEntityPortalFromIsland(Entity entity, Island island, Location portalLocation,
+                                                    PortalType portalType, Location destinationLocation);
 
 }

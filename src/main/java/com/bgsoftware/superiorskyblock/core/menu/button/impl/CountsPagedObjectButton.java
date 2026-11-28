@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.EnumHelper;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
@@ -17,13 +18,11 @@ import com.bgsoftware.superiorskyblock.core.menu.button.PagedMenuTemplateButtonI
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.core.values.BlockValue;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
+import java.util.List;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
@@ -63,9 +62,12 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("CARROT", "CARROT_ITEM")
             .put("CARROTS", "CARROT")
             .put("CAULDRON", "CAULDRON_ITEM")
+            .put("CAVE_VINES", "GLOW_BERRIES")
+            .put("CAVE_VINES_PLANT", "GLOW_BERRIES")
             .put("CHERRY_WALL_HANGING_SIGN", "CHERRY_HANGING_SIGN")
             .put("CHERRY_WALL_SIGN", "CHERRY_SIGN")
             .put("COCOA", ServerVersion.isLegacy() ? "INK_SACK:3" : "COCOA_BEANS")
+            .put("COPPER_WALL_TORCH", "COPPER_TORCH")
             .put("CREEPER_WALL_HEAD", "CREEPER_HEAD")
             .put("CRIMSON_WALL_HANGING_SIGN", "CRIMSON_HANGING_SIGN")
             .put("CRIMSON_WALL_SIGN", "CRIMSON_SIGN")
@@ -154,6 +156,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("POTTED_DEAD_BUSH", "FLOWER_POT")
             .put("POTTED_FERN", "FLOWER_POT")
             .put("POTTED_FLOWERING_AZALEA_BUSH", "FLOWER_POT")
+            .put("POTTED_GOLDEN_DANDELION", "GOLDEN_DANDELION")
             .put("POTTED_JUNGLE_SAPLING", "FLOWER_POT")
             .put("POTTED_LILY_OF_THE_VALLEY", "FLOWER_POT")
             .put("POTTED_MANGROVE_PROPAGULE", "FLOWER_POT")
@@ -163,6 +166,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
             .put("POTTED_OXEYE_DAISY", "FLOWER_POT")
             .put("POTTED_PALE_OAK_SAPLING", "FLOWER_POT")
             .put("POTTED_PINK_TULIP", "FLOWER_POT")
+            .put("POTTED_POPLAR_SAPLING", "FLOWER_POT")
             .put("POTTED_POPPY", "FLOWER_POT")
             .put("POTTED_RED_MUSHROOM", "FLOWER_POT")
             .put("POTTED_RED_TULIP", "FLOWER_POT")
@@ -227,19 +231,15 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
-        // Dummy button
-    }
-
-    @Override
-    public ItemStack modifyViewItem(ItemStack buttonItem) {
+    public ItemStack modifyViewItem(ItemBuilder itemBuilder) {
         Key rawKey = pagedObject.getBlockKey();
-        Pair<Key, ItemStack> customKeyItem = plugin.getBlockValues().convertCustomKeyItem(rawKey);
+        Pair<Key, ItemStack> customKeyItem = plugin.getKeys().convertCustomKeyItem(rawKey);
 
         BigDecimal amount = new BigDecimal(pagedObject.getAmount());
 
-        ItemMeta currentMeta = buttonItem.getItemMeta();
-        ItemBuilder itemBuilder;
+        String displayName = itemBuilder.getDisplayName();
+        List<String> lore = itemBuilder.getLore();
+
         String materialName;
 
         ItemStack customItem = customKeyItem.getValue();
@@ -275,8 +275,8 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
         SuperiorPlayer inventoryViewer = menuView.getInventoryViewer();
 
         return itemBuilder
-                .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")
-                .withLore(currentMeta.hasLore() ? currentMeta.getLore() : Collections.emptyList())
+                .withName(displayName)
+                .withLore(lore)
                 .withAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue())
                 .replaceAll("{0}", Formatters.CAPITALIZED_FORMATTER.format(materialName))
                 .replaceAll("{1}", amount + "")
@@ -291,8 +291,7 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
 
         @Override
         public PagedMenuTemplateButton<MenuCounts.View, MenuCounts.BlockCount> build() {
-            return new PagedMenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getButtonIndex(), CountsPagedObjectButton.class,
+            return new PagedMenuTemplateButtonImpl<>(this, CountsPagedObjectButton.class,
                     CountsPagedObjectButton::new);
         }
 
@@ -320,22 +319,14 @@ public class CountsPagedObjectButton extends AbstractPagedMenuButton<MenuCounts.
         if (key instanceof MaterialKey)
             return new Pair<>(((MaterialKey) key).getMaterial(), ((MaterialKey) key).getDurability());
 
-        try {
-            Material blockMaterial = Material.valueOf(key.getGlobalKey());
-            short damage = 0;
+        Material blockMaterial = EnumHelper.getEnum(Material.class, key.getGlobalKey());
+        if (blockMaterial == null)
+            return new Pair<>(Material.BEDROCK, (short) 0);
 
-            if (!key.getSubKey().isEmpty()) {
-                try {
-                    damage = Short.parseShort(key.getSubKey());
-                } catch (Throwable ignored) {
-                }
-            }
+        String subKey = key.getSubKey();
+        short damage = Text.parseShort(subKey, (short) 0);
 
-            return new Pair<>(blockMaterial, damage);
-        } catch (Exception ignored) {
-        }
-
-        return new Pair<>(Material.BEDROCK, (short) 0);
+        return new Pair<>(blockMaterial, damage);
     }
 
 }

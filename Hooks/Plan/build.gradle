@@ -1,0 +1,23 @@
+group 'Hooks:Plan'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compileOnly project(":API")
+    compileOnly rootProject
+    compileOnly 'org.spigotmc:v1_8_R3-Taco:latest'
+    compileOnly 'com.github.plan-player-analytics:Plan:5.7.3232'
+}
+
+if (project.hasProperty('hook.compile_plan') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_plan").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

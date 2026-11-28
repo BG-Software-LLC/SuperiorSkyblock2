@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEffect;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRemoveEffect;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,9 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class UpgradeTypeIslandEffects implements IUpgradeType {
-
-    private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddEffect(),
-            new CmdAdminSetEffect());
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -37,7 +35,7 @@ public class UpgradeTypeIslandEffects implements IUpgradeType {
 
     @Override
     public List<ISuperiorCommand> getCommands() {
-        return commands;
+        return Arrays.asList(new CmdAdminAddEffect(), new CmdAdminRemoveEffect(), new CmdAdminSetEffect());
     }
 
     private class IslandEffectsListener implements Listener {

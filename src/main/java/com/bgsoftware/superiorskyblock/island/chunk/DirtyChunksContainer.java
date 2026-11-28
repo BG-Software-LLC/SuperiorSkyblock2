@@ -25,7 +25,7 @@ public class DirtyChunksContainer {
     private final Island island;
     private final int minChunkX;
     private final int minChunkZ;
-    private final int chunksInXAxis;
+    private final int chunksInZAxis;
     private final int totalChunksCount;
     private final boolean shouldSave;
 
@@ -39,10 +39,12 @@ public class DirtyChunksContainer {
         BlockPosition maximum = island.getMaximumPosition();
         int maxChunkX = maximum.getX() >> 4;
         int maxChunkZ = maximum.getZ() >> 4;
-        int chunksInZAxis = maxChunkZ - this.minChunkZ;
+        // The chunk ranges are inclusive on both ends, therefore the amount of chunks in each
+        // axis is the difference between the bounds plus one.
+        int chunksInXAxis = (maxChunkX - this.minChunkX) + 1;
 
-        this.chunksInXAxis = maxChunkX - this.minChunkX;
-        this.totalChunksCount = this.chunksInXAxis * chunksInZAxis;
+        this.chunksInZAxis = (maxChunkZ - this.minChunkZ) + 1;
+        this.totalChunksCount = chunksInXAxis * this.chunksInZAxis;
 
         this.shouldSave = !island.isSpawn();
     }
@@ -85,8 +87,12 @@ public class DirtyChunksContainer {
         if (chunkIndex < 0)
             throw new IllegalStateException("Chunk is not inside island boundaries: " + chunkPosition);
 
-        BitSet dirtyChunksBitset = this.dirtyChunks.computeIfAbsent(chunkPosition.getWorldsInfo().getDimension(),
-                e -> new BitSet(this.totalChunksCount));
+        Dimension dimension = chunkPosition.getWorldsInfo().getDimension();
+        BitSet dirtyChunksBitset = this.dirtyChunks.get(dimension);
+        if (dirtyChunksBitset == null) {
+            dirtyChunksBitset = new BitSet(this.totalChunksCount);
+            this.dirtyChunks.put(dimension, dirtyChunksBitset);
+        }
 
         boolean isMarkedDirty = !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
 
@@ -109,8 +115,8 @@ public class DirtyChunksContainer {
                 WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, dimension);
                 if (worldInfo != null) {
                     for (int j = dirtyChunks.nextSetBit(0); j >= 0; j = dirtyChunks.nextSetBit(j + 1)) {
-                        int deltaX = j / this.chunksInXAxis;
-                        int deltaZ = j % this.chunksInXAxis;
+                        int deltaX = j / this.chunksInZAxis;
+                        int deltaZ = j % this.chunksInZAxis;
                         consumer.accept(mutableChunkPosition.reset(worldInfo, deltaX + this.minChunkX, deltaZ + this.minChunkZ));
                     }
                 }
@@ -122,7 +128,8 @@ public class DirtyChunksContainer {
     private int getChunkIndex(ChunkPosition chunkPosition) {
         int deltaX = chunkPosition.getX() - this.minChunkX;
         int deltaZ = chunkPosition.getZ() - this.minChunkZ;
-        return deltaX * this.chunksInXAxis + deltaZ;
+        // The index is encoded in a row-major order, so the stride is the amount of chunks in the Z axis.
+        return deltaX * this.chunksInZAxis + deltaZ;
     }
 
 }

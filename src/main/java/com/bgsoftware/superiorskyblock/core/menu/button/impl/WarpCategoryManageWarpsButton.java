@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuWarpCategoryManage;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class WarpCategoryManageWarpsButton extends AbstractMenuViewButton<MenuWarpCategoryManage.View> {
 
@@ -15,7 +15,7 @@ public class WarpCategoryManageWarpsButton extends AbstractMenuViewButton<MenuWa
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuWarpCategoryManage.View> context) {
         menuView.setPreviousMove(false);
         plugin.getMenus().openWarps(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), menuView.getWarpCategory());
     }
@@ -24,8 +24,8 @@ public class WarpCategoryManageWarpsButton extends AbstractMenuViewButton<MenuWa
 
         @Override
         public MenuTemplateButton<MenuWarpCategoryManage.View> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, WarpCategoryManageWarpsButton.class, WarpCategoryManageWarpsButton::new);
+            return new MenuTemplateButtonImpl<>(this, WarpCategoryManageWarpsButton.class,
+                    WarpCategoryManageWarpsButton::new);
         }
 
     }

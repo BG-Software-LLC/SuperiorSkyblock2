@@ -15,20 +15,13 @@ import org.kitteh.vanish.event.VanishStatusChangeEvent;
 
 public class VanishProvider_VanishNoPacket implements VanishProvider, Listener {
 
-    private static boolean alreadyEnabled = false;
-
     private final SuperiorSkyblockPlugin plugin;
     private final VanishPlugin instance;
 
     public VanishProvider_VanishNoPacket(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.instance = JavaPlugin.getPlugin(VanishPlugin.class);
-
-        if (!alreadyEnabled) {
-            alreadyEnabled = true;
-            Bukkit.getPluginManager().registerEvents(this, plugin);
-        }
-
+        Bukkit.getPluginManager().registerEvents(this, plugin);
         Log.info("Hooked into VanishNoPacket for support of vanish status of players.");
     }
 

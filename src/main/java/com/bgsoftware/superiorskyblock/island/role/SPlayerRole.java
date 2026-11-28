@@ -97,6 +97,18 @@ public class SPlayerRole implements PlayerRole {
         return LADDER_ROLE_NAMES;
     }
 
+    @Nullable
+    public static PlayerRole getSafe(@Nullable String name) {
+        if (name != null) {
+            try {
+                return plugin.getRoles().getPlayerRole(name);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        return null;
+    }
+
     public static void refreshRoles() {
         LIMIT_ROLE_NAMES = null;
         LADDER_ROLE_NAMES = null;

@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.platform.event.args;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.PlayerHand;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -112,12 +114,6 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
-    public static class InventoryClickEvent extends GameEventArgs {
-
-        public org.bukkit.event.inventory.InventoryClickEvent bukkitEvent;
-
-    }
-
     public static class PlayerChangedWorldEvent extends PlayerEvent {
 
         public World from;
@@ -213,10 +209,6 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
-    public static class BlockDestroyEvent extends BlockEvent {
-
-    }
-
     public static class EntityDeathEvent extends EntityEvent {
 
     }
@@ -285,6 +277,26 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
+    public static class InventoryClickEvent extends GameEventArgs {
+
+        public org.bukkit.event.inventory.InventoryClickEvent bukkitEvent;
+
+    }
+
+    public static class DialogCloseEvent extends DialogEvent {
+
+    }
+
+    public static class DialogOpenEvent extends DialogEvent {
+
+    }
+
+    public static class DialogClickEvent extends DialogEvent {
+
+        public int clickedSlot;
+
+    }
+
     public static class PlayerLoginEvent extends PlayerEvent {
 
     }
@@ -322,6 +334,13 @@ public class GameEventArgs implements IEventArgs {
     public static class PlayerItemConsumeEvent extends PlayerEvent {
 
         public ItemStack consumedItem;
+
+    }
+
+
+    public static class PlayerAttackEntityEvent extends PlayerEvent {
+
+        public Entity entity;
 
     }
 
@@ -371,6 +390,12 @@ public class GameEventArgs implements IEventArgs {
 
     }
 
+    public static class PlayerTakeLecternBookEvent extends PlayerEvent {
+
+        public Block clickedBlock;
+
+    }
+
     public static class RaidTriggerEvent extends WorldEvent {
 
         public Player player;
@@ -386,6 +411,26 @@ public class GameEventArgs implements IEventArgs {
     }
 
     public static class BlockPhysicsEvent extends BlockEvent {
+
+    }
+
+    public static class BlockUpdateShapeEvent extends BlockEvent {
+
+        public BlockState oldState;
+
+    }
+
+    public static class GenericGameEvent extends WorldEvent {
+
+        public String gameEvent;
+        public Location location;
+
+    }
+
+    public static class EntityInteractEvent extends EntityEvent {
+
+        @Nullable
+        public Block block;
 
     }
 
@@ -411,6 +456,13 @@ public class GameEventArgs implements IEventArgs {
     private static class EntityEvent extends GameEventArgs {
 
         public Entity entity;
+
+    }
+
+    private static class DialogEvent extends GameEventArgs {
+
+        public SuperiorPlayer superiorPlayer;
+        public DialogWrapper<?> dialog;
 
     }
 

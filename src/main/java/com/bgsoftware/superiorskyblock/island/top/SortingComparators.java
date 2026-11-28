@@ -11,7 +11,8 @@ import java.util.Comparator;
 
 public class SortingComparators {
 
-    public final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = Comparator.comparing(SuperiorPlayer::getName);
+    public final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR =
+            Comparator.comparing(SuperiorPlayer::getName);
     public final static Comparator<SIsland.UniqueVisitor> PAIRED_PLAYERS_NAMES_COMPARATOR =
             Comparator.comparing(o -> o.getSuperiorPlayer().getName());
     public final static Comparator<BankTransaction> BANK_TRANSACTIONS_COMPARATOR =
@@ -27,6 +28,10 @@ public class SortingComparators {
     };
     public final static Comparator<Island> LEVEL_COMPARATOR = (o1, o2) -> {
         int compare = o2.getIslandLevel().compareTo(o1.getIslandLevel());
+        return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
+    };
+    public final static Comparator<Island> BANK_COMPARATOR = (o1, o2) -> {
+        int compare = o2.getIslandBank().getBalance().compareTo(o1.getIslandBank().getBalance());
         return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
     public final static Comparator<Island> RATING_COMPARATOR = (o1, o2) -> {

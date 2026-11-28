@@ -7,20 +7,21 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.player.PlayerStatus;
 import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
+import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.service.region.MoveResult;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyReference;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ObjectsPools;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.ChatFormatter;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.dialog.DialogWrapper;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.IslandChat;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.notifications.IslandNotifications;
@@ -31,10 +32,12 @@ import com.bgsoftware.superiorskyblock.platform.event.GameEventType;
 import com.bgsoftware.superiorskyblock.platform.event.args.GameEventArgs;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.player.chat.ChatStates;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.player.permissions.PlayerPermissionsStore;
 import com.bgsoftware.superiorskyblock.player.respawn.RespawnActions;
+import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -57,6 +60,12 @@ public class PlayersListener extends AbstractGameEventListener {
         @Override
         protected RegionManagerService create() {
             return plugin.getServices().getService(RegionManagerService.class);
+        }
+    };
+    private final LazyReference<DragonBattleServiceImpl> dragonBattleService = new LazyReference<DragonBattleServiceImpl>() {
+        @Override
+        protected DragonBattleServiceImpl create() {
+            return (DragonBattleServiceImpl) plugin.getServices().getService(DragonBattleService.class);
         }
     };
 
@@ -127,6 +136,11 @@ public class PlayersListener extends AbstractGameEventListener {
         if (superiorPlayer.isShownAsOnline())
             IslandNotifications.notifyPlayerJoin(superiorPlayer);
 
+        // Refresh PermissionsStore
+        PlayerPermissionsStore permissionsStore = PlayerPermissionsStore.getPermissionsStore(player.getUniqueId());
+        if (permissionsStore != null)
+            permissionsStore.refreshCache(player);
+
         MoveResult moveResult;
         Island island;
 
@@ -174,6 +188,10 @@ public class PlayersListener extends AbstractGameEventListener {
 
     private void onPlayerQuit(GameEvent<GameEventArgs.PlayerQuitEvent> e) {
         Player player = e.getArgs().player;
+
+        // Pending requests of dangerous commands should not be executed after the player left.
+        plugin.getCommands().cancelDangerousRequests(player.getUniqueId());
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if (superiorPlayer instanceof SuperiorNPCPlayer) {
@@ -213,6 +231,11 @@ public class PlayersListener extends AbstractGameEventListener {
 
         // Remove all player chat-listeners
         PlayerChat.remove(player);
+
+        // Destroy current opened dialog
+        DialogWrapper<?> dialog = DialogWrapper.getByPlayer(player.getUniqueId());
+        if (dialog != null)
+            dialog.onCloseDialog();
     }
 
     private void onPlayerGameModeChange(GameEvent<GameEventArgs.PlayerGamemodeChangeEvent> e) {
@@ -247,6 +270,12 @@ public class PlayersListener extends AbstractGameEventListener {
         switch (moveResult) {
             case VOID_TELEPORT:
             case SUCCESS:
+                break;
+            case LEAVE_ISLAND_TO_OUTSIDE:
+                // Only cancel the event if player is not inside vehicle. If the player is inside the vehicle,
+                // IslandOutsideListener will detect it and teleport him away.
+                if (!player.isInsideVehicle())
+                    e.setCancelled();
                 break;
             default:
                 e.setCancelled();
@@ -311,9 +340,7 @@ public class PlayersListener extends AbstractGameEventListener {
             return;
         }
 
-        SuperiorPlayer damagerPlayer = e.getArgs().damager == null ? null :
-                BukkitEntities.getPlayerSource(e.getArgs().damager)
-                        .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
+        SuperiorPlayer damagerPlayer = BukkitEntities.getSuperiorPlayerSource(e.getArgs().damager);
 
         // Some plugins, such as Sentinel, may actually cause a NPC to attack.
         if (damagerPlayer instanceof SuperiorNPCPlayer) {
@@ -386,40 +413,42 @@ public class PlayersListener extends AbstractGameEventListener {
 
     private void onPlayerChat(GameEvent<GameEventArgs.PlayerChatEvent> e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getArgs().player);
-        Island island = superiorPlayer.getIsland();
 
-        if (superiorPlayer.hasTeamChatEnabled()) {
-            if (island == null) {
-                if (!PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+        if (superiorPlayer.getChatState() == ChatStates.LOCAL_CHAT) {
+            Island island;
+            try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+                island = plugin.getGrid().getIslandAt((e.getArgs().player).getLocation(wrapper.getHandle()));
+            }
+
+            if (island == null || island.isSpawn()) {
+                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.GLOBAL))
                     return;
 
-                superiorPlayer.toggleTeamChat();
+                superiorPlayer.setChatState(ChatStates.GLOBAL);
                 return;
             }
 
             e.setCancelled();
 
-            String message = e.getArgs().message;
+            IslandChat.handleIslandChat(island, superiorPlayer, ChatStates.LOCAL_CHAT, e.getArgs().message);
+        } else if (superiorPlayer.getChatState() == ChatStates.TEAM_CHAT) {
+            Island island = superiorPlayer.getIsland();
 
-            PluginEvent<PluginEventArgs.IslandChat> event = PluginEventsFactory.callIslandChatEvent(island, superiorPlayer,
-                    superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ? Formatters.COLOR_FORMATTER.format(message) : message);
+            if (island == null) {
+                if (!PluginEventsFactory.callPlayerChangeChatStateEvent(superiorPlayer, ChatStates.GLOBAL) ||
+                        !PluginEventsFactory.callPlayerToggleTeamChatEvent(superiorPlayer))
+                    return;
 
-            if (event.isCancelled())
+                superiorPlayer.setChatState(ChatStates.GLOBAL);
                 return;
-
-            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, Collections.emptyList(),
-                    superiorPlayer.getPlayerRole(), superiorPlayer.getName(), event.getArgs().message);
-
-            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole().getDisplayName(),
-                    superiorPlayer.getName(), event.getArgs().message);
-            for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
-                if (onlinePlayer.hasAdminSpyEnabled())
-                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole().getDisplayName(),
-                            superiorPlayer.getName(), event.getArgs().message);
             }
+
+            e.setCancelled();
+
+            IslandChat.handleIslandChat(island, superiorPlayer, ChatStates.TEAM_CHAT, e.getArgs().message);
         } else if (e.getArgs().format != null) {
-            e.getArgs().format = Formatters.CHAT_FORMATTER.format(new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, island));
+            e.getArgs().format = Formatters.CHAT_FORMATTER.format(
+                    new ChatFormatter.ChatFormatArgs(e.getArgs().format, superiorPlayer, superiorPlayer.getIsland()));
         }
     }
 
@@ -516,6 +545,8 @@ public class PlayersListener extends AbstractGameEventListener {
             if (respawnAtIsland != null) {
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 superiorPlayer.updateWorldBorder(respawnAtIsland);
+                // Respawning does not go through the island enter handling.
+                this.dragonBattleService.get().restoreKilledEnderDragonBattle(respawnAtIsland, respawnLocation.getWorld());
             }
         }, 2L);
 

@@ -7,9 +7,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleResetResult;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.IslandWorlds;
+import com.bgsoftware.superiorskyblock.core.ObjectsPools;
 import com.bgsoftware.superiorskyblock.service.IService;
-import com.bgsoftware.superiorskyblock.world.Dimensions;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -46,24 +48,12 @@ public class DragonBattleServiceImpl implements DragonBattleService, IService {
     }
 
     @Override
-    @Deprecated
-    public EnderDragon getEnderDragon(Island island) {
-        return getEnderDragon(island, Dimensions.THE_END);
-    }
-
-    @Override
     public void stopEnderDragonBattle(Island island, Dimension dimension) {
         Preconditions.checkNotNull(island, "island parameter cannot be null");
         Preconditions.checkNotNull(dimension, "dimension parameter cannot be null");
         Preconditions.checkArgument(dimension.getEnvironment() == World.Environment.THE_END, "dimension must be the_end environment");
 
         plugin.getNMSDragonFight().removeDragonBattle(island, dimension);
-    }
-
-    @Override
-    @Deprecated
-    public void stopEnderDragonBattle(Island island) {
-        stopEnderDragonBattle(island, Dimensions.THE_END);
     }
 
     @Override
@@ -96,10 +86,32 @@ public class DragonBattleServiceImpl implements DragonBattleService, IService {
         return DragonBattleResetResult.SUCCESS;
     }
 
-    @Override
-    @Deprecated
-    public DragonBattleResetResult resetEnderDragonBattle(Island island) {
-        return resetEnderDragonBattle(island, Dimensions.THE_END);
+    // Fights are restored when their dragon is loaded, so fights of killed dragons are lost when the server stops.
+    // We restore them when players enter the island, so the dragons can be respawned.
+    public void restoreKilledEnderDragonBattle(Island island, World world) {
+        if (island.isSpawn())
+            return;
+
+        Dimension dimension = plugin.getProviders().getWorldsProvider().getIslandsWorldDimension(world);
+        if (dimension == null || dimension.getEnvironment() != World.Environment.THE_END)
+            return;
+
+        SettingsManager.Worlds.End dimensionConfig = (SettingsManager.Worlds.End) plugin.getSettings().getWorlds().getDimensionConfig(dimension);
+
+        if (dimensionConfig == null || !dimensionConfig.isEnabled() || !dimensionConfig.isDragonFight() ||
+                !island.isDimensionEnabled(dimension) || !island.wasSchematicGenerated(dimension))
+            return;
+
+        BlockPosition center = island.getCenterPosition();
+        BlockOffset portalOffset = dimensionConfig.getPortalOffset();
+        try (ObjectsPools.Wrapper<Location> wrapper = ObjectsPools.LOCATION.obtain()) {
+            Location fightOrigin = wrapper.getHandle();
+            fightOrigin.setWorld(world);
+            fightOrigin.setX(center.getX() + portalOffset.getOffsetX());
+            fightOrigin.setY(center.getY() + portalOffset.getOffsetY());
+            fightOrigin.setZ(center.getZ() + portalOffset.getOffsetZ());
+            plugin.getNMSDragonFight().restoreKilledDragonBattle(island, fightOrigin);
+        }
     }
 
 }

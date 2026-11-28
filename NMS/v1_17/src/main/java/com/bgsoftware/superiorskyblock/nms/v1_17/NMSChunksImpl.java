@@ -18,7 +18,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -78,15 +77,16 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
                 Arrays.fill(biomes, biome);
                 levelChunk.setUnsaved(true);
 
-                ClientboundForgetLevelChunkPacket forgetLevelChunkPacket = new ClientboundForgetLevelChunkPacket(chunkPos.x, chunkPos.z);
                 //noinspection deprecation
                 ClientboundLevelChunkPacket levelChunkPacket = new ClientboundLevelChunkPacket(levelChunk);
                 ClientboundLightUpdatePacket lightUpdatePacket = new ClientboundLightUpdatePacket(chunkPos,
                         levelChunk.level.getLightEngine(), null, null, true);
 
                 playersToUpdate.forEach(player -> {
+                    if (!player.isOnline() || player.getWorld() != levelChunk.getLevel().getWorld())
+                        return;
+
                     ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                    serverPlayer.connection.send(forgetLevelChunkPacket);
                     serverPlayer.connection.send(lightUpdatePacket);
                     serverPlayer.connection.send(levelChunkPacket);
                 });
@@ -218,9 +218,10 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
                     byte yPosition = sectionCompound.getByte("Y");
                     if (sectionCompound.contains("Palette", 9) && sectionCompound.contains("BlockStates", 12)) {
                         //noinspection deprecation
-                        levelChunkSections[i] = new LevelChunkSection(yPosition);
-                        levelChunkSections[i].getStates().read(sectionCompound.getList("Palette", 10),
+                        LevelChunkSection levelChunkSection = levelChunkSections[i] = new LevelChunkSection(yPosition);
+                        levelChunkSection.getStates().read(sectionCompound.getList("Palette", 10),
                                 sectionCompound.getLongArray("BlockStates"));
+                        levelChunkSection.recalcBlockCounts();
                     }
                 }
 
@@ -256,10 +257,6 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
 
             @Override
             public void onUnloadedChunk(NMSUtils.UnloadedChunkCompound unloadedChunkCompound) {
-                CompoundTag chunkCompound = unloadedChunkCompound.chunkCompound();
-                if (!chunkCompound.contains("Level", 10))
-                    return;
-
                 unloadedChunkCompounds.add(unloadedChunkCompound);
 
                 latchCountDown();
@@ -269,8 +266,7 @@ public class NMSChunksImpl extends com.bgsoftware.superiorskyblock.nms.v1_17.Abs
             public void onFinish() {
                 BukkitExecutor.ensureMain(() -> {
                     for (NMSUtils.UnloadedChunkCompound unloadedChunkCompound : unloadedChunkCompounds) {
-                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getCompound("Level")
-                                .getList("Entities", 10);
+                        ListTag entitiesTag = unloadedChunkCompound.chunkCompound().getList("Entities", 10);
                         allCalculatedChunks.add(calculatedChunk(unloadedChunkCompound.chunkPosition(),
                                 unloadedChunkCompound.serverLevel(), entitiesTag));
                     }

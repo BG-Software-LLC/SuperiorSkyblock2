@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.menu.Menu;
 import com.bgsoftware.superiorskyblock.api.menu.view.MenuView;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.DynamicArray;
-import com.bgsoftware.superiorskyblock.core.io.MenuParserImpl;
+import com.bgsoftware.superiorskyblock.core.menu.parser.MenuParserImpl;
 import com.bgsoftware.superiorskyblock.core.menu.AbstractPagedMenu;
 import com.bgsoftware.superiorskyblock.core.menu.MenuIdentifiers;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
@@ -79,7 +79,8 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
                        Menu<View, IslandViewArgs> menu, IslandViewArgs args) {
             super(inventoryViewer, previousMenuView, menu);
             this.island = args.getIsland();
-            this.hasManagePerms = island.hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
+            this.hasManagePerms = island.isMember(inventoryViewer) &&
+                    island.hasPermission(inventoryViewer, IslandPrivileges.SET_WARP);
         }
 
         @Override
@@ -104,7 +105,7 @@ public class MenuWarpCategories extends AbstractPagedMenu<MenuWarpCategories.Vie
 
     }
 
-    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu, boolean firstTime) {
         if (newMenu.isString("slots") || !newMenu.isConfigurationSection("items"))
             return false;
 

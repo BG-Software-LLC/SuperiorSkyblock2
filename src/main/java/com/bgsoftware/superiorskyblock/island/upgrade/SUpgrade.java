@@ -5,39 +5,39 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.view.EmptyInt2IntMapView;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
-import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
-import com.bgsoftware.superiorskyblock.core.value.IntValue;
 import com.bgsoftware.superiorskyblock.core.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.Set;
 
 public class SUpgrade implements Upgrade {
 
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0,
-            EmptyUpgradeCost.getInstance(),
+            Collections.singletonList(EmptyUpgradeCost.getInstance()),
             Collections.emptyList(),
             "",
             Collections.emptySet(),
-            DoubleValue.syncedFixed(-1D),
-            DoubleValue.syncedFixed(-1D),
-            DoubleValue.syncedFixed(-1D),
-            IntValue.syncedFixed(-1),
-            IntValue.syncedFixed(-1),
-            IntValue.syncedFixed(-1),
-            IntValue.syncedFixed(-1),
+            Value.syncedFixed(OptionalDouble.empty()),
+            Value.syncedFixed(OptionalDouble.empty()),
+            Value.syncedFixed(OptionalDouble.empty()),
+            Value.syncedFixed(OptionalInt.empty()),
+            Value.syncedFixed(OptionalInt.empty()),
+            Value.syncedFixed(OptionalInt.empty()),
+            Value.syncedFixed(OptionalInt.empty()),
             Value.syncedFixed(KeyMaps.createEmptyMap()),
             Value.syncedFixed(KeyMaps.createEmptyMap()),
             Value.syncedFixed(new EnumerateMap<>(Collections.emptyList())),
             Value.syncedFixed(Collections.emptyMap()),
-            Value.syncedFixed(new BigDecimal(-2)),
+            Value.syncedFixed(Optional.empty()),
             Value.syncedFixed(EmptyInt2IntMapView.INSTANCE));
 
     private final String name;

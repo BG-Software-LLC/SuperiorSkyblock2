@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuTemplateButt
 import com.bgsoftware.superiorskyblock.core.menu.button.AbstractMenuViewButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.MenuTemplateButtonImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandVisitors;
+import com.bgsoftware.superiorskyblock.api.menu.button.click.ButtonClickContext;
 import com.bgsoftware.superiorskyblock.core.menu.view.MenuViewWrapper;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class OpenUniqueVisitorsButton extends AbstractMenuViewButton<MenuIslandVisitors.View> {
 
@@ -15,7 +15,7 @@ public class OpenUniqueVisitorsButton extends AbstractMenuViewButton<MenuIslandV
     }
 
     @Override
-    public void onButtonClick(InventoryClickEvent clickEvent) {
+    public void onButtonClick(ButtonClickContext<MenuIslandVisitors.View> context) {
         menuView.setPreviousMove(false);
         plugin.getMenus().openUniqueVisitors(menuView.getInventoryViewer(), MenuViewWrapper.fromView(menuView), menuView.getIsland());
     }
@@ -24,8 +24,8 @@ public class OpenUniqueVisitorsButton extends AbstractMenuViewButton<MenuIslandV
 
         @Override
         public MenuTemplateButton<MenuIslandVisitors.View> build() {
-            return new MenuTemplateButtonImpl<>(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, OpenUniqueVisitorsButton.class, OpenUniqueVisitorsButton::new);
+            return new MenuTemplateButtonImpl<>(this, OpenUniqueVisitorsButton.class,
+                    OpenUniqueVisitorsButton::new);
         }
 
     }

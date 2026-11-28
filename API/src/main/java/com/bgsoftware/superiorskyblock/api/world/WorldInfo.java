@@ -39,20 +39,6 @@ public interface WorldInfo {
     /**
      * Create a new world info.
      *
-     * @param worldName   The name of the world.
-     * @param environment The environment of the world.
-     * @deprecated See {@link #of(String, Dimension)}
-     */
-    @Deprecated
-    static WorldInfo of(String worldName, World.Environment environment) {
-        Preconditions.checkNotNull(worldName, "worldName parameter cannot be null");
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null");
-        return SuperiorSkyblockAPI.getFactory().createWorldInfo(worldName, environment);
-    }
-
-    /**
-     * Create a new world info.
-     *
      * @param worldName The name of the world.
      * @param dimension The dimension of the world.
      */
