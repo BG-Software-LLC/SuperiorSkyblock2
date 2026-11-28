@@ -5,14 +5,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
@@ -80,50 +79,23 @@ public class CmdAdminAddBlockLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        boolean isUnlimited = false;
-        boolean isInvalid = false;
-        Island changedIsland = null;
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
             int currentLimit = island.getBlockLimit(key);
             if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                isUnlimited = true;
-                continue;
+                return ChangeResult.UNLIMITED;
             }
 
             int newLimit = currentLimit + limit;
 
             if (newLimit < 0) {
-                isInvalid = true;
-                continue;
+                return ChangeResult.BELOW_MINIMUM;
             }
 
-            PluginEvent<PluginEventArgs.IslandChangeBlockLimit> event = PluginEventsFactory.callIslandChangeBlockLimitEvent(
-                    island, sender, key, newLimit);
-            if (!event.isCancelled()) {
-                island.setBlockLimit(key, event.getArgs().blockLimit);
-                changedIsland = island;
-                ++islandsChangedCount;
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandChangeBlockLimitEvent(island, sender, key, newLimit),
+                    eventArgs -> eventArgs.island.setBlockLimit(eventArgs.block, eventArgs.blockLimit));
+        });
 
-        if (islandsChangedCount <= 0) {
-            if (isUnlimited) {
-                Message.LIMIT_IS_UNLIMITED.send(sender);
-            } else if (isInvalid) {
-                Message.INVALID_LIMIT.send(sender, limit);
-            }
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_BLOCK_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));
-        } else if (targetPlayer == null) {
-            Message.CHANGED_BLOCK_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), changedIsland.getName());
-        } else {
-            Message.CHANGED_BLOCK_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
     @Override

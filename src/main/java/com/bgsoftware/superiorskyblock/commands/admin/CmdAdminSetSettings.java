@@ -5,11 +5,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -72,34 +73,20 @@ public class CmdAdminSetSettings implements IAdminIslandCommand {
 
         boolean value = args[4].equalsIgnoreCase("true");
 
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
-            if (island.hasSettingsEnabled(islandFlag) == value) {
-                ++islandsChangedCount;
-                continue;
-            }
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.hasSettingsEnabled(islandFlag) == value)
+                return ChangeResult.APPLIED;
 
             if (value) {
-                if (PluginEventsFactory.callIslandEnableFlagEvent(island, sender, islandFlag)) {
-                    ++islandsChangedCount;
-                    island.enableSettings(islandFlag);
-                }
-            } else if (PluginEventsFactory.callIslandDisableFlagEvent(island, sender, islandFlag)) {
-                ++islandsChangedCount;
-                island.disableSettings(islandFlag);
+                return ChangeResult.ifAllowed(PluginEventsFactory.callIslandEnableFlagEvent(island, sender, islandFlag),
+                        island, islandFlag, Island::enableSettings);
             }
-        }
 
-        if (islandsChangedCount <= 0)
-            return;
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandDisableFlagEvent(island, sender, islandFlag),
+                    island, islandFlag, Island::disableSettings);
+        });
 
-        if (islands.size() != 1)
-            Message.SETTINGS_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandFlag.getName()));
-        else if (targetPlayer == null)
-            Message.SETTINGS_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandFlag.getName()), islands.get(0).getName());
-        else
-            Message.SETTINGS_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandFlag.getName()), targetPlayer.getName());
+        change.sendSummary(sender, args);
     }
 
     @Override

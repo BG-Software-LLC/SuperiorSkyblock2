@@ -4,11 +4,11 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -72,28 +72,11 @@ public class CmdAdminSetMobDrops implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> ChangeResult.ifAllowed(
+                PluginEventsFactory.callIslandChangeMobDropsEvent(island, sender, multiplier),
+                eventArgs -> eventArgs.island.setMobDropsMultiplier(eventArgs.mobDrops)));
 
-        for (Island island : islands) {
-            PluginEvent<PluginEventArgs.IslandChangeMobDrops> event = PluginEventsFactory.callIslandChangeMobDropsEvent(
-                    island, sender, multiplier);
-            if (!event.isCancelled()) {
-                island.setMobDropsMultiplier(event.getArgs().mobDrops);
-                ++islandsChangedCount;
-            }
-        }
-
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_MOB_DROPS_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_MOB_DROPS_NAME.send(sender, islands.get(0).getName());
-        } else {
-            Message.CHANGED_MOB_DROPS.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
 }

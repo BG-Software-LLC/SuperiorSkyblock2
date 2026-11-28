@@ -4,11 +4,11 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -72,28 +72,11 @@ public class CmdAdminSetCropGrowth implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> ChangeResult.ifAllowed(
+                PluginEventsFactory.callIslandChangeCropGrowthEvent(island, sender, multiplier),
+                eventArgs -> eventArgs.island.setCropGrowthMultiplier(eventArgs.cropGrowth)));
 
-        for (Island island : islands) {
-            PluginEvent<PluginEventArgs.IslandChangeCropGrowth> event = PluginEventsFactory.callIslandChangeCropGrowthEvent(
-                    island, sender, multiplier);
-            if (!event.isCancelled()) {
-                island.setCropGrowthMultiplier(event.getArgs().cropGrowth);
-                ++islandsChangedCount;
-            }
-        }
-
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_CROP_GROWTH_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_CROP_GROWTH_NAME.send(sender, islands.get(0).getName());
-        } else {
-            Message.CHANGED_CROP_GROWTH.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
 }

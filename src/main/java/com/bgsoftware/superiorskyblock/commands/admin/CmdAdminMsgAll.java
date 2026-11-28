@@ -4,6 +4,8 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -62,15 +64,12 @@ public class CmdAdminMsgAll implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         String message = CommandArguments.buildLongString(args, 3, true);
 
-        islands.forEach(island -> island.sendMessage(message));
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            island.sendMessage(message);
+            return ChangeResult.APPLIED;
+        });
 
-        if (islands.size() > 1) {
-            Message.GLOBAL_MESSAGE_SENT_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.GLOBAL_MESSAGE_SENT_NAME.send(sender, islands.get(0).getName());
-        } else {
-            Message.GLOBAL_MESSAGE_SENT.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
 }

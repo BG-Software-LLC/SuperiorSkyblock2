@@ -6,16 +6,16 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
 import com.bgsoftware.superiorskyblock.world.GeneratorType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -106,63 +106,43 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
         }
 
         Key defaultBlock = GeneratorType.fromDimension(dimension).getDefaultBlock();
-        boolean isInvalid = false;
-        Island changedIsland = null;
-        int islandsChangedCount = 0;
-        int islandsFilledWithDefaultBlockCount = 0;
-        int defaultBlockPercentage = 0;
+        MutableInt islandsFilledWithDefaultBlockCount = new MutableInt(0);
+        MutableInt defaultBlockPercentage = new MutableInt(0);
 
-        for (Island island : islands) {
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
             if (percentage) {
                 int ratePercentage = Math.max(0, Math.min(100, island.getExactGeneratorPercentage(material, dimension) + amount));
                 int oldDefaultBlockAmount = defaultBlock == null ? 0 : island.getGeneratorAmount(defaultBlock, dimension);
+
                 if (!island.setGeneratorPercentage(material, ratePercentage, dimension,
                         sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, true)) {
-                    continue;
+                    return ChangeResult.CANCELLED;
                 }
 
                 if (CmdAdminSetGenerator.isFilledWithDefaultBlock(island, material, dimension, defaultBlock, oldDefaultBlockAmount)) {
-                    ++islandsFilledWithDefaultBlockCount;
-                    defaultBlockPercentage = island.getGeneratorPercentage(defaultBlock, dimension);
-                }
-            } else {
-                int currentAmount = island.getExactGeneratorAmount(material, dimension);
-                if (currentAmount + amount < 0) {
-                    isInvalid = true;
-                    continue;
+                    islandsFilledWithDefaultBlockCount.set(islandsFilledWithDefaultBlockCount.get() + 1);
+                    defaultBlockPercentage.set(island.getGeneratorPercentage(defaultBlock, dimension));
                 }
 
-                PluginEvent<PluginEventArgs.IslandChangeGeneratorRate> event = PluginEventsFactory.callIslandChangeGeneratorRateEvent(
-                        island, sender, material, dimension, currentAmount + amount);
-                if (event.isCancelled()) {
-                    continue;
-                }
-
-                island.setGeneratorAmount(material, event.getArgs().generatorRate, dimension);
+                return ChangeResult.APPLIED;
             }
 
-            changedIsland = island;
-            ++islandsChangedCount;
-        }
+            int newAmount = island.getExactGeneratorAmount(material, dimension) + amount;
 
-        if (islandsChangedCount <= 0) {
-            if (isInvalid) {
-                Message.INVALID_AMOUNT.send(sender, amount);
+            if (newAmount < 0) {
+                return ChangeResult.BELOW_MINIMUM;
             }
-            return;
-        }
 
-        if (islandsChangedCount > 1) {
-            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
-        } else if (targetPlayer == null) {
-            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), changedIsland.getName());
-        } else {
-            Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandChangeGeneratorRateEvent(
+                            island, sender, material, dimension, newAmount),
+                    eventArgs -> eventArgs.island.setGeneratorAmount(eventArgs.block, eventArgs.generatorRate, eventArgs.dimension));
+        });
 
-        if (islandsFilledWithDefaultBlockCount > 0) {
-            CmdAdminSetGenerator.sendFilledWithDefaultBlockMessage(sender, defaultBlock, defaultBlockPercentage,
-                    islandsFilledWithDefaultBlockCount, islandsChangedCount);
+        change.sendSummary(sender, args);
+
+        if (islandsFilledWithDefaultBlockCount.get() > 0) {
+            CmdAdminSetGenerator.sendFilledWithDefaultBlockMessage(sender, defaultBlock, defaultBlockPercentage.get(),
+                    islandsFilledWithDefaultBlockCount.get(), change.getAppliedCount());
         }
     }
 

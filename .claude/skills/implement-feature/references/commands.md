@@ -5,6 +5,8 @@ Exemplars:
 - `git show 3a8abdc3a`: an admin island command.
 - `git show e96a44078 168496c61`: an admin player command, plus the `plugin.yml` node it forgot.
 
+The admin exemplars predate `BulkChange`, so take their reporting from "Admin command" below instead.
+
 ## Player command: `commands/player/CmdX.java`
 It `implements ISuperiorCommand`, or `IPermissibleCommand` when it needs an island privilege or role (`getPrivilege()`).
 - `getAliases()`: lowercase. The first alias is the canonical label, used by help and `disabled-commands`. Never drop an existing alias.
@@ -20,7 +22,16 @@ Permission `"superior.admin.<alias>"`. Pick the interface by target:
 - `IAdminPlayerCommand`: `execute(plugin, sender, targetPlayer, args)`, `supportMultiplePlayers()`;
 - plain `ISuperiorCommand`.
 
-Argument counts include `admin` and the sub-command; the target is `args[2]`. Loop over the islands, fire the cancellable event per island, count the successes, return if none, and report with the `X_ALL`/`X_NAME`/`X` trio (`messages.md`).
+Argument counts include `admin` and the sub-command; the target is `args[2]`. Parse the shared arguments first; the parsers send their own errors. Then build `BulkChange.ofIslands(islands, island -> ...)` (or `BulkChange.ofPlayers(targetPlayers, ...)`), which returns a `ChangeResult` per target, and finish with `change.sendSummary(sender, args)`. Don't add success messages of your own (`messages.md`). Per target:
+- A value check that fails returns its skip reason before the event fires: `ChangeResult.UNLIMITED` (an add on a limit `<= IslandUpgradeConstants.NO_LIMIT_VALUE`), `BELOW_MINIMUM`, or `ABOVE_MAXIMUM`.
+- Otherwise fire the cancellable event and `return ChangeResult.ifAllowed(event, eventArgs -> ...)`, applying the values from `eventArgs`. Events that return a `boolean` use `ChangeResult.ifAllowed(allowed, island, [value, ...,] Island::setX)`.
+- A failure that carries a reason from another plugin returns `ChangeResult.cancelled(reason)`.
+- Without an event, apply the change and `return ChangeResult.APPLIED`.
+- Appliers take what they need from their parameters and capture nothing (see `ChangeResult`).
+- Messages to the targets themselves (e.g. `DISBAND_SET` to the player) are sent inside the per-target lambda.
+- A follow-up message after the summary uses `change.hasApplied()` / `change.getAppliedCount()` (`CmdAdminSetSize`, `CmdAdminSetGenerator`).
+
+Current exemplars: `CmdAdminSetTeamLimit` (set), `CmdAdminAddTeamLimit` (add, with unlimited and minimum), `CmdAdminResetSettings` (boolean event), `CmdAdminSetDisbands` (players).
 
 ## Registration
 1. `registerCommand(new CmdX())`, alphabetical, in `commands/player/PlayerCommandsMap` / `commands/admin/AdminCommandsMap`. A command that belongs to a built-in module goes in that module's `getSuperiorCommands`/`getSuperiorAdminCommands` (upgrade types: `getCommands()`).

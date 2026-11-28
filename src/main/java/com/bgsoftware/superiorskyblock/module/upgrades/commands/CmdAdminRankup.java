@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersServ
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -86,32 +88,30 @@ public class CmdAdminRankup implements IAdminIslandCommand {
 
         SuperiorPlayer playerSender = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
 
-        islands.forEach(island -> {
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
             UpgradeLevel currentLevel = island.getUpgradeLevel(upgrade);
             UpgradeLevel nextLevel = upgrade.getUpgradeLevel(currentLevel.getLevel() + 1);
 
             PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
                     island, playerSender, upgrade, currentLevel, nextLevel, IslandUpgradeEvent.Cause.PLAYER_RANKUP);
 
-            if (!event.isCancelled()) {
-                SuperiorPlayer owner = island.getOwner();
+            if (event.isCancelled())
+                return ChangeResult.CANCELLED;
 
-                for (String command : event.getArgs().commands) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            placeholdersService.get().parsePlaceholders(owner.asOfflinePlayer(), command
-                                    .replace("%player%", owner.getName())
-                                    .replace("%leader%", owner.getName()))
-                    );
-                }
+            SuperiorPlayer owner = island.getOwner();
+
+            for (String command : event.getArgs().commands) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        placeholdersService.get().parsePlaceholders(owner.asOfflinePlayer(), command
+                                .replace("%player%", owner.getName())
+                                .replace("%leader%", owner.getName()))
+                );
             }
+
+            return ChangeResult.APPLIED;
         });
 
-        if (islands.size() > 1)
-            Message.RANKUP_SUCCESS_ALL.send(sender, upgrade.getName());
-        else if (targetPlayer == null)
-            Message.RANKUP_SUCCESS_NAME.send(sender, upgrade.getName(), islands.get(0).getName());
-        else
-            Message.RANKUP_SUCCESS.send(sender, upgrade.getName(), targetPlayer.getName());
+        change.sendSummary(sender, args);
     }
 
     @Override

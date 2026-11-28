@@ -5,11 +5,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -77,59 +78,19 @@ public class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
         boolean unlockWorld = Boolean.parseBoolean(args[4]);
 
-        if (unlockWorld) {
-            handleWorldUnlock(sender, islands, dimension, targetPlayer, args[3]);
-        } else {
-            handleWorldLock(sender, islands, dimension, targetPlayer, args[3]);
-        }
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            boolean allowed = unlockWorld ? PluginEventsFactory.callIslandUnlockWorldEvent(island, sender, dimension) :
+                    PluginEventsFactory.callIslandLockWorldEvent(island, sender, dimension);
+            return ChangeResult.ifAllowed(allowed, island, dimension, unlockWorld, Island::setDimensionEnabled);
+        });
+
+        change.sendSummary(sender, args);
     }
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getDimensions(plugin, args[3]) : args.length == 5 ?
                 CommandTabCompletes.getCustomComplete(args[4], "true", "false") : Collections.emptyList();
-    }
-
-    private void handleWorldUnlock(CommandSender sender, List<Island> islands, Dimension dimension,
-                                   @Nullable SuperiorPlayer targetPlayer, String worldType) {
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
-            if (!PluginEventsFactory.callIslandUnlockWorldEvent(island, sender, dimension))
-                continue;
-
-            island.setDimensionEnabled(dimension, true);
-            ++islandsChangedCount;
-        }
-
-        if (islandsChangedCount > 1)
-            Message.UNLOCK_WORLD_ANNOUNCEMENT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(worldType));
-        else if (targetPlayer == null)
-            Message.UNLOCK_WORLD_ANNOUNCEMENT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(worldType), islands.get(0).getName());
-        else
-            Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(worldType), targetPlayer.getName());
-
-    }
-
-    private void handleWorldLock(CommandSender sender, List<Island> islands, Dimension dimension,
-                                 @Nullable SuperiorPlayer targetPlayer, String worldType) {
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
-            if (!PluginEventsFactory.callIslandLockWorldEvent(island, sender, dimension))
-                continue;
-
-            island.setDimensionEnabled(dimension, false);
-            ++islandsChangedCount;
-        }
-
-        if (islandsChangedCount > 1)
-            Message.LOCK_WORLD_ANNOUNCEMENT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(worldType));
-        else if (targetPlayer == null)
-            Message.LOCK_WORLD_ANNOUNCEMENT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(worldType), islands.get(0).getName());
-        else
-            Message.LOCK_WORLD_ANNOUNCEMENT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(worldType), targetPlayer.getName());
-
     }
 
 }

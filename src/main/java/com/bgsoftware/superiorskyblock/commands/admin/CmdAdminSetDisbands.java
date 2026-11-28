@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
@@ -64,14 +66,13 @@ public class CmdAdminSetDisbands implements IAdminPlayerCommand {
 
         int amount = arguments.getNumber();
 
-        targetPlayers.forEach(superiorPlayer -> superiorPlayer.setDisbands(amount));
+        BulkChange<SuperiorPlayer> change = BulkChange.ofPlayers(targetPlayers, superiorPlayer -> {
+            superiorPlayer.setDisbands(amount);
+            Message.DISBAND_SET.send(superiorPlayer, amount);
+            return ChangeResult.APPLIED;
+        });
 
-        if (targetPlayers.size() > 1) {
-            Message.DISBAND_SET_ALL.send(sender, amount);
-        } else if (!sender.equals(targetPlayers.get(0).asPlayer()))
-            Message.DISBAND_SET_OTHER.send(sender, targetPlayers.get(0).getName(), amount);
-
-        targetPlayers.forEach(superiorPlayer -> Message.DISBAND_SET.send(superiorPlayer, amount));
+        change.sendSummary(sender, args);
     }
 
 }

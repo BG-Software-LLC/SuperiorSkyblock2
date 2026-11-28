@@ -4,13 +4,14 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -62,27 +63,15 @@ public class CmdAdminOpen implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        List<Island> changedIslands = new ArrayList<>();
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (!island.isLocked())
+                return ChangeResult.ALREADY_OPENED;
 
-        for (Island island : islands) {
-            if (island.isLocked() && PluginEventsFactory.callIslandOpenEvent(island, sender)) {
-                changedIslands.add(island);
-                island.setLocked(false);
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandOpenEvent(island, sender),
+                    island, false, Island::setLocked);
+        });
 
-        if (changedIslands.isEmpty()) {
-            Message.ISLAND_ALREADY_OPENED.send(sender);
-            return;
-        }
-
-        if (changedIslands.size() > 1) {
-            Message.OPENED_ISLAND_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.OPENED_ISLAND_NAME.send(sender, changedIslands.get(0).getName());
-        } else {
-            Message.OPENED_ISLAND.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
     @Override

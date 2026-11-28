@@ -5,10 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
@@ -68,31 +69,16 @@ public class CmdAdminRemoveEntityLimit implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Key key = Keys.ofEntityType(args[3]);
 
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
-            if (island.getExactEntityLimitRaw(key) != IslandUpgradeConstants.SYNCED_VALUE) {
-                if (!PluginEventsFactory.callIslandRemoveEntityLimitEvent(island, sender, key)) {
-                    continue;
-                }
-
-                island.removeEntityLimit(key);
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.getExactEntityLimitRaw(key) == IslandUpgradeConstants.SYNCED_VALUE) {
+                return ChangeResult.APPLIED;
             }
 
-            ++islandsChangedCount;
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandRemoveEntityLimitEvent(island, sender, key),
+                    island, key, Island::removeEntityLimit);
+        });
 
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));
-        } else if (targetPlayer == null) {
-            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), islands.get(0).getName());
-        } else {
-            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
     @Override

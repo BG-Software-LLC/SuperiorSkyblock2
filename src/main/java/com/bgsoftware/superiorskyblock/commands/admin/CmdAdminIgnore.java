@@ -4,12 +4,13 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,27 +61,15 @@ public class CmdAdminIgnore implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        List<Island> changedIslands = new ArrayList<>();
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.isIgnored())
+                return ChangeResult.ALREADY_IGNORED;
 
-        for (Island island : islands) {
-            if (!island.isIgnored()) {
-                changedIslands.add(island);
-                island.setIgnored(true);
-            }
-        }
+            island.setIgnored(true);
+            return ChangeResult.APPLIED;
+        });
 
-        if (changedIslands.isEmpty()) {
-            Message.ISLAND_ALREADY_IGNORED.send(sender);
-            return;
-        }
-
-        if (changedIslands.size() > 1) {
-            Message.IGNORED_ISLAND_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.IGNORED_ISLAND_NAME.send(sender, changedIslands.get(0).getName());
-        } else {
-            Message.IGNORED_ISLAND.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
     @Override

@@ -5,12 +5,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -83,50 +83,23 @@ public class CmdAdminAddRoleLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        boolean isUnlimited = false;
-        boolean isInvalid = false;
-        Island changedIsland = null;
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
             int currentLimit = island.getRoleLimit(playerRole);
             if (currentLimit <= IslandUpgradeConstants.NO_LIMIT_VALUE) {
-                isUnlimited = true;
-                continue;
+                return ChangeResult.UNLIMITED;
             }
 
             int newLimit = currentLimit + limit;
 
             if (newLimit < 0) {
-                isInvalid = true;
-                continue;
+                return ChangeResult.BELOW_MINIMUM;
             }
 
-            PluginEvent<PluginEventArgs.IslandChangeRoleLimit> event = PluginEventsFactory.callIslandChangeRoleLimitEvent(
-                    island, sender, playerRole, newLimit);
-            if (!event.isCancelled()) {
-                island.setRoleLimit(playerRole, event.getArgs().roleLimit);
-                changedIsland = island;
-                ++islandsChangedCount;
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandChangeRoleLimitEvent(island, sender, playerRole, newLimit),
+                    eventArgs -> eventArgs.island.setRoleLimit(eventArgs.playerRole, eventArgs.roleLimit));
+        });
 
-        if (islandsChangedCount <= 0) {
-            if (isUnlimited) {
-                Message.LIMIT_IS_UNLIMITED.send(sender);
-            } else if (isInvalid) {
-                Message.INVALID_LIMIT.send(sender, limit);
-            }
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.CHANGED_ROLE_LIMIT_ALL.send(sender, playerRole);
-        } else if (targetPlayer == null) {
-            Message.CHANGED_ROLE_LIMIT_NAME.send(sender, playerRole, changedIsland.getName());
-        } else {
-            Message.CHANGED_ROLE_LIMIT.send(sender, playerRole, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
     @Override

@@ -2,8 +2,11 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
@@ -12,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CmdAdminRemoveRatings implements IAdminIslandCommand {
 
@@ -61,33 +65,21 @@ public class CmdAdminRemoveRatings implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, @Nullable SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         boolean removingAllRatings = targetPlayer == null;
-        Collection<Island> iterIslands = removingAllRatings ? islands : plugin.getGrid().getIslands();
+        // When removing the ratings of a player, only the islands that player rated are changed.
+        Collection<Island> iterIslands = removingAllRatings ? islands : plugin.getGrid().getIslands().stream()
+                .filter(island -> island.getRating(targetPlayer) != Rating.UNKNOWN)
+                .collect(Collectors.toList());
 
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(iterIslands, island -> {
+            if (removingAllRatings)
+                return ChangeResult.ifAllowed(PluginEventsFactory.callIslandClearRatingsEvent(island, sender),
+                        island, Island::removeRatings);
 
-        for (Island island : iterIslands) {
-            if (removingAllRatings) {
-                if (PluginEventsFactory.callIslandClearRatingsEvent(island, sender)) {
-                    ++islandsChangedCount;
-                    island.removeRatings();
-                }
-            } else if (PluginEventsFactory.callIslandRemoveRatingEvent(island, sender, targetPlayer)) {
-                ++islandsChangedCount;
-                island.removeRating(targetPlayer);
-            }
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandRemoveRatingEvent(island, sender, targetPlayer),
+                    island, targetPlayer, Island::removeRating);
+        });
 
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (!removingAllRatings) {
-            Message.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
-        } else if (islandsChangedCount == 1) {
-            Message.RATE_REMOVE_ALL_ISLAND.send(sender, islands.get(0).getName());
-        } else {
-            Message.RATE_REMOVE_ALL_ISLANDS.send(sender);
-        }
+        change.sendSummary(sender, args);
     }
 
 }

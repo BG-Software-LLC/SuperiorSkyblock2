@@ -6,11 +6,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
@@ -77,31 +78,16 @@ public class CmdAdminRemoveGenerator implements IAdminIslandCommand {
             return;
         }
 
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
-            if (island.getExactGeneratorAmountRaw(key, dimension) != IslandUpgradeConstants.SYNCED_VALUE) {
-                if (!PluginEventsFactory.callIslandRemoveGeneratorRateEvent(island, sender, key, dimension)) {
-                    continue;
-                }
-
-                island.removeGeneratorAmount(key, dimension);
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.getExactGeneratorAmountRaw(key, dimension) == IslandUpgradeConstants.SYNCED_VALUE) {
+                return ChangeResult.APPLIED;
             }
 
-            ++islandsChangedCount;
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandRemoveGeneratorRateEvent(island, sender, key, dimension),
+                    island, key, dimension, Island::removeGeneratorAmount);
+        });
 
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));
-        } else if (targetPlayer == null) {
-            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), islands.get(0).getName());
-        } else {
-            Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
     @Override

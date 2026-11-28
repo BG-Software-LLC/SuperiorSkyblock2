@@ -6,11 +6,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
@@ -76,24 +77,11 @@ public class CmdAdminSetPermission implements IAdminIslandCommand {
         if (playerRole == null)
             return;
 
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> ChangeResult.ifAllowed(
+                PluginEventsFactory.callIslandChangeRolePrivilegeEvent(island, sender, playerRole),
+                island, playerRole, islandPrivilege, Island::setPermission));
 
-        for (Island island : islands) {
-            if (PluginEventsFactory.callIslandChangeRolePrivilegeEvent(island, sender, playerRole)) {
-                island.setPermission(playerRole, islandPrivilege);
-                ++islandsChangedCount;
-            }
-        }
-
-        if (islandsChangedCount <= 0)
-            return;
-
-        if (islandsChangedCount > 1)
-            Message.PERMISSION_CHANGED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()));
-        else if (targetPlayer == null)
-            Message.PERMISSION_CHANGED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()), islands.get(0).getName());
-        else
-            Message.PERMISSION_CHANGED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()), targetPlayer.getName());
+        change.sendSummary(sender, args);
     }
 
     @Override

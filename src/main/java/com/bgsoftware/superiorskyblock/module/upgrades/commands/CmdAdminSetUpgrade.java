@@ -6,12 +6,12 @@ import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs;
-import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEvent;
 import com.bgsoftware.superiorskyblock.core.events.plugin.PluginEventsFactory;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
@@ -79,6 +79,12 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
             return;
 
         int level = arguments.getNumber();
+
+        if (level < 1) {
+            Message.INVALID_LEVEL.send(sender, args[4]);
+            return;
+        }
+
         int maxLevel = upgrade.getMaxUpgradeLevel();
 
         if (level > maxLevel) {
@@ -86,26 +92,12 @@ public class CmdAdminSetUpgrade implements IAdminIslandCommand {
             return;
         }
 
-        int islandsChangedCount = 0;
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> ChangeResult.ifAllowed(
+                PluginEventsFactory.callIslandUpgradeEvent(island, sender, upgrade, upgrade.getUpgradeLevel(level),
+                        IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE),
+                eventArgs -> eventArgs.island.setUpgradeLevel(eventArgs.upgrade, eventArgs.nextLevel.getLevel())));
 
-        for (Island island : islands) {
-            PluginEvent<PluginEventArgs.IslandUpgrade> event = PluginEventsFactory.callIslandUpgradeEvent(
-                    island, sender, upgrade, upgrade.getUpgradeLevel(level), IslandUpgradeEvent.Cause.ADMIN_SET_UPGRADE);
-            if (!event.isCancelled()) {
-                island.setUpgradeLevel(upgrade, level);
-                ++islandsChangedCount;
-            }
-        }
-
-        if (islandsChangedCount <= 0)
-            return;
-
-        if (islandsChangedCount > 1)
-            Message.SET_UPGRADE_LEVEL_ALL.send(sender, upgrade.getName());
-        else if (targetPlayer == null)
-            Message.SET_UPGRADE_LEVEL_NAME.send(sender, upgrade.getName(), islands.get(0).getName());
-        else
-            Message.SET_UPGRADE_LEVEL.send(sender, upgrade.getName(), targetPlayer.getName());
+        change.sendSummary(sender, args);
     }
 
     @Override

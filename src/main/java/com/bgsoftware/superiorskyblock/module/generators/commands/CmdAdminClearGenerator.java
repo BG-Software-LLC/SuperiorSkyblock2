@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
@@ -71,31 +73,16 @@ public class CmdAdminClearGenerator implements IAdminIslandCommand {
             return;
         }
 
-        int islandsChangedCount = 0;
-
-        for (Island island : islands) {
-            if (!island.getCustomGeneratorAmounts(dimension).isEmpty()) {
-                if (!PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension)) {
-                    continue;
-                }
-
-                island.clearGeneratorAmounts(dimension);
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            if (island.getCustomGeneratorAmounts(dimension).isEmpty()) {
+                return ChangeResult.APPLIED;
             }
 
-            ++islandsChangedCount;
-        }
+            return ChangeResult.ifAllowed(PluginEventsFactory.callIslandClearGeneratorRatesEvent(island, sender, dimension),
+                    island, dimension, Island::clearGeneratorAmounts);
+        });
 
-        if (islandsChangedCount <= 0) {
-            return;
-        }
-
-        if (islandsChangedCount > 1) {
-            Message.GENERATOR_CLEARED_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.GENERATOR_CLEARED_NAME.send(sender, islands.get(0).getName());
-        } else {
-            Message.GENERATOR_CLEARED.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
     @Override

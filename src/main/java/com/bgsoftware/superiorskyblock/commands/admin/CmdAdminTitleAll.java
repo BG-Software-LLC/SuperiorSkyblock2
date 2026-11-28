@@ -4,6 +4,8 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.BulkChange;
+import com.bgsoftware.superiorskyblock.commands.ChangeResult;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
@@ -95,17 +97,14 @@ public class CmdAdminTitleAll implements IAdminIslandCommand {
             return;
         }
 
-        islands.forEach(island -> island.sendTitle(title == null ? null : Formatters.COLOR_FORMATTER.format(title),
-                subtitle == null ? null : Formatters.COLOR_FORMATTER.format(subtitle),
-                fadeIn.getNumber(), duration.getNumber(), fadeOut.getNumber()));
+        BulkChange<Island> change = BulkChange.ofIslands(islands, island -> {
+            island.sendTitle(title == null ? null : Formatters.COLOR_FORMATTER.format(title),
+                    subtitle == null ? null : Formatters.COLOR_FORMATTER.format(subtitle),
+                    fadeIn.getNumber(), duration.getNumber(), fadeOut.getNumber());
+            return ChangeResult.APPLIED;
+        });
 
-        if (islands.size() > 1) {
-            Message.GLOBAL_TITLE_SENT_ALL.send(sender);
-        } else if (targetPlayer == null) {
-            Message.GLOBAL_TITLE_SENT_NAME.send(sender, islands.get(0).getName());
-        } else {
-            Message.GLOBAL_TITLE_SENT.send(sender, targetPlayer.getName());
-        }
+        change.sendSummary(sender, args);
     }
 
 }
