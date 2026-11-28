@@ -61,6 +61,9 @@ CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} in {1} dime
 CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for the island {1}.'
 CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} in {2} dimension for {1}''s island.'
 CHANGED_BLOCK_AMOUNT: '&e&lBlocchi | &7Aggiornato con successo il numero di blocchi di {0} a {1}.'
+CHANGED_BLOCK_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}''s island.'
+CHANGED_BLOCK_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for all the islands.'
+CHANGED_BLOCK_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the block category {0} for {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0} dell''isola {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0} in tutte le isole.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0} nell''isola di {1}.'
@@ -80,6 +83,9 @@ CHANGED_CROP_GROWTH: '&e&lAggiornamenti | &7Aggiornato con successo il moltiplic
 CHANGED_CROP_GROWTH_ALL: '&e&lAggiornamenti | &7Aggiornato con successo il moltiplicatore della crescita delle colture di tutte le isole.'
 CHANGED_CROP_GROWTH_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il moltiplicatore della crescita delle colture dell''isola di {0}.'
 CHANGED_DISCORD: '&e&lIsola | &7Discord dell''isola cambiata con successo in {0}.'
+CHANGED_ENTITY_CATEGORY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}''s island.'
+CHANGED_ENTITY_CATEGORY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for all the islands.'
+CHANGED_ENTITY_CATEGORY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the entity category {0} for {1}.'
 CHANGED_ENTITY_LIMIT: '&e&lMiglioramenti | &7Aggiornato con successo il limite delle entità di {0} per l''isola di {1}.'
 CHANGED_ENTITY_LIMIT_ALL: '&e&lMiglioramenti | &7Aggiornato con successo il limite delle entità di {0} per tutte le isola.'
 CHANGED_ENTITY_LIMIT_NAME: '&e&lMiglioramenti | &7Aggiornato con successo il limite delle entità di {0} per l''isola {1}.'
@@ -120,6 +126,7 @@ COMMAND_ARGUMENT_ALL_MISSIONS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
 COMMAND_ARGUMENT_BIOME: bioma
+COMMAND_ARGUMENT_BLOCK_CATEGORY: 'block-category'
 COMMAND_ARGUMENT_BORDER_COLOR: 'colore-bordo'
 COMMAND_ARGUMENT_COMMAND: 'comando...'
 COMMAND_ARGUMENT_COMMAND_ONLINE_FILTER: 'online-filter'
@@ -127,6 +134,7 @@ COMMAND_ARGUMENT_DIMENSION: 'dimension'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: effetto-pozione
 COMMAND_ARGUMENT_EMAIL: email
+COMMAND_ARGUMENT_ENTITY_CATEGORY: 'entity-category'
 COMMAND_ARGUMENT_ENTITY: entità
 COMMAND_ARGUMENT_ISLAND_NAME: nome-isola
 COMMAND_ARGUMENT_ISLAND_ROLE: ruolo-isola
@@ -167,11 +175,13 @@ COMMAND_DESCRIPTION_ACCEPT: Accetta un invito da un giocatore.
 COMMAND_DESCRIPTION_ADMIN: Utilizzare i comandi di amministrazione.
 COMMAND_DESCRIPTION_ADMIN_ADD: Aggiungi un utente a un'isola.
 COMMAND_DESCRIPTION_ADMIN_ADD_BANK_LIMIT: 'Increase the bank limit for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_CATEGORY_LIMIT: 'Increase block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: Aumenta il limite di blocchi per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: Aggiungi un bonus a un giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: Aumenta il limite dei giocatori coop per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH: Aumenta il moltiplicatore di crescita del raccolto per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: Aggiungi un effetto isola per l'isola di un altro giocatore.
+COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_CATEGORY_LIMIT: 'Increase entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: Aumenta il limite di entità per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: Aggiungi la percentuale di un materiale per il generatore di ciottoli.
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: Aumenta il moltiplicatore dei mob drops per l'isola di un altro giocatore.
@@ -210,8 +220,10 @@ COMMAND_DESCRIPTION_ADMIN_PURGE: Elimina le isole.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Potenzia un aggiornamento per un isola.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Ricalcola il valore di un'isola.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Ricarica tutte le configurazioni e le attività del plugin.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_CATEGORY_LIMIT: 'Remove a block category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Rimuovi il limite di un blocco da un'isola.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_EFFECT: 'Remove an effect from an island.'
+COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_CATEGORY_LIMIT: 'Remove an entity category limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_ENTITY_LIMIT: 'Remove an entity limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_GENERATOR: 'Remove a material from the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_RESET_PERMISSIONS: 'Reset all island permissions for a specific island.'
@@ -223,12 +235,14 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set the bank limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Imposta il bioma di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: Imposta la quantità di un blocco in una posizione specifica.
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_CATEGORY_LIMIT: 'Set block category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Imposta il limite di un blocco per l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: Imposta il numero di righe del baule dell'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: Imposta il limite di giocatori coop per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Imposta il moltiplicatore della crescita delle colture per l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Imposta la quantità di reset dell'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: Imposta il livello dell'effetto dell'isola di un altro giocatore.
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_CATEGORY_LIMIT: 'Set entity category limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Imposta il limite di entità per l'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_ISLAND_PREVIEW: 'Set the preview location for an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Trasferisci un'isola a qualcun altro.
@@ -407,10 +421,12 @@ INTERACT_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi interagire al di fuori del tuo
 INVALID_AMOUNT: '&c&lErrore | &7Importo invalido {0}.'
 INVALID_BIOME: '&c&lErrore | &7Bioma invalido {0}.'
 INVALID_BLOCK: '&c&lErrore| &7Posizione del blocco invalida {0}.'
+INVALID_BLOCK_CATEGORY: '&c&lError | &7Invalid block category {0}.'
 INVALID_BORDER_COLOR: '&c&lError | &7Colore del bordo non valido: {0}'
 INVALID_COMMAND: '&c&lError | &7Invalid command {0}.'
 INVALID_EFFECT: '&c&lErrore| &7Effetto invalido {0}.'
 INVALID_ENTITY: '&c&lErrore | &7Entità invalida {0}.'
+INVALID_ENTITY_CATEGORY: '&c&lError | &7Invalid entity category {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Invalid dimension {0}.'
 INVALID_INTERVAL: '&c&lError | &7Intervallo non valido: {0}'
 INVALID_ISLAND: '&c&lErrore | &7Non hai un''isola.'
@@ -482,6 +498,10 @@ ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Lista dei comandi [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Usa /is help {0} per girare pagina.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIsola | &7Bank Limit: {0}'
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Block Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |-
   &e&lIsola | &7Limite dei blocchi:
   {0}
@@ -497,6 +517,10 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |-
   &e&lIsola | &7Limite Entità:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsola | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS: |-
+  &e&lIsland | &7Entity Categories Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIsola | &7Moltiplicatore delle colture: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIsola | &7Moltiplicatore dei drops dei mob: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |-

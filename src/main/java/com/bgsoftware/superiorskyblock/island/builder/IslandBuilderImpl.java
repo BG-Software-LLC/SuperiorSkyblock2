@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -29,6 +30,8 @@ import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateSet;
 import com.bgsoftware.superiorskyblock.core.collections.view.Int2ObjectMapView;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryLimits;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.value.DoubleValue;
 import com.bgsoftware.superiorskyblock.core.value.IntValue;
@@ -97,6 +100,9 @@ public class IslandBuilderImpl implements Island.Builder {
     public final Map<IslandFlag, Byte> islandFlags = new LinkedHashMap<>();
     public final EnumerateMap<Dimension, KeyMap<IntValue>> cobbleGeneratorValues = new EnumerateMap<>(Dimension.values());
     public final List<SIsland.UniqueVisitor> uniqueVisitors = new LinkedList<>();
+    public final KeyCategoryLimits blockCategoryLimits = new KeyCategoryLimits();
+    public final KeyCategoryLimits entityCategoryLimits = new KeyCategoryLimits();
+    public boolean legacyBlockCounts = false;
     public final KeyMap<IntValue> entityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
     public final Map<PotionEffectType, IntValue> islandEffects = new LinkedHashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
@@ -550,6 +556,42 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Island.Builder setBlockCategoryLimit(KeyCategory blockCategory, int limit) {
+        Preconditions.checkNotNull(blockCategory, "blockCategory parameter cannot be null.");
+        KeyCategoryId id = KeyCategoryId.of(blockCategory);
+        Preconditions.checkArgument(id != null, "Invalid block category: " + blockCategory.getName());
+        setBlockCategoryLimitRaw(id, limit);
+        return this;
+    }
+
+    public void setBlockCategoryLimitRaw(KeyCategoryId id, int limit) {
+        this.blockCategoryLimits.put(id, limit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getBlockCategoryLimits() {
+        return this.blockCategoryLimits.toCategoriesMap(plugin.getSettings().getBlockCategoriesMapping(), false);
+    }
+
+    @Override
+    public Island.Builder setEntityCategoryLimit(KeyCategory entityCategory, int limit) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+        KeyCategoryId id = KeyCategoryId.of(entityCategory);
+        Preconditions.checkArgument(id != null, "Invalid entity category: " + entityCategory.getName());
+        setEntityCategoryLimitRaw(id, limit);
+        return this;
+    }
+
+    public void setEntityCategoryLimitRaw(KeyCategoryId id, int limit) {
+        this.entityCategoryLimits.put(id, limit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getEntityCategoryLimits() {
+        return this.entityCategoryLimits.toCategoriesMap(plugin.getSettings().getEntityCategoriesMapping(), false);
+    }
+
+    @Override
     public Island.Builder setEntityLimit(Key entity, int limit) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
         this.entityLimits.put(entity, limit <= IslandUpgradeConstants.SYNCED_VALUE ? IntValue.syncedFixed(limit) : IntValue.fixed(limit));
@@ -611,7 +653,11 @@ public class IslandBuilderImpl implements Island.Builder {
         Iterator<Int2ObjectMapView.Entry<IntValue>> iterator = this.roleLimits.entryIterator();
         while (iterator.hasNext()) {
             Int2ObjectMapView.Entry<IntValue> entry = iterator.next();
-            roleLimits.put(plugin.getRoles().getPlayerRoleFromId(entry.getKey()), entry.getValue().get());
+            PlayerRole playerRole = plugin.getRoles().getPlayerRoleFromId(entry.getKey());
+
+            if (playerRole != null) {
+                roleLimits.put(playerRole, entry.getValue().get());
+            }
         }
 
         return Collections.unmodifiableMap(roleLimits);

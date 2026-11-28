@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.service.region.RegionManagerService;
@@ -263,6 +264,20 @@ public class StackedBlocksInteractionServiceImpl implements StackedBlocksInterac
                 if (islandBlockLimit.compareTo(BigInteger.ZERO) >= 0 &&
                         islandBlockCount.add(amountToDepositBig).compareTo(islandBlockLimit) > 0) {
                     amountToDeposit = islandBlockLimit.subtract(islandBlockCount).intValue();
+                }
+            }
+
+            // We ensure we do not exceed the limits of the block's categories
+            for (KeyCategory blockCategory : plugin.getSettings().getBlockCategoriesMapping().getCategories(blockKey)) {
+                int blockCategoryLimit = island.getBlockCategoryLimit(blockCategory);
+                if (blockCategoryLimit < 0) {
+                    continue;
+                }
+
+                BigInteger blockCategoryRemaining = BigInteger.valueOf(blockCategoryLimit)
+                        .subtract(island.getBlocksTracker().getBlockCategoryCount(blockCategory));
+                if (blockCategoryRemaining.compareTo(BigInteger.valueOf(amountToDeposit)) < 0) {
+                    amountToDeposit = blockCategoryRemaining.max(BigInteger.ZERO).intValue();
                 }
             }
         }

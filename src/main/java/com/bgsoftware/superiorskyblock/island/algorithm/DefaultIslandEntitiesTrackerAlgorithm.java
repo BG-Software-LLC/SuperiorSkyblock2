@@ -1,21 +1,27 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.common.annotations.Nullable;
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChunkFlags;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.Counter;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.types.EntityTypeKey;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.upgrade.IslandUpgradeConstants;
 import com.google.common.base.Preconditions;
@@ -24,6 +30,7 @@ import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +44,11 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final KeyMap<Integer> entityCounts = KeyMaps.createConcurrentHashMap(KeyIndicator.ENTITY_TYPE);
+    private final Synchronized<EnumerateMap<KeyCategoryId, Integer>> categoryCounts =
+            Synchronized.of(new EnumerateMap<>(KeyCategoryId.values()));
+    // The mapper the category counts were built with. When it changes (reload), the counts are rebuilt.
+    @Nullable
+    private volatile SettingsManager.CategoriesMapper countedMapper = null;
 
     private final Island island;
 
@@ -68,8 +80,13 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             return false;
         }
 
-        int currentAmount = entityCounts.getOrDefault(key, 0);
-        entityCounts.put(key, currentAmount + amount);
+        this.categoryCounts.write(counts -> {
+            this.entityCounts.put(key, this.entityCounts.getOrDefault(key, 0) + amount);
+
+            SettingsManager.CategoriesMapper mapper = plugin.getSettings().getEntityCategoriesMapping();
+            if (mapper == this.countedMapper)
+                addToCategories(counts, mapper, key, amount);
+        });
 
         Log.debugResult(Debug.ENTITY_SPAWN, "Return", "Success");
 
@@ -97,15 +114,22 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             return false;
         }
 
-        int currentAmount = entityCounts.getOrDefault(key, -1);
+        this.categoryCounts.write(counts -> {
+            int currentAmount = this.entityCounts.getOrDefault(key, -1);
+            if (currentAmount == -1)
+                return;
 
-        if (currentAmount != -1) {
-            if (currentAmount > amount) {
-                entityCounts.put(key, currentAmount - amount);
-            } else {
-                entityCounts.remove(key);
-            }
-        }
+            int removed = Math.min(currentAmount, amount);
+
+            if (currentAmount > amount)
+                this.entityCounts.put(key, currentAmount - amount);
+            else
+                this.entityCounts.remove(key);
+
+            SettingsManager.CategoriesMapper mapper = plugin.getSettings().getEntityCategoriesMapping();
+            if (mapper == this.countedMapper)
+                addToCategories(counts, mapper, key, -removed);
+        });
 
         Log.debugResult(Debug.ENTITY_DESPAWN, "Return", "Success");
 
@@ -123,8 +147,56 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     }
 
     @Override
+    public int getEntityCategoryCount(KeyCategory entityCategory) {
+        Preconditions.checkNotNull(entityCategory, "entityCategory parameter cannot be null.");
+
+        KeyCategoryId id = KeyCategoryId.of(entityCategory);
+        if (id == null)
+            return 0;
+
+        // Fast path: counts are up to date, so read under the read lock. On a mismatch (or a race with a
+        // mapping change) fall back to the write path, which rebuilds the counts.
+        Integer result = this.categoryCounts.readAndGet(counts ->
+                plugin.getSettings().getEntityCategoriesMapping() == this.countedMapper ? counts.getOrDefault(id, 0) : null);
+        if (result != null)
+            return result;
+
+        return this.categoryCounts.writeAndGet(counts -> {
+            ensureCategoryCounts(counts);
+            return counts.getOrDefault(id, 0);
+        });
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getEntityCategoryCounts() {
+        return this.categoryCounts.writeAndGet(counts -> {
+            ensureCategoryCounts(counts);
+
+            if (counts.isEmpty())
+                return Collections.<KeyCategory, Integer>emptyMap();
+
+            Map<KeyCategory, Integer> result = new LinkedHashMap<>();
+            for (KeyCategory category : plugin.getSettings().getEntityCategoriesMapping().getCategories()) {
+                KeyCategoryId id = KeyCategoryId.of(category);
+                if (id == null)
+                    continue;
+                int count = counts.getOrDefault(id, 0);
+                if (count > 0)
+                    result.put(category, count);
+            }
+
+            return Collections.unmodifiableMap(result);
+        });
+    }
+
+    @Override
     public void clearEntityCounts() {
-        this.entityCounts.clear();
+        this.categoryCounts.write(counts -> {
+            this.entityCounts.clear();
+            counts.clear();
+            // Force a rebuild on next access.
+            this.countedMapper = null;
+        });
     }
 
     @Override
@@ -172,9 +244,14 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                     clearEntityCounts();
 
                     if (!recalculatedEntityCounts.isEmpty()) {
-                        recalculatedEntityCounts.forEach((entity, count) -> {
-                            Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), entity, count.get());
-                            this.entityCounts.put(entity, count.get());
+                        this.categoryCounts.write(counts -> {
+                            recalculatedEntityCounts.forEach((entity, count) -> {
+                                Log.debug(Debug.ENTITY_SPAWN, island.getOwner().getName(), entity, count.get());
+                                this.entityCounts.put(entity, count.get());
+                            });
+                            // Rebuilt from the exact counts on next access.
+                            counts.clear();
+                            this.countedMapper = null;
                         });
                     }
                 } finally {
@@ -196,7 +273,11 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     }
 
     private boolean canTrackEntity(Key key) {
-        if (island.getEntityLimit(key) != IslandUpgradeConstants.NO_LIMIT_VALUE)
+        if (island.getEntityLimit(key) != IslandUpgradeConstants.NO_LIMIT_VALUE) {
+            return true;
+        }
+
+        if (hasEntityCategoryLimit(key))
             return true;
 
         if (key instanceof EntityTypeKey) {
@@ -216,6 +297,44 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
         }
 
         return trackableEntities.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(trackableEntities);
+    }
+
+    private boolean hasEntityCategoryLimit(Key key) {
+        for (KeyCategory category : plugin.getSettings().getEntityCategoriesMapping().getCategories(key)) {
+            if (island.getEntityCategoryLimit(category) != IslandUpgradeConstants.NO_LIMIT_VALUE)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static void addToCategories(EnumerateMap<KeyCategoryId, Integer> counts,
+                                        SettingsManager.CategoriesMapper mapper, Key key, int delta) {
+        for (KeyCategory category : mapper.getCategories(key)) {
+            KeyCategoryId id = KeyCategoryId.of(category);
+            if (id == null)
+                continue;
+
+            int value = counts.getOrDefault(id, 0) + delta;
+            if (value <= 0) {
+                // EnumerateMap#remove corrupts the size when the slot is empty.
+                if (counts.containsKey(id))
+                    counts.remove(id);
+            } else {
+                counts.put(id, value);
+            }
+        }
+    }
+
+    // Call only inside categoryCounts.write / writeAndGet.
+    private void ensureCategoryCounts(EnumerateMap<KeyCategoryId, Integer> counts) {
+        SettingsManager.CategoriesMapper mapper = plugin.getSettings().getEntityCategoriesMapping();
+        if (mapper == this.countedMapper)
+            return;
+
+        counts.clear();
+        this.entityCounts.forEach((key, count) -> addToCategories(counts, mapper, key, count));
+        this.countedMapper = mapper;
     }
 
 }

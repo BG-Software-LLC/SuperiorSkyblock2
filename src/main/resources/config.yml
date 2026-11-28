@@ -55,6 +55,20 @@ default-values:
   block-limits:
     HOPPER: 8
 
+  # Set the default block category limits of all islands.
+  # The following example will set a limit of 100 Valuable Blocks in islands:
+  #   block-category-limits:
+  #     VALUABLE_BLOCKS: 100
+  # You can manage block categories in the block-categories.yml file.
+  block-category-limits: {}
+
+  # Set the default entity category limits of all islands.
+  # The following example will set a limit of 10 Monsters in islands:
+  #   entity-category-limits:
+  #     MONSTER: 10
+  # You can manage entity categories in the entity-categories.yml file.
+  entity-category-limits: {}
+
   # Set the default entity limits of all islands.
   # The following example will set a limit of 4 Minecarts in islands:
   #   entity-limits:

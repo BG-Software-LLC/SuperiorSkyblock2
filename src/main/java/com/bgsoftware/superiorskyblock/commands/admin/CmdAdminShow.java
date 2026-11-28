@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -186,10 +187,24 @@ public class CmdAdminShow implements IAdminIslandCommand {
                         Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE);
             }
 
+            // Island entity categories limits
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
+                collectIslandData(superiorPlayer, locale, island::getEntityCategoryLimits, island::getCustomEntityCategoryLimits,
+                        Message.ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS, Message.ISLAND_INFO_ADMIN_ENTITY_CATEGORIES_LIMITS_LINE,
+                        KeyCategory::getName);
+            }
+
             // Island block limits
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
                 collectIslandLimits(superiorPlayer, locale, island::getBlocksLimits, island::getExactBlockLimitRaw,
                         Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS, Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE);
+            }
+
+            // Island block categories limits
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
+                collectIslandData(superiorPlayer, locale, island::getBlockCategoryLimits, island::getCustomBlockCategoryLimits,
+                        Message.ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS, Message.ISLAND_INFO_ADMIN_BLOCK_CATEGORIES_LIMITS_LINE,
+                        KeyCategory::getName);
             }
         }
 

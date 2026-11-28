@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandBankDepositEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankWithdrawEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeBankLimitEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeBlockCategoryLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeBlockLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeBorderSizeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeCoopLimitEvent;
@@ -16,6 +17,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandChangeCropGrowthEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeDescriptionEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeDiscordEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeEffectLevelEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeEntityCategoryLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeEntityLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeGeneratorRateEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
@@ -64,8 +66,10 @@ import com.bgsoftware.superiorskyblock.api.events.IslandOpenEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandOpenWarpEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRateEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandRemoveBlockCategoryLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRemoveBlockLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRemoveEffectEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandRemoveEntityCategoryLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRemoveEntityLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRemoveGeneratorRateEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRemoveRatingEvent;
@@ -131,6 +135,7 @@ import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.I
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandBankWithdraw;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandBiomeChange;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeBankLimit;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeBlockCategoryLimit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeBlockLimit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeBorderSize;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeCoopLimit;
@@ -138,6 +143,7 @@ import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.I
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeDescription;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeDiscord;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeEffectLevel;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeEntityCategoryLimit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeEntityLimit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeGeneratorRate;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandChangeLevelBonus;
@@ -186,8 +192,10 @@ import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.I
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandOpenWarp;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandQuit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandRate;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandRemoveBlockCategoryLimit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandRemoveBlockLimit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandRemoveEffect;
+import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandRemoveEntityCategoryLimit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandRemoveEntityLimit;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandRemoveGeneratorRate;
 import static com.bgsoftware.superiorskyblock.core.events.args.PluginEventArgs.IslandRemoveRating;
@@ -335,6 +343,18 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
             pluginEvent.getArgs().bankLimit = ((IslandChangeBankLimitEvent) bukkitEvent).getBankLimit();
         }
     };
+    public static final PluginEventType<IslandChangeBlockCategoryLimit> ISLAND_CHANGE_BLOCK_CATEGORY_LIMIT_EVENT = new PluginEventType<IslandChangeBlockCategoryLimit>(IslandChangeBlockCategoryLimitEvent.class) {
+        @Override
+        public Event createBukkitEvent(IslandChangeBlockCategoryLimit args) {
+            return new IslandChangeBlockCategoryLimitEvent(args.superiorPlayer, args.island, args.blockCategory, args.blockCategoryLimit);
+        }
+
+        @Override
+        public void applyBukkitToPluginEvent(Event bukkitEvent, PluginEvent<IslandChangeBlockCategoryLimit> pluginEvent) {
+            super.applyBukkitToPluginEvent(bukkitEvent, pluginEvent);
+            pluginEvent.getArgs().blockCategoryLimit = ((IslandChangeBlockCategoryLimitEvent) bukkitEvent).getBlockCategoryLimit();
+        }
+    };
     public static final PluginEventType<IslandChangeBlockLimit> ISLAND_CHANGE_BLOCK_LIMIT_EVENT = new PluginEventType<IslandChangeBlockLimit>(IslandChangeBlockLimitEvent.class) {
         @Override
         public Event createBukkitEvent(IslandChangeBlockLimit args) {
@@ -417,6 +437,18 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
         public void applyBukkitToPluginEvent(Event bukkitEvent, PluginEvent<IslandChangeEffectLevel> pluginEvent) {
             super.applyBukkitToPluginEvent(bukkitEvent, pluginEvent);
             pluginEvent.getArgs().effectLevel = ((IslandChangeEffectLevelEvent) bukkitEvent).getEffectLevel();
+        }
+    };
+    public static final PluginEventType<IslandChangeEntityCategoryLimit> ISLAND_CHANGE_ENTITY_CATEGORY_LIMIT_EVENT = new PluginEventType<IslandChangeEntityCategoryLimit>(IslandChangeEntityCategoryLimitEvent.class) {
+        @Override
+        public Event createBukkitEvent(IslandChangeEntityCategoryLimit args) {
+            return new IslandChangeEntityCategoryLimitEvent(args.superiorPlayer, args.island, args.entityCategory, args.entityCategoryLimit);
+        }
+
+        @Override
+        public void applyBukkitToPluginEvent(Event bukkitEvent, PluginEvent<IslandChangeEntityCategoryLimit> pluginEvent) {
+            super.applyBukkitToPluginEvent(bukkitEvent, pluginEvent);
+            pluginEvent.getArgs().entityCategoryLimit = ((IslandChangeEntityCategoryLimitEvent) bukkitEvent).getEntityCategoryLimit();
         }
     };
     public static final PluginEventType<IslandChangeEntityLimit> ISLAND_CHANGE_ENTITY_LIMIT_EVENT = new PluginEventType<IslandChangeEntityLimit>(IslandChangeEntityLimitEvent.class) {
@@ -845,6 +877,12 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
             return new IslandRateEvent(args.superiorPlayer, args.ratingPlayer, args.island, args.rating);
         }
     };
+    public static final PluginEventType<IslandRemoveBlockCategoryLimit> ISLAND_REMOVE_BLOCK_CATEGORY_LIMIT_EVENT = new PluginEventType<IslandRemoveBlockCategoryLimit>(IslandRemoveBlockCategoryLimitEvent.class) {
+        @Override
+        public Event createBukkitEvent(IslandRemoveBlockCategoryLimit args) {
+            return new IslandRemoveBlockCategoryLimitEvent(args.superiorPlayer, args.island, args.blockCategory);
+        }
+    };
     public static final PluginEventType<IslandRemoveBlockLimit> ISLAND_REMOVE_BLOCK_LIMIT_EVENT = new PluginEventType<IslandRemoveBlockLimit>(IslandRemoveBlockLimitEvent.class) {
         @Override
         public Event createBukkitEvent(IslandRemoveBlockLimit args) {
@@ -855,6 +893,12 @@ public abstract class PluginEventType<Args extends PluginEventArgs> extends Even
         @Override
         public Event createBukkitEvent(IslandRemoveEffect args) {
             return new IslandRemoveEffectEvent(args.superiorPlayer, args.island, args.effectType);
+        }
+    };
+    public static final PluginEventType<IslandRemoveEntityCategoryLimit> ISLAND_REMOVE_ENTITY_CATEGORY_LIMIT_EVENT = new PluginEventType<IslandRemoveEntityCategoryLimit>(IslandRemoveEntityCategoryLimitEvent.class) {
+        @Override
+        public Event createBukkitEvent(IslandRemoveEntityCategoryLimit args) {
+            return new IslandRemoveEntityCategoryLimitEvent(args.superiorPlayer, args.island, args.entityCategory);
         }
     };
     public static final PluginEventType<IslandRemoveEntityLimit> ISLAND_REMOVE_ENTITY_LIMIT_EVENT = new PluginEventType<IslandRemoveEntityLimit>(IslandRemoveEntityLimitEvent.class) {

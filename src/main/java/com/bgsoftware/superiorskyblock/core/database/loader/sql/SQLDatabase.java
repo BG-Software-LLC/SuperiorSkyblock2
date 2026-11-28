@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v1.Datab
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v2.DatabaseUpgrade_V2;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v3.DatabaseUpgrade_V3;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v4.DatabaseUpgrade_V4;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.upgrade.v5.DatabaseUpgrade_V5;
 import com.bgsoftware.superiorskyblock.core.database.sql.DBSession;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableBoolean;
 import com.bgsoftware.superiorskyblock.core.mutable.MutableInt;
@@ -20,7 +21,8 @@ public class SQLDatabase {
             DatabaseUpgrade_V1.INSTANCE,
             DatabaseUpgrade_V2.INSTANCE,
             DatabaseUpgrade_V3.INSTANCE,
-            DatabaseUpgrade_V4.INSTANCE
+            DatabaseUpgrade_V4.INSTANCE,
+            DatabaseUpgrade_V5.INSTANCE
     };
 
     private SQLDatabase() {
@@ -144,6 +146,18 @@ public class SQLDatabase {
                 new Column("island", "UUID"),
                 new Column("effect_type", "UNIQUE_TEXT"),
                 new Column("level", "INTEGER")
+        );
+
+        DBSession.createTable("islands_entity_category_limits",
+                new Column("island", "UUID"),
+                new Column("entity_category", "UNIQUE_TEXT"),
+                new Column("`limit`", "INTEGER")
+        );
+
+        DBSession.createTable("islands_block_category_limits",
+                new Column("island", "UUID"),
+                new Column("block_category", "UNIQUE_TEXT"),
+                new Column("`limit`", "INTEGER")
         );
 
         DBSession.createTable("islands_entity_limits",

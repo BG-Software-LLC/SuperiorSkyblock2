@@ -192,6 +192,8 @@ permissions:
             description: Add a user to an island.
           superior.admin.addbanklimit:
             description: Increase the bank limit for another player's island.
+          superior.admin.addblockcategorylimit:
+            description: Increase block category limit for another player's island.
           superior.admin.addblocklimit:
             description: Increase block limit for another player's island.
           superior.admin.addbonus:
@@ -202,6 +204,8 @@ permissions:
             description: Increase the crop growth multiplier for another player's island.
           superior.admin.addeffect:
             description: Add an island effect for another player's island.
+          superior.admin.addentitycategorylimit:
+            description: Increase entity category limit for another player's island.
           superior.admin.addentitylimit:
             description: Increase entity limit for another player's island.
           superior.admin.addgenerator:
@@ -284,10 +288,14 @@ permissions:
             description: Re-calculates the worth of an island.
           superior.admin.reload:
             description: Reload all configurations and tasks of the plugin.
+          superior.admin.removeblockcategorylimit:
+            description: Remove a block category limit for an island.
           superior.admin.removeblocklimit:
             description: Remove a block limit for an island.
           superior.admin.removeeffect:
             description: Remove an effect for an island.
+          superior.admin.removeentitycategorylimit:
+            description: Remove an entity category limit for an island.
           superior.admin.removeentitylimit:
             description: Remove an entity limit for an island.
           superior.admin.removegenerator:
@@ -310,6 +318,8 @@ permissions:
             description: Set the biome of an island.
           superior.admin.setblockamount:
             description: Set the block amount in a specific location.
+          superior.admin.setblockcategorylimit:
+            description: Set block category limit for another player's island.
           superior.admin.setblocklimit:
             description: Set block limit for another player's island.
           superior.admin.setchestrow:
@@ -322,6 +332,8 @@ permissions:
             description: Set a player's amount of island disbands.
           superior.admin.seteffect:
             description: Set the island effect level of another player's island.
+          superior.admin.setentitycategorylimit:
+            description: Set entity category limit for another player's island.
           superior.admin.setentitylimit:
             description: Set entity limit for another player's island.
           superior.admin.setgenerator:

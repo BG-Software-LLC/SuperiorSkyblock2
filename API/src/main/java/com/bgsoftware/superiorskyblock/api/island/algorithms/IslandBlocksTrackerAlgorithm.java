@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island.algorithms;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -45,6 +46,28 @@ public interface IslandBlocksTrackerAlgorithm {
      * Get all the blocks that are on the island.
      */
     Map<Key, BigInteger> getBlockCounts();
+
+    /**
+     * Get block counts by the exact key each block was placed with, without value-key, limit-key or global-key aggregation.
+     * These are the counts stored in the database.
+     */
+    Map<Key, BigInteger> getIndividualBlockCounts();
+
+    /**
+     * Get the amount of blocks that are on the island and belong to a block category.
+     * Counted from individual block counts; only blocks with a worth, a limit, a values-menu entry
+     * or a limited category are counted.
+     *
+     * @param blockCategory The block category to check.
+     */
+    BigInteger getBlockCategoryCount(KeyCategory blockCategory);
+
+    /**
+     * Get the amount of blocks that are on the island for each block category.
+     * Counted from individual block counts; only blocks with a worth, a limit, a values-menu entry
+     * or a limited category are counted.
+     */
+    Map<KeyCategory, BigInteger> getBlockCategoryCounts();
 
     /**
      * Clear all the block counts of the island.

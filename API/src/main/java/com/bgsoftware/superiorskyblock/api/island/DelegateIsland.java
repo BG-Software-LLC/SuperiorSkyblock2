@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
@@ -1551,6 +1552,76 @@ public class DelegateIsland implements Island {
     @Override
     public boolean hasReachedBlockLimit(Key key, @Size int amount) {
         return this.handle.hasReachedBlockLimit(key, amount);
+    }
+
+    @Override
+    public int getBlockCategoryLimit(KeyCategory blockCategory) {
+        return this.handle.getBlockCategoryLimit(blockCategory);
+    }
+
+    @Override
+    public int getBlockCategoryLimitRaw(KeyCategory blockCategory) {
+        return this.handle.getBlockCategoryLimitRaw(blockCategory);
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getBlockCategoryLimits() {
+        return this.handle.getBlockCategoryLimits();
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getCustomBlockCategoryLimits() {
+        return this.handle.getCustomBlockCategoryLimits();
+    }
+
+    @Override
+    public void clearBlockCategoryLimits() {
+        this.handle.clearBlockCategoryLimits();
+    }
+
+    @Override
+    public void setBlockCategoryLimit(KeyCategory blockCategory, int limit) {
+        this.handle.setBlockCategoryLimit(blockCategory, limit);
+    }
+
+    @Override
+    public void removeBlockCategoryLimit(KeyCategory blockCategory) {
+        this.handle.removeBlockCategoryLimit(blockCategory);
+    }
+
+    @Override
+    public int getEntityCategoryLimit(KeyCategory entityCategory) {
+        return this.handle.getEntityCategoryLimit(entityCategory);
+    }
+
+    @Override
+    public int getEntityCategoryLimitRaw(KeyCategory entityCategory) {
+        return this.handle.getEntityCategoryLimitRaw(entityCategory);
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getEntityCategoryLimits() {
+        return this.handle.getEntityCategoryLimits();
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getCustomEntityCategoryLimits() {
+        return this.handle.getCustomEntityCategoryLimits();
+    }
+
+    @Override
+    public void clearEntityCategoryLimits() {
+        this.handle.clearEntityCategoryLimits();
+    }
+
+    @Override
+    public void setEntityCategoryLimit(KeyCategory entityCategory, int limit) {
+        this.handle.setEntityCategoryLimit(entityCategory, limit);
+    }
+
+    @Override
+    public void removeEntityCategoryLimit(KeyCategory entityCategory) {
+        this.handle.removeEntityCategoryLimit(entityCategory);
     }
 
     @Override

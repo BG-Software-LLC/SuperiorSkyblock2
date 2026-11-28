@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island.algorithm;
 
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 
 import java.math.BigInteger;
 import java.util.Collections;
@@ -40,6 +41,21 @@ public class SpawnIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerAlg
 
     @Override
     public Map<Key, BigInteger> getBlockCounts() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<Key, BigInteger> getIndividualBlockCounts() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public BigInteger getBlockCategoryCount(KeyCategory blockCategory) {
+        return BigInteger.ZERO;
+    }
+
+    @Override
+    public Map<KeyCategory, BigInteger> getBlockCategoryCounts() {
         return Collections.emptyMap();
     }
 

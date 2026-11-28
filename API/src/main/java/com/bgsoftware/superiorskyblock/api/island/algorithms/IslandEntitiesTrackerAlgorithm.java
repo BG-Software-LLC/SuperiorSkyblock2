@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island.algorithms;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 
 import java.util.Map;
 
@@ -35,6 +36,18 @@ public interface IslandEntitiesTrackerAlgorithm {
      * Get all the entities that are on the island.
      */
     Map<Key, Integer> getEntitiesCounts();
+
+    /**
+     * Get the amount of entities that are on the island.
+     *
+     * @param entityCategory The entity category to check.
+     */
+    int getEntityCategoryCount(KeyCategory entityCategory);
+
+    /**
+     * Get all the entities that are on the island.
+     */
+    Map<KeyCategory, Integer> getEntityCategoryCounts();
 
     /**
      * Clear all the entity counts of the island.

@@ -4,6 +4,7 @@ import com.bgsoftware.common.annotations.Nullable;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
@@ -148,6 +149,21 @@ public class PluginEventsFactory {
         return fireEvent(ISLAND_CHANGE_BANK_LIMIT_EVENT, islandChangeBankLimit);
     }
 
+    public static PluginEvent<IslandChangeBlockCategoryLimit> callIslandChangeBlockCategoryLimitEvent(Island island, CommandSender commandSender,
+                                                                                                      KeyCategory blockCategory, int blockCategoryLimit) {
+        return callIslandChangeBlockCategoryLimitEvent(island, commandSenderToSuperiorPlayer(commandSender), blockCategory, blockCategoryLimit);
+    }
+
+    public static PluginEvent<IslandChangeBlockCategoryLimit> callIslandChangeBlockCategoryLimitEvent(Island island, @Nullable SuperiorPlayer superiorPlayer,
+                                                                                                      KeyCategory blockCategory, int blockCategoryLimit) {
+        IslandChangeBlockCategoryLimit islandChangeBlockCategoryLimit = new IslandChangeBlockCategoryLimit();
+        islandChangeBlockCategoryLimit.island = island;
+        islandChangeBlockCategoryLimit.superiorPlayer = superiorPlayer;
+        islandChangeBlockCategoryLimit.blockCategory = blockCategory;
+        islandChangeBlockCategoryLimit.blockCategoryLimit = blockCategoryLimit;
+        return fireEvent(ISLAND_CHANGE_BLOCK_CATEGORY_LIMIT_EVENT, islandChangeBlockCategoryLimit);
+    }
+
     public static PluginEvent<IslandChangeBlockLimit> callIslandChangeBlockLimitEvent(Island island, CommandSender commandSender, Key block, int blockLimit) {
         return callIslandChangeBlockLimitEvent(island, commandSenderToSuperiorPlayer(commandSender), block, blockLimit);
     }
@@ -226,6 +242,21 @@ public class PluginEventsFactory {
         islandChangeEffectLevel.effectType = effectType;
         islandChangeEffectLevel.effectLevel = effectLevel;
         return fireEvent(ISLAND_CHANGE_EFFECT_LEVEL_EVENT, islandChangeEffectLevel);
+    }
+
+    public static PluginEvent<IslandChangeEntityCategoryLimit> callIslandChangeEntityCategoryLimitEvent(Island island, CommandSender commandSender,
+                                                                                                             KeyCategory entityCategory, int entityCategoryLimit) {
+        return callIslandChangeEntityCategoryLimitEvent(island, commandSenderToSuperiorPlayer(commandSender), entityCategory, entityCategoryLimit);
+    }
+
+    public static PluginEvent<IslandChangeEntityCategoryLimit> callIslandChangeEntityCategoryLimitEvent(Island island, @Nullable SuperiorPlayer superiorPlayer,
+                                                                                                        KeyCategory entityCategory, int entityCategoryLimit) {
+        IslandChangeEntityCategoryLimit islandChangeEntityCategoryLimit = new IslandChangeEntityCategoryLimit();
+        islandChangeEntityCategoryLimit.island = island;
+        islandChangeEntityCategoryLimit.superiorPlayer = superiorPlayer;
+        islandChangeEntityCategoryLimit.entityCategory = entityCategory;
+        islandChangeEntityCategoryLimit.entityCategoryLimit = entityCategoryLimit;
+        return fireEvent(ISLAND_CHANGE_ENTITY_CATEGORY_LIMIT_EVENT, islandChangeEntityCategoryLimit);
     }
 
     public static PluginEvent<IslandChangeEntityLimit> callIslandChangeEntityLimitEvent(Island island, CommandSender commandSender,
@@ -742,6 +773,18 @@ public class PluginEventsFactory {
         return !fireEvent(ISLAND_RATE_EVENT, islandRate).isCancelled();
     }
 
+    public static boolean callIslandRemoveBlockCategoryLimitEvent(Island island, CommandSender commandSender, KeyCategory blockCategory) {
+        return callIslandRemoveBlockCategoryLimitEvent(island, commandSenderToSuperiorPlayer(commandSender), blockCategory);
+    }
+
+    public static boolean callIslandRemoveBlockCategoryLimitEvent(Island island, @Nullable SuperiorPlayer superiorPlayer, KeyCategory blockCategory) {
+        IslandRemoveBlockCategoryLimit islandRemoveBlockCategoryLimit = new IslandRemoveBlockCategoryLimit();
+        islandRemoveBlockCategoryLimit.island = island;
+        islandRemoveBlockCategoryLimit.superiorPlayer = superiorPlayer;
+        islandRemoveBlockCategoryLimit.blockCategory = blockCategory;
+        return !fireEvent(ISLAND_REMOVE_BLOCK_CATEGORY_LIMIT_EVENT, islandRemoveBlockCategoryLimit).isCancelled();
+    }
+
     public static boolean callIslandRemoveBlockLimitEvent(Island island, CommandSender commandSender, Key block) {
         return callIslandRemoveBlockLimitEvent(island, commandSenderToSuperiorPlayer(commandSender), block);
     }
@@ -764,6 +807,18 @@ public class PluginEventsFactory {
         islandRemoveEffect.superiorPlayer = superiorPlayer;
         islandRemoveEffect.effectType = effectType;
         return !fireEvent(ISLAND_REMOVE_EFFECT_EVENT, islandRemoveEffect).isCancelled();
+    }
+
+    public static boolean callIslandRemoveEntityCategoryLimitEvent(Island island, CommandSender commandSender, KeyCategory entityCategory) {
+        return callIslandRemoveEntityCategoryLimitEvent(island, commandSenderToSuperiorPlayer(commandSender), entityCategory);
+    }
+
+    public static boolean callIslandRemoveEntityCategoryLimitEvent(Island island, @Nullable SuperiorPlayer superiorPlayer, KeyCategory entityCategory) {
+        IslandRemoveEntityCategoryLimit islandRemoveEntityCategoryLimit = new IslandRemoveEntityCategoryLimit();
+        islandRemoveEntityCategoryLimit.island = island;
+        islandRemoveEntityCategoryLimit.superiorPlayer = superiorPlayer;
+        islandRemoveEntityCategoryLimit.entityCategory = entityCategory;
+        return !fireEvent(ISLAND_REMOVE_ENTITY_CATEGORY_LIMIT_EVENT, islandRemoveEntityCategoryLimit).isCancelled();
     }
 
     public static boolean callIslandRemoveEntityLimitEvent(Island island, CommandSender commandSender, Key entity) {

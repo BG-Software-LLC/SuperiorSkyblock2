@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.world.Dimension;
@@ -29,6 +30,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -276,14 +278,32 @@ public class IslandsDeserializer {
         if (Text.isBlank(blocks))
             return;
 
-        JsonArray blockCounts = GSON.fromJson(blocks, JsonArray.class);
+        JsonElement blockCounts = GSON.fromJson(blocks, JsonElement.class);
 
-        blockCounts.forEach(blockCountElement -> {
-            JsonObject blockCountObject = blockCountElement.getAsJsonObject();
-            Key blockKey = Keys.ofMaterialAndData(blockCountObject.get("id").getAsString());
-            BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
-            builder.setBlockCount(blockKey, amount);
-        });
+        if (blockCounts.isJsonObject()) {
+            // Individual counts: {"<key>": <amount>}
+            blockCounts.getAsJsonObject().entrySet().forEach(blockCountEntry -> {
+                Key blockKey = Keys.ofMaterialAndData(blockCountEntry.getKey());
+                BigInteger amount = blockCountEntry.getValue().getAsBigInteger();
+                builder.setBlockCount(blockKey, amount);
+            });
+        } else if (blockCounts.isJsonArray()) {
+            // Legacy aggregated counts: [{"id": "<key>", "amount": "<amount>"}].
+            // They are converted to individual counts when the island is loaded.
+            JsonArray legacyBlockCounts = blockCounts.getAsJsonArray();
+
+            if (legacyBlockCounts.size() > 0)
+                ((IslandBuilderImpl) builder).legacyBlockCounts = true;
+
+            legacyBlockCounts.forEach(blockCountElement -> {
+                JsonObject blockCountObject = blockCountElement.getAsJsonObject();
+                Key blockKey = Keys.ofMaterialAndData(blockCountObject.get("id").getAsString());
+                BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
+                builder.setBlockCount(blockKey, amount);
+            });
+        } else {
+            Log.warn("Cannot load block counts with an invalid format: ", blocks, ", skipping...");
+        }
     }
 
     public static void deserializeEntityCounts(Island.Builder builder, String entities) {
@@ -353,6 +373,60 @@ public class IslandsDeserializer {
 
             Island.Builder builder = lookupIsland(databaseCache, uuid.get(), "islands_block_limits");
             builder.setBlockLimit(block.get(), limit.get());
+        });
+    }
+
+    public static void deserializeEntityCategoryLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
+        databaseBridge.loadAllObjects("islands_entity_category_limits", entityCategoryLimitsRow -> {
+            DatabaseResult entityCategoryLimits = new DatabaseResult(entityCategoryLimitsRow);
+
+            Optional<UUID> uuid = entityCategoryLimits.getUUID("island");
+            if (!uuid.isPresent()) {
+                Log.warn("Cannot load entity category limits for null islands, skipping...");
+                return;
+            }
+
+            Optional<String> entityCategory = entityCategoryLimits.getString("entity_category");
+            if (!entityCategory.isPresent()) {
+                Log.warn("Cannot load entity category limits for invalid categories on ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            Optional<Integer> limit = entityCategoryLimits.getInt("limit");
+            if (!limit.isPresent()) {
+                Log.warn("Cannot load entity category limits with invalid limits for ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            IslandBuilderImpl builder = (IslandBuilderImpl) lookupIsland(databaseCache, uuid.get(), "islands_entity_category_limits");
+            builder.setEntityCategoryLimitRaw(KeyCategoryId.getOrRegister(entityCategory.get()), limit.get());
+        });
+    }
+
+    public static void deserializeBlockCategoryLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
+        databaseBridge.loadAllObjects("islands_block_category_limits", blockCategoryLimitsRow -> {
+            DatabaseResult blockCategoryLimits = new DatabaseResult(blockCategoryLimitsRow);
+
+            Optional<UUID> uuid = blockCategoryLimits.getUUID("island");
+            if (!uuid.isPresent()) {
+                Log.warn("Cannot load block category limits for null islands, skipping...");
+                return;
+            }
+
+            Optional<String> blockCategory = blockCategoryLimits.getString("block_category");
+            if (!blockCategory.isPresent()) {
+                Log.warn("Cannot load block category limits for invalid categories on ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            Optional<Integer> limit = blockCategoryLimits.getInt("limit");
+            if (!limit.isPresent()) {
+                Log.warn("Cannot load block category limits with invalid limits for ", uuid.get(), ", skipping...");
+                return;
+            }
+
+            IslandBuilderImpl builder = (IslandBuilderImpl) lookupIsland(databaseCache, uuid.get(), "islands_block_category_limits");
+            builder.setBlockCategoryLimitRaw(KeyCategoryId.getOrRegister(blockCategory.get()), limit.get());
         });
     }
 

@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.api.island.cache.IslandCache;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
@@ -1718,6 +1719,76 @@ public class SpawnIsland implements Island {
     @Override
     public boolean hasReachedBlockLimit(Key key, @Size int amount) {
         return false;
+    }
+
+    @Override
+    public int getBlockCategoryLimit(KeyCategory blockCategory) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public int getBlockCategoryLimitRaw(KeyCategory blockCategory) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getBlockCategoryLimits() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getCustomBlockCategoryLimits() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public void clearBlockCategoryLimits() {
+        // Do nothing.
+    }
+
+    @Override
+    public void setBlockCategoryLimit(KeyCategory blockCategory, int limit) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeBlockCategoryLimit(KeyCategory blockCategory) {
+        // Do nothing.
+    }
+
+    @Override
+    public int getEntityCategoryLimit(KeyCategory entityCategory) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public int getEntityCategoryLimitRaw(KeyCategory entityCategory) {
+        return IslandUpgradeConstants.NO_LIMIT_VALUE;
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getEntityCategoryLimits() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<KeyCategory, Integer> getCustomEntityCategoryLimits() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public void clearEntityCategoryLimits() {
+        // Do nothing.
+    }
+
+    @Override
+    public void setEntityCategoryLimit(KeyCategory entityCategory, int limit) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeEntityCategoryLimit(KeyCategory entityCategory) {
+        // Do nothing.
     }
 
     @Override

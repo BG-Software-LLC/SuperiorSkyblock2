@@ -27,6 +27,7 @@ import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.key.KeyIndicator;
 import com.bgsoftware.superiorskyblock.core.key.Keys;
+import com.bgsoftware.superiorskyblock.core.key.category.KeyCategoryId;
 import com.bgsoftware.superiorskyblock.core.key.map.KeyMaps;
 import com.bgsoftware.superiorskyblock.core.key.set.KeySets;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -83,6 +84,8 @@ public class SettingsContainer {
     public final String islandCommand;
     public final int defaultIslandSize;
     public final KeyMap<Integer> defaultBlockLimits;
+    public final Map<String, Integer> defaultBlockCategoryLimits;
+    public final Map<String, Integer> defaultEntityCategoryLimits;
     public final KeyMap<Integer> defaultEntityLimits;
     public final EnumerateMap<Dimension, Map<Key, Integer>> defaultGenerator;
     public final int defaultWarpsLimit;
@@ -275,6 +278,30 @@ public class SettingsContainer {
             }
         }
         this.defaultBlockLimits = KeyMaps.unmodifiableKeyMap(defaultBlockLimits);
+        Map<String, Integer> defaultBlockCategoryLimits = new ArrayMap<>();
+        if (config.isConfigurationSection("default-values.block-category-limits")) {
+            for (String blockCategoryName : config.getConfigurationSection("default-values.block-category-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.block-category-limits." + blockCategoryName);
+                if (limit >= 0) {
+                    String categoryName = blockCategoryName.toUpperCase(Locale.ENGLISH);
+                    KeyCategoryId.getOrRegister(categoryName);
+                    defaultBlockCategoryLimits.put(categoryName, limit);
+                }
+            }
+        }
+        this.defaultBlockCategoryLimits = Collections.unmodifiableMap(defaultBlockCategoryLimits);
+        Map<String, Integer> defaultEntityCategoryLimits = new ArrayMap<>();
+        if (config.isConfigurationSection("default-values.entity-category-limits")) {
+            for (String entityCategoryName : config.getConfigurationSection("default-values.entity-category-limits").getKeys(false)) {
+                int limit = config.getInt("default-values.entity-category-limits." + entityCategoryName);
+                if (limit >= 0) {
+                    String categoryName = entityCategoryName.toUpperCase(Locale.ENGLISH);
+                    KeyCategoryId.getOrRegister(categoryName);
+                    defaultEntityCategoryLimits.put(categoryName, limit);
+                }
+            }
+        }
+        this.defaultEntityCategoryLimits = Collections.unmodifiableMap(defaultEntityCategoryLimits);
         KeyMap<Integer> defaultEntityLimits = KeyMaps.createArrayMap(KeyIndicator.ENTITY_TYPE);
         if (config.isConfigurationSection("default-values.entity-limits")) {
             for (String entityName : config.getConfigurationSection("default-values.entity-limits").getKeys(false)) {

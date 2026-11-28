@@ -71,6 +71,12 @@ public class SQLDatabaseLoader extends MachineStateDatabaseLoader {
         DBSession.createIndex("islands_effects_index", "islands_effects",
                 "island", "effect_type");
 
+        DBSession.createIndex("entity_category_limits_index", "islands_entity_category_limits",
+                "island", "entity_category");
+
+        DBSession.createIndex("block_category_limits_index", "islands_block_category_limits",
+                "island", "block_category");
+
         DBSession.createIndex("entity_limits_index", "islands_entity_limits",
                 "island", "entity");
 
