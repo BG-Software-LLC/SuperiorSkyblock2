@@ -418,6 +418,10 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     }
 
+    public boolean isDimensionSchematic(String schematic) {
+        return this.schematicsContainer.isDimensionSchematic(schematic);
+    }
+
     public String getDefaultSchematic(Dimension dimension) {
         String suffix = "_" + dimension.getName().toLowerCase(Locale.ENGLISH);
         for (String schematicName : this.schematicsContainer.getSchematics().keySet()) {
