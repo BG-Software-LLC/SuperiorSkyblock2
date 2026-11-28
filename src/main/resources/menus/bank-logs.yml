@@ -60,7 +60,7 @@ items:
       name: '&6Switch Sorting Type'
       lore:
         - '&7Switch transaction logs sorting type.'
-        - '&7Sorting Type: &e{1}&7.'
+        - '&7Sorting Type: &eCreation time&7.'
         - ''
         - '{0}'
         - ''
@@ -72,7 +72,7 @@ items:
       name: '&6Switch Sorting Type'
       lore:
         - '&7Switch transaction logs sorting type.'
-        - '&7Sorting Type: &e{1}&7.'
+        - '&7Sorting Type: &eMoney&7.'
         - ''
         - '{0}'
         - ''

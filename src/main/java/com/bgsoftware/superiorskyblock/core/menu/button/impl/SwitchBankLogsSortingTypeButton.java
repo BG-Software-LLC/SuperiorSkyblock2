@@ -37,7 +37,6 @@ public class SwitchBankLogsSortingTypeButton extends AbstractMenuViewButton<Menu
 
         SortType sortingType = menuView.getSortingType();
         SortingButtonData data = getTemplate().buttons.get(sortingType);
-        String displayName = data == null ? (sortingType == null ? "" : sortingType.name()) : data.getDisplayName();
 
         if (data == null)
             data = getTemplate().buttons.values().iterator().next();
@@ -48,8 +47,6 @@ public class SwitchBankLogsSortingTypeButton extends AbstractMenuViewButton<Menu
         if (itemBuilder == null) {
             return null;
         }
-
-        itemBuilder.replaceAll("{1}", displayName);
 
         List<String> sortingTypes = new LinkedList<>();
 
